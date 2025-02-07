@@ -70,3 +70,9 @@
 
 
 
+#game_play_area {
+    background-image: url("img/board.jpg");
+    width: 1500px;
+    height: 759px;
+    background-size: 100% 100%;
+}
