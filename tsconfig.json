@@ -1,0 +1,36 @@
+{
+  "rootDir": ".", 
+  "compilerOptions": {
+    "target": "es5",
+    "module": "none",
+    "lib": ["dom", "esnext"],  
+    "sourceMap": false,
+    "outFile": "johncompany.js",
+    "removeComments": true
+  },
+  "files": [
+    "node_modules/bga-animations/src/animations.ts",
+    "node_modules/bga-animations/src/animations/attach-with-animation.ts",
+    "node_modules/bga-animations/src/animations/cumulated-animations.ts",
+    "node_modules/bga-animations/src/animations/show-screen-center-animation.ts",
+    "node_modules/bga-animations/src/animations/slide-to-animation.ts",
+    "node_modules/bga-animations/src/animations/slide-animation.ts",
+    "node_modules/bga-animations/src/animations/pause-animation.ts",
+    "node_modules/bga-animations/src/animations-utils.ts",
+    "node_modules/bga-animations/src/animation-manager.ts",
+    "src/core/counter.d.ts",
+    "src/core/define.ts",
+    "src/core/framework.d.ts",
+    "src/core/notification-manager/index.ts",
+    "src/core/states/ConfirmPartialTurn.ts",
+    "src/core/states/ConfirmTurn.ts",
+    "src/core/states/types.d.ts",
+    "src/core/utility.ts",
+    "src/johncompany.ts",
+    "src/johncompany.d.ts",
+    "src/constants.ts",
+    "src/logs/index.ts",
+    "src/logs/templates.ts",
+    "src/templates.ts"
+  ]
+}

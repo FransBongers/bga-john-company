@@ -1,78 +1,314 @@
-/**
+@charset "UTF-8";
+/*
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
- * JohnCompany implementation : © <Your name here> <Your email address here>
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  * -----
- *
- * johncompany.css
- *
- * JohnCompany stylesheet
- *
  */
-
-/*
-    This is the CSS stylesheet of your game User Interface.
-    
-    Styles defined on this file will be applied to the HTML elements you define in your
-    HTML template (johncompany_johncompany.tpl), and to HTML elements you create dynamically
-    (in johncompany.js).
-    
-    Usually, you are using CSS to:
-    
-    1°) define the overall layout of your game
-        (ex: place the board on the top left, place player's hand beside, place the deck on the right, ...).
-
-    2°) create your CSS-sprites:
-        All images of your games should be gathered into a small number of image files. Then, using
-        background-image and background-position CSS properties, you create HTML blocks that can 
-        display these images correctly (see example below).
-    
-    3°) ... anything else:
-        It is really easy to add and remove CSS classes dynamically from your Javascript with
-        dojo.addClass and dojo.removeClass. It is also easy to check if an element has a class
-        (dojo.hasClass) or to get all elements with a specific class (dojo.query). This is why,
-        very often, using CSS classes for the logic of your user interface allow you to do complex
-        thing easily.
-        
-        
-     Note: on the production platform, this file will be compressed and comments will be removed.
-           Consequently, don't hesitate to put as many comments as necessary.
-*/
-
-
-/* Note: you must not use any @import directive */
-
-
-/********* You can start writing your CSS below this line: **********/
-
-
-/*
-    Example of CSS sprites (a black token and a white token, 20x20px each, embedded in the same "tokens.png" 40x20px image):
-
-    .white_token {
-        background-image: url('img/tokens.png');
-        background-position: 0px 0px;
-    }
-    .black_token {
-        background-image: url('img/tokens.png');
-        background-position: -20px 0px;
-    }
-    .token {
-        width: 20px;
-        height: 20px;
-        background-repeat: none;
-    }
-*/
-
-
-
-
-#game_play_area {
-    background-image: url("img/board.jpg");
-    width: 1500px;
-    height: 759px;
-    background-size: 100% 100%;
+/* make space between buttons on touch devices */
+@media (hover: none) {
+  #page-title .action-button.bgabutton,
+  #page-title .bgabutton {
+    margin-bottom: 8px;
+    margin-top: 8px;
+  }
 }
+/* Hide the "You may note something for next time..." popup that would appear. */
+#turnBasedNotesIncent {
+  display: none;
+}
+
+/** Hide player is now online, player is now offline messages 
+* Note: requires setup of adding notif name as class
+* TODO: add name of function
+*/
+.notif_playerstatus {
+  display: none !important;
+}
+
+/* Prevent the game from scrolling while the game log or chat is visible on mobile. */
+body.chatbar_ontop {
+  overflow: hidden;
+}
+
+/* Add text shadows to player colors that require it */
+a[style*="color: #f9e08d"],
+a[style*="color:#f9e08d"],
+span[style*="color: #f9e08d"],
+span[style*="color:#f9e08d"],
+a[style*="color: #dbd9d6"],
+a[style*="color:#dbd9d6"],
+span[style*="color: #dbd9d6"],
+span[style*="color:#dbd9d6"],
+a[style*="color: #ffb1b9"],
+a[style*="color:#ffb1b9"],
+span[style*="color: #ffb1b9"],
+span[style*="color:#ffb1b9"],
+a[style*="color: #99dae9"],
+a[style*="color:#99dae9"],
+span[style*="color: #99dae9"],
+span[style*="color:#99dae9"],
+a[style*="color: #c7b4e1"],
+a[style*="color:#c7b4e1"],
+span[style*="color: #c7b4e1"],
+span[style*="color:#c7b4e1"],
+a[style*="color: #addb90"],
+a[style*="color:#addb90"],
+span[style*="color: #addb90"],
+span[style*="color:#addb90"] {
+  text-shadow: 1px 0 0 black, 0 1px 0 black, -1px 0 0 black, 0 -1px 0 black, 1px 1px 0 black, -1px 1px 0 black, 1px -1px 0 black, -1px -1px 0 black !important;
+}
+
+/* ------- UNDO TURN ------- */
+/* Cancelled notification messages */
+.log.cancel {
+  color: #c62828 !important;
+  text-decoration: line-through;
+}
+
+/* Desktop logs */
+.log.cancel .roundedbox {
+  background-color: rgba(240, 186, 117, 0.6) !important;
+}
+
+/* Mobile logs */
+.log.cancel.roundedbox {
+  background-color: #ef9a9a;
+}
+
+a[style*="color: #c0c0c0"],
+a[style*="color:#c0c0c0"],
+span[style*="color: #c0c0c0"],
+span[style*="color:#c0c0c0"] {
+  text-shadow: 1px 0 0 black, 0 1px 0 black, -1px 0 0 black, 0 -1px 0 black, 1px 1px 0 black, -1px 1px 0 black, 1px -1px 0 black, -1px -1px 0 black !important;
+}
+
+#logs .log.notif_newUndoableStep {
+  margin-top: 0px;
+}
+#logs .log.notif_newUndoableStep .roundedbox {
+  display: none;
+  text-align: center;
+  cursor: pointer;
+  background-color: #c4c2c2;
+  font-size: 12px;
+  padding: 2px 5px;
+}
+#logs .log.notif_newUndoableStep .roundedbox::before, #logs .log.notif_newUndoableStep .roundedbox::after {
+  content: "\f0e2";
+  font: normal normal normal 12px/1 FontAwesome;
+  margin: 0px 10px;
+}
+#logs .log.notif_newUndoableStep.selectable .roundedbox {
+  display: block;
+}
+
+.chatwindowlogs_zone .log.notif_newUndoableStep {
+  margin-bottom: -4px;
+  padding: 0px;
+  display: none !important;
+}
+.chatwindowlogs_zone .log.notif_newUndoableStep.selectable {
+  display: block !important;
+}
+.chatwindowlogs_zone .log.notif_newUndoableStep.selectable .roundedboxinner {
+  text-align: center;
+  cursor: pointer;
+  background-color: #c4c2c2;
+  font-size: 12px;
+  padding: 2px 5px;
+}
+.chatwindowlogs_zone .log.notif_newUndoableStep.selectable .roundedboxinner::before, .chatwindowlogs_zone .log.notif_newUndoableStep.selectable .roundedboxinner::after {
+  content: "\f0e2";
+  font: normal normal normal 12px/1 FontAwesome;
+  margin: 0px 10px;
+}
+.chatwindowlogs_zone .log.notif_newUndoableStep.selectable .roundedboxinner .msgtime {
+  display: none;
+}
+
+/* ------- LOG TOKENS ------- */
+.log_tooltip {
+  position: relative;
+}
+.log_tooltip .help-marker {
+  top: -11px;
+  left: auto;
+  right: -18px;
+}
+
+.gest_log_die {
+  min-height: calc(var(--gestTokenScale) * 40px);
+  min-width: calc(var(--gestTokenScale) * 40px);
+  max-height: calc(var(--gestTokenScale) * 40px);
+  max-width: calc(var(--gestTokenScale) * 40px);
+  display: inline-block;
+  border: 1px solid;
+  border-radius: 5%;
+}
+.gest_log_die .gest_log_die_value {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  font-weight: 700;
+  font-size: large;
+  margin-top: 3px;
+}
+
+#customActions .gest_log_token {
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+}
+#customActions .gest_force_side[data-type=TallageCarriage],
+#customActions .gest_force_side[data-type=TrapCarriage],
+#customActions .gest_force_side[data-type=TributeCarriage],
+#customActions .gest_force_side[data-type=Carriage] {
+  --gestForceScale: 0.55;
+  margin: -3px;
+}
+#customActions .gest_force_side[data-type=Camp],
+#customActions .gest_force_side[data-type=Henchmen],
+#customActions .gest_force_side[data-type=MerryMen],
+#customActions .gest_force_side[data-type=RobinHood] {
+  --gestForceScale: 0.55;
+  top: -3px;
+  margin-top: 3px;
+}
+#customActions .gest_log_card {
+  --gestCardScale: 0.119;
+  margin: -3px 0px;
+}
+
+#pagemaintitletext .gest_card_side,
+#pagemaintitletext .gest_card,
+#gameaction_status .gest_card_side,
+#gameaction_status .gest_card {
+  display: none;
+}
+#pagemaintitletext .gest_log_token,
+#gameaction_status .gest_log_token {
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+}
+#pagemaintitletext .gest_log_die,
+#gameaction_status .gest_log_die {
+  --gestTokenScale: 0.7;
+  position: relative;
+  top: -3px;
+  margin-top: 3px;
+  vertical-align: middle;
+}
+#pagemaintitletext .gest_log_die .gest_log_die_value,
+#gameaction_status .gest_log_die .gest_log_die_value {
+  margin-top: -1px;
+}
+#pagemaintitletext .gest_traveller_back_log,
+#gameaction_status .gest_traveller_back_log {
+  display: inline-block;
+  --gestCardScale: 0.15;
+  vertical-align: middle;
+  position: relative;
+  top: -3px;
+  margin-top: 3px;
+}
+#pagemaintitletext .gest_force_side[data-type=TallageCarriage],
+#pagemaintitletext .gest_force_side[data-type=TrapCarriage],
+#pagemaintitletext .gest_force_side[data-type=TributeCarriage],
+#pagemaintitletext .gest_force_side[data-type=Carriage],
+#gameaction_status .gest_force_side[data-type=TallageCarriage],
+#gameaction_status .gest_force_side[data-type=TrapCarriage],
+#gameaction_status .gest_force_side[data-type=TributeCarriage],
+#gameaction_status .gest_force_side[data-type=Carriage] {
+  --gestForceScale: 0.65;
+  top: -3px;
+  margin-top: 3px;
+}
+#pagemaintitletext .gest_force_side[data-type=Camp],
+#pagemaintitletext .gest_force_side[data-type=Henchmen],
+#pagemaintitletext .gest_force_side[data-type=MerryMen],
+#pagemaintitletext .gest_force_side[data-type=RobinHood],
+#gameaction_status .gest_force_side[data-type=Camp],
+#gameaction_status .gest_force_side[data-type=Henchmen],
+#gameaction_status .gest_force_side[data-type=MerryMen],
+#gameaction_status .gest_force_side[data-type=RobinHood] {
+  --gestForceScale: 0.7;
+  top: -3px;
+  margin-top: 3px;
+}
+#pagemaintitletext .gest_icon[data-icon=shilling],
+#gameaction_status .gest_icon[data-icon=shilling] {
+  --gestIconScale: 1.1;
+  top: -3px;
+  margin-top: 3px;
+}
+
+.log > .roundedbox .gest_card,
+.log > .roundedboxinner .gest_card {
+  margin-top: calc(var(--logCardScale) * 6px);
+}
+.log > .roundedbox .gest_log_token,
+.log > .roundedboxinner .gest_log_token {
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+}
+.log > .roundedbox .gest_log_card,
+.log > .roundedboxinner .gest_log_card {
+  --gestCardScale: var(--logCardScale);
+}
+.log > .roundedbox .gest_log_die,
+.log > .roundedboxinner .gest_log_die {
+  --gestTokenScale: 0.7;
+  position: relative;
+  top: -3px;
+  margin-top: 3px;
+  vertical-align: middle;
+}
+.log > .roundedbox .gest_force_side[data-type=TallageCarriage],
+.log > .roundedbox .gest_force_side[data-type=TrapCarriage],
+.log > .roundedbox .gest_force_side[data-type=TributeCarriage],
+.log > .roundedbox .gest_force_side[data-type=Carriage],
+.log > .roundedboxinner .gest_force_side[data-type=TallageCarriage],
+.log > .roundedboxinner .gest_force_side[data-type=TrapCarriage],
+.log > .roundedboxinner .gest_force_side[data-type=TributeCarriage],
+.log > .roundedboxinner .gest_force_side[data-type=Carriage] {
+  --gestForceScale: 0.65;
+  top: -3px;
+  margin-top: 3px;
+}
+.log > .roundedbox .gest_force_side[data-type=Camp],
+.log > .roundedbox .gest_force_side[data-type=Henchmen],
+.log > .roundedbox .gest_force_side[data-type=MerryMen],
+.log > .roundedbox .gest_force_side[data-type=RobinHood],
+.log > .roundedboxinner .gest_force_side[data-type=Camp],
+.log > .roundedboxinner .gest_force_side[data-type=Henchmen],
+.log > .roundedboxinner .gest_force_side[data-type=MerryMen],
+.log > .roundedboxinner .gest_force_side[data-type=RobinHood] {
+  --gestForceScale: 0.6;
+  top: -3px;
+  margin-top: 3px;
+}
+.log > .roundedbox .gest_icon[data-icon=shilling],
+.log > .roundedboxinner .gest_icon[data-icon=shilling] {
+  --gestIconScale: 0.9;
+  top: -3px;
+  margin-top: 3px;
+}
+
+.gest_log_die[data-die-color=green] {
+  background-color: green;
+  color: silver;
+}
+
+.gest_log_die[data-die-color=white] {
+  background-color: white;
+  color: red;
+}
+
+/*# sourceMappingURL=johncompany.css.map */
