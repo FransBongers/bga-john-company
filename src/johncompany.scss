@@ -8,5 +8,37 @@
  * -----
  */
 
+@use './base';
+@use './board/board';
 @use './core/default';
 @use './logs/logs';
+
+html {
+  background-image: url('img/background.jpg');
+  background-attachment: fixed;
+}
+
+#play_area_container {
+  background-color: yellow;
+  // padding: 4px;
+  // display: grid;
+  // grid-template-columns: auto auto;
+  // grid-gap: 8px;
+}
+
+.joco_family_member {
+  position: absolute;
+  top: calc(var(--leftColumnScale) * 662px);
+  left: calc(var(--leftColumnScale) * 246px);
+  background-color: base.$player-purple;
+  padding: 2px;
+  border-radius: 47%;
+  // background-image: url('img/familyMember2.svg');
+  // background-size: 100% 100%;
+  height: calc(var(--leftColumnScale) * 42px);
+  width: calc(var(--leftColumnScale) * 35.6px);
+  // height: 100px;
+  // width: 85px;
+  fill: base.$player-purple-dark;
+  // stroke: base.$player-blue-dark;
+}

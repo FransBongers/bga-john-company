@@ -1,35 +1,28 @@
-class ConfirmPartialTurn implements State {
-  private static instance: ConfirmPartialTurn;
+class PlayerTurn implements State {
+  private static instance: PlayerTurn;
   private args: OnEnteringConfirmTurnArgs;
 
   constructor(private game: GameAlias) {}
 
   public static create(game: JohnCompany) {
-    ConfirmPartialTurn.instance = new ConfirmPartialTurn(game);
+    PlayerTurn.instance = new PlayerTurn(game);
   }
 
   public static getInstance() {
-    return ConfirmPartialTurn.instance;
+    return PlayerTurn.instance;
   }
 
   onEnteringState(args: OnEnteringConfirmTurnArgs) {
-    this.args = args;
+    debug('Entering SelectPlotState');
+    // this.args = args;
     this.updateInterfaceInitialStep();
   }
 
   onLeavingState() {
-    debug('Leaving ConfirmTurnState');
+    debug('Leaving SelectPlotState');
   }
 
-  setDescription(activePlayerId: number) {
-    // this.game.clientUpdatePageTitle({
-    //   text: _("${player_name} must confirm the switch of player"),
-    //   args: {
-    //     player_name: this.game.playerManager.getPlayer({playerId: activePlayerId}).getName()
-    //   },
-    //   nonActivePlayers: true,
-    // });
-  }
+  setDescription(activePlayerId: number) {}
 
   //  .####.##....##.########.########.########..########....###.....######..########
   //  ..##..###...##....##....##.......##.....##.##.........##.##...##....##.##......
@@ -49,22 +42,22 @@ class ConfirmPartialTurn implements State {
 
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
-    this.game.clientUpdatePageTitle({
-      text: _(
-        '${you} must confirm the switch of player. You will not be able to restart your turn'
-      ),
-      args: {
-        you: '${you}',
+
+    updatePageTitle(_('${you} must select an option'));
+
+    addPrimaryActionButton({
+      id: 'action_button',
+      text: 'Click me',
+      callback: () => {
+        console.log('hello world');
       },
     });
-    this.game.addConfirmButton({
-      callback: () =>
-        this.game.takeAction({
-          action: 'actConfirmPartialTurn',
-          atomicAction: false,
-        }),
-    });
-    this.game.addUndoButtons(this.args);
+
+    // this.game.addPassButton({
+    //   optionalAction: this.args.optionalAction,
+    //   text: _('Skip Plot'),
+    // });
+    // this.game.addUndoButtons(this.args);
   }
 
   //  .##.....##.########.####.##.......####.########.##....##

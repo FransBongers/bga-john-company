@@ -18,15 +18,16 @@ const MIN_NOTIFICATION_MS = 1200;
 
 class NotificationManager {
   private static instance: NotificationManager;
-  private game: JohnCompany;
+  private game: GameAlias;
   private subscriptions: unknown[];
+  private id: string;
 
-  constructor(game) {
+  constructor(game: GameAlias) {
     this.game = game;
     this.subscriptions = [];
   }
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     NotificationManager.instance = new NotificationManager(game);
   }
 

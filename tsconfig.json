@@ -20,7 +20,8 @@
     "node_modules/bga-animations/src/animation-manager.ts",
     "src/core/counter.d.ts",
     "src/core/define.ts",
-    "src/core/framework.d.ts",
+    "src/core/framework/types.d.ts",
+    "src/core/interaction/index.ts",
     "src/core/notification-manager/index.ts",
     "src/core/states/ConfirmPartialTurn.ts",
     "src/core/states/ConfirmTurn.ts",
@@ -28,9 +29,12 @@
     "src/core/utility.ts",
     "src/johncompany.ts",
     "src/johncompany.d.ts",
+    "src/board/index.ts",
+    "src/board/templates.ts",
     "src/constants.ts",
     "src/logs/index.ts",
     "src/logs/templates.ts",
+    "src/states/PlayerTurn.ts",
     "src/templates.ts"
   ]
 }

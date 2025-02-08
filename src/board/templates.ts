@@ -1,0 +1,1 @@
+const tplBoard = (gamedatas: GamedatasAlias ) => `<div id="joco_board"></div>`

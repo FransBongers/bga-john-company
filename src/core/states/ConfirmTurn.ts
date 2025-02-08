@@ -1,9 +1,15 @@
-class ConfirmTurnState implements State {
-  private game: GameAlias;
+class ConfirmTurn implements State {
+  private static instance: ConfirmTurn;
   private args: OnEnteringConfirmTurnArgs;
 
-  constructor(game: GameAlias) {
-    this.game = game;
+  constructor(private game: GameAlias) {}
+
+  public static create(game: JohnCompany) {
+    ConfirmTurn.instance = new ConfirmTurn(game);
+  }
+
+  public static getInstance() {
+    return ConfirmTurn.instance;
   }
 
   onEnteringState(args: OnEnteringConfirmTurnArgs) {
@@ -12,7 +18,7 @@ class ConfirmTurnState implements State {
   }
 
   onLeavingState() {
-    debug("Leaving ConfirmTurnState");
+    debug('Leaving ConfirmTurnState');
   }
 
   setDescription(activePlayerId: number) {
@@ -44,14 +50,14 @@ class ConfirmTurnState implements State {
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
     this.game.clientUpdatePageTitle({
-      text: _("${you} must confirm or restart your turn"),
+      text: _('${you} must confirm or restart your turn'),
       args: {
-        you: "${you}",
+        you: '${you}',
       },
     });
     this.game.addConfirmButton({
       callback: () =>
-        this.game.takeAction({ action: "actConfirmTurn", atomicAction: false }),
+        this.game.takeAction({ action: 'actConfirmTurn', atomicAction: false }),
     });
     this.game.addUndoButtons(this.args);
   }
