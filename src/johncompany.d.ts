@@ -98,11 +98,15 @@ interface JohnCompanyGamedatas extends Gamedatas {
   canceledNotifIds: string[];
   playerOrder: number[];
   players: Record<number, JohnCompanyPlayerData>;
- 
+}
+
+interface JoCoSetupCard {
+  id: string;
+  location: string;
 }
 
 interface JohnCompanyPlayerData extends BgaPlayer {
-
+  hand: JoCoSetupCard[];
 }
 
 type GameAlias = JohnCompany;

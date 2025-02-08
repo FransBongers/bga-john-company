@@ -1,0 +1,21 @@
+<?php
+$setupCardIds = [
+  'Setup1710_01',
+  'Setup1710_02',
+  'Setup1710_03',
+  'Setup1710_04',
+  'Setup1710_05',
+  'Setup1710_06',
+  'Setup1710_07',
+  'Setup1710_08',
+  'Setup1710_09',
+  'Setup1710_10',
+  'Setup1710_11',
+  'Setup1710_12',
+  'Setup1710_13',
+  'Setup1710_14',
+  'Setup1710_15',
+  'Setup1710_16',
+  'Setup1710_17',
+  'Setup1710_18',
+];

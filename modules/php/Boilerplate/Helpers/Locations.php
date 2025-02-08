@@ -2,7 +2,8 @@
 
 namespace Bga\Games\JohnCompany\Boilerplate\Helpers;
 
-abstract class Locations
+class Locations
 {
-  
+ 
+    
 }

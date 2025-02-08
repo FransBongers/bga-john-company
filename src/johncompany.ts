@@ -128,6 +128,13 @@ class JohnCompany implements Game {
 
     NotificationManager.getInstance().setupNotifications();
 
+    Object.values(gamedatas.players).forEach((player) => {
+      const cards = player.hand.map(({id}) => `<div id="${id}" class="joco_setup_card"></div>`);
+      if (cards.length > 0) {
+        document.getElementById('joco_board').insertAdjacentHTML('afterbegin', cards.join(''));
+      }
+    })
+
     //  this.tooltipManager.setupTooltips();
     debug('Ending game setup');
   }

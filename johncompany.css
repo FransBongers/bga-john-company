@@ -15,6 +15,138 @@
   width: calc(var(--leftColumnScale) * 1500px);
 }
 
+.joco_setup_card {
+  width: 150px;
+  height: 228px;
+  display: inline-block;
+}
+
+#Setup1710_01 {
+  background-image: url("img/1710_1.jpg");
+  background-position-x: 0%;
+  background-position-y: 0%;
+  background-size: 400% 200%;
+}
+
+#Setup1710_02 {
+  background-image: url("img/1710_1.jpg");
+  background-position-x: 33.3333333333%;
+  background-position-y: 0%;
+  background-size: 400% 200%;
+}
+
+#Setup1710_03 {
+  background-image: url("img/1710_1.jpg");
+  background-position-x: 66.6666666667%;
+  background-position-y: 0%;
+  background-size: 400% 200%;
+}
+
+#Setup1710_04 {
+  background-image: url("img/1710_1.jpg");
+  background-position-x: 100%;
+  background-position-y: 0%;
+  background-size: 400% 200%;
+}
+
+#Setup1710_05 {
+  background-image: url("img/1710_1.jpg");
+  background-position-x: 0%;
+  background-position-y: 100%;
+  background-size: 400% 200%;
+}
+
+#Setup1710_06 {
+  background-image: url("img/1710_1.jpg");
+  background-position-x: 33.3333333333%;
+  background-position-y: 100%;
+  background-size: 400% 200%;
+}
+
+#Setup1710_07 {
+  background-image: url("img/1710_1.jpg");
+  background-position-x: 66.6666666667%;
+  background-position-y: 100%;
+  background-size: 400% 200%;
+}
+
+#Setup1710_08 {
+  background-image: url("img/1710_1.jpg");
+  background-position-x: 100%;
+  background-position-y: 100%;
+  background-size: 400% 200%;
+}
+
+#Setup1710_09 {
+  background-image: url("img/1710_2.jpg");
+  background-position-x: 0%;
+  background-position-y: 0%;
+  background-size: 400% 300%;
+}
+
+#Setup1710_10 {
+  background-image: url("img/1710_2.jpg");
+  background-position-x: 33.3333333333%;
+  background-position-y: 0%;
+  background-size: 400% 300%;
+}
+
+#Setup1710_11 {
+  background-image: url("img/1710_2.jpg");
+  background-position-x: 66.6666666667%;
+  background-position-y: 0%;
+  background-size: 400% 300%;
+}
+
+#Setup1710_12 {
+  background-image: url("img/1710_2.jpg");
+  background-position-x: 100%;
+  background-position-y: 0%;
+  background-size: 400% 300%;
+}
+
+#Setup1710_13 {
+  background-image: url("img/1710_2.jpg");
+  background-position-x: 0%;
+  background-position-y: 50%;
+  background-size: 400% 300%;
+}
+
+#Setup1710_14 {
+  background-image: url("img/1710_2.jpg");
+  background-position-x: 33.3333333333%;
+  background-position-y: 50%;
+  background-size: 400% 300%;
+}
+
+#Setup1710_15 {
+  background-image: url("img/1710_2.jpg");
+  background-position-x: 66.6666666667%;
+  background-position-y: 50%;
+  background-size: 400% 300%;
+}
+
+#Setup1710_16 {
+  background-image: url("img/1710_2.jpg");
+  background-position-x: 100%;
+  background-position-y: 50%;
+  background-size: 400% 300%;
+}
+
+#Setup1710_17 {
+  background-image: url("img/1710_2.jpg");
+  background-position-x: 0%;
+  background-position-y: 100%;
+  background-size: 400% 300%;
+}
+
+#Setup1710_18 {
+  background-image: url("img/1710_2.jpg");
+  background-position-x: 33.3333333333%;
+  background-position-y: 100%;
+  background-size: 400% 300%;
+}
+
 /* make space between buttons on touch devices */
 @media (hover: none) {
   #page-title .action-button.bgabutton,

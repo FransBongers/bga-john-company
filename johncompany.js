@@ -677,6 +677,15 @@ var JohnCompany = (function () {
         NotificationManager.create(this);
         Board.create(this);
         NotificationManager.getInstance().setupNotifications();
+        Object.values(gamedatas.players).forEach(function (player) {
+            var cards = player.hand.map(function (_a) {
+                var id = _a.id;
+                return "<div id=\"".concat(id, "\" class=\"joco_setup_card\"></div>");
+            });
+            if (cards.length > 0) {
+                document.getElementById('joco_board').insertAdjacentHTML('afterbegin', cards.join(''));
+            }
+        });
         debug('Ending game setup');
     };
     JohnCompany.prototype.setupPlayerOrder = function (_a) {

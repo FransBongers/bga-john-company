@@ -22,11 +22,19 @@ namespace Bga\Games\JohnCompany;
 
 require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
+use Bga\Games\JohnCompany\Boilerplate\Core\Stats;
+use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\Players;
+use Bga\Games\JohnCompany\Managers\SetupCards;
 
 class Game extends \Table
 {
+    use \Bga\Games\JohnCompany\DebugTrait;
+    use \Bga\Games\JohnCompany\EngineTrait;
+    use \Bga\Games\JohnCompany\TurnTrait;
+
     public static $instance = null;
     public function __construct()
     {
@@ -35,7 +43,8 @@ class Game extends \Table
         $this->initGameStateLabels([
             'logging' => 10,
         ]);
-
+        // Engine::boot();
+        // Stats::checkExistence();
 
         /* example of notification decorator.
         // automatically complete notification args when needed
@@ -316,22 +325,15 @@ class Game extends \Table
      * - when the game starts
      * - when a player refreshes the game page (F5)
      */
-    public function getAllDatas(): array
+    public function getAllDatas($playerId = null): array
     {
-        $result = [];
+        $playerId = $playerId ?? Players::getCurrentId();
 
-        // WARNING: We must only return information visible by the current player.
-        $current_player_id = (int) $this->getCurrentPlayerId();
+        $data = [
+            'players' => Players::getUiData($playerId),
+        ];
 
-        // Get information about players.
-        // NOTE: you can retrieve some extra field you added for "player" table in `dbmodel.sql` if you need it.
-        $result["players"] = $this->getCollectionFromDb(
-            "SELECT `player_id` `id`, `player_score` `score` FROM `player`"
-        );
-
-        // TODO: Gather all information about current game situation (visible by player $current_player_id).
-
-        return $result;
+        return $data;
     }
 
     /**
@@ -380,10 +382,15 @@ class Game extends \Table
         $this->reattributeColorsBasedOnPreferences($players, $gameinfos["player_colors"]);
         $this->reloadPlayersBasicInfos();
 
+        $players = Players::getAll()->toArray();
+
+        Families::setupNewGame($players);
+        SetupCards::setupNewGame();
+
         // Init global values with their initial values.
 
         // Dummy content.
-        $this->setGameStateInitialValue("my_first_global_variable", 0);
+        // $this->setGameStateInitialValue("my_first_global_variable", 0);
 
         // Init game statistics.
         //

@@ -28,3 +28,8 @@ const ST_END_GAME = 99;
 const ST_END_GAME_NAME = 'gameEnd';
 
 const ST_CLEANUP = 88; // TODO: replace
+
+/**
+ * Locations
+ */
+const DECK = 'deck';
