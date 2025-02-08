@@ -654,7 +654,7 @@ var JohnCompany = (function () {
             ConfirmTurn: ConfirmTurn,
             PlayerTurn: PlayerTurn,
         };
-        console.log('agestofrobinhood constructor');
+        console.log('johncompany constructor');
     }
     JohnCompany.prototype.setup = function (gamedatas) {
         var _this = this;

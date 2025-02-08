@@ -33,7 +33,7 @@ class JohnCompany implements Game {
   // Default
   public animationManager: AnimationManager;
   //  public settings: Settings;
-  // public gameOptions: * AGestOfRobinHoodGamedatas['gameOptions'];
+  // public gameOptions: GamedatasAlias['gameOptions'];
   public notificationManager: NotificationManager;
   //  public playerManager: PlayerManager;
   public playerOrder: number[];
@@ -61,7 +61,7 @@ class JohnCompany implements Game {
   };
 
   constructor() {
-    console.log('agestofrobinhood constructor');
+    console.log('johncompany constructor');
   }
 
   // ..######..########.########.##.....##.########.

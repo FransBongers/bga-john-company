@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -49,6 +50,8 @@
 
 //    !! It is not a good idea to modify this file when a game is running !!
 
+require_once 'modules/php/Boilerplate/constants.inc.php';
+require_once 'modules/php/constants.inc.php';
 
 $machinestates = [
 
@@ -72,7 +75,7 @@ $machinestates = [
         "args" => "argPlayerTurn",
         "possibleactions" => [
             // these actions are called from the front with bgaPerformAction, and matched to the function on the game.php file
-            "actPlayCard", 
+            "actPlayCard",
             "actPass",
         ],
         "transitions" => ["playCard" => 3, "pass" => 3]
@@ -87,9 +90,71 @@ $machinestates = [
         "transitions" => ["endGame" => 99, "nextPlayer" => 2]
     ],
 
+    // .########.##....##..######...####.##....##.########
+    // .##.......###...##.##....##...##..###...##.##......
+    // .##.......####..##.##.........##..####..##.##......
+    // .######...##.##.##.##...####..##..##.##.##.######..
+    // .##.......##..####.##....##...##..##..####.##......
+    // .##.......##...###.##....##...##..##...###.##......
+    // .########.##....##..######...####.##....##.########
+
+    ST_RESOLVE_STACK => [
+        'name' => 'resolveStack',
+        'type' => 'game',
+        'action' => 'stResolveStack',
+        'transitions' => [],
+    ],
+
+    ST_CONFIRM_TURN => [
+        'name' => 'confirmTurn',
+        'description' => clienttranslate('${actplayer} must confirm or restart their turn'),
+        'descriptionmyturn' => clienttranslate('${you} must confirm or restart your turn'),
+        'type' => 'activeplayer',
+        'args' => 'argsConfirmTurn',
+        'action' => 'stConfirmTurn',
+        'possibleactions' => ['actConfirmTurn', 'actRestart'],
+        'transitions' => [
+            // 'breakStart' => ST_BREAK_MULTIACTIVE
+        ],
+    ],
+
+    ST_CONFIRM_PARTIAL_TURN => [
+        'name' => 'confirmPartialTurn',
+        'description' => clienttranslate('${actplayer} must confirm the switch of player'),
+        'descriptionmyturn' => clienttranslate('${you} must confirm the switch of player. You will not be able to restart turn'),
+        'type' => 'activeplayer',
+        'args' => 'argsConfirmTurn',
+        // 'action' => 'stConfirmPartialTurn',
+        'possibleactions' => ['actConfirmPartialTurn', 'actRestart'],
+    ],
+
+    // .########.##....##.########......#######..########
+    // .##.......###...##.##.....##....##.....##.##......
+    // .##.......####..##.##.....##....##.....##.##......
+    // .######...##.##.##.##.....##....##.....##.######..
+    // .##.......##..####.##.....##....##.....##.##......
+    // .##.......##...###.##.....##....##.....##.##......
+    // .########.##....##.########......#######..##......
+
+    // ..######......###....##.....##.########
+    // .##....##....##.##...###...###.##......
+    // .##.........##...##..####.####.##......
+    // .##...####.##.....##.##.###.##.######..
+    // .##....##..#########.##.....##.##......
+    // .##....##..##.....##.##.....##.##......
+    // ..######...##.....##.##.....##.########
+
+    ST_PRE_END_GAME => [
+        'name' => 'preEndGame',
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
     // Final state.
     // Please do not modify (and do not overload action/args methods).
-    99 => [
+    ST_END_GAME => [
         "name" => "gameEnd",
         "description" => clienttranslate("End of game"),
         "type" => "manager",
@@ -97,7 +162,20 @@ $machinestates = [
         "args" => "argGameEnd"
     ],
 
+    // ....###....########..#######..##.....##.####..######.
+    // ...##.##......##....##.....##.###...###..##..##....##
+    // ..##...##.....##....##.....##.####.####..##..##......
+    // .##.....##....##....##.....##.##.###.##..##..##......
+    // .#########....##....##.....##.##.....##..##..##......
+    // .##.....##....##....##.....##.##.....##..##..##....##
+    // .##.....##....##.....#######..##.....##.####..######.
+
+    // ....###.....######..########.####..#######..##....##..######.
+    // ...##.##...##....##....##.....##..##.....##.###...##.##....##
+    // ..##...##..##..........##.....##..##.....##.####..##.##......
+    // .##.....##.##..........##.....##..##.....##.##.##.##..######.
+    // .#########.##..........##.....##..##.....##.##..####.......##
+    // .##.....##.##....##....##.....##..##.....##.##...###.##....##
+    // .##.....##..######.....##....####..#######..##....##..######.
+
 ];
-
-
-
