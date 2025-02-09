@@ -1,3 +1,9 @@
+const tplPlayArea = () => `
+  <div id="play_area_container">
+    
+  </div>
+`
+
 const familyMember = `
 <div class="joco_family_member">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50.27 59.47">

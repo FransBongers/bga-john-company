@@ -10,8 +10,9 @@
 
 @use './base';
 @use './board/board';
+@use './boilerplate/default';
 @use './cards/setupCards';
-@use './core/default';
+@use './hand//hand';
 @use './logs/logs';
 
 html {
@@ -20,7 +21,10 @@ html {
 }
 
 #play_area_container {
-  background-color: yellow;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  // background-color: yellow;
   // padding: 4px;
   // display: grid;
   // grid-template-columns: auto auto;
@@ -32,8 +36,8 @@ html {
   top: calc(var(--leftColumnScale) * 662px);
   left: calc(var(--leftColumnScale) * 246px);
   background-color: base.$player-purple;
-  padding: 2px;
-  border-radius: 47%;
+  padding: calc(var(--leftColumnScale) * 2px);
+  border-radius: 50%;
   // background-image: url('img/familyMember2.svg');
   // background-size: 100% 100%;
   height: calc(var(--leftColumnScale) * 42px);

@@ -43,15 +43,22 @@ class PlayerTurn implements State {
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
 
-    updatePageTitle(_('${you} must select an option'));
+    updatePageTitle(_('${you} must select a card'));
 
-    addPrimaryActionButton({
-      id: 'action_button',
-      text: 'Click me',
-      callback: () => {
-        console.log('hello world');
-      },
-    });
+    const cards = document.getElementById('joco_hand').children;
+
+    for (let i = 0; i < cards.length; i++) {
+      const node = cards.item(i);
+      node.classList.add(SELECTABLE);
+    }
+
+    // addPrimaryActionButton({
+    //   id: 'action_button',
+    //   text: 'Click me',
+    //   callback: () => {
+    //     console.log('hello world');
+    //   },
+    // });
 
     // this.game.addPassButton({
     //   optionalAction: this.args.optionalAction,
