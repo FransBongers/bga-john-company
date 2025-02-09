@@ -33,12 +33,6 @@ class SetupCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     return new $className($data);
   }
 
-  //////////////////////////////////
-  //////////////////////////////////
-  //////////// GETTERS //////////////
-  //////////////////////////////////
-  //////////////////////////////////
-
 
 
   // ..######..########.########.##.....##.########.
@@ -55,11 +49,14 @@ class SetupCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     // Load list of cards
     include dirname(__FILE__) . '/../Cards/Setup/list.inc.php';
 
+    $scenarioCards = Scenarios::get()->getSetupCards();
     $numberOfCards = max($numberOfPlayers * 3, 12);
 
     // return;
     foreach ($setupCardIds as $index => $cId) {
-      if ($index < $numberOfCards)
+      $card = self::getCardInstance($cId);
+
+      if ($card->getScenarioSetup() === $scenarioCards && $index < $numberOfCards)
       $cards[$cId] = [
         'id' => $cId,
         'location' => DECK,

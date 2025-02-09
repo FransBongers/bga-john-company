@@ -1,5 +1,7 @@
 <?php
 namespace Bga\Games\JohnCompany\Boilerplate\Helpers;
+
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Game;
 
 abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
@@ -140,7 +142,7 @@ abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
   /**
    * Return an array of attributes
    */
-  public function jsonSerialize()
+  public function jsonSerialize(): array
   {
     $data = [];
     foreach ($this->attributes as $attribute => $field) {

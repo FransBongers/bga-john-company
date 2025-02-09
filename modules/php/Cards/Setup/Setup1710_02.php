@@ -8,6 +8,7 @@ class Setup1710_02 extends \Bga\Games\JohnCompany\Models\SetupCard
   {
     parent::__construct($row);
     $this->id = 'Setup1710_02';
+    $this->scenarioSetup = 1710;
   }
 
 }

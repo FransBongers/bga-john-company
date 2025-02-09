@@ -26,6 +26,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Stats;
 use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 
@@ -352,6 +353,7 @@ class Game extends \Table
      */
     protected function setupNewGame($players, $options = [])
     {
+        Globals::setupNewGame($players, $options);
         // Set the colors of the players with HTML color code. The default below is red/green/blue/orange/brown. The
         // number of colors defined here must correspond to the maximum number of players allowed for the gams.
         $gameinfos = $this->getGameinfos();
@@ -385,6 +387,7 @@ class Game extends \Table
         $players = Players::getAll()->toArray();
 
         Families::setupNewGame($players);
+        FamilyMembers::setupNewGame();
         SetupCards::setupNewGame();
 
         // Init global values with their initial values.

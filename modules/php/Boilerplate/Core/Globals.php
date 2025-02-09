@@ -22,7 +22,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     'logState' => 'int', // Used to store state id when enabling the log
     'firstPlayer' => 'int',
     // 'activePlayerId' => 'int',
- 
+    'scenarioId' => 'str',
   ];
 
   protected static $table = 'global_variables';
@@ -148,7 +148,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
    */
   public static function setupNewGame($players, $options)
   {
-
+    Globals::setScenarioId(THE_1710_SCENARIO);
 
     // Game options
     
