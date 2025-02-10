@@ -29,7 +29,7 @@ class Interaction {
     extraClasses?: string;
   }) {
     Interaction.use().addPrimaryActionButton;
-    console.log('addPrimaryActionButton');
+
     if ($(id)) {
       return;
     }

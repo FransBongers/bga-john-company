@@ -27,6 +27,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Stats;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\Orders;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 
@@ -331,6 +332,7 @@ class Game extends \Table
         $playerId = $playerId ?? Players::getCurrentId();
 
         $data = [
+            'orders' => Orders::getAll(),
             'players' => Players::getUiData($playerId),
         ];
 
@@ -388,6 +390,7 @@ class Game extends \Table
 
         Families::setupNewGame($players);
         FamilyMembers::setupNewGame();
+        Orders::setupNewGame();
         SetupCards::setupNewGame();
 
         // Init global values with their initial values.

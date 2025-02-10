@@ -98,6 +98,13 @@ interface JohnCompanyGamedatas extends Gamedatas {
   canceledNotifIds: string[];
   playerOrder: number[];
   players: Record<number, JohnCompanyPlayerData>;
+  orders: Record<string, JoCoOrder>;
+}
+
+interface JoCoOrder {
+  id: string;
+  location: string;
+  status: 'open' | 'closed' | 'filled' | 'string'
 }
 
 interface JoCoSetupCard {

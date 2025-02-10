@@ -34,6 +34,11 @@ class Scenario implements \JsonSerializable
     return $data;
   }
 
+  public function getOrders()
+  {
+    return $this->orders;
+  }
+
   public function getSetupCards()
   {
     return $this->setupCards;

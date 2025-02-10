@@ -1,3 +1,39 @@
+var ORDER_PUNJAB_1 = 'Order_Punjab_1';
+var ORDER_DELHI_1 = 'Order_Delhi_1';
+var ORDER_DELHI_2 = 'Order_Delhi_2';
+var ORDER_DELHI_3 = 'Order_Delhi_3';
+var ORDER_BENGAL_1 = 'Order_Bengal_1';
+var ORDER_BENGAL_2 = 'Order_Bengal_2';
+var ORDER_BOMBAY_1 = 'Order_Bombay_1';
+var ORDER_BOMBAY_2 = 'Order_Bombay_2';
+var ORDER_BOMBAY_3 = 'Order_Bombay_3';
+var ORDER_MARATHA_1 = 'Order_Maratha_1';
+var ORDER_MARATHA_2 = 'Order_Maratha_2';
+var ORDER_MARATHA_3 = 'Order_Maratha_3';
+var ORDER_HYDERABAD_1 = 'Order_Hyderabad_1';
+var ORDER_MYSORE_1 = 'Order_Mysore_1';
+var ORDER_MYSORE_2 = 'Order_Mysore_2';
+var ORDER_MADRAS_1 = 'Order_Madras_1';
+var ORDER_MADRAS_2 = 'Order_Madras_2';
+var ORDERS = [
+    ORDER_PUNJAB_1,
+    ORDER_DELHI_1,
+    ORDER_DELHI_2,
+    ORDER_DELHI_3,
+    ORDER_BENGAL_1,
+    ORDER_BENGAL_2,
+    ORDER_BOMBAY_1,
+    ORDER_BOMBAY_2,
+    ORDER_BOMBAY_3,
+    ORDER_MARATHA_1,
+    ORDER_MARATHA_2,
+    ORDER_MARATHA_3,
+    ORDER_HYDERABAD_1,
+    ORDER_MYSORE_1,
+    ORDER_MYSORE_2,
+    ORDER_MADRAS_1,
+    ORDER_MADRAS_2,
+];
 var BgaAnimation = (function () {
     function BgaAnimation(animationFunction, settings) {
         this.animationFunction = animationFunction;
@@ -456,7 +492,6 @@ var Interaction = (function () {
     Interaction.prototype.addPrimaryActionButton = function (_a) {
         var id = _a.id, text = _a.text, callback = _a.callback, extraClasses = _a.extraClasses;
         Interaction.use().addPrimaryActionButton;
-        console.log('addPrimaryActionButton');
         if ($(id)) {
             return;
         }
@@ -663,7 +698,6 @@ var JohnCompany = (function () {
         var _this = this;
         var body = document.getElementById('ebd-body');
         this.mobileVersion = body && body.classList.contains('mobile_version');
-        console.log('inserting html');
         dojo.place("<div id='customActions' style='display:inline-block'></div>", $('generalactions'), 'after');
         document
             .getElementById('game_play_area')
@@ -795,7 +829,6 @@ var JohnCompany = (function () {
     };
     JohnCompany.prototype.addPrimaryActionButton = function (_a) {
         var id = _a.id, text = _a.text, callback = _a.callback, extraClasses = _a.extraClasses;
-        console.log('addPrimaryActionButton');
         if ($(id)) {
             return;
         }
@@ -920,7 +953,6 @@ var JohnCompany = (function () {
         console.log('updateLayout');
         var ROOT = document.documentElement;
         var playerAreaContainer = document.getElementById('play_area_container');
-        console.log('playerAreaContainer', playerAreaContainer);
         if (!playerAreaContainer) {
             return;
         }
@@ -929,7 +961,6 @@ var JohnCompany = (function () {
         var RIGHT_COLUMN = 634;
         var LEFT_SIZE = WIDTH;
         var leftColumnScale = LEFT_SIZE / LEFT_COLUMN;
-        console.log('leftColumnScale', leftColumnScale);
         ROOT.style.setProperty('--leftColumnScale', "".concat(leftColumnScale));
         var RIGHT_SIZE = WIDTH;
         var rightColumnScale = RIGHT_SIZE / RIGHT_COLUMN;
@@ -1072,8 +1103,29 @@ var JohnCompany = (function () {
     };
     return JohnCompany;
 }());
+var _a;
+var ORDERS_CONFIG = (_a = {},
+    _a[ORDER_PUNJAB_1] = [25, 935],
+    _a[ORDER_DELHI_1] = [17, 1071],
+    _a[ORDER_DELHI_2] = [49, 1160],
+    _a[ORDER_DELHI_3] = [64, 1040],
+    _a[ORDER_BENGAL_1] = [115, 1278],
+    _a[ORDER_BENGAL_2] = [173, 1375],
+    _a[ORDER_BOMBAY_1] = [92, 957],
+    _a[ORDER_BOMBAY_2] = [175, 999],
+    _a[ORDER_BOMBAY_3] = [235, 943],
+    _a[ORDER_MARATHA_1] = [111, 1173],
+    _a[ORDER_MARATHA_2] = [179, 1074],
+    _a[ORDER_MARATHA_3] = [221, 1224],
+    _a[ORDER_HYDERABAD_1] = [302, 1135],
+    _a[ORDER_MYSORE_1] = [346, 1020],
+    _a[ORDER_MYSORE_2] = [402, 1057],
+    _a[ORDER_MADRAS_1] = [400, 1151],
+    _a[ORDER_MADRAS_2] = [450, 1120],
+    _a);
 var Board = (function () {
     function Board(game) {
+        this.orders = {};
         this.game = game;
         this.setup(game.gamedatas);
     }
@@ -1087,12 +1139,35 @@ var Board = (function () {
         document
             .getElementById('play_area_container')
             .insertAdjacentHTML('afterbegin', tplBoard(gamedatas));
-        this.boardElement = document.getElementById('joco_board');
-        this.boardElement.insertAdjacentHTML('afterbegin', familyMember);
+        this.ui = {
+            board: document.getElementById('joco_board'),
+            orders: document.getElementById('joco_orders'),
+        };
+        this.ui.board.insertAdjacentHTML('afterbegin', familyMember);
+        this.setupOrders(gamedatas);
+    };
+    Board.prototype.setupOrders = function (gamedatas) {
+        var _this = this;
+        Object.keys(gamedatas.orders).forEach(function (orderId) {
+            var elt = (_this.orders[orderId] = document.createElement('div'));
+            elt.classList.add('joco_order');
+        });
+        this.updateOrders(gamedatas);
+    };
+    Board.prototype.updateOrders = function (gamedatas) {
+        var _this = this;
+        this.ui.orders.replaceChildren();
+        Object.entries(gamedatas.orders).forEach(function (_a) {
+            var orderId = _a[0], order = _a[1];
+            _this.orders[orderId].style.top = "calc(var(--boardScale) * ".concat(ORDERS_CONFIG[orderId][0], "px)");
+            _this.orders[orderId].style.left = "calc(var(--boardScale) * ".concat(ORDERS_CONFIG[orderId][1], "px)");
+            _this.orders[orderId].setAttribute('data-status', order.status);
+            _this.ui.orders.appendChild(_this.orders[orderId]);
+        });
     };
     return Board;
 }());
-var tplBoard = function (gamedatas) { return "<div id=\"joco_board\"></div>"; };
+var tplBoard = function (gamedatas) { return "<div id=\"joco_board\">\n  <div id=\"joco_orders\"></div>\n</div>"; };
 var Hand = (function () {
     function Hand(game) {
         this.game = game;

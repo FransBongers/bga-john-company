@@ -82,5 +82,12 @@ CREATE TABLE IF NOT EXISTS `family_members` (
   `fatigue` int(10) DEFAULT 0,
   PRIMARY KEY (`family_member_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+CREATE TABLE IF NOT EXISTS `orders` (
+  `order_id` varchar(32) NOT NULL,
+  `order_location` varchar(32) NOT NULL,
+  `order_state` int(10) DEFAULT 0,
+  `status` varchar(32) NOT NULL,
+  PRIMARY KEY (`order_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 ALTER TABLE `gamelog`
 ADD `cancel` TINYINT(1) NOT NULL DEFAULT 0;

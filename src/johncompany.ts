@@ -75,7 +75,6 @@ class JohnCompany implements Game {
     const body = document.getElementById('ebd-body');
     this.mobileVersion = body && body.classList.contains('mobile_version');
 
-    console.log('inserting html');
     // Create a new div for buttons to avoid BGA auto clearing it
     dojo.place(
       "<div id='customActions' style='display:inline-block'></div>",
@@ -394,7 +393,6 @@ class JohnCompany implements Game {
     callback: Function | string;
     extraClasses?: string;
   }) {
-		console.log('addPrimaryActionButton');
     if ($(id)) {
       return;
     }
@@ -631,7 +629,7 @@ class JohnCompany implements Game {
 
     const ROOT = document.documentElement;
     const playerAreaContainer = document.getElementById('play_area_container');
-    console.log('playerAreaContainer', playerAreaContainer);
+
     if (!playerAreaContainer) {
       return;
     }
@@ -657,7 +655,7 @@ class JohnCompany implements Game {
     //  } else {
     const LEFT_SIZE = WIDTH;
     const leftColumnScale = LEFT_SIZE / LEFT_COLUMN;
-    console.log('leftColumnScale',leftColumnScale);
+
     ROOT.style.setProperty('--leftColumnScale', `${leftColumnScale}`);
     //  ROOT.style.setProperty(
     // 	 '--mapSizeMultiplier',

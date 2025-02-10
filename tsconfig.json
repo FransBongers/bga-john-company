@@ -9,6 +9,7 @@
     "removeComments": true
   },
   "files": [
+    "src/constants.ts",
     "node_modules/bga-animations/src/animations.ts",
     "node_modules/bga-animations/src/animations/attach-with-animation.ts",
     "node_modules/bga-animations/src/animations/cumulated-animations.ts",
@@ -32,7 +33,6 @@
     "src/johncompany.d.ts",
     "src/board/index.ts",
     "src/board/templates.ts",
-    "src/constants.ts",
     "src/hand/index.ts",
     "src/hand/templates.ts",
     "src/logs/index.ts",

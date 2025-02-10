@@ -1,4 +1,5 @@
 #joco_board {
+  --boardScale: var(--leftColumnScale);
   position: relative;
   background-image: url('img/board.jpg');
   background-size: 100% 100%;
@@ -6,4 +7,23 @@
   width: calc(var(--leftColumnScale) * 1500px);
   // width: 100%;
   // aspect-ratio: 30 / 15;
+}
+
+#joco_orders {
+  position: absolute;
+}
+
+.joco_order {
+  position: absolute;
+  border-radius: 50%;
+  height: calc(var(--leftColumnScale) * 42px);
+  width: calc(var(--leftColumnScale) * 36px);
+}
+
+.joco_order[data-status=closed] {
+  background-color: black;
+}
+
+.joco_order[data-status=filled] {
+  background-color: lightgray;
 }
