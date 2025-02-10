@@ -1,3 +1,5 @@
+@use '../base';
+
 #joco_board {
   --boardScale: var(--leftColumnScale);
   position: relative;
@@ -16,8 +18,11 @@
 .joco_order {
   position: absolute;
   border-radius: 50%;
-  height: calc(var(--leftColumnScale) * 42px);
-  width: calc(var(--leftColumnScale) * 36px);
+  height: calc(var(--leftColumnScale) * 46px);
+  width: calc(var(--leftColumnScale) * 39.5px);
+  // background-color: yellow;
+  // opacity: 0.5;
+  // box-shadow: 0px 0px 0px 4px base.$selectable-color !important;
 }
 
 .joco_order[data-status=closed] {

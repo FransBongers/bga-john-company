@@ -24,8 +24,8 @@
 .joco_order {
   position: absolute;
   border-radius: 50%;
-  height: calc(var(--leftColumnScale) * 42px);
-  width: calc(var(--leftColumnScale) * 36px);
+  height: calc(var(--leftColumnScale) * 46px);
+  width: calc(var(--leftColumnScale) * 39.5px);
 }
 
 .joco_order[data-status=closed] {
@@ -339,7 +339,7 @@ html {
   padding: calc(var(--leftColumnScale) * 2px);
   border-radius: 50%;
   height: calc(var(--leftColumnScale) * 42px);
-  width: calc(var(--leftColumnScale) * 35.6px);
+  width: calc(var(--leftColumnScale) * 35.5px);
   fill: #880064;
 }
 
