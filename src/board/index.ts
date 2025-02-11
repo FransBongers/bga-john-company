@@ -1,24 +1,3 @@
-// Array with top, left coords for each order
-const ORDERS_CONFIG = {
-  [ORDER_PUNJAB_1]: [22.5, 933],
-  [ORDER_DELHI_1]: [15, 1069],
-  [ORDER_DELHI_2]: [47, 1158.5],
-  [ORDER_DELHI_3]: [62, 1038],
-  [ORDER_BENGAL_1]: [113, 1276],
-  [ORDER_BENGAL_2]: [171, 1373],
-  [ORDER_BOMBAY_1]: [89.5, 955],
-  [ORDER_BOMBAY_2]: [173, 996.5],
-  [ORDER_BOMBAY_3]: [233, 941],
-  [ORDER_MARATHA_1]: [109.5, 1171],
-  [ORDER_MARATHA_2]: [176.5, 1072.5],
-  [ORDER_MARATHA_3]: [219.5, 1222],
-  [ORDER_HYDERABAD_1]: [300.5, 1133],
-  [ORDER_MYSORE_1]: [344, 1017.5],
-  [ORDER_MYSORE_2]: [400.5, 1055],
-  [ORDER_MADRAS_1]: [398, 1148.5],
-  [ORDER_MADRAS_2]: [447.5, 1118.5],
-};
-
 class Board {
   private static instance: Board;
   private game: GameAlias;
@@ -26,6 +5,13 @@ class Board {
   private ui: {
     board: HTMLElement;
     orders: HTMLElement;
+    pawns: {
+      balance?: HTMLElement;
+      standing?: HTMLElement;
+      debt?: HTMLElement;
+      turn?: HTMLElement;
+      phase?: HTMLElement;
+    }
   };
   private orders: Record<string, HTMLElement> = {};
 
@@ -59,10 +45,12 @@ class Board {
     this.ui = {
       board: document.getElementById('joco_board'),
       orders: document.getElementById('joco_orders'),
+      pawns: {}
     };
 
     this.ui.board.insertAdjacentHTML('afterbegin', familyMember);
     this.setupOrders(gamedatas);
+    this.setupPawns(gamedatas)
   }
 
   setupOrders(gamedatas: GamedatasAlias) {
@@ -74,6 +62,17 @@ class Board {
     this.updateOrders(gamedatas);
   }
 
+  setupPawns(gamedatas: GamedatasAlias) {
+    ['balance', 'standing', 'debt', 'turn', 'phase'].forEach((pawn) => {
+      const elt = (this.ui.pawns[pawn] = document.createElement('div'));
+      elt.id = pawn;
+      elt.classList.add('joco_pawn');
+      elt.setAttribute('data-color', pawn === 'turn' ? 'black' : pawn === 'phase' ? 'silver' : 'red');
+      this.ui.board.appendChild(elt);
+    })
+    
+    this.updatePawns(gamedatas);
+  }
   // .##.....##.########..########.....###....########.########....##.....##.####
   // .##.....##.##.....##.##.....##...##.##......##....##..........##.....##..##.
   // .##.....##.##.....##.##.....##..##...##.....##....##..........##.....##..##.
@@ -85,10 +84,20 @@ class Board {
   updateOrders(gamedatas: GamedatasAlias) {
     this.ui.orders.replaceChildren();
     Object.entries(gamedatas.orders).forEach(([orderId, order]) => {
-      this.orders[orderId].style.top = `calc(var(--boardScale) * ${ORDERS_CONFIG[orderId][0]}px)`
-      this.orders[orderId].style.left = `calc(var(--boardScale) * ${ORDERS_CONFIG[orderId][1]}px)`
+      setAbsolutePosition(this.orders[orderId], BOARD_SCALE, ORDERS_CONFIG[orderId]);
+      // this.orders[orderId].style.top = `calc(var(--boardScale) * ${ORDERS_CONFIG[orderId].top}px)`
+      // this.orders[orderId].style.left = `calc(var(--boardScale) * ${ORDERS_CONFIG[orderId].left}px)`
       this.orders[orderId].setAttribute('data-status', order.status);
       this.ui.orders.appendChild(this.orders[orderId]);
     });
+  }
+
+  updatePawns(gamedatas: GamedatasAlias) {
+    const {balance, debt, standing} = gamedatas.company;
+    setAbsolutePosition(this.ui.pawns.balance, BOARD_SCALE, getCompanyBalanceConfig(balance));
+    setAbsolutePosition(this.ui.pawns.debt, BOARD_SCALE, getCompanyDebtConfig(debt));
+    setAbsolutePosition(this.ui.pawns.standing, BOARD_SCALE, getCompanyStandingConfig(standing));
+    setAbsolutePosition(this.ui.pawns.phase, BOARD_SCALE, PHASE_CONFIG[gamedatas.phase]);
+    setAbsolutePosition(this.ui.pawns.turn, BOARD_SCALE, TURN_CONFIG[gamedatas.turn]);
   }
 }

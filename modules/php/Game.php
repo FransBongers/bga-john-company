@@ -25,10 +25,12 @@ require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Stats;
+use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Orders;
 use Bga\Games\JohnCompany\Managers\Players;
+use Bga\Games\JohnCompany\Managers\Scenarios;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 
 class Game extends \Table
@@ -332,6 +334,9 @@ class Game extends \Table
         $playerId = $playerId ?? Players::getCurrentId();
 
         $data = [
+            'turn' => Globals::getTurn(),
+            'phase' => Globals::getPhase(),
+            'company' => Company::get(),
             'orders' => Orders::getAll(),
             'players' => Players::getUiData($playerId),
         ];
@@ -388,8 +393,10 @@ class Game extends \Table
 
         $players = Players::getAll()->toArray();
 
+        Scenarios::setupNewGame($players, $options);
         Families::setupNewGame($players);
         FamilyMembers::setupNewGame();
+        Company::setupNewGame();
         Orders::setupNewGame();
         SetupCards::setupNewGame();
 

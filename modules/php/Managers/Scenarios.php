@@ -10,6 +10,16 @@ class Scenarios
     THE_1710_SCENARIO
   ];
 
+  public static function setupNewGame($players, $options)
+  {
+    // TODO: set based on game option
+    Globals::setScenarioId(THE_1710_SCENARIO);
+
+    $scenario = self::get();
+    Globals::setTurn($scenario->getStartTurn());
+  }
+  
+
   public static function get($scenarioId = null)
   {
     $scenarioId = $scenarioId === null ? Globals::getScenarioId() : $scenarioId;

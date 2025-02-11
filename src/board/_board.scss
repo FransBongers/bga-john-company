@@ -13,6 +13,8 @@
 
 #joco_orders {
   position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .joco_order {
@@ -31,4 +33,27 @@
 
 .joco_order[data-status=filled] {
   background-color: lightgray;
+}
+
+.joco_pawn {
+  position: absolute;
+  background-size: 100% 100%;
+  width: calc(var(--boardScale) * 20px);
+  height: calc(var(--boardScale) * 37px);
+  top: calc(var(--boardScale) * 63px);
+  left: calc(var(--boardScale) * 370px);
+  // width: 30px;
+  // height: 56px;
+}
+
+.joco_pawn[data-color=red] {
+  background-image: url('img/pawn_red.svg');
+}
+
+.joco_pawn[data-color=black] {
+  background-image: url('img/pawn_black.svg');
+}
+
+.joco_pawn[data-color=silver] {
+  background-image: url('img/pawn_silver.svg');
 }

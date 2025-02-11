@@ -31,6 +31,7 @@
     "src/boilerplate/utility.ts",
     "src/johncompany.ts",
     "src/johncompany.d.ts",
+    "src/board/config.ts",
     "src/board/index.ts",
     "src/board/templates.ts",
     "src/hand/index.ts",

@@ -1,4 +1,17 @@
 /**
+ * Var names
+ */
+const BOARD_SCALE = 'boardScale';
+
+/**
+ * Phases
+ */
+const LONDON_SEASON = 'londonSeason';
+const FAMILY = 'family';
+const FIRMS = 'firms';
+const HIRING = 'hiring';
+
+/**
  * OrderIds
  */
 const ORDER_PUNJAB_1 = 'Order_Punjab_1';

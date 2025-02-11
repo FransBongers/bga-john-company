@@ -98,7 +98,14 @@ interface JohnCompanyGamedatas extends Gamedatas {
   canceledNotifIds: string[];
   playerOrder: number[];
   players: Record<number, JohnCompanyPlayerData>;
+  company: {
+    debt: number;
+    balance: number;
+    standing: number | 'fail';
+  },
   orders: Record<string, JoCoOrder>;
+  turn: number;
+  phase: string;
 }
 
 interface JoCoOrder {

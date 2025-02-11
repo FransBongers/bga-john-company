@@ -17,6 +17,7 @@ class Scenario implements \JsonSerializable
   protected $passedLaws = [];
   protected $elephant;
   protected $armies = [];
+  protected $startTurn;
 
   public function __construct() {}
 
@@ -34,6 +35,16 @@ class Scenario implements \JsonSerializable
     return $data;
   }
 
+  public function getCompanyStanding()
+  {
+    return $this->companyStanding;
+  }
+
+  public function getCompanyDebt()
+  {
+    return $this->companyDebt;
+  }
+
   public function getOrders()
   {
     return $this->orders;
@@ -42,5 +53,10 @@ class Scenario implements \JsonSerializable
   public function getSetupCards()
   {
     return $this->setupCards;
+  }
+
+  public function getStartTurn()
+  {
+    return $this->startTurn;
   }
 }

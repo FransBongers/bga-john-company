@@ -2,6 +2,21 @@
 require_once 'gameoptions.inc.php';
 
 /**
+ * Company
+ */
+const BALANCE = 'balance';
+const DEBT = 'debt';
+const STANDING = 'standing';
+
+/**
+ * Phases
+ */
+const LONDON_SEASON = 'londonSeason';
+const FAMILY = 'family';
+const FIRMS = 'firms';
+const HIRING = 'hiring';
+
+/**
  * Families
  */
 const BENYON = 'Benyon';
