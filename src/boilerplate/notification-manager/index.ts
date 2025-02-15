@@ -60,6 +60,9 @@ class NotificationManager {
       // Boilerplate
       'log',
       'message',
+      // 'draftCard',
+      'draftCardPrivate',
+      'draftNewCardsPrivate',
     ];
 
     // example: https://github.com/thoun/knarr/blob/main/src/knarr.ts
@@ -78,7 +81,7 @@ class NotificationManager {
             notifDetails.args as Record<string, unknown>
           );
           // TODO: check if this clearPossible causes any issues?
-          this.game.clearPossible();
+          // this.game.clearPossible();
           if (msg != '') {
             $('gameaction_status').innerHTML = msg;
             $('pagemaintitletext').innerHTML = msg;
@@ -104,7 +107,7 @@ class NotificationManager {
       );
       this.game.framework().notifqueue.setSynchronous(notifName, undefined);
 
-      [].forEach((notifId) => {
+      ['draftCard'].forEach((notifId) => {
         this.game
           .framework()
           .notifqueue.setIgnoreNotificationCheck(
@@ -147,5 +150,33 @@ class NotificationManager {
 
   async notif_message(notif: Notif<unknown>) {
     // Only here so messages get displayed in title bar
+  }
+
+  async notif_draftCardPrivate(notif: Notif<NotifDraftCardPrivateArgs>) {
+    const {cardIds} = notif.args;
+
+    await Promise.all(cardIds.map(async (cardId, index) => {
+      // await Interaction.use().wait(index * 100);
+      await this.game.animationManager.attachWithAnimation(
+        new BgaSlideAnimation({ element: document.getElementById(cardId) }),
+        document.getElementById('joco_chosen_cards')
+      );
+    }));
+  }
+
+  async notif_draftNewCardsPrivate(notif: Notif<NotifDraftNewCardsPrivateArgs>) {
+    const { cardIds, lastCard } = notif.args;
+
+    SetupArea.getInstance().newCards(cardIds, lastCard);
+    // document.getElementById('joco_draft_cards').replaceChildren();
+    // const draftCards = newHand.map((id) => tplSetupCard(id));
+
+    // if (newHand.length > 0) {
+    //   document
+    //     .getElementById('joco_draft_cards')
+    //     .insertAdjacentHTML('afterbegin', draftCards.join(''));
+    // }
+
+    // this.game.animationManager.attachWithAnimation({}, document.getElementById('joco_setup_cards'))
   }
 }

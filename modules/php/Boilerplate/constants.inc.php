@@ -6,7 +6,7 @@ const NODE_SEQ = 'seq';
 const NODE_OR = 'or';
 const NODE_XOR = 'xor';
 const NODE_PARALLEL = 'parallel';
-const NODE_LEAF = 'leaf';
+const NODE_LEAF = "leaf";
 
 const ZOMBIE = 98;
 const PASS = 99;
@@ -28,8 +28,3 @@ const ST_END_GAME = 99;
 const ST_END_GAME_NAME = 'gameEnd';
 
 const ST_CLEANUP = 88; // TODO: replace
-
-/**
- * Locations
- */
-const DECK = 'deck';

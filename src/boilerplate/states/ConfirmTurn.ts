@@ -55,10 +55,9 @@ class ConfirmTurn implements State {
         you: '${you}',
       },
     });
-    this.game.addConfirmButton({
-      callback: () =>
-        this.game.takeAction({ action: 'actConfirmTurn', atomicAction: false }),
-    });
+    this.game.addConfirmButton(() =>
+      this.game.framework().bgaPerformAction('actConfirmTurn')
+    );
     this.game.addUndoButtons(this.args);
   }
 

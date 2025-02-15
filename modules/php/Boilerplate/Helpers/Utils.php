@@ -117,6 +117,19 @@ abstract class Utils extends \APP_DbObject
     }, $arrayOfItems);
   }
 
+  public static function returnIds($itemsWithId)
+  {
+    return array_map(function ($item) {
+      return $item->getId();
+    }, $itemsWithId);
+  }
+
+  public static function itemsInLocation($itemsWithLocation, $location) {
+    return self::filter($itemsWithLocation, function ($item) use ($location) {
+      return $item->getLocation() === $location;
+    });
+  }
+
   // .##.....##.########.##.......########..########.########...######.
   // .##.....##.##.......##.......##.....##.##.......##.....##.##....##
   // .##.....##.##.......##.......##.....##.##.......##.....##.##......
@@ -133,22 +146,22 @@ abstract class Utils extends \APP_DbObject
   // ...##.##...##.....##.##........##..##.....##.##.....##....##.....##..##.....##.##...###
   // ....###....##.....##.########.####.########..##.....##....##....####..#######..##....##
 
-  public static function validateJSonAlphaNum($value, $argName = 'unknown')
-  {
-    if (is_array($value)) {
-      foreach ($value as $key => $v) {
-        Utils::validateJSonAlphaNum($key, $argName);
-        Utils::validateJSonAlphaNum($v, $argName);
-      }
-      return true;
-    }
-    if (is_int($value)) {
-      return true;
-    }
-    $bValid = preg_match("/^[_0-9a-zA-Z- ]*$/", $value) === 1;
-    if (!$bValid) {
-      throw new \BgaSystemException("Bad value for: $argName", true, true, FEX_bad_input_argument);
-    }
-    return true;
-  }
+  // public static function validateJSonAlphaNum($value, $argName = 'unknown')
+  // {
+  //   if (is_array($value)) {
+  //     foreach ($value as $key => $v) {
+  //       Utils::validateJSonAlphaNum($key, $argName);
+  //       Utils::validateJSonAlphaNum($v, $argName);
+  //     }
+  //     return true;
+  //   }
+  //   if (is_int($value)) {
+  //     return true;
+  //   }
+  //   $bValid = preg_match("/^[_0-9a-zA-Z- ]*$/", $value) === 1;
+  //   if (!$bValid) {
+  //     throw new \BgaSystemException("Bad value for: $argName", true, true, FEX_bad_input_argument);
+  //   }
+  //   return true;
+  // }
 }

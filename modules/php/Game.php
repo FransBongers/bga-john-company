@@ -23,6 +23,7 @@ namespace Bga\Games\JohnCompany;
 require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Stats;
 use Bga\Games\JohnCompany\Managers\Company;
@@ -43,11 +44,12 @@ class Game extends \Table
     public function __construct()
     {
         parent::__construct();
+
         self::$instance = $this;
         $this->initGameStateLabels([
             'logging' => 10,
         ]);
-        // Engine::boot();
+        Engine::boot();
         // Stats::checkExistence();
 
         /* example of notification decorator.
@@ -337,8 +339,14 @@ class Game extends \Table
             'turn' => Globals::getTurn(),
             'phase' => Globals::getPhase(),
             'company' => Company::get(),
+            'families' => Families::getAll(),
+            'familyMembers' => FamilyMembers::getAll(),
             'orders' => Orders::getAll(),
+            'playerOrder' => Players::getTurnOrder($playerId),
             'players' => Players::getUiData($playerId),
+            'staticData' => [
+                'setupCards' => SetupCards::getStaticUiData()
+            ]
         ];
 
         return $data;

@@ -10,7 +10,8 @@ class SetupCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   protected $location;
   protected $state;
   protected $scenarioSetup;
-
+  protected $items = [];
+  protected $extra = false;
 
   protected $attributes = [
     'id' => ['card_id', 'str'],
@@ -19,7 +20,10 @@ class SetupCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   ];
 
   protected $staticAttributes = [
-    'scenarioSetup'
+    'id',
+    'scenarioSetup',
+    'items',
+    'extra',
   ];
 
   public function jsonSerialize(): array

@@ -45,12 +45,12 @@ class PlayerTurn implements State {
 
     updatePageTitle(_('${you} must select a card'));
 
-    const cards = document.getElementById('joco_hand').children;
+    // const cards = document.getElementById('joco_hand').children;
 
-    for (let i = 0; i < cards.length; i++) {
-      const node = cards.item(i);
-      node.classList.add(SELECTABLE);
-    }
+    // for (let i = 0; i < cards.length; i++) {
+    //   const node = cards.item(i);
+    //   node.classList.add(SELECTABLE);
+    // }
 
     // addPrimaryActionButton({
     //   id: 'action_button',

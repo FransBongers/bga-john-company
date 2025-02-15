@@ -1,34 +1,36 @@
-class ConfirmPartialTurn implements State {
-  private static instance: ConfirmPartialTurn;
-  private args: OnEnteringConfirmTurnArgs;
+interface OnEnteringFamilyActionArgs extends CommonStateArgs {
+  _private?: {
+    options: JoCoSetupCard[];
+    selected: string;
+  };
+}
+
+class FamilyAction implements State {
+  private static instance: FamilyAction;
+  private args: OnEnteringFamilyActionArgs;
 
   constructor(private game: GameAlias) {}
 
   public static create(game: JohnCompany) {
-    ConfirmPartialTurn.instance = new ConfirmPartialTurn(game);
+    FamilyAction.instance = new FamilyAction(game);
   }
 
   public static getInstance() {
-    return ConfirmPartialTurn.instance;
+    return FamilyAction.instance;
   }
 
-  onEnteringState(args: OnEnteringConfirmTurnArgs) {
+  onEnteringState(args: OnEnteringFamilyActionArgs) {
+    debug('Entering FamilyAction state');
     this.args = args;
     this.updateInterfaceInitialStep();
   }
 
   onLeavingState() {
-    debug('Leaving ConfirmTurnState');
+    debug('Leaving FamilyAction state');
   }
 
-  setDescription(activePlayerId: number) {
-    // this.game.clientUpdatePageTitle({
-    //   text: _("${player_name} must confirm the switch of player"),
-    //   args: {
-    //     player_name: this.game.playerManager.getPlayer({playerId: activePlayerId}).getName()
-    //   },
-    //   nonActivePlayers: true,
-    // });
+  setDescription(activePlayerId: number, args: OnEnteringFamilyActionArgs) {
+
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########
@@ -49,18 +51,25 @@ class ConfirmPartialTurn implements State {
 
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
-    this.game.clientUpdatePageTitle({
-      text: _(
-        '${you} must confirm the switch of player. You will not be able to restart your turn'
-      ),
-      args: {
-        you: '${you}',
-      },
+
+    updatePageTitle(_('${you} must select a family action'));
+
+ 
+
+  }
+
+  private updateInterfaceConfirm(card: JoCoSetupCard) {
+    clearPossible();
+    updatePageTitle(_('Draft selected card?'));
+    setSelected(card.id);
+    addConfirmButton(() => {
+      performAction('actFamilyAction', {
+        cardId: card.id,
+      });
+      // Set selected again because performAction will clean interface
+      setSelected(card.id);
     });
-    this.game.addConfirmButton(() =>
-      this.game.framework().bgaPerformAction('actConfirmPartialTurn')
-    );
-    this.game.addUndoButtons(this.args);
+    addCancelButton();
   }
 
   //  .##.....##.########.####.##.......####.########.##....##

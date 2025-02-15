@@ -2,6 +2,25 @@
 require_once 'gameoptions.inc.php';
 
 /**
+ * Locations
+ */
+const DECK = 'deck';
+const EXTRA_SETUP = 'extraSetup';
+
+const ST_SETUP_DRAFT = 19;
+const ST_DRAFT_CARD = 20;
+const ST_DRAFT_CARD_NEXT_STEP = 21;
+const ST_PERFORM_SETUP = 22;
+const ST_FAMILY_ACTION = 23;
+
+
+const DRAFT_CARD = 'DraftCard';
+const DRAFT_CARD_NEXT_STEP = 'DraftCardNextStep';
+const PERFORM_SETUP = 'PerformSetup';
+const FAMILY_ACTION = 'FamilyAction';
+
+
+/**
  * Company
  */
 const BALANCE = 'balance';
@@ -9,8 +28,29 @@ const DEBT = 'debt';
 const STANDING = 'standing';
 
 /**
+ * Setup
+ */
+const OFFICE = 'office';
+const COMPANY_SHARE = 'companyShare';
+const CASH = 'cash';
+const PRIME_MINISTER = 'primeMinister';
+const RANDOM_BLACKMAIL_CARD = 'randomBlackmailCard';
+const SHIP = 'ship';
+const LUXURY = 'luxury';
+const WORKSHOP = 'workshop';
+
+/**
+ * Ship locations
+ */
+const WEST_INDIAN = 'westIndian';
+const EAST_INDIAN = 'eastIndian';
+const SOUTH_INDIAN = 'southIndian';
+const UNFITTED = 'unfitted';
+
+/**
  * Phases
  */
+const SETUP = 'setup'; // Only used during start of game
 const LONDON_SEASON = 'londonSeason';
 const FAMILY = 'family';
 const FIRMS = 'firms';
@@ -34,6 +74,8 @@ const FAMILIES = [
   SYKES,
   WALSH,
 ];
+
+const CROWN = 'Crown';
 
 /**
  * Colors
@@ -112,6 +154,16 @@ const OFFICES = [
   GOVERNOR_OF_HYDERABAD,
   GOVERNOR_OF_MYSORE,
 ];
+
+/**
+ * Family member positions
+ */
+const COMMANDER = 'commander';
+const OFFICER = 'officer';
+const OFFICER_IN_TRAINING = 'officerInTraining';
+const WRITER = 'writer';
+
+const COURT_OF_DIRECTORS = 'courtOfDirectors';
 
 /**
  * ScenarioIds

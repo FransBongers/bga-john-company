@@ -62,7 +62,8 @@ $machinestates = [
         "description" => "",
         "type" => "manager",
         "action" => "stGameSetup",
-        "transitions" => ["" => 2]
+        "transitions" => ["" => ST_SETUP_DRAFT]
+        // "transitions" => ["" => 2]
     ),
 
     // Note: ID=2 => your first state
@@ -178,4 +179,48 @@ $machinestates = [
     // .##.....##.##....##....##.....##..##.....##.##...###.##....##
     // .##.....##..######.....##....####..#######..##....##..######.
 
+    ST_SETUP_DRAFT => [
+        'name' => 'SetupDraft',
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stSetupDraft',
+    ],
+
+    ST_DRAFT_CARD => [
+        'name' => DRAFT_CARD,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('All players must draft a card'),
+        'descriptionmyturn' => clienttranslate('${you} must draft a card'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['actDraftCard', 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_DRAFT_CARD_NEXT_STEP => [
+        'name' => ST_DRAFT_CARD_NEXT_STEP,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_PERFORM_SETUP => [
+        'name' => PERFORM_SETUP,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_FAMILY_ACTION => [
+        'name' => FAMILY_ACTION,
+        'type' => 'activeplayer',
+        'description' => clienttranslate('${actplayer} must perform a family action'),
+        'descriptionmyturn' => clienttranslate('${you} must select a family action'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['actFamilyAction', 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
 ];

@@ -1,34 +1,41 @@
-class ConfirmPartialTurn implements State {
-  private static instance: ConfirmPartialTurn;
-  private args: OnEnteringConfirmTurnArgs;
+interface OnEnteringDraftCardArgs extends CommonStateArgs {
+  _private?: {
+    options: JoCoSetupCard[];
+    selected: string[];
+  };
+  numberToSelect: number;
+}
+
+class DraftCard implements State {
+  private static instance: DraftCard;
+  private args: OnEnteringDraftCardArgs;
+  private selectedCards: string[];
 
   constructor(private game: GameAlias) {}
 
   public static create(game: JohnCompany) {
-    ConfirmPartialTurn.instance = new ConfirmPartialTurn(game);
+    DraftCard.instance = new DraftCard(game);
   }
 
   public static getInstance() {
-    return ConfirmPartialTurn.instance;
+    return DraftCard.instance;
   }
 
-  onEnteringState(args: OnEnteringConfirmTurnArgs) {
+  onEnteringState(args: OnEnteringDraftCardArgs) {
+    debug('Entering DraftCard state');
     this.args = args;
+    this.selectedCards = [];
     this.updateInterfaceInitialStep();
   }
 
   onLeavingState() {
-    debug('Leaving ConfirmTurnState');
+    debug('Leaving DraftCard state');
   }
 
-  setDescription(activePlayerId: number) {
-    // this.game.clientUpdatePageTitle({
-    //   text: _("${player_name} must confirm the switch of player"),
-    //   args: {
-    //     player_name: this.game.playerManager.getPlayer({playerId: activePlayerId}).getName()
-    //   },
-    //   nonActivePlayers: true,
-    // });
+  setDescription(activePlayerId: number, args: OnEnteringDraftCardArgs) {
+    if (args._private?.selected) {
+      args._private?.selected.forEach((cardId) => setSelected(cardId));
+    }
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########
@@ -49,18 +56,47 @@ class ConfirmPartialTurn implements State {
 
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
-    this.game.clientUpdatePageTitle({
-      text: _(
-        '${you} must confirm the switch of player. You will not be able to restart your turn'
-      ),
-      args: {
-        you: '${you}',
-      },
+
+    if (this.args.numberToSelect === 1) {
+      updatePageTitle(_('${you} must select a card to draft'));
+    } else {
+      updatePageTitle(
+        _('${you} must select a card to draft (${number} remaining)'),
+        {
+          number: this.args.numberToSelect - this.selectedCards.length,
+        }
+      );
+    }
+
+    this.setSelected();
+
+    this.args._private.options.forEach((option) => {
+      const node = document.getElementById(option.id);
+      node.classList.add(SELECTABLE);
+      onClick(node, () => this.handleClick(option.id));
     });
-    this.game.addConfirmButton(() =>
-      this.game.framework().bgaPerformAction('actConfirmPartialTurn')
-    );
-    this.game.addUndoButtons(this.args);
+    if (this.selectedCards.length > 0) {
+      addCancelButton();
+    }
+  }
+
+  private updateInterfaceConfirm() {
+    clearPossible();
+    if (this.args.numberToSelect === 1) {
+      updatePageTitle(_('Draft selected card?'));
+    } else {
+      updatePageTitle(_('Draft selected cards'));
+    }
+    this.setSelected();
+
+    addConfirmButton(() => {
+      performAction('actDraftCard', {
+        cardIds: this.selectedCards,
+      });
+      // Set selected again because performAction will clean interface
+      this.setSelected();
+    });
+    addCancelButton();
   }
 
   //  .##.....##.########.####.##.......####.########.##....##
@@ -70,6 +106,10 @@ class ConfirmPartialTurn implements State {
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private setSelected() {
+    this.selectedCards.forEach((cardId) => setSelected(cardId));
+  }
 
   //  ..######..##.......####..######..##....##
   //  .##....##.##........##..##....##.##...##.
@@ -86,4 +126,24 @@ class ConfirmPartialTurn implements State {
   // .##.....##.#########.##..####.##.....##.##.......##.............##
   // .##.....##.##.....##.##...###.##.....##.##.......##.......##....##
   // .##.....##.##.....##.##....##.########..########.########..######.
+
+  private handleClick(cardId: string) {
+    if (this.selectedCards.includes(cardId)) {
+      // Unselect if card was already selected
+      this.selectedCards = this.selectedCards.filter(
+        (selectedCardId) => selectedCardId !== cardId
+      );
+    } else {
+      // Otherwise add to selected cards
+      this.selectedCards.push(cardId);
+    }
+
+    if (this.selectedCards.length === this.args.numberToSelect) {
+      // To confirm step if required number has been selected
+      this.updateInterfaceConfirm();
+    } else {
+      // Otherwise to select step
+      this.updateInterfaceInitialStep();
+    }
+  }
 }

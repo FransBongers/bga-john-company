@@ -2,6 +2,7 @@
 
 namespace Bga\Games\JohnCompany\Boilerplate\Core;
 
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
 
 class Notifications
@@ -78,10 +79,8 @@ class Notifications
     // Keep only the thing that matters
     $refreshedData = [
       // Add data here that needs to be refreshed
-  
+
     ];
-
-
   }
 
 
@@ -131,7 +130,7 @@ class Notifications
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  
+
 
   // ..######......###....##.....##.########
   // .##....##....##.##...###...###.##......
@@ -141,13 +140,33 @@ class Notifications
   // .##....##..##.....##.##.....##.##......
   // ..######...##.....##.##.....##.########
 
-// .##....##..#######..########.####.########..######.
-// .###...##.##.....##....##.....##..##.......##....##
-// .####..##.##.....##....##.....##..##.......##......
-// .##.##.##.##.....##....##.....##..######....######.
-// .##..####.##.....##....##.....##..##.............##
-// .##...###.##.....##....##.....##..##.......##....##
-// .##....##..#######.....##....####.##........######.
+  // .##....##..#######..########.####.########..######.
+  // .###...##.##.....##....##.....##..##.......##....##
+  // .####..##.##.....##....##.....##..##.......##......
+  // .##.##.##.##.....##....##.....##..######....######.
+  // .##..####.##.....##....##.....##..##.............##
+  // .##...###.##.....##....##.....##..##.......##....##
+  // .##....##..#######.....##....####.##........######.
 
-  
+
+  public static function draftCard($player, $cards)
+  {
+    self::notify($player, 'draftCardPrivate', clienttranslate('You draft a card'), [
+      'player' => $player,
+      'cardIds' => Utils::returnIds($cards),
+    ]);
+
+    self::notifyAll('draftCard', clienttranslate('${player_name} drafts a card'), [
+      'player' => $player,
+      'preserve' => ['playerId']
+    ]);
+  }
+
+  public static function draftNewCards($player, $cardIds, $lastCard)
+  {
+    self::notify($player, 'draftNewCardsPrivate', '', [
+      'cardIds' => $cardIds,
+      'lastCard' => $lastCard,
+    ]);
+  }
 }

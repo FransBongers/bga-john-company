@@ -49,7 +49,11 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
 
   public function hasChairmanMarker()
   {
-    return $this->hasChairmanMarker;
+    return $this->hasChairmanMarker === 1;
   }
 
+  public function getPlayer()
+  {
+    
+  }
 }

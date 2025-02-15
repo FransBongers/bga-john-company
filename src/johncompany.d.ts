@@ -102,25 +102,62 @@ interface JohnCompanyGamedatas extends Gamedatas {
     debt: number;
     balance: number;
     standing: number | 'fail';
-  },
+  };
+  families: Record<string, JocoFamily>;
+  familyMembers: Record<string, JocoFamilyMember>;
   orders: Record<string, JoCoOrder>;
   turn: number;
   phase: string;
+  staticData: {
+    setupCards: Record<string, JocoSetupCardStatic>
+  }
+}
+
+interface JocoFamily {
+  id: string;
+  crownPromiseCubes: number;
+  hasChairmanMarker: number;
+  isLeaderOfOpposition: number;
+  lawPieces: number;
+  location: string;
+  opportunityMarker: number;
+  spentOnRetirement: number;
+  state: number;
+  treasury: number;
+  trophies: number;
+  victoryPoints: number;
+}
+
+interface JocoFamilyMember {
+  id: string;
+  location: string;
+  state: number;
+  familyId: string;
 }
 
 interface JoCoOrder {
   id: string;
   location: string;
-  status: 'open' | 'closed' | 'filled' | 'string'
+  status: 'open' | 'closed' | 'filled' | 'string';
 }
 
-interface JoCoSetupCard {
+type JoCoSetupCard = JoCoSetupCardBase & JocoSetupCardStatic;
+
+interface JoCoSetupCardBase {
   id: string;
   location: string;
 }
 
+type JocoSetupCardStatic = {
+  id: string;
+  extra: boolean;
+  scenarioSetup: number;
+  items: Array<{ type: string; value?: string }>;
+};
+
 interface JohnCompanyPlayerData extends BgaPlayer {
-  hand: JoCoSetupCard[];
+  draft: JoCoSetupCard[];
+  setupCards: JoCoSetupCard[];
 }
 
 type GameAlias = JohnCompany;

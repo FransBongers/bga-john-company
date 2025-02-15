@@ -1,6 +1,6 @@
 <?php
 
-namespace Bga\Games\JohnCompany;
+namespace Bga\Games\JohnCompany\Actions;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
@@ -8,19 +8,32 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
-use Bga\Games\JohnCompany\Managers\Offices;
-use Bga\Games\JohnCompany\Managers\Orders;
 use Bga\Games\JohnCompany\Managers\Players;
-use Bga\Games\JohnCompany\Managers\Scenarios;
-use Bga\Games\JohnCompany\Managers\SetupCards;
-use Bga\Games\JohnCompany\Models\FamilyMember;
 
-trait DebugTrait
+class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
-  function setupItem($item, $families) {}
+  public function getState()
+  {
+    return ST_PERFORM_SETUP;
+  }
 
+  // ..######..########....###....########.########
+  // .##....##....##......##.##......##....##......
+  // .##..........##.....##...##.....##....##......
+  // ..######.....##....##.....##....##....######..
+  // .......##....##....#########....##....##......
+  // .##....##....##....##.....##....##....##......
+  // ..######.....##....##.....##....##....########
 
-  function debug_setup()
+  // ....###.....######..########.####..#######..##....##
+  // ...##.##...##....##....##.....##..##.....##.###...##
+  // ..##...##..##..........##.....##..##.....##.####..##
+  // .##.....##.##..........##.....##..##.....##.##.##.##
+  // .#########.##..........##.....##..##.....##.##..####
+  // .##.....##.##....##....##.....##..##.....##.##...###
+  // .##.....##..######.....##....####..#######..##....##
+
+  public function stPerformSetup()
   {
     $families = Families::getAll();
     $players = Players::getAll();
@@ -38,6 +51,9 @@ trait DebugTrait
           switch ($item['type']) {
             case OFFICE:
               FamilyMembers::getMemberFor($familyId)->setLocation($item['value']);
+              if ($item['value'] === CHAIRMAN) {
+                $families[$familyId]->setHasChairmanMarker(1);
+              }
               break;
             case COMPANY_SHARE:
               FamilyMembers::getMemberFor($familyId)->setLocation(COURT_OF_DIRECTORS);
@@ -61,20 +77,18 @@ trait DebugTrait
         }
       }
     }
-  }
 
-  function debug_test()
-  {
-    
-    // Orders::get(ORDER_BENGAL_2)->setStatus(FILLED);
-    // Orders::setupNewGame();
-    // Notifications::log('familyMembers', FamilyMembers::getInLocationOrdered(Locations::familyMemberSupply(HASTINGS))->toArray());
-    Notifications::log('playerOrder', Players::getTurnOrder(2371055));
+    $this->resolveAction(['automatic' => true]);
   }
 
 
-  function debug_engineDisplay()
-  {
-    Notifications::log('engine', Globals::getEngine());
-  }
+  //  .##.....##.########.####.##.......####.########.##....##
+  //  .##.....##....##.....##..##........##.....##.....##..##.
+  //  .##.....##....##.....##..##........##.....##......####..
+  //  .##.....##....##.....##..##........##.....##.......##...
+  //  .##.....##....##.....##..##........##.....##.......##...
+  //  .##.....##....##.....##..##........##.....##.......##...
+  //  ..#######.....##....####.########.####....##.......##...
+
+
 }

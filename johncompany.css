@@ -17,6 +17,7 @@
   width: calc(var(--leftColumnScale) * 1500px);
 }
 
+#joco_family_members,
 #joco_orders {
   position: absolute;
   top: 0;
@@ -113,9 +114,35 @@ span[style*="color:#addb90"] {
   text-shadow: 1px 0 0 black, 0 1px 0 black, -1px 0 0 black, 0 -1px 0 black, 1px 1px 0 black, -1px 1px 0 black, 1px -1px 0 black, -1px -1px 0 black !important;
 }
 
+#joco_setup_area {
+  --cardScale: 1;
+  display: flex;
+  flex-flow: row wrap;
+  gap: 24px;
+}
+#joco_setup_area .joco_container {
+  display: flex;
+  flex-flow: column;
+  padding: 8px;
+  min-width: 460px;
+}
+#joco_setup_area .joco_container .joco_label {
+  /* height: 20px; */
+  font-weight: bold;
+  font-size: large;
+  margin-bottom: 8px;
+}
+#joco_setup_area .joco_container #joco_chosen_cards,
+#joco_setup_area .joco_container #joco_draft_cards {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .joco_setup_card {
-  width: 150px;
-  height: 228px;
+  height: calc(var(--cardScale) * 228px);
+  width: calc(var(--cardScale) * 150px);
   display: inline-block;
   border: 1px solid black;
   border-radius: 5px;
@@ -258,13 +285,6 @@ span[style*="color:#addb90"] {
   background-size: 400% 300%;
 }
 
-#joco_hand {
-  display: flex;
-  flex-direction: row;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
 /* ------- UNDO TURN ------- */
 /* Cancelled notification messages */
 .log.cancel {
@@ -375,17 +395,55 @@ html {
   justify-content: center;
   align-items: center;
   position: absolute;
-  top: calc(var(--leftColumnScale) * 662px);
-  left: calc(var(--leftColumnScale) * 246px);
-  background-color: #c7b4e1;
   border-radius: 50%;
   height: calc(var(--leftColumnScale) * 46px);
   width: calc(var(--leftColumnScale) * 39px);
 }
 .joco_family_member svg {
-  fill: #880064;
   height: calc(var(--leftColumnScale) * 42px);
   width: calc(var(--leftColumnScale) * 35px);
+}
+
+.joco_family_member[data-family=Benyon] {
+  background-color: #ffb1b9;
+}
+.joco_family_member[data-family=Benyon] svg {
+  fill: #cd3263;
+}
+
+.joco_family_member[data-family=Hastings] {
+  background-color: #99dae9;
+}
+.joco_family_member[data-family=Hastings] svg {
+  fill: #006480;
+}
+
+.joco_family_member[data-family=Larkins] {
+  background-color: #f9e08d;
+}
+.joco_family_member[data-family=Larkins] svg {
+  fill: #9d5e16;
+}
+
+.joco_family_member[data-family=Paxton] {
+  background-color: #dbd9d6;
+}
+.joco_family_member[data-family=Paxton] svg {
+  fill: #101820;
+}
+
+.joco_family_member[data-family=Sykes] {
+  background-color: #c7b4e1;
+}
+.joco_family_member[data-family=Sykes] svg {
+  fill: #880064;
+}
+
+.joco_family_member[data-family=Walsh] {
+  background-color: #addb90;
+}
+.joco_family_member[data-family=Walsh] svg {
+  fill: #2b5135;
 }
 
 /*# sourceMappingURL=johncompany.css.map */

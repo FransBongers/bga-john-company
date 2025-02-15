@@ -3,6 +3,8 @@
 namespace Bga\Games\JohnCompany;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
+use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\Players;
 
 
@@ -19,6 +21,68 @@ trait TurnTrait
   }
 
 
+  function stSetupDraft()
+  {
+    // TODO: check game option
+    $draftVariant = true;
+
+    $node = [
+      'children' => [],
+    ];
+
+    if ($draftVariant) {
+
+      $playerCount = Players::count();
+      // For 3-6 players there is one less round
+      // than number of cards as there is only of card left
+      $playerCountRoundsMap = [
+        1 => 4,
+        2 => 2,
+        3 => 3,
+        4 => 2,
+        5 => 2,
+        6 => 2,
+      ];
+      $numberOfDraftRounds = $playerCountRoundsMap[$playerCount];
+      for ($i = 0; $i < $numberOfDraftRounds; $i++) {
+        $node['children'][] = [
+          'action' => DRAFT_CARD,
+          'playerId' => 'all',
+        ];
+      }
+    }
+
+    $node['children'][] =  [
+      'action' => PERFORM_SETUP,
+    ];
+
+    Engine::setup($node, ['method' => 'stSetupFamilyActions']);
+    Engine::proceed();
+  }
+
+  function stSetupFamilyActions()
+  {
+    $chairmanFamilyId = Utils::filter(Families::getAll()->toArray(), function ($family) {
+      return $family->hasChairmanMarker();
+    })[0]->getId();
+
+    $player = Players::getPlayerForFamily($chairmanFamilyId);
+
+    $turnOrder = Players::getTurnOrder($player->getId());
+    $node = [
+      'children' => array_map(function ($playerId) {
+        return [
+          'action' => FAMILY_ACTION,
+          'playerId' => $playerId,
+        ];
+      }, $turnOrder),
+    ];
+
+    Engine::setup($node, ['method' => 'setupGameTurn']);
+    Engine::proceed();
+  }
+
+  function setupGameTurn() {}
 
   /**
    * Activate next player
@@ -30,9 +94,7 @@ trait TurnTrait
     self::giveExtraTime($player->getId());
 
     $node = [
-      'children' => [
-
-      ],
+      'children' => [],
     ];
     // Notifications::startTurn($player);
 

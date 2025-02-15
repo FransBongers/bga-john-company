@@ -33,6 +33,19 @@ class SetupCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     return new $className($data);
   }
 
+  /**
+   * getStaticUiData : return static data
+   */
+  public static function getStaticUiData()
+  {
+    $pieces = self::getAll()->toArray();
+
+    $data = [];
+    foreach ($pieces as $index => $piece) {
+      $data[$piece->getId()] = $piece->getStaticData();
+    }
+    return $data;
+  }
 
 
   // ..######..########.########.##.....##.########.
@@ -56,24 +69,33 @@ class SetupCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     foreach ($setupCardIds as $index => $cId) {
       $card = self::getCardInstance($cId);
 
-      if ($card->getScenarioSetup() === $scenarioCards && $index < $numberOfCards)
-      $cards[$cId] = [
-        'id' => $cId,
-        'location' => DECK,
-      ];
+      if ($card->getScenarioSetup() === $scenarioCards) {
+        $cards[$cId] = [
+          'id' => $cId,
+          'location' => $card->getExtra() ? EXTRA_SETUP : DECK,
+        ];
+      }
     }
 
-    // // Create the cards
+    // Create the cards
     self::create($cards, null);
+    self::shuffle(EXTRA_SETUP);
     self::shuffle(DECK);
+
+    $numberOfExtraCardsInPlay = $numberOfCards - 12;
+    if ($numberOfExtraCardsInPlay > 0) {
+      self::pickForLocation($numberOfExtraCardsInPlay, EXTRA_SETUP, DECK);
+      self::shuffle(DECK);
+    }
   }
 
-  private static function dealSetupCards($families) {
+  private static function dealSetupCards($families)
+  {
     $numberOfCards = count($families) === 3 ? 4 : 3;
 
-      foreach($families as $family) {
-        self::pickForLocation($numberOfCards, DECK, $family->getId());
-      }
+    foreach ($families as $family) {
+      self::pickForLocation($numberOfCards, DECK, Locations::draft($family->getId()));
+    }
   }
 
   /* Creation of the cards */

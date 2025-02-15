@@ -57,6 +57,8 @@ class JohnCompany implements Game {
   private states = {
     ConfirmPartialTurn,
     ConfirmTurn,
+    DraftCard,
+    FamilyAction,
     PlayerTurn,
   };
 
@@ -92,7 +94,7 @@ class JohnCompany implements Game {
     this.gamedatas = gamedatas;
     // this.gameOptions = gamedatas.gameOptions;
     debug('gamedatas', gamedatas);
-    //  this.setupPlayerOrder({ playerOrder: gamedatas.playerOrder });
+    this.setupPlayerOrder(gamedatas.playerOrder);
 
     this._connections = [];
 
@@ -120,11 +122,13 @@ class JohnCompany implements Game {
 
     //  this.gameMap = new GameMap(this);
     //  this.cardArea = new CardArea(this);
-
-		Interaction.create(this);
+    StaticData.create(this);
+    Interaction.create(this);
     NotificationManager.create(this);
     Board.create(this);
-    Hand.create(this);
+    if (this.playerOrder.includes(this.getPlayerId())) {
+      SetupArea.create(this);
+    }
 
     NotificationManager.getInstance().setupNotifications();
 
@@ -133,7 +137,7 @@ class JohnCompany implements Game {
   }
 
   // Sets player order with current player at index 0 if player is in the game
-  setupPlayerOrder({ playerOrder }: { playerOrder: number[] }) {
+  setupPlayerOrder(playerOrder: number[]) {
     const currentPlayerId = this.getPlayerId();
     const isInGame = playerOrder.includes(currentPlayerId);
     if (isInGame) {
@@ -167,11 +171,7 @@ class JohnCompany implements Game {
   public onEnteringState(stateName: string, args: any) {
     console.log('Entering state: ' + stateName, args);
     // UI changes for active player
-    console.log('state', this.states[stateName]);
-    if (
-      this.framework().isCurrentPlayerActive() &&
-      this.states[stateName]
-    ) {
+    if (this.framework().isCurrentPlayerActive() && this.states[stateName]) {
       this.states[stateName].getInstance().onEnteringState(args.args);
     } else if (this.states[stateName]) {
       this.states[stateName]
@@ -322,7 +322,7 @@ class JohnCompany implements Game {
     }
   }
 
-  addCancelButton({ callback }: { callback?: Function } = {}) {
+  addCancelButton(callback?: Function) {
     this.addDangerActionButton({
       id: 'cancel_btn',
       text: _('Cancel'),
@@ -335,7 +335,7 @@ class JohnCompany implements Game {
     });
   }
 
-  addConfirmButton({ callback }: { callback: Function | string }) {
+  addConfirmButton(callback: Function) {
     this.addPrimaryActionButton({
       id: 'confirm_btn',
       text: _('Confirm'),
@@ -354,11 +354,12 @@ class JohnCompany implements Game {
       this.addSecondaryActionButton({
         id: 'pass_btn',
         text: text ? _(text) : _('Pass'),
-        callback: () =>
-          this.takeAction({
-            action: 'actPassOptionalAction',
-            atomicAction: false,
-          }),
+        callback: () => {
+          // this.takeAction({
+          //   action: 'actPassOptionalAction',
+          //   atomicAction: false,
+          // });
+        },
       });
     }
   }
@@ -470,15 +471,16 @@ class JohnCompany implements Game {
       this.addDangerActionButton({
         id: 'undo_last_step_btn',
         text: _('Undo last step'),
-        callback: () =>
-          this.takeAction({
-            action: 'actUndoToStep',
-            args: {
-              stepId: lastStep,
-            },
-            checkAction: 'actRestart',
-            atomicAction: false,
-          }),
+        callback: () => {
+          // this.takeAction({
+          //   action: 'actUndoToStep',
+          //   args: {
+          //     stepId: lastStep,
+          //   },
+          //   checkAction: 'actRestart',
+          //   atomicAction: false,
+          // });
+        },
       });
     }
 
@@ -486,8 +488,9 @@ class JohnCompany implements Game {
       this.addDangerActionButton({
         id: 'restart_btn',
         text: _('Restart turn'),
-        callback: () =>
-          this.takeAction({ action: 'actRestart', atomicAction: false }),
+        callback: () => {
+          // this.takeAction({ action: 'actRestart', atomicAction: false }),
+        },
       });
     }
   }
@@ -501,19 +504,19 @@ class JohnCompany implements Game {
     this.framework().removeActionButtons();
     dojo.empty('customActions');
 
-    //  dojo.forEach(this._connections, dojo.disconnect);
-    //  this._connections = [];
-    //  this._selectableNodes.forEach((node) => {
-    // 	 if ($(node)) {
-    // 		 dojo.removeClass(node, GEST_SELECTABLE);
-    // 		 dojo.removeClass(node, GEST_SELECTED);
-    // 	 }
-    //  });
-    //  this._selectableNodes = [];
+    dojo.forEach(this._connections, dojo.disconnect);
+    this._connections = [];
+    this._selectableNodes.forEach((node) => {
+      if ($(node)) {
+        dojo.removeClass(node, SELECTABLE);
+        dojo.removeClass(node, SELECTED);
+      }
+    });
+    this._selectableNodes = [];
 
     //  // TODO: remove this and handle via _selectableNodes
-    //  dojo.query(`.${GEST_SELECTABLE}`).removeClass(GEST_SELECTABLE);
-    //  dojo.query(`.${GEST_SELECTED}`).removeClass(GEST_SELECTED);
+    dojo.query(`.${SELECTABLE}`).removeClass(SELECTABLE);
+    dojo.query(`.${SELECTED}`).removeClass(SELECTED);
 
     //  this.gameMap.clearSelectable();
   }
@@ -606,14 +609,14 @@ class JohnCompany implements Game {
     // this.stopActionTimer();
     // this.framework().checkAction("actRestart");
     // this.takeAction('actUndoToStep', args: { stepId });
-    this.takeAction({
-      action: 'actUndoToStep',
-      atomicAction: false,
-      args: {
-        stepId,
-      },
-      checkAction: 'actRestart',
-    });
+    // this.takeAction({
+    //   action: 'actUndoToStep',
+    //   atomicAction: false,
+    //   args: {
+    //     stepId,
+    //   },
+    //   checkAction: 'actRestart',
+    // });
   }
 
   public updateLayout() {
@@ -936,38 +939,38 @@ class JohnCompany implements Game {
   /*
    * Make an AJAX call with automatic lock
    */
-  takeAction({
-    action,
-    atomicAction = true,
-    args = {},
-    checkAction,
-  }: {
-    action: string;
-    atomicAction?: boolean;
-    args?: Record<string, unknown>;
-    checkAction?: string; // Action used in checkAction
-  }) {
-    const actionName = atomicAction ? action : undefined;
-    if (!this.framework().checkAction(checkAction || action)) {
-      this.actionError(action);
-      return;
-    }
-    const data = {
-      lock: true,
-      actionName,
-      args: JSON.stringify(args),
-    };
-    // data.
-    const gameName = this.framework().game_name;
-    this.framework().ajaxcall(
-      `/${gameName}/${gameName}/${
-        atomicAction ? 'actTakeAtomicAction' : action
-      }.html`,
-      data,
-      this,
-      () => {}
-    );
-  }
+  // takeAction({
+  //   action,
+  //   atomicAction = true,
+  //   args = {},
+  //   checkAction,
+  // }: {
+  //   action: string;
+  //   atomicAction?: boolean;
+  //   args?: Record<string, unknown>;
+  //   checkAction?: string; // Action used in checkAction
+  // }) {
+  //   const actionName = atomicAction ? action : undefined;
+  //   if (!this.framework().checkAction(checkAction || action)) {
+  //     this.actionError(action);
+  //     return;
+  //   }
+  //   const data = {
+  //     lock: true,
+  //     actionName,
+  //     args: JSON.stringify(args),
+  //   };
+  //   // data.
+  //   const gameName = this.framework().game_name;
+  //   this.framework().ajaxcall(
+  //     `/${gameName}/${gameName}/${
+  //       atomicAction ? 'actTakeAtomicAction' : action
+  //     }.html`,
+  //     data,
+  //     this,
+  //     () => {}
+  //   );
+  // }
 
   // // Generic call for Atomic Action that encode args as a JSON to be decoded by backend
   // takeAtomicAction(action, args, warning = false) {

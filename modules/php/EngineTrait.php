@@ -7,6 +7,9 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Log;
+use \Bga\GameFramework\Actions\Types\JsonParam;
+use Bga\GameFramework\Notify;
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 
 trait EngineTrait
 {
@@ -42,12 +45,12 @@ trait EngineTrait
   /**
    * Pass the argument of the action to the atomic action
    */
-  function actTakeAtomicAction($actionName, $args)
+  function actTakeAtomicAction(string $actionName, #[JsonParam(associative: null)] mixed $args)
   {
-    self::checkAction($actionName);
     $action = $this->getCurrentAtomicAction();
     AtomicActions::takeAction($action, $actionName, $args, Engine::getNextUnresolved());
   }
+
 
   /**
    * To pass if the action is an optional one

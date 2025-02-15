@@ -1,0 +1,109 @@
+@use '../base';
+@use "sass:math";
+@use "sass:map";
+
+#joco_setup_area {
+  --cardScale: 1;
+  display: flex;
+  flex-flow: row wrap;
+  gap: 24px;
+  // background-color: purple;
+  // justify-content: space-between;
+
+  .joco_container {
+    display: flex;
+    flex-flow: column;
+    padding: 8px;
+    // background-color: yellow;
+    min-width: 460px;
+
+    .joco_label {
+      // transform-origin: top;
+      // rotate: -90deg;
+      /* height: 20px; */
+      // align-self: center;
+      font-weight: bold;
+      font-size: large;
+      margin-bottom: 8px;
+    }
+
+    #joco_chosen_cards,
+    #joco_draft_cards {
+      display: flex;
+      flex-direction: row;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+  }
+}
+
+.joco_setup_card {
+  height: calc(var(--cardScale) * 228px);
+  width: calc(var(--cardScale) * 150px);
+  display: inline-block;
+  border: 1px solid black;
+  border-radius: 5px;
+}
+
+.joco_setup_card.selectable {
+  cursor: pointer;
+  box-shadow: 0px 0px 0px 4px base.$selectable-color !important;
+}
+
+.joco_setup_card.selected,
+.joco_setup_card.selectable:hover {
+  cursor: pointer;
+  box-shadow: 0px 0px 0px 4px base.$selected-color !important;
+}
+
+$setupCards: (
+  1: "Setup1710_01",
+  2: "Setup1710_02",
+  3: "Setup1710_03",
+  4: "Setup1710_04",
+  5: "Setup1710_05",
+  6: "Setup1710_06",
+  7: "Setup1710_07",
+  8: "Setup1710_08",
+  9: "Setup1710_09",
+  10: "Setup1710_10",
+  11: "Setup1710_11",
+  12: "Setup1710_12",
+  13: "Setup1710_13",
+  14: "Setup1710_14",
+  15: "Setup1710_15",
+  16: "Setup1710_16",
+  17: "Setup1710_17",
+  18: "Setup1710_18",
+);
+  
+@for $i from 1 through 8 {
+  ##{map.get($setupCards,$i)} {
+    background-image: url('img/1710_1.jpg');
+    background-position-x: math.div((($i - 1) % 4 * 100%), 3);
+    background-position-y: math.div(math.floor(calc(($i - 1) / 4)) * 100%, 1);
+    background-size: 400% 200%;
+  }
+}
+
+$setupCards2: (
+  1: "Setup1710_09",
+  2: "Setup1710_10",
+  3: "Setup1710_11",
+  4: "Setup1710_12",
+  5: "Setup1710_13",
+  6: "Setup1710_14",
+  7: "Setup1710_15",
+  8: "Setup1710_16",
+  9: "Setup1710_17",
+  10: "Setup1710_18",
+);
+
+@for $i from 1 through 10 {
+  ##{map.get($setupCards2,$i)} {
+    background-image: url('img/1710_2.jpg');
+    background-position-x: math.div((($i - 1) % 4 * 100%), 3);
+    background-position-y: math.div(math.floor(calc(($i - 1) / 4)) * 100%, 2);
+    background-size: 400% 300%;
+  }
+}

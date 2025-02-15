@@ -12,7 +12,7 @@
 @use './board/board';
 @use './boilerplate/default';
 @use './cards/setupCards';
-@use './hand//hand';
+@use './setup-area/setup-area';
 @use './logs/logs';
 
 html {
@@ -64,9 +64,9 @@ html {
   justify-content: center;
   align-items: center;
   position: absolute;
-  top: calc(var(--leftColumnScale) * 662px);
-  left: calc(var(--leftColumnScale) * 246px);
-  background-color: base.$player-purple;
+  // top: calc(var(--leftColumnScale) * 662px);
+  // left: calc(var(--leftColumnScale) * 246px);
+  // background-color: base.$player-purple;
   // padding: calc(var(--leftColumnScale) * 2px);
   border-radius: 50%;
   // background-image: url('img/familyMember2.svg');
@@ -78,9 +78,45 @@ html {
   // fill: base.$player-purple-dark;
   // stroke: base.$player-blue-dark;
   svg {
-    fill: base.$player-purple-dark;
+    // fill: base.$player-purple-dark;
     height: calc(var(--leftColumnScale) * 42px);
     width: calc(var(--leftColumnScale) * 35px);
   }
 }
 
+.joco_family_member[data-family="Benyon"] {
+  background-color: base.$player-pink;
+  svg {
+    fill: base.$player-pink-dark;
+  }
+}
+.joco_family_member[data-family="Hastings"] {
+  background-color: base.$player-blue;
+  svg {
+    fill: base.$player-blue-dark;
+  }
+}
+.joco_family_member[data-family="Larkins"] {
+  background-color: base.$player-yellow;
+  svg {
+    fill: base.$player-yellow-dark;
+  }
+}
+.joco_family_member[data-family="Paxton"] {
+  background-color: base.$player-gray;
+  svg {
+    fill: base.$player-gray-dark;
+  }
+}
+.joco_family_member[data-family="Sykes"] {
+  background-color: base.$player-purple;
+  svg {
+    fill: base.$player-purple-dark;
+  }
+}
+.joco_family_member[data-family="Walsh"] {
+  background-color: base.$player-green;
+  svg {
+    fill: base.$player-green-dark;
+  }
+}

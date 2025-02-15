@@ -9,6 +9,17 @@ class Setup1710_14 extends \Bga\Games\JohnCompany\Models\SetupCard
     parent::__construct($row);
     $this->id = 'Setup1710_14';
     $this->scenarioSetup = 1710;
+    $this->extra = true;
+    $this->items = [
+      [
+        'type' => SHIP,
+        'value' => UNFITTED
+      ],
+      [
+        'type' => SHIP,
+        'value' => UNFITTED
+      ],
+    ];
   }
 
 }

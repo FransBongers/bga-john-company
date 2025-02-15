@@ -2,7 +2,9 @@
 
 namespace Bga\Games\JohnCompany\Managers;
 
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
+
 
 
 /*
@@ -48,7 +50,7 @@ class Players extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     Game::get()->reloadPlayersBasicInfos();
     // PlayersExtra::setupNewGame();
 
-    
+
   }
 
   public static function getActiveId()
@@ -114,7 +116,7 @@ class Players extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     return self::get(self::getCurrentId());
   }
 
-  public function getNextId($player)
+  public static function getNextId($player)
   {
     $playerId = is_int($player) ? $player : $player->getId();
 
@@ -122,7 +124,7 @@ class Players extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     return (int) $table[$playerId];
   }
 
-  public function getPrevId($player)
+  public static function getPrevId($player)
   {
     $playerId = is_int($player) ? $player : $player->getId();
 
@@ -135,7 +137,7 @@ class Players extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
   /*
    * Return the number of players
    */
-  public function count()
+  public static function count()
   {
     return self::DB()->count();
   }
@@ -150,22 +152,11 @@ class Players extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     });
   }
 
-  public static function getPlayerOrder()
-  {
-    $players = self::getAll()->toArray();
-    usort($players, function ($a, $b) {
-      return $a->getNo() - $b->getNo();
-    });
-    $playerOrder = array_map(function ($player) {
-      return $player->getId();
-    }, $players);
-    return $playerOrder;
-  }
 
   /*
    * Get current turn order according to first player variable
    */
-  public static function getTurnOrder($firstPlayer = null)
+  public static function getTurnOrder($firstPlayerId = null)
   {
     $players = self::getAll()->toArray();
     usort($players, function ($a, $b) {
@@ -174,6 +165,15 @@ class Players extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     $playerOrder = array_map(function ($player) {
       return $player->getId();
     }, $players);
+    
+    if (in_array($firstPlayerId, $playerOrder)) {
+      while($playerOrder[0] !== $firstPlayerId) {
+        $currentFirst = array_shift($playerOrder);
+        $playerOrder[] = $currentFirst;
+      }
+    }
+
+
     return $playerOrder;
   }
 
@@ -214,4 +214,11 @@ class Players extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
   // .##.....##.##..........##....##.....##.##.....##.##.....##.##....##
   // .##.....##.########....##....##.....##..#######..########...######.
 
+  public static function getPlayerForFamily($familyId)
+  {
+    $players = self::getAll()->toArray();
+    return Utils::array_find($players, function ($player) use ($familyId) {
+      return HEX_COLOR_COLOR_MAP[$player->getColor()] === FAMILY_COLOR_MAP[$familyId];
+    });
+  }
 }

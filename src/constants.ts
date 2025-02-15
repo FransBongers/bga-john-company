@@ -6,6 +6,7 @@ const BOARD_SCALE = 'boardScale';
 /**
  * Phases
  */
+const SETUP = 'setup'; // Only used during start of game
 const LONDON_SEASON = 'londonSeason';
 const FAMILY = 'family';
 const FIRMS = 'firms';
@@ -51,3 +52,47 @@ const ORDERS = [
   ORDER_MADRAS_1,
   ORDER_MADRAS_2,
 ];
+
+/**
+ * Offices
+ */
+const CHAIRMAN = 'Chairman';
+const DIRECTOR_OF_TRADE = 'DirectorOfTrade';
+const MANAGER_OF_SHIPPING = 'ManagerOfShipping';
+const MILITARY_AFFAIRS = 'MilitaryAffairs';
+const PRESIDENT_OF_BOMBAY = 'PresidentOfBombay';
+const PRESIDENT_OF_MADRAS = 'PresidentOfMadras';
+const PRESIDENT_OF_BENGAL = 'PresidentOfBengal';
+const GOVERNOR_GENERAL = 'GovernorGeneral';
+const SUPERINTENDENT_OF_TRADE_IN_CHINE = 'SuperintendentOfTradeInChina';
+const GOVERNOR_OF_BOMBAY = 'GovernorOfBombay';
+const GOVERNOR_OF_MADRAS = 'GovernorOfMadras';
+const GOVERNOR_OF_BENGAL = 'GovernorOfBengal';
+const GOVERNOR_OF_PUNJAB = 'GovernorOfPunjab';
+const GOVERNOR_OF_DELHI = 'GovernorOfDelhi';
+const GOVERNOR_OF_MARATHA = 'GovernorOfMaratha';
+const GOVERNOR_OF_HYDERABAD = 'GovernorOfHyderabad';
+const GOVERNOR_OF_MYSORE = 'GovernorOfMysore';
+
+/**
+ * Family member positions
+ */
+const COMMANDER = 'commander';
+const OFFICER = 'officer';
+const OFFICER_IN_TRAINING = 'officerInTraining';
+const WRITER = 'writer';
+
+const COURT_OF_DIRECTORS = 'courtOfDirectors';
+
+
+/**
+ * RegionIds
+ */
+const BENGAL = 'Bengal';
+const BOMBAY = 'Bombay';
+const DELHI = 'Delhi';
+const HYDERABAD = 'Hyderabad';
+const MADRAS = 'Madras';
+const MARATHA = 'Maratha';
+const MYSORE = 'Mysore';
+const PUNJAB = 'Punjab';

@@ -151,7 +151,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
    */
   public static function setupNewGame($players, $options)
   {
-    Globals::setPhase(FAMILY);
+    Globals::setPhase(SETUP);
     // Game options
     
   }

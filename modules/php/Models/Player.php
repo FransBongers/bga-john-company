@@ -3,6 +3,7 @@
 namespace Bga\Games\JohnCompany\Models;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Preferences;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 
 /*
@@ -43,7 +44,8 @@ class Player extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     return array_merge(
       $data,
       [
-        'hand' => $isCurrentPlayer ? $this->getHand() : [],
+        'draft' => $isCurrentPlayer ? $this->getDraft() : [],
+        'setupCards' => $isCurrentPlayer ? $this->getSetupCards() : [],
       ],
     );
   }
@@ -53,14 +55,19 @@ class Player extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     return (int) parent::getId();
   }
 
-  public function getFamiliyId()
+  public function getFamilyId()
   {
     return COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[$this->getColor()]];
   }
 
-  public function getHand()
+  public function getDraft()
   {
-    return SetupCards::getInLocation($this->getFamiliyId())->toArray();
+    return SetupCards::getInLocation(Locations::draft($this->getFamilyId()))->toArray();
+  }
+
+  public function getSetupCards()
+  {
+    return SetupCards::getInLocation(Locations::setupCards($this->getFamilyId()))->toArray();
   }
 
 }

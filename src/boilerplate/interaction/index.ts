@@ -17,7 +17,7 @@ class Interaction {
     return Interaction.instance;
   }
 
-  addPrimaryActionButton({
+  public addPrimaryActionButton({
     id,
     text,
     callback,
@@ -28,8 +28,6 @@ class Interaction {
     callback: Function | string;
     extraClasses?: string;
   }) {
-    Interaction.use().addPrimaryActionButton;
-
     if ($(id)) {
       return;
     }
@@ -41,7 +39,19 @@ class Interaction {
     }
   }
 
-  clientUpdatePageTitle(
+  public addCancelButton(callback?: Function) {
+    this.game.addCancelButton(callback);
+  }
+
+  public addConfirmButton(callback: Function) {
+    this.game.addConfirmButton(callback);
+  }
+
+  public clearPossible() {
+    this.game.clearPossible();
+  }
+
+  public clientUpdatePageTitle(
     text: string,
     args: Record<string, string | number>,
     nonActivePlayers: boolean = false
@@ -53,5 +63,31 @@ class Interaction {
       this.game.gamedatas.gamestate.descriptionmyturn = title;
     }
     this.game.framework().updatePageTitle();
+  }
+
+  public onClick(node: HTMLElement, callback: Function, temporary = true) {
+    this.game.onClick(node, callback, temporary);
+  }
+
+  public setSelected(node: HTMLElement) {
+    if (!node) {
+      return;
+    }
+    node.classList.add(SELECTED);
+  }
+
+  public performAction(actionName: string, args: Record<string, unknown>) {
+    this.game.framework().bgaPerformAction(
+      'actTakeAtomicAction',
+      {
+        actionName,
+        args: JSON.stringify(args),
+      }
+      //  {lock: true, checkAction: false}
+    );
+  }
+
+  public async wait(ms: number) {
+    return await this.game.framework().wait(ms);
   }
 }
