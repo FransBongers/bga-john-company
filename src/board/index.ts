@@ -16,6 +16,16 @@ class Board {
   };
   private orders: Record<string, HTMLElement> = {};
   private familyMembers: Record<string, HTMLElement> = {};
+  private courtOfDirectors: JocoFamilyMember[] = [];
+  private writers: {
+    Bengal: JocoFamilyMember[];
+    Bombay: JocoFamilyMember[];
+    Madras: JocoFamilyMember[];
+  } = {
+    [BENGAL]: [],
+    [BOMBAY]: [],
+    [MADRAS]: [],
+  };
 
   constructor(game: GameAlias) {
     this.game = game;
@@ -70,7 +80,7 @@ class Board {
       elt.setAttribute('data-family', familyMember.familyId);
       elt.setAttribute('data-number', familyMemberNumber);
     });
-    this.updateFamilyMembers(gamedatas);
+    this.updateFamilyMembers(Object.values(gamedatas.familyMembers));
   }
 
   setupOrders(gamedatas: GamedatasAlias) {
@@ -104,34 +114,50 @@ class Board {
   // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
   // ..#######..##........########..##.....##....##....########.....#######..####
 
-  updateFamilyMembers(gamedatas: GamedatasAlias) {
-    const counters = {
-      [COURT_OF_DIRECTORS]: 0,
-      writers: {
-        [BENGAL]: 0,
-        [BOMBAY]: 0,
-        [MADRAS]: 0,
+  updateFamilyMembers(familyMembers: JocoFamilyMember[]) {
+    familyMembers.forEach((familyMember) => {
+      const { location, id } = familyMember;
+      if (location.startsWith('supply')) {
+        return;
       }
-    };
-    Object.values(gamedatas.familyMembers).forEach(({ location, id }) => {
-      if (!location.startsWith('supply')) {
-        this.ui.familyMembers.appendChild(this.familyMembers[id]);
-        let position: AbsolutePosition = { top: 0, left: 0 };
-        if (location === COURT_OF_DIRECTORS) {
-          position = getCourtOfDirectorsPosition(counters[COURT_OF_DIRECTORS]);
-          counters[COURT_OF_DIRECTORS]++;
-        } else if (location === OFFICER_IN_TRAINING) {
-        } else if (location.startsWith(WRITER)) {
-          const regionId = location.split('_')[1];
-          position = getWriterPosition(regionId, counters.writers[regionId]);
-          counters.writers[regionId]++;
-        } else if (location.startsWith(OFFICER)) {
-        } else {
-          position = FAMILY_MEMBER_OFFICE_CONFIG[location];
-        }
-        setAbsolutePosition(this.familyMembers[id], BOARD_SCALE, position);
+      this.ui.familyMembers.appendChild(this.familyMembers[id]);
+
+      let position: AbsolutePosition = { top: 0, left: 0 };
+
+      if (location === COURT_OF_DIRECTORS) {
+        position = getCourtOfDirectorsPosition(this.courtOfDirectors.length);
+        this.courtOfDirectors.push(familyMember);
+      } else if (location === OFFICER_IN_TRAINING) {
+      } else if (location.startsWith(WRITER)) {
+        const regionId = location.split('_')[1];
+        position = getWriterPosition(regionId, this.writers[regionId].length);
+        this.writers[regionId].push(familyMember);
+      } else if (location.startsWith(OFFICER)) {
+      } else {
+        position = FAMILY_MEMBER_OFFICE_CONFIG[location];
       }
+      setAbsolutePosition(this.familyMembers[id], BOARD_SCALE, position);
     });
+  }
+
+  async placeFamilyMembers(
+    familyMembers: JocoFamilyMember[],
+    fromElement: HTMLElement
+  ) {
+    const fromRect = fromElement.getBoundingClientRect();
+    const promises = familyMembers.map(async (familyMember, index) => {
+      const { id } = familyMember;
+      await this.game.framework().wait(index * 250);
+      this.updateFamilyMembers([familyMember]);
+      await this.game.animationManager.play(
+        new BgaSlideAnimation({
+          element: this.familyMembers[id],
+          transitionTimingFunction: 'ease-in-out',
+          fromRect,
+        })
+      );
+    });
+    await Promise.all(promises);
   }
 
   updateOrders(gamedatas: GamedatasAlias) {

@@ -43,6 +43,8 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
       $familyId = $player->getFamilyId();
 
       Notifications::log('setupCards', $setupCards);
+      $familyMembers = [];
+
       foreach ($setupCards as $card) {
         $items = $card->getItems();
         Notifications::log('items', $items);
@@ -50,25 +52,37 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
         foreach ($items as $item) {
           switch ($item['type']) {
             case OFFICE:
-              FamilyMembers::getMemberFor($familyId)->setLocation($item['value']);
+              $familyMember = FamilyMembers::getMemberFor($familyId);
+              $familyMember->setLocation($item['value']);
+              $familyMembers[] = $familyMember;
               if ($item['value'] === CHAIRMAN) {
                 $families[$familyId]->setHasChairmanMarker(1);
               }
               break;
             case COMPANY_SHARE:
-              FamilyMembers::getMemberFor($familyId)->setLocation(COURT_OF_DIRECTORS);
+              $familyMember = FamilyMembers::getMemberFor($familyId);
+              $familyMember->setLocation(COURT_OF_DIRECTORS);
+              $familyMembers[] = $familyMember;
               break;
             case WRITER:
-              FamilyMembers::getMemberFor($familyId)->setLocation(Locations::writers($item['value']));
+              $familyMember = FamilyMembers::getMemberFor($familyId);
+              $familyMember->setLocation(Locations::writers($item['value']));
+              $familyMembers[] = $familyMember;
               break;
             case OFFICER:
-              FamilyMembers::getMemberFor($familyId)->setLocation(Locations::officers($item['value']));
+              $familyMember = FamilyMembers::getMemberFor($familyId);
+              $familyMember->setLocation(Locations::officers($item['value']));
+              $familyMembers[] = $familyMember;
               break;
             case COMMANDER:
-              FamilyMembers::getMemberFor($familyId)->setLocation(Locations::commander($item['value']));
+              $familyMember = FamilyMembers::getMemberFor($familyId);
+              $familyMember->setLocation(Locations::commander($item['value']));
+              $familyMembers[] = $familyMember;
               break;
             case OFFICER_IN_TRAINING:
-              FamilyMembers::getMemberFor($familyId)->setLocation(OFFICER_IN_TRAINING);
+              $familyMember = FamilyMembers::getMemberFor($familyId);
+              $familyMember->setLocation(OFFICER_IN_TRAINING);
+              $familyMembers[] = $familyMember;
               break;
             case CASH:
               $families[$familyId]->incTreasury($item['value']);
@@ -76,6 +90,8 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
           }
         }
       }
+
+      Notifications::setupFamilyMembers($player, $familyMembers);
     }
 
     $this->resolveAction(['automatic' => true]);

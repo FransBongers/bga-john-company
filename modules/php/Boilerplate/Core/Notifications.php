@@ -169,4 +169,12 @@ class Notifications
       'lastCard' => $lastCard,
     ]);
   }
+
+  public static function setupFamilyMembers($player, $familyMembers)
+  {
+    self::notifyAll('setupFamilyMembers', clienttranslate('${player_name} places family members'), [
+      'player' => $player,
+      'familyMembers' => $familyMembers,
+    ]);
+  }
 }

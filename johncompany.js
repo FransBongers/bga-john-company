@@ -608,6 +608,7 @@ var NotificationManager = (function () {
             'message',
             'draftCardPrivate',
             'draftNewCardsPrivate',
+            'setupFamilyMembers',
         ];
         notifs.forEach(function (notifName) {
             _this.subscriptions.push(dojo.subscribe(notifName, _this, function (notifDetails) {
@@ -691,6 +692,21 @@ var NotificationManager = (function () {
                 _a = notif.args, cardIds = _a.cardIds, lastCard = _a.lastCard;
                 SetupArea.getInstance().newCards(cardIds, lastCard);
                 return [2];
+            });
+        });
+    };
+    NotificationManager.prototype.notif_setupFamilyMembers = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, familyMembers, playerId;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = notif.args, familyMembers = _a.familyMembers, playerId = _a.playerId;
+                        return [4, Board.getInstance().placeFamilyMembers(familyMembers, document.getElementById("player_board_".concat(playerId)))];
+                    case 1:
+                        _b.sent();
+                        return [2];
+                }
             });
         });
     };
@@ -1322,8 +1338,15 @@ var FAMILY_MEMBER_OFFICE_CONFIG = (_c = {},
     _c);
 var Board = (function () {
     function Board(game) {
+        var _a;
         this.orders = {};
         this.familyMembers = {};
+        this.courtOfDirectors = [];
+        this.writers = (_a = {},
+            _a[BENGAL] = [],
+            _a[BOMBAY] = [],
+            _a[MADRAS] = [],
+            _a);
         this.game = game;
         this.setup(game.gamedatas);
     }
@@ -1359,7 +1382,7 @@ var Board = (function () {
             elt.setAttribute('data-family', familyMember.familyId);
             elt.setAttribute('data-number', familyMemberNumber);
         });
-        this.updateFamilyMembers(gamedatas);
+        this.updateFamilyMembers(Object.values(gamedatas.familyMembers));
     };
     Board.prototype.setupOrders = function (gamedatas) {
         var _this = this;
@@ -1380,40 +1403,69 @@ var Board = (function () {
         });
         this.updatePawns(gamedatas);
     };
-    Board.prototype.updateFamilyMembers = function (gamedatas) {
-        var _a, _b;
+    Board.prototype.updateFamilyMembers = function (familyMembers) {
         var _this = this;
-        var counters = (_a = {},
-            _a[COURT_OF_DIRECTORS] = 0,
-            _a.writers = (_b = {},
-                _b[BENGAL] = 0,
-                _b[BOMBAY] = 0,
-                _b[MADRAS] = 0,
-                _b),
-            _a);
-        Object.values(gamedatas.familyMembers).forEach(function (_a) {
-            var location = _a.location, id = _a.id;
-            if (!location.startsWith('supply')) {
-                _this.ui.familyMembers.appendChild(_this.familyMembers[id]);
-                var position = { top: 0, left: 0 };
-                if (location === COURT_OF_DIRECTORS) {
-                    position = getCourtOfDirectorsPosition(counters[COURT_OF_DIRECTORS]);
-                    counters[COURT_OF_DIRECTORS]++;
-                }
-                else if (location === OFFICER_IN_TRAINING) {
-                }
-                else if (location.startsWith(WRITER)) {
-                    var regionId = location.split('_')[1];
-                    position = getWriterPosition(regionId, counters.writers[regionId]);
-                    counters.writers[regionId]++;
-                }
-                else if (location.startsWith(OFFICER)) {
-                }
-                else {
-                    position = FAMILY_MEMBER_OFFICE_CONFIG[location];
-                }
-                setAbsolutePosition(_this.familyMembers[id], BOARD_SCALE, position);
+        familyMembers.forEach(function (familyMember) {
+            var location = familyMember.location, id = familyMember.id;
+            if (location.startsWith('supply')) {
+                return;
             }
+            _this.ui.familyMembers.appendChild(_this.familyMembers[id]);
+            var position = { top: 0, left: 0 };
+            if (location === COURT_OF_DIRECTORS) {
+                position = getCourtOfDirectorsPosition(_this.courtOfDirectors.length);
+                _this.courtOfDirectors.push(familyMember);
+            }
+            else if (location === OFFICER_IN_TRAINING) {
+            }
+            else if (location.startsWith(WRITER)) {
+                var regionId = location.split('_')[1];
+                position = getWriterPosition(regionId, _this.writers[regionId].length);
+                _this.writers[regionId].push(familyMember);
+            }
+            else if (location.startsWith(OFFICER)) {
+            }
+            else {
+                position = FAMILY_MEMBER_OFFICE_CONFIG[location];
+            }
+            setAbsolutePosition(_this.familyMembers[id], BOARD_SCALE, position);
+        });
+    };
+    Board.prototype.placeFamilyMembers = function (familyMembers, fromElement) {
+        return __awaiter(this, void 0, void 0, function () {
+            var fromRect, promises;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        fromRect = fromElement.getBoundingClientRect();
+                        promises = familyMembers.map(function (familyMember, index) { return __awaiter(_this, void 0, void 0, function () {
+                            var id;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        id = familyMember.id;
+                                        return [4, this.game.framework().wait(index * 250)];
+                                    case 1:
+                                        _a.sent();
+                                        this.updateFamilyMembers([familyMember]);
+                                        return [4, this.game.animationManager.play(new BgaSlideAnimation({
+                                                element: this.familyMembers[id],
+                                                transitionTimingFunction: 'ease-in-out',
+                                                fromRect: fromRect,
+                                            }))];
+                                    case 2:
+                                        _a.sent();
+                                        return [2];
+                                }
+                            });
+                        }); });
+                        return [4, Promise.all(promises)];
+                    case 1:
+                        _a.sent();
+                        return [2];
+                }
+            });
         });
     };
     Board.prototype.updateOrders = function (gamedatas) {

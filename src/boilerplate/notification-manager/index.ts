@@ -63,6 +63,7 @@ class NotificationManager {
       // 'draftCard',
       'draftCardPrivate',
       'draftNewCardsPrivate',
+      'setupFamilyMembers',
     ];
 
     // example: https://github.com/thoun/knarr/blob/main/src/knarr.ts
@@ -153,18 +154,22 @@ class NotificationManager {
   }
 
   async notif_draftCardPrivate(notif: Notif<NotifDraftCardPrivateArgs>) {
-    const {cardIds} = notif.args;
+    const { cardIds } = notif.args;
 
-    await Promise.all(cardIds.map(async (cardId, index) => {
-      // await Interaction.use().wait(index * 100);
-      await this.game.animationManager.attachWithAnimation(
-        new BgaSlideAnimation({ element: document.getElementById(cardId) }),
-        document.getElementById('joco_chosen_cards')
-      );
-    }));
+    await Promise.all(
+      cardIds.map(async (cardId, index) => {
+        // await Interaction.use().wait(index * 100);
+        await this.game.animationManager.attachWithAnimation(
+          new BgaSlideAnimation({ element: document.getElementById(cardId) }),
+          document.getElementById('joco_chosen_cards')
+        );
+      })
+    );
   }
 
-  async notif_draftNewCardsPrivate(notif: Notif<NotifDraftNewCardsPrivateArgs>) {
+  async notif_draftNewCardsPrivate(
+    notif: Notif<NotifDraftNewCardsPrivateArgs>
+  ) {
     const { cardIds, lastCard } = notif.args;
 
     SetupArea.getInstance().newCards(cardIds, lastCard);
@@ -178,5 +183,13 @@ class NotificationManager {
     // }
 
     // this.game.animationManager.attachWithAnimation({}, document.getElementById('joco_setup_cards'))
+  }
+
+  async notif_setupFamilyMembers(notif: Notif<NotifSetupFamilyMembers>) {
+    const { familyMembers, playerId } = notif.args;
+    await Board.getInstance().placeFamilyMembers(
+      familyMembers,
+      document.getElementById(`player_board_${playerId}`)
+    );
   }
 }
