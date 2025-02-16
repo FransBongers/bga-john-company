@@ -3,6 +3,8 @@
 namespace Bga\Games\JohnCompany;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
+use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\Players;
@@ -23,8 +25,7 @@ trait TurnTrait
 
   function stSetupDraft()
   {
-    // TODO: check game option
-    $draftVariant = true;
+    $draftVariant = Globals::getDraftSetup();
 
     $node = [
       'children' => [],
@@ -62,6 +63,9 @@ trait TurnTrait
 
   function stSetupFamilyActions()
   {
+    Globals::setPhase(FAMILY);
+    Notifications::nextPhase(FAMILY);
+
     $chairmanFamilyId = Utils::filter(Families::getAll()->toArray(), function ($family) {
       return $family->hasChairmanMarker();
     })[0]->getId();
@@ -73,7 +77,8 @@ trait TurnTrait
       'children' => array_map(function ($playerId) {
         return [
           'action' => FAMILY_ACTION,
-          'playerId' => $playerId,
+          'playerId' => 'all',
+          'familyId' => Players::get($playerId)->getFamilyId(),
         ];
       }, $turnOrder),
     ];

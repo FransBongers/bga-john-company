@@ -1,6 +1,36 @@
 <?php
 require_once 'gameoptions.inc.php';
 
+const CROWN_PLAYER_ID = 1;
+
+/**
+ * ScenarioIds
+ */
+const THE_1710_SCENARIO = 'The1710Scenario';
+const THE_1758_SCENARIO = 'The1758Scenario';
+const THE_1813_SCENARIO = 'The1813Scenario';
+const THE_LONG_1710_SCENARIO = 'TheLong1710Scenario';
+
+/**
+ * Game options
+ */
+const OPTION_SCENARIO = 100;
+const OPTION_SCENARIO_1710 = 1;
+const OPTION_SCENARIO_1758 = 2;
+const OPTION_SCENARIO_1813 = 3;
+const OPTION_SCENARIO_LONG1710 = 4;
+
+const SCENARIO_OPTION_SCENARIO_ID_MAP = [
+  1 => THE_1710_SCENARIO,
+  2 => THE_1758_SCENARIO,
+  3 => THE_1813_SCENARIO,
+  4 => THE_LONG_1710_SCENARIO
+];
+
+const OPTION_DRAFT_SETUP_CARDS = 101;
+const OPTION_DRAFT_SETUP_CARDS_DISABLED = 0;
+const OPTION_DRAFT_SETUP_CARDS_ENABLED = 1;
+
 /**
  * Locations
  */
@@ -86,6 +116,7 @@ const GREEN = 'green';
 const PINK = 'pink';
 const PURPLE = 'purple';
 const YELLOW = 'yellow';
+const RED = 'red'; // The crown
 
 const HEX_COLOR_COLOR_MAP = [
   '99dae9' => BLUE,
@@ -94,6 +125,7 @@ const HEX_COLOR_COLOR_MAP = [
   'ffb1b9' => PINK,
   'c7b4e1' => PURPLE,
   'f9e08d' => YELLOW,
+  'bd1f35' => RED,
 ];
 
 const COLOR_FAMILY_MAP = [
@@ -103,6 +135,7 @@ const COLOR_FAMILY_MAP = [
   GRAY => PAXTON,
   PURPLE => SYKES,
   GREEN => WALSH,
+  RED => CROWN,
 ];
 
 const FAMILY_COLOR_MAP = [
@@ -112,6 +145,7 @@ const FAMILY_COLOR_MAP = [
   PAXTON => GRAY,
   SYKES => PURPLE,
   WALSH => GREEN,
+  CROWN => RED,
 ];
 
 /**
@@ -165,13 +199,6 @@ const WRITER = 'writer';
 
 const COURT_OF_DIRECTORS = 'courtOfDirectors';
 
-/**
- * ScenarioIds
- */
-const THE_1710_SCENARIO = 'The1710Scenario';
-const THE_1758_SCENARIO = 'The1758Scenario';
-const THE_1813_SCENARIO = 'The1813Scenario';
-const THE_LONG_1710_SCENARIO = 'TheLong1710Scenario';
 
 /**
  * RegionIds

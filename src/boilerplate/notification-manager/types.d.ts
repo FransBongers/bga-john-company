@@ -22,6 +22,10 @@ interface NotifDraftCardPrivateArgs extends NotifWithPlayerArgs {
   cardIds: string[];
 }
 
+interface NotifNextPhase {
+  phase: string;
+}
+
 interface NotifSetupFamilyMembers extends NotifWithPlayerArgs {
   familyMembers: JocoFamilyMember[];
 }

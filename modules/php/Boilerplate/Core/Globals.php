@@ -21,11 +21,17 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     'customTurnOrders' => 'obj', // DO NOT MODIFY, USED FOR CUSTOM TURN ORDER FEATURE
     'logState' => 'int', // Used to store state id when enabling the log
     'firstPlayer' => 'int',
+    // Game options
+    'scenarioId' => 'str',
+    'crownInGame' => 'bool', // based on number of players
+    'draftSetup' => 'bool',
+    // Other
     // 'activePlayerId' => 'int',
     'company' => 'obj',
-    'scenarioId' => 'str',
+    'crown' => 'obj',
     'phase' => 'str',
     'turn' => 'int',
+    'options' => 'obj',
   ];
 
   protected static $table = 'global_variables';
@@ -151,8 +157,15 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
    */
   public static function setupNewGame($players, $options)
   {
-    Globals::setPhase(SETUP);
-    // Game options
+    self::setPhase(SETUP);
+    self::setCrownInGame(count($players) <= 2);
+    Globals::setCrown([]);
+    // 
+    // Game options - Note game option values are always a string
+    self::setScenarioId(SCENARIO_OPTION_SCENARIO_ID_MAP[intval($options[OPTION_SCENARIO])]);
+    self::setDraftSetup(intval($options[OPTION_DRAFT_SETUP_CARDS]) === OPTION_DRAFT_SETUP_CARDS_ENABLED);
+    self::setOptions($options);
+    // self::setScenarioId(THE_1710_SCENARIO);
     
   }
 

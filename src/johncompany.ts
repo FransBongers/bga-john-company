@@ -33,7 +33,7 @@ class JohnCompany implements Game {
   // Default
   public animationManager: AnimationManager;
   //  public settings: Settings;
-  // public gameOptions: GamedatasAlias['gameOptions'];
+  public gameOptions: GamedatasAlias['gameOptions'];
   public notificationManager: NotificationManager;
   //  public playerManager: PlayerManager;
   public playerOrder: number[];
@@ -92,9 +92,15 @@ class JohnCompany implements Game {
     this.setupDontPreloadImages();
 
     this.gamedatas = gamedatas;
-    // this.gameOptions = gamedatas.gameOptions;
+    this.gameOptions = gamedatas.gameOptions;
+
     debug('gamedatas', gamedatas);
     this.setupPlayerOrder(gamedatas.playerOrder);
+    if (this.gameOptions.crownEnabled) {
+      document.getElementById('player_boards').insertAdjacentHTML('afterbegin', tplCrownPlayerPanel(_('The Crown'), gamedatas.players[CROWN_PLAYER_ID].color))
+      // dojo.place(tplWakhanPlayerPanel({ name: _('Wakhan') }), 'player_boards', 0);
+    }
+
 
     this._connections = [];
 
@@ -124,8 +130,10 @@ class JohnCompany implements Game {
     //  this.cardArea = new CardArea(this);
     StaticData.create(this);
     Interaction.create(this);
+    PlayerManager.create(this);
     NotificationManager.create(this);
     Board.create(this);
+    
     if (this.playerOrder.includes(this.getPlayerId())) {
       SetupArea.create(this);
     }

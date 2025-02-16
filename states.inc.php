@@ -215,7 +215,7 @@ $machinestates = [
 
     ST_FAMILY_ACTION => [
         'name' => FAMILY_ACTION,
-        'type' => 'activeplayer',
+        'type' => 'multipleactiveplayer',
         'description' => clienttranslate('${actplayer} must perform a family action'),
         'descriptionmyturn' => clienttranslate('${you} must select a family action'),
         'args' => 'argsAtomicAction',

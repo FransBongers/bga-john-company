@@ -54,7 +54,7 @@ class FamilyMembers extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     foreach ($families as $familyId => $family) {
       $familyMembers[] = [
         "id" => "familyMember_" . $familyId . "_{INDEX}",
-        "nbr" => 18,
+        "nbr" => $familyId === CROWN ? 36 : 18,
         "nbrStart" => 1,
         "location" => Locations::familyMemberSupply($familyId),
         "family_id" => $familyId

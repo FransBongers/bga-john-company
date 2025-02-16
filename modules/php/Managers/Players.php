@@ -2,6 +2,8 @@
 
 namespace Bga\Games\JohnCompany\Managers;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
 
@@ -19,6 +21,23 @@ class Players extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
   protected static function cast($row)
   {
     return new \Bga\Games\JohnCompany\Models\Player($row);
+  }
+
+  public static function getCrown()
+  {
+    return self::cast([
+      'player_id' => CROWN_PLAYER_ID,
+      'player_ai' => "0",
+      'player_no' => 3,
+      'player_avatar' => "000000",
+      'player_beginner' => null,
+      'player_name' => clienttranslate('The Crown'),
+      'player_color' => Globals::getCrown()['color'],
+      'player_eliminated' => '0',
+      'player_score' => '0',
+      'player_score_aux' => '0',
+      'player_zombie' => '0',
+    ]);
   }
 
   public static function setupNewGame($players, $options)
@@ -46,11 +65,29 @@ class Players extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
 
     $query->values($values);
 
-    // Game::get()->reattributeColorsBasedOnPreferences($players, $gameInfos['player_colors']);
+    Game::get()->reattributeColorsBasedOnPreferences($players, $gameInfos['player_colors']);
     Game::get()->reloadPlayersBasicInfos();
     // PlayersExtra::setupNewGame();
 
+    if (Globals::getCrownInGame()) {
+      Globals::setCrown([
+        'color' => self::getUnusedColor(),
+      ]);
+    }
+  }
 
+  private static function getUnusedColor()
+  {
+    $colors = Game::get()->getGameinfos()['player_colors'];
+    $players = self::getAll()->toArray();
+
+    $remainingColors = Utils::filter($colors, function ($color) use ($players) {
+      return !Utils::array_some($players, function ($player) use ($color) {
+        return $player->getColor() === $color;
+      });
+    });
+    shuffle($remainingColors);
+    return $remainingColors[0];
   }
 
   public static function getActiveId()
@@ -74,6 +111,9 @@ class Players extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
    */
   public static function get($playerId = null)
   {
+    if ($playerId === CROWN_PLAYER_ID) {
+      return self::getCrown();
+    }
     $playerId = $playerId ?: self::getActiveId();
     return self::DB()
       ->where($playerId)
@@ -147,9 +187,15 @@ class Players extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
    */
   public static function getUiData($playerId)
   {
-    return self::getAll()->map(function ($player) use ($playerId) {
+    $data = self::getAll()->map(function ($player) use ($playerId) {
       return $player->jsonSerialize($playerId);
     });
+
+    if (Globals::getCrownInGame()) {
+      $data[CROWN_PLAYER_ID] = self::getCrown()->jsonSerialize();
+    }
+
+    return $data;
   }
 
 
@@ -159,15 +205,18 @@ class Players extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
   public static function getTurnOrder($firstPlayerId = null)
   {
     $players = self::getAll()->toArray();
+    if (Globals::getCrownInGame()) {
+      $players[] = self::getCrown();
+    }
     usort($players, function ($a, $b) {
       return $a->getNo() - $b->getNo();
     });
     $playerOrder = array_map(function ($player) {
       return $player->getId();
     }, $players);
-    
+
     if (in_array($firstPlayerId, $playerOrder)) {
-      while($playerOrder[0] !== $firstPlayerId) {
+      while ($playerOrder[0] !== $firstPlayerId) {
         $currentFirst = array_shift($playerOrder);
         $playerOrder[] = $currentFirst;
       }
@@ -216,6 +265,9 @@ class Players extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
 
   public static function getPlayerForFamily($familyId)
   {
+    if ($familyId === CROWN) {
+      return self::getCrown();
+    }
     $players = self::getAll()->toArray();
     return Utils::array_find($players, function ($player) use ($familyId) {
       return HEX_COLOR_COLOR_MAP[$player->getColor()] === FAMILY_COLOR_MAP[$familyId];

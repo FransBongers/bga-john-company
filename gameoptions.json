@@ -1,1 +1,36 @@
-{}
+{
+  "100": {
+    "name": "Scenario",
+    "values": {
+      "1": {
+        "name": "The 1710 Scenario",
+        "tmdisplay": "1710"
+      },
+      "2": {
+        "name": "The 1758 Scenario",
+        "tmdisplay": "1758"
+      },
+      "3": {
+        "name": "The 1813 Scenario",
+        "tmdisplay": "1813"
+      },
+      "4": {
+        "name": "The Long 1710 Scenario",
+        "tmdisplay": "Long 1710"
+      }
+    }
+  },
+  "101": {
+    "name": "Draft setup cards",
+    "values": {
+      "0": {
+        "name": "Disabled",
+        "tmdisplay": "Random setup"
+      },
+      "1": {
+        "name": "Enabled",
+        "tmdisplay": "Draft setup"
+      }
+    }
+  }
+}

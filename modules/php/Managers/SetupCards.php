@@ -4,7 +4,8 @@ namespace Bga\Games\JohnCompany\Managers;
 
 use Bga\GameFramework\Notify;
 use Bga\Games\JohnCompany\Game;
-use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\Families;
 
@@ -91,17 +92,34 @@ class SetupCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 
   private static function dealSetupCards($families)
   {
-    $numberOfCards = count($families) === 3 ? 4 : 3;
+    $numberOfFamilies = count(Utils::filter(array_values($families), function ($family) {
+      return $family->getId() !== CROWN;
+    }));
+    $draftEnabled = Globals::getDraftSetup();
+
+    $numberOfCards = 3;
+    if ($numberOfFamilies === 3 || (!$draftEnabled && $numberOfFamilies <= 2)) {
+      $numberOfCards = 4;
+    }
 
     foreach ($families as $family) {
-      self::pickForLocation($numberOfCards, DECK, Locations::draft($family->getId()));
+      $familyId = $family->getId();
+      if ($familyId === CROWN) {
+        continue;
+      }
+      $location = $draftEnabled ? Locations::draft($familyId) : Locations::setupCards($familyId);
+      self::pickForLocation($numberOfCards, DECK, $location);
+    }
+
+    if (!$draftEnabled && $numberOfFamilies <= 2) {
+      self::pickForLocation($numberOfFamilies === 1 ? 8 : 4, DECK, Locations::setupCards(CROWN));
     }
   }
 
   /* Creation of the cards */
   public static function setupNewGame($players = null, $options = null)
   {
-    $families = Families::getAll();
+    $families = Families::getAll()->toArray();
 
     self::setupLoadCards(count($families));
     self::dealSetupCards($families);

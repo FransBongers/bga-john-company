@@ -96,6 +96,9 @@ interface CommonStateArgs {
 interface JohnCompanyGamedatas extends Gamedatas {
   // Default
   canceledNotifIds: string[];
+  gameOptions: {
+    crownEnabled: boolean;
+  };
   playerOrder: number[];
   players: Record<number, JohnCompanyPlayerData>;
   company: {

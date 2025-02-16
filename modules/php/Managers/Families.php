@@ -61,8 +61,14 @@ class Families extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
       if (Utils::array_some($players, function ($player) use ($familyId) {
         return FAMILY_COLOR_MAP[$familyId] ===  HEX_COLOR_COLOR_MAP[$player->getColor()];
       }))
-      $families[$familyId] = [
-        'id' => $familyId,
+        $families[$familyId] = [
+          'id' => $familyId,
+          'location' => 'London',
+        ];
+    }
+    if (count($players) <= 2) {
+      $families[CROWN] = [
+        'id' => CROWN,
         'location' => 'London',
       ];
     }

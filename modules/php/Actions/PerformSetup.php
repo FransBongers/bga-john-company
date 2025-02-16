@@ -9,6 +9,7 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Players;
+use Bga\Games\JohnCompany\Managers\SetupCards;
 
 class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
@@ -38,9 +39,9 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
     $families = Families::getAll();
     $players = Players::getAll();
 
-    foreach ($players as $player) {
-      $setupCards = $player->getSetupCards();
-      $familyId = $player->getFamilyId();
+    foreach ($families as $familyId => $family) {
+      $setupCards = SetupCards::getInLocation(Locations::setupCards($familyId));
+      // $familyId = $player->getFamilyId();
 
       Notifications::log('setupCards', $setupCards);
       $familyMembers = [];
@@ -91,7 +92,7 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
         }
       }
 
-      Notifications::setupFamilyMembers($player, $familyMembers);
+      Notifications::setupFamilyMembers($family->getPlayer(), $familyMembers);
     }
 
     $this->resolveAction(['automatic' => true]);

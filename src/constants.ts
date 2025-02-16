@@ -4,6 +4,50 @@
 const BOARD_SCALE = 'boardScale';
 
 /**
+ * Families
+ */
+const BENYON = 'Benyon';
+const HASTINGS = 'Hastings';
+const LARKINS = 'Larkins';
+const PAXTON = 'Paxton';
+const SYKES = 'Sykes';
+const WALSH = 'Walsh';
+
+const CROWN = 'Crown';
+const CROWN_PLAYER_ID = 1;
+
+/**
+ * Colors
+ */
+const BLUE = 'blue';
+const GRAY = 'gray';
+const GREEN = 'green';
+const PINK = 'pink';
+const PURPLE = 'purple';
+const YELLOW = 'yellow';
+const RED = 'red'; // The crown
+
+const HEX_COLOR_COLOR_MAP = {
+  '99dae9': BLUE,
+  dbd9d6: GRAY,
+  addb90: GREEN,
+  ffb1b9: PINK,
+  c7b4e1: PURPLE,
+  f9e08d: YELLOW,
+  // 'bd1f35': RED,
+};
+
+const COLOR_FAMILY_MAP = {
+  [PINK]: BENYON,
+  [BLUE]: HASTINGS,
+  [YELLOW]: LARKINS,
+  [GRAY]: PAXTON,
+  [PURPLE]: SYKES,
+  [GREEN]: WALSH,
+  // RED: CROWN,
+};
+
+/**
  * Phases
  */
 const SETUP = 'setup'; // Only used during start of game
@@ -83,7 +127,6 @@ const OFFICER_IN_TRAINING = 'officerInTraining';
 const WRITER = 'writer';
 
 const COURT_OF_DIRECTORS = 'courtOfDirectors';
-
 
 /**
  * RegionIds

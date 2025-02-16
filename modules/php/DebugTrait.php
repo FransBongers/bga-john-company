@@ -69,7 +69,8 @@ trait DebugTrait
     // Orders::get(ORDER_BENGAL_2)->setStatus(FILLED);
     // Orders::setupNewGame();
     // Notifications::log('familyMembers', FamilyMembers::getInLocationOrdered(Locations::familyMemberSupply(HASTINGS))->toArray());
-    Notifications::log('playerOrder', Players::getTurnOrder(2371055));
+    // Notifications::log('players', Players::getCrown());
+    Notifications::log('draftSetup', Globals::getDraftSetup());
   }
 
 

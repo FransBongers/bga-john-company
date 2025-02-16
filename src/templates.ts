@@ -4,6 +4,24 @@ const tplPlayArea = () => `
   </div>
 `;
 
+const tplCrownPlayerPanel = (name: string, color: string) => {
+  return `<div id="overall_player_board_1" class="player-board">
+            <div class="player_board_inner" id="player_board_inner_${color}">
+              <div class="emblemwrap" id="avatarwrap_1">
+                  <div class="pp_wakhan_avatar avatar emblem" id="avatar_1"></div>
+              </div>
+              <div class="player-name" id="player_name_1">
+                <a style="color: #${color}">${name}</a>
+              </div>
+              <div id="player_board_1" class="player_board_content">
+                <div class="player_score" style="margin-top: 5px;">
+                  <span id="player_score_1" class="player_score_value"></span> <i class="fa fa-star" id="icon_point_1"></i>
+                </div>
+              </div>
+            </div>
+          </div>`
+}
+
 const familyMember2 = `
   <div class="joco_family_member2">
     <div class="joco_family_member_icon">

@@ -120,3 +120,10 @@ html {
     fill: base.$player-green-dark;
   }
 }
+.joco_family_member[data-family=Crown] {
+  background-color: base.$crown-red;
+  // background-color: #EE4B2B;
+}
+.joco_family_member[data-family=Crown] svg {
+  fill: black;
+}

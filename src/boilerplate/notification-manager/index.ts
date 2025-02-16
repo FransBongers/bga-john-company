@@ -63,6 +63,7 @@ class NotificationManager {
       // 'draftCard',
       'draftCardPrivate',
       'draftNewCardsPrivate',
+      'nextPhase',
       'setupFamilyMembers',
     ];
 
@@ -183,6 +184,11 @@ class NotificationManager {
     // }
 
     // this.game.animationManager.attachWithAnimation({}, document.getElementById('joco_setup_cards'))
+  }
+
+  async notif_nextPhase(notif: Notif<NotifNextPhase>) {
+    const {phase} = notif.args;
+    Board.getInstance().movePhasePawn(phase);
   }
 
   async notif_setupFamilyMembers(notif: Notif<NotifSetupFamilyMembers>) {

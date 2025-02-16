@@ -446,4 +446,12 @@ html {
   fill: #2b5135;
 }
 
+.joco_family_member[data-family=Crown] {
+  background-color: #bd1f35;
+}
+
+.joco_family_member[data-family=Crown] svg {
+  fill: black;
+}
+
 /*# sourceMappingURL=johncompany.css.map */

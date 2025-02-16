@@ -2,6 +2,8 @@
 
 namespace Bga\Games\JohnCompany\Models;
 
+use Bga\Games\JohnCompany\Managers\Players;
+
 class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
 {
   protected $id;
@@ -54,6 +56,6 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
 
   public function getPlayer()
   {
-    
+    return Players::getPlayerForFamily($this->id);
   }
 }

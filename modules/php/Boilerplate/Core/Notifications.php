@@ -170,6 +170,18 @@ class Notifications
     ]);
   }
 
+  public static function nextPhase($phase)
+  {
+    $phaseNameMap = [
+      FAMILY => clienttranslate('Family phase')
+    ];
+    $text = isset($phaseNameMap[$phase]) ? $phaseNameMap[$phase] : $phase;
+
+    self::notifyAll('nextPhase', $text, [
+      'phase' => $phase,
+    ]);
+  }
+
   public static function setupFamilyMembers($player, $familyMembers)
   {
     self::notifyAll('setupFamilyMembers', clienttranslate('${player_name} places family members'), [
