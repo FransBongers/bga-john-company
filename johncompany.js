@@ -1597,7 +1597,7 @@ var Board = (function () {
     };
     return Board;
 }());
-var tplBoard = function (gamedatas) { return "<div id=\"joco_board\">\n  <div id=\"joco_family_members\"></div>\n  <div id=\"joco_orders\"></div>\n  <div id=\"joco_towers\">\n    <div class=\"joco_tower\">\n      <div class=\"joco_tower_top\" style=\"z-index: 2;\"></div>\n      <div class=\"joco_tower_level\" style=\"z-index: 1;\"></div>\n      <div class=\"joco_tower_level\"></div>\n      \n    </div>\n  </div>\n</div>"; };
+var tplBoard = function (gamedatas) { return "<div id=\"joco_board\">\n  <div id=\"joco_family_members\"></div>\n  <div id=\"joco_orders\"></div>\n  <div id=\"joco_towers\">\n    <div class=\"joco_tower\" style=\"bottom: calc(var(--boardScale) * -149px); left: calc(var(--boardScale) * 1095px);\">\n      <div class=\"joco_tower_top\" style=\"z-index: 2;\"></div>\n      <div class=\"joco_tower_level\" style=\"z-index: 1;\"></div>\n      <div class=\"joco_tower_level\"></div>\n    </div>\n    <div class=\"joco_tower\" style=\"bottom: calc(var(--boardScale) * -60px); left: calc(var(--boardScale) * 1186px);\">\n      <div class=\"joco_tower_top\" style=\"z-index: 2;\"></div>\n      <div class=\"joco_tower_level\"></div>\n    </div>\n    <div class=\"joco_tower\" style=\"bottom: calc(var(--boardScale) * -74px); left: calc(var(--boardScale) * 851px);\">\n      <div class=\"joco_tower_top\" style=\"z-index: 2;\"></div>\n    </div>\n  </div>\n</div>"; };
 var SetupArea = (function () {
     function SetupArea(game) {
         this.cards = {};

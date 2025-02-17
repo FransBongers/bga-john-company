@@ -63,8 +63,6 @@
 
 .joco_tower {
   position: absolute;
-  bottom: calc(var(--boardScale) * -82px);
-  left: calc(var(--boardScale) * 849px);
   display: flex;
   flex-direction: column;
   height: fit-content;

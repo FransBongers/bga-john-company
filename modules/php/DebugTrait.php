@@ -11,6 +11,7 @@ use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Orders;
 use Bga\Games\JohnCompany\Managers\Players;
+use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Managers\Scenarios;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 use Bga\Games\JohnCompany\Models\FamilyMember;
@@ -70,7 +71,8 @@ trait DebugTrait
     // Orders::setupNewGame();
     // Notifications::log('familyMembers', FamilyMembers::getInLocationOrdered(Locations::familyMemberSupply(HASTINGS))->toArray());
     // Notifications::log('players', Players::getCrown());
-    Notifications::log('draftSetup', Globals::getDraftSetup());
+    Notifications::log('regions', Regions::getAll());
+    // Regions::setupNewGame();
   }
 
 

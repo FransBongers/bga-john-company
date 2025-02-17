@@ -9,9 +9,6 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 
 
-/**
- * Cards
- */
 class Offices extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 {
   protected static $table = 'offices';

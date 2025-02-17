@@ -31,6 +31,7 @@ use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Orders;
 use Bga\Games\JohnCompany\Managers\Players;
+use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Managers\Scenarios;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 
@@ -345,6 +346,7 @@ class Game extends \Table
             'families' => Families::getAll(),
             'familyMembers' => FamilyMembers::getAll(),
             'orders' => Orders::getAll(),
+            'regions' => Regions::getAll(),
             'playerOrder' => Players::getTurnOrder($playerId),
             'players' => Players::getUiData($playerId),
             'staticData' => [
@@ -410,6 +412,7 @@ class Game extends \Table
         FamilyMembers::setupNewGame();
         Company::setupNewGame();
         Orders::setupNewGame();
+        Regions::setupNewGame();
         SetupCards::setupNewGame();
 
         // Init global values with their initial values.

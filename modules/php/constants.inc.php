@@ -212,6 +212,16 @@ const MARATHA = 'Maratha';
 const MYSORE = 'Mysore';
 const PUNJAB = 'Punjab';
 
+const REGIONS = [
+  BENGAL,
+  BOMBAY,
+  DELHI,
+  HYDERABAD,
+  MADRAS,
+  MARATHA,
+  MYSORE,
+  PUNJAB,
+];
 
 
 /**

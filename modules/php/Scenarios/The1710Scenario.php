@@ -41,6 +41,7 @@ class The1710Scenario extends \Bga\Games\JohnCompany\Models\Scenario
         'strength' => 1
       ],
       MARATHA => [
+        'control' => DELHI,
         'strength' => 2
       ],
       MYSORE => [

@@ -8,13 +8,15 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 
-
-class Orders extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
+class Regions extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 {
-  protected static $table = 'orders';
-  protected static $prefix = 'order_';
+  protected static $table = 'regions';
+  protected static $prefix = 'region_';
   protected static $customFields = [
-    'status',
+    'looted',
+    'unrest',
+    'strength',
+    'control',
   ];
   protected static $autoremovePrefix = false;
   protected static $autoreshuffle = false;
@@ -22,14 +24,14 @@ class Orders extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 
   protected static function cast($row)
   {
-    return self::getInstance($row['order_id'], $row);
+    return self::getInstance($row['region_id'], $row);
   }
 
   public static function getInstance($id, $data = null)
   {
     // $prefix = self::getClassPrefix($id);
 
-    $className = "\Bga\Games\JohnCompany\Orders\\$id";
+    $className = "\Bga\Games\JohnCompany\Regions\\$id";
     return new $className($data);
   }
 
@@ -43,22 +45,23 @@ class Orders extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   // ..######..########....##.....#######..##.......
 
 
-  public static function setupNewGame()
+  public static function setupNewGame($players = null, $options = null)
   {
-    $scenarioOrders = Scenarios::get()->getOrders();
+    $scenarioData = Scenarios::get()->getRegions();
 
-    $orders = [];
-    foreach (ORDERS as $orderId) {
-      $order = self::getInstance($orderId);
-      // TODO: set location based on scenario
-      $orders[$orderId] = [
-        'id' => $orderId,
-        'location' => $order->getRegionId(),
-        'status' => isset($scenarioOrders[$orderId]) ? $scenarioOrders[$orderId] : OPEN,
-      ];
+    $regions = [];
+    foreach (REGIONS as $regionId) {
+
+        $regions[$regionId] = [
+          'id' => $regionId,
+          'location' => 'India',
+          'strength' => $scenarioData[$regionId]['strength'],
+          'control' => isset($scenarioData[$regionId]['control']) ? $scenarioData[$regionId]['control'] : null,
+        ];
     }
 
-    // Notifications::log('orders', $orders);
-    self::create($orders, null);
+    Notifications::log('regions', $regions);
+
+    self::create($regions, null);
   }
 }

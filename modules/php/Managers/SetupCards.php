@@ -10,9 +10,6 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\Families;
 
 
-/**
- * Cards
- */
 class SetupCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 {
   protected static $table = 'setup_cards';
