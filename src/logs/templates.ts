@@ -15,3 +15,5 @@ const tlpLogTokenText = ({
 
 
 /* ------- GAME SPECIFIC LOG TOKENS ------- */
+
+const tplLogTokenPound = () => `<div class="log_token joco_pound"></div>`

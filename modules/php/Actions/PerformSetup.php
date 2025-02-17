@@ -45,6 +45,7 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
 
       Notifications::log('setupCards', $setupCards);
       $familyMembers = [];
+      $cash = 0;
 
       foreach ($setupCards as $card) {
         $items = $card->getItems();
@@ -87,12 +88,14 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
               break;
             case CASH:
               $families[$familyId]->incTreasury($item['value']);
+              $cash += $item['value'];
               break;
           }
         }
       }
 
       Notifications::setupFamilyMembers($family->getPlayer(), $familyMembers);
+      Notifications::setupCash($family->getPlayer(), $cash);
     }
 
     $this->resolveAction(['automatic' => true]);

@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS `families` (
   `crown_promise_cubes` int(10) DEFAULT 0,
   `has_chairman_marker` tinyint(1) DEFAULT 0,
   `is_leader_of_opposition` tinyint(1) DEFAULT 0,
+  `is_prime_minister` tinyint(1) DEFAULT 0,
   `trophies` int(10) DEFAULT 0,
   `law_pieces` int(10) DEFAULT 0,
   `spent_on_retirement` int(10) DEFAULT 0,

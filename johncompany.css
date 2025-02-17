@@ -17,6 +17,7 @@
   width: calc(var(--leftColumnScale) * 1500px);
 }
 
+#joco_towers,
 #joco_family_members,
 #joco_orders {
   position: absolute;
@@ -58,6 +59,33 @@
 
 .joco_pawn[data-color=silver] {
   background-image: url("img/pawn_silver.svg");
+}
+
+.joco_tower {
+  position: absolute;
+  bottom: calc(var(--boardScale) * -82px);
+  left: calc(var(--boardScale) * 849px);
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  width: fit-content;
+  align-items: center;
+}
+
+.joco_tower_level {
+  background-image: url("img/tower_level.png");
+  width: calc(var(--boardScale) * 45px);
+  height: calc(var(--boardScale) * 41px);
+  background-size: 100% 100%;
+  margin-top: calc(var(--boardScale) * -27px);
+}
+
+.joco_tower_top {
+  background-image: url("img/tower_top.png");
+  width: calc(var(--boardScale) * 59px);
+  height: calc(var(--boardScale) * 40px);
+  background-size: 100% 100%;
+  z-index: 2;
 }
 
 /* make space between buttons on touch devices */
@@ -125,6 +153,7 @@ span[style*="color:#addb90"] {
   flex-flow: column;
   padding: 8px;
   min-width: 460px;
+  background-color: rgba(255, 250, 250, 0.4);
 }
 #joco_setup_area .joco_container .joco_label {
   /* height: 20px; */
@@ -354,6 +383,11 @@ span[style*="color:#c0c0c0"] {
 }
 
 /* ------- LOG TOKENS ------- */
+.log_token.joco_pound.animation {
+  position: absolute;
+  --tokenScale: 0.6;
+}
+
 .log_tooltip {
   position: relative;
 }
@@ -361,6 +395,33 @@ span[style*="color:#c0c0c0"] {
   top: -11px;
   left: auto;
   right: -18px;
+}
+
+.log_token {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  top: -3px;
+  margin-top: 3px;
+  margin-left: 1px;
+  margin-right: 1px;
+}
+
+#pagemaintitletext,
+#gameaction_status {
+  --tokenScale: 0.6;
+}
+
+.log > .roundedbox,
+.log > .roundedboxinner {
+  --tokenScale: 0.6;
+}
+
+.joco_pound {
+  background-image: url("img/pound.png");
+  background-size: 100% 100%;
+  height: calc(var(--tokenScale) * 50px);
+  width: calc(var(--tokenScale) * 50px);
 }
 
 html {

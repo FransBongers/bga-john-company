@@ -80,26 +80,39 @@ span[style*='color:#c0c0c0'] {
 
 /* ------- LOG TOKENS ------- */
 
+.log_token.joco_pound.animation {
+  position: absolute;
+  --tokenScale: 0.6;
+}
+
 .log_tooltip {
   position: relative;
   .help-marker {
     top: -11px;
     left: auto;
     right: -18px;
+  }
 }
+
+.log_token {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  top: -3px;
+  margin-top: 3px;
+  margin-left: 1px;
+  margin-right: 1px;
 }
 
 #customActions {
-
 }
 
 #pagemaintitletext,
 #gameaction_status {
- 
+  --tokenScale: 0.6;
 }
 
 .log > .roundedbox,
 .log > .roundedboxinner {
- 
+  --tokenScale: 0.6;
 }
-

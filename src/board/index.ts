@@ -81,7 +81,9 @@ class Board {
       );
       let familyId = familyMember.familyId;
       if (familyId === CROWN) {
-        const crownColor = PlayerManager.getInstance().getPlayer(CROWN_PLAYER_ID).getColor();
+        const crownColor = PlayerManager.getInstance()
+          .getPlayer(CROWN_PLAYER_ID)
+          .getColor();
         familyId = COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[crownColor]];
       }
       elt.setAttribute('data-family', familyId);
@@ -203,7 +205,11 @@ class Board {
       BOARD_SCALE,
       getCompanyStandingConfig(standing)
     );
-
+    setAbsolutePosition(
+      this.ui.pawns.phase,
+      BOARD_SCALE,
+      PHASE_CONFIG[gamedatas.phase]
+    );
     setAbsolutePosition(
       this.ui.pawns.turn,
       BOARD_SCALE,

@@ -64,6 +64,7 @@ class NotificationManager {
       'draftCardPrivate',
       'draftNewCardsPrivate',
       'nextPhase',
+      'setupCash',
       'setupFamilyMembers',
     ];
 
@@ -187,8 +188,50 @@ class NotificationManager {
   }
 
   async notif_nextPhase(notif: Notif<NotifNextPhase>) {
-    const {phase} = notif.args;
+    const { phase } = notif.args;
     Board.getInstance().movePhasePawn(phase);
+  }
+
+  async notif_setupCash(notif: Notif<NotifSetupCash>) {
+    const { amount, playerId } = notif.args;
+
+    // let msg = this.game.format_string_recursive(
+    //   notif.log,
+    //   notif.args as unknown as Record<string, unknown>
+    // );
+
+    // $('pagemaintitletext').innerHTML = msg;
+    // // // TODO: figure out why it's not possible to get element from pagetitle here
+    // // // const logPound: HTMLElement = document.querySelector('#pagemaintitletext > .joco_pound');
+    // // const logPound = document.getElementById('generalactions');
+    // const logPound: HTMLElement = document.querySelector('#pagemaintitletext .joco_pound');
+    // logPound.style.border = '2px solid red';
+    // console.log('logPound', logPound);
+    // const items = [];
+    // for (let i = 0; i < amount; i++) {
+    //   items.push(i);
+    // }
+    // await Promise.all(
+    //   items.map(async (index) => {
+    //     await this.game.framework().wait(index * 100);
+    //     if (logPound) {
+    //       console.log('logPound 2',logPound);
+    //       const element = document.createElement('div');
+    //       element.classList.add('log_token');
+    //       element.classList.add('joco_pound');
+    //       element.classList.add('animation');
+    //       // element.style.position = 'absolute';
+          
+    //       logPound.insertAdjacentElement('afterbegin', element);
+    //       await moveToAnimation({
+    //         game: this.game,
+    //         element,
+    //         toId: `player_board_${playerId}`,
+    //         remove: true,
+    //       });
+    //     }
+    //   })
+    // );
   }
 
   async notif_setupFamilyMembers(notif: Notif<NotifSetupFamilyMembers>) {

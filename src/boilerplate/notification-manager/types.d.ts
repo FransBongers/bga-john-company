@@ -26,6 +26,10 @@ interface NotifNextPhase {
   phase: string;
 }
 
+interface NotifSetupCash extends NotifWithPlayerArgs {
+  amount: number;
+}
+
 interface NotifSetupFamilyMembers extends NotifWithPlayerArgs {
   familyMembers: JocoFamilyMember[];
 }

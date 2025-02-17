@@ -182,6 +182,15 @@ class Notifications
     ]);
   }
 
+  public static function setupCash($player, $cash)
+  {
+    self::notifyAll('setupCash', clienttranslate('${player_name} gains ${amount} ${tkn_pound}'), [
+      'player' => $player,
+      'amount' => $cash,
+      'tkn_pound' => clienttranslate('Pounds')
+    ]);
+  }
+
   public static function setupFamilyMembers($player, $familyMembers)
   {
     self::notifyAll('setupFamilyMembers', clienttranslate('${player_name} places family members'), [

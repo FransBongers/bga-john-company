@@ -31,6 +31,7 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     'crownPromiseCubes' => ['crown_promise_cubes', 'int'],
     'hasChairmanMarker' => ['has_chairman_marker', 'int'],
     'isLeaderOfOpposition' => ['is_leader_of_opposition', 'int'],// base on number of votes?
+    'is_prime_minister' => ['is_prime_minister', 'int'],// base on number of votes?
     'trophies' => ['trophies', 'int'],
     'lawPieces' => ['law_pieces', 'int'],
     'spentOnRetirement' => ['spent_on_retirement', 'int'],

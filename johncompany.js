@@ -533,6 +533,47 @@ var AnimationManager = (function () {
     };
     return AnimationManager;
 }());
+var _this = this;
+var moveToAnimation = function (_a) { return __awaiter(_this, [_a], void 0, function (_b) {
+    var toElement, fromRect, toRect, top, left, originalPositionStyle;
+    var game = _b.game, element = _b.element, toId = _b.toId, _c = _b.remove, remove = _c === void 0 ? false : _c;
+    return __generator(this, function (_d) {
+        switch (_d.label) {
+            case 0:
+                toElement = document.getElementById(toId);
+                fromRect = element.getBoundingClientRect();
+                toRect = toElement.getBoundingClientRect();
+                top = toRect.top - fromRect.top;
+                left = toRect.left - fromRect.left;
+                originalPositionStyle = element.style.position;
+                element.style.top = "".concat(pxNumber(element.style.top) + top, "px");
+                element.style.left = "".concat(pxNumber(element.style.left) + left, "px");
+                element.style.position = 'relative';
+                return [4, game.animationManager.play(new BgaSlideAnimation({
+                        element: element,
+                        transitionTimingFunction: 'ease-in-out',
+                        fromRect: fromRect,
+                    }))];
+            case 1:
+                _d.sent();
+                if (remove) {
+                    element.remove();
+                }
+                else {
+                    element.style.position = originalPositionStyle;
+                }
+                return [2];
+        }
+    });
+}); };
+var pxNumber = function (px) {
+    if ((px || '').endsWith('px')) {
+        return Number(px.slice(0, -2));
+    }
+    else {
+        return 0;
+    }
+};
 var DISABLED = 'disabled';
 var SELECTABLE = 'selectable';
 var SELECTED = 'selected';
@@ -641,6 +682,7 @@ var NotificationManager = (function () {
             'draftCardPrivate',
             'draftNewCardsPrivate',
             'nextPhase',
+            'setupCash',
             'setupFamilyMembers',
         ];
         notifs.forEach(function (notifName) {
@@ -734,6 +776,15 @@ var NotificationManager = (function () {
             return __generator(this, function (_a) {
                 phase = notif.args.phase;
                 Board.getInstance().movePhasePawn(phase);
+                return [2];
+            });
+        });
+    };
+    NotificationManager.prototype.notif_setupCash = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, amount, playerId;
+            return __generator(this, function (_b) {
+                _a = notif.args, amount = _a.amount, playerId = _a.playerId;
                 return [2];
             });
         });
@@ -1429,7 +1480,9 @@ var Board = (function () {
             elt.insertAdjacentHTML('afterbegin', (_a = familyMemberSvgs[familyMemberNumber]) !== null && _a !== void 0 ? _a : familyMemberSvgs[1]);
             var familyId = familyMember.familyId;
             if (familyId === CROWN) {
-                var crownColor = PlayerManager.getInstance().getPlayer(CROWN_PLAYER_ID).getColor();
+                var crownColor = PlayerManager.getInstance()
+                    .getPlayer(CROWN_PLAYER_ID)
+                    .getColor();
                 familyId = COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[crownColor]];
             }
             elt.setAttribute('data-family', familyId);
@@ -1539,11 +1592,12 @@ var Board = (function () {
         setAbsolutePosition(this.ui.pawns.balance, BOARD_SCALE, getCompanyBalanceConfig(balance));
         setAbsolutePosition(this.ui.pawns.debt, BOARD_SCALE, getCompanyDebtConfig(debt));
         setAbsolutePosition(this.ui.pawns.standing, BOARD_SCALE, getCompanyStandingConfig(standing));
+        setAbsolutePosition(this.ui.pawns.phase, BOARD_SCALE, PHASE_CONFIG[gamedatas.phase]);
         setAbsolutePosition(this.ui.pawns.turn, BOARD_SCALE, TURN_CONFIG[gamedatas.turn]);
     };
     return Board;
 }());
-var tplBoard = function (gamedatas) { return "<div id=\"joco_board\">\n  <div id=\"joco_family_members\"></div>\n  <div id=\"joco_orders\"></div>\n</div>"; };
+var tplBoard = function (gamedatas) { return "<div id=\"joco_board\">\n  <div id=\"joco_family_members\"></div>\n  <div id=\"joco_orders\"></div>\n  <div id=\"joco_towers\">\n    <div class=\"joco_tower\">\n      <div class=\"joco_tower_top\" style=\"z-index: 2;\"></div>\n      <div class=\"joco_tower_level\" style=\"z-index: 1;\"></div>\n      <div class=\"joco_tower_level\"></div>\n      \n    </div>\n  </div>\n</div>"; };
 var SetupArea = (function () {
     function SetupArea(game) {
         this.cards = {};
@@ -1602,16 +1656,20 @@ var SetupArea = (function () {
 var tplSetupArea = function () { return "\n<div id=\"joco_setup_area\">\n  <div class=\"joco_container\">\n    <span class=\"joco_label\">".concat(_('Chosen setup cards'), "</span>\n    <div id=\"joco_chosen_cards\"></div>\n  </div>\n  <div class=\"joco_container\">\n    <span class=\"joco_label\">").concat(_('Draft'), "</span>\n    <div id=\"joco_draft_cards\"></div>\n  </div>\n</div"); };
 var LOG_TOKEN_BOLD_TEXT = 'boldText';
 var LOG_TOKEN_BOLD_ITALIC_TEXT = 'boldItalicText';
+var LOG_TOKEN_POUND = 'pound';
 var tooltipIdCounter = 0;
 var getTokenDiv = function (_a) {
     var key = _a.key, value = _a.value, game = _a.game;
     var splitKey = key.split('_');
     var type = splitKey[1];
+    console.log('type', type);
     switch (type) {
         case LOG_TOKEN_BOLD_TEXT:
             return tlpLogTokenText({ text: value });
         case LOG_TOKEN_BOLD_ITALIC_TEXT:
             return tlpLogTokenText({ text: value, italic: true });
+        case LOG_TOKEN_POUND:
+            return tplLogTokenPound();
         default:
             return value;
     }
@@ -1620,6 +1678,7 @@ var tlpLogTokenText = function (_a) {
     var text = _a.text, tooltipId = _a.tooltipId, _b = _a.italic, italic = _b === void 0 ? false : _b;
     return "<span ".concat(tooltipId ? "id=\"".concat(tooltipId, "\" class=\"log_tooltip\"") : '', " style=\"font-weight: 700;").concat(italic ? ' font-style: italic;' : '', "\">").concat(_(text), "</span>");
 };
+var tplLogTokenPound = function () { return "<div class=\"log_token joco_pound\"></div>"; };
 var PlayerManager = (function () {
     function PlayerManager(game) {
         this.game = game;

@@ -19,6 +19,7 @@
     "node_modules/bga-animations/src/animations/pause-animation.ts",
     "node_modules/bga-animations/src/animations-utils.ts",
     "node_modules/bga-animations/src/animation-manager.ts",
+    "src/animations.ts",
     "src/boilerplate/constants.ts",
     "src/boilerplate/counter.d.ts",
     "src/boilerplate/define.ts",
