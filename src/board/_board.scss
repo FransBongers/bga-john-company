@@ -92,6 +92,16 @@
   height: calc(var(--boardScale) * 41px);
   background-size: 100% 100%;
   margin-top: calc(var(--boardScale) * -27px);
+
+  @for $i from 2 through 6 {
+    &:nth-child(#{$i}) {
+      z-index: 7 - $i;
+    }
+  }
+
+  &.hidden {
+    display: none;
+  }
 }
 
 .joco_tower_top {
@@ -99,5 +109,6 @@
   width: calc(var(--boardScale) * 59px);
   height: calc(var(--boardScale) * 40px);
   background-size: 100% 100%;
-  z-index: 2;
+  z-index: 6;
 }
+

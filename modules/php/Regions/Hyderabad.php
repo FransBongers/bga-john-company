@@ -15,6 +15,7 @@ class Hyderabad extends \Bga\Games\JohnCompany\Models\Region
       BOMBAY,
       MARATHA
     ];
+    $this->exportIcons = 1;
     $this->orderIds = [
       ORDER_HYDERABAD_1,
     ];

@@ -1321,7 +1321,7 @@ var JohnCompany = (function () {
     };
     return JohnCompany;
 }());
-var _a, _b, _c;
+var _a, _b, _c, _d;
 var ORDERS_CONFIG = (_a = {},
     _a[ORDER_PUNJAB_1] = { top: 22.5, left: 933 },
     _a[ORDER_DELHI_1] = { top: 15, left: 1069 },
@@ -1435,12 +1435,23 @@ var FAMILY_MEMBER_OFFICE_CONFIG = (_c = {},
     _c.commander_Bombay = { top: 278, left: 695 },
     _c.commander_Madras = { top: 84, left: 695 },
     _c);
+var towerConfig = (_d = {},
+    _d[BENGAL] = { bottom: -149, left: 1339 },
+    _d[BOMBAY] = { bottom: -332, left: 954 },
+    _d[DELHI] = { bottom: -60, left: 1186 },
+    _d[HYDERABAD] = { bottom: -341, left: 1038 },
+    _d[MADRAS] = { bottom: -542, left: 1109 },
+    _d[MARATHA] = { bottom: -149, left: 1095 },
+    _d[MYSORE] = { bottom: -462, left: 983 },
+    _d[PUNJAB] = { bottom: -74, left: 851 },
+    _d);
 var Board = (function () {
     function Board(game) {
         var _a;
-        this.orders = {};
-        this.familyMembers = {};
         this.courtOfDirectors = [];
+        this.familyMembers = {};
+        this.orders = {};
+        this.regions = {};
         this.writers = (_a = {},
             _a[BENGAL] = [],
             _a[BOMBAY] = [],
@@ -1466,6 +1477,7 @@ var Board = (function () {
             pawns: {},
         };
         this.setupOrders(gamedatas);
+        this.setupRegions(gamedatas);
         this.setupPawns(gamedatas);
         this.setupFamilyMembers(gamedatas);
     };
@@ -1497,6 +1509,12 @@ var Board = (function () {
             elt.classList.add('joco_order');
         });
         this.updateOrders(gamedatas);
+    };
+    Board.prototype.setupRegions = function (gamedatas) {
+        var _this = this;
+        Object.values(gamedatas.regions).forEach(function (region) {
+            _this.regions[region.id] = new Region(region.id, _this.game, region);
+        });
     };
     Board.prototype.setupPawns = function (gamedatas) {
         var _this = this;
@@ -1597,7 +1615,44 @@ var Board = (function () {
     };
     return Board;
 }());
-var tplBoard = function (gamedatas) { return "<div id=\"joco_board\">\n  <div id=\"joco_family_members\"></div>\n  <div id=\"joco_orders\"></div>\n  <div id=\"joco_towers\">\n    <div class=\"joco_tower\" style=\"bottom: calc(var(--boardScale) * -149px); left: calc(var(--boardScale) * 1095px);\">\n      <div class=\"joco_tower_top\" style=\"z-index: 2;\"></div>\n      <div class=\"joco_tower_level\" style=\"z-index: 1;\"></div>\n      <div class=\"joco_tower_level\"></div>\n    </div>\n    <div class=\"joco_tower\" style=\"bottom: calc(var(--boardScale) * -60px); left: calc(var(--boardScale) * 1186px);\">\n      <div class=\"joco_tower_top\" style=\"z-index: 2;\"></div>\n      <div class=\"joco_tower_level\"></div>\n    </div>\n    <div class=\"joco_tower\" style=\"bottom: calc(var(--boardScale) * -74px); left: calc(var(--boardScale) * 851px);\">\n      <div class=\"joco_tower_top\" style=\"z-index: 2;\"></div>\n    </div>\n  </div>\n</div>"; };
+var Region = (function () {
+    function Region(id, game, data) {
+        this.id = id;
+        this.game = game;
+        console.log('setup region', id);
+        this.setup(data);
+    }
+    Region.prototype.setup = function (data) {
+        var elt = (this.tower = document.createElement('div'));
+        elt.classList.add('joco_tower');
+        elt.style.bottom = "calc(var(--boardScale) * ".concat(towerConfig[data.id].bottom, "px)");
+        elt.style.left = "calc(var(--boardScale) * ".concat(towerConfig[data.id].left, "px)");
+        var towerTop = document.createElement('div');
+        towerTop.classList.add('joco_tower_top');
+        elt.appendChild(towerTop);
+        for (var i = 0; i < 6; i++) {
+            var towerLevel = document.createElement('div');
+            towerLevel.classList.add('joco_tower_level');
+            elt.appendChild(towerLevel);
+        }
+        document.getElementById('joco_towers').appendChild(elt);
+        this.updateStrength(data.strength);
+    };
+    Region.prototype.updateStrength = function (value) {
+        var children = this.tower.children;
+        for (var i = 0; i < children.length; i++) {
+            var child = children[i];
+            if (i > value) {
+                child.classList.add('hidden');
+            }
+            else {
+                child.classList.remove('hidden');
+            }
+        }
+    };
+    return Region;
+}());
+var tplBoard = function (gamedatas) { return "<div id=\"joco_board\">\n  <div id=\"joco_family_members\"></div>\n  <div id=\"joco_orders\"></div>\n  <div id=\"joco_towers\"></div>\n</div>"; };
 var SetupArea = (function () {
     function SetupArea(game) {
         this.cards = {};

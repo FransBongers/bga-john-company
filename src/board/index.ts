@@ -14,9 +14,10 @@ class Board {
       phase?: HTMLElement;
     };
   };
-  private orders: Record<string, HTMLElement> = {};
-  private familyMembers: Record<string, HTMLElement> = {};
   private courtOfDirectors: JocoFamilyMember[] = [];
+  private familyMembers: Record<string, HTMLElement> = {};
+  private orders: Record<string, HTMLElement> = {};
+  private regions: Record<string, Region> = {};
   private writers: {
     Bengal: JocoFamilyMember[];
     Bombay: JocoFamilyMember[];
@@ -63,6 +64,7 @@ class Board {
 
     // this.ui.board.insertAdjacentHTML('afterbegin', familyMember);
     this.setupOrders(gamedatas);
+    this.setupRegions(gamedatas);
     this.setupPawns(gamedatas);
     this.setupFamilyMembers(gamedatas);
   }
@@ -99,6 +101,12 @@ class Board {
       elt.classList.add('joco_order');
     });
     this.updateOrders(gamedatas);
+  }
+
+  setupRegions(gamedatas: GamedatasAlias) {
+    Object.values(gamedatas.regions).forEach((region: JocoRegionBase) => {
+      this.regions[region.id] = new Region(region.id, this.game, region);
+    });
   }
 
   setupPawns(gamedatas: GamedatasAlias) {

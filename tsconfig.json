@@ -35,6 +35,7 @@
     "src/johncompany.d.ts",
     "src/board/config.ts",
     "src/board/index.ts",
+    "src/board/region.ts",
     "src/board/templates.ts",
     "src/setup-area/index.ts",
     "src/setup-area/templates.ts",

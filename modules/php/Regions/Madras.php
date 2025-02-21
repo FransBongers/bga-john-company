@@ -13,6 +13,7 @@ class Madras extends \Bga\Games\JohnCompany\Models\Region
       HYDERABAD,
       MYSORE
     ];
+    $this->exportIcons = 1;
     $this->orderIds = [
       ORDER_MADRAS_1,
       ORDER_MADRAS_2,

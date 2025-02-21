@@ -17,6 +17,7 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   protected $loot;
   protected $adjacentRegionIds;
   protected $orderIds;
+  protected $exportIcons = 0;
 
 
   public function __construct($row)
@@ -40,11 +41,15 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     'loot',
     'adjacentRegionIds',
     'orderIds',
+    'exportIcons',
   ];
 
   public function jsonSerialize(): array
   {
     $data = parent::jsonSerialize();
+    unset($data['state']);
+    unset($data['location']);
+    $data['looted'] = $this->looted === 1;
     return $data;
   }
 

@@ -109,11 +109,12 @@ interface JohnCompanyGamedatas extends Gamedatas {
   families: Record<string, JocoFamily>;
   familyMembers: Record<string, JocoFamilyMember>;
   orders: Record<string, JoCoOrder>;
-  turn: number;
   phase: string;
+  regions: Record<string, JocoRegionBase>;
   staticData: {
-    setupCards: Record<string, JocoSetupCardStatic>
-  }
+    setupCards: Record<string, JocoSetupCardStatic>;
+  };
+  turn: number;
 }
 
 interface JocoFamily {
@@ -142,6 +143,14 @@ interface JoCoOrder {
   id: string;
   location: string;
   status: 'open' | 'closed' | 'filled' | 'string';
+}
+
+interface JocoRegionBase {
+  id: string;
+  control: string | null;
+  looted: boolean;
+  strength: number;
+  untest: number;
 }
 
 type JoCoSetupCard = JoCoSetupCardBase & JocoSetupCardStatic;

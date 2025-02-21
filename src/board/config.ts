@@ -124,3 +124,14 @@ const FAMILY_MEMBER_OFFICE_CONFIG: Record<string, AbsolutePosition> = {
   commander_Bombay: { top: 278, left: 695 },
   commander_Madras: { top: 84, left: 695 },
 };
+
+const towerConfig: Record<string, { bottom: number; left: number }> = {
+  [BENGAL]: { bottom: -149, left: 1339 },
+  [BOMBAY]: { bottom: -332, left: 954 },
+  [DELHI]: { bottom: -60, left: 1186 },
+  [HYDERABAD]: { bottom: -341, left: 1038 },
+  [MADRAS]: { bottom: -542, left: 1109 },
+  [MARATHA]: { bottom: -149, left: 1095 },
+  [MYSORE]: { bottom: -462, left: 983 },
+  [PUNJAB]: { bottom: -74, left: 851 },
+};

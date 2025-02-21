@@ -13,6 +13,7 @@ class Bengal extends \Bga\Games\JohnCompany\Models\Region
       DELHI,
       MARATHA,
     ];
+    $this->exportIcons = 2;
     $this->orderIds = [
       ORDER_BENGAL_1,
       ORDER_BENGAL_2,
