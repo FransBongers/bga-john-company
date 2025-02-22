@@ -6,6 +6,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
@@ -14,6 +15,8 @@ use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Managers\Scenarios;
 use Bga\Games\JohnCompany\Managers\SetupCards;
+use Bga\Games\JohnCompany\Managers\Ships;
+use Bga\Games\JohnCompany\Models\Enterprise;
 use Bga\Games\JohnCompany\Models\FamilyMember;
 
 trait DebugTrait
@@ -71,8 +74,8 @@ trait DebugTrait
     // Orders::setupNewGame();
     // Notifications::log('familyMembers', FamilyMembers::getInLocationOrdered(Locations::familyMemberSupply(HASTINGS))->toArray());
     // Notifications::log('players', Players::getCrown());
-    Notifications::log('regions', Regions::getAll());
-    // Regions::setupNewGame();
+    // Notifications::log('regions', Regions::getAll());
+    Enterprises::setupNewGame();
   }
 
 

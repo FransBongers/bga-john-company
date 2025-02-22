@@ -27,6 +27,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Stats;
 use Bga\Games\JohnCompany\Managers\Company;
+use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Orders;
@@ -34,6 +35,7 @@ use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Managers\Scenarios;
 use Bga\Games\JohnCompany\Managers\SetupCards;
+use Bga\Games\JohnCompany\Managers\Ships;
 
 class Game extends \Table
 {
@@ -374,46 +376,20 @@ class Game extends \Table
     protected function setupNewGame($players, $options = [])
     {
         Globals::setupNewGame($players, $options);
-        // Set the colors of the players with HTML color code. The default below is red/green/blue/orange/brown. The
-        // number of colors defined here must correspond to the maximum number of players allowed for the gams.
+
         Players::setupNewGame($players, $options);
-        // $gameinfos = $this->getGameinfos();
-        // $default_colors = $gameinfos['player_colors'];
-
-        // foreach ($players as $player_id => $player) {
-        //     // Now you can access both $player_id and $player array
-        //     $query_values[] = vsprintf("('%s', '%s', '%s', '%s', '%s')", [
-        //         $player_id,
-        //         array_shift($default_colors),
-        //         $player["player_canal"],
-        //         addslashes($player["player_name"]),
-        //         addslashes($player["player_avatar"]),
-        //     ]);
-        // }
-
-        // // Create players based on generic information.
-        // //
-        // // NOTE: You can add extra field on player table in the database (see dbmodel.sql) and initialize
-        // // additional fields directly here.
-        // static::DbQuery(
-        //     sprintf(
-        //         "INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar) VALUES %s",
-        //         implode(",", $query_values)
-        //     )
-        // );
-
-        // $this->reattributeColorsBasedOnPreferences($players, $gameinfos["player_colors"]);
-        // $this->reloadPlayersBasicInfos();
 
         $players = Players::getAll()->toArray();
 
         Scenarios::setupNewGame($players, $options);
+        Enterprises::setupNewGame();
         Families::setupNewGame($players);
         FamilyMembers::setupNewGame();
         Company::setupNewGame();
         Orders::setupNewGame();
         Regions::setupNewGame();
         SetupCards::setupNewGame();
+        Ships::setupNewGame();
 
         // Init global values with their initial values.
 

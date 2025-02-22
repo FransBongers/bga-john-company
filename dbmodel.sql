@@ -45,6 +45,16 @@ CREATE TABLE IF NOT EXISTS `log` (
   `affected` JSON,
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+CREATE TABLE IF NOT EXISTS `enterprises` (
+  `enterprise_id` varchar(32) NOT NULL,
+  `enterprise_location` varchar(32) NOT NULL,
+  `enterprise_state` int(10) DEFAULT 0,
+  `invested` tinyint(1) DEFAULT 0,
+  `ship_id` varchar(32) DEFAULT NULL,
+  `used` tinyint(1) DEFAULT 0,
+  `type` varchar(32) NOT NULL,
+  PRIMARY KEY (`enterprise_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 CREATE TABLE IF NOT EXISTS `families` (
   `family_id` varchar(16) NOT NULL,
   `family_location` varchar(32) NOT NULL,
@@ -100,7 +110,14 @@ CREATE TABLE IF NOT EXISTS `setup_cards` (
   `card_state` int(10) DEFAULT 0,
   PRIMARY KEY (`card_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
-
+CREATE TABLE IF NOT EXISTS `ships` (
+  `ship_id` varchar(32) NOT NULL,
+  `ship_location` varchar(32) NOT NULL,
+  `ship_state` int(10) DEFAULT 0,
+  `fatigued` tinyint(1) DEFAULT 0,
+  `type` varchar(32) NOT NULL,
+  PRIMARY KEY (`ship_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 
 ALTER TABLE `gamelog`
 ADD `cancel` TINYINT(1) NOT NULL DEFAULT 0;

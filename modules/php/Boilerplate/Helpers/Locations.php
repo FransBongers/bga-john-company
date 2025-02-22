@@ -33,4 +33,19 @@ class Locations
   {
     return 'commander_' . $presidencyId;
   }
+
+  public static function playerShipsSupply()
+  {
+    return SUPPLY_PLAYER_SHIPS;
+  }
+
+  public static function otherShipsSupply()
+  {
+    return SUPPLY_OTHER_SHIPS;
+  }
+
+  public static function enterpriseSupply($type)
+  {
+    return 'supply_' . $type;
+  }
 }

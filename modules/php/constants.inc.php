@@ -66,8 +66,10 @@ const CASH = 'cash';
 const PRIME_MINISTER = 'primeMinister';
 const RANDOM_BLACKMAIL_CARD = 'randomBlackmailCard';
 const SHIP = 'ship';
-const LUXURY = 'luxury';
-const WORKSHOP = 'workshop';
+const LUXURY = 'Luxury';
+const WORKSHOP = 'Workshop';
+
+const SHIPYARD = 'Shipyard';
 
 /**
  * Ship locations
@@ -271,3 +273,65 @@ const ORDERS = [
 const CLOSED = 'closed';
 const FILLED = 'filled';
 const OPEN = 'open';
+
+/**
+ * Ship types
+ */
+const PLAYER_OWNED_SHIP = 'playerOwnedShip';
+// Capitalized because these are used to derive class names
+const COMPANY_SHIP = 'CompanyShip';
+const EXTRA_SHIP = 'ExtraShip';
+
+const SUPPLY_OTHER_SHIPS = 'supply_otherShips';
+const SUPPLY_PLAYER_SHIPS = 'supply_playerShips';
+
+/**
+ * Player owned ship names
+ */
+const ATLAS = 'Atlas';
+const BRITANNIA = 'Britannia';
+const CONSTANT_FRIEND = 'ConstantFriend';
+const DILIGENCE = 'Diligence';
+const ELIZA = 'Eliza';
+const FORTITUDE = 'Fortitude';
+const GANGES = 'Ganges';
+const HAMPSHIRE = 'Hampshire';
+const INDEFATIGABLE = 'Indefatigable';
+const JAMES = 'James';
+const KING_GEORGE = 'KingGeorge';
+const LADY_FLORA = 'LadyFlora';
+const NEPTUNE = 'Neptune';
+const OBRA_DINN = 'ObraDinn';
+const QUEEN_CHARLOTTE = 'QueenCharlotte';
+const RECOVERY = 'Recovery';
+const SAMARITAN = 'Samaritan';
+const THISTLEWORTH = 'Thistleworth';
+const UNION = 'Union';
+const WALPOLE = 'Walpole';
+const YORK = 'York';
+const ZENOBIA = 'Zenobia';
+
+const SHIP_NAMES = [
+  ATLAS,
+  BRITANNIA,
+  CONSTANT_FRIEND,
+  DILIGENCE,
+  ELIZA,
+  FORTITUDE,
+  GANGES,
+  HAMPSHIRE,
+  INDEFATIGABLE,
+  JAMES,
+  KING_GEORGE,
+  LADY_FLORA,
+  NEPTUNE,
+  OBRA_DINN,
+  QUEEN_CHARLOTTE,
+  RECOVERY,
+  SAMARITAN,
+  THISTLEWORTH,
+  UNION,
+  WALPOLE,
+  YORK,
+  ZENOBIA,
+];
