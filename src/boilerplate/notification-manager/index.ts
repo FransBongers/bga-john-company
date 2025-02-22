@@ -65,6 +65,7 @@ class NotificationManager {
       'draftNewCardsPrivate',
       'nextPhase',
       'setupCash',
+      'setupDone',
       'setupFamilyMembers',
     ];
 
@@ -232,6 +233,10 @@ class NotificationManager {
     //     }
     //   })
     // );
+  }
+  
+  async notif_setupDone(notif: Notif<unknown>) {
+    SetupArea.getInstance().hide();
   }
 
   async notif_setupFamilyMembers(notif: Notif<NotifSetupFamilyMembers>) {

@@ -170,6 +170,11 @@ class Notifications
     ]);
   }
 
+  public static function setupDone()
+  {
+    self::notifyAll('setupDone', '', []);
+  }
+
   public static function nextPhase($phase)
   {
     $phaseNameMap = [

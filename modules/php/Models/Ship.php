@@ -24,7 +24,7 @@ class Ship extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implement
     'location' => 'ship_location',
     'state' => ['ship_state', 'int'],
     'fatigued' => ['fatigued', 'int'],
-    'type' => ['type', 'int'],
+    'type' => ['type', 'str'],
   ];
 
   protected $staticAttributes = [
@@ -34,6 +34,7 @@ class Ship extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implement
   public function jsonSerialize(): array
   {
     $data = parent::jsonSerialize();
+    $data['fatigued'] = $this->fatigued === 1;
     return $data;
   }
 

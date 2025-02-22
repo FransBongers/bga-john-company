@@ -85,4 +85,9 @@ class SetupArea {
       }
     });
   }
+
+  public hide() {
+    console.log('hide');
+    this.ui.setupArea.style.display = 'none';
+  }
 }

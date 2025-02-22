@@ -139,3 +139,11 @@ const MADRAS = 'Madras';
 const MARATHA = 'Maratha';
 const MYSORE = 'Mysore';
 const PUNJAB = 'Punjab';
+
+/**
+ * Ship locations
+ */
+const WEST_INDIAN = 'westIndian';
+const EAST_INDIAN = 'eastIndian';
+const SOUTH_INDIAN = 'southIndian';
+const UNFITTED = 'unfitted';

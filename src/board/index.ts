@@ -13,9 +13,13 @@ class Board {
       turn?: HTMLElement;
       phase?: HTMLElement;
     };
+    ships: HTMLElement;
+    treasuries: HTMLElement;
   };
-  private courtOfDirectors: JocoFamilyMember[] = [];
   private familyMembers: Record<string, HTMLElement> = {};
+  private ships: Record<string, HTMLElement> = {};
+
+  private courtOfDirectors: JocoFamilyMember[] = [];
   private orders: Record<string, HTMLElement> = {};
   private regions: Record<string, Region> = {};
   private writers: {
@@ -27,6 +31,17 @@ class Board {
     [BOMBAY]: [],
     [MADRAS]: [],
   };
+  private officersInTraining: JocoFamilyMember[] = [];
+  private seas: {
+    westIndian: JocoShipBase[];
+    eastIndian: JocoShipBase[];
+    southIndian: JocoShipBase[];
+  } = {
+    [WEST_INDIAN]: [],
+    [SOUTH_INDIAN]: [],
+    [EAST_INDIAN]: [],
+  };
+  private treasuries: Record<string, Counter> = {}
 
   constructor(game: GameAlias) {
     this.game = game;
@@ -60,6 +75,8 @@ class Board {
       familyMembers: document.getElementById('joco_family_members'),
       orders: document.getElementById('joco_orders'),
       pawns: {},
+      ships: document.getElementById('joco_ships'),
+      treasuries: document.getElementById('joco_treasuries'),
     };
 
     // this.ui.board.insertAdjacentHTML('afterbegin', familyMember);
@@ -67,9 +84,11 @@ class Board {
     this.setupRegions(gamedatas);
     this.setupPawns(gamedatas);
     this.setupFamilyMembers(gamedatas);
+    this.setupShips(gamedatas);
+    this.setupTreasuries(gamedatas);
   }
 
-  setupFamilyMembers(gamedatas: GamedatasAlias) {
+  private setupFamilyMembers(gamedatas: GamedatasAlias) {
     Object.values(gamedatas.familyMembers).forEach((familyMember) => {
       const elt = (this.familyMembers[familyMember.id] =
         document.createElement('div'));
@@ -94,7 +113,7 @@ class Board {
     this.updateFamilyMembers(Object.values(gamedatas.familyMembers));
   }
 
-  setupOrders(gamedatas: GamedatasAlias) {
+  private setupOrders(gamedatas: GamedatasAlias) {
     Object.keys(gamedatas.orders).forEach((orderId) => {
       const elt = (this.orders[orderId] = document.createElement('div'));
       // elt.id = orderId;
@@ -103,13 +122,13 @@ class Board {
     this.updateOrders(gamedatas);
   }
 
-  setupRegions(gamedatas: GamedatasAlias) {
+  private setupRegions(gamedatas: GamedatasAlias) {
     Object.values(gamedatas.regions).forEach((region: JocoRegionBase) => {
       this.regions[region.id] = new Region(region.id, this.game, region);
     });
   }
 
-  setupPawns(gamedatas: GamedatasAlias) {
+  private setupPawns(gamedatas: GamedatasAlias) {
     ['balance', 'standing', 'debt', 'turn', 'phase'].forEach((pawn) => {
       const elt = (this.ui.pawns[pawn] = document.createElement('div'));
       elt.id = pawn;
@@ -123,6 +142,28 @@ class Board {
 
     this.updatePawns(gamedatas);
   }
+
+  private setupShips(gamedatas: GamedatasAlias) {
+    Object.values(gamedatas.ships).forEach(({ id, type, fatigued }) => {
+      const elt = (this.ships[id] = document.createElement('div'));
+
+      elt.classList.add('joco_ship');
+
+      elt.setAttribute('data-type', type);
+      elt.setAttribute('data-fatigued', fatigued ? 'true' : 'false');
+    });
+    this.updateShips(Object.values(gamedatas.ships));
+  }
+
+  private setupTreasuries(gamedatas: GamedatasAlias) {
+    Object.entries(TREASURY_POSITIONS).forEach(([office, position]) => {
+      this.ui.treasuries.insertAdjacentHTML('afterbegin', tplTreasury(office, position));
+      this.treasuries[office] = new ebg.counter();
+      this.treasuries[office].create(`joco_${office}_treasury`);
+      this.treasuries[office].setValue(gamedatas.offices[office].treasury);
+    })
+  }
+
   // .##.....##.########..########.....###....########.########....##.....##.####
   // .##.....##.##.....##.##.....##...##.##......##....##..........##.....##..##.
   // .##.....##.##.....##.##.....##..##...##.....##....##..........##.....##..##.
@@ -145,6 +186,10 @@ class Board {
         position = getCourtOfDirectorsPosition(this.courtOfDirectors.length);
         this.courtOfDirectors.push(familyMember);
       } else if (location === OFFICER_IN_TRAINING) {
+        position = getOfficersInTrainingPosition(
+          this.officersInTraining.length
+        );
+        this.officersInTraining.push(familyMember);
       } else if (location.startsWith(WRITER)) {
         const regionId = location.split('_')[1];
         position = getWriterPosition(regionId, this.writers[regionId].length);
@@ -223,5 +268,22 @@ class Board {
       BOARD_SCALE,
       TURN_CONFIG[gamedatas.turn]
     );
+  }
+
+  private updateShips(ships: JocoShipBase[]) {
+    ships.forEach((ship) => {
+      const { id, location } = ship;
+      if ([SOUTH_INDIAN, WEST_INDIAN, EAST_INDIAN].includes(location)) {
+        this.ui.ships.appendChild(this.ships[id]);
+        const position = getShipPosition(
+          location,
+          this.seas[location].length
+        );
+        this.seas[location].push(ship);
+        setAbsolutePosition(this.ships[id], BOARD_SCALE, position);
+      }
+      // TODO:
+      // Unfitted ships
+    });
   }
 }

@@ -16,7 +16,6 @@ const getTokenDiv = ({
 }) => {
   const splitKey = key.split('_');
   const type = splitKey[1];
-  console.log('type', type)
   switch (type) {
     case LOG_TOKEN_BOLD_TEXT:
       return tlpLogTokenText({ text: value });

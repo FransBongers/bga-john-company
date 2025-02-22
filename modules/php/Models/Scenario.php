@@ -45,6 +45,11 @@ class Scenario implements \JsonSerializable
     return $this->companyDebt;
   }
 
+  public function getCompanyTreasuries()
+  {
+    return $this->companyTreasuries;
+  }
+
   public function getOrders()
   {
     return $this->orders;

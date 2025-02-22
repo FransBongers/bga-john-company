@@ -19,7 +19,9 @@
 
 #joco_towers,
 #joco_family_members,
-#joco_orders {
+#joco_orders,
+#joco_ships,
+#joco_treasuries {
   position: absolute;
   top: 0;
   left: 0;
@@ -102,6 +104,23 @@
   height: calc(var(--boardScale) * 40px);
   background-size: 100% 100%;
   z-index: 6;
+}
+
+.joco_ship {
+  position: absolute;
+  background-image: url("img/ship_player.png");
+  width: calc(var(--boardScale) * 40px);
+  height: calc(var(--boardScale) * 36px);
+  background-size: 100% 100%;
+}
+
+.joco_treasury {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  gap: calc(var(--boardScale) * 4px);
+  font-weight: 700;
+  font-size: calc(var(--boardScale) * 30px);
 }
 
 /* make space between buttons on touch devices */

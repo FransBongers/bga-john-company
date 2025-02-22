@@ -102,6 +102,10 @@ var MADRAS = 'Madras';
 var MARATHA = 'Maratha';
 var MYSORE = 'Mysore';
 var PUNJAB = 'Punjab';
+var WEST_INDIAN = 'westIndian';
+var EAST_INDIAN = 'eastIndian';
+var SOUTH_INDIAN = 'southIndian';
+var UNFITTED = 'unfitted';
 var BgaAnimation = (function () {
     function BgaAnimation(animationFunction, settings) {
         this.animationFunction = animationFunction;
@@ -683,6 +687,7 @@ var NotificationManager = (function () {
             'draftNewCardsPrivate',
             'nextPhase',
             'setupCash',
+            'setupDone',
             'setupFamilyMembers',
         ];
         notifs.forEach(function (notifName) {
@@ -785,6 +790,14 @@ var NotificationManager = (function () {
             var _a, amount, playerId;
             return __generator(this, function (_b) {
                 _a = notif.args, amount = _a.amount, playerId = _a.playerId;
+                return [2];
+            });
+        });
+    };
+    NotificationManager.prototype.notif_setupDone = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                SetupArea.getInstance().hide();
                 return [2];
             });
         });
@@ -961,7 +974,7 @@ var JohnCompany = (function () {
         PlayerManager.create(this);
         NotificationManager.create(this);
         Board.create(this);
-        if (this.playerOrder.includes(this.getPlayerId())) {
+        if (this.playerOrder.includes(this.getPlayerId()) && gamedatas.phase === SETUP) {
             SetupArea.create(this);
         }
         NotificationManager.getInstance().setupNotifications();
@@ -1183,7 +1196,6 @@ var JohnCompany = (function () {
         var stepId = _a.stepId;
     };
     JohnCompany.prototype.updateLayout = function () {
-        console.log('updateLayout');
         var ROOT = document.documentElement;
         var playerAreaContainer = document.getElementById('play_area_container');
         if (!playerAreaContainer) {
@@ -1321,7 +1333,7 @@ var JohnCompany = (function () {
     };
     return JohnCompany;
 }());
-var _a, _b, _c, _d;
+var _a, _b, _c, _d, _e;
 var ORDERS_CONFIG = (_a = {},
     _a[ORDER_PUNJAB_1] = { top: 22.5, left: 933 },
     _a[ORDER_DELHI_1] = { top: 15, left: 1069 },
@@ -1390,28 +1402,81 @@ var TURN_CONFIG = {
     8: { top: 355, left: 199.5 },
     endGameScoring: { top: 138, left: 199.5 },
 };
-var getCourtOfDirectorsPosition = function (index) {
-    return getGroupPosition(555, 243, index);
-};
-var getWriterPosition = function (presidency, index) {
-    switch (presidency) {
-        case BOMBAY:
-            return getGroupPosition(602, 831, index);
-        case BENGAL:
-            return getGroupPosition(602, 1210, index);
-        case MADRAS:
-            return getGroupPosition(602, 1021, index);
-        default:
-            return { top: 0, left: 0 };
-    }
-};
-var getGroupPosition = function (top, left, index) {
+var getGroupPosition = function (top, left, index, rowSize) {
     var row = Math.floor(index / 4);
     var column = index % 4;
     return {
         top: top + 46 * row,
         left: left + 39 * column,
     };
+};
+var getCourtOfDirectorsPosition = function (index) {
+    return getGroupPosition(555, 243, index, 4);
+};
+var getOfficersInTrainingPosition = function (index) {
+    return getGroupPosition(602, 692, index, 3);
+};
+var getWriterPosition = function (presidency, index) {
+    switch (presidency) {
+        case BOMBAY:
+            return getGroupPosition(602, 894, index, 3);
+        case BENGAL:
+            return getGroupPosition(602, 1273, index, 3);
+        case MADRAS:
+            return getGroupPosition(602, 1084, index, 3);
+        default:
+            return { top: 0, left: 0 };
+    }
+};
+var WEST_INDIAN_POSITIONS = [
+    {
+        top: 445,
+        left: 870,
+    },
+    {
+        top: 293,
+        left: 880,
+    },
+];
+var SOUTH_INDIAN_POSITIONS = [
+    {
+        top: 391,
+        left: 1233,
+    },
+    {
+        top: 491,
+        left: 1203,
+    },
+];
+var EAST_INDIAN_POSITIONS = [
+    {
+        top: 332,
+        left: 1273,
+    },
+    {
+        top: 365,
+        left: 1313,
+    },
+];
+var getShipPosition = function (sea, index) {
+    var numberOfPositions = 2;
+    var positionIndex = index % numberOfPositions;
+    var offset = Math.floor(index / numberOfPositions);
+    var position = { top: 0, left: 0 };
+    switch (sea) {
+        case WEST_INDIAN:
+            position = WEST_INDIAN_POSITIONS[positionIndex];
+            break;
+        case SOUTH_INDIAN:
+            position = SOUTH_INDIAN_POSITIONS[positionIndex];
+            break;
+        case EAST_INDIAN:
+            position = EAST_INDIAN_POSITIONS[positionIndex];
+            break;
+    }
+    position.top = position.top - 20 * offset;
+    position.left = position.left + 20 * offset;
+    return position;
 };
 var FAMILY_MEMBER_OFFICE_CONFIG = (_c = {},
     _c[CHAIRMAN] = { top: 662, left: 246 },
@@ -1445,11 +1510,19 @@ var towerConfig = (_d = {},
     _d[MYSORE] = { bottom: -462, left: 983 },
     _d[PUNJAB] = { bottom: -74, left: 851 },
     _d);
+var TREASURY_POSITIONS = (_e = {},
+    _e[DIRECTOR_OF_TRADE] = { top: 618, left: 456 },
+    _e[MANAGER_OF_SHIPPING] = { top: 618, left: 595 },
+    _e[PRESIDENT_OF_BOMBAY] = { top: 618, left: 846 },
+    _e[PRESIDENT_OF_MADRAS] = { top: 618, left: 1036 },
+    _e[PRESIDENT_OF_BENGAL] = { top: 618, left: 1225 },
+    _e);
 var Board = (function () {
     function Board(game) {
-        var _a;
-        this.courtOfDirectors = [];
+        var _a, _b;
         this.familyMembers = {};
+        this.ships = {};
+        this.courtOfDirectors = [];
         this.orders = {};
         this.regions = {};
         this.writers = (_a = {},
@@ -1457,6 +1530,13 @@ var Board = (function () {
             _a[BOMBAY] = [],
             _a[MADRAS] = [],
             _a);
+        this.officersInTraining = [];
+        this.seas = (_b = {},
+            _b[WEST_INDIAN] = [],
+            _b[SOUTH_INDIAN] = [],
+            _b[EAST_INDIAN] = [],
+            _b);
+        this.treasuries = {};
         this.game = game;
         this.setup(game.gamedatas);
     }
@@ -1475,11 +1555,15 @@ var Board = (function () {
             familyMembers: document.getElementById('joco_family_members'),
             orders: document.getElementById('joco_orders'),
             pawns: {},
+            ships: document.getElementById('joco_ships'),
+            treasuries: document.getElementById('joco_treasuries'),
         };
         this.setupOrders(gamedatas);
         this.setupRegions(gamedatas);
         this.setupPawns(gamedatas);
         this.setupFamilyMembers(gamedatas);
+        this.setupShips(gamedatas);
+        this.setupTreasuries(gamedatas);
     };
     Board.prototype.setupFamilyMembers = function (gamedatas) {
         var _this = this;
@@ -1527,6 +1611,27 @@ var Board = (function () {
         });
         this.updatePawns(gamedatas);
     };
+    Board.prototype.setupShips = function (gamedatas) {
+        var _this = this;
+        Object.values(gamedatas.ships).forEach(function (_a) {
+            var id = _a.id, type = _a.type, fatigued = _a.fatigued;
+            var elt = (_this.ships[id] = document.createElement('div'));
+            elt.classList.add('joco_ship');
+            elt.setAttribute('data-type', type);
+            elt.setAttribute('data-fatigued', fatigued ? 'true' : 'false');
+        });
+        this.updateShips(Object.values(gamedatas.ships));
+    };
+    Board.prototype.setupTreasuries = function (gamedatas) {
+        var _this = this;
+        Object.entries(TREASURY_POSITIONS).forEach(function (_a) {
+            var office = _a[0], position = _a[1];
+            _this.ui.treasuries.insertAdjacentHTML('afterbegin', tplTreasury(office, position));
+            _this.treasuries[office] = new ebg.counter();
+            _this.treasuries[office].create("joco_".concat(office, "_treasury"));
+            _this.treasuries[office].setValue(gamedatas.offices[office].treasury);
+        });
+    };
     Board.prototype.updateFamilyMembers = function (familyMembers) {
         var _this = this;
         familyMembers.forEach(function (familyMember) {
@@ -1541,6 +1646,8 @@ var Board = (function () {
                 _this.courtOfDirectors.push(familyMember);
             }
             else if (location === OFFICER_IN_TRAINING) {
+                position = getOfficersInTrainingPosition(_this.officersInTraining.length);
+                _this.officersInTraining.push(familyMember);
             }
             else if (location.startsWith(WRITER)) {
                 var regionId = location.split('_')[1];
@@ -1613,13 +1720,24 @@ var Board = (function () {
         setAbsolutePosition(this.ui.pawns.phase, BOARD_SCALE, PHASE_CONFIG[gamedatas.phase]);
         setAbsolutePosition(this.ui.pawns.turn, BOARD_SCALE, TURN_CONFIG[gamedatas.turn]);
     };
+    Board.prototype.updateShips = function (ships) {
+        var _this = this;
+        ships.forEach(function (ship) {
+            var id = ship.id, location = ship.location;
+            if ([SOUTH_INDIAN, WEST_INDIAN, EAST_INDIAN].includes(location)) {
+                _this.ui.ships.appendChild(_this.ships[id]);
+                var position = getShipPosition(location, _this.seas[location].length);
+                _this.seas[location].push(ship);
+                setAbsolutePosition(_this.ships[id], BOARD_SCALE, position);
+            }
+        });
+    };
     return Board;
 }());
 var Region = (function () {
     function Region(id, game, data) {
         this.id = id;
         this.game = game;
-        console.log('setup region', id);
         this.setup(data);
     }
     Region.prototype.setup = function (data) {
@@ -1652,7 +1770,11 @@ var Region = (function () {
     };
     return Region;
 }());
-var tplBoard = function (gamedatas) { return "<div id=\"joco_board\">\n  <div id=\"joco_family_members\"></div>\n  <div id=\"joco_orders\"></div>\n  <div id=\"joco_towers\"></div>\n</div>"; };
+var tplBoard = function (gamedatas) { return "<div id=\"joco_board\">\n  <div id=\"joco_family_members\"></div>\n  <div id=\"joco_orders\"></div>\n  <div id=\"joco_ships\"></div>\n  <div id=\"joco_towers\"></div>\n  <div id=\"joco_treasuries\"></div>\n</div>"; };
+var tplTreasury = function (office, _a) {
+    var top = _a.top, left = _a.left;
+    return "\n<div class=\"joco_treasury\" style=\"top: calc(var(--boardScale) * ".concat(top, "px); left: calc(var(--boardScale) * ").concat(left, "px);\">\n  <span>").concat(_('£'), "</span>\n  <span class=\"joco_treasury_counter\" id=\"joco_").concat(office, "_treasury\"></span>\n</div>");
+};
 var SetupArea = (function () {
     function SetupArea(game) {
         this.cards = {};
@@ -1706,6 +1828,10 @@ var SetupArea = (function () {
             }
         });
     };
+    SetupArea.prototype.hide = function () {
+        console.log('hide');
+        this.ui.setupArea.style.display = 'none';
+    };
     return SetupArea;
 }());
 var tplSetupArea = function () { return "\n<div id=\"joco_setup_area\">\n  <div class=\"joco_container\">\n    <span class=\"joco_label\">".concat(_('Chosen setup cards'), "</span>\n    <div id=\"joco_chosen_cards\"></div>\n  </div>\n  <div class=\"joco_container\">\n    <span class=\"joco_label\">").concat(_('Draft'), "</span>\n    <div id=\"joco_draft_cards\"></div>\n  </div>\n</div"); };
@@ -1717,7 +1843,6 @@ var getTokenDiv = function (_a) {
     var key = _a.key, value = _a.value, game = _a.game;
     var splitKey = key.split('_');
     var type = splitKey[1];
-    console.log('type', type);
     switch (type) {
         case LOG_TOKEN_BOLD_TEXT:
             return tlpLogTokenText({ text: value });

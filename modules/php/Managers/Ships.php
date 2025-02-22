@@ -62,7 +62,7 @@ class Ships extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     self::create($ships, null);
     self::create([
       [
-        "id" => "ship_" . "_{INDEX}",
+        "id" => "ship_" . "{INDEX}",
         "nbr" => 14,
         "nbrStart" => 1,
         'location' => SUPPLY_OTHER_SHIPS,

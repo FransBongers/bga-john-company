@@ -191,6 +191,15 @@ const OFFICES = [
   GOVERNOR_OF_MYSORE,
 ];
 
+// TODO: check how to handle director of trade and governor general
+const OFFICES_WITH_TREASURY = [
+  DIRECTOR_OF_TRADE,
+  MANAGER_OF_SHIPPING,
+  PRESIDENT_OF_BOMBAY,
+  PRESIDENT_OF_MADRAS,
+  PRESIDENT_OF_BENGAL,
+];
+
 /**
  * Family member positions
  */

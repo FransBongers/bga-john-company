@@ -2,7 +2,6 @@ class Region {
   private tower: HTMLElement;
 
   constructor(private id: string, private game: GameAlias, data: JocoRegionBase) {
-    console.log('setup region', id);
     this.setup(data);
   }
 

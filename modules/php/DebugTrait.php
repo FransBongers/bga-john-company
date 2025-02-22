@@ -75,7 +75,8 @@ trait DebugTrait
     // Notifications::log('familyMembers', FamilyMembers::getInLocationOrdered(Locations::familyMemberSupply(HASTINGS))->toArray());
     // Notifications::log('players', Players::getCrown());
     // Notifications::log('regions', Regions::getAll());
-    Enterprises::setupNewGame();
+    // Enterprises::setupNewGame();
+    Offices::setupNewGame();
   }
 
 

@@ -134,7 +134,7 @@ class JohnCompany implements Game {
     NotificationManager.create(this);
     Board.create(this);
     
-    if (this.playerOrder.includes(this.getPlayerId())) {
+    if (this.playerOrder.includes(this.getPlayerId()) && gamedatas.phase === SETUP) {
       SetupArea.create(this);
     }
 
@@ -628,7 +628,7 @@ class JohnCompany implements Game {
   }
 
   public updateLayout() {
-    console.log('updateLayout');
+    // console.log('updateLayout');
     //  if (!this.settings) {
     // 	 return;
     //  }

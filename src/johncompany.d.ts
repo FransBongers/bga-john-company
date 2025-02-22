@@ -22,6 +22,12 @@ interface CommonStateArgs {
   previousSteps: number[];
 }
 
+interface GamePiece {
+  id: string;
+  location: string;
+  state: number;
+}
+
 // interface JohnCompanyGame extends Game {
 //   // addCancelButton: ({ callback }?: { callback?: Function }) => void;
 //   addConfirmButton: (props: { callback: Function | string }) => void;
@@ -108,9 +114,11 @@ interface JohnCompanyGamedatas extends Gamedatas {
   };
   families: Record<string, JocoFamily>;
   familyMembers: Record<string, JocoFamilyMember>;
+  offices: Record<string, JoCoOfficeBase>;
   orders: Record<string, JoCoOrder>;
   phase: string;
   regions: Record<string, JocoRegionBase>;
+  ships: Record<string, JocoShipBase>;
   staticData: {
     setupCards: Record<string, JocoSetupCardStatic>;
   };
@@ -139,6 +147,11 @@ interface JocoFamilyMember {
   familyId: string;
 }
 
+interface JoCoOfficeBase extends GamePiece {
+  familyMemberId: string | null;
+  treasury: number;
+}
+
 interface JoCoOrder {
   id: string;
   location: string;
@@ -151,6 +164,11 @@ interface JocoRegionBase {
   looted: boolean;
   strength: number;
   untest: number;
+}
+
+interface JocoShipBase extends GamePiece {
+  type: string;
+  fatigued: boolean;
 }
 
 type JoCoSetupCard = JoCoSetupCardBase & JocoSetupCardStatic;

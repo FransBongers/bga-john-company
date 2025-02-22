@@ -71,28 +71,11 @@ const TURN_CONFIG: Record<string | number, AbsolutePosition> = {
   endGameScoring: { top: 138, left: 199.5 },
 };
 
-const getCourtOfDirectorsPosition = (index: number) =>
-  getGroupPosition(555, 243, index);
-const getWriterPosition = (
-  presidency: string,
-  index: number
-): AbsolutePosition => {
-  switch (presidency) {
-    case BOMBAY:
-      return getGroupPosition(602, 831, index);
-    case BENGAL:
-      return getGroupPosition(602, 1210, index);
-    case MADRAS:
-      return getGroupPosition(602, 1021, index);
-    default:
-      return { top: 0, left: 0 };
-  }
-};
-
 const getGroupPosition = (
   top: number,
   left: number,
-  index: number
+  index: number,
+  rowSize: number
 ): AbsolutePosition => {
   const row = Math.floor(index / 4);
   const column = index % 4;
@@ -100,6 +83,87 @@ const getGroupPosition = (
     top: top + 46 * row,
     left: left + 39 * column,
   };
+};
+
+const getCourtOfDirectorsPosition = (index: number) =>
+  getGroupPosition(555, 243, index, 4);
+
+const getOfficersInTrainingPosition = (index: number) =>
+  getGroupPosition(602, 692, index, 3);
+
+const getWriterPosition = (
+  presidency: string,
+  index: number
+): AbsolutePosition => {
+  switch (presidency) {
+    case BOMBAY:
+      return getGroupPosition(602, 894, index, 3);
+    case BENGAL:
+      return getGroupPosition(602, 1273, index, 3);
+    case MADRAS:
+      return getGroupPosition(602, 1084, index, 3);
+    default:
+      return { top: 0, left: 0 };
+  }
+};
+
+const WEST_INDIAN_POSITIONS: AbsolutePosition[] = [
+  {
+    top: 445,
+    left: 870,
+  },
+  {
+    top: 293,
+    left: 880,
+  },
+];
+
+const SOUTH_INDIAN_POSITIONS: AbsolutePosition[] = [
+  {
+    top: 391,
+    left: 1233,
+  },
+  {
+    top: 491,
+    left: 1203,
+  },
+];
+
+const EAST_INDIAN_POSITIONS: AbsolutePosition[] = [
+  {
+    top: 332,
+    left: 1273,
+  },
+  {
+    top: 365,
+    left: 1313,
+  },
+];
+
+const getShipPosition = (sea: string, index: number): AbsolutePosition => {
+  const numberOfPositions = 2;
+  // Item in array, depends on array length of positions
+  const positionIndex = index % numberOfPositions;
+
+  // Extra offset in case there are more ships than positions
+  const offset = Math.floor(index / numberOfPositions);
+
+  let position = { top: 0, left: 0 };
+  switch (sea) {
+    case WEST_INDIAN:
+      position = WEST_INDIAN_POSITIONS[positionIndex];
+      break;
+    case SOUTH_INDIAN:
+      position = SOUTH_INDIAN_POSITIONS[positionIndex];
+      break;
+    case EAST_INDIAN:
+      position = EAST_INDIAN_POSITIONS[positionIndex];
+      break;
+  }
+
+  position.top = position.top - 20 * offset;
+  position.left = position.left + 20 * offset;
+  return position;
 };
 
 const FAMILY_MEMBER_OFFICE_CONFIG: Record<string, AbsolutePosition> = {
@@ -135,3 +199,11 @@ const towerConfig: Record<string, { bottom: number; left: number }> = {
   [MYSORE]: { bottom: -462, left: 983 },
   [PUNJAB]: { bottom: -74, left: 851 },
 };
+
+const TREASURY_POSITIONS: Record<string, AbsolutePosition> = {
+  [DIRECTOR_OF_TRADE]: { top: 618, left: 456 },
+  [MANAGER_OF_SHIPPING]: { top: 618, left: 595 },
+  [PRESIDENT_OF_BOMBAY]: { top: 618, left: 846 },
+  [PRESIDENT_OF_MADRAS]: { top: 618, left: 1036 },
+  [PRESIDENT_OF_BENGAL]: { top: 618, left: 1225 },
+}

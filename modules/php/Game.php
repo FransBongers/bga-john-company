@@ -30,6 +30,7 @@ use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Orders;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Regions;
@@ -347,10 +348,12 @@ class Game extends \Table
             'company' => Company::get(),
             'families' => Families::getAll(),
             'familyMembers' => FamilyMembers::getAll(),
+            'offices' => Offices::getAll(),
             'orders' => Orders::getAll(),
-            'regions' => Regions::getAll(),
             'playerOrder' => Players::getTurnOrder($playerId),
             'players' => Players::getUiData($playerId),
+            'regions' => Regions::getAll(),
+            'ships' => Ships::getAll(),
             'staticData' => [
                 'setupCards' => SetupCards::getStaticUiData()
             ]
@@ -386,6 +389,7 @@ class Game extends \Table
         Families::setupNewGame($players);
         FamilyMembers::setupNewGame();
         Company::setupNewGame();
+        Offices::setupNewGame();
         Orders::setupNewGame();
         Regions::setupNewGame();
         SetupCards::setupNewGame();
