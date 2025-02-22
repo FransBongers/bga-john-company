@@ -15,7 +15,7 @@ class Setup1710_12 extends \Bga\Games\JohnCompany\Models\SetupCard
         'value' => MILITARY_AFFAIRS,
       ],
       [
-        'type' => SHIP,
+        'type' => SHIPYARD,
         'value' => EAST_INDIAN
       ],
       [

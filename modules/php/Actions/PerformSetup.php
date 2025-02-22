@@ -6,6 +6,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Players;
@@ -46,6 +47,9 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
       Notifications::log('setupCards', $setupCards);
       $familyMembers = [];
       $cash = 0;
+      $enterprises = [];
+      $randomBlackMailCards = 0;
+      $isPrimeMinister = false;
 
       foreach ($setupCards as $card) {
         $items = $card->getItems();
@@ -90,12 +94,49 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
               $families[$familyId]->incTreasury($item['value']);
               $cash += $item['value'];
               break;
+            case LUXURY;
+            case SHIPYARD;
+            case WORKSHOP;
+              $enterprises[] = $item;
+              break;
+            case RANDOM_BLACKMAIL_CARD;
+              $randomBlackMailCards++;
+              break;
+            case PRIME_MINISTER;
+              $isPrimeMinister = true;
+              break;
           }
         }
       }
+      $player = $family->getPlayer();
+      Notifications::setupFamilyMembers($player, $familyMembers);
+      Notifications::setupCash($player, $cash);
+      if ($isPrimeMinister) {
+        // TODO: assign
+      }
 
-      Notifications::setupFamilyMembers($family->getPlayer(), $familyMembers);
-      Notifications::setupCash($family->getPlayer(), $cash);
+      // Enterprises
+      foreach ($enterprises as $item) {
+        $type = $item['type'];
+
+        $enterprise = Enterprises::getTopOf(Locations::enterpriseSupply($type));
+        $enterprise->setLocation($familyId);
+        Notifications::message(clienttranslate('${player_name} gains a ${enterprise}'), ['player' => $player, 'enterprise' => $type]);
+
+        if ($type === SHIPYARD) {
+          $value = $item['value'];
+          $ship = $enterprise->getShip();
+          if ($value === UNFITTED) {
+            // TODO: make this the default value for Ships?
+            $ship->setLocation($enterprise->getId());
+          } else {
+            $ship->setLocation($value);
+            Notifications::message(clienttranslate('${player_name} places ship in ${sea}'), ['player' => $player, 'sea' => $value]);
+          }
+        }
+      }
+      // Random Blackmail card
+
     }
 
     $this->resolveAction(['automatic' => true]);

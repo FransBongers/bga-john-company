@@ -15,7 +15,7 @@ class Setup1710_11 extends \Bga\Games\JohnCompany\Models\SetupCard
         'value' => DIRECTOR_OF_TRADE,
       ],
       [
-        'type' => SHIP,
+        'type' => SHIPYARD,
         'value' => SOUTH_INDIAN
       ],
       [

@@ -12,11 +12,11 @@ class Setup1710_14 extends \Bga\Games\JohnCompany\Models\SetupCard
     $this->extra = true;
     $this->items = [
       [
-        'type' => SHIP,
+        'type' => SHIPYARD,
         'value' => UNFITTED
       ],
       [
-        'type' => SHIP,
+        'type' => SHIPYARD,
         'value' => UNFITTED
       ],
     ];

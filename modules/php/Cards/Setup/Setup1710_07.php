@@ -11,7 +11,7 @@ class Setup1710_07 extends \Bga\Games\JohnCompany\Models\SetupCard
     $this->scenarioSetup = 1710;
     $this->items = [
       [
-        'type' => SHIP,
+        'type' => SHIPYARD,
         'value' => WEST_INDIAN,
       ],
       [

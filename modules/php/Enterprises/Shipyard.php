@@ -19,4 +19,8 @@ class Shipyard extends \Bga\Games\JohnCompany\Models\Enterprise
   public function getIncome() {
     return Ships::get($this->shipId)->getLocation() === $this->id ? 0 : 1;
   }
+
+  public function getShip() {
+    return Ships::get($this->shipId);
+  }
 }
