@@ -1,6 +1,9 @@
 const tplPlayArea = () => `
-  <div id="play_area_container">
-    
+  <div id="joco-play-area">
+    <div id="joco"></div>
+    <div id="joco-overlay">
+      <div id="joco-bar"></div>
+    </div>
   </div>
 `;
 

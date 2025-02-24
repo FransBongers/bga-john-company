@@ -787,10 +787,46 @@ var NotificationManager = (function () {
     };
     NotificationManager.prototype.notif_setupCash = function (notif) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, amount, playerId;
+            var _a, amount, playerId, logPound, fromRect, promises;
+            var _this = this;
             return __generator(this, function (_b) {
-                _a = notif.args, amount = _a.amount, playerId = _a.playerId;
-                return [2];
+                switch (_b.label) {
+                    case 0:
+                        _a = notif.args, amount = _a.amount, playerId = _a.playerId;
+                        return [4, this.game.framework().wait(1)];
+                    case 1:
+                        _b.sent();
+                        logPound = document.querySelector('#pagemaintitletext .joco_pound');
+                        fromRect = logPound.getBoundingClientRect();
+                        promises = Array.from(Array(amount).keys()).map(function (_, index) { return __awaiter(_this, void 0, void 0, function () {
+                            var element;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: return [4, this.game.framework().wait(index * 100)];
+                                    case 1:
+                                        _a.sent();
+                                        element = document.createElement('div');
+                                        element.classList.add('log_token');
+                                        element.classList.add('joco_pound');
+                                        element.classList.add('animation');
+                                        document.getElementById("player_board_".concat(playerId)).insertAdjacentElement('afterbegin', element);
+                                        return [4, this.game.animationManager.play(new BgaSlideAnimation({
+                                                element: element,
+                                                transitionTimingFunction: 'ease-in-out',
+                                                fromRect: fromRect,
+                                            }))];
+                                    case 2:
+                                        _a.sent();
+                                        element.remove();
+                                        return [2];
+                                }
+                            });
+                        }); });
+                        return [4, Promise.all(promises)];
+                    case 2:
+                        _b.sent();
+                        return [2];
+                }
             });
         });
     };
@@ -973,7 +1009,10 @@ var JohnCompany = (function () {
         Interaction.create(this);
         PlayerManager.create(this);
         NotificationManager.create(this);
+        Negotiation.create(this);
+        PlayerAreas.create(this);
         Board.create(this);
+        Bar.create(this);
         if (this.playerOrder.includes(this.getPlayerId()) && gamedatas.phase === SETUP) {
             SetupArea.create(this);
         }
@@ -1197,7 +1236,7 @@ var JohnCompany = (function () {
     };
     JohnCompany.prototype.updateLayout = function () {
         var ROOT = document.documentElement;
-        var playerAreaContainer = document.getElementById('play_area_container');
+        var playerAreaContainer = document.getElementById('joco-play-area');
         if (!playerAreaContainer) {
             return;
         }
@@ -1333,6 +1372,75 @@ var JohnCompany = (function () {
     };
     return JohnCompany;
 }());
+var Bar = (function () {
+    function Bar(game) {
+        this.ui = {
+            tabs: {},
+            barButtons: [],
+        };
+        this.active = 0;
+        this.config = [
+            {
+                id: 'joco-board',
+                text: _('Board'),
+            },
+            {
+                id: 'joco-player-areas',
+                text: _('Player Areas'),
+            },
+            {
+                id: 'joco-negotiation',
+                text: _('Negotiation'),
+            },
+        ];
+        this.game = game;
+        this.setup(game.gamedatas);
+    }
+    Bar.create = function (game) {
+        Bar.instance = new Bar(game);
+    };
+    Bar.getInstance = function () {
+        return Bar.instance;
+    };
+    Bar.prototype.setup = function (gamedatas) {
+        var _this = this;
+        var bar = document.getElementById('joco-bar');
+        console.log('active', this.active);
+        this.config.forEach(function (_a, index) {
+            var id = _a.id, text = _a.text;
+            bar.insertAdjacentHTML('beforeend', tplTabButton(text, index));
+            _this.ui.barButtons.push(document.getElementById("joco-bar-item-".concat(index)));
+            _this.ui.tabs[id] = document.getElementById(id);
+            console.log('id', id);
+            if (index === _this.active) {
+                _this.ui.barButtons[index].classList.add('joco-bar-item-active');
+                _this.ui.tabs[id].classList.add('joco-tab-visible');
+            }
+            else {
+                _this.ui.tabs[id].classList.add('joco-tab-hidden');
+            }
+        });
+        bar.addEventListener('click', function (event) { return _this.onIconClick(event); });
+    };
+    Bar.prototype.onIconClick = function (event) {
+        var target = event.target;
+        if (!target.classList.contains('joco-bar-item')) {
+            return;
+        }
+        var index = Number(target.id.split('-')[3]);
+        this.updateActive();
+        this.active = index;
+        this.updateActive();
+    };
+    Bar.prototype.updateActive = function () {
+        var tab = this.ui.tabs[this.config[this.active].id];
+        tab.classList.toggle('joco-tab-visible');
+        tab.classList.toggle('joco-tab-hidden');
+        this.ui.barButtons[this.active].classList.toggle('joco-bar-item-active');
+    };
+    return Bar;
+}());
+var tplTabButton = function (text, index) { return "\n<div id=\"joco-bar-item-".concat(index, "\" class=\"joco-bar-item\">").concat(text, "</div>\n"); };
 var _a, _b, _c, _d, _e;
 var ORDERS_CONFIG = (_a = {},
     _a[ORDER_PUNJAB_1] = { top: 22.5, left: 933 },
@@ -1548,10 +1656,10 @@ var Board = (function () {
     };
     Board.prototype.setup = function (gamedatas) {
         document
-            .getElementById('play_area_container')
+            .getElementById('joco')
             .insertAdjacentHTML('afterbegin', tplBoard(gamedatas));
         this.ui = {
-            board: document.getElementById('joco_board'),
+            board: document.getElementById('joco-board'),
             familyMembers: document.getElementById('joco_family_members'),
             orders: document.getElementById('joco_orders'),
             pawns: {},
@@ -1770,7 +1878,7 @@ var Region = (function () {
     };
     return Region;
 }());
-var tplBoard = function (gamedatas) { return "<div id=\"joco_board\">\n  <div id=\"joco_family_members\"></div>\n  <div id=\"joco_orders\"></div>\n  <div id=\"joco_ships\"></div>\n  <div id=\"joco_towers\"></div>\n  <div id=\"joco_treasuries\"></div>\n</div>"; };
+var tplBoard = function (gamedatas) { return "<div id=\"joco-board\">\n  <div id=\"joco_family_members\"></div>\n  <div id=\"joco_orders\"></div>\n  <div id=\"joco_ships\"></div>\n  <div id=\"joco_towers\"></div>\n  <div id=\"joco_treasuries\"></div>\n</div>"; };
 var tplTreasury = function (office, _a) {
     var top = _a.top, left = _a.left;
     return "\n<div class=\"joco_treasury\" style=\"top: calc(var(--boardScale) * ".concat(top, "px); left: calc(var(--boardScale) * ").concat(left, "px);\">\n  <span>").concat(_('£'), "</span>\n  <span class=\"joco_treasury_counter\" id=\"joco_").concat(office, "_treasury\"></span>\n</div>");
@@ -1791,7 +1899,7 @@ var SetupArea = (function () {
     SetupArea.prototype.setup = function (gamedatas) {
         var _this = this;
         document
-            .getElementById('play_area_container')
+            .getElementById('game_play_area')
             .insertAdjacentHTML('afterbegin', tplSetupArea());
         this.ui = {
             setupArea: document.getElementById('joco_setup_area'),
@@ -1859,6 +1967,51 @@ var tlpLogTokenText = function (_a) {
     return "<span ".concat(tooltipId ? "id=\"".concat(tooltipId, "\" class=\"log_tooltip\"") : '', " style=\"font-weight: 700;").concat(italic ? ' font-style: italic;' : '', "\">").concat(_(text), "</span>");
 };
 var tplLogTokenPound = function () { return "<div class=\"log_token joco_pound\"></div>"; };
+var Negotiation = (function () {
+    function Negotiation(game) {
+        this.game = game;
+        this.game = game;
+        this.setup(game.gamedatas);
+    }
+    Negotiation.create = function (game) {
+        Negotiation.instance = new Negotiation(game);
+    };
+    Negotiation.getInstance = function () {
+        return Negotiation.instance;
+    };
+    Negotiation.prototype.setup = function (gamedatas) {
+        document
+            .getElementById('joco')
+            .insertAdjacentHTML('afterbegin', tplNegotiation());
+    };
+    return Negotiation;
+}());
+var tplNegotiation = function () { return "<div id=\"joco-negotiation\">\n  TODO\n</div>"; };
+var PlayerAreas = (function () {
+    function PlayerAreas(game) {
+        this.game = game;
+        this.game = game;
+        this.setup(game.gamedatas);
+    }
+    PlayerAreas.create = function (game) {
+        PlayerAreas.instance = new PlayerAreas(game);
+    };
+    PlayerAreas.getInstance = function () {
+        return PlayerAreas.instance;
+    };
+    PlayerAreas.prototype.setup = function (gamedatas) {
+        document
+            .getElementById('joco')
+            .insertAdjacentHTML('afterbegin', tplPlayerAreas());
+        var container = document.getElementById('joco-player-areas');
+        this.game.playerOrder.forEach(function (playerId) {
+            container.insertAdjacentHTML('beforeend', tplPlayerArea(gamedatas.players[playerId]));
+        });
+    };
+    return PlayerAreas;
+}());
+var tplPlayerAreas = function () { return "<div id=\"joco-player-areas\">\n</div>"; };
+var tplPlayerArea = function (player) { return "\n  <div class=\"joco-player-area\">\n    <span style=\"color:#".concat(player.color, "; align-self: center;\" class=\"playername\">").concat(player.name, "</span>\n  </div>\n"); };
 var PlayerManager = (function () {
     function PlayerManager(game) {
         this.game = game;
@@ -2094,7 +2247,7 @@ var StaticData = (function () {
     };
     return StaticData;
 }());
-var tplPlayArea = function () { return "\n  <div id=\"play_area_container\">\n    \n  </div>\n"; };
+var tplPlayArea = function () { return "\n  <div id=\"joco-play-area\">\n    <div id=\"joco\"></div>\n    <div id=\"joco-overlay\">\n      <div id=\"joco-bar\"></div>\n    </div>\n  </div>\n"; };
 var tplCrownPlayerPanel = function (name, color) {
     return "<div id=\"overall_player_board_1\" class=\"player-board\">\n            <div class=\"player_board_inner\" id=\"player_board_inner_".concat(color, "\">\n              <div class=\"emblemwrap\" id=\"avatarwrap_1\">\n                  <div class=\"pp_wakhan_avatar avatar emblem\" id=\"avatar_1\"></div>\n              </div>\n              <div class=\"player-name\" id=\"player_name_1\">\n                <a style=\"color: #").concat(color, "\">").concat(name, "</a>\n              </div>\n              <div id=\"player_board_1\" class=\"player_board_content\">\n                <div class=\"player_score\" style=\"margin-top: 5px;\">\n                  <span id=\"player_score_1\" class=\"player_score_value\"></span> <i class=\"fa fa-star\" id=\"icon_point_1\"></i>\n                </div>\n              </div>\n            </div>\n          </div>");
 };

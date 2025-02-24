@@ -1,11 +1,12 @@
 @use '../base';
 
-#joco_board {
+#joco-board {
   --boardScale: var(--leftColumnScale);
   position: relative;
   background-image: url('img/board.jpg');
   background-size: 100% 100%;
   height: calc(var(--leftColumnScale) * 759px);
+  min-height: calc(var(--leftColumnScale) * 759px);
   width: calc(var(--leftColumnScale) * 1500px);
   // width: 100%;
   // aspect-ratio: 30 / 15;

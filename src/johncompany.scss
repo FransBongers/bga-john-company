@@ -9,9 +9,12 @@
  */
 
 @use './base';
+@use './bar/bar';
 @use './board/board';
 @use './boilerplate/default';
 @use './cards/setupCards';
+@use './negotiation/negotiation';
+@use './player-areas/player-areas';
 @use './setup-area/setup-area';
 @use './logs/logs';
 @use './tokens';
@@ -21,15 +24,71 @@ html {
   background-attachment: fixed;
 }
 
-#play_area_container {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+#joco #joco-overlay,
+#joco-play-area {
+  left: 0;
+  position: relative;
+  top: 0;
+  width: 100%;
+}
+
+#joco,
+#joco-overlay {
+  display: block;
+  grid-column: 1 / 2;
+  height: 100%;
+}
+
+
+#joco-play-area {
+  width: 100%;
+  display: grid;
+  grid-template: 82px auto / 100%;
+  height: min-content;
+  // margin-bottom: 100px;
+  margin-left: 0;
+  // display: flex;
+  // flex-direction: column;
+  // gap: 8px;
+
   // background-color: yellow;
   // padding: 4px;
   // display: grid;
   // grid-template-columns: auto auto;
   // grid-gap: 8px;
+}
+
+#joco-overlay {
+  grid-row: 1 / 3;
+  pointer-events: none;
+  display: block;
+  grid-column: 1 / 2;
+  height: 100%;
+}
+
+#joco {
+  grid-row: 2 / 3;
+  display: grid;
+  grid-template: auto / 100%;
+}
+
+#joco > div {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  height: min-content;
+}
+
+.joco-tab-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transition: visibility .45s ease-out, opacity .45s linear;
+  visibility: hidden;
+}
+
+.joco-tab-visible {
+  opacity: 1;
+  transition: visibility 0s ease-out, opacity .6s linear;
+  visibility: visible;
 }
 
 .joco_family_member2 {
@@ -48,7 +107,7 @@ html {
   // width: calc(var(--leftColumnScale) * 39px);
   // height: 100px;
   // width: 85px;
-  
+
   // stroke: base.$player-blue-dark;
   .joco_family_member_icon2 {
     background-image: url('img/familyMember2.svg');
@@ -58,7 +117,6 @@ html {
     width: calc(var(--leftColumnScale) * 35px);
   }
 }
-
 
 .joco_family_member {
   display: flex;
@@ -85,46 +143,46 @@ html {
   }
 }
 
-.joco_family_member[data-family="Benyon"] {
+.joco_family_member[data-family='Benyon'] {
   background-color: base.$player-pink;
   svg {
     fill: base.$player-pink-dark;
   }
 }
-.joco_family_member[data-family="Hastings"] {
+.joco_family_member[data-family='Hastings'] {
   background-color: base.$player-blue;
   svg {
     fill: base.$player-blue-dark;
   }
 }
-.joco_family_member[data-family="Larkins"] {
+.joco_family_member[data-family='Larkins'] {
   background-color: base.$player-yellow;
   svg {
     fill: base.$player-yellow-dark;
   }
 }
-.joco_family_member[data-family="Paxton"] {
+.joco_family_member[data-family='Paxton'] {
   background-color: base.$player-gray;
   svg {
     fill: base.$player-gray-dark;
   }
 }
-.joco_family_member[data-family="Sykes"] {
+.joco_family_member[data-family='Sykes'] {
   background-color: base.$player-purple;
   svg {
     fill: base.$player-purple-dark;
   }
 }
-.joco_family_member[data-family="Walsh"] {
+.joco_family_member[data-family='Walsh'] {
   background-color: base.$player-green;
   svg {
     fill: base.$player-green-dark;
   }
 }
-.joco_family_member[data-family=Crown] {
+.joco_family_member[data-family='Crown'] {
   background-color: base.$crown-red;
   // background-color: #EE4B2B;
 }
-.joco_family_member[data-family=Crown] svg {
+.joco_family_member[data-family='Crown'] svg {
   fill: black;
 }

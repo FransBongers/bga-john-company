@@ -132,8 +132,11 @@ class JohnCompany implements Game {
     Interaction.create(this);
     PlayerManager.create(this);
     NotificationManager.create(this);
+    Negotiation.create(this);
+    PlayerAreas.create(this);
     Board.create(this);
-    
+    Bar.create(this);
+
     if (this.playerOrder.includes(this.getPlayerId()) && gamedatas.phase === SETUP) {
       SetupArea.create(this);
     }
@@ -639,7 +642,7 @@ class JohnCompany implements Game {
     //  );
 
     const ROOT = document.documentElement;
-    const playerAreaContainer = document.getElementById('play_area_container');
+    const playerAreaContainer = document.getElementById('joco-play-area');
 
     if (!playerAreaContainer) {
       return;

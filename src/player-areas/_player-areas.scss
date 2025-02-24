@@ -1,0 +1,15 @@
+#joco-player-areas {
+  // min-height: 300px;
+  // background-color: yellow;
+  // z-index: 0;
+}
+
+.joco-player-area {
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+
+  .playername {
+    font-size: larger;
+  }
+}

@@ -67,11 +67,11 @@ class Board {
   // Setup functions
   setup(gamedatas: GamedatasAlias) {
     document
-      .getElementById('play_area_container')
+      .getElementById('joco')
       .insertAdjacentHTML('afterbegin', tplBoard(gamedatas));
 
     this.ui = {
-      board: document.getElementById('joco_board'),
+      board: document.getElementById('joco-board'),
       familyMembers: document.getElementById('joco_family_members'),
       orders: document.getElementById('joco_orders'),
       pawns: {},

@@ -1,4 +1,4 @@
-const tplBoard = (gamedatas: GamedatasAlias ) => `<div id="joco_board">
+const tplBoard = (gamedatas: GamedatasAlias ) => `<div id="joco-board">
   <div id="joco_family_members"></div>
   <div id="joco_orders"></div>
   <div id="joco_ships"></div>

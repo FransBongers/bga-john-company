@@ -35,7 +35,7 @@ class SetupArea {
   // Setup functions
   setup(gamedatas: GamedatasAlias) {
     document
-      .getElementById('play_area_container')
+      .getElementById('game_play_area')
       .insertAdjacentHTML('afterbegin', tplSetupArea());
 
     this.ui = {
