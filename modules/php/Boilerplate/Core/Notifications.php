@@ -130,7 +130,15 @@ class Notifications
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-
+  private static function getSeaName($seaId)
+  {
+    $idNameMap = [
+      EAST_INDIAN => clienttranslate('East Indian'),
+      SOUTH_INDIAN => clienttranslate('South Indian'),
+      WEST_INDIAN => clienttranslate('West Indian'),
+    ];
+    return $idNameMap[$seaId];
+  }
 
   // ..######......###....##.....##.########
   // .##....##....##.##...###...###.##......
@@ -170,9 +178,16 @@ class Notifications
     ]);
   }
 
-  public static function setupDone()
+  public static function gainEnterprise($player, $enterprise)
   {
-    self::notifyAll('setupDone', '', []);
+    // Notifications::message(clienttranslate('${player_name} gains a ${enterprise}'), ['player' => $player, 'enterprise' => $type]);
+    self::notifyAll('gainEnterprise', clienttranslate('${player_name} gains a ${tkn_boldText_enterprise} ${tkn_enterpriseIcon}'), [
+      'player' => $player,
+      'tkn_boldText_enterprise' => $enterprise->getName(),
+      'tkn_enterpriseIcon' => $enterprise->getType(),
+      'type' => $enterprise->getType(),
+      'i18n' => ['tkn_boldText_enterprise'],
+    ]);
   }
 
   public static function nextPhase($phase)
@@ -187,13 +202,28 @@ class Notifications
     ]);
   }
 
-  public static function setupCash($player, $cash)
+  public static function gainCash($player, $cash)
   {
-    self::notifyAll('setupCash', clienttranslate('${player_name} gains ${amount} ${tkn_pound}'), [
+    self::notifyAll('gainCash', clienttranslate('${player_name} gains ${amount} ${tkn_pound}'), [
       'player' => $player,
       'amount' => $cash,
       'tkn_pound' => clienttranslate('Pounds')
     ]);
+  }
+
+  public static function placeShip($player, $ship)
+  {
+    // TODO: ship icon?
+    self::notifyAll('placeShip', clienttranslate('${player_name} places a ship in the ${tkn_boldText_sea}'), [
+      'player' => $player,
+      'tkn_boldText_sea' => self::getSeaName($ship->getLocation()),
+      'ship' => $ship->jsonSerialize(),
+    ]);
+  }
+
+  public static function setupDone()
+  {
+    self::notifyAll('setupDone', '', []);
   }
 
   public static function setupFamilyMembers($player, $familyMembers)
@@ -201,6 +231,29 @@ class Notifications
     self::notifyAll('setupFamilyMembers', clienttranslate('${player_name} places family members'), [
       'player' => $player,
       'familyMembers' => $familyMembers,
+    ]);
+  }
+
+  public static function setupRevealCards($player, $cards)
+  {
+    $log = '';
+    $args = [];
+
+    foreach ($cards as $index => $card) {
+      $key = 'tkn_setupCard_' . $index;
+      $log = $log . '${' . $key . '}';
+      $args[$key] = $card->getId();
+    }
+
+    $setupCardsLog = [
+      'log' => $log,
+      'args' => $args,
+    ];
+
+    self::message(clienttranslate('${player_name} reveals their setup cards ${tkn_newLine}${setupCardsLog}'), [
+      'player' => $player,
+      'setupCardsLog' => $setupCardsLog,
+      'tkn_newLine' => '',
     ]);
   }
 }

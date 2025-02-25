@@ -1,0 +1,22 @@
+.joco-icon {
+  background-image: url("img/icons.png");
+  background-size: 400% 100%;
+  width: calc(var(--iconScale) * 48px);
+  height: calc(var(--iconScale) * 48px);
+}
+
+.joco-icon[data-icon="Luxury"] {
+  background-position-x: 0%;
+}
+
+.joco-icon[data-icon="share"] {
+  background-position-x: 100%;
+}
+
+.joco-icon[data-icon="Shipyard"] {
+  background-position-x: 66.66667%;
+}
+
+.joco-icon[data-icon="Workshop"] {
+background-position-x: 33.33333%;
+}

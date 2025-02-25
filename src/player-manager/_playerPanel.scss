@@ -1,0 +1,40 @@
+.player-board-game-specific-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .joco_family_member {
+    --tokenScale: 1.043;
+    position: relative;
+    margin: 0px auto;
+  }
+
+  .joco_pound {
+    --tokenScale: 0.96;
+  }
+
+  .joco-ship {
+    --tokenScale: 1.2;
+    position: relative;
+    margin-top: auto;
+  }
+
+  .joco-counter-container {
+    display: flex;
+  }
+  
+  .joco-counter {
+    // position: relative;
+    margin: 0px auto;
+    font-weight: 700;
+    font-size: larger;
+  }
+}
+
+.joco-counters-row {
+  width: 100%;
+  display: grid;
+  grid-template: 48px auto / repeat(4, 48px);
+  justify-content: space-evenly;
+  gap: 4px;
+}

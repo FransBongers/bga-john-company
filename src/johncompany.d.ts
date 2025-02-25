@@ -112,6 +112,7 @@ interface JohnCompanyGamedatas extends Gamedatas {
     balance: number;
     standing: number | 'fail';
   };
+  enterprises: Record<string, JoCoEnterPriseBase>
   families: Record<string, JocoFamily>;
   familyMembers: Record<string, JocoFamilyMember>;
   offices: Record<string, JoCoOfficeBase>;
@@ -185,8 +186,16 @@ type JocoSetupCardStatic = {
   items: Array<{ type: string; value?: string }>;
 };
 
+interface JoCoEnterPriseBase extends GamePiece {
+  invested: boolean;
+  shipId: string | null;
+  type: string;
+  used: boolean;
+}
+
 interface JohnCompanyPlayerData extends BgaPlayer {
   draft: JoCoSetupCard[];
+  familyId: string;
   setupCards: JoCoSetupCard[];
 }
 

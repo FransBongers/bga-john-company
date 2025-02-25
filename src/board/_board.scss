@@ -2,6 +2,7 @@
 
 #joco-board {
   --boardScale: var(--leftColumnScale);
+  --tokenScale: var(--leftColumnScale);
   position: relative;
   background-image: url('img/board.jpg');
   background-size: 100% 100%;
@@ -115,11 +116,11 @@
   z-index: 6;
 }
 
-.joco_ship {
+.joco-ship {
   position: absolute;
   background-image: url('img/ship_player.png');
-  width: calc(var(--boardScale) * 40px);
-  height: calc(var(--boardScale) * 36px);
+  width: calc(var(--tokenScale) * 40px);
+  height: calc(var(--tokenScale) * 36px);
   background-size: 100% 100%;
 }
 

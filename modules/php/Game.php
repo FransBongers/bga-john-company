@@ -37,6 +37,7 @@ use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Managers\Scenarios;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 use Bga\Games\JohnCompany\Managers\Ships;
+use Bga\Games\JohnCompany\Models\Enterprise;
 
 class Game extends \Table
 {
@@ -346,6 +347,7 @@ class Game extends \Table
             'turn' => Globals::getTurn(),
             'phase' => Globals::getPhase(),
             'company' => Company::get(),
+            'enterprises' => Enterprises::getAll(),
             'families' => Families::getAll(),
             'familyMembers' => FamilyMembers::getAll(),
             'offices' => Offices::getAll(),

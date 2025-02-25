@@ -49,11 +49,11 @@ class SetupArea {
       .forEach((card) => {
         const elt = (this.cards[card.id] = document.createElement('div'));
         elt.id = card.id;
-        elt.classList.add('joco_setup_card');
+        elt.classList.add('joco-setup-card');
+        elt.setAttribute('data-card-id', card.id);
       });
 
     const players = gamedatas.players;
-    console.log('players', this.playerId, players);
 
     gamedatas.players[this.playerId].draft.forEach(({ id }) => {
       this.ui.draft.appendChild(this.cards[id]);
@@ -63,16 +63,6 @@ class SetupArea {
       this.ui.chosenCards.appendChild(this.cards[id]);
     });
 
-    // Object.values(gamedatas.players).forEach((player) => {
-    //   const draftCards = player.hand.map(({id}) => tplSetupCard(id));
-    //   const setupCards = player.setupCards.map(({id}) => tplSetupCard(id));
-    //   if (draftCards.length > 0) {
-    //     document.getElementById('joco_draft_cards').insertAdjacentHTML('afterbegin', draftCards.join(''));
-    //   }
-    //   if(setupCards.length > 0) {
-    //     document.getElementById('joco_setup_cards').insertAdjacentHTML('afterbegin', setupCards.join(''));
-    //   }
-    // })
   }
 
   public newCards(cardIds: string[], lastCard: boolean) {
@@ -87,7 +77,6 @@ class SetupArea {
   }
 
   public hide() {
-    console.log('hide');
     this.ui.setupArea.style.display = 'none';
   }
 }

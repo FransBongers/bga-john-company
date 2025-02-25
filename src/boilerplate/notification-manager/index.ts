@@ -63,8 +63,10 @@ class NotificationManager {
       // 'draftCard',
       'draftCardPrivate',
       'draftNewCardsPrivate',
+      'gainCash',
+      'gainEnterprise',
       'nextPhase',
-      'setupCash',
+      'placeShip',
       'setupDone',
       'setupFamilyMembers',
     ];
@@ -135,6 +137,10 @@ class NotificationManager {
     dojo.forEach(this.subscriptions, dojo.unsubscribe);
   }
 
+  getPlayer(playerId: number): JocoPlayer {
+    return PlayerManager.getInstance().getPlayer(playerId);
+  }
+
   // getPlayer({ playerId }: { playerId: number }): JoCoPlayer {
   //   return this.game.playerManager.getPlayer({ playerId });
   // }
@@ -176,16 +182,20 @@ class NotificationManager {
     const { cardIds, lastCard } = notif.args;
 
     SetupArea.getInstance().newCards(cardIds, lastCard);
-    // document.getElementById('joco_draft_cards').replaceChildren();
-    // const draftCards = newHand.map((id) => tplSetupCard(id));
+  }
 
-    // if (newHand.length > 0) {
-    //   document
-    //     .getElementById('joco_draft_cards')
-    //     .insertAdjacentHTML('afterbegin', draftCards.join(''));
-    // }
-
-    // this.game.animationManager.attachWithAnimation({}, document.getElementById('joco_setup_cards'))
+  async notif_gainEnterprise(notif: Notif<NotifGainEnterprise>) {
+    const { playerId, type } = notif.args;
+    const typeCounterMap = {
+      [LUXURIES_COUNTER]: LUXURIES_COUNTER,
+      [SHIPYARD]: SHIPYARDS_COUNTER,
+      [WORKSHOP]: WORKSHOPS_COUNTER,
+    };
+    const player = this.getPlayer(playerId);
+    player.counters[typeCounterMap[type]].incValue(1);
+    if (type === SHIPYARD) {
+      player.counters[SHIPS_COUNTER].incValue(1);
+    }
   }
 
   async notif_nextPhase(notif: Notif<NotifNextPhase>) {
@@ -193,7 +203,7 @@ class NotificationManager {
     Board.getInstance().movePhasePawn(phase);
   }
 
-  async notif_setupCash(notif: Notif<NotifSetupCash>) {
+  async notif_gainCash(notif: Notif<NotifGainCash>) {
     const { amount, playerId } = notif.args;
 
     // New try
@@ -208,7 +218,6 @@ class NotificationManager {
       '#pagemaintitletext .joco_pound'
     );
 
-    
     const fromRect = logPound.getBoundingClientRect();
 
     const promises = Array.from(Array(amount).keys()).map(async (_, index) => {
@@ -217,7 +226,9 @@ class NotificationManager {
       element.classList.add('log_token');
       element.classList.add('joco_pound');
       element.classList.add('animation');
-      document.getElementById(`player_board_${playerId}`).insertAdjacentElement('afterbegin', element);
+      document
+        .getElementById(`joco-cash-${playerId}`)
+        .insertAdjacentElement('afterbegin', element);
       await this.game.animationManager.play(
         new BgaSlideAnimation({
           element,
@@ -226,9 +237,22 @@ class NotificationManager {
         })
       );
       element.remove();
+      PlayerManager.getInstance()
+        .getPlayer(playerId)
+        .counters[CASH_COUNTER].incValue(1);
     });
 
     await Promise.all(promises);
+  }
+
+  async notif_placeShip(notif: Notif<NotifPlaceShip>) {
+    const { playerId, ship } = notif.args;
+    const player = this.getPlayer(playerId);
+    player.counters[SHIPS_COUNTER].incValue(-1);
+    await Board.getInstance().placeShip(
+      ship,
+      player.ui[SHIPS_COUNTER],
+    );
   }
 
   async notif_setupDone(notif: Notif<unknown>) {
@@ -239,7 +263,7 @@ class NotificationManager {
     const { familyMembers, playerId } = notif.args;
     await Board.getInstance().placeFamilyMembers(
       familyMembers,
-      document.getElementById(`player_board_${playerId}`)
+      this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER],
     );
   }
 }

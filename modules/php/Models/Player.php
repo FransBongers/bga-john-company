@@ -45,6 +45,7 @@ class Player extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
       $data,
       [
         'draft' => $isCurrentPlayer ? $this->getDraft() : [],
+        'familyId' => $this->getFamilyId(),
         'setupCards' => $isCurrentPlayer ? $this->getSetupCards() : [],
       ],
     );
@@ -57,7 +58,11 @@ class Player extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
 
   public function getFamilyId()
   {
-    return COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[$this->getColor()]];
+    if ($this->getId() === CROWN_PLAYER_ID) {
+      return CROWN;
+    } else {
+      return COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[$this->getColor()]];
+    }
   }
 
   public function getDraft()
@@ -69,5 +74,4 @@ class Player extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   {
     return SetupCards::getInLocation(Locations::setupCards($this->getFamilyId()))->toArray();
   }
-
 }

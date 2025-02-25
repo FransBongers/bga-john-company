@@ -39,6 +39,7 @@
     "src/board/index.ts",
     "src/board/region.ts",
     "src/board/templates.ts",
+    "src/board/utility.ts",
     "src/setup-area/index.ts",
     "src/setup-area/templates.ts",
     "src/logs/index.ts",

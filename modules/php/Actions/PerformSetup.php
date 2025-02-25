@@ -41,10 +41,11 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
     $players = Players::getAll();
 
     foreach ($families as $familyId => $family) {
-      $setupCards = SetupCards::getInLocation(Locations::setupCards($familyId));
+      $setupCards = SetupCards::getInLocation(Locations::setupCards($familyId))->toArray();
       // $familyId = $player->getFamilyId();
+      $player = $family->getPlayer();
+      Notifications::setupRevealCards($player, $setupCards);
 
-      Notifications::log('setupCards', $setupCards);
       $familyMembers = [];
       $cash = 0;
       $enterprises = [];
@@ -108,9 +109,9 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
           }
         }
       }
-      $player = $family->getPlayer();
+      
       Notifications::setupFamilyMembers($player, $familyMembers);
-      Notifications::setupCash($player, $cash);
+      Notifications::gainCash($player, $cash);
       if ($isPrimeMinister) {
         // TODO: assign
       }
@@ -121,7 +122,8 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
 
         $enterprise = Enterprises::getTopOf(Locations::enterpriseSupply($type));
         $enterprise->setLocation($familyId);
-        Notifications::message(clienttranslate('${player_name} gains a ${enterprise}'), ['player' => $player, 'enterprise' => $type]);
+        // Notifications::message(clienttranslate('${player_name} gains a ${enterprise}'), ['player' => $player, 'enterprise' => $type]);
+        Notifications::gainEnterprise($player, $enterprise);
 
         if ($type === SHIPYARD) {
           $value = $item['value'];
@@ -131,7 +133,7 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
             $ship->setLocation($enterprise->getId());
           } else {
             $ship->setLocation($value);
-            Notifications::message(clienttranslate('${player_name} places ship in ${sea}'), ['player' => $player, 'sea' => $value]);
+            Notifications::placeShip($player, $ship);
           }
         }
       }

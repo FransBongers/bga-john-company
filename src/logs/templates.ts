@@ -17,3 +17,7 @@ const tlpLogTokenText = ({
 /* ------- GAME SPECIFIC LOG TOKENS ------- */
 
 const tplLogTokenPound = () => `<div class="log_token joco_pound"></div>`
+
+const tplLogTokenEnterpriseIcon = (type: string) => `<div class="log-token joco-icon" data-icon="${type}"></div>`
+
+const tplLogTokenSetupCard = (id: string) => `<div class="log-token joco-setup-card" data-card-id="${id}"></div>`

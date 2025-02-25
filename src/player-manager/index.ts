@@ -35,8 +35,12 @@ class PlayerManager {
     return PlayerManager.instance;
   }
 
-  getPlayer(playerId): JocoPlayer {
+  getPlayer(playerId: number): JocoPlayer {
     return this.players[playerId];
+  }
+
+  getPlayerForFamily(familyId: string): JocoPlayer {
+    return Object.values(this.players).find((player) => player.familyId === familyId);
   }
 
   getPlayers(): JocoPlayer[] {

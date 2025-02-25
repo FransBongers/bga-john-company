@@ -41,7 +41,7 @@ class Board {
     [SOUTH_INDIAN]: [],
     [EAST_INDIAN]: [],
   };
-  private treasuries: Record<string, Counter> = {}
+  private treasuries: Record<string, Counter> = {};
 
   constructor(game: GameAlias) {
     this.game = game;
@@ -89,26 +89,38 @@ class Board {
   }
 
   private setupFamilyMembers(gamedatas: GamedatasAlias) {
-    Object.values(gamedatas.familyMembers).forEach((familyMember) => {
-      const elt = (this.familyMembers[familyMember.id] =
-        document.createElement('div'));
-      const familyMemberNumber = `${
-        Number(familyMember.id.split('_')[2]) % 18
-      }`;
-      elt.classList.add('joco_family_member');
-      elt.insertAdjacentHTML(
-        'afterbegin',
-        familyMemberSvgs[familyMemberNumber] ?? familyMemberSvgs[1]
+    Object.values(gamedatas.familyMembers).forEach(({ id, familyId }) => {
+      this.familyMembers[id] = createFamilyMember(
+        familyId === CROWN
+          ? COLOR_FAMILY_MAP[
+              HEX_COLOR_COLOR_MAP[
+                PlayerManager.getInstance()
+                  .getPlayer(CROWN_PLAYER_ID)
+                  .getColor()
+              ]
+            ]
+          : familyId,
+        id
       );
-      let familyId = familyMember.familyId;
-      if (familyId === CROWN) {
-        const crownColor = PlayerManager.getInstance()
-          .getPlayer(CROWN_PLAYER_ID)
-          .getColor();
-        familyId = COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[crownColor]];
-      }
-      elt.setAttribute('data-family', familyId);
-      elt.setAttribute('data-number', familyMemberNumber);
+      // const elt = (this.familyMembers[familyMember.id] =
+      //   document.createElement('div'));
+      // const familyMemberNumber = `${
+      //   Number(familyMember.id.split('_')[2]) % 18
+      // }`;
+      // elt.classList.add('joco_family_member');
+      // elt.insertAdjacentHTML(
+      //   'afterbegin',
+      //   familyMemberSvgs[familyMemberNumber] ?? familyMemberSvgs[1]
+      // );
+      // let familyId = familyMember.familyId;
+      // if (familyId === CROWN) {
+      //   const crownColor = PlayerManager.getInstance()
+      //     .getPlayer(CROWN_PLAYER_ID)
+      //     .getColor();
+      //   familyId = COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[crownColor]];
+      // }
+      // elt.setAttribute('data-family', familyId);
+      // elt.setAttribute('data-number', familyMemberNumber);
     });
     this.updateFamilyMembers(Object.values(gamedatas.familyMembers));
   }
@@ -147,7 +159,7 @@ class Board {
     Object.values(gamedatas.ships).forEach(({ id, type, fatigued }) => {
       const elt = (this.ships[id] = document.createElement('div'));
 
-      elt.classList.add('joco_ship');
+      elt.classList.add('joco-ship');
 
       elt.setAttribute('data-type', type);
       elt.setAttribute('data-fatigued', fatigued ? 'true' : 'false');
@@ -157,11 +169,14 @@ class Board {
 
   private setupTreasuries(gamedatas: GamedatasAlias) {
     Object.entries(TREASURY_POSITIONS).forEach(([office, position]) => {
-      this.ui.treasuries.insertAdjacentHTML('afterbegin', tplTreasury(office, position));
+      this.ui.treasuries.insertAdjacentHTML(
+        'afterbegin',
+        tplTreasury(office, position)
+      );
       this.treasuries[office] = new ebg.counter();
       this.treasuries[office].create(`joco_${office}_treasury`);
       this.treasuries[office].setValue(gamedatas.offices[office].treasury);
-    })
+    });
   }
 
   // .##.....##.########..########.....###....########.########....##.....##.####
@@ -209,7 +224,11 @@ class Board {
     const fromRect = fromElement.getBoundingClientRect();
     const promises = familyMembers.map(async (familyMember, index) => {
       const { id } = familyMember;
+      const player = PlayerManager.getInstance().getPlayerForFamily(
+        familyMember.familyId
+      );
       await this.game.framework().wait(index * 250);
+      player.counters[FAMILY_MEMBERS_COUNTER].incValue(-1);
       this.updateFamilyMembers([familyMember]);
       await this.game.animationManager.play(
         new BgaSlideAnimation({
@@ -218,6 +237,9 @@ class Board {
           fromRect,
         })
       );
+      if (familyMember.location === COURT_OF_DIRECTORS) {
+        player.counters[SHARES_COUNTER].incValue(1);
+      }
     });
     await Promise.all(promises);
   }
@@ -270,20 +292,30 @@ class Board {
     );
   }
 
+  public async placeShip(ship: JocoShipBase, fromElement?: HTMLElement) {
+    const { id, location } = ship;
+    if ([SOUTH_INDIAN, WEST_INDIAN, EAST_INDIAN].includes(location)) {
+      this.ui.ships.appendChild(this.ships[id]);
+      const position = getShipPosition(location, this.seas[location].length);
+      this.seas[location].push(ship);
+      setAbsolutePosition(this.ships[id], BOARD_SCALE, position);
+      if (fromElement) {
+        await this.game.animationManager.play(
+          new BgaSlideAnimation({
+            element: this.ships[id],
+            transitionTimingFunction: 'ease-in-out',
+            fromRect: fromElement.getBoundingClientRect(),
+          })
+        );
+      }
+    }
+    // TODO:
+    // Unfitted ships
+  }
+
   private updateShips(ships: JocoShipBase[]) {
     ships.forEach((ship) => {
-      const { id, location } = ship;
-      if ([SOUTH_INDIAN, WEST_INDIAN, EAST_INDIAN].includes(location)) {
-        this.ui.ships.appendChild(this.ships[id]);
-        const position = getShipPosition(
-          location,
-          this.seas[location].length
-        );
-        this.seas[location].push(ship);
-        setAbsolutePosition(this.ships[id], BOARD_SCALE, position);
-      }
-      // TODO:
-      // Unfitted ships
+      this.placeShip(ship);
     });
   }
 }

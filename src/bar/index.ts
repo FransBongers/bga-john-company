@@ -50,12 +50,11 @@ class Bar {
   // Setup functions
   setup(gamedatas: GamedatasAlias) {
     const bar = document.getElementById('joco-bar');
-    console.log('active', this.active);
     this.config.forEach(({ id, text }, index) => {
       bar.insertAdjacentHTML('beforeend', tplTabButton(text, index));
       this.ui.barButtons.push(document.getElementById(`joco-bar-item-${index}`));
       this.ui.tabs[id] = document.getElementById(id);
-      console.log('id', id);
+
       if (index === this.active) {
         this.ui.barButtons[index].classList.add('joco-bar-item-active');
         this.ui.tabs[id].classList.add('joco-tab-visible');

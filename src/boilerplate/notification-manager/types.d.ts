@@ -22,12 +22,20 @@ interface NotifDraftCardPrivateArgs extends NotifWithPlayerArgs {
   cardIds: string[];
 }
 
+interface NotifGainCash extends NotifWithPlayerArgs {
+  amount: number;
+}
+
+interface NotifGainEnterprise extends NotifWithPlayerArgs {
+  type: string;
+}
+
 interface NotifNextPhase {
   phase: string;
 }
 
-interface NotifSetupCash extends NotifWithPlayerArgs {
-  amount: number;
+interface NotifPlaceShip extends NotifWithPlayerArgs {
+  ship: JocoShipBase;
 }
 
 interface NotifSetupFamilyMembers extends NotifWithPlayerArgs {

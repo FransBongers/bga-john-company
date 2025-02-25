@@ -57,6 +57,41 @@ const FIRMS = 'firms';
 const HIRING = 'hiring';
 
 /**
+ * Setup
+ */
+const OFFICE = 'office';
+const COMPANY_SHARE = 'companyShare';
+const CASH = 'cash';
+const PRIME_MINISTER = 'primeMinister';
+const RANDOM_BLACKMAIL_CARD = 'randomBlackmailCard';
+const SHIP = 'ship';
+const LUXURY = 'Luxury';
+const WORKSHOP = 'Workshop';
+
+const SHIPYARD = 'Shipyard';
+
+/**
+ * Counters
+ */
+const FAMILY_MEMBERS_COUNTER = 'familyMembers';
+const CASH_COUNTER = 'cash';
+const SHIPS_COUNTER = 'ships';
+const SHARES_COUNTER = 'shares';
+const WORKSHOPS_COUNTER = 'workshops';
+const SHIPYARDS_COUNTER = 'shipyards';
+const LUXURIES_COUNTER = 'luxuries';
+
+const COUNTERS = [
+  FAMILY_MEMBERS_COUNTER,
+  CASH_COUNTER,
+  SHIPS_COUNTER,
+  SHARES_COUNTER,
+  WORKSHOPS_COUNTER,
+  SHIPYARDS_COUNTER,
+  LUXURIES_COUNTER,
+];
+
+/**
  * OrderIds
  */
 const ORDER_PUNJAB_1 = 'Order_Punjab_1';

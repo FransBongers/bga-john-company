@@ -82,7 +82,7 @@ span[style*='color:#c0c0c0'] {
 
 .log_token.joco_pound.animation {
   position: absolute;
-  --tokenScale: 0.6;
+  --tokenScale: 0.96;
 }
 
 .log_tooltip {
@@ -94,6 +94,7 @@ span[style*='color:#c0c0c0'] {
   }
 }
 
+.log-token,
 .log_token {
   position: relative;
   display: inline-block;
@@ -110,9 +111,22 @@ span[style*='color:#c0c0c0'] {
 #pagemaintitletext,
 #gameaction_status {
   --tokenScale: 0.6;
+  --iconScale: 0.7;
+  --cardScale: 0;
+
+  .joco-setup-card,
+  .joco-new-line {
+    display: none;
+  }
 }
 
 .log > .roundedbox,
 .log > .roundedboxinner {
   --tokenScale: 0.6;
+  --iconScale: 0.7;
+  
+  .joco-setup-card {
+    --cardScale: 0.74;
+  }
+
 }

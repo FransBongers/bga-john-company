@@ -17,6 +17,8 @@ class Enterprise extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model imp
   protected $windows = 0;
   protected $shipId;
   protected $type;
+  protected $invested;
+  protected $used;
 
   public function __construct($row)
   {
@@ -47,6 +49,8 @@ class Enterprise extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model imp
   public function jsonSerialize(): array
   {
     $data = parent::jsonSerialize();
+    $data['invested'] = $this->invested === 1;
+    $data['used'] = $this->invested === 1;
     return $data;
   }
 
