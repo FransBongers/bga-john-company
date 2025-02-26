@@ -293,6 +293,7 @@ const EXTRA_SHIP = 'ExtraShip';
 
 const SUPPLY_OTHER_SHIPS = 'supply_otherShips';
 const SUPPLY_PLAYER_SHIPS = 'supply_playerShips';
+const SUPPLY_REGIMENTS = 'supply_regiments';
 
 /**
  * Player owned ship names
@@ -343,4 +344,30 @@ const SHIP_NAMES = [
   WALPOLE,
   YORK,
   ZENOBIA,
+];
+
+/**
+ * Army Pieces
+ */
+const REGIMENT = 'Regiment';
+const LOCAL_ALLIANCE = 'LocalAlliance';
+// Bengal
+const AWADH = 'Awadh';
+const JAGAT_SETHS = 'JagatSeths';
+const ORISSA = 'Orissa';
+// Madras
+const THE_NIZAM = 'TheNizam';
+const ARCOT = 'Arcot';
+// Bombay
+const RAJPUT_PRINCE = 'RajputPrince';
+const SIKHS = 'Sikhs';
+
+const LOCAL_ALLIANCES = [
+  AWADH,
+  JAGAT_SETHS,
+  ORISSA,
+  THE_NIZAM,
+  ARCOT,
+  RAJPUT_PRINCE,
+  SIKHS,
 ];

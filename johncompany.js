@@ -1858,7 +1858,7 @@ var Board = (function () {
                                             }))];
                                     case 2:
                                         _a.sent();
-                                        if (familyMember.location === COURT_OF_DIRECTORS) {
+                                        if (familyMember.location === COURT_OF_DIRECTORS || familyMember.location === CHAIRMAN) {
                                             player.counters[SHARES_COUNTER].incValue(1);
                                         }
                                         return [2];

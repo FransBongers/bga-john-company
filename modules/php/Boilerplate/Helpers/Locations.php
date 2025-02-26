@@ -48,4 +48,9 @@ class Locations
   {
     return 'supply_' . $type;
   }
+
+  public static function regimentsSupply()
+  {
+    return SUPPLY_REGIMENTS;
+  }
 }

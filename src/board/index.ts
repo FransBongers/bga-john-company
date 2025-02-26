@@ -237,7 +237,7 @@ class Board {
           fromRect,
         })
       );
-      if (familyMember.location === COURT_OF_DIRECTORS) {
+      if (familyMember.location === COURT_OF_DIRECTORS || familyMember.location === CHAIRMAN) {
         player.counters[SHARES_COUNTER].incValue(1);
       }
     });

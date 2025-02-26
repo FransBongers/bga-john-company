@@ -28,7 +28,7 @@ class Enterprises extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     return self::getInstance($row['enterprise_id'], $row);
   }
 
-  public static function getInstance($id, $data = null)
+  public static function getInstance($id, $data)
   {
     $type = $data['type'];
     $className = "\Bga\Games\JohnCompany\Enterprises\\$type";
@@ -63,14 +63,14 @@ class Enterprises extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 
     self::create([
       [
-        "id" => "workshop_" . "_{INDEX}",
+        "id" => "workshop_{INDEX}",
         "nbr" => 20,
         "nbrStart" => 1,
         'location' => Locations::enterpriseSupply(WORKSHOP),
         'type' => WORKSHOP,
       ],
       [
-        "id" => "luxury_" . "_{INDEX}",
+        "id" => "luxury_{INDEX}",
         "nbr" => 16,
         "nbrStart" => 1,
         'location' => Locations::enterpriseSupply(LUXURY),

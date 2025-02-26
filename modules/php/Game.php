@@ -26,6 +26,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Stats;
+use Bga\Games\JohnCompany\Managers\ArmyPieces;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
@@ -346,6 +347,7 @@ class Game extends \Table
             ],
             'turn' => Globals::getTurn(),
             'phase' => Globals::getPhase(),
+            'armyPieces' => ArmyPieces::getAll(),
             'company' => Company::get(),
             'enterprises' => Enterprises::getAll(),
             'families' => Families::getAll(),
@@ -387,6 +389,7 @@ class Game extends \Table
         $players = Players::getAll()->toArray();
 
         Scenarios::setupNewGame($players, $options);
+        ArmyPieces::setupNewGame();
         Enterprises::setupNewGame();
         Families::setupNewGame($players);
         FamilyMembers::setupNewGame();

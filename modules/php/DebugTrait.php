@@ -6,6 +6,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Managers\ArmyPieces;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
@@ -76,7 +77,7 @@ trait DebugTrait
     // Notifications::log('players', Players::getCrown());
     // Notifications::log('regions', Regions::getAll());
     // Enterprises::setupNewGame();
-    Offices::setupNewGame();
+    ArmyPieces::setupNewGame();
   }
 
 

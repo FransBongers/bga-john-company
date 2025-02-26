@@ -45,6 +45,13 @@ CREATE TABLE IF NOT EXISTS `log` (
   `affected` JSON,
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+CREATE TABLE IF NOT EXISTS `army_pieces` (
+  `army_piece_id` varchar(32) NOT NULL,
+  `army_piece_location` varchar(32) NOT NULL,
+  `army_piece_state` int(10) DEFAULT 0,
+  `exhausted` tinyint(1) DEFAULT 0,
+  PRIMARY KEY (`army_piece_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 CREATE TABLE IF NOT EXISTS `enterprises` (
   `enterprise_id` varchar(32) NOT NULL,
   `enterprise_location` varchar(32) NOT NULL,
