@@ -32,6 +32,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     'phase' => 'str',
     'turn' => 'int',
     'options' => 'obj',
+    'powerTokens' => 'obj',
   ];
 
   protected static $table = 'global_variables';
@@ -159,7 +160,13 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
   {
     self::setPhase(SETUP);
     self::setCrownInGame(count($players) <= 2);
-    Globals::setCrown([]);
+    self::setCrown([]);
+    self::setPowerTokens([
+      POWER_TOKEN_SOCIAL,
+      POWER_TOKEN_COMPANY_SHARE,
+      POWER_TOKEN_SHIPPING,
+      POWER_TOKEN_MANUFACTURING,
+    ]);
     // 
     // Game options - Note game option values are always a string
     self::setScenarioId(SCENARIO_OPTION_SCENARIO_ID_MAP[intval($options[OPTION_SCENARIO])]);

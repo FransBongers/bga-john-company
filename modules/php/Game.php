@@ -356,6 +356,7 @@ class Game extends \Table
             'orders' => Orders::getAll(),
             'playerOrder' => Players::getTurnOrder($playerId),
             'players' => Players::getUiData($playerId),
+            'powerTokens' => Globals::getPowerTokens(),
             'regions' => Regions::getAll(),
             'ships' => Ships::getAll(),
             'staticData' => [

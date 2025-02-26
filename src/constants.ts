@@ -182,3 +182,27 @@ const WEST_INDIAN = 'westIndian';
 const EAST_INDIAN = 'eastIndian';
 const SOUTH_INDIAN = 'southIndian';
 const UNFITTED = 'unfitted';
+
+/**
+ * Power tokens
+ */
+const POWER_TOKEN_COMPANY_SHARE = 'companyShare';
+const POWER_TOKEN_MANUFACTURING = 'manufacturing';
+const POWER_TOKEN_SHIPPING = 'shipping';
+const POWER_TOKEN_SOCIAL = 'social';
+
+const SHARE_VICTORY_POINTS_TOKEN = 'shareVictoryPoints';
+
+const POWER_TOKENS = [
+  POWER_TOKEN_COMPANY_SHARE,
+  POWER_TOKEN_MANUFACTURING,
+  POWER_TOKEN_SHIPPING,
+  POWER_TOKEN_SOCIAL,
+];
+
+const POWER_TOKEN_ICON_MAP = {
+  [POWER_TOKEN_COMPANY_SHARE]: 'share',
+  [POWER_TOKEN_MANUFACTURING]: WORKSHOP,
+  [POWER_TOKEN_SHIPPING]: SHIPYARD,
+  [POWER_TOKEN_SOCIAL]: LUXURY,
+}

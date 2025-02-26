@@ -118,6 +118,7 @@ interface JohnCompanyGamedatas extends Gamedatas {
   offices: Record<string, JoCoOfficeBase>;
   orders: Record<string, JoCoOrder>;
   phase: string;
+  powerTokens: string[];
   regions: Record<string, JocoRegionBase>;
   ships: Record<string, JocoShipBase>;
   staticData: {

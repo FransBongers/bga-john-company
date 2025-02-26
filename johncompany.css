@@ -53,6 +53,7 @@
   width: calc(var(--leftColumnScale) * 1500px);
 }
 
+#joco-power-tokens,
 #joco_towers,
 #joco_family_members,
 #joco_orders,
@@ -157,6 +158,41 @@
   gap: calc(var(--boardScale) * 4px);
   font-weight: 700;
   font-size: calc(var(--boardScale) * 30px);
+}
+
+.joco-power-token {
+  position: absolute;
+  box-sizing: border-box;
+  background-image: url("img/power_tokens.jpg");
+  width: calc(var(--tokenScale) * 38px);
+  height: calc(var(--tokenScale) * 30px);
+  background-size: 500% 100%;
+  border-radius: 12%;
+  border: calc(var(--tokenScale) * 1px) solid black;
+  --iconScale: calc(var(--tokenScale) * 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.joco-power-token[data-type=social] {
+  background-position-x: 0%;
+}
+
+.joco-power-token[data-type=companyShare] {
+  background-position-x: 25%;
+}
+
+.joco-power-token[data-type=manufacturing] {
+  background-position-x: 75%;
+}
+
+.joco-power-token[data-type=shipping] {
+  background-position-x: 50%;
+}
+
+.joco-power-token[data-type=shareVictoryPoints] {
+  background-position-x: 100%;
 }
 
 /* make space between buttons on touch devices */
@@ -645,7 +681,7 @@ html {
   border-radius: 50%;
   height: calc(var(--tokenScale) * 46px);
   width: calc(var(--tokenScale) * 39px);
-  outline: 1px solid black;
+  outline: calc(var(--tokenScale) * 1px) solid black;
 }
 .joco_family_member svg {
   height: calc(var(--tokenScale) * 42px);

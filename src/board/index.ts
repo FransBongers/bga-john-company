@@ -13,6 +13,7 @@ class Board {
       turn?: HTMLElement;
       phase?: HTMLElement;
     };
+    powerTokens: HTMLElement;
     ships: HTMLElement;
     treasuries: HTMLElement;
   };
@@ -32,6 +33,7 @@ class Board {
     [MADRAS]: [],
   };
   private officersInTraining: JocoFamilyMember[] = [];
+  private powerTokens: Record<string, HTMLElement> = {};
   private seas: {
     westIndian: JocoShipBase[];
     eastIndian: JocoShipBase[];
@@ -75,6 +77,7 @@ class Board {
       familyMembers: document.getElementById('joco_family_members'),
       orders: document.getElementById('joco_orders'),
       pawns: {},
+      powerTokens: document.getElementById('joco-power-tokens'),
       ships: document.getElementById('joco_ships'),
       treasuries: document.getElementById('joco_treasuries'),
     };
@@ -83,6 +86,7 @@ class Board {
     this.setupOrders(gamedatas);
     this.setupRegions(gamedatas);
     this.setupPawns(gamedatas);
+    this.setupPowerTokens(gamedatas);
     this.setupFamilyMembers(gamedatas);
     this.setupShips(gamedatas);
     this.setupTreasuries(gamedatas);
@@ -153,6 +157,20 @@ class Board {
     });
 
     this.updatePawns(gamedatas);
+  }
+
+  private setupPowerTokens(gamedatas) {
+    POWER_TOKENS.forEach((token) => {
+      const elt = (this.ui.powerTokens[token] = document.createElement('div'));
+      elt.classList.add('joco-power-token');
+      elt.setAttribute('data-type', token);
+      const iconElt = document.createElement('div');
+      iconElt.classList.add('joco-icon');
+      iconElt.setAttribute('data-icon', POWER_TOKEN_ICON_MAP[token]);
+      elt.appendChild(iconElt);
+      this.ui.powerTokens.appendChild(elt);
+    });
+    this.updatePowerTokens(gamedatas);
   }
 
   private setupShips(gamedatas: GamedatasAlias) {
@@ -237,7 +255,10 @@ class Board {
           fromRect,
         })
       );
-      if (familyMember.location === COURT_OF_DIRECTORS || familyMember.location === CHAIRMAN) {
+      if (
+        familyMember.location === COURT_OF_DIRECTORS ||
+        familyMember.location === CHAIRMAN
+      ) {
         player.counters[SHARES_COUNTER].incValue(1);
       }
     });
@@ -257,6 +278,12 @@ class Board {
       this.orders[orderId].setAttribute('data-status', order.status);
       this.ui.orders.appendChild(this.orders[orderId]);
     });
+  }
+
+  private updatePowerTokens(gamedatas: GamedatasAlias) {
+    gamedatas.powerTokens.forEach((token, index) => {
+      setAbsolutePosition(this.ui.powerTokens[token], BOARD_SCALE, POWER_TOKEN_POSITIONS[index]);  
+    })
   }
 
   movePhasePawn(phase: string) {

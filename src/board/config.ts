@@ -206,4 +206,11 @@ const TREASURY_POSITIONS: Record<string, AbsolutePosition> = {
   [PRESIDENT_OF_BOMBAY]: { top: 618, left: 846 },
   [PRESIDENT_OF_MADRAS]: { top: 618, left: 1036 },
   [PRESIDENT_OF_BENGAL]: { top: 618, left: 1225 },
-}
+};
+
+const POWER_TOKEN_POSITIONS: AbsolutePosition[] = [
+  { top: 72, left: 276 },
+  { top: 115, left: 276 },
+  { top: 159, left: 251 },
+  { top: 159, left: 301 },
+];

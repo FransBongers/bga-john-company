@@ -371,3 +371,13 @@ const LOCAL_ALLIANCES = [
   RAJPUT_PRINCE,
   SIKHS,
 ];
+
+/**
+ * Power tokens
+ */
+const POWER_TOKEN_COMPANY_SHARE = 'companyShare';
+const POWER_TOKEN_MANUFACTURING = 'manufacturing';
+const POWER_TOKEN_SHIPPING = 'shipping';
+const POWER_TOKEN_SOCIAL = 'social';
+
+const SHARE_VICTORY_POINTS_TOKEN = 'shareVictoryPoints';

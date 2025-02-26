@@ -1,4 +1,4 @@
-var _a;
+var _a, _b;
 var BOARD_SCALE = 'boardScale';
 var BENYON = 'Benyon';
 var HASTINGS = 'Hastings';
@@ -131,6 +131,23 @@ var WEST_INDIAN = 'westIndian';
 var EAST_INDIAN = 'eastIndian';
 var SOUTH_INDIAN = 'southIndian';
 var UNFITTED = 'unfitted';
+var POWER_TOKEN_COMPANY_SHARE = 'companyShare';
+var POWER_TOKEN_MANUFACTURING = 'manufacturing';
+var POWER_TOKEN_SHIPPING = 'shipping';
+var POWER_TOKEN_SOCIAL = 'social';
+var SHARE_VICTORY_POINTS_TOKEN = 'shareVictoryPoints';
+var POWER_TOKENS = [
+    POWER_TOKEN_COMPANY_SHARE,
+    POWER_TOKEN_MANUFACTURING,
+    POWER_TOKEN_SHIPPING,
+    POWER_TOKEN_SOCIAL,
+];
+var POWER_TOKEN_ICON_MAP = (_b = {},
+    _b[POWER_TOKEN_COMPANY_SHARE] = 'share',
+    _b[POWER_TOKEN_MANUFACTURING] = WORKSHOP,
+    _b[POWER_TOKEN_SHIPPING] = SHIPYARD,
+    _b[POWER_TOKEN_SOCIAL] = LUXURY,
+    _b);
 var BgaAnimation = (function () {
     function BgaAnimation(animationFunction, settings) {
         this.animationFunction = animationFunction;
@@ -1695,6 +1712,12 @@ var TREASURY_POSITIONS = (_e = {},
     _e[PRESIDENT_OF_MADRAS] = { top: 618, left: 1036 },
     _e[PRESIDENT_OF_BENGAL] = { top: 618, left: 1225 },
     _e);
+var POWER_TOKEN_POSITIONS = [
+    { top: 72, left: 276 },
+    { top: 115, left: 276 },
+    { top: 159, left: 251 },
+    { top: 159, left: 301 },
+];
 var Board = (function () {
     function Board(game) {
         var _a, _b;
@@ -1709,6 +1732,7 @@ var Board = (function () {
             _a[MADRAS] = [],
             _a);
         this.officersInTraining = [];
+        this.powerTokens = {};
         this.seas = (_b = {},
             _b[WEST_INDIAN] = [],
             _b[SOUTH_INDIAN] = [],
@@ -1733,12 +1757,14 @@ var Board = (function () {
             familyMembers: document.getElementById('joco_family_members'),
             orders: document.getElementById('joco_orders'),
             pawns: {},
+            powerTokens: document.getElementById('joco-power-tokens'),
             ships: document.getElementById('joco_ships'),
             treasuries: document.getElementById('joco_treasuries'),
         };
         this.setupOrders(gamedatas);
         this.setupRegions(gamedatas);
         this.setupPawns(gamedatas);
+        this.setupPowerTokens(gamedatas);
         this.setupFamilyMembers(gamedatas);
         this.setupShips(gamedatas);
         this.setupTreasuries(gamedatas);
@@ -1779,6 +1805,20 @@ var Board = (function () {
             _this.ui.board.appendChild(elt);
         });
         this.updatePawns(gamedatas);
+    };
+    Board.prototype.setupPowerTokens = function (gamedatas) {
+        var _this = this;
+        POWER_TOKENS.forEach(function (token) {
+            var elt = (_this.ui.powerTokens[token] = document.createElement('div'));
+            elt.classList.add('joco-power-token');
+            elt.setAttribute('data-type', token);
+            var iconElt = document.createElement('div');
+            iconElt.classList.add('joco-icon');
+            iconElt.setAttribute('data-icon', POWER_TOKEN_ICON_MAP[token]);
+            elt.appendChild(iconElt);
+            _this.ui.powerTokens.appendChild(elt);
+        });
+        this.updatePowerTokens(gamedatas);
     };
     Board.prototype.setupShips = function (gamedatas) {
         var _this = this;
@@ -1858,7 +1898,8 @@ var Board = (function () {
                                             }))];
                                     case 2:
                                         _a.sent();
-                                        if (familyMember.location === COURT_OF_DIRECTORS || familyMember.location === CHAIRMAN) {
+                                        if (familyMember.location === COURT_OF_DIRECTORS ||
+                                            familyMember.location === CHAIRMAN) {
                                             player.counters[SHARES_COUNTER].incValue(1);
                                         }
                                         return [2];
@@ -1881,6 +1922,12 @@ var Board = (function () {
             setAbsolutePosition(_this.orders[orderId], BOARD_SCALE, ORDERS_CONFIG[orderId]);
             _this.orders[orderId].setAttribute('data-status', order.status);
             _this.ui.orders.appendChild(_this.orders[orderId]);
+        });
+    };
+    Board.prototype.updatePowerTokens = function (gamedatas) {
+        var _this = this;
+        gamedatas.powerTokens.forEach(function (token, index) {
+            setAbsolutePosition(_this.ui.powerTokens[token], BOARD_SCALE, POWER_TOKEN_POSITIONS[index]);
         });
     };
     Board.prototype.movePhasePawn = function (phase) {
@@ -1964,7 +2011,7 @@ var Region = (function () {
     };
     return Region;
 }());
-var tplBoard = function (gamedatas) { return "<div id=\"joco-board\">\n  <div id=\"joco_family_members\"></div>\n  <div id=\"joco_orders\"></div>\n  <div id=\"joco_ships\"></div>\n  <div id=\"joco_towers\"></div>\n  <div id=\"joco_treasuries\"></div>\n</div>"; };
+var tplBoard = function (gamedatas) { return "<div id=\"joco-board\">\n  <div id=\"joco_family_members\"></div>\n  <div id=\"joco_orders\"></div>\n  <div id=\"joco-power-tokens\"></div>\n  <div id=\"joco_ships\"></div>\n  <div id=\"joco_towers\"></div>\n  <div id=\"joco_treasuries\"></div>\n</div>"; };
 var tplTreasury = function (office, _a) {
     var top = _a.top, left = _a.left;
     return "\n<div class=\"joco_treasury\" style=\"top: calc(var(--boardScale) * ".concat(top, "px); left: calc(var(--boardScale) * ").concat(left, "px);\">\n  <span>").concat(_('£'), "</span>\n  <span class=\"joco_treasury_counter\" id=\"joco_").concat(office, "_treasury\"></span>\n</div>");
