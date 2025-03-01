@@ -2,6 +2,8 @@
 
 namespace Bga\Games\JohnCompany\Models;
 
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Players;
 
 class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
@@ -30,8 +32,8 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     'opportunityMarker' => ['opportunity_marker', 'int'],
     'crownPromiseCubes' => ['crown_promise_cubes', 'int'],
     'hasChairmanMarker' => ['has_chairman_marker', 'int'],
-    'isLeaderOfOpposition' => ['is_leader_of_opposition', 'int'],// base on number of votes?
-    'is_prime_minister' => ['is_prime_minister', 'int'],// base on number of votes?
+    'isLeaderOfOpposition' => ['is_leader_of_opposition', 'int'], // base on number of votes?
+    'is_prime_minister' => ['is_prime_minister', 'int'], // base on number of votes?
     'trophies' => ['trophies', 'int'],
     'lawPieces' => ['law_pieces', 'int'],
     'spentOnRetirement' => ['spent_on_retirement', 'int'],
@@ -58,5 +60,11 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   public function getPlayer()
   {
     return Players::getPlayerForFamily($this->id);
+  }
+
+  // TODO: include members on prizes in count
+  public function canPlaceFamilyMembers()
+  {
+    return count(FamilyMembers::getInLocation(Locations::familyMemberSupply($this->id))) > 0;
   }
 }

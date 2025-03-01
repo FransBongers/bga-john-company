@@ -8,6 +8,7 @@ class Hyderabad extends \Bga\Games\JohnCompany\Models\Region
   {
     parent::__construct($row);
     $this->id = HYDERABAD;
+    $this->name = clienttranslate('Hyderabad');
     $this->loot = 7;
     $this->adjacentRegionIds = [
       MADRAS,

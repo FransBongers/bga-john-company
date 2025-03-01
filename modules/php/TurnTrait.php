@@ -79,8 +79,13 @@ trait TurnTrait
           'action' => FAMILY_ACTION,
           'playerId' => 'all',
           'familyId' => Players::get($playerId)->getFamilyId(),
+          'activePlayerId' => $playerId,
         ];
       }, $turnOrder),
+    ];
+
+    $node['children'][] = [
+      'action' => NEW_COMPANY_SHARES,
     ];
 
     Engine::setup($node, ['method' => 'setupGameTurn']);

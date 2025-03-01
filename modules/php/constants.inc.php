@@ -42,12 +42,28 @@ const ST_DRAFT_CARD = 20;
 const ST_DRAFT_CARD_NEXT_STEP = 21;
 const ST_PERFORM_SETUP = 22;
 const ST_FAMILY_ACTION = 23;
+const ST_NEW_COMPANY_SHARES = 24;
+// Family Actions
+const ST_ENLIST_WRITER = 25;
+const ST_ENLIST_OFFICER = 26;
+const ST_PURCHASE_LUXURY = 27;
+const ST_PURCHASE_SHIPYARD = 28;
+const ST_PURCHASE_WORKSHOP = 29;
+const ST_SEEK_SHARE = 30;
 
 
 const DRAFT_CARD = 'DraftCard';
 const DRAFT_CARD_NEXT_STEP = 'DraftCardNextStep';
 const PERFORM_SETUP = 'PerformSetup';
 const FAMILY_ACTION = 'FamilyAction';
+const NEW_COMPANY_SHARES = 'NewCompanyShares';
+// Family Actions
+const ENLIST_WRITER = 'EnlistWriter';
+const ENLIST_OFFICER = 'EnlistOfficer';
+const PURCHASE_LUXURY = 'PurchaseLuxury';
+const PURCHASE_SHIPYARD = 'PurchaseShipyard';
+const PURCHASE_WORKSHOP = 'PurchaseWorkshop';
+const SEEK_SHARE = 'SeekShare';
 
 
 /**
@@ -203,12 +219,12 @@ const OFFICES_WITH_TREASURY = [
 /**
  * Family member positions
  */
-const COMMANDER = 'commander';
-const OFFICER = 'officer';
-const OFFICER_IN_TRAINING = 'officerInTraining';
-const WRITER = 'writer';
+const COMMANDER = 'Commander';
+const OFFICER = 'Officer';
+const OFFICER_IN_TRAINING = 'OfficerInTraining';
+const WRITER = 'Writer';
 
-const COURT_OF_DIRECTORS = 'courtOfDirectors';
+const COURT_OF_DIRECTORS = 'CourtOfDirectors';
 
 
 /**
@@ -232,6 +248,12 @@ const REGIONS = [
   MARATHA,
   MYSORE,
   PUNJAB,
+];
+
+const PRESIDENCIES = [
+  BENGAL,
+  BOMBAY,
+  MADRAS
 ];
 
 
@@ -381,3 +403,4 @@ const POWER_TOKEN_SHIPPING = 'shipping';
 const POWER_TOKEN_SOCIAL = 'social';
 
 const SHARE_VICTORY_POINTS_TOKEN = 'shareVictoryPoints';
+

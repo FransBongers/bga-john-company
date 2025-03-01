@@ -58,6 +58,7 @@ class JohnCompany implements Game {
     ConfirmPartialTurn,
     ConfirmTurn,
     DraftCard,
+    EnlistWriter,
     FamilyAction,
     PlayerTurn,
   };
@@ -97,10 +98,17 @@ class JohnCompany implements Game {
     debug('gamedatas', gamedatas);
     this.setupPlayerOrder(gamedatas.playerOrder);
     if (this.gameOptions.crownEnabled) {
-      document.getElementById('player_boards').insertAdjacentHTML('afterbegin', tplCrownPlayerPanel(_('The Crown'), gamedatas.players[CROWN_PLAYER_ID].color))
+      document
+        .getElementById('player_boards')
+        .insertAdjacentHTML(
+          'afterbegin',
+          tplCrownPlayerPanel(
+            _('The Crown'),
+            gamedatas.players[CROWN_PLAYER_ID].color
+          )
+        );
       // dojo.place(tplWakhanPlayerPanel({ name: _('Wakhan') }), 'player_boards', 0);
     }
-
 
     this._connections = [];
 
@@ -137,7 +145,10 @@ class JohnCompany implements Game {
     Board.create(this);
     Bar.create(this);
 
-    if (this.playerOrder.includes(this.getPlayerId()) && gamedatas.phase === SETUP) {
+    if (
+      this.playerOrder.includes(this.getPlayerId()) &&
+      gamedatas.phase === SETUP
+    ) {
       SetupArea.create(this);
     }
 
@@ -181,13 +192,19 @@ class JohnCompany implements Game {
   //                  You can use this method to perform some user interface changes at this moment.
   public onEnteringState(stateName: string, args: any) {
     console.log('Entering state: ' + stateName, args);
+    const activePlayerId: number | undefined = args.args?.playerId;
+    console.log('activePlayerId',activePlayerId);
     // UI changes for active player
-    if (this.framework().isCurrentPlayerActive() && this.states[stateName]) {
+    if (
+      this.framework().isCurrentPlayerActive() &&
+      this.states[stateName] &&
+      (!activePlayerId || activePlayerId === this.getPlayerId())
+    ) {
       this.states[stateName].getInstance().onEnteringState(args.args);
     } else if (this.states[stateName]) {
       this.states[stateName]
         .getInstance()
-        .setDescription(Number(args.active_player), args.args);
+        .setDescription(Number(activePlayerId || args.active_player), args.args);
     }
 
     // if (this.framework().isCurrentPlayerActive()) {
@@ -609,7 +626,7 @@ class JohnCompany implements Game {
     if (temporary) {
       this.connect($(node), 'click', safeCallback);
       // dojo.removeClass(node, 'unselectable'); // replace with pr_selectable / pr_selected
-      // dojo.addClass(node, 'selectable');
+      dojo.addClass(node, 'selectable');
       this._selectableNodes.push(node);
     } else {
       dojo.connect($(node), 'click', safeCallback);

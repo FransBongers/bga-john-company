@@ -178,6 +178,17 @@ class Notifications
     ]);
   }
 
+  public static function enlistWriter($player, $familyMember, $region)
+  {
+    self::notifyAll('enlistFamilyMember', clienttranslate('${player_name} enlists ${tkn_icon} in ${tkn_boldText_regionName}'), [
+      'player' => $player,
+      'tkn_icon' => WRITER,
+      'tkn_boldText_regionName' => $region->getName(),
+      'familyMember' => $familyMember,
+      'i18n' => ['tkn_boldText_regionName'],
+    ]);
+  }
+
   public static function gainEnterprise($player, $enterprise)
   {
     // Notifications::message(clienttranslate('${player_name} gains a ${enterprise}'), ['player' => $player, 'enterprise' => $type]);

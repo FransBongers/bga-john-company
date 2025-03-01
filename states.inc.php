@@ -223,4 +223,23 @@ $machinestates = [
         'possibleactions' => ['actFamilyAction', 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
+
+    ST_NEW_COMPANY_SHARES => [
+        'name' => NEW_COMPANY_SHARES,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_ENLIST_WRITER => [
+        'name' => ENLIST_WRITER,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer} must enlist a writer'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['actEnlistWriter', 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
 ];

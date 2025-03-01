@@ -46,6 +46,8 @@ class ArmyPieces extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 
   public static function setupNewGame()
   {
+    $startingRegiments = Scenarios::get()->getStartingRegiments();
+
     self::create([
       [
         "id" => REGIMENT . "_{INDEX}",
@@ -55,6 +57,12 @@ class ArmyPieces extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
         'exhausted' => 0,
       ],
     ]);
+
+    self::shuffle(Locations::regimentsSupply());
+
+    foreach(PRESIDENCIES as $presidency) {
+      self::pickForLocation($startingRegiments, Locations::regimentsSupply(), $presidency);
+    }
 
     $localAlliances = [];
     // return;

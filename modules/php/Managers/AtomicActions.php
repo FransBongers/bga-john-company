@@ -14,6 +14,8 @@ class AtomicActions
     DRAFT_CARD_NEXT_STEP => DRAFT_CARD_NEXT_STEP,
     PERFORM_SETUP => PERFORM_SETUP,
     FAMILY_ACTION => FAMILY_ACTION,
+    NEW_COMPANY_SHARES => NEW_COMPANY_SHARES,
+    ENLIST_WRITER => ENLIST_WRITER,
   ];
 
   public static function get($actionId, $ctx = null)
@@ -24,6 +26,7 @@ class AtomicActions
       throw new \BgaVisibleSystemException('Trying to get an atomic action not defined in Actions.php : ' . $actionId);
     }
     $name = '\Bga\Games\JohnCompany\Actions\\' . self::$classes[$actionId];
+    // $name = '\Bga\Games\JohnCompany\Actions\\' . $actionId;
     return new $name($ctx);
   }
 

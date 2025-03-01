@@ -24,6 +24,10 @@ class StaticData {
   // .##....##.##..........##....##.....##.##.......
   // ..######..########....##.....#######..##.......
 
+  public region(id: string) {
+    return this.staticData.regions[id];
+  }
+
   public setupCard(id: string): JocoSetupCardStatic {
     return this.staticData.setupCards[id];
   }

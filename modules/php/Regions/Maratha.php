@@ -8,6 +8,7 @@ class Maratha extends \Bga\Games\JohnCompany\Models\Region
   {
     parent::__construct($row);
     $this->id = MARATHA;
+    $this->name = clienttranslate('Maratha');
     $this->loot = 3;
     $this->adjacentRegionIds = [
       BENGAL,

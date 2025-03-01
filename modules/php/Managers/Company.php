@@ -23,4 +23,9 @@ class Company
       DEBT => $scenario->getCompanyDebt(),
     ]);
   }
+
+  public static function getVacantOffices()
+  {
+    return [];
+  }
 }

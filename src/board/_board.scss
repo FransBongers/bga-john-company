@@ -13,6 +13,8 @@
   // aspect-ratio: 30 / 15;
 }
 
+#joco-select-boxes,
+#joco-regiments,
 #joco-power-tokens,
 #joco_towers,
 #joco_family_members,
@@ -65,6 +67,19 @@
   background-image: url('img/pawn_silver.svg');
 }
 
+.joco-regiment {
+  box-sizing: border-box;
+  position: absolute;
+  background-image: url('img/regiment.jpg');
+  background-size: 100% 100%;
+  width: calc(var(--boardScale) * 35px);
+  height: calc(var(--boardScale) * 35px);
+  top: calc(var(--boardScale) * 22px);
+  left: calc(var(--boardScale) * 694px);
+  border: calc(var(--boardScale) * 1px) solid black;
+  border-radius: 12%;
+}
+
 .joco_tower {
   // --towerScale: 1;
   position: absolute;
@@ -74,22 +89,6 @@
   width: fit-content;
   align-items: center;
 }
-
-// .joco_tower_level {
-//   background-image: url('img/tower_level.png');
-//   width: calc(var(--boardScale) * 50px);
-//   height: calc(var(--boardScale) * 46px);
-//   background-size: 100% 100%;
-//   margin-top: calc(var(--boardScale) * -30px);
-// }
-
-// .joco_tower_top {
-//   background-image: url('img/tower_top.png');
-//   width: calc(var(--boardScale) * 65px);
-//   height: calc(var(--boardScale) * 44px);
-//   background-size: 100% 100%;
-//   z-index: 2;
-// }
 
 .joco_tower_level {
   background-image: url('img/tower_level.png');
@@ -167,4 +166,42 @@
 
 .joco-power-token[data-type="shareVictoryPoints"] {
   background-position-x: 100%;
+}
+
+.joco-select-box {
+  position: absolute;
+  display: none;
+  width: calc(var(--tokenScale) * 168px);
+  height: calc(var(--tokenScale) * 72px);
+}
+
+
+.joco-select-box[data-region="Bombay"] {
+  top: calc(var(--boardScale) * 600px);
+  left: calc(var(--boardScale) * 830px);
+}
+
+.joco-select-box[data-region="Madras"] {
+  top: calc(var(--boardScale) * 600px);
+  left: calc(var(--boardScale) * 1019px);
+}
+
+.joco-select-box[data-region="Bengal"] {
+  top: calc(var(--boardScale) * 600px);
+  left: calc(var(--boardScale) * 1209px);
+}
+
+.joco-select-box.selectable {
+  cursor: pointer;
+  display: block;
+  outline: calc(var(--boardScale) * 4px) solid base.$selectable-color;
+  border-radius: calc(var(--boardScale) * 6px);
+}
+
+.joco-select-box.selected,
+.joco-select-box.selectable:hover {
+  cursor: pointer;
+  display: block;
+  outline: calc(var(--boardScale) * 4px) solid base.$selected-color;
+  border-radius: calc(var(--boardScale) * 6px);
 }

@@ -17,6 +17,7 @@ class Scenario implements \JsonSerializable
   protected $passedLaws = [];
   protected $elephant;
   protected $armies = [];
+  protected $startingRegiments = 1;
   protected $startTurn;
 
   public function __construct() {}
@@ -63,6 +64,11 @@ class Scenario implements \JsonSerializable
   public function getSetupCards()
   {
     return $this->setupCards;
+  }
+
+  public function getStartingRegiments()
+  {
+    return $this->startingRegiments;
   }
 
   public function getStartTurn()

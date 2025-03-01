@@ -85,6 +85,19 @@ const getGroupPosition = (
   };
 };
 
+const getRegimentPosition = (presidency: string, index: number, exhausted: boolean): AbsolutePosition => {
+  switch (presidency) {
+    case BOMBAY:
+      return getGroupPosition(22, 694, index, 4);
+    case BENGAL:
+      return getGroupPosition(408, 694, index, 4);
+    case MADRAS:
+      return getGroupPosition(215, 694, index, 4);
+    default:
+      return { top: 0, left: 0 };
+  }
+}
+
 const getCourtOfDirectorsPosition = (index: number) =>
   getGroupPosition(555, 243, index, 4);
 
@@ -184,9 +197,9 @@ const FAMILY_MEMBER_OFFICE_CONFIG: Record<string, AbsolutePosition> = {
   [GOVERNOR_OF_MARATHA]: { top: 105, left: 1105 },
   [GOVERNOR_OF_HYDERABAD]: { top: 298, left: 1049 },
   [GOVERNOR_OF_MYSORE]: { top: 420, left: 993 },
-  commander_Bengal: { top: 471, left: 695 },
-  commander_Bombay: { top: 278, left: 695 },
-  commander_Madras: { top: 84, left: 695 },
+  Commander_Bengal: { top: 471, left: 695 },
+  Commander_Bombay: { top: 278, left: 695 },
+  Commander_Madras: { top: 84, left: 695 },
 };
 
 const towerConfig: Record<string, { bottom: number; left: number }> = {

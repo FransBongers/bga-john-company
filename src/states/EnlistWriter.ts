@@ -1,36 +1,34 @@
-interface OnEnteringFamilyActionArgs extends CommonStateArgs {
-  _private?: {
-    options: JoCoSetupCard[];
-    selected: string;
-  };
+interface OnEnteringEnlistWriterArgs extends CommonStateArgs {
+
 }
 
-class FamilyAction implements State {
-  private static instance: FamilyAction;
-  private args: OnEnteringFamilyActionArgs;
+class EnlistWriter implements State {
+  private static instance: EnlistWriter;
+  private args: OnEnteringEnlistWriterArgs;
 
   constructor(private game: GameAlias) {}
 
   public static create(game: JohnCompany) {
-    FamilyAction.instance = new FamilyAction(game);
+    EnlistWriter.instance = new EnlistWriter(game);
   }
 
   public static getInstance() {
-    return FamilyAction.instance;
+    return EnlistWriter.instance;
   }
 
-  onEnteringState(args: OnEnteringFamilyActionArgs) {
-    debug('Entering FamilyAction state');
+  onEnteringState(args: OnEnteringEnlistWriterArgs) {
+    debug('Entering EnlistWriter state');
     this.args = args;
     this.updateInterfaceInitialStep();
   }
 
   onLeavingState() {
-    debug('Leaving FamilyAction state');
+    debug('Leaving EnlistWriter state');
   }
 
-  setDescription(activePlayerId: number, args: OnEnteringFamilyActionArgs) {
-    updatePageTitle(_('${tkn_playerName} must perform a family action'), {
+  setDescription(activePlayerId: number, args: OnEnteringEnlistWriterArgs) {
+    console.log('setDescription');
+    updatePageTitle(_('${tkn_playerName} must select a region to place their writer'), {
       tkn_playerName: PlayerManager.getInstance()
         .getPlayer(activePlayerId)
         .getName(),
@@ -56,38 +54,34 @@ class FamilyAction implements State {
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
 
-    updatePageTitle(_('${you} must select a family action'));
+    updatePageTitle(_('${you} must select a region to place ${tkn_icon}'), {
+      tkn_icon: WRITER
+    });
 
-    addSecondaryActionButton({
-      id: 'writer_btn',
-      text: formatStringRecursive(_('Enlist ${tkn_icon}'), {
-        tkn_icon: 'Writer',
-      }),
-      callback: () => this.updateInterfaceConfirm(ENLIST_WRITER),
+    [BENGAL, BOMBAY, MADRAS].forEach((region) => {
+      const box = Board.getInstance().selectBoxes[`${region}_${WRITER}`];
+      console.log('box', box);
+      onClick(box, () => this.updateInterfaceConfirm(region))
     });
   }
 
-  private updateInterfaceConfirm(familyAction: string) {
+  private updateInterfaceConfirm(regionId: string) {
     clearPossible();
 
-    // let text: string;
-    // const args: Record<string, string> = {};
+    setSelected(Board.getInstance().selectBoxes[`${regionId}_${WRITER}`])
 
-    // switch (familyAction) {
-    //   case ENLIST_WRITER:
-    //     text = _('Enlist Writer ${tkn_icon}?');
-    //     args['tkn_icon'] = 'Writer';
-    // }
-
-    // updatePageTitle(text, args);
-
-    const callback = () => performAction('actFamilyAction', {
-      familyAction,
+    updatePageTitle(_('Enlist ${tkn_icon} in ${regionName}?'), {
+      tkn_icon: WRITER,
+      regionName: _(StaticData.get().region(regionId).name),
     });
 
-    // addConfirmButton(callback);
+    const callback = () => performAction('actEnlistWriter', {
+      regionId,
+    });
 
-    callback();
+    addConfirmButton(callback);
+
+    // callback();
 
     addCancelButton();
   }

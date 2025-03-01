@@ -107,6 +107,7 @@ interface JohnCompanyGamedatas extends Gamedatas {
   };
   playerOrder: number[];
   players: Record<number, JohnCompanyPlayerData>;
+  armyPieces: Record<string, JocoArmyPieceBase>
   company: {
     debt: number;
     balance: number;
@@ -122,6 +123,7 @@ interface JohnCompanyGamedatas extends Gamedatas {
   regions: Record<string, JocoRegionBase>;
   ships: Record<string, JocoShipBase>;
   staticData: {
+    regions: Record<string, JocoRegionStatic>;
     setupCards: Record<string, JocoSetupCardStatic>;
   };
   turn: number;
@@ -160,12 +162,20 @@ interface JoCoOrder {
   status: 'open' | 'closed' | 'filled' | 'string';
 }
 
+interface JocoArmyPieceBase extends GamePiece {
+  exhausted: boolean;
+}
+
 interface JocoRegionBase {
   id: string;
   control: string | null;
   looted: boolean;
   strength: number;
   untest: number;
+}
+
+interface JocoRegionStatic {
+  name: string;
 }
 
 interface JocoShipBase extends GamePiece {

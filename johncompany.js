@@ -114,11 +114,11 @@ var GOVERNOR_OF_DELHI = 'GovernorOfDelhi';
 var GOVERNOR_OF_MARATHA = 'GovernorOfMaratha';
 var GOVERNOR_OF_HYDERABAD = 'GovernorOfHyderabad';
 var GOVERNOR_OF_MYSORE = 'GovernorOfMysore';
-var COMMANDER = 'commander';
-var OFFICER = 'officer';
-var OFFICER_IN_TRAINING = 'officerInTraining';
-var WRITER = 'writer';
-var COURT_OF_DIRECTORS = 'courtOfDirectors';
+var COMMANDER = 'Commander';
+var OFFICER = 'Officer';
+var OFFICER_IN_TRAINING = 'OfficerInTraining';
+var WRITER = 'Writer';
+var COURT_OF_DIRECTORS = 'CourtOfDirectors';
 var BENGAL = 'Bengal';
 var BOMBAY = 'Bombay';
 var DELHI = 'Delhi';
@@ -148,6 +148,12 @@ var POWER_TOKEN_ICON_MAP = (_b = {},
     _b[POWER_TOKEN_SHIPPING] = SHIPYARD,
     _b[POWER_TOKEN_SOCIAL] = LUXURY,
     _b);
+var ENLIST_WRITER = 'EnlistWriter';
+var ENLIST_OFFICER = 'EnlistOfficer';
+var PURCHASE_LUXURY = 'PurchaseLuxury';
+var PURCHASE_SHIPYARD = 'PurchaseShipyard';
+var PURCHASE_WORKSHOP = 'PurchaseWorkshop';
+var SEEK_SHARE = 'SeekShare';
 var BgaAnimation = (function () {
     function BgaAnimation(animationFunction, settings) {
         this.animationFunction = animationFunction;
@@ -656,6 +662,18 @@ var Interaction = (function () {
             dojo.addClass(id, extraClasses);
         }
     };
+    Interaction.prototype.addSecondaryActionButton = function (_a) {
+        var id = _a.id, text = _a.text, callback = _a.callback, extraClasses = _a.extraClasses;
+        if ($(id)) {
+            return;
+        }
+        this.game
+            .framework()
+            .addActionButton(id, text, callback, 'customActions', false, 'gray');
+        if (extraClasses) {
+            dojo.addClass(id, extraClasses);
+        }
+    };
     Interaction.prototype.addCancelButton = function (callback) {
         this.game.addCancelButton(callback);
     };
@@ -675,6 +693,9 @@ var Interaction = (function () {
             this.game.gamedatas.gamestate.descriptionmyturn = title;
         }
         this.game.framework().updatePageTitle();
+    };
+    Interaction.prototype.formatStringRecursive = function (log, args) {
+        return this.game.format_string_recursive(log, args);
     };
     Interaction.prototype.onClick = function (node, callback, temporary) {
         if (temporary === void 0) { temporary = true; }
@@ -727,6 +748,7 @@ var NotificationManager = (function () {
             'message',
             'draftCardPrivate',
             'draftNewCardsPrivate',
+            'enlistFamilyMember',
             'gainCash',
             'gainEnterprise',
             'nextPhase',
@@ -822,6 +844,21 @@ var NotificationManager = (function () {
             });
         });
     };
+    NotificationManager.prototype.notif_enlistFamilyMember = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, familyMember, playerId;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = notif.args, familyMember = _a.familyMember, playerId = _a.playerId;
+                        return [4, Board.getInstance().placeFamilyMembers([familyMember], this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER])];
+                    case 1:
+                        _b.sent();
+                        return [2];
+                }
+            });
+        });
+    };
     NotificationManager.prototype.notif_gainEnterprise = function (notif) {
         return __awaiter(this, void 0, void 0, function () {
             var _a, playerId, type, typeCounterMap, player;
@@ -838,16 +875,6 @@ var NotificationManager = (function () {
                 if (type === SHIPYARD) {
                     player.counters[SHIPS_COUNTER].incValue(1);
                 }
-                return [2];
-            });
-        });
-    };
-    NotificationManager.prototype.notif_nextPhase = function (notif) {
-        return __awaiter(this, void 0, void 0, function () {
-            var phase;
-            return __generator(this, function (_a) {
-                phase = notif.args.phase;
-                Board.getInstance().movePhasePawn(phase);
                 return [2];
             });
         });
@@ -899,6 +926,16 @@ var NotificationManager = (function () {
                         _b.sent();
                         return [2];
                 }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_nextPhase = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var phase;
+            return __generator(this, function (_a) {
+                phase = notif.args.phase;
+                Board.getInstance().movePhasePawn(phase);
+                return [2];
             });
         });
     };
@@ -1024,6 +1061,7 @@ var addConfirmButton = function (callback) {
     Interaction.use().addConfirmButton(callback);
 };
 var addPrimaryActionButton = function (props) { return Interaction.use().addPrimaryActionButton(props); };
+var addSecondaryActionButton = function (props) { return Interaction.use().addSecondaryActionButton(props); };
 var clearPossible = function () {
     Interaction.use().clearPossible();
 };
@@ -1031,6 +1069,9 @@ var updatePageTitle = function (text, args, nonActivePlayers) {
     if (args === void 0) { args = {}; }
     if (nonActivePlayers === void 0) { nonActivePlayers = false; }
     return Interaction.use().clientUpdatePageTitle(text, Object.assign(args, { you: '${you}' }), nonActivePlayers);
+};
+var formatStringRecursive = function (log, args) {
+    return Interaction.use().formatStringRecursive(log, args);
 };
 var setAbsolutePosition = function (elt, scaleVarName, _a) {
     var top = _a.top, left = _a.left;
@@ -1068,6 +1109,7 @@ var JohnCompany = (function () {
             ConfirmPartialTurn: ConfirmPartialTurn,
             ConfirmTurn: ConfirmTurn,
             DraftCard: DraftCard,
+            EnlistWriter: EnlistWriter,
             FamilyAction: FamilyAction,
             PlayerTurn: PlayerTurn,
         };
@@ -1087,7 +1129,9 @@ var JohnCompany = (function () {
         debug('gamedatas', gamedatas);
         this.setupPlayerOrder(gamedatas.playerOrder);
         if (this.gameOptions.crownEnabled) {
-            document.getElementById('player_boards').insertAdjacentHTML('afterbegin', tplCrownPlayerPanel(_('The Crown'), gamedatas.players[CROWN_PLAYER_ID].color));
+            document
+                .getElementById('player_boards')
+                .insertAdjacentHTML('afterbegin', tplCrownPlayerPanel(_('The Crown'), gamedatas.players[CROWN_PLAYER_ID].color));
         }
         this._connections = [];
         Object.values(this.states).forEach(function (state) { return state.create(_this); });
@@ -1102,7 +1146,8 @@ var JohnCompany = (function () {
         PlayerAreas.create(this);
         Board.create(this);
         Bar.create(this);
-        if (this.playerOrder.includes(this.getPlayerId()) && gamedatas.phase === SETUP) {
+        if (this.playerOrder.includes(this.getPlayerId()) &&
+            gamedatas.phase === SETUP) {
             SetupArea.create(this);
         }
         NotificationManager.getInstance().setupNotifications();
@@ -1122,14 +1167,19 @@ var JohnCompany = (function () {
     JohnCompany.prototype.setupDontPreloadImages = function () { };
     JohnCompany.prototype.onEnteringState = function (stateName, args) {
         var _this = this;
+        var _a;
         console.log('Entering state: ' + stateName, args);
-        if (this.framework().isCurrentPlayerActive() && this.states[stateName]) {
+        var activePlayerId = (_a = args.args) === null || _a === void 0 ? void 0 : _a.playerId;
+        console.log('activePlayerId', activePlayerId);
+        if (this.framework().isCurrentPlayerActive() &&
+            this.states[stateName] &&
+            (!activePlayerId || activePlayerId === this.getPlayerId())) {
             this.states[stateName].getInstance().onEnteringState(args.args);
         }
         else if (this.states[stateName]) {
             this.states[stateName]
                 .getInstance()
-                .setDescription(Number(args.active_player), args.args);
+                .setDescription(Number(activePlayerId || args.active_player), args.args);
         }
         if (args.args && args.args.previousSteps) {
             args.args.previousSteps.forEach(function (stepId) {
@@ -1314,6 +1364,7 @@ var JohnCompany = (function () {
         };
         if (temporary) {
             this.connect($(node), 'click', safeCallback);
+            dojo.addClass(node, 'selectable');
             this._selectableNodes.push(node);
         }
         else {
@@ -1605,6 +1656,18 @@ var getGroupPosition = function (top, left, index, rowSize) {
         left: left + 39 * column,
     };
 };
+var getRegimentPosition = function (presidency, index, exhausted) {
+    switch (presidency) {
+        case BOMBAY:
+            return getGroupPosition(22, 694, index, 4);
+        case BENGAL:
+            return getGroupPosition(408, 694, index, 4);
+        case MADRAS:
+            return getGroupPosition(215, 694, index, 4);
+        default:
+            return { top: 0, left: 0 };
+    }
+};
 var getCourtOfDirectorsPosition = function (index) {
     return getGroupPosition(555, 243, index, 4);
 };
@@ -1691,9 +1754,9 @@ var FAMILY_MEMBER_OFFICE_CONFIG = (_c = {},
     _c[GOVERNOR_OF_MARATHA] = { top: 105, left: 1105 },
     _c[GOVERNOR_OF_HYDERABAD] = { top: 298, left: 1049 },
     _c[GOVERNOR_OF_MYSORE] = { top: 420, left: 993 },
-    _c.commander_Bengal = { top: 471, left: 695 },
-    _c.commander_Bombay = { top: 278, left: 695 },
-    _c.commander_Madras = { top: 84, left: 695 },
+    _c.Commander_Bengal = { top: 471, left: 695 },
+    _c.Commander_Bombay = { top: 278, left: 695 },
+    _c.Commander_Madras = { top: 84, left: 695 },
     _c);
 var towerConfig = (_d = {},
     _d[BENGAL] = { bottom: -149, left: 1339 },
@@ -1720,24 +1783,33 @@ var POWER_TOKEN_POSITIONS = [
 ];
 var Board = (function () {
     function Board(game) {
-        var _a, _b;
+        var _a, _b, _c;
         this.familyMembers = {};
+        this.armyPieces = {};
         this.ships = {};
+        this.selectBoxes = {};
         this.courtOfDirectors = [];
         this.orders = {};
         this.regions = {};
-        this.writers = (_a = {},
-            _a[BENGAL] = [],
-            _a[BOMBAY] = [],
-            _a[MADRAS] = [],
-            _a);
+        this.armies = {
+            regiments: (_a = {},
+                _a[BENGAL] = [],
+                _a[BOMBAY] = [],
+                _a[MADRAS] = [],
+                _a),
+        };
+        this.writers = (_b = {},
+            _b[BENGAL] = [],
+            _b[BOMBAY] = [],
+            _b[MADRAS] = [],
+            _b);
         this.officersInTraining = [];
         this.powerTokens = {};
-        this.seas = (_b = {},
-            _b[WEST_INDIAN] = [],
-            _b[SOUTH_INDIAN] = [],
-            _b[EAST_INDIAN] = [],
-            _b);
+        this.seas = (_c = {},
+            _c[WEST_INDIAN] = [],
+            _c[SOUTH_INDIAN] = [],
+            _c[EAST_INDIAN] = [],
+            _c);
         this.treasuries = {};
         this.game = game;
         this.setup(game.gamedatas);
@@ -1756,18 +1828,33 @@ var Board = (function () {
             board: document.getElementById('joco-board'),
             familyMembers: document.getElementById('joco_family_members'),
             orders: document.getElementById('joco_orders'),
+            regiments: document.getElementById('joco-regiments'),
             pawns: {},
             powerTokens: document.getElementById('joco-power-tokens'),
+            selectBoxes: document.getElementById('joco-select-boxes'),
             ships: document.getElementById('joco_ships'),
             treasuries: document.getElementById('joco_treasuries'),
         };
+        this.setupArmyPieces(gamedatas);
         this.setupOrders(gamedatas);
         this.setupRegions(gamedatas);
         this.setupPawns(gamedatas);
         this.setupPowerTokens(gamedatas);
         this.setupFamilyMembers(gamedatas);
+        this.setupSelectBoxes();
         this.setupShips(gamedatas);
         this.setupTreasuries(gamedatas);
+    };
+    Board.prototype.setupArmyPieces = function (gamedatas) {
+        var _this = this;
+        Object.entries(gamedatas.armyPieces).forEach(function (_a) {
+            var id = _a[0], piece = _a[1];
+            if (id.startsWith('Regiment')) {
+                var elt = (_this.armyPieces[id] = document.createElement('div'));
+                elt.classList.add('joco-regiment');
+            }
+        });
+        this.updateArmyPieces(Object.values(gamedatas.armyPieces));
     };
     Board.prototype.setupFamilyMembers = function (gamedatas) {
         var _this = this;
@@ -1820,6 +1907,16 @@ var Board = (function () {
         });
         this.updatePowerTokens(gamedatas);
     };
+    Board.prototype.setupSelectBoxes = function () {
+        var _this = this;
+        [BENGAL, BOMBAY, MADRAS].forEach(function (region) {
+            var elt = (_this.selectBoxes["".concat(region, "_").concat(WRITER)] = document.createElement('div'));
+            elt.classList.add('joco-select-box');
+            elt.classList.add('joco-select-writer');
+            elt.setAttribute('data-region', region);
+            _this.ui.selectBoxes.appendChild(elt);
+        });
+    };
     Board.prototype.setupShips = function (gamedatas) {
         var _this = this;
         Object.values(gamedatas.ships).forEach(function (_a) {
@@ -1839,6 +1936,21 @@ var Board = (function () {
             _this.treasuries[office] = new ebg.counter();
             _this.treasuries[office].create("joco_".concat(office, "_treasury"));
             _this.treasuries[office].setValue(gamedatas.offices[office].treasury);
+        });
+    };
+    Board.prototype.updateArmyPieces = function (pieces) {
+        var _this = this;
+        this.ui.regiments.replaceChildren();
+        pieces.forEach(function (piece) {
+            if (piece.location.startsWith('supply')) {
+                return;
+            }
+            if (piece.id.startsWith('Regiment')) {
+                var elt = _this.armyPieces[piece.id];
+                _this.ui.regiments.appendChild(elt);
+                setAbsolutePosition(elt, BOARD_SCALE, getRegimentPosition(piece.location, _this.armies.regiments[piece.location].length, piece.exhausted));
+                _this.armies.regiments[piece.location].push(elt);
+            }
         });
     };
     Board.prototype.updateFamilyMembers = function (familyMembers) {
@@ -2011,7 +2123,7 @@ var Region = (function () {
     };
     return Region;
 }());
-var tplBoard = function (gamedatas) { return "<div id=\"joco-board\">\n  <div id=\"joco_family_members\"></div>\n  <div id=\"joco_orders\"></div>\n  <div id=\"joco-power-tokens\"></div>\n  <div id=\"joco_ships\"></div>\n  <div id=\"joco_towers\"></div>\n  <div id=\"joco_treasuries\"></div>\n</div>"; };
+var tplBoard = function (gamedatas) { return "<div id=\"joco-board\">\n  <div id=\"joco_family_members\"></div>\n  <div id=\"joco_orders\"></div>\n  <div id=\"joco-regiments\"></div>\n  <div id=\"joco-power-tokens\"></div>\n  <div id=\"joco_ships\"></div>\n  <div id=\"joco_towers\"></div>\n  <div id=\"joco_treasuries\"></div>\n  <div id=\"joco-select-boxes\"></div>\n</div>"; };
 var tplTreasury = function (office, _a) {
     var top = _a.top, left = _a.left;
     return "\n<div class=\"joco_treasury\" style=\"top: calc(var(--boardScale) * ".concat(top, "px); left: calc(var(--boardScale) * ").concat(left, "px);\">\n  <span>").concat(_('£'), "</span>\n  <span class=\"joco_treasury_counter\" id=\"joco_").concat(office, "_treasury\"></span>\n</div>");
@@ -2088,8 +2200,10 @@ var tplSetupArea = function () { return "\n<div id=\"joco_setup_area\">\n  <div 
 var LOG_TOKEN_BOLD_TEXT = 'boldText';
 var LOG_TOKEN_BOLD_ITALIC_TEXT = 'boldItalicText';
 var LOG_TOKEN_NEW_LINE = 'newLine';
+var LOG_TOKEN_PLAYER_NAME = 'playerName';
 var LOG_TOKEN_POUND = 'pound';
 var LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
+var LOG_TOKEN_ICON = 'icon';
 var LOG_TOKEN_SETUP_CARD = 'setupCard';
 var tooltipIdCounter = 0;
 var getTokenDiv = function (_a) {
@@ -2101,14 +2215,25 @@ var getTokenDiv = function (_a) {
             return tlpLogTokenText({ text: value });
         case LOG_TOKEN_BOLD_ITALIC_TEXT:
             return tlpLogTokenText({ text: value, italic: true });
+        case LOG_TOKEN_ICON:
         case LOG_TOKEN_ENTERPRISE_ICON:
-            return tplLogTokenEnterpriseIcon(value);
+            return tplLogTokenIcon(value);
         case LOG_TOKEN_POUND:
             return tplLogTokenPound();
         case LOG_TOKEN_SETUP_CARD:
             return tplLogTokenSetupCard(value);
         case LOG_TOKEN_NEW_LINE:
             return '<br class="joco-new-line">';
+        case LOG_TOKEN_PLAYER_NAME:
+            var player = PlayerManager.getInstance()
+                .getPlayers()
+                .find(function (player) { return player.getName() === value; });
+            return player
+                ? tplLogTokenPlayerName({
+                    name: player.getName(),
+                    color: player.getColor(),
+                })
+                : value;
         default:
             return value;
     }
@@ -2118,8 +2243,16 @@ var tlpLogTokenText = function (_a) {
     return "<span ".concat(tooltipId ? "id=\"".concat(tooltipId, "\" class=\"log_tooltip\"") : '', " style=\"font-weight: 700;").concat(italic ? ' font-style: italic;' : '', "\">").concat(_(text), "</span>");
 };
 var tplLogTokenPound = function () { return "<div class=\"log_token joco_pound\"></div>"; };
-var tplLogTokenEnterpriseIcon = function (type) { return "<div class=\"log-token joco-icon\" data-icon=\"".concat(type, "\"></div>"); };
-var tplLogTokenSetupCard = function (id) { return "<div class=\"log-token joco-setup-card\" data-card-id=\"".concat(id, "\"></div>"); };
+var tplLogTokenIcon = function (type) {
+    return "<div class=\"log-token joco-icon\" data-icon=\"".concat(type, "\"></div>");
+};
+var tplLogTokenSetupCard = function (id) {
+    return "<div class=\"log-token joco-setup-card\" data-card-id=\"".concat(id, "\"></div>");
+};
+var tplLogTokenPlayerName = function (_a) {
+    var name = _a.name, color = _a.color;
+    return "<span class=\"playername\" style=\"color:#".concat(color, ";\">").concat(name, "</span>");
+};
 var Negotiation = (function () {
     function Negotiation(game) {
         this.game = game;
@@ -2258,7 +2391,7 @@ var JocoPlayer = (function () {
         }).length);
         this.counters[SHARES_COUNTER].setValue(Object.values(gamedatas.familyMembers).filter(function (_a) {
             var familyId = _a.familyId, location = _a.location;
-            return familyId === _this.familyId && location === COURT_OF_DIRECTORS;
+            return familyId === _this.familyId && (location === COURT_OF_DIRECTORS || location === CHAIRMAN);
         }).length);
         this.counters[SHIPYARDS_COUNTER].setValue(Object.values(gamedatas.enterprises).filter(function (_a) {
             var type = _a.type, location = _a.location;
@@ -2368,6 +2501,59 @@ var DraftCard = (function () {
     };
     return DraftCard;
 }());
+var EnlistWriter = (function () {
+    function EnlistWriter(game) {
+        this.game = game;
+    }
+    EnlistWriter.create = function (game) {
+        EnlistWriter.instance = new EnlistWriter(game);
+    };
+    EnlistWriter.getInstance = function () {
+        return EnlistWriter.instance;
+    };
+    EnlistWriter.prototype.onEnteringState = function (args) {
+        debug('Entering EnlistWriter state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    };
+    EnlistWriter.prototype.onLeavingState = function () {
+        debug('Leaving EnlistWriter state');
+    };
+    EnlistWriter.prototype.setDescription = function (activePlayerId, args) {
+        console.log('setDescription');
+        updatePageTitle(_('${tkn_playerName} must select a region to place their writer'), {
+            tkn_playerName: PlayerManager.getInstance()
+                .getPlayer(activePlayerId)
+                .getName(),
+        });
+    };
+    EnlistWriter.prototype.updateInterfaceInitialStep = function () {
+        var _this = this;
+        this.game.clearPossible();
+        updatePageTitle(_('${you} must select a region to place ${tkn_icon}'), {
+            tkn_icon: WRITER
+        });
+        [BENGAL, BOMBAY, MADRAS].forEach(function (region) {
+            var box = Board.getInstance().selectBoxes["".concat(region, "_").concat(WRITER)];
+            console.log('box', box);
+            onClick(box, function () { return _this.updateInterfaceConfirm(region); });
+        });
+    };
+    EnlistWriter.prototype.updateInterfaceConfirm = function (regionId) {
+        clearPossible();
+        setSelected(Board.getInstance().selectBoxes["".concat(regionId, "_").concat(WRITER)]);
+        updatePageTitle(_('Enlist ${tkn_icon} in ${regionName}?'), {
+            tkn_icon: WRITER,
+            regionName: _(StaticData.get().region(regionId).name),
+        });
+        var callback = function () { return performAction('actEnlistWriter', {
+            regionId: regionId,
+        }); };
+        addConfirmButton(callback);
+        addCancelButton();
+    };
+    return EnlistWriter;
+}());
 var FamilyAction = (function () {
     function FamilyAction(game) {
         this.game = game;
@@ -2387,21 +2573,30 @@ var FamilyAction = (function () {
         debug('Leaving FamilyAction state');
     };
     FamilyAction.prototype.setDescription = function (activePlayerId, args) {
+        updatePageTitle(_('${tkn_playerName} must perform a family action'), {
+            tkn_playerName: PlayerManager.getInstance()
+                .getPlayer(activePlayerId)
+                .getName(),
+        });
     };
     FamilyAction.prototype.updateInterfaceInitialStep = function () {
+        var _this = this;
         this.game.clearPossible();
         updatePageTitle(_('${you} must select a family action'));
-    };
-    FamilyAction.prototype.updateInterfaceConfirm = function (card) {
-        clearPossible();
-        updatePageTitle(_('Draft selected card?'));
-        setSelected(card.id);
-        addConfirmButton(function () {
-            performAction('actFamilyAction', {
-                cardId: card.id,
-            });
-            setSelected(card.id);
+        addSecondaryActionButton({
+            id: 'writer_btn',
+            text: formatStringRecursive(_('Enlist ${tkn_icon}'), {
+                tkn_icon: 'Writer',
+            }),
+            callback: function () { return _this.updateInterfaceConfirm(ENLIST_WRITER); },
         });
+    };
+    FamilyAction.prototype.updateInterfaceConfirm = function (familyAction) {
+        clearPossible();
+        var callback = function () { return performAction('actFamilyAction', {
+            familyAction: familyAction,
+        }); };
+        callback();
         addCancelButton();
     };
     return FamilyAction;
@@ -2440,6 +2635,9 @@ var StaticData = (function () {
     };
     StaticData.get = function () {
         return StaticData.instance;
+    };
+    StaticData.prototype.region = function (id) {
+        return this.staticData.regions[id];
     };
     StaticData.prototype.setupCard = function (id) {
         return this.staticData.setupCards[id];

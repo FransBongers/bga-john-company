@@ -8,6 +8,7 @@ class Bengal extends \Bga\Games\JohnCompany\Models\Region
   {
     parent::__construct($row);
     $this->id = BENGAL;
+    $this->name = clienttranslate('Bengal');
     $this->loot = 6;
     $this->adjacentRegionIds = [
       DELHI,

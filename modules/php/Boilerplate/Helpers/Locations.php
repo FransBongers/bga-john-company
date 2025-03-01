@@ -21,17 +21,17 @@ class Locations
 
   public static function writers($presidencyId)
   {
-    return 'writers_' . $presidencyId;
+    return 'Writers_' . $presidencyId;
   }
 
   public static function officers($presidencyId)
   {
-    return 'officers_' . $presidencyId;
+    return 'Officers_' . $presidencyId;
   }
 
   public static function commander($presidencyId)
   {
-    return 'commander_' . $presidencyId;
+    return 'Commander_' . $presidencyId;
   }
 
   public static function playerShipsSupply()

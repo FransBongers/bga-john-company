@@ -39,6 +39,28 @@ class Interaction {
     }
   }
 
+  addSecondaryActionButton({
+    id,
+    text,
+    callback,
+    extraClasses,
+  }: {
+    id: string;
+    text: string;
+    callback: Function | string;
+    extraClasses?: string;
+  }) {
+    if ($(id)) {
+      return;
+    }
+    this.game
+      .framework()
+      .addActionButton(id, text, callback, 'customActions', false, 'gray');
+    if (extraClasses) {
+      dojo.addClass(id, extraClasses);
+    }
+  }
+
   public addCancelButton(callback?: Function) {
     this.game.addCancelButton(callback);
   }
@@ -53,7 +75,7 @@ class Interaction {
 
   public clientUpdatePageTitle(
     text: string,
-    args: Record<string, string | number>,
+    args: Record<string, string | number | unknown>,
     nonActivePlayers: boolean = false
   ) {
     const title = this.game.format_string_recursive(_(text), args);
@@ -63,6 +85,10 @@ class Interaction {
       this.game.gamedatas.gamestate.descriptionmyturn = title;
     }
     this.game.framework().updatePageTitle();
+  }
+
+  public formatStringRecursive(log: string, args: Record<string, unknown>): string {
+    return this.game.format_string_recursive(log, args);
   }
 
   public onClick(node: HTMLElement, callback: Function, temporary = true) {

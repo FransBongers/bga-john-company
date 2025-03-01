@@ -23,13 +23,20 @@ const addPrimaryActionButton = (props: {
   extraClasses?: string;
 }) => Interaction.use().addPrimaryActionButton(props);
 
+const addSecondaryActionButton = (props: {
+  id: string;
+  text: string;
+  callback: Function | string;
+  extraClasses?: string;
+}) => Interaction.use().addSecondaryActionButton(props);
+
 const clearPossible = () => {
   Interaction.use().clearPossible();
 };
 
 const updatePageTitle = (
   text: string,
-  args: Record<string, string | number> = {},
+  args: Record<string, string | number | unknown> = {},
   nonActivePlayers: boolean = false
 ) =>
   Interaction.use().clientUpdatePageTitle(
@@ -37,6 +44,13 @@ const updatePageTitle = (
     Object.assign(args, { you: '${you}' }),
     nonActivePlayers
   );
+
+const formatStringRecursive = (
+  log: string,
+  args: Record<string, unknown>
+): string => {
+  return Interaction.use().formatStringRecursive(log, args);
+};
 
 const setAbsolutePosition = (
   elt: HTMLElement,

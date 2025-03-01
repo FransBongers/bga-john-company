@@ -18,6 +18,7 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   protected $adjacentRegionIds;
   protected $orderIds;
   protected $exportIcons = 0;
+  protected $name;
 
 
   public function __construct($row)
@@ -42,6 +43,7 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     'adjacentRegionIds',
     'orderIds',
     'exportIcons',
+    'name',
   ];
 
   public function jsonSerialize(): array

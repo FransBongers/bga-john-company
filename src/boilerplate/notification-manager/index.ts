@@ -63,6 +63,7 @@ class NotificationManager {
       // 'draftCard',
       'draftCardPrivate',
       'draftNewCardsPrivate',
+      'enlistFamilyMember',
       'gainCash',
       'gainEnterprise',
       'nextPhase',
@@ -184,6 +185,14 @@ class NotificationManager {
     SetupArea.getInstance().newCards(cardIds, lastCard);
   }
 
+  async notif_enlistFamilyMember(notif: Notif<NotifEnlistFamilyMember>) {
+    const { familyMember, playerId } = notif.args;
+    await Board.getInstance().placeFamilyMembers(
+      [familyMember],
+      this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER]
+    );
+  }
+
   async notif_gainEnterprise(notif: Notif<NotifGainEnterprise>) {
     const { playerId, type } = notif.args;
     const typeCounterMap = {
@@ -196,11 +205,6 @@ class NotificationManager {
     if (type === SHIPYARD) {
       player.counters[SHIPS_COUNTER].incValue(1);
     }
-  }
-
-  async notif_nextPhase(notif: Notif<NotifNextPhase>) {
-    const { phase } = notif.args;
-    Board.getInstance().movePhasePawn(phase);
   }
 
   async notif_gainCash(notif: Notif<NotifGainCash>) {
@@ -245,14 +249,16 @@ class NotificationManager {
     await Promise.all(promises);
   }
 
+  async notif_nextPhase(notif: Notif<NotifNextPhase>) {
+    const { phase } = notif.args;
+    Board.getInstance().movePhasePawn(phase);
+  }
+
   async notif_placeShip(notif: Notif<NotifPlaceShip>) {
     const { playerId, ship } = notif.args;
     const player = this.getPlayer(playerId);
     player.counters[SHIPS_COUNTER].incValue(-1);
-    await Board.getInstance().placeShip(
-      ship,
-      player.ui[SHIPS_COUNTER],
-    );
+    await Board.getInstance().placeShip(ship, player.ui[SHIPS_COUNTER]);
   }
 
   async notif_setupDone(notif: Notif<unknown>) {
@@ -263,7 +269,7 @@ class NotificationManager {
     const { familyMembers, playerId } = notif.args;
     await Board.getInstance().placeFamilyMembers(
       familyMembers,
-      this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER],
+      this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER]
     );
   }
 }

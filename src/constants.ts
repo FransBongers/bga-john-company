@@ -156,12 +156,12 @@ const GOVERNOR_OF_MYSORE = 'GovernorOfMysore';
 /**
  * Family member positions
  */
-const COMMANDER = 'commander';
-const OFFICER = 'officer';
-const OFFICER_IN_TRAINING = 'officerInTraining';
-const WRITER = 'writer';
+const COMMANDER = 'Commander';
+const OFFICER = 'Officer';
+const OFFICER_IN_TRAINING = 'OfficerInTraining';
+const WRITER = 'Writer';
 
-const COURT_OF_DIRECTORS = 'courtOfDirectors';
+const COURT_OF_DIRECTORS = 'CourtOfDirectors';
 
 /**
  * RegionIds
@@ -206,3 +206,13 @@ const POWER_TOKEN_ICON_MAP = {
   [POWER_TOKEN_SHIPPING]: SHIPYARD,
   [POWER_TOKEN_SOCIAL]: LUXURY,
 }
+
+/**
+ * Family Actions
+ */
+const ENLIST_WRITER = 'EnlistWriter';
+const ENLIST_OFFICER = 'EnlistOfficer';
+const PURCHASE_LUXURY = 'PurchaseLuxury';
+const PURCHASE_SHIPYARD = 'PurchaseShipyard';
+const PURCHASE_WORKSHOP = 'PurchaseWorkshop';
+const SEEK_SHARE = 'SeekShare';

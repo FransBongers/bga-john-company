@@ -109,7 +109,7 @@ class JocoPlayer {
     this.counters[SHARES_COUNTER].setValue(
       Object.values(gamedatas.familyMembers).filter(
         ({ familyId, location }) =>
-          familyId === this.familyId && location === COURT_OF_DIRECTORS
+          familyId === this.familyId && (location === COURT_OF_DIRECTORS || location === CHAIRMAN)
       ).length
     );
     this.counters[SHIPYARDS_COUNTER].setValue(

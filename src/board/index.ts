@@ -6,6 +6,7 @@ class Board {
     board: HTMLElement;
     orders: HTMLElement;
     familyMembers: HTMLElement;
+    regiments: HTMLElement;
     pawns: {
       balance?: HTMLElement;
       standing?: HTMLElement;
@@ -14,15 +15,31 @@ class Board {
       phase?: HTMLElement;
     };
     powerTokens: HTMLElement;
+    selectBoxes: HTMLElement;
     ships: HTMLElement;
     treasuries: HTMLElement;
   };
   private familyMembers: Record<string, HTMLElement> = {};
+  private armyPieces: Record<string, HTMLElement> = {};
   private ships: Record<string, HTMLElement> = {};
+  public selectBoxes: Record<string, HTMLElement> = {};
 
   private courtOfDirectors: JocoFamilyMember[] = [];
   private orders: Record<string, HTMLElement> = {};
   private regions: Record<string, Region> = {};
+  private armies: {
+    regiments: {
+      Bengal: JocoArmyPieceBase[];
+      Bombay: JocoArmyPieceBase[];
+      Madras: JocoArmyPieceBase[];
+    };
+  } = {
+    regiments: {
+      [BENGAL]: [],
+      [BOMBAY]: [],
+      [MADRAS]: [],
+    },
+  };
   private writers: {
     Bengal: JocoFamilyMember[];
     Bombay: JocoFamilyMember[];
@@ -76,20 +93,34 @@ class Board {
       board: document.getElementById('joco-board'),
       familyMembers: document.getElementById('joco_family_members'),
       orders: document.getElementById('joco_orders'),
+      regiments: document.getElementById('joco-regiments'),
       pawns: {},
       powerTokens: document.getElementById('joco-power-tokens'),
+      selectBoxes: document.getElementById('joco-select-boxes'),
       ships: document.getElementById('joco_ships'),
       treasuries: document.getElementById('joco_treasuries'),
     };
 
     // this.ui.board.insertAdjacentHTML('afterbegin', familyMember);
+    this.setupArmyPieces(gamedatas);
     this.setupOrders(gamedatas);
     this.setupRegions(gamedatas);
     this.setupPawns(gamedatas);
     this.setupPowerTokens(gamedatas);
     this.setupFamilyMembers(gamedatas);
+    this.setupSelectBoxes();
     this.setupShips(gamedatas);
     this.setupTreasuries(gamedatas);
+  }
+
+  private setupArmyPieces(gamedatas: GamedatasAlias) {
+    Object.entries(gamedatas.armyPieces).forEach(([id, piece]) => {
+      if (id.startsWith('Regiment')) {
+        const elt = (this.armyPieces[id] = document.createElement('div'));
+        elt.classList.add('joco-regiment');
+      }
+    });
+    this.updateArmyPieces(Object.values(gamedatas.armyPieces));
   }
 
   private setupFamilyMembers(gamedatas: GamedatasAlias) {
@@ -173,6 +204,16 @@ class Board {
     this.updatePowerTokens(gamedatas);
   }
 
+  private setupSelectBoxes() {
+    [BENGAL, BOMBAY, MADRAS].forEach((region) => {
+      const elt = (this.selectBoxes[`${region}_${WRITER}`] = document.createElement('div'));
+      elt.classList.add('joco-select-box');
+      elt.classList.add('joco-select-writer');
+      elt.setAttribute('data-region', region);
+      this.ui.selectBoxes.appendChild(elt);
+    });
+  }
+
   private setupShips(gamedatas: GamedatasAlias) {
     Object.values(gamedatas.ships).forEach(({ id, type, fatigued }) => {
       const elt = (this.ships[id] = document.createElement('div'));
@@ -204,6 +245,21 @@ class Board {
   // .##.....##.##........##.....##.#########....##....##..........##.....##..##.
   // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
   // ..#######..##........########..##.....##....##....########.....#######..####
+
+  updateArmyPieces(pieces: JocoArmyPieceBase[]) {
+    this.ui.regiments.replaceChildren();
+    pieces.forEach((piece) => {
+      if (piece.location.startsWith('supply')) {
+        return;
+      }
+      if (piece.id.startsWith('Regiment')) {
+        const elt = this.armyPieces[piece.id];
+        this.ui.regiments.appendChild(elt)
+        setAbsolutePosition(elt, BOARD_SCALE, getRegimentPosition(piece.location, this.armies.regiments[piece.location].length, piece.exhausted));
+        this.armies.regiments[piece.location].push(elt);
+      }
+    })
+  }
 
   updateFamilyMembers(familyMembers: JocoFamilyMember[]) {
     familyMembers.forEach((familyMember) => {
@@ -282,8 +338,12 @@ class Board {
 
   private updatePowerTokens(gamedatas: GamedatasAlias) {
     gamedatas.powerTokens.forEach((token, index) => {
-      setAbsolutePosition(this.ui.powerTokens[token], BOARD_SCALE, POWER_TOKEN_POSITIONS[index]);  
-    })
+      setAbsolutePosition(
+        this.ui.powerTokens[token],
+        BOARD_SCALE,
+        POWER_TOKEN_POSITIONS[index]
+      );
+    });
   }
 
   movePhasePawn(phase: string) {
