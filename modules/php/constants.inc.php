@@ -46,10 +46,12 @@ const ST_NEW_COMPANY_SHARES = 24;
 // Family Actions
 const ST_ENLIST_WRITER = 25;
 const ST_ENLIST_OFFICER = 26;
-const ST_PURCHASE_LUXURY = 27;
-const ST_PURCHASE_SHIPYARD = 28;
-const ST_PURCHASE_WORKSHOP = 29;
+const ST_PURCHASE_ENTERPRISE = 27;
+// const ST_PURCHASE_LUXURY = 27;
+// const ST_PURCHASE_SHIPYARD = 28;
+// const ST_PURCHASE_WORKSHOP = 29;
 const ST_SEEK_SHARE = 30;
+const ST_CHAIRMAN = 40;
 
 
 const DRAFT_CARD = 'DraftCard';
@@ -60,6 +62,7 @@ const NEW_COMPANY_SHARES = 'NewCompanyShares';
 // Family Actions
 const ENLIST_WRITER = 'EnlistWriter';
 const ENLIST_OFFICER = 'EnlistOfficer';
+const PURCHASE_ENTERPRISE = 'PurchaseEnterprise';
 const PURCHASE_LUXURY = 'PurchaseLuxury';
 const PURCHASE_SHIPYARD = 'PurchaseShipyard';
 const PURCHASE_WORKSHOP = 'PurchaseWorkshop';
@@ -250,10 +253,14 @@ const REGIONS = [
   PUNJAB,
 ];
 
+const BENGAL_PRESIDENCY = 'BengalPresidency';
+const BOMBAY_PRESIDENCY = 'BombayPresidency';
+const MADRAS_PRESIDENCY = 'MadrasPresidency';
+
 const PRESIDENCIES = [
-  BENGAL,
-  BOMBAY,
-  MADRAS
+  BENGAL_PRESIDENCY,
+  BOMBAY_PRESIDENCY,
+  MADRAS_PRESIDENCY,
 ];
 
 
@@ -404,3 +411,17 @@ const POWER_TOKEN_SOCIAL = 'social';
 
 const SHARE_VICTORY_POINTS_TOKEN = 'shareVictoryPoints';
 
+/**
+ * Crown climates
+ */
+const BULL = 'Bull';
+const STAG = 'Stag';
+const LION = 'Lion';
+const BEAR = 'Bear';
+const PEACOCK = 'Peacock';
+
+/**
+ * Directions
+ */
+const CLOCKWISE = 'clockwise';
+const COUNTER_CLOCKWISE = 'counterClockwise';

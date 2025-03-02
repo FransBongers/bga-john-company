@@ -40,4 +40,5 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
     return $this->jsonSerialize(); // Static datas are already in js file
   }
 
+  
 }

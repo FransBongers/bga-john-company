@@ -232,6 +232,17 @@ $machinestates = [
         'transitions' => [],
     ],
 
+    ST_ENLIST_OFFICER => [
+        'name' => ENLIST_OFFICER,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer} must enlist an officer'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['actEnlistOfficer', 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
     ST_ENLIST_WRITER => [
         'name' => ENLIST_WRITER,
         'type' => 'multipleactiveplayer',
@@ -240,6 +251,17 @@ $machinestates = [
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
         'possibleactions' => ['actEnlistWriter', 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_CHAIRMAN => [
+        'name' => CHAIRMAN,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . CHAIRMAN, 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 ];

@@ -178,6 +178,16 @@ class Notifications
     ]);
   }
 
+  public static function enlistOfficer($player, $familyMember)
+  {
+    self::notifyAll('enlistFamilyMember', clienttranslate('${player_name} enlists ${tkn_icon}'), [
+      'player' => $player,
+      'tkn_icon' => OFFICER_IN_TRAINING,
+      'familyMember' => $familyMember,
+    ]);
+  }
+
+
   public static function enlistWriter($player, $familyMember, $region)
   {
     self::notifyAll('enlistFamilyMember', clienttranslate('${player_name} enlists ${tkn_icon} in ${tkn_boldText_regionName}'), [
@@ -231,6 +241,20 @@ class Notifications
       'ship' => $ship->jsonSerialize(),
     ]);
   }
+
+  public static function purchaseEnterprise($player, $enterprise, $amount)
+  {
+    self::notifyAll('purchaseEnterprise', clienttranslate('${player_name} pays ${amount} ${tkn_pound} to purchase a ${tkn_boldText_enterprise} ${tkn_enterpriseIcon}'), [
+      'player' => $player,
+      'tkn_boldText_enterprise' => $enterprise->getName(),
+      'tkn_enterpriseIcon' => $enterprise->getType(),
+      'amount' => $amount,
+      'type' => $enterprise->getType(),
+      'tkn_pound' => clienttranslate('Pounds'),
+      'i18n' => ['tkn_boldText_enterprise'],
+    ]);
+  }
+
 
   public static function setupDone()
   {

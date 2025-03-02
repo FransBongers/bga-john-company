@@ -1,8 +1,5 @@
 interface OnEnteringFamilyActionArgs extends CommonStateArgs {
-  _private?: {
-    options: JoCoSetupCard[];
-    selected: string;
-  };
+  options: Record<string, boolean>;
 }
 
 class FamilyAction implements State {
@@ -58,13 +55,53 @@ class FamilyAction implements State {
 
     updatePageTitle(_('${you} must select a family action'));
 
-    addSecondaryActionButton({
-      id: 'writer_btn',
-      text: formatStringRecursive(_('Enlist ${tkn_icon}'), {
-        tkn_icon: 'Writer',
-      }),
-      callback: () => this.updateInterfaceConfirm(ENLIST_WRITER),
-    });
+    if (this.args.options[ENLIST_WRITER]) {
+      addSecondaryActionButton({
+        id: 'writer_btn',
+        text: formatStringRecursive(_('Enlist ${tkn_icon}'), {
+          tkn_icon: 'Writer',
+        }),
+        callback: () => this.updateInterfaceConfirm(ENLIST_WRITER),
+      });
+    }
+    if (this.args.options[ENLIST_OFFICER]) {
+      addSecondaryActionButton({
+        id: 'officer_btn',
+        text: formatStringRecursive(_('Enlist ${tkn_icon}'), {
+          tkn_icon: OFFICER_IN_TRAINING,
+        }),
+        callback: () => this.updateInterfaceConfirm(ENLIST_OFFICER),
+      });
+    }
+    if (this.args.options[PURCHASE_LUXURY]) {
+      addSecondaryActionButton({
+        id: 'luxury_btn',
+        text: formatStringRecursive(_('Purchase ${tkn_icon}'), {
+          tkn_icon: LUXURY,
+        }),
+        callback: () => this.updateInterfaceConfirm(PURCHASE_LUXURY),
+      });
+    }
+    if (this.args.options[PURCHASE_SHIPYARD]) {
+      addSecondaryActionButton({
+        id: 'shipyard_btn',
+        text: formatStringRecursive(_('Purchase ${tkn_icon}'), {
+          tkn_icon: SHIPYARD,
+        }),
+        callback: () => this.updateInterfaceConfirm(PURCHASE_SHIPYARD),
+      });
+    }
+    if (this.args.options[PURCHASE_WORKSHOP]) {
+      addSecondaryActionButton({
+        id: 'workshop_btn',
+        text: formatStringRecursive(_('Purchase ${tkn_icon}'), {
+          tkn_icon: WORKSHOP,
+        }),
+        callback: () => this.updateInterfaceConfirm(PURCHASE_WORKSHOP),
+      });
+    }
+
+
   }
 
   private updateInterfaceConfirm(familyAction: string) {

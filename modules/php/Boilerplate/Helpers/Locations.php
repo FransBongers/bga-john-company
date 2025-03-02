@@ -29,6 +29,11 @@ class Locations
     return 'Officers_' . $presidencyId;
   }
 
+  public static function officerInTraining()
+  {
+    return OFFICER_IN_TRAINING;
+  }
+
   public static function commander($presidencyId)
   {
     return 'Commander_' . $presidencyId;

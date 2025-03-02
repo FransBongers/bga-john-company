@@ -87,11 +87,11 @@ const getGroupPosition = (
 
 const getRegimentPosition = (presidency: string, index: number, exhausted: boolean): AbsolutePosition => {
   switch (presidency) {
-    case BOMBAY:
+    case BOMBAY_PRESIDENCY:
       return getGroupPosition(22, 694, index, 4);
-    case BENGAL:
+    case BENGAL_PRESIDENCY:
       return getGroupPosition(408, 694, index, 4);
-    case MADRAS:
+    case MADRAS_PRESIDENCY:
       return getGroupPosition(215, 694, index, 4);
     default:
       return { top: 0, left: 0 };

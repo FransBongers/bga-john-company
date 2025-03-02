@@ -29,15 +29,15 @@ class Board {
   private regions: Record<string, Region> = {};
   private armies: {
     regiments: {
-      Bengal: JocoArmyPieceBase[];
-      Bombay: JocoArmyPieceBase[];
-      Madras: JocoArmyPieceBase[];
+      BengalPresidency: JocoArmyPieceBase[];
+      BombayPresidency: JocoArmyPieceBase[];
+      MadrasPresidency: JocoArmyPieceBase[];
     };
   } = {
     regiments: {
-      [BENGAL]: [],
-      [BOMBAY]: [],
-      [MADRAS]: [],
+      [BENGAL_PRESIDENCY]: [],
+      [BOMBAY_PRESIDENCY]: [],
+      [MADRAS_PRESIDENCY]: [],
     },
   };
   private writers: {

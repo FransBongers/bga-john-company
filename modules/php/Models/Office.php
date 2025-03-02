@@ -2,6 +2,8 @@
 
 namespace Bga\Games\JohnCompany\Models;
 
+use Bga\Games\JohnCompany\Managers\Players;
+
 class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
 {
   protected $id;
@@ -12,6 +14,7 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   protected $treasury = 0;
   protected $hirePriority;
   protected $title;
+  protected $familyMemberId;
 
   public function __construct($row)
   {
@@ -45,4 +48,19 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     return $this->jsonSerialize(); // Static datas are already in js file
   }
 
+  public function getPlayer(): Player | null
+  {
+    if ($this->familyMemberId === null) {
+      return null;
+    }
+
+    $familyId = explode('_', $this->familyMemberId)[1];
+    return Players::getPlayerForFamily($familyId);
+  }
+
+  public function getPlayerId(): int | null
+  {
+    $player = $this->getPlayer();
+    return $player === null ? null : $player->getId();
+  }
 }

@@ -13,11 +13,23 @@ use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 
-class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
+class PurchaseEnterprise extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
+
+  protected $familyActionEnterpriseMap = [
+    PURCHASE_LUXURY => LUXURY,
+    PURCHASE_SHIPYARD => SHIPYARD,
+    PURCHASE_WORKSHOP => WORKSHOP,
+  ];
+  protected $enterprisePrice = [
+    LUXURY => 4,
+    SHIPYARD => 2,
+    WORKSHOP => 5,
+  ];
+
   public function getState()
   {
-    return ST_ENLIST_WRITER;
+    return ST_PURCHASE_ENTERPRISE;
   }
 
   // ....###....########...######....######.
@@ -28,14 +40,13 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
   // .##.....##.##....##..##....##..##....##
   // .##.....##.##.....##..######....######.
 
-  public function argsEnlistWriter()
+  public function argsPurchaseEnterprise()
   {
     $info = $this->ctx->getInfo();
     $playerId = $info['activePlayerId'];
 
     $data = [
       'playerId' => $playerId,
-      'options' => $this->getOptions($playerId),
     ];
 
     return $data;
@@ -57,7 +68,7 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
   // .##.....##.##....##....##.....##..##.....##.##...###
   // .##.....##..######.....##....####..#######..##....##
 
-  public function actPassEnlistWriter()
+  public function actPassPurchaseEnterprise()
   {
     $player = self::getPlayer();
     // Stats::incPassActionCount($player->getId(), 1);
@@ -65,32 +76,33 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
     $this->resolveAction(PASS);
   }
 
-  public function actEnlistWriter($args)
+  public function actPurchaseEnterprise($args)
   {
-    self::checkAction('actEnlistWriter');
-    $this->checkPlayer();
+    self::checkAction('actPurchaseEnterprise');
+    $playerId = $this->checkPlayer();
 
-    $regionId = $args->regionId;
-
-    $stateArgs = $this->argsEnlistWriter();
-
-    if (!in_array($regionId, $stateArgs['options'])) {
-      throw new \feException("ERROR 004");
-    }
-
-    $playerId = $stateArgs['playerId'];
-
-    $player = Players::get($playerId);
-    $familyId = $player->getFamilyId();
-
-    $familyMember = FamilyMembers::getMemberFor($familyId);
-    $familyMember->setLocation(Locations::writers($regionId));
-
-    Notifications::enlistWriter($player, $familyMember, Regions::get($regionId));
-
-    // TODO: insert extra actions
+    // $this->performAction($playerId);
 
     $this->resolveAction([], true);
+  }
+
+  public function performAction($playerId, $familyAction)
+  {
+    $player = Players::get($playerId);
+    $family = $player->getFamily();
+
+    $enterpriseType = $this->familyActionEnterpriseMap[$familyAction];
+    $enterprise = Enterprises::getTopOf(Locations::enterpriseSupply($enterpriseType));
+    $enterprise->setLocation($family->getId());
+
+    $amount = $this->enterprisePrice[$enterpriseType];
+
+    $family->incTreasury(-$amount);
+
+    // Notifications::pay($player, $amount);
+    Notifications::purchaseEnterprise($player, $enterprise, $amount);
+
+    // TODO: insert action for bonus action
   }
 
   //  .##.....##.########.####.##.......####.########.##....##
@@ -106,11 +118,23 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
     $player = Players::get($playerId);
     $family = $player->getFamily();
 
-    $canPlaceFamilyMembers = $family->canPlaceFamilyMembers();
+    $treasury = $family->getTreasury();
+    $options = [];
 
-    if (!$canPlaceFamilyMembers) {
-      return [];
+    $enterpises = Enterprises::getAll()->toArray();
+
+    if ($treasury >= 4 && count(Utils::itemsInLocation($enterpises, Locations::enterpriseSupply(LUXURY))) > 0) {
+      $options[] = PURCHASE_LUXURY;
     }
-    return [BENGAL, BOMBAY, MADRAS];
+
+    if ($treasury >= 2 && count(Utils::itemsInLocation($enterpises, Locations::enterpriseSupply(SHIPYARD))) > 0) {
+      $options[] = PURCHASE_SHIPYARD;
+    }
+
+    if ($treasury >= 5 && count(Utils::itemsInLocation($enterpises, Locations::enterpriseSupply(WORKSHOP))) > 0) {
+      $options[] = PURCHASE_WORKSHOP;
+    }
+
+    return $options;
   }
 }

@@ -28,4 +28,14 @@ class Company
   {
     return [];
   }
+
+  public static function getDebt()
+  {
+    return Globals::getCompany()[DEBT];
+  }
+
+  public static function getStanding()
+  {
+    return Globals::getCompany()[STANDING];
+  }
 }

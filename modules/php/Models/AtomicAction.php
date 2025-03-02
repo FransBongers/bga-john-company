@@ -76,6 +76,15 @@ class AtomicAction
     }
   }
 
+  public function checkPlayer()
+  {
+    $activePlayerId = $this->ctx->getInfo()['activePlayerId'];
+    if(Players::getCurrentId() !== $activePlayerId) {
+      throw new \feException("ERROR 002");
+    };
+    return $activePlayerId;
+  }
+
   public function getClassName()
   {
     $classname = get_class($this);

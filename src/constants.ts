@@ -176,6 +176,13 @@ const MYSORE = 'Mysore';
 const PUNJAB = 'Punjab';
 
 /**
+ * Presidencis
+ */
+const BENGAL_PRESIDENCY = 'BengalPresidency';
+const BOMBAY_PRESIDENCY = 'BombayPresidency';
+const MADRAS_PRESIDENCY = 'MadrasPresidency';
+
+/**
  * Ship locations
  */
 const WEST_INDIAN = 'westIndian';
@@ -205,7 +212,7 @@ const POWER_TOKEN_ICON_MAP = {
   [POWER_TOKEN_MANUFACTURING]: WORKSHOP,
   [POWER_TOKEN_SHIPPING]: SHIPYARD,
   [POWER_TOKEN_SOCIAL]: LUXURY,
-}
+};
 
 /**
  * Family Actions
@@ -216,3 +223,4 @@ const PURCHASE_LUXURY = 'PurchaseLuxury';
 const PURCHASE_SHIPYARD = 'PurchaseShipyard';
 const PURCHASE_WORKSHOP = 'PurchaseWorkshop';
 const SEEK_SHARE = 'SeekShare';
+const PURCHASE_ENTERPRISE = 'PurchaseEnterprise';

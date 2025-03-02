@@ -42,6 +42,11 @@ interface NotifPlaceShip extends NotifWithPlayerArgs {
   ship: JocoShipBase;
 }
 
+interface NotifPurchaseEnterprise extends NotifWithPlayerArgs {
+  amount: number;
+  type: string;
+}
+
 interface NotifSetupFamilyMembers extends NotifWithPlayerArgs {
   familyMembers: JocoFamilyMember[];
 }

@@ -5,19 +5,16 @@ namespace Bga\Games\JohnCompany\Actions;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
-use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
-use Bga\Games\JohnCompany\Game;
-use Bga\Games\JohnCompany\Managers\Enterprises;
-use Bga\Games\JohnCompany\Managers\Regions;
+
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 
-class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
+class EnlistOfficer extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
   public function getState()
   {
-    return ST_ENLIST_WRITER;
+    return ST_ENLIST_OFFICER;
   }
 
   // ....###....########...######....######.
@@ -28,14 +25,13 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
   // .##.....##.##....##..##....##..##....##
   // .##.....##.##.....##..######....######.
 
-  public function argsEnlistWriter()
+  public function argsEnlistOfficer()
   {
     $info = $this->ctx->getInfo();
     $playerId = $info['activePlayerId'];
 
     $data = [
       'playerId' => $playerId,
-      'options' => $this->getOptions($playerId),
     ];
 
     return $data;
@@ -57,7 +53,7 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
   // .##.....##.##....##....##.....##..##.....##.##...###
   // .##.....##..######.....##....####..#######..##....##
 
-  public function actPassEnlistWriter()
+  public function actPassEnlistOfficer()
   {
     $player = self::getPlayer();
     // Stats::incPassActionCount($player->getId(), 1);
@@ -65,32 +61,28 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
     $this->resolveAction(PASS);
   }
 
-  public function actEnlistWriter($args)
+  public function actEnlistOfficer($args)
   {
-    self::checkAction('actEnlistWriter');
-    $this->checkPlayer();
+    self::checkAction('actEnlistOfficer');
+    $playerId = $this->checkPlayer();
 
-    $regionId = $args->regionId;
+    $this->performAction($playerId);
 
-    $stateArgs = $this->argsEnlistWriter();
+    $this->resolveAction([], true);
+  }
 
-    if (!in_array($regionId, $stateArgs['options'])) {
-      throw new \feException("ERROR 004");
-    }
-
-    $playerId = $stateArgs['playerId'];
-
+  public function performAction($playerId)
+  {
     $player = Players::get($playerId);
     $familyId = $player->getFamilyId();
 
     $familyMember = FamilyMembers::getMemberFor($familyId);
-    $familyMember->setLocation(Locations::writers($regionId));
 
-    Notifications::enlistWriter($player, $familyMember, Regions::get($regionId));
+    $familyMember->setLocation(Locations::officerInTraining());
 
-    // TODO: insert extra actions
+    Notifications::enlistOfficer($player, $familyMember);
 
-    $this->resolveAction([], true);
+    // TODO: insert action for bonus action
   }
 
   //  .##.....##.########.####.##.......####.########.##....##
@@ -101,16 +93,11 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  public function getOptions($playerId)
+  public function canPerformAction($playerId)
   {
     $player = Players::get($playerId);
     $family = $player->getFamily();
 
-    $canPlaceFamilyMembers = $family->canPlaceFamilyMembers();
-
-    if (!$canPlaceFamilyMembers) {
-      return [];
-    }
-    return [BENGAL, BOMBAY, MADRAS];
+    return $family->canPlaceFamilyMembers();
   }
 }

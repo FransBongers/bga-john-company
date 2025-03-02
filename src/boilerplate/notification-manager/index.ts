@@ -68,6 +68,7 @@ class NotificationManager {
       'gainEnterprise',
       'nextPhase',
       'placeShip',
+      'purchaseEnterprise',
       'setupDone',
       'setupFamilyMembers',
     ];
@@ -146,6 +147,52 @@ class NotificationManager {
   //   return this.game.playerManager.getPlayer({ playerId });
   // }
 
+  getEnterpriseCounter(type: string) {
+    const typeCounterMap = {
+      [LUXURY]: LUXURIES_COUNTER,
+      [SHIPYARD]: SHIPYARDS_COUNTER,
+      [WORKSHOP]: WORKSHOPS_COUNTER,
+    };
+    return typeCounterMap[type];
+  }
+
+  async pay(playerId: number, amount: number) {
+    await this.game.framework().wait(1);
+
+    const logPound: HTMLElement = document.querySelector(
+      '#pagemaintitletext .joco_pound'
+    );
+
+    const fromRect = document
+      .getElementById(`joco-cash-${playerId}`)
+      .getBoundingClientRect();
+
+    const player = PlayerManager.getInstance().getPlayer(playerId);
+
+    const promises = Array.from(Array(amount).keys()).map(async (_, index) => {
+      await this.game.framework().wait(index * 150);
+      player.counters[CASH_COUNTER].incValue(-1);
+      const element = document.createElement('div');
+      element.classList.add('log_token');
+      element.classList.add('joco_pound');
+      element.classList.add('animation');
+      // document
+      //   .getElementById(`joco-cash-${playerId}`)
+      //   .insertAdjacentElement('afterbegin', element);
+      logPound.insertAdjacentElement('afterbegin', element);
+      await this.game.animationManager.play(
+        new BgaSlideAnimation({
+          element,
+          transitionTimingFunction: 'ease-in-out',
+          fromRect,
+        })
+      );
+      element.remove();
+    });
+
+    await Promise.all(promises);
+  }
+
   // .##....##..#######..########.####.########..######.
   // .###...##.##.....##....##.....##..##.......##....##
   // .####..##.##.....##....##.....##..##.......##......
@@ -195,13 +242,9 @@ class NotificationManager {
 
   async notif_gainEnterprise(notif: Notif<NotifGainEnterprise>) {
     const { playerId, type } = notif.args;
-    const typeCounterMap = {
-      [LUXURIES_COUNTER]: LUXURIES_COUNTER,
-      [SHIPYARD]: SHIPYARDS_COUNTER,
-      [WORKSHOP]: WORKSHOPS_COUNTER,
-    };
+
     const player = this.getPlayer(playerId);
-    player.counters[typeCounterMap[type]].incValue(1);
+    player.counters[this.getEnterpriseCounter(type)].incValue(1);
     if (type === SHIPYARD) {
       player.counters[SHIPS_COUNTER].incValue(1);
     }
@@ -210,7 +253,6 @@ class NotificationManager {
   async notif_gainCash(notif: Notif<NotifGainCash>) {
     const { amount, playerId } = notif.args;
 
-    // New try
     // Need to wait, otherwise the token in pagemaintitletext cannot be found
     await this.game.framework().wait(1);
     // let msg = this.game.format_string_recursive(
@@ -259,6 +301,20 @@ class NotificationManager {
     const player = this.getPlayer(playerId);
     player.counters[SHIPS_COUNTER].incValue(-1);
     await Board.getInstance().placeShip(ship, player.ui[SHIPS_COUNTER]);
+  }
+
+  async notif_purchaseEnterprise(notif: Notif<NotifPurchaseEnterprise>) {
+    const { playerId, type, amount } = notif.args;
+
+    await this.pay(playerId, amount);
+
+    await this.game.framework().wait(1);
+
+    const player = this.getPlayer(playerId);
+    player.counters[this.getEnterpriseCounter(type)].incValue(1);
+    if (type === SHIPYARD) {
+      player.counters[SHIPS_COUNTER].incValue(1);
+    }
   }
 
   async notif_setupDone(notif: Notif<unknown>) {

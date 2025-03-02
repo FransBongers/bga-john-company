@@ -29,6 +29,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     // 'activePlayerId' => 'int',
     'company' => 'obj',
     'crown' => 'obj',
+    'deregulation' => 'bool',
     'phase' => 'str',
     'turn' => 'int',
     'options' => 'obj',
@@ -161,6 +162,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     self::setPhase(SETUP);
     self::setCrownInGame(count($players) <= 2);
     self::setCrown([]);
+    self::setDeregulation(false);
     self::setPowerTokens([
       POWER_TOKEN_SOCIAL,
       POWER_TOKEN_COMPANY_SHARE,
