@@ -58,4 +58,9 @@ class Locations
   {
     return SUPPLY_REGIMENTS;
   }
+
+  public static function londonSeasonPool($type)
+  {
+    return 'pool_' . $type;
+  }
 }

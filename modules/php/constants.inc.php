@@ -90,6 +90,11 @@ const WORKSHOP = 'Workshop';
 
 const SHIPYARD = 'Shipyard';
 
+const BLACKMAIL = 'Blackmail';
+const PRESTIGE = 'Prestige';
+const ENTERPRISE = 'Enterprise';
+const SPOUSE = 'Spouse';
+
 /**
  * Ship locations
  */

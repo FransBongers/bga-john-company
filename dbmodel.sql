@@ -92,6 +92,13 @@ CREATE TABLE IF NOT EXISTS `family_members` (
   `fatigue` int(10) DEFAULT 0,
   PRIMARY KEY (`family_member_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+CREATE TABLE IF NOT EXISTS `london_season_cards` (
+  `card_id` varchar(100) NOT NULL,
+  `card_location` varchar(32) NOT NULL,
+  `card_state` int(10) DEFAULT 0,
+  `used` tinyint(1) DEFAULT 0,
+  PRIMARY KEY (`card_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 CREATE TABLE IF NOT EXISTS `offices` (
   `office_id` varchar(32) NOT NULL,
   `office_location` varchar(32) NOT NULL,
@@ -131,6 +138,5 @@ CREATE TABLE IF NOT EXISTS `ships` (
   `type` varchar(32) NOT NULL,
   PRIMARY KEY (`ship_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
-
 ALTER TABLE `gamelog`
 ADD `cancel` TINYINT(1) NOT NULL DEFAULT 0;

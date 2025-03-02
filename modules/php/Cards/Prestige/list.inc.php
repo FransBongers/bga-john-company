@@ -1,0 +1,23 @@
+<?php
+$prestigeCardIds = [
+  'PrestigeCard_11',
+  'PrestigeCard_12',
+  'PrestigeCard_13',
+  'PrestigeCard_14',
+  'PrestigeCard_15',
+  'PrestigeCard_16',
+  'PrestigeCard_17',
+  'PrestigeCard_18',
+  'PrestigeCard_19',
+  'PrestigeCard_20',
+  'PrestigeCard_21',
+  'PrestigeCard_22',
+  'PrestigeCard_23',
+  'PrestigeCard_24',
+  'PrestigeCard_25',
+  'PrestigeCard_26',
+  'PrestigeCard_27',
+  'PrestigeCard_28',
+  'PrestigeCard_29',
+  'PrestigeCard_30',
+];
