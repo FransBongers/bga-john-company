@@ -78,4 +78,12 @@ class FamilyMembers extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   {
     return self::getTopOf(Locations::familyMemberSupply($familyId));
   }
+
+  public static function getOnStockExchange()
+  {
+    return self::getSelectQuery()
+      ->where(static::$prefix . 'location', 'LIKE', 'StockExchange' . '%')
+      ->get()
+      ->toArray();
+  }
 }

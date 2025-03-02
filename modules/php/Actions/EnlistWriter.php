@@ -75,7 +75,7 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
     $stateArgs = $this->argsEnlistWriter();
 
     if (!in_array($regionId, $stateArgs['options'])) {
-      throw new \feException("ERROR 004");
+      throw new \feException("ERROR_004");
     }
 
     $playerId = $stateArgs['playerId'];

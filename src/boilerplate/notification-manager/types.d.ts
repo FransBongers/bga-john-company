@@ -34,6 +34,15 @@ interface NotifGainEnterprise extends NotifWithPlayerArgs {
   type: string;
 }
 
+interface NotifMoveFamilyMembers {
+  familyMembers: JocoFamilyMember[];
+}
+
+interface NotifNewCompanyShare extends NotifWithPlayerArgs {
+  familyMember: JocoFamilyMember;
+  debt: number;
+}
+
 interface NotifNextPhase {
   phase: string;
 }
@@ -45,6 +54,11 @@ interface NotifPlaceShip extends NotifWithPlayerArgs {
 interface NotifPurchaseEnterprise extends NotifWithPlayerArgs {
   amount: number;
   type: string;
+}
+
+interface NotifSeekShare extends NotifWithPlayerArgs {
+  amount: number;
+  familyMember: JocoFamilyMember;
 }
 
 interface NotifSetupFamilyMembers extends NotifWithPlayerArgs {

@@ -61,6 +61,7 @@ class JohnCompany implements Game {
     EnlistWriter,
     FamilyAction,
     PlayerTurn,
+    SeekShare,
   };
 
   constructor() {

@@ -97,7 +97,7 @@ class DraftCard extends \Bga\Games\JohnCompany\Models\AtomicAction
       });
 
       if ($selectedCard === null) {
-        throw new \feException("ERROR 001");
+        throw new \feException("ERROR_001");
       }
 
       $selectedCard->setLocation(Locations::setupCards($player->getFamilyId()));

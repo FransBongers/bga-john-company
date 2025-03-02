@@ -24,6 +24,13 @@ class Company
     ]);
   }
 
+  private static function update($key, $value)
+  {
+    $company = Globals::getCompany();
+    $company[$key] = $value;
+    Globals::setCompany($company);
+  }
+
   public static function getVacantOffices()
   {
     return [];
@@ -32,6 +39,11 @@ class Company
   public static function getDebt()
   {
     return Globals::getCompany()[DEBT];
+  }
+
+  public static function setDebt($value)
+  {
+    self::update(DEBT, $value);
   }
 
   public static function getStanding()

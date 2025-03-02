@@ -80,7 +80,7 @@ class AtomicAction
   {
     $activePlayerId = $this->ctx->getInfo()['activePlayerId'];
     if(Players::getCurrentId() !== $activePlayerId) {
-      throw new \feException("ERROR 002");
+      throw new \feException("ERROR_002");
     };
     return $activePlayerId;
   }

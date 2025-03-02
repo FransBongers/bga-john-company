@@ -121,6 +121,10 @@ class Notifications
     }
   }
 
+  protected static function tknPound()
+  {
+    return clienttranslate('Pounds');
+  }
 
   //  .##.....##.########.####.##.......####.########.##....##
   //  .##.....##....##.....##..##........##.....##.....##..##.
@@ -232,6 +236,25 @@ class Notifications
     ]);
   }
 
+  public static function moveFamilyMembers($familyMembers)
+  {
+    self::notifyAll('moveFamilyMembers', clienttranslate(''), [
+      'familyMembers' => $familyMembers,
+    ]);
+  }
+
+  public static function newCompanyShare($player, $familyMember, $debt)
+  {
+    self::notifyAll('newCompanyShare', clienttranslate('${player_name} adds a family member to the ${tkn_boldText_court}'), [
+      'player' => $player,
+      'tkn_icon' => SHARE,
+      'tkn_boldText_court' => clienttranslate('Court of Directors'),
+      'familyMember' => $familyMember,
+      'debt' => $debt,
+      'i18n' => ['tkn_boldText_court']
+    ]);
+  }
+
   public static function placeShip($player, $ship)
   {
     // TODO: ship icon?
@@ -252,6 +275,17 @@ class Notifications
       'type' => $enterprise->getType(),
       'tkn_pound' => clienttranslate('Pounds'),
       'i18n' => ['tkn_boldText_enterprise'],
+    ]);
+  }
+
+  public static function seekShare($player, $familyMember, $amount)
+  {
+    self::notifyAll('seekShare', clienttranslate('${player_name} pays ${amount} ${tkn_pound} to seek a ${tkn_icon}'), [
+      'player' => $player,
+      'tkn_icon' => SHARE,
+      'tkn_pound' => self::tknPound(),
+      'amount' => $amount,
+      'familyMember' => $familyMember,
     ]);
   }
 
@@ -291,4 +325,5 @@ class Notifications
       'tkn_newLine' => '',
     ]);
   }
+
 }

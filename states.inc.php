@@ -254,6 +254,18 @@ $machinestates = [
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
+    ST_SEEK_SHARE => [
+        'name' => SEEK_SHARE,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer} must seek a share'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . SEEK_SHARE, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+
     ST_CHAIRMAN => [
         'name' => CHAIRMAN,
         'type' => 'multipleactiveplayer',

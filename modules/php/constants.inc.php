@@ -47,10 +47,7 @@ const ST_NEW_COMPANY_SHARES = 24;
 const ST_ENLIST_WRITER = 25;
 const ST_ENLIST_OFFICER = 26;
 const ST_PURCHASE_ENTERPRISE = 27;
-// const ST_PURCHASE_LUXURY = 27;
-// const ST_PURCHASE_SHIPYARD = 28;
-// const ST_PURCHASE_WORKSHOP = 29;
-const ST_SEEK_SHARE = 30;
+const ST_SEEK_SHARE = 28;
 const ST_CHAIRMAN = 40;
 
 
@@ -89,6 +86,7 @@ const LUXURY = 'Luxury';
 const WORKSHOP = 'Workshop';
 
 const SHIPYARD = 'Shipyard';
+const SHARE = 'Share';
 
 const BLACKMAIL = 'Blackmail';
 const PRESTIGE = 'Prestige';
@@ -430,3 +428,20 @@ const PEACOCK = 'Peacock';
  */
 const CLOCKWISE = 'clockwise';
 const COUNTER_CLOCKWISE = 'counterClockwise';
+
+/**
+ * Stock Exchange locations
+ */
+const STOCK_EXCHANGE_2 = 'StockExchange_2';
+const STOCK_EXCHANGE_3_LEFT = 'StockExchange_3_Left';
+const STOCK_EXCHANGE_3_RIGHT = 'StockExchange_3_Right';
+const STOCK_EXCHANGE_4 = 'StockExchange_4';
+const STOCK_EXCHANGE_5 = 'StockExchange_5';
+
+const STOCK_EXCHANGE_POSITIONS = [
+  STOCK_EXCHANGE_5,
+  STOCK_EXCHANGE_4,
+  STOCK_EXCHANGE_3_RIGHT,
+  STOCK_EXCHANGE_3_LEFT,
+  STOCK_EXCHANGE_2,  
+];

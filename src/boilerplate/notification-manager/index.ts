@@ -66,9 +66,12 @@ class NotificationManager {
       'enlistFamilyMember',
       'gainCash',
       'gainEnterprise',
+      'moveFamilyMembers',
+      'newCompanyShare',
       'nextPhase',
       'placeShip',
       'purchaseEnterprise',
+      'seekShare',
       'setupDone',
       'setupFamilyMembers',
     ];
@@ -291,6 +294,24 @@ class NotificationManager {
     await Promise.all(promises);
   }
 
+  async notif_moveFamilyMembers(notif: Notif<NotifMoveFamilyMembers>) {
+    const { familyMembers } = notif.args;
+    const board = Board.getInstance();
+    board.updateFamilyMembers(familyMembers);
+  }
+
+  async notif_newCompanyShare(notif: Notif<NotifNewCompanyShare>) {
+    const { playerId, familyMember, debt } = notif.args;
+
+    const player = this.getPlayer(playerId);
+
+    const board = Board.getInstance();
+    board.updateFamilyMembers([familyMember]);
+    player.counters[SHARES_COUNTER].incValue(1);
+
+    board.movePhaseCompanyDebtPawn(debt);
+  }
+
   async notif_nextPhase(notif: Notif<NotifNextPhase>) {
     const { phase } = notif.args;
     Board.getInstance().movePhasePawn(phase);
@@ -308,13 +329,21 @@ class NotificationManager {
 
     await this.pay(playerId, amount);
 
-    await this.game.framework().wait(1);
-
     const player = this.getPlayer(playerId);
     player.counters[this.getEnterpriseCounter(type)].incValue(1);
     if (type === SHIPYARD) {
       player.counters[SHIPS_COUNTER].incValue(1);
     }
+  }
+
+  async notif_seekShare(notif: Notif<NotifSeekShare>) {
+    const { playerId, familyMember, amount } = notif.args;
+    await this.pay(playerId, amount);
+
+    await Board.getInstance().placeFamilyMembers(
+      [familyMember],
+      this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER]
+    );
   }
 
   async notif_setupDone(notif: Notif<unknown>) {

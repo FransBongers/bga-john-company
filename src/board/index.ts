@@ -206,10 +206,18 @@ class Board {
 
   private setupSelectBoxes() {
     [BENGAL, BOMBAY, MADRAS].forEach((region) => {
-      const elt = (this.selectBoxes[`${region}_${WRITER}`] = document.createElement('div'));
+      const elt = (this.selectBoxes[`${region}_${WRITER}`] =
+        document.createElement('div'));
       elt.classList.add('joco-select-box');
       elt.classList.add('joco-select-writer');
       elt.setAttribute('data-region', region);
+      this.ui.selectBoxes.appendChild(elt);
+    });
+    STOCK_EXCHANGE_POSITIONS.forEach((position) => {
+      const elt = (this.selectBoxes[position] = document.createElement('div'));
+      elt.classList.add('joco-select-box');
+      elt.classList.add('joco-seek-share');
+      elt.setAttribute('data-position', position);
       this.ui.selectBoxes.appendChild(elt);
     });
   }
@@ -254,11 +262,19 @@ class Board {
       }
       if (piece.id.startsWith('Regiment')) {
         const elt = this.armyPieces[piece.id];
-        this.ui.regiments.appendChild(elt)
-        setAbsolutePosition(elt, BOARD_SCALE, getRegimentPosition(piece.location, this.armies.regiments[piece.location].length, piece.exhausted));
+        this.ui.regiments.appendChild(elt);
+        setAbsolutePosition(
+          elt,
+          BOARD_SCALE,
+          getRegimentPosition(
+            piece.location,
+            this.armies.regiments[piece.location].length,
+            piece.exhausted
+          )
+        );
         this.armies.regiments[piece.location].push(elt);
       }
-    })
+    });
   }
 
   updateFamilyMembers(familyMembers: JocoFamilyMember[]) {
@@ -267,7 +283,10 @@ class Board {
       if (location.startsWith('supply')) {
         return;
       }
-      this.ui.familyMembers.appendChild(this.familyMembers[id]);
+      if (!this.familyMembers[id].parentElement) {
+        this.ui.familyMembers.appendChild(this.familyMembers[id]);
+      }
+      
 
       let position: AbsolutePosition = { top: 0, left: 0 };
 
@@ -284,6 +303,8 @@ class Board {
         position = getWriterPosition(regionId, this.writers[regionId].length);
         this.writers[regionId].push(familyMember);
       } else if (location.startsWith(OFFICER)) {
+      } else if (location.startsWith('StockExchange')) {
+        position = getStockExchangePosition(location);
       } else {
         position = FAMILY_MEMBER_OFFICE_CONFIG[location];
       }
@@ -348,6 +369,14 @@ class Board {
 
   movePhasePawn(phase: string) {
     setAbsolutePosition(this.ui.pawns.phase, BOARD_SCALE, PHASE_CONFIG[phase]);
+  }
+
+  movePhaseCompanyDebtPawn(debt: number) {
+    setAbsolutePosition(
+      this.ui.pawns.debt,
+      BOARD_SCALE,
+      getCompanyDebtConfig(debt)
+    );
   }
 
   updatePawns(gamedatas: GamedatasAlias) {

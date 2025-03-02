@@ -1,37 +1,42 @@
-interface OnEnteringFamilyActionArgs extends CommonStateArgs {
-  options: Record<string, boolean>;
+interface OnEnteringSeekShareArgs extends CommonStateArgs {
+  options: Record<string, number>;
 }
 
-class FamilyAction implements State {
-  private static instance: FamilyAction;
-  private args: OnEnteringFamilyActionArgs;
+class SeekShare implements State {
+  private static instance: SeekShare;
+  private args: OnEnteringSeekShareArgs;
 
   constructor(private game: GameAlias) {}
 
   public static create(game: JohnCompany) {
-    FamilyAction.instance = new FamilyAction(game);
+    SeekShare.instance = new SeekShare(game);
   }
 
   public static getInstance() {
-    return FamilyAction.instance;
+    return SeekShare.instance;
   }
 
-  onEnteringState(args: OnEnteringFamilyActionArgs) {
-    debug('Entering FamilyAction state');
+  onEnteringState(args: OnEnteringSeekShareArgs) {
+    debug('Entering SeekShare state');
     this.args = args;
     this.updateInterfaceInitialStep();
   }
 
   onLeavingState() {
-    debug('Leaving FamilyAction state');
+    debug('Leaving SeekShare state');
   }
 
-  setDescription(activePlayerId: number, args: OnEnteringFamilyActionArgs) {
-    updatePageTitle(_('${tkn_playerName} must perform a family action'), {
-      tkn_playerName: PlayerManager.getInstance()
-        .getPlayer(activePlayerId)
-        .getName(),
-    });
+  setDescription(activePlayerId: number, args: OnEnteringSeekShareArgs) {
+    updatePageTitle(
+      _(
+        '${tkn_playerName} must place a family member on the Stock Exchange track'
+      ),
+      {
+        tkn_playerName: PlayerManager.getInstance()
+          .getPlayer(activePlayerId)
+          .getName(),
+      }
+    );
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########
@@ -53,42 +58,38 @@ class FamilyAction implements State {
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
 
-    updatePageTitle(_('${you} must select a family action'));
-
-    this.addButton(ENLIST_WRITER, WRITER, _('Enlist ${tkn_icon}'));
-    this.addButton(
-      ENLIST_OFFICER,
-      OFFICER_IN_TRAINING,
-      _('Enlist ${tkn_icon}')
+    updatePageTitle(
+      _('${you} must select a place on the Stock Exchange track'),
+      {
+        tkn_icon: WRITER,
+      }
     );
-    this.addButton(PURCHASE_LUXURY, LUXURY, _('Purchase ${tkn_icon}'));
-    this.addButton(PURCHASE_SHIPYARD, SHIPYARD, _('Purchase ${tkn_icon}'));
-    this.addButton(PURCHASE_WORKSHOP, WORKSHOP, _('Purchase ${tkn_icon}'));
-    this.addButton(SEEK_SHARE, SHARE, _('Seek ${tkn_icon}'));
+
+    Object.entries(this.args.options).forEach(([position, price]) => {
+      const box = Board.getInstance().selectBoxes[position];
+      onClick(box, () => this.updateInterfaceConfirm(position, price));
+    });
   }
 
-  private updateInterfaceConfirm(familyAction: string) {
+  private updateInterfaceConfirm(position: string, price: number) {
     clearPossible();
 
-    // let text: string;
-    // const args: Record<string, string> = {};
+    setSelected(Board.getInstance().selectBoxes[position]);
 
-    // switch (familyAction) {
-    //   case ENLIST_WRITER:
-    //     text = _('Enlist Writer ${tkn_icon}?');
-    //     args['tkn_icon'] = 'Writer';
-    // }
-
-    // updatePageTitle(text, args);
+    updatePageTitle(_('Pay ${amount} ${tkn_pound} to seek a ${tkn_icon}?'), {
+      amount: price,
+      tkn_pound: _('Pounds'),
+      tkn_icon: SHARE
+    });
 
     const callback = () =>
-      performAction('actFamilyAction', {
-        familyAction,
+      performAction('actSeekShare', {
+        position,
       });
 
-    // addConfirmButton(callback);
+    addConfirmButton(callback);
 
-    callback();
+    // callback();
 
     addCancelButton();
   }
@@ -100,18 +101,6 @@ class FamilyAction implements State {
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
-
-  private addButton(action: string, icon: string, text: string) {
-    if (this.args.options[action]) {
-      addSecondaryActionButton({
-        id: `${action}_btn`,
-        text: formatStringRecursive(text, {
-          tkn_icon: icon,
-        }),
-        callback: () => this.updateInterfaceConfirm(action),
-      });
-    }
-  }
 
   //  ..######..##.......####..######..##....##
   //  .##....##.##........##..##....##.##...##.

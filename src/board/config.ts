@@ -85,7 +85,11 @@ const getGroupPosition = (
   };
 };
 
-const getRegimentPosition = (presidency: string, index: number, exhausted: boolean): AbsolutePosition => {
+const getRegimentPosition = (
+  presidency: string,
+  index: number,
+  exhausted: boolean
+): AbsolutePosition => {
   switch (presidency) {
     case BOMBAY_PRESIDENCY:
       return getGroupPosition(22, 694, index, 4);
@@ -96,7 +100,7 @@ const getRegimentPosition = (presidency: string, index: number, exhausted: boole
     default:
       return { top: 0, left: 0 };
   }
-}
+};
 
 const getCourtOfDirectorsPosition = (index: number) =>
   getGroupPosition(555, 243, index, 4);
@@ -115,6 +119,23 @@ const getWriterPosition = (
       return getGroupPosition(602, 1273, index, 3);
     case MADRAS:
       return getGroupPosition(602, 1084, index, 3);
+    default:
+      return { top: 0, left: 0 };
+  }
+};
+
+const getStockExchangePosition = (position: string): AbsolutePosition => {
+  switch (position) {
+    case STOCK_EXCHANGE_2:
+      return { top: 458, left: 249 };
+    case STOCK_EXCHANGE_3_LEFT:
+      return { top: 414, left: 275 };
+    case STOCK_EXCHANGE_3_RIGHT:
+      return { top: 458, left: 301 };
+    case STOCK_EXCHANGE_4:
+      return { top: 414, left: 327 };
+    case STOCK_EXCHANGE_5:
+      return { top: 458, left: 353 };
     default:
       return { top: 0, left: 0 };
   }

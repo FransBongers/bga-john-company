@@ -67,4 +67,9 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   {
     return count(FamilyMembers::getInLocation(Locations::familyMemberSupply($this->id))) > 0;
   }
+
+  public function pay($amount)
+  {
+    $this->incTreasury(-$amount);
+  }
 }

@@ -8,6 +8,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\AICards;
 use Bga\Games\JohnCompany\Managers\ArmyPieces;
+use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
@@ -30,15 +31,16 @@ trait DebugTrait
 
   function debug_test()
   {
-    
+      Company::setDebt(1);
+
     // Orders::get(ORDER_BENGAL_2)->setStatus(FILLED);
     // Orders::setupNewGame();
     // Notifications::log('familyMembers', FamilyMembers::getInLocationOrdered(Locations::familyMemberSupply(HASTINGS))->toArray());
     // Notifications::log('players', Players::getCrown());
     // Notifications::log('regions', Regions::getAll());
     // Enterprises::setupNewGame();
-    LondonSeasonCards::setupNewGame();
-    Notifications::log('cards', LondonSeasonCards::getAll());
+    // LondonSeasonCards::setupNewGame();
+    // Notifications::log('memebers', FamilyMembers::getOnStockExchange());
   }
 
 

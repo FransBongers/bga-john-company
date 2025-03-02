@@ -69,6 +69,7 @@ const LUXURY = 'Luxury';
 const WORKSHOP = 'Workshop';
 
 const SHIPYARD = 'Shipyard';
+const SHARE = 'Share';
 
 /**
  * Counters
@@ -208,7 +209,7 @@ const POWER_TOKENS = [
 ];
 
 const POWER_TOKEN_ICON_MAP = {
-  [POWER_TOKEN_COMPANY_SHARE]: 'share',
+  [POWER_TOKEN_COMPANY_SHARE]: SHARE,
   [POWER_TOKEN_MANUFACTURING]: WORKSHOP,
   [POWER_TOKEN_SHIPPING]: SHIPYARD,
   [POWER_TOKEN_SOCIAL]: LUXURY,
@@ -224,3 +225,20 @@ const PURCHASE_SHIPYARD = 'PurchaseShipyard';
 const PURCHASE_WORKSHOP = 'PurchaseWorkshop';
 const SEEK_SHARE = 'SeekShare';
 const PURCHASE_ENTERPRISE = 'PurchaseEnterprise';
+
+/**
+ * Stock Exchange locations
+ */
+const STOCK_EXCHANGE_2 = 'StockExchange_2';
+const STOCK_EXCHANGE_3_LEFT = 'StockExchange_3_Left';
+const STOCK_EXCHANGE_3_RIGHT = 'StockExchange_3_Right';
+const STOCK_EXCHANGE_4 = 'StockExchange_4';
+const STOCK_EXCHANGE_5 = 'StockExchange_5';
+
+const STOCK_EXCHANGE_POSITIONS = [
+  STOCK_EXCHANGE_2,
+  STOCK_EXCHANGE_3_LEFT,
+  STOCK_EXCHANGE_3_RIGHT,
+  STOCK_EXCHANGE_4,
+  STOCK_EXCHANGE_5,
+];

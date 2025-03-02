@@ -45,6 +45,7 @@ var SHIP = 'ship';
 var LUXURY = 'Luxury';
 var WORKSHOP = 'Workshop';
 var SHIPYARD = 'Shipyard';
+var SHARE = 'Share';
 var FAMILY_MEMBERS_COUNTER = 'familyMembers';
 var CASH_COUNTER = 'cash';
 var SHIPS_COUNTER = 'ships';
@@ -146,7 +147,7 @@ var POWER_TOKENS = [
     POWER_TOKEN_SOCIAL,
 ];
 var POWER_TOKEN_ICON_MAP = (_b = {},
-    _b[POWER_TOKEN_COMPANY_SHARE] = 'share',
+    _b[POWER_TOKEN_COMPANY_SHARE] = SHARE,
     _b[POWER_TOKEN_MANUFACTURING] = WORKSHOP,
     _b[POWER_TOKEN_SHIPPING] = SHIPYARD,
     _b[POWER_TOKEN_SOCIAL] = LUXURY,
@@ -158,6 +159,18 @@ var PURCHASE_SHIPYARD = 'PurchaseShipyard';
 var PURCHASE_WORKSHOP = 'PurchaseWorkshop';
 var SEEK_SHARE = 'SeekShare';
 var PURCHASE_ENTERPRISE = 'PurchaseEnterprise';
+var STOCK_EXCHANGE_2 = 'StockExchange_2';
+var STOCK_EXCHANGE_3_LEFT = 'StockExchange_3_Left';
+var STOCK_EXCHANGE_3_RIGHT = 'StockExchange_3_Right';
+var STOCK_EXCHANGE_4 = 'StockExchange_4';
+var STOCK_EXCHANGE_5 = 'StockExchange_5';
+var STOCK_EXCHANGE_POSITIONS = [
+    STOCK_EXCHANGE_2,
+    STOCK_EXCHANGE_3_LEFT,
+    STOCK_EXCHANGE_3_RIGHT,
+    STOCK_EXCHANGE_4,
+    STOCK_EXCHANGE_5,
+];
 var BgaAnimation = (function () {
     function BgaAnimation(animationFunction, settings) {
         this.animationFunction = animationFunction;
@@ -755,9 +768,12 @@ var NotificationManager = (function () {
             'enlistFamilyMember',
             'gainCash',
             'gainEnterprise',
+            'moveFamilyMembers',
+            'newCompanyShare',
             'nextPhase',
             'placeShip',
             'purchaseEnterprise',
+            'seekShare',
             'setupDone',
             'setupFamilyMembers',
         ];
@@ -984,6 +1000,31 @@ var NotificationManager = (function () {
             });
         });
     };
+    NotificationManager.prototype.notif_moveFamilyMembers = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var familyMembers, board;
+            return __generator(this, function (_a) {
+                familyMembers = notif.args.familyMembers;
+                board = Board.getInstance();
+                board.updateFamilyMembers(familyMembers);
+                return [2];
+            });
+        });
+    };
+    NotificationManager.prototype.notif_newCompanyShare = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, playerId, familyMember, debt, player, board;
+            return __generator(this, function (_b) {
+                _a = notif.args, playerId = _a.playerId, familyMember = _a.familyMember, debt = _a.debt;
+                player = this.getPlayer(playerId);
+                board = Board.getInstance();
+                board.updateFamilyMembers([familyMember]);
+                player.counters[SHARES_COUNTER].incValue(1);
+                board.movePhaseCompanyDebtPawn(debt);
+                return [2];
+            });
+        });
+    };
     NotificationManager.prototype.notif_nextPhase = function (notif) {
         return __awaiter(this, void 0, void 0, function () {
             var phase;
@@ -1021,14 +1062,29 @@ var NotificationManager = (function () {
                         return [4, this.pay(playerId, amount)];
                     case 1:
                         _b.sent();
-                        return [4, this.game.framework().wait(1)];
-                    case 2:
-                        _b.sent();
                         player = this.getPlayer(playerId);
                         player.counters[this.getEnterpriseCounter(type)].incValue(1);
                         if (type === SHIPYARD) {
                             player.counters[SHIPS_COUNTER].incValue(1);
                         }
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_seekShare = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, playerId, familyMember, amount;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = notif.args, playerId = _a.playerId, familyMember = _a.familyMember, amount = _a.amount;
+                        return [4, this.pay(playerId, amount)];
+                    case 1:
+                        _b.sent();
+                        return [4, Board.getInstance().placeFamilyMembers([familyMember], this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER])];
+                    case 2:
+                        _b.sent();
                         return [2];
                 }
             });
@@ -1190,6 +1246,7 @@ var JohnCompany = (function () {
             EnlistWriter: EnlistWriter,
             FamilyAction: FamilyAction,
             PlayerTurn: PlayerTurn,
+            SeekShare: SeekShare,
         };
         console.log('johncompany constructor');
     }
@@ -1764,6 +1821,22 @@ var getWriterPosition = function (presidency, index) {
             return { top: 0, left: 0 };
     }
 };
+var getStockExchangePosition = function (position) {
+    switch (position) {
+        case STOCK_EXCHANGE_2:
+            return { top: 458, left: 249 };
+        case STOCK_EXCHANGE_3_LEFT:
+            return { top: 414, left: 275 };
+        case STOCK_EXCHANGE_3_RIGHT:
+            return { top: 458, left: 301 };
+        case STOCK_EXCHANGE_4:
+            return { top: 414, left: 327 };
+        case STOCK_EXCHANGE_5:
+            return { top: 458, left: 353 };
+        default:
+            return { top: 0, left: 0 };
+    }
+};
 var WEST_INDIAN_POSITIONS = [
     {
         top: 445,
@@ -1988,10 +2061,18 @@ var Board = (function () {
     Board.prototype.setupSelectBoxes = function () {
         var _this = this;
         [BENGAL, BOMBAY, MADRAS].forEach(function (region) {
-            var elt = (_this.selectBoxes["".concat(region, "_").concat(WRITER)] = document.createElement('div'));
+            var elt = (_this.selectBoxes["".concat(region, "_").concat(WRITER)] =
+                document.createElement('div'));
             elt.classList.add('joco-select-box');
             elt.classList.add('joco-select-writer');
             elt.setAttribute('data-region', region);
+            _this.ui.selectBoxes.appendChild(elt);
+        });
+        STOCK_EXCHANGE_POSITIONS.forEach(function (position) {
+            var elt = (_this.selectBoxes[position] = document.createElement('div'));
+            elt.classList.add('joco-select-box');
+            elt.classList.add('joco-seek-share');
+            elt.setAttribute('data-position', position);
             _this.ui.selectBoxes.appendChild(elt);
         });
     };
@@ -2038,7 +2119,9 @@ var Board = (function () {
             if (location.startsWith('supply')) {
                 return;
             }
-            _this.ui.familyMembers.appendChild(_this.familyMembers[id]);
+            if (!_this.familyMembers[id].parentElement) {
+                _this.ui.familyMembers.appendChild(_this.familyMembers[id]);
+            }
             var position = { top: 0, left: 0 };
             if (location === COURT_OF_DIRECTORS) {
                 position = getCourtOfDirectorsPosition(_this.courtOfDirectors.length);
@@ -2054,6 +2137,9 @@ var Board = (function () {
                 _this.writers[regionId].push(familyMember);
             }
             else if (location.startsWith(OFFICER)) {
+            }
+            else if (location.startsWith('StockExchange')) {
+                position = getStockExchangePosition(location);
             }
             else {
                 position = FAMILY_MEMBER_OFFICE_CONFIG[location];
@@ -2122,6 +2208,9 @@ var Board = (function () {
     };
     Board.prototype.movePhasePawn = function (phase) {
         setAbsolutePosition(this.ui.pawns.phase, BOARD_SCALE, PHASE_CONFIG[phase]);
+    };
+    Board.prototype.movePhaseCompanyDebtPawn = function (debt) {
+        setAbsolutePosition(this.ui.pawns.debt, BOARD_SCALE, getCompanyDebtConfig(debt));
     };
     Board.prototype.updatePawns = function (gamedatas) {
         var _a = gamedatas.company, balance = _a.balance, debt = _a.debt, standing = _a.standing;
@@ -2495,7 +2584,7 @@ var JocoPlayer = (function () {
     };
     return JocoPlayer;
 }());
-var tplPlayerCounters = function (playerId) { return "\n<div id=\"joco-counters-".concat(playerId, "-row-1\" class=\"joco-counters-row\">\n  <div id=\"joco-cash-").concat(playerId, "\" class=\"log_token joco_pound\"></div>\n  <div id=\"joco-ships-").concat(playerId, "\" class=\"joco-ship\" data-type=\"playerOwnedShip\"></div>\n  <div></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-familyMembers-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-cash-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-ships-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"></div>\n</div>\n<div class=\"joco-counters-row\">\n  <div id=\"joco-shares-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"share\"></div>\n  <div id=\"joco-workshops-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"Workshop\"></div>\n  <div id=\"joco-shipyards-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"Shipyard\"></div>\n  <div id=\"joco-luxuries-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"Luxury\"></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-shares-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-workshops-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-shipyards-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-luxuries-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n</div>\n"); };
+var tplPlayerCounters = function (playerId) { return "\n<div id=\"joco-counters-".concat(playerId, "-row-1\" class=\"joco-counters-row\">\n  <div id=\"joco-cash-").concat(playerId, "\" class=\"log_token joco_pound\"></div>\n  <div id=\"joco-ships-").concat(playerId, "\" class=\"joco-ship\" data-type=\"playerOwnedShip\"></div>\n  <div></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-familyMembers-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-cash-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-ships-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"></div>\n</div>\n<div class=\"joco-counters-row\">\n  <div id=\"joco-shares-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"Share\"></div>\n  <div id=\"joco-workshops-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"Workshop\"></div>\n  <div id=\"joco-shipyards-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"Shipyard\"></div>\n  <div id=\"joco-luxuries-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"Luxury\"></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-shares-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-workshops-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-shipyards-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-luxuries-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n</div>\n"); };
 var DraftCard = (function () {
     function DraftCard(game) {
         this.game = game;
@@ -2658,62 +2747,36 @@ var FamilyAction = (function () {
         });
     };
     FamilyAction.prototype.updateInterfaceInitialStep = function () {
-        var _this = this;
         this.game.clearPossible();
         updatePageTitle(_('${you} must select a family action'));
-        if (this.args.options[ENLIST_WRITER]) {
-            addSecondaryActionButton({
-                id: 'writer_btn',
-                text: formatStringRecursive(_('Enlist ${tkn_icon}'), {
-                    tkn_icon: 'Writer',
-                }),
-                callback: function () { return _this.updateInterfaceConfirm(ENLIST_WRITER); },
-            });
-        }
-        if (this.args.options[ENLIST_OFFICER]) {
-            addSecondaryActionButton({
-                id: 'officer_btn',
-                text: formatStringRecursive(_('Enlist ${tkn_icon}'), {
-                    tkn_icon: OFFICER_IN_TRAINING,
-                }),
-                callback: function () { return _this.updateInterfaceConfirm(ENLIST_OFFICER); },
-            });
-        }
-        if (this.args.options[PURCHASE_LUXURY]) {
-            addSecondaryActionButton({
-                id: 'luxury_btn',
-                text: formatStringRecursive(_('Purchase ${tkn_icon}'), {
-                    tkn_icon: LUXURY,
-                }),
-                callback: function () { return _this.updateInterfaceConfirm(PURCHASE_LUXURY); },
-            });
-        }
-        if (this.args.options[PURCHASE_SHIPYARD]) {
-            addSecondaryActionButton({
-                id: 'shipyard_btn',
-                text: formatStringRecursive(_('Purchase ${tkn_icon}'), {
-                    tkn_icon: SHIPYARD,
-                }),
-                callback: function () { return _this.updateInterfaceConfirm(PURCHASE_SHIPYARD); },
-            });
-        }
-        if (this.args.options[PURCHASE_WORKSHOP]) {
-            addSecondaryActionButton({
-                id: 'workshop_btn',
-                text: formatStringRecursive(_('Purchase ${tkn_icon}'), {
-                    tkn_icon: WORKSHOP,
-                }),
-                callback: function () { return _this.updateInterfaceConfirm(PURCHASE_WORKSHOP); },
-            });
-        }
+        this.addButton(ENLIST_WRITER, WRITER, _('Enlist ${tkn_icon}'));
+        this.addButton(ENLIST_OFFICER, OFFICER_IN_TRAINING, _('Enlist ${tkn_icon}'));
+        this.addButton(PURCHASE_LUXURY, LUXURY, _('Purchase ${tkn_icon}'));
+        this.addButton(PURCHASE_SHIPYARD, SHIPYARD, _('Purchase ${tkn_icon}'));
+        this.addButton(PURCHASE_WORKSHOP, WORKSHOP, _('Purchase ${tkn_icon}'));
+        this.addButton(SEEK_SHARE, SHARE, _('Seek ${tkn_icon}'));
     };
     FamilyAction.prototype.updateInterfaceConfirm = function (familyAction) {
         clearPossible();
-        var callback = function () { return performAction('actFamilyAction', {
-            familyAction: familyAction,
-        }); };
+        var callback = function () {
+            return performAction('actFamilyAction', {
+                familyAction: familyAction,
+            });
+        };
         callback();
         addCancelButton();
+    };
+    FamilyAction.prototype.addButton = function (action, icon, text) {
+        var _this = this;
+        if (this.args.options[action]) {
+            addSecondaryActionButton({
+                id: "".concat(action, "_btn"),
+                text: formatStringRecursive(text, {
+                    tkn_icon: icon,
+                }),
+                callback: function () { return _this.updateInterfaceConfirm(action); },
+            });
+        }
     };
     return FamilyAction;
 }());
@@ -2740,6 +2803,61 @@ var PlayerTurn = (function () {
         updatePageTitle(_('${you} must select a card'));
     };
     return PlayerTurn;
+}());
+var SeekShare = (function () {
+    function SeekShare(game) {
+        this.game = game;
+    }
+    SeekShare.create = function (game) {
+        SeekShare.instance = new SeekShare(game);
+    };
+    SeekShare.getInstance = function () {
+        return SeekShare.instance;
+    };
+    SeekShare.prototype.onEnteringState = function (args) {
+        debug('Entering SeekShare state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    };
+    SeekShare.prototype.onLeavingState = function () {
+        debug('Leaving SeekShare state');
+    };
+    SeekShare.prototype.setDescription = function (activePlayerId, args) {
+        updatePageTitle(_('${tkn_playerName} must place a family member on the Stock Exchange track'), {
+            tkn_playerName: PlayerManager.getInstance()
+                .getPlayer(activePlayerId)
+                .getName(),
+        });
+    };
+    SeekShare.prototype.updateInterfaceInitialStep = function () {
+        var _this = this;
+        this.game.clearPossible();
+        updatePageTitle(_('${you} must select a place on the Stock Exchange track'), {
+            tkn_icon: WRITER,
+        });
+        Object.entries(this.args.options).forEach(function (_a) {
+            var position = _a[0], price = _a[1];
+            var box = Board.getInstance().selectBoxes[position];
+            onClick(box, function () { return _this.updateInterfaceConfirm(position, price); });
+        });
+    };
+    SeekShare.prototype.updateInterfaceConfirm = function (position, price) {
+        clearPossible();
+        setSelected(Board.getInstance().selectBoxes[position]);
+        updatePageTitle(_('Pay ${amount} ${tkn_pound} to seek a ${tkn_icon}?'), {
+            amount: price,
+            tkn_pound: _('Pounds'),
+            tkn_icon: SHARE
+        });
+        var callback = function () {
+            return performAction('actSeekShare', {
+                position: position,
+            });
+        };
+        addConfirmButton(callback);
+        addCancelButton();
+    };
+    return SeekShare;
 }());
 var StaticData = (function () {
     function StaticData(game) {

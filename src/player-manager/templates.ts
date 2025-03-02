@@ -21,7 +21,7 @@ const tplPlayerCounters = (playerId: number) => `
   <div class="joco-counter-container"></div>
 </div>
 <div class="joco-counters-row">
-  <div id="joco-shares-${playerId}" class="joco-icon" data-icon="share"></div>
+  <div id="joco-shares-${playerId}" class="joco-icon" data-icon="Share"></div>
   <div id="joco-workshops-${playerId}" class="joco-icon" data-icon="Workshop"></div>
   <div id="joco-shipyards-${playerId}" class="joco-icon" data-icon="Shipyard"></div>
   <div id="joco-luxuries-${playerId}" class="joco-icon" data-icon="Luxury"></div>
