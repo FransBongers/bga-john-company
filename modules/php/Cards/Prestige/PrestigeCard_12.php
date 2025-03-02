@@ -1,6 +1,6 @@
 <?php
 
-namespace Bga\Games\JohnCompany\Cards\Blackmail;
+namespace Bga\Games\JohnCompany\Cards\Prestige;
 
 class PrestigeCard_12 extends \Bga\Games\JohnCompany\Models\PrestigeCard
 {
