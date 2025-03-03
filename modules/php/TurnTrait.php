@@ -6,6 +6,8 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
+use Bga\Games\JohnCompany\Managers\AICards;
+use Bga\Games\JohnCompany\Managers\Crown;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
@@ -58,8 +60,18 @@ trait TurnTrait
       'action' => PERFORM_SETUP,
     ];
 
-    Engine::setup($node, ['method' => 'stSetupFamilyActions']);
+    // If crown in in the game we need to draw card to set initial climate
+    $callback = Globals::getCrownInGame() ? 'stSetupCrownClimate' : 'stSetupFamilyActions';
+
+    Engine::setup($node, ['method' => $callback]);
     Engine::proceed();
+  }
+
+  function stSetupCrownClimate()
+  {
+    Crown::drawCardAndSetClimate();
+
+    $this->stSetupFamilyActions();
   }
 
   // .########....###....##.....##.####.##.......##....##

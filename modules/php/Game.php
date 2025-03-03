@@ -26,8 +26,10 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Stats;
+use Bga\Games\JohnCompany\Managers\AICards;
 use Bga\Games\JohnCompany\Managers\ArmyPieces;
 use Bga\Games\JohnCompany\Managers\Company;
+use Bga\Games\JohnCompany\Managers\Crown;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
@@ -365,6 +367,10 @@ class Game extends \Table
             ]
         ];
 
+        if (Globals::getCrownInGame()) {
+            $data['crown'] = Crown::get();
+        }
+
         return $data;
     }
 
@@ -401,6 +407,9 @@ class Game extends \Table
         Regions::setupNewGame();
         SetupCards::setupNewGame();
         Ships::setupNewGame();
+        if (Globals::getCrownInGame()) {
+            AICards::setupNewGame();
+        }
 
         // Init global values with their initial values.
 

@@ -160,6 +160,14 @@ class Notifications
   // .##...###.##.....##....##.....##..##.......##....##
   // .##....##..#######.....##....####.##........######.
 
+  public static function setCrownClimate($player, $climate)
+  {
+    self::notifyAll('setCrownClimate', clienttranslate('${player_name} sets climate to ${tkn_climate}'), [
+      'player' => $player,
+      'climate' => $climate,
+      'tkn_climate' => $climate,
+    ]);
+  }
 
   public static function draftCard($player, $cards)
   {

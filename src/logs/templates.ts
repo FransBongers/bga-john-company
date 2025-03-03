@@ -17,6 +17,8 @@ const tlpLogTokenText = ({
 
 /* ------- GAME SPECIFIC LOG TOKENS ------- */
 
+const tplLogTokenClimate = (climate: string) => `<div class="log_token joco-crown-climate-icon" data-climate="${climate}"></div>`
+
 const tplLogTokenPound = () => `<div class="log_token joco_pound"></div>`;
 
 const tplLogTokenIcon = (type: string) =>

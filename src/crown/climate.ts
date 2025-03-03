@@ -40,7 +40,10 @@ class CrownClimate {
     // Add box to show current climate
     CROWN_CLIMATE.forEach((climate) => {
       const elt = (this.climate[climate] = document.createElement('div'));
-      elt.classList.add('joco-crown-climate-indicator');
+      elt.classList.add('joco-crown-climate-indicator-container');
+      const indicatorElt = document.createElement('div');
+      indicatorElt.classList.add('joco-crown-climate-indicator');
+      elt.appendChild(indicatorElt);
       row.appendChild(elt);
     });
 
@@ -49,7 +52,10 @@ class CrownClimate {
     );
 
     node.insertAdjacentElement('afterbegin', row);
-    this.updateClimate('Peacock');
+    if (gamedatas.crown.climate) {
+      this.updateClimate(gamedatas.crown.climate);
+    }
+    
   }
 
   // .##.....##.########..########.....###....########.########....##.....##.####

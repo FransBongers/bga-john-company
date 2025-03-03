@@ -123,6 +123,10 @@ span[style*='color:#c0c0c0'] {
   .joco-new-line {
     display: none;
   }
+
+  .joco-crown-climate-icon {
+    --iconScale: 0.85;
+  }
 }
 
 .log > .roundedbox,
@@ -132,6 +136,10 @@ span[style*='color:#c0c0c0'] {
   
   .joco-setup-card {
     --cardScale: 0.74;
+  }
+
+  .joco-crown-climate-icon {
+    --iconScale: 0.85;
   }
 
 }

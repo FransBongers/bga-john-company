@@ -3,6 +3,7 @@ const LOG_TOKEN_BOLD_ITALIC_TEXT = 'boldItalicText';
 const LOG_TOKEN_NEW_LINE = 'newLine';
 const LOG_TOKEN_PLAYER_NAME = 'playerName';
 // Game specific
+const LOG_TOKEN_CLIMATE = 'climate';
 const LOG_TOKEN_POUND = 'pound';
 const LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
 const LOG_TOKEN_ICON = 'icon';
@@ -26,6 +27,8 @@ const getTokenDiv = ({
       return tlpLogTokenText({ text: value });
     case LOG_TOKEN_BOLD_ITALIC_TEXT:
       return tlpLogTokenText({ text: value, italic: true });
+    case LOG_TOKEN_CLIMATE:
+      return tplLogTokenClimate(value);
     case LOG_TOKEN_ICON:
     case LOG_TOKEN_ENTERPRISE_ICON:
       return tplLogTokenIcon(value);

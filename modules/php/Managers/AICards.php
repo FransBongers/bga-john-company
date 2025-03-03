@@ -45,6 +45,17 @@ class AICards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     return $data;
   }
 
+  public static function drawCard()
+  {
+    if (self::countInLocation(DECK) === 0) {
+      self::moveAllInLocation(DISCARD, DECK);
+      self::shuffle(DECK);
+    }
+    $card = self::getTopOf(DECK);
+    $card->setLocation(DISCARD);
+    return $card;
+  }
+
 
   // ..######..########.########.##.....##.########.
   // .##....##.##..........##....##.....##.##.....##

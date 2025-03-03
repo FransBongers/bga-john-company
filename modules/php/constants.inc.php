@@ -35,6 +35,7 @@ const OPTION_DRAFT_SETUP_CARDS_ENABLED = 1;
  * Locations
  */
 const DECK = 'deck';
+const DISCARD = 'discard';
 const EXTRA_SETUP = 'extraSetup';
 
 const ST_SETUP_DRAFT = 19;
@@ -72,6 +73,11 @@ const SEEK_SHARE = 'SeekShare';
 const BALANCE = 'balance';
 const DEBT = 'debt';
 const STANDING = 'standing';
+
+/**
+ * Crown
+ */
+const CLIMATE = 'climate';
 
 /**
  * Setup

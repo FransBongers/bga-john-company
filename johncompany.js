@@ -786,6 +786,7 @@ var NotificationManager = (function () {
             'placeShip',
             'purchaseEnterprise',
             'seekShare',
+            'setCrownClimate',
             'setupDone',
             'setupFamilyMembers',
         ];
@@ -1120,6 +1121,16 @@ var NotificationManager = (function () {
                         _b.sent();
                         return [2];
                 }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_setCrownClimate = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var climate;
+            return __generator(this, function (_a) {
+                climate = notif.args.climate;
+                CrownClimate.getInstance().updateClimate(climate);
+                return [2];
             });
         });
     };
@@ -2424,12 +2435,17 @@ var CrownClimate = (function () {
         });
         CROWN_CLIMATE.forEach(function (climate) {
             var elt = (_this.climate[climate] = document.createElement('div'));
-            elt.classList.add('joco-crown-climate-indicator');
+            elt.classList.add('joco-crown-climate-indicator-container');
+            var indicatorElt = document.createElement('div');
+            indicatorElt.classList.add('joco-crown-climate-indicator');
+            elt.appendChild(indicatorElt);
             row.appendChild(elt);
         });
         var node = document.querySelector("#player_board_".concat(CROWN_PLAYER_ID, " .player-board-game-specific-content"));
         node.insertAdjacentElement('afterbegin', row);
-        this.updateClimate('Peacock');
+        if (gamedatas.crown.climate) {
+            this.updateClimate(gamedatas.crown.climate);
+        }
     };
     CrownClimate.prototype.updateClimate = function (climate) {
         if (this.active) {
@@ -2503,6 +2519,7 @@ var LOG_TOKEN_BOLD_TEXT = 'boldText';
 var LOG_TOKEN_BOLD_ITALIC_TEXT = 'boldItalicText';
 var LOG_TOKEN_NEW_LINE = 'newLine';
 var LOG_TOKEN_PLAYER_NAME = 'playerName';
+var LOG_TOKEN_CLIMATE = 'climate';
 var LOG_TOKEN_POUND = 'pound';
 var LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
 var LOG_TOKEN_ICON = 'icon';
@@ -2517,6 +2534,8 @@ var getTokenDiv = function (_a) {
             return tlpLogTokenText({ text: value });
         case LOG_TOKEN_BOLD_ITALIC_TEXT:
             return tlpLogTokenText({ text: value, italic: true });
+        case LOG_TOKEN_CLIMATE:
+            return tplLogTokenClimate(value);
         case LOG_TOKEN_ICON:
         case LOG_TOKEN_ENTERPRISE_ICON:
             return tplLogTokenIcon(value);
@@ -2544,6 +2563,7 @@ var tlpLogTokenText = function (_a) {
     var text = _a.text, tooltipId = _a.tooltipId, _b = _a.italic, italic = _b === void 0 ? false : _b;
     return "<span ".concat(tooltipId ? "id=\"".concat(tooltipId, "\" class=\"log_tooltip\"") : '', " style=\"font-weight: 700;").concat(italic ? ' font-style: italic;' : '', "\">").concat(_(text), "</span>");
 };
+var tplLogTokenClimate = function (climate) { return "<div class=\"log_token joco-crown-climate-icon\" data-climate=\"".concat(climate, "\"></div>"); };
 var tplLogTokenPound = function () { return "<div class=\"log_token joco_pound\"></div>"; };
 var tplLogTokenIcon = function (type) {
     return "<div class=\"log-token joco-icon\" data-icon=\"".concat(type, "\"></div>");

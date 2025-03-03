@@ -113,6 +113,10 @@ interface JohnCompanyGamedatas extends Gamedatas {
     balance: number;
     standing: number | 'fail';
   };
+  crown?: {
+    color: string;
+    climate?: Climate;
+  };
   enterprises: Record<string, JoCoEnterPriseBase>
   families: Record<string, JocoFamily>;
   familyMembers: Record<string, JocoFamilyMember>;

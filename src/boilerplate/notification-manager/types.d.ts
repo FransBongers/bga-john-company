@@ -61,6 +61,10 @@ interface NotifSeekShare extends NotifWithPlayerArgs {
   familyMember: JocoFamilyMember;
 }
 
+interface NotifSetCrownClimate extends NotifWithPlayerArgs {
+  climate: Climate;
+}
+
 interface NotifSetupFamilyMembers extends NotifWithPlayerArgs {
   familyMembers: JocoFamilyMember[];
 }

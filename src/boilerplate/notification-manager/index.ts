@@ -72,6 +72,7 @@ class NotificationManager {
       'placeShip',
       'purchaseEnterprise',
       'seekShare',
+      'setCrownClimate',
       'setupDone',
       'setupFamilyMembers',
     ];
@@ -351,6 +352,11 @@ class NotificationManager {
       [familyMember],
       this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER]
     );
+  }
+
+  async notif_setCrownClimate(notif: Notif<NotifSetCrownClimate>) {
+    const { climate } = notif.args;
+    CrownClimate.getInstance().updateClimate(climate);
   }
 
   async notif_setupDone(notif: Notif<unknown>) {

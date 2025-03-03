@@ -35,14 +35,31 @@
   background-position-x: 100%;
 }
 
-.joco-crown-climate-indicator {
+.joco-crown-climate-indicator-container {
   width: 30px;
   height: 30px;
   border: 2px solid black;
   border-radius: 50%;
   margin: 0px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .joco-crown-climate-indicator {
+    width: 25px;
+    height: 25px;
+    background-color: black;
+    border-radius: 50%;
+    opacity: 0;
+    visibility: hidden;
+    transition: visibility 0s ease-out, opacity 0.6s linear;
+  }
 }
 
-.joco-crown-climate-indicator.active {
-  background-color: black;
+.joco-crown-climate-indicator-container.active {
+  // background-color: black;
+  .joco-crown-climate-indicator {
+    opacity: 1;
+    visibility: visible;
+  }
 }
