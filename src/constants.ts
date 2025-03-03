@@ -242,3 +242,20 @@ const STOCK_EXCHANGE_POSITIONS = [
   STOCK_EXCHANGE_4,
   STOCK_EXCHANGE_5,
 ];
+
+/**
+ * Crown climates
+ */
+const BULL = 'Bull';
+const STAG = 'Stag';
+const LION = 'Lion';
+const BEAR = 'Bear';
+const PEACOCK = 'Peacock';
+
+const CROWN_CLIMATE = [
+  BULL,
+  STAG,
+  LION,
+  BEAR,
+  PEACOCK,
+];

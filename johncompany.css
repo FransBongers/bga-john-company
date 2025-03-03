@@ -88,9 +88,6 @@
   height: calc(var(--boardScale) * 37px);
   top: calc(var(--boardScale) * 63px);
   left: calc(var(--boardScale) * 370px);
-  transition-property: top, left;
-  transition-duration: 700ms;
-  transition-timing-function: ease;
 }
 
 .joco_pawn[data-color=red] {
@@ -335,6 +332,55 @@ a[style*="color:#addb90"],
 span[style*="color: #addb90"],
 span[style*="color:#addb90"] {
   text-shadow: 1px 0 0 black, 0 1px 0 black, -1px 0 0 black, 0 -1px 0 black, 1px 1px 0 black, -1px 1px 0 black, 1px -1px 0 black, -1px -1px 0 black !important;
+}
+
+.joco-crown-climate-row {
+  --iconScale: 1;
+  width: 100%;
+  display: grid;
+  grid-template: 39px auto/repeat(5, 40px);
+  justify-content: space-evenly;
+  gap: 2px;
+  row-gap: 4px;
+}
+
+.joco-crown-climate-icon {
+  background-image: url("img/crown_climate.png");
+  background-size: 500% 100%;
+  width: calc(var(--iconScale) * 40px);
+  height: calc(var(--iconScale) * 39px);
+}
+
+.joco-crown-climate-icon[data-climate=Bear] {
+  background-position-x: 0%;
+}
+
+.joco-crown-climate-icon[data-climate=Bull] {
+  background-position-x: 25%;
+}
+
+.joco-crown-climate-icon[data-climate=Lion] {
+  background-position-x: 50%;
+}
+
+.joco-crown-climate-icon[data-climate=Peacock] {
+  background-position-x: 75%;
+}
+
+.joco-crown-climate-icon[data-climate=Stag] {
+  background-position-x: 100%;
+}
+
+.joco-crown-climate-indicator {
+  width: 30px;
+  height: 30px;
+  border: 2px solid black;
+  border-radius: 50%;
+  margin: 0px auto;
+}
+
+.joco-crown-climate-indicator.active {
+  background-color: black;
 }
 
 .joco-icon {
@@ -782,9 +828,6 @@ html {
   height: calc(var(--tokenScale) * 46px);
   width: calc(var(--tokenScale) * 39px);
   outline: calc(var(--tokenScale) * 1px) solid black;
-  transition-property: top, left;
-  transition-duration: 700ms;
-  transition-timing-function: ease;
 }
 .joco_family_member svg {
   height: calc(var(--tokenScale) * 42px);

@@ -1,0 +1,48 @@
+.joco-crown-climate-row {
+  --iconScale: 1;
+  width: 100%;
+  display: grid;
+  grid-template: 39px auto / repeat(5, 40px);
+  justify-content: space-evenly;
+  gap: 2px;
+  row-gap: 4px;
+}
+
+.joco-crown-climate-icon {
+  background-image: url('img/crown_climate.png');
+  background-size: 500% 100%;
+  width: calc(var(--iconScale) * 40px);
+  height: calc(var(--iconScale) * 39px);
+}
+
+.joco-crown-climate-icon[data-climate='Bear'] {
+  background-position-x: 0%;
+}
+
+.joco-crown-climate-icon[data-climate='Bull'] {
+  background-position-x: 25%;
+}
+
+.joco-crown-climate-icon[data-climate='Lion'] {
+  background-position-x: 50%;
+}
+
+.joco-crown-climate-icon[data-climate='Peacock'] {
+  background-position-x: 75%;
+}
+
+.joco-crown-climate-icon[data-climate='Stag'] {
+  background-position-x: 100%;
+}
+
+.joco-crown-climate-indicator {
+  width: 30px;
+  height: 30px;
+  border: 2px solid black;
+  border-radius: 50%;
+  margin: 0px auto;
+}
+
+.joco-crown-climate-indicator.active {
+  background-color: black;
+}

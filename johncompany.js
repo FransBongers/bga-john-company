@@ -171,6 +171,18 @@ var STOCK_EXCHANGE_POSITIONS = [
     STOCK_EXCHANGE_4,
     STOCK_EXCHANGE_5,
 ];
+var BULL = 'Bull';
+var STAG = 'Stag';
+var LION = 'Lion';
+var BEAR = 'Bear';
+var PEACOCK = 'Peacock';
+var CROWN_CLIMATE = [
+    BULL,
+    STAG,
+    LION,
+    BEAR,
+    PEACOCK,
+];
 var BgaAnimation = (function () {
     function BgaAnimation(animationFunction, settings) {
         this.animationFunction = animationFunction;
@@ -1003,11 +1015,20 @@ var NotificationManager = (function () {
     NotificationManager.prototype.notif_moveFamilyMembers = function (notif) {
         return __awaiter(this, void 0, void 0, function () {
             var familyMembers, board;
+            var _this = this;
             return __generator(this, function (_a) {
-                familyMembers = notif.args.familyMembers;
-                board = Board.getInstance();
-                board.updateFamilyMembers(familyMembers);
-                return [2];
+                switch (_a.label) {
+                    case 0:
+                        familyMembers = notif.args.familyMembers;
+                        board = Board.getInstance();
+                        return [4, Promise.all(familyMembers.map(function (familyMember, index) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                                return [2, board.moveFamilyMember(familyMember, index)];
+                            }); }); }))];
+                    case 1:
+                        _a.sent();
+                        board.updateFamilyMembers(familyMembers);
+                        return [2];
+                }
             });
         });
     };
@@ -1015,13 +1036,20 @@ var NotificationManager = (function () {
         return __awaiter(this, void 0, void 0, function () {
             var _a, playerId, familyMember, debt, player, board;
             return __generator(this, function (_b) {
-                _a = notif.args, playerId = _a.playerId, familyMember = _a.familyMember, debt = _a.debt;
-                player = this.getPlayer(playerId);
-                board = Board.getInstance();
-                board.updateFamilyMembers([familyMember]);
-                player.counters[SHARES_COUNTER].incValue(1);
-                board.movePhaseCompanyDebtPawn(debt);
-                return [2];
+                switch (_b.label) {
+                    case 0:
+                        _a = notif.args, playerId = _a.playerId, familyMember = _a.familyMember, debt = _a.debt;
+                        player = this.getPlayer(playerId);
+                        board = Board.getInstance();
+                        return [4, Promise.all([
+                                board.moveFamilyMember(familyMember),
+                                board.movePawn('debt', debt),
+                            ])];
+                    case 1:
+                        _b.sent();
+                        player.counters[SHARES_COUNTER].incValue(1);
+                        return [2];
+                }
             });
         });
     };
@@ -1029,9 +1057,14 @@ var NotificationManager = (function () {
         return __awaiter(this, void 0, void 0, function () {
             var phase;
             return __generator(this, function (_a) {
-                phase = notif.args.phase;
-                Board.getInstance().movePhasePawn(phase);
-                return [2];
+                switch (_a.label) {
+                    case 0:
+                        phase = notif.args.phase;
+                        return [4, Board.getInstance().movePawn('phase', phase)];
+                    case 1:
+                        _a.sent();
+                        return [2];
+                }
             });
         });
     };
@@ -1276,6 +1309,9 @@ var JohnCompany = (function () {
         StaticData.create(this);
         Interaction.create(this);
         PlayerManager.create(this);
+        if (this.gameOptions.crownEnabled) {
+            CrownClimate.create(this);
+        }
         NotificationManager.create(this);
         Negotiation.create(this);
         PlayerAreas.create(this);
@@ -2147,6 +2183,29 @@ var Board = (function () {
             setAbsolutePosition(_this.familyMembers[id], BOARD_SCALE, position);
         });
     };
+    Board.prototype.moveFamilyMember = function (familyMember_1) {
+        return __awaiter(this, arguments, void 0, function (familyMember, index) {
+            var fromRect;
+            if (index === void 0) { index = 0; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, Interaction.use().wait(index * 200)];
+                    case 1:
+                        _a.sent();
+                        fromRect = this.familyMembers[familyMember.id].getBoundingClientRect();
+                        this.updateFamilyMembers([familyMember]);
+                        return [4, this.game.animationManager.play(new BgaSlideAnimation({
+                                element: this.familyMembers[familyMember.id],
+                                transitionTimingFunction: 'ease-in-out',
+                                fromRect: fromRect,
+                            }))];
+                    case 2:
+                        _a.sent();
+                        return [2];
+                }
+            });
+        });
+    };
     Board.prototype.placeFamilyMembers = function (familyMembers, fromElement) {
         return __awaiter(this, void 0, void 0, function () {
             var fromRect, promises;
@@ -2162,7 +2221,7 @@ var Board = (function () {
                                     case 0:
                                         id = familyMember.id;
                                         player = PlayerManager.getInstance().getPlayerForFamily(familyMember.familyId);
-                                        return [4, this.game.framework().wait(index * 250)];
+                                        return [4, this.game.framework().wait(index * 200)];
                                     case 1:
                                         _a.sent();
                                         player.counters[FAMILY_MEMBERS_COUNTER].incValue(-1);
@@ -2206,19 +2265,54 @@ var Board = (function () {
             setAbsolutePosition(_this.ui.powerTokens[token], BOARD_SCALE, POWER_TOKEN_POSITIONS[index]);
         });
     };
-    Board.prototype.movePhasePawn = function (phase) {
-        setAbsolutePosition(this.ui.pawns.phase, BOARD_SCALE, PHASE_CONFIG[phase]);
+    Board.prototype.movePawn = function (type, value) {
+        return __awaiter(this, void 0, void 0, function () {
+            var fromRect;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        fromRect = this.ui.pawns[type].getBoundingClientRect();
+                        this.updatePawn(type, value);
+                        return [4, this.game.animationManager.play(new BgaSlideAnimation({
+                                element: this.ui.pawns[type],
+                                transitionTimingFunction: 'ease-in-out',
+                                fromRect: fromRect,
+                            }))];
+                    case 1:
+                        _a.sent();
+                        return [2];
+                }
+            });
+        });
     };
-    Board.prototype.movePhaseCompanyDebtPawn = function (debt) {
-        setAbsolutePosition(this.ui.pawns.debt, BOARD_SCALE, getCompanyDebtConfig(debt));
+    Board.prototype.updatePawn = function (type, value) {
+        var position;
+        switch (type) {
+            case 'balance':
+                position = getCompanyBalanceConfig(value);
+                break;
+            case 'debt':
+                position = getCompanyDebtConfig(value);
+                break;
+            case 'phase':
+                position = PHASE_CONFIG[value];
+                break;
+            case 'standing':
+                position = getCompanyStandingConfig(value);
+                break;
+            case 'turn':
+                position = TURN_CONFIG[value];
+                break;
+        }
+        setAbsolutePosition(this.ui.pawns[type], BOARD_SCALE, position);
     };
     Board.prototype.updatePawns = function (gamedatas) {
         var _a = gamedatas.company, balance = _a.balance, debt = _a.debt, standing = _a.standing;
-        setAbsolutePosition(this.ui.pawns.balance, BOARD_SCALE, getCompanyBalanceConfig(balance));
-        setAbsolutePosition(this.ui.pawns.debt, BOARD_SCALE, getCompanyDebtConfig(debt));
-        setAbsolutePosition(this.ui.pawns.standing, BOARD_SCALE, getCompanyStandingConfig(standing));
-        setAbsolutePosition(this.ui.pawns.phase, BOARD_SCALE, PHASE_CONFIG[gamedatas.phase]);
-        setAbsolutePosition(this.ui.pawns.turn, BOARD_SCALE, TURN_CONFIG[gamedatas.turn]);
+        this.updatePawn('balance', balance);
+        this.updatePawn('debt', debt);
+        this.updatePawn('standing', standing);
+        this.updatePawn('phase', gamedatas.phase);
+        this.updatePawn('turn', gamedatas.turn);
     };
     Board.prototype.placeShip = function (ship, fromElement) {
         return __awaiter(this, void 0, void 0, function () {
@@ -2305,6 +2399,47 @@ var createFamilyMember = function (familyId, familyMemberId) {
     elt.setAttribute('data-number', "".concat(familyMemberNumber));
     return elt;
 };
+var CrownClimate = (function () {
+    function CrownClimate(game) {
+        this.game = game;
+        this.climate = {};
+        this.game = game;
+        this.setup(game.gamedatas);
+    }
+    CrownClimate.create = function (game) {
+        CrownClimate.instance = new CrownClimate(game);
+    };
+    CrownClimate.getInstance = function () {
+        return CrownClimate.instance;
+    };
+    CrownClimate.prototype.setup = function (gamedatas) {
+        var _this = this;
+        var row = document.createElement('div');
+        row.classList.add('joco-crown-climate-row');
+        CROWN_CLIMATE.forEach(function (climate) {
+            var elt = document.createElement('div');
+            elt.classList.add('joco-crown-climate-icon');
+            elt.setAttribute('data-climate', climate);
+            row.appendChild(elt);
+        });
+        CROWN_CLIMATE.forEach(function (climate) {
+            var elt = (_this.climate[climate] = document.createElement('div'));
+            elt.classList.add('joco-crown-climate-indicator');
+            row.appendChild(elt);
+        });
+        var node = document.querySelector("#player_board_".concat(CROWN_PLAYER_ID, " .player-board-game-specific-content"));
+        node.insertAdjacentElement('afterbegin', row);
+        this.updateClimate('Peacock');
+    };
+    CrownClimate.prototype.updateClimate = function (climate) {
+        if (this.active) {
+            this.climate[this.active].classList.remove('active');
+        }
+        this.active = climate;
+        this.climate[this.active].classList.add('active');
+    };
+    return CrownClimate;
+}());
 var SetupArea = (function () {
     function SetupArea(game) {
         this.cards = {};

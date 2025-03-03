@@ -51,9 +51,9 @@
   height: calc(var(--boardScale) * 37px);
   top: calc(var(--boardScale) * 63px);
   left: calc(var(--boardScale) * 370px);
-  transition-property: top, left;
-  transition-duration: 700ms;
-  transition-timing-function: ease;
+  // transition-property: top, left;
+  // transition-duration: 700ms;
+  // transition-timing-function: ease;
   // width: 30px;
   // height: 56px;
 }

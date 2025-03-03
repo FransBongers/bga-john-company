@@ -140,6 +140,9 @@ class JohnCompany implements Game {
     StaticData.create(this);
     Interaction.create(this);
     PlayerManager.create(this);
+    if (this.gameOptions.crownEnabled) {
+      CrownClimate.create(this);
+    }
     NotificationManager.create(this);
     Negotiation.create(this);
     PlayerAreas.create(this);

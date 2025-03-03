@@ -297,6 +297,11 @@ class NotificationManager {
   async notif_moveFamilyMembers(notif: Notif<NotifMoveFamilyMembers>) {
     const { familyMembers } = notif.args;
     const board = Board.getInstance();
+    await Promise.all(
+      familyMembers.map(async (familyMember, index) =>
+        board.moveFamilyMember(familyMember, index)
+      )
+    );
     board.updateFamilyMembers(familyMembers);
   }
 
@@ -306,15 +311,17 @@ class NotificationManager {
     const player = this.getPlayer(playerId);
 
     const board = Board.getInstance();
-    board.updateFamilyMembers([familyMember]);
-    player.counters[SHARES_COUNTER].incValue(1);
 
-    board.movePhaseCompanyDebtPawn(debt);
+    await Promise.all([
+      board.moveFamilyMember(familyMember),
+      board.movePawn('debt', debt),
+    ]);
+    player.counters[SHARES_COUNTER].incValue(1);
   }
 
   async notif_nextPhase(notif: Notif<NotifNextPhase>) {
     const { phase } = notif.args;
-    Board.getInstance().movePhasePawn(phase);
+    await Board.getInstance().movePawn('phase', phase);
   }
 
   async notif_placeShip(notif: Notif<NotifPlaceShip>) {

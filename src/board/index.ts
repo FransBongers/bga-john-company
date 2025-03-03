@@ -286,7 +286,6 @@ class Board {
       if (!this.familyMembers[id].parentElement) {
         this.ui.familyMembers.appendChild(this.familyMembers[id]);
       }
-      
 
       let position: AbsolutePosition = { top: 0, left: 0 };
 
@@ -312,6 +311,23 @@ class Board {
     });
   }
 
+  public async moveFamilyMember(
+    familyMember: JocoFamilyMember,
+    index: number = 0
+  ) {
+    await Interaction.use().wait(index * 200);
+    const fromRect =
+      this.familyMembers[familyMember.id].getBoundingClientRect();
+    this.updateFamilyMembers([familyMember]);
+    await this.game.animationManager.play(
+      new BgaSlideAnimation({
+        element: this.familyMembers[familyMember.id],
+        transitionTimingFunction: 'ease-in-out',
+        fromRect,
+      })
+    );
+  }
+
   async placeFamilyMembers(
     familyMembers: JocoFamilyMember[],
     fromElement: HTMLElement
@@ -322,7 +338,7 @@ class Board {
       const player = PlayerManager.getInstance().getPlayerForFamily(
         familyMember.familyId
       );
-      await this.game.framework().wait(index * 250);
+      await this.game.framework().wait(index * 200);
       player.counters[FAMILY_MEMBERS_COUNTER].incValue(-1);
       this.updateFamilyMembers([familyMember]);
       await this.game.animationManager.play(
@@ -367,45 +383,47 @@ class Board {
     });
   }
 
-  movePhasePawn(phase: string) {
-    setAbsolutePosition(this.ui.pawns.phase, BOARD_SCALE, PHASE_CONFIG[phase]);
+  async movePawn(type: keyof typeof this.ui.pawns, value: string | number) {
+    const fromRect = this.ui.pawns[type].getBoundingClientRect();
+    this.updatePawn(type, value);
+    await this.game.animationManager.play(
+      new BgaSlideAnimation({
+        element: this.ui.pawns[type],
+        transitionTimingFunction: 'ease-in-out',
+        fromRect,
+      })
+    );
   }
 
-  movePhaseCompanyDebtPawn(debt: number) {
-    setAbsolutePosition(
-      this.ui.pawns.debt,
-      BOARD_SCALE,
-      getCompanyDebtConfig(debt)
-    );
+  updatePawn(type: keyof typeof this.ui.pawns, value: string | number) {
+    let position: AbsolutePosition;
+    switch (type) {
+      case 'balance':
+        position = getCompanyBalanceConfig(value as number);
+        break;
+      case 'debt':
+        position = getCompanyDebtConfig(value as number);
+        break;
+      case 'phase':
+        position = PHASE_CONFIG[value];
+        break;
+      case 'standing':
+        position = getCompanyStandingConfig(value as number);
+        break;
+      case 'turn':
+        position = TURN_CONFIG[value as string];
+        break;
+    }
+    setAbsolutePosition(this.ui.pawns[type], BOARD_SCALE, position);
   }
 
   updatePawns(gamedatas: GamedatasAlias) {
     const { balance, debt, standing } = gamedatas.company;
-    setAbsolutePosition(
-      this.ui.pawns.balance,
-      BOARD_SCALE,
-      getCompanyBalanceConfig(balance)
-    );
-    setAbsolutePosition(
-      this.ui.pawns.debt,
-      BOARD_SCALE,
-      getCompanyDebtConfig(debt)
-    );
-    setAbsolutePosition(
-      this.ui.pawns.standing,
-      BOARD_SCALE,
-      getCompanyStandingConfig(standing)
-    );
-    setAbsolutePosition(
-      this.ui.pawns.phase,
-      BOARD_SCALE,
-      PHASE_CONFIG[gamedatas.phase]
-    );
-    setAbsolutePosition(
-      this.ui.pawns.turn,
-      BOARD_SCALE,
-      TURN_CONFIG[gamedatas.turn]
-    );
+    this.updatePawn('balance', balance);
+    this.updatePawn('debt', debt);
+    this.updatePawn('standing', standing);
+    this.updatePawn('phase', gamedatas.phase);
+    this.updatePawn('turn', gamedatas.turn);
   }
 
   public async placeShip(ship: JocoShipBase, fromElement?: HTMLElement) {

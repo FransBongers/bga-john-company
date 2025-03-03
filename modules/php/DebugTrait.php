@@ -31,7 +31,7 @@ trait DebugTrait
 
   function debug_test()
   {
-      Company::setDebt(1);
+      Company::setDebt(0);
 
     // Orders::get(ORDER_BENGAL_2)->setStatus(FILLED);
     // Orders::setupNewGame();
