@@ -55,6 +55,7 @@ class JohnCompany implements Game {
   public mobileVersion: boolean = false;
 
   private states = {
+    Chairman,
     ConfirmPartialTurn,
     ConfirmTurn,
     DraftCard,

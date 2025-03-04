@@ -44,7 +44,9 @@ trait DebugTrait
     // Notifications::log('memebers', FamilyMembers::getOnStockExchange());
     // AICards::setupNewGame();
     Crown::drawCardAndSetClimate();
-    // Notifications::log('ai-card', AICards::drawCard());
+    // $presidencues = Offices::getMany([PRESIDENT_OF_MADRAS])->toArray();
+    // Notifications::log('offices', Offices::getAll()[CHAIRMAN]);
+    // Notifications::log('family', Offices::get(PRESIDENT_OF_MADRAS)->getFamilyId());
   }
 
 

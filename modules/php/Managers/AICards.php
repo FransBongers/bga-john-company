@@ -52,7 +52,7 @@ class AICards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
       self::shuffle(DECK);
     }
     $card = self::getTopOf(DECK);
-    $card->setLocation(DISCARD);
+    $card->insertOnTop(DISCARD);
     return $card;
   }
 

@@ -74,6 +74,14 @@ class FamilyMembers extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   // .##....##..##..........##.......##....##.......##....##..##....##
   // ..######...########....##.......##....########.##.....##..######.
 
+  public static function getAllFor($familyId)
+  {
+    $allMembers = self::getAll()->toArray();
+    return Utils::filter($allMembers, function ($familyMember) use ($familyId) {
+      return $familyMember->getFamilyId() === $familyId;
+    });
+  }
+
   public static function getMemberFor($familyId)
   {
     return self::getTopOf(Locations::familyMemberSupply($familyId));

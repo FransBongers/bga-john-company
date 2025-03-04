@@ -53,6 +53,7 @@
     "src/player-manager/index.ts",
     "src/player-manager/player.ts",
     "src/player-manager/templates.ts",
+    "src/states/Chairman.ts",
     "src/states/DraftCard.ts",
     "src/states/EnlistWriter.ts",
     "src/states/FamilyAction.ts",

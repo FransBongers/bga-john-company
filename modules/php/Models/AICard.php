@@ -2,6 +2,8 @@
 
 namespace Bga\Games\JohnCompany\Models;
 
+use Bga\Games\JohnCompany\Managers\AICards;
+
 class AICard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
 {
   protected $id;
@@ -50,5 +52,11 @@ class AICard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   public function getClimate(): string
   {
     return BULL;
+  }
+
+  public function insertOnTop($location)
+  {
+    $this->location = $location;
+    AICards::insertOnTop($this->getId(), $location);
   }
 }

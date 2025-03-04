@@ -12,4 +12,13 @@ class PresidentOfBengal extends \Bga\Games\JohnCompany\Models\Office
     $this->hirePriority = 7;
   }
 
+  public function getPresidencyId()
+  {
+    return BENGAL_PRESIDENCY;
+  }
+
+  public function getRegionId()
+  {
+    return BENGAL;
+  }
 }

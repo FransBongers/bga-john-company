@@ -12,4 +12,13 @@ class PresidentOfBombay extends \Bga\Games\JohnCompany\Models\Office
     $this->hirePriority = 5;
   }
 
+  public function getPresidencyId()
+  {
+    return BOMBAY_PRESIDENCY;
+  }
+
+  public function getRegionId()
+  {
+    return BOMBAY;
+  }
 }

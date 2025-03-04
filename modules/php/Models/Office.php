@@ -2,6 +2,7 @@
 
 namespace Bga\Games\JohnCompany\Models;
 
+use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\Players;
 
 class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
@@ -62,5 +63,22 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   {
     $player = $this->getPlayer();
     return $player === null ? null : $player->getId();
+  }
+
+  public function getFamilyId()
+  {
+    if ($this->familyMemberId === null) {
+      return null;
+    }
+
+    $familyId = explode('_', $this->familyMemberId)[1];
+    return $familyId;
+  }
+
+  public function getFamily()
+  {
+    $familyId = $this->getFamilyId();
+
+    return $familyId === null ? null : Families::get($familyId);
   }
 }

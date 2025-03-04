@@ -9,6 +9,7 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\AtomicActions;
+use Bga\Games\JohnCompany\Managers\Crown;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
@@ -17,9 +18,46 @@ use Bga\Games\JohnCompany\Managers\SetupCards;
 
 class FamilyAction extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
+  protected $crownActions = [
+    BULL => [SEEK_SHARE, PURCHASE_SHIPYARD, ENLIST_WRITER, ENLIST_WRITER, ENLIST_OFFICER],
+    STAG => [SEEK_SHARE, ENLIST_WRITER, PURCHASE_SHIPYARD, ENLIST_WRITER, ENLIST_OFFICER],
+    LION => [PURCHASE_SHIPYARD, ENLIST_OFFICER, ENLIST_WRITER, ENLIST_OFFICER],
+    BEAR => [ENLIST_OFFICER, PURCHASE_LUXURY, PURCHASE_WORKSHOP, ENLIST_OFFICER, ENLIST_WRITER],
+    PEACOCK => [PURCHASE_WORKSHOP, PURCHASE_LUXURY, ENLIST_OFFICER, ENLIST_OFFICER, ENLIST_WRITER],
+  ];
+
   public function getState()
   {
     return ST_FAMILY_ACTION;
+  }
+
+
+  // ..######..########....###....########.########
+  // .##....##....##......##.##......##....##......
+  // .##..........##.....##...##.....##....##......
+  // ..######.....##....##.....##....##....######..
+  // .......##....##....#########....##....##......
+  // .##....##....##....##.....##....##....##......
+  // ..######.....##....##.....##....##....########
+
+  // ....###.....######..########.####..#######..##....##
+  // ...##.##...##....##....##.....##..##.....##.###...##
+  // ..##...##..##..........##.....##..##.....##.####..##
+  // .##.....##.##..........##.....##..##.....##.##.##.##
+  // .#########.##..........##.....##..##.....##.##..####
+  // .##.....##.##....##....##.....##..##.....##.##...###
+  // .##.....##..######.....##....####..#######..##....##
+
+  public function stFamilyAction()
+  {
+    $info = $this->ctx->getInfo();
+    // $player = self::getPlayer();
+    $playerId = $info['activePlayerId'];
+
+    if ($playerId === CROWN_PLAYER_ID) {
+      $this->performCrownAction();
+      $this->resolveAction(['automatic' => true]);
+    }
   }
 
   // ....###....########...######....######.
@@ -91,10 +129,8 @@ class FamilyAction extends \Bga\Games\JohnCompany\Models\AtomicAction
         'activePlayerId' => $stateArgs['playerId']
       ];
       $this->ctx->insertAsBrother(Engine::buildTree($action));
-    } else if ($familyAction === ENLIST_OFFICER) {
-      AtomicActions::get($familyAction)->performAction($playerId);
     } else {
-      AtomicActions::get(PURCHASE_ENTERPRISE)->performAction($playerId, $familyAction);
+      AtomicActions::get($familyAction)->performAction($playerId);
     }
 
     $this->resolveAction([], true);
@@ -114,17 +150,72 @@ class FamilyAction extends \Bga\Games\JohnCompany\Models\AtomicAction
     $familyId = $player->getFamilyId();
     $family = Families::get($familyId);
 
-    $enterpriseOptions = AtomicActions::get(PURCHASE_ENTERPRISE)->getOptions($playerId);
+    // $enterpriseOptions = AtomicActions::get(PURCHASE_ENTERPRISE)->getOptions($playerId);
 
-    $options = [
-      ENLIST_WRITER => count(AtomicActions::get(ENLIST_WRITER)->getOptions($playerId)) > 0,
-      ENLIST_OFFICER => AtomicActions::get(ENLIST_OFFICER)->canPerformAction($playerId),
-      PURCHASE_LUXURY => in_array(PURCHASE_LUXURY, $enterpriseOptions),
-      PURCHASE_SHIPYARD => in_array(PURCHASE_SHIPYARD, $enterpriseOptions),
-      PURCHASE_WORKSHOP => in_array(PURCHASE_WORKSHOP, $enterpriseOptions),
-      SEEK_SHARE => count(AtomicActions::get(SEEK_SHARE)->getOptions($playerId)) > 0,
-    ];
+    $options = [];
+
+    foreach ([ENLIST_WRITER, ENLIST_OFFICER, PURCHASE_LUXURY, PURCHASE_SHIPYARD, PURCHASE_WORKSHOP, SEEK_SHARE] as $familyAction) {
+      $atomicAction = AtomicActions::get($familyAction);
+      $options[$familyAction] = $atomicAction->canBePerformedBy($family);
+    }
+    // $options = [
+    //   ENLIST_WRITER => count(AtomicActions::get(ENLIST_WRITER)->getOptions($playerId)) > 0,
+    //   ENLIST_OFFICER => AtomicActions::get(ENLIST_OFFICER)->canPerformAction($playerId),
+    //   PURCHASE_LUXURY => in_array(PURCHASE_LUXURY, $enterpriseOptions),
+    //   PURCHASE_SHIPYARD => in_array(PURCHASE_SHIPYARD, $enterpriseOptions),
+    //   PURCHASE_WORKSHOP => in_array(PURCHASE_WORKSHOP, $enterpriseOptions),
+    //   SEEK_SHARE => count(AtomicActions::get(SEEK_SHARE)->getOptions($playerId)) > 0,
+    // ];
 
     return $options;
+  }
+
+  // ..######..########...#######..##......##.##....##
+  // .##....##.##.....##.##.....##.##..##..##.###...##
+  // .##.......##.....##.##.....##.##..##..##.####..##
+  // .##.......########..##.....##.##..##..##.##.##.##
+  // .##.......##...##...##.....##.##..##..##.##..####
+  // .##....##.##....##..##.....##.##..##..##.##...###
+  // ..######..##.....##..#######...###..###..##....##
+
+  // ....###.....######..########.####..#######..##....##
+  // ...##.##...##....##....##.....##..##.....##.###...##
+  // ..##...##..##..........##.....##..##.....##.####..##
+  // .##.....##.##..........##.....##..##.....##.##.##.##
+  // .#########.##..........##.....##..##.....##.##..####
+  // .##.....##.##....##....##.....##..##.....##.##...###
+  // .##.....##..######.....##....####..#######..##....##
+
+  private function performCrownAction()
+  {
+    $family = Families::get(CROWN);
+    $climate = Crown::getClimate();
+
+    // 1. Free Writer Enlistment (TODO)
+
+    // 
+    $numberOfFamilyActions = count(Players::getAll()) === 1 ? 2 : 1;
+
+    $extraAction = null; // TODO: get extra action from passed law
+
+    $actionOrder = $this->crownActions[$climate];
+
+    foreach ($actionOrder as $familyAction) {
+      if ($numberOfFamilyActions === 0) {
+        continue;
+      }
+      $action = AtomicActions::get($familyAction);
+      if (!$action->canBePerformedBy($family)) {
+        continue;
+      }
+
+      $action->performCrownAction();
+
+      if ($familyAction === $extraAction) {
+        $extraAction = null;
+      } else {
+        $numberOfFamilyActions--;
+      }
+    }
   }
 }

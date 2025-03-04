@@ -1284,6 +1284,7 @@ var JohnCompany = (function () {
         this._selectableNodes = [];
         this.mobileVersion = false;
         this.states = {
+            Chairman: Chairman,
             ConfirmPartialTurn: ConfirmPartialTurn,
             ConfirmTurn: ConfirmTurn,
             DraftCard: DraftCard,
@@ -2740,6 +2741,47 @@ var JocoPlayer = (function () {
     return JocoPlayer;
 }());
 var tplPlayerCounters = function (playerId) { return "\n<div id=\"joco-counters-".concat(playerId, "-row-1\" class=\"joco-counters-row\">\n  <div id=\"joco-cash-").concat(playerId, "\" class=\"log_token joco_pound\"></div>\n  <div id=\"joco-ships-").concat(playerId, "\" class=\"joco-ship\" data-type=\"playerOwnedShip\"></div>\n  <div></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-familyMembers-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-cash-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-ships-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"></div>\n</div>\n<div class=\"joco-counters-row\">\n  <div id=\"joco-shares-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"Share\"></div>\n  <div id=\"joco-workshops-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"Workshop\"></div>\n  <div id=\"joco-shipyards-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"Shipyard\"></div>\n  <div id=\"joco-luxuries-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"Luxury\"></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-shares-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-workshops-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-shipyards-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-luxuries-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n</div>\n"); };
+var Chairman = (function () {
+    function Chairman(game) {
+        this.game = game;
+    }
+    Chairman.create = function (game) {
+        Chairman.instance = new Chairman(game);
+    };
+    Chairman.getInstance = function () {
+        return Chairman.instance;
+    };
+    Chairman.prototype.onEnteringState = function (args) {
+        debug('Entering Chairman state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    };
+    Chairman.prototype.onLeavingState = function () {
+        debug('Leaving Chairman state');
+    };
+    Chairman.prototype.setDescription = function (activePlayerId, args) {
+        updatePageTitle(_('${tkn_playerName} may advance the Company Debt marker'), {
+            tkn_playerName: PlayerManager.getInstance()
+                .getPlayer(activePlayerId)
+                .getName(),
+        });
+    };
+    Chairman.prototype.updateInterfaceInitialStep = function () {
+        this.game.clearPossible();
+        updatePageTitle(_('${you} may advance the Company Debt marker'));
+    };
+    Chairman.prototype.updateInterfaceConfirm = function (Chairman) {
+        clearPossible();
+        var callback = function () {
+            return performAction('actChairman', {
+                Chairman: Chairman,
+            });
+        };
+        callback();
+        addCancelButton();
+    };
+    return Chairman;
+}());
 var DraftCard = (function () {
     function DraftCard(game) {
         this.game = game;

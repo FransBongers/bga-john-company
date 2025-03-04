@@ -47,8 +47,10 @@ const ST_NEW_COMPANY_SHARES = 24;
 // Family Actions
 const ST_ENLIST_WRITER = 25;
 const ST_ENLIST_OFFICER = 26;
-const ST_PURCHASE_ENTERPRISE = 27;
-const ST_SEEK_SHARE = 28;
+const ST_PURCHASE_LUXURY = 27;
+const ST_PURCHASE_SHIPYARD = 28;
+const ST_PURCHASE_WORKSHOP = 29;
+const ST_SEEK_SHARE = 30;
 const ST_CHAIRMAN = 40;
 
 
@@ -60,7 +62,6 @@ const NEW_COMPANY_SHARES = 'NewCompanyShares';
 // Family Actions
 const ENLIST_WRITER = 'EnlistWriter';
 const ENLIST_OFFICER = 'EnlistOfficer';
-const PURCHASE_ENTERPRISE = 'PurchaseEnterprise';
 const PURCHASE_LUXURY = 'PurchaseLuxury';
 const PURCHASE_SHIPYARD = 'PurchaseShipyard';
 const PURCHASE_WORKSHOP = 'PurchaseWorkshop';

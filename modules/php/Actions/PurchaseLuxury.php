@@ -2,20 +2,15 @@
 
 namespace Bga\Games\JohnCompany\Actions;
 
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Managers\Enterprises;
 
-use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
-use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
-
-use Bga\Games\JohnCompany\Managers\Families;
-use Bga\Games\JohnCompany\Managers\FamilyMembers;
-use Bga\Games\JohnCompany\Managers\Players;
-use Bga\Games\JohnCompany\Managers\SetupCards;
-
-class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
+class PurchaseLuxury extends \Bga\Games\JohnCompany\Actions\PurchaseEnterprise
 {
+
   public function getState()
   {
-    return ST_SEEK_SHARE;
+    return ST_PURCHASE_LUXURY;
   }
 
   // ....###....########...######....######.
@@ -26,18 +21,9 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
   // .##.....##.##....##..##....##..##....##
   // .##.....##.##.....##..######....######.
 
-  public function argsSeekShare()
+  public function argsPurchaseLuxury()
   {
-    $info = $this->ctx->getInfo();
-    $playerId = $info['activePlayerId'];
-    $player = Players::get($playerId);
-    $familyId = $player->getFamilyId();
-    $family = Families::get($familyId);
-
-    $data = [
-      'playerId' => $playerId,
-      'options' => $this->getOptions($family),
-    ];
+    $data = [];
 
     return $data;
   }
@@ -58,7 +44,7 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
   // .##.....##.##....##....##.....##..##.....##.##...###
   // .##.....##..######.....##....####..#######..##....##
 
-  public function actPassSeekShare()
+  public function actPassPurchaseLuxury()
   {
     $player = self::getPlayer();
     // Stats::incPassActionCount($player->getId(), 1);
@@ -66,44 +52,20 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
     $this->resolveAction(PASS);
   }
 
-  public function actSeekShare($args)
+  public function actPurchaseLuxury($args)
   {
-    self::checkAction('actSeekShare');
+    self::checkAction('actPurchaseLuxury');
     $playerId = $this->checkPlayer();
 
-    $position = $args->position;
-
-    $stateArgs = $this->argsSeekShare();
-
-    if (!isset($position, $stateArgs['options'])) {
-      throw new \feException("ERROR_005");
-    }
-
-    $price = $stateArgs['options'][$position];
-
-    $this->performAction($playerId, $position, $price);
+    // $this->performAction($playerId);
 
     $this->resolveAction([], true);
   }
 
-  public function performAction($playerId, $position, $price)
+  public function performAction($playerId)
   {
-
-
-    $player = Players::get($playerId);
-    $family = $player->getFamily();
-
-    $family->pay($price);
-
-    $familyMember = FamilyMembers::getMemberFor($family->getId());
-    $familyMember->setLocation($position);
-
-    Notifications::seekShare($player, $familyMember, $price);
-
-    // TODO: insert extra actions
-
+    $this->purchaseEnterprise($playerId, LUXURY);
   }
-
 
   //  .##.....##.########.####.##.......####.########.##....##
   //  .##.....##....##.....##..##........##.....##.....##..##.
@@ -113,37 +75,11 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  private function getStockPrice($stockExchangeLocation)
-  {
-    return intval(explode('_', $stockExchangeLocation)[1]);
-  }
-
   public function canBePerformedBy($family)
-  {
-    return count($this->getOptions($family)) > 0;
-  }
-
-  public function getOptions($family)
   {
     $treasury = $family->getTreasury();
 
-    $membersOnStockExchange = FamilyMembers::getOnStockExchange();
-
-    $options = [];
-
-    foreach (STOCK_EXCHANGE_POSITIONS as $location) {
-      if (Utils::array_some($membersOnStockExchange, function ($member) use ($location) {
-        return $member->getLocation() === $location;
-      })) {
-        continue;
-      }
-      $price = $this->getStockPrice($location);
-      if ($price <= $treasury) {
-        $options[$location] = $price;
-      }
-    }
-
-    return $options;
+    return $treasury >= 4 && Enterprises::countInLocation(Locations::enterpriseSupply(LUXURY)) > 0;
   }
 
   // ..######..########...#######..##......##.##....##
@@ -164,20 +100,6 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   public function performCrownAction()
   {
-    $family = Families::get(CROWN);
-
-    $options = $this->getOptions($family);
-
-    $cheapest = 100;
-    $position = null;
-
-    foreach (STOCK_EXCHANGE_POSITIONS as $sePosition) {
-      if (isset($options[$sePosition]) && $options[$sePosition] < $cheapest) {
-        $position = $sePosition;
-        $cheapest = $options[$sePosition];
-      }
-    }
-
-    $this->performAction(CROWN_PLAYER_ID, $position, $cheapest);
+    $this->performAction(CROWN_PLAYER_ID);
   }
 }

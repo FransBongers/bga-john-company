@@ -12,4 +12,13 @@ class PresidentOfMadras extends \Bga\Games\JohnCompany\Models\Office
     $this->hirePriority = 6;
   }
 
+  public function getPresidencyId()
+  {
+    return MADRAS_PRESIDENCY;
+  }
+
+  public function getRegionId()
+  {
+    return MADRAS;
+  }
 }

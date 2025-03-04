@@ -9,6 +9,7 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 
@@ -39,6 +40,7 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
   {
     $families = Families::getAll();
     $players = Players::getAll();
+    $offices = Offices::getAll();
 
     foreach ($families as $familyId => $family) {
       $setupCards = SetupCards::getInLocation(Locations::setupCards($familyId))->toArray();
@@ -65,6 +67,7 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
               if ($item['value'] === CHAIRMAN) {
                 $families[$familyId]->setHasChairmanMarker(1);
               }
+              $offices[$item['value']]->setFamilyMemberId($familyMember->getId());
               break;
             case COMPANY_SHARE:
               $familyMember = FamilyMembers::getMemberFor($familyId);
