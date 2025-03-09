@@ -61,12 +61,102 @@ class Interaction {
     }
   }
 
-  public addCancelButton(callback?: Function) {
-    this.game.addCancelButton(callback);
+  addCancelButton(callback?: Function) {
+    this.addDangerActionButton({
+      id: 'cancel_btn',
+      text: _('Cancel'),
+      callback: () => {
+        if (callback) {
+          callback();
+        }
+        this.game.onCancel();
+      },
+    });
   }
 
   public addConfirmButton(callback: Function) {
-    this.game.addConfirmButton(callback);
+    this.addPrimaryActionButton({
+      id: 'confirm_btn',
+      text: _('Confirm'),
+      callback,
+    });
+  }
+
+  public addDangerActionButton({
+    id,
+    text,
+    callback,
+    extraClasses,
+  }: {
+    id: string;
+    text: string;
+    callback: Function | string;
+    extraClasses?: string;
+  }) {
+    if ($(id)) {
+      return;
+    }
+    this.game
+      .framework()
+      .addActionButton(id, text, callback, 'customActions', false, 'red');
+    if (extraClasses) {
+      dojo.addClass(id, extraClasses);
+    }
+  }
+
+  public addPassButton({
+    optionalAction,
+    text,
+  }: {
+    optionalAction: boolean;
+    text?: string;
+  }) {
+    if (optionalAction) {
+      this.addSecondaryActionButton({
+        id: 'pass_btn',
+        text: text ? _(text) : _('Pass'),
+        callback: () => {
+          // this.game.takeAction({
+          //   action: 'actPassOptionalAction',
+          //   atomicAction: false,
+          // });
+        },
+      });
+    }
+  }
+
+  public addUndoButtons({
+    previousSteps,
+    previousEngineChoices,
+  }: CommonStateArgs) {
+    const lastStep = Math.max(0, ...previousSteps);
+    if (lastStep > 0) {
+      // this.addDangerActionButton('btnUndoLastStep', _('Undo last step'), () => this.undoToStep(lastStep), 'restartAction');
+      this.addDangerActionButton({
+        id: 'undo_last_step_btn',
+        text: _('Undo last step'),
+        callback: () => {
+          // this.takeAction({
+          //   action: 'actUndoToStep',
+          //   args: {
+          //     stepId: lastStep,
+          //   },
+          //   checkAction: 'actRestart',
+          //   atomicAction: false,
+          // });
+        },
+      });
+    }
+
+    if (previousEngineChoices > 0) {
+      this.addDangerActionButton({
+        id: 'restart_btn',
+        text: _('Restart turn'),
+        callback: () => {
+          // this.takeAction({ action: 'actRestart', atomicAction: false }),
+        },
+      });
+    }
   }
 
   public clearPossible() {
@@ -87,7 +177,10 @@ class Interaction {
     this.game.framework().updatePageTitle();
   }
 
-  public formatStringRecursive(log: string, args: Record<string, unknown>): string {
+  public formatStringRecursive(
+    log: string,
+    args: Record<string, unknown>
+  ): string {
     return this.game.format_string_recursive(log, args);
   }
 

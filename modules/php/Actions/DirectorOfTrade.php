@@ -2,19 +2,25 @@
 
 namespace Bga\Games\JohnCompany\Actions;
 
-
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
-
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
+use Bga\Games\JohnCompany\Game;
+use Bga\Games\JohnCompany\Managers\AtomicActions;
+use Bga\Games\JohnCompany\Managers\Company;
+use Bga\Games\JohnCompany\Managers\Enterprises;
+use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 
-class EnlistOfficer extends \Bga\Games\JohnCompany\Models\AtomicAction
+class DirectorOfTrade extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
   public function getState()
   {
-    return ST_ENLIST_OFFICER;
+    return ST_DIRECTOR_OF_TRADE;
   }
 
   // ....###....########...######....######.
@@ -25,13 +31,14 @@ class EnlistOfficer extends \Bga\Games\JohnCompany\Models\AtomicAction
   // .##.....##.##....##..##....##..##....##
   // .##.....##.##.....##..######....######.
 
-  public function argsEnlistOfficer()
+  public function argsDirectorOfTrade()
   {
     $info = $this->ctx->getInfo();
+    // $player = self::getPlayer();
     $playerId = $info['activePlayerIds'][0];
 
     $data = [
-      'activePlayerIds' => $info['activePlayerIds'],
+      'activePlayerIds' => [$playerId],
     ];
 
     return $data;
@@ -53,7 +60,7 @@ class EnlistOfficer extends \Bga\Games\JohnCompany\Models\AtomicAction
   // .##.....##.##....##....##.....##..##.....##.##...###
   // .##.....##..######.....##....####..#######..##....##
 
-  public function actPassEnlistOfficer()
+  public function actPassDirectorOfTrade()
   {
     $player = self::getPlayer();
     // Stats::incPassActionCount($player->getId(), 1);
@@ -61,28 +68,12 @@ class EnlistOfficer extends \Bga\Games\JohnCompany\Models\AtomicAction
     $this->resolveAction(PASS);
   }
 
-  public function actEnlistOfficer($args)
+  public function actDirectorOfTrade($args)
   {
-    self::checkAction('actEnlistOfficer');
+    self::checkAction('actDirectorOfTrade');
     $playerId = $this->checkPlayer();
 
-    $this->performAction($playerId);
-
     $this->resolveAction([], true);
-  }
-
-  public function performAction($playerId)
-  {
-    $player = Players::get($playerId);
-    $familyId = $player->getFamilyId();
-
-    $familyMember = FamilyMembers::getMemberFor($familyId);
-
-    $familyMember->setLocation(Locations::officerInTraining());
-
-    Notifications::enlistOfficer($player, $familyMember);
-
-    // TODO: insert action for bonus action
   }
 
   //  .##.....##.########.####.##.......####.########.##....##
@@ -93,29 +84,4 @@ class EnlistOfficer extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  public function canBePerformedBy($family)
-  {
-    return $family->canPlaceFamilyMembers();
-  }
-
-  // ..######..########...#######..##......##.##....##
-  // .##....##.##.....##.##.....##.##..##..##.###...##
-  // .##.......##.....##.##.....##.##..##..##.####..##
-  // .##.......########..##.....##.##..##..##.##.##.##
-  // .##.......##...##...##.....##.##..##..##.##..####
-  // .##....##.##....##..##.....##.##..##..##.##...###
-  // ..######..##.....##..#######...###..###..##....##
-
-  // ....###.....######..########.####..#######..##....##
-  // ...##.##...##....##....##.....##..##.....##.###...##
-  // ..##...##..##..........##.....##..##.....##.####..##
-  // .##.....##.##..........##.....##..##.....##.##.##.##
-  // .#########.##..........##.....##..##.....##.##..####
-  // .##.....##.##....##....##.....##..##.....##.##...###
-  // .##.....##..######.....##....####..#######..##....##
-
-  public function performCrownAction()
-  {
-    $this->performAction(CROWN_PLAYER_ID);
-  }
 }

@@ -1,40 +1,43 @@
-interface OnEnteringSeekShareArgs extends CommonStateArgs {
-  options: Record<string, number>;
+interface OnEnteringChairmanDebtConsentArgs extends CommonStateArgs {
+  chairmanPlayerId: number;
+  debt: number;
+  remainingVotesRequired: number;
 }
 
-class SeekShare implements State {
-  private static instance: SeekShare;
-  private args: OnEnteringSeekShareArgs;
+class ChairmanDebtConsent implements State {
+  private static instance: ChairmanDebtConsent;
+  private args: OnEnteringChairmanDebtConsentArgs;
 
   constructor(private game: GameAlias) {}
 
   public static create(game: JohnCompany) {
-    SeekShare.instance = new SeekShare(game);
+    ChairmanDebtConsent.instance = new ChairmanDebtConsent(game);
   }
 
   public static getInstance() {
-    return SeekShare.instance;
+    return ChairmanDebtConsent.instance;
   }
 
-  onEnteringState(args: OnEnteringSeekShareArgs) {
-    debug('Entering SeekShare state');
+  onEnteringState(args: OnEnteringChairmanDebtConsentArgs) {
+    debug('Entering ChairmanDebtConsent state');
     this.args = args;
+
     this.updateInterfaceInitialStep();
   }
 
   onLeavingState() {
-    debug('Leaving SeekShare state');
+    debug('Leaving ChairmanDebtConsent state');
   }
 
-  setDescription(activePlayerIds: number[], args: OnEnteringSeekShareArgs) {
+  setDescription(
+    activePlayerIds: number,
+    args: OnEnteringChairmanDebtConsentArgs
+  ) {
+    this.args = args;
     updatePageTitle(
-      _(
-        '${tkn_playerName} must place a family member on the Stock Exchange track'
-      ),
+      _('Other players may give consent to increase Company Debt to ${value}'),
       {
-        tkn_playerName: PlayerManager.getInstance()
-          .getPlayer(activePlayerIds[0])
-          .getName(),
+        value: this.args.debt,
       }
     );
   }
@@ -59,39 +62,29 @@ class SeekShare implements State {
     this.game.clearPossible();
 
     updatePageTitle(
-      _('${you} must select a place on the Stock Exchange track'),
+      _(
+        '${tkn_playerName} asks for your consent to increase Company Debt to ${value} (${required} more ${tkn_icon} required)'
+      ),
       {
-        tkn_icon: WRITER,
+        value: this.args.debt,
+        tkn_playerName: getPlayerName(this.args.chairmanPlayerId),
+        required: this.args.remainingVotesRequired,
+        tkn_icon: SHARE,
       }
     );
-
-    Object.entries(this.args.options).forEach(([position, price]) => {
-      const box = Board.getInstance().selectBoxes[position];
-      onClick(box, () => this.updateInterfaceConfirm(position, price));
+    setSelected(
+      Board.getInstance().selectBoxes[`companyDebt_${this.args.debt}`]
+    );
+    addPrimaryActionButton({
+      id: 'yay_btn',
+      text: 'Yay',
+      callback: () => this.performAction(true),
     });
-  }
-
-  private updateInterfaceConfirm(position: string, price: number) {
-    clearPossible();
-
-    setSelected(Board.getInstance().selectBoxes[position]);
-
-    updatePageTitle(_('Pay ${amount} ${tkn_pound} to seek a ${tkn_icon}?'), {
-      amount: price,
-      tkn_pound: _('Pounds'),
-      tkn_icon: SHARE
+    addDangerActionButton({
+      id: 'nay_btn',
+      text: 'Nay',
+      callback: () => this.performAction(false),
     });
-
-    const callback = () =>
-      performAction('actSeekShare', {
-        position,
-      });
-
-    addConfirmButton(callback);
-
-    // callback();
-
-    addCancelButton();
   }
 
   //  .##.....##.########.####.##.......####.########.##....##
@@ -101,6 +94,12 @@ class SeekShare implements State {
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private performAction(yay: boolean) {
+    performAction('actChairmanDebtConsent', {
+      consent: yay,
+    });
+  }
 
   //  ..######..##.......####..######..##....##
   //  .##....##.##........##..##....##.##...##.

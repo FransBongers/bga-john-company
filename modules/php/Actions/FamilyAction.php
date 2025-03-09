@@ -52,7 +52,7 @@ class FamilyAction extends \Bga\Games\JohnCompany\Models\AtomicAction
   {
     $info = $this->ctx->getInfo();
     // $player = self::getPlayer();
-    $playerId = $info['activePlayerId'];
+    $playerId = $info['activePlayerIds'][0];
 
     if ($playerId === CROWN_PLAYER_ID) {
       $this->performCrownAction();
@@ -72,10 +72,10 @@ class FamilyAction extends \Bga\Games\JohnCompany\Models\AtomicAction
   {
     $info = $this->ctx->getInfo();
     // $player = self::getPlayer();
-    $playerId = $info['activePlayerId'];
+    $playerId = $info['activePlayerIds'][0];
 
     $data = [
-      'playerId' => $playerId,
+      'activePlayerIds' => [$playerId],
       'options' => $this->getOptions($playerId),
     ];
 
@@ -120,13 +120,13 @@ class FamilyAction extends \Bga\Games\JohnCompany\Models\AtomicAction
       throw new \feException("ERROR_003");
     }
 
-    Players::get($stateArgs['playerId'])->getFamily()->setOpportunityMarker($familyAction);
+    Players::get($playerId)->getFamily()->setOpportunityMarker($familyAction);
 
     if (in_array($familyAction, [ENLIST_WRITER, SEEK_SHARE])) {
       $action = [
         'action' => $familyAction,
         'playerId' => 'all',
-        'activePlayerId' => $stateArgs['playerId']
+        'activePlayerIds' => [$playerId]
       ];
       $this->ctx->insertAsBrother(Engine::buildTree($action));
     } else {

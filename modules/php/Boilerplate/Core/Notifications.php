@@ -169,6 +169,25 @@ class Notifications
     ]);
   }
 
+  public static function companyOperationChairman($player, $companyDebt, $debtIncreased, $updatedTreasuries, $companyBalance)
+  {
+    $text = clienttranslate('${player_name} increases Company Debt to ${tkn_boldText_debtValue} and allocates funds to office treasuries');
+    if ($debtIncreased && count($updatedTreasuries) === 0) {
+      $text = clienttranslate('${player_name} increases Company Debt to ${tkn_boldText_debtValue}');
+    } else if (!$debtIncreased && count($updatedTreasuries) > 0) {
+      $text = clienttranslate('${player_name} allocates funds to office treasuries');
+    }
+
+    self::notifyAll('companyOperationChairman', $text, [
+      'player' => $player,
+      'tkn_boldText_debtValue' => $companyDebt,
+      'companyBalance' => $companyBalance,
+      'companyDebt' => $companyDebt,
+      'debtIncreased' => $debtIncreased,
+      'treasuries' => $updatedTreasuries,
+    ]);
+  }
+
   public static function draftCard($player, $cards)
   {
     self::notify($player, 'draftCardPrivate', clienttranslate('You draft a card'), [
@@ -241,6 +260,17 @@ class Notifications
       'player' => $player,
       'amount' => $cash,
       'tkn_pound' => clienttranslate('Pounds')
+    ]);
+  }
+
+  public static function increaseCompanyDebt($player, $companyDebt, $companyBalance)
+  {
+    self::notifyAll('increaseCompanyDebt', clienttranslate('${player_name} increases Company Debt to ${tkn_boldText_value}'), [
+      'player' => $player,
+      'tkn_boldText_value' => $companyDebt,
+      'companyDebt' => $companyDebt,
+      'companyBalance' => $companyBalance,
+      'i18n' => ['tkn_boldText_value'],
     ]);
   }
 
@@ -333,5 +363,4 @@ class Notifications
       'tkn_newLine' => '',
     ]);
   }
-
 }

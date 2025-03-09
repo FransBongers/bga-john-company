@@ -273,4 +273,19 @@ class Players extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
       return HEX_COLOR_COLOR_MAP[$player->getColor()] === FAMILY_COLOR_MAP[$familyId];
     });
   }
+
+  // // Returns array with $familyId => $playerId
+  // public static function getFamilyIdPlayerIdMap()
+  // {
+  //   $players = self::getAll();
+  //   $map = [];
+  //   foreach($players as $playerId => $player) {
+  //     if ($playerId === CROWN_PLAYER_ID) {
+  //       $map[CROWN] = $playerId;
+  //       continue;
+  //     }
+  //     $map[COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[$player->getColor()]]] = $playerId;
+  //   }
+  //   return $map;
+  // }
 }

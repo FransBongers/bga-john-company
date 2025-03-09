@@ -16,6 +16,15 @@ const addConfirmButton = (callback: Function) => {
   Interaction.use().addConfirmButton(callback);
 };
 
+const addDangerActionButton = (props: {
+  id: string;
+  text: string;
+  callback: Function | string;
+  extraClasses?: string;
+}) => {
+  Interaction.use().addDangerActionButton(props);
+};
+
 const addPrimaryActionButton = (props: {
   id: string;
   text: string;
@@ -29,6 +38,10 @@ const addSecondaryActionButton = (props: {
   callback: Function | string;
   extraClasses?: string;
 }) => Interaction.use().addSecondaryActionButton(props);
+
+const addUndoButtons = (props: CommonStateArgs) => {
+  Interaction.use().addUndoButtons(props);
+};
 
 const clearPossible = () => {
   Interaction.use().clearPossible();
@@ -82,4 +95,8 @@ const setSelected = (node: HTMLElement | string) => {
 const performAction = (actionName: string, args: Record<string, unknown>) => {
   Interaction.use().clearPossible();
   Interaction.use().performAction(actionName, args);
+};
+
+const getPlayerName = (playerId: number) => {
+  return PlayerManager.getInstance().getPlayer(playerId).getName();
 };

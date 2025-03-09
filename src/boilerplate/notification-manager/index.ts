@@ -61,11 +61,13 @@ class NotificationManager {
       'log',
       'message',
       // 'draftCard',
+      'companyOperationChairman',
       'draftCardPrivate',
       'draftNewCardsPrivate',
       'enlistFamilyMember',
       'gainCash',
       'gainEnterprise',
+      'increaseCompanyDebt',
       'moveFamilyMembers',
       'newCompanyShare',
       'nextPhase',
@@ -228,6 +230,22 @@ class NotificationManager {
     );
   }
 
+  async notif_companyOperationChairman(
+    notif: Notif<NotifCompanyOperationChairman>
+  ) {
+    const { debtIncreased, companyDebt, treasuries, companyBalance } =
+      notif.args;
+    const board = Board.getInstance();
+    Object.entries(treasuries).forEach(([officeId, value]) => {
+      board.treasuries[officeId].toValue(value);
+    });
+
+    await Promise.all([
+      board.movePawn('debt', companyDebt),
+      board.movePawn('balance', companyBalance),
+    ]);
+  }
+
   async notif_draftNewCardsPrivate(
     notif: Notif<NotifDraftNewCardsPrivateArgs>
   ) {
@@ -293,6 +311,15 @@ class NotificationManager {
     });
 
     await Promise.all(promises);
+  }
+
+  async notif_increaseCompanyDebt(notif: Notif<NotifIncreaseCompanyDebt>) {
+    const { companyBalance, companyDebt } = notif.args;
+    const board = Board.getInstance();
+    await Promise.all([
+      board.movePawn('debt', companyDebt),
+      board.movePawn('balance', companyBalance),
+    ]);
   }
 
   async notif_moveFamilyMembers(notif: Notif<NotifMoveFamilyMembers>) {

@@ -13,6 +13,13 @@ interface NotifWithPlayerArgs {
   player_name: string;
 }
 
+interface NotifCompanyOperationChairman extends NotifWithPlayerArgs {
+  companyBalance: number,
+  companyDebt: number;
+  debtIncreased: boolean;
+  treasuries: Record<string, number>;
+}
+
 interface NotifDraftNewCardsPrivateArgs {
   cardIds: string[];
   lastCard: boolean;
@@ -32,6 +39,11 @@ interface NotifGainCash extends NotifWithPlayerArgs {
 
 interface NotifGainEnterprise extends NotifWithPlayerArgs {
   type: string;
+}
+
+interface NotifIncreaseCompanyDebt extends NotifWithPlayerArgs {
+  companyDebt: number;
+  companyBalance: number;
 }
 
 interface NotifMoveFamilyMembers {

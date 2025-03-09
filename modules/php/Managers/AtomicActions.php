@@ -11,6 +11,8 @@ class AtomicActions
   // Mapping of actionId and corresponding class
   static $classes = [
     CHAIRMAN => CHAIRMAN,
+    CHAIRMAN_DEBT_CONSENT => CHAIRMAN_DEBT_CONSENT,
+    DIRECTOR_OF_TRADE => DIRECTOR_OF_TRADE,
     DRAFT_CARD => DRAFT_CARD,
     DRAFT_CARD_NEXT_STEP => DRAFT_CARD_NEXT_STEP,
     ENLIST_OFFICER => ENLIST_OFFICER,

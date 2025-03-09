@@ -1,5 +1,7 @@
 var _a, _b;
 var BOARD_SCALE = 'boardScale';
+var PLUS = 'plus';
+var MINUS = 'minus';
 var BENYON = 'Benyon';
 var HASTINGS = 'Hastings';
 var LARKINS = 'Larkins';
@@ -704,10 +706,67 @@ var Interaction = (function () {
         }
     };
     Interaction.prototype.addCancelButton = function (callback) {
-        this.game.addCancelButton(callback);
+        var _this = this;
+        this.addDangerActionButton({
+            id: 'cancel_btn',
+            text: _('Cancel'),
+            callback: function () {
+                if (callback) {
+                    callback();
+                }
+                _this.game.onCancel();
+            },
+        });
     };
     Interaction.prototype.addConfirmButton = function (callback) {
-        this.game.addConfirmButton(callback);
+        this.addPrimaryActionButton({
+            id: 'confirm_btn',
+            text: _('Confirm'),
+            callback: callback,
+        });
+    };
+    Interaction.prototype.addDangerActionButton = function (_a) {
+        var id = _a.id, text = _a.text, callback = _a.callback, extraClasses = _a.extraClasses;
+        if ($(id)) {
+            return;
+        }
+        this.game
+            .framework()
+            .addActionButton(id, text, callback, 'customActions', false, 'red');
+        if (extraClasses) {
+            dojo.addClass(id, extraClasses);
+        }
+    };
+    Interaction.prototype.addPassButton = function (_a) {
+        var optionalAction = _a.optionalAction, text = _a.text;
+        if (optionalAction) {
+            this.addSecondaryActionButton({
+                id: 'pass_btn',
+                text: text ? _(text) : _('Pass'),
+                callback: function () {
+                },
+            });
+        }
+    };
+    Interaction.prototype.addUndoButtons = function (_a) {
+        var previousSteps = _a.previousSteps, previousEngineChoices = _a.previousEngineChoices;
+        var lastStep = Math.max.apply(Math, __spreadArray([0], previousSteps, false));
+        if (lastStep > 0) {
+            this.addDangerActionButton({
+                id: 'undo_last_step_btn',
+                text: _('Undo last step'),
+                callback: function () {
+                },
+            });
+        }
+        if (previousEngineChoices > 0) {
+            this.addDangerActionButton({
+                id: 'restart_btn',
+                text: _('Restart turn'),
+                callback: function () {
+                },
+            });
+        }
     };
     Interaction.prototype.clearPossible = function () {
         this.game.clearPossible();
@@ -775,11 +834,13 @@ var NotificationManager = (function () {
         var notifs = [
             'log',
             'message',
+            'companyOperationChairman',
             'draftCardPrivate',
             'draftNewCardsPrivate',
             'enlistFamilyMember',
             'gainCash',
             'gainEnterprise',
+            'increaseCompanyDebt',
             'moveFamilyMembers',
             'newCompanyShare',
             'nextPhase',
@@ -924,6 +985,29 @@ var NotificationManager = (function () {
             });
         });
     };
+    NotificationManager.prototype.notif_companyOperationChairman = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, debtIncreased, companyDebt, treasuries, companyBalance, board;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = notif.args, debtIncreased = _a.debtIncreased, companyDebt = _a.companyDebt, treasuries = _a.treasuries, companyBalance = _a.companyBalance;
+                        board = Board.getInstance();
+                        Object.entries(treasuries).forEach(function (_a) {
+                            var officeId = _a[0], value = _a[1];
+                            board.treasuries[officeId].toValue(value);
+                        });
+                        return [4, Promise.all([
+                                board.movePawn('debt', companyDebt),
+                                board.movePawn('balance', companyBalance),
+                            ])];
+                    case 1:
+                        _b.sent();
+                        return [2];
+                }
+            });
+        });
+    };
     NotificationManager.prototype.notif_draftNewCardsPrivate = function (notif) {
         return __awaiter(this, void 0, void 0, function () {
             var _a, cardIds, lastCard;
@@ -1007,6 +1091,25 @@ var NotificationManager = (function () {
                         }); });
                         return [4, Promise.all(promises)];
                     case 2:
+                        _b.sent();
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_increaseCompanyDebt = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, companyBalance, companyDebt, board;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = notif.args, companyBalance = _a.companyBalance, companyDebt = _a.companyDebt;
+                        board = Board.getInstance();
+                        return [4, Promise.all([
+                                board.movePawn('debt', companyDebt),
+                                board.movePawn('balance', companyBalance),
+                            ])];
+                    case 1:
                         _b.sent();
                         return [2];
                 }
@@ -1187,10 +1290,10 @@ var ConfirmPartialTurn = (function () {
                 you: '${you}',
             },
         });
-        this.game.addConfirmButton(function () {
+        addConfirmButton(function () {
             return _this.game.framework().bgaPerformAction('actConfirmPartialTurn');
         });
-        this.game.addUndoButtons(this.args);
+        addUndoButtons(this.args);
     };
     return ConfirmPartialTurn;
 }());
@@ -1222,10 +1325,10 @@ var ConfirmTurn = (function () {
                 you: '${you}',
             },
         });
-        this.game.addConfirmButton(function () {
+        addConfirmButton(function () {
             return _this.game.framework().bgaPerformAction('actConfirmTurn');
         });
-        this.game.addUndoButtons(this.args);
+        addUndoButtons(this.args);
     };
     return ConfirmTurn;
 }());
@@ -1238,8 +1341,14 @@ var addCancelButton = function (callback) {
 var addConfirmButton = function (callback) {
     Interaction.use().addConfirmButton(callback);
 };
+var addDangerActionButton = function (props) {
+    Interaction.use().addDangerActionButton(props);
+};
 var addPrimaryActionButton = function (props) { return Interaction.use().addPrimaryActionButton(props); };
 var addSecondaryActionButton = function (props) { return Interaction.use().addSecondaryActionButton(props); };
+var addUndoButtons = function (props) {
+    Interaction.use().addUndoButtons(props);
+};
 var clearPossible = function () {
     Interaction.use().clearPossible();
 };
@@ -1272,6 +1381,9 @@ var performAction = function (actionName, args) {
     Interaction.use().clearPossible();
     Interaction.use().performAction(actionName, args);
 };
+var getPlayerName = function (playerId) {
+    return PlayerManager.getInstance().getPlayer(playerId).getName();
+};
 function sleep(ms) {
     return new Promise(function (r) { return setTimeout(r, ms); });
 }
@@ -1285,8 +1397,10 @@ var JohnCompany = (function () {
         this.mobileVersion = false;
         this.states = {
             Chairman: Chairman,
+            ChairmanDebtConsent: ChairmanDebtConsent,
             ConfirmPartialTurn: ConfirmPartialTurn,
             ConfirmTurn: ConfirmTurn,
+            DirectorOfTrade: DirectorOfTrade,
             DraftCard: DraftCard,
             EnlistWriter: EnlistWriter,
             FamilyAction: FamilyAction,
@@ -1352,17 +1466,17 @@ var JohnCompany = (function () {
         var _this = this;
         var _a;
         console.log('Entering state: ' + stateName, args);
-        var activePlayerId = (_a = args.args) === null || _a === void 0 ? void 0 : _a.playerId;
-        console.log('activePlayerId', activePlayerId);
-        if (this.framework().isCurrentPlayerActive() &&
-            this.states[stateName] &&
-            (!activePlayerId || activePlayerId === this.getPlayerId())) {
+        var activePlayerIds = (_a = args.args) === null || _a === void 0 ? void 0 : _a.activePlayerIds;
+        var playerIsActiveAndStateExists = this.framework().isCurrentPlayerActive() && this.states[stateName];
+        var currentPlayerId = this.getPlayerId();
+        if (playerIsActiveAndStateExists &&
+            (!activePlayerIds || activePlayerIds.includes(currentPlayerId))) {
             this.states[stateName].getInstance().onEnteringState(args.args);
         }
         else if (this.states[stateName]) {
             this.states[stateName]
                 .getInstance()
-                .setDescription(Number(activePlayerId || args.active_player), args.args);
+                .setDescription(activePlayerIds || Number(args.active_player), args.args);
         }
         if (args.args && args.args.previousSteps) {
             args.args.previousSteps.forEach(function (stepId) {
@@ -1378,6 +1492,9 @@ var JohnCompany = (function () {
         }
     };
     JohnCompany.prototype.onLeavingState = function (stateName) {
+        if (this.states[stateName]) {
+            this.states[stateName].getInstance().onLeavingState();
+        }
         this.clearPossible();
     };
     JohnCompany.prototype.onUpdateActionButtons = function (stateName, args) {
@@ -1397,98 +1514,6 @@ var JohnCompany = (function () {
         this.framework().addActionButton(id, text, callback, 'customActions', false, color);
         if (extraClasses) {
             dojo.addClass(id, extraClasses);
-        }
-    };
-    JohnCompany.prototype.addCancelButton = function (callback) {
-        var _this = this;
-        this.addDangerActionButton({
-            id: 'cancel_btn',
-            text: _('Cancel'),
-            callback: function () {
-                if (callback) {
-                    callback();
-                }
-                _this.onCancel();
-            },
-        });
-    };
-    JohnCompany.prototype.addConfirmButton = function (callback) {
-        this.addPrimaryActionButton({
-            id: 'confirm_btn',
-            text: _('Confirm'),
-            callback: callback,
-        });
-    };
-    JohnCompany.prototype.addPassButton = function (_a) {
-        var optionalAction = _a.optionalAction, text = _a.text;
-        if (optionalAction) {
-            this.addSecondaryActionButton({
-                id: 'pass_btn',
-                text: text ? _(text) : _('Pass'),
-                callback: function () {
-                },
-            });
-        }
-    };
-    JohnCompany.prototype.addPlayerButton = function (_a) {
-        var player = _a.player, callback = _a.callback;
-        var id = "select_".concat(player.id);
-        this.addPrimaryActionButton({
-            id: id,
-            text: player.name,
-            callback: callback,
-        });
-        var node = document.getElementById(id);
-        node.style.backgroundColor = "#".concat(player.color);
-    };
-    JohnCompany.prototype.addPrimaryActionButton = function (_a) {
-        var id = _a.id, text = _a.text, callback = _a.callback, extraClasses = _a.extraClasses;
-        if ($(id)) {
-            return;
-        }
-        this.framework().addActionButton(id, text, callback, 'customActions', false, 'blue');
-        if (extraClasses) {
-            dojo.addClass(id, extraClasses);
-        }
-    };
-    JohnCompany.prototype.addSecondaryActionButton = function (_a) {
-        var id = _a.id, text = _a.text, callback = _a.callback, extraClasses = _a.extraClasses;
-        if ($(id)) {
-            return;
-        }
-        this.framework().addActionButton(id, text, callback, 'customActions', false, 'gray');
-        if (extraClasses) {
-            dojo.addClass(id, extraClasses);
-        }
-    };
-    JohnCompany.prototype.addDangerActionButton = function (_a) {
-        var id = _a.id, text = _a.text, callback = _a.callback, extraClasses = _a.extraClasses;
-        if ($(id)) {
-            return;
-        }
-        this.framework().addActionButton(id, text, callback, 'customActions', false, 'red');
-        if (extraClasses) {
-            dojo.addClass(id, extraClasses);
-        }
-    };
-    JohnCompany.prototype.addUndoButtons = function (_a) {
-        var previousSteps = _a.previousSteps, previousEngineChoices = _a.previousEngineChoices;
-        var lastStep = Math.max.apply(Math, __spreadArray([0], previousSteps, false));
-        if (lastStep > 0) {
-            this.addDangerActionButton({
-                id: 'undo_last_step_btn',
-                text: _('Undo last step'),
-                callback: function () {
-                },
-            });
-        }
-        if (previousEngineChoices > 0) {
-            this.addDangerActionButton({
-                id: 'restart_btn',
-                text: _('Restart turn'),
-                callback: function () {
-                },
-            });
         }
     };
     JohnCompany.prototype.clearInterface = function () {
@@ -1783,7 +1808,7 @@ var ORDERS_CONFIG = (_a = {},
     _a[ORDER_MADRAS_2] = { top: 447.5, left: 1118.5 },
     _a);
 var getCompanyBalanceConfig = function (balance) {
-    var left = 24 + 34.5 * balance;
+    var left = 24 + 34.5 * (balance % 40);
     return { top: 702, left: left };
 };
 var COMPANY_DEBT_CONFIG = [
@@ -1968,17 +1993,28 @@ var towerConfig = (_d = {},
     _d[PUNJAB] = { bottom: -74, left: 851 },
     _d);
 var TREASURY_POSITIONS = (_e = {},
-    _e[DIRECTOR_OF_TRADE] = { top: 618, left: 456 },
-    _e[MANAGER_OF_SHIPPING] = { top: 618, left: 595 },
-    _e[PRESIDENT_OF_BOMBAY] = { top: 618, left: 846 },
-    _e[PRESIDENT_OF_MADRAS] = { top: 618, left: 1036 },
-    _e[PRESIDENT_OF_BENGAL] = { top: 618, left: 1225 },
+    _e[DIRECTOR_OF_TRADE] = { top: 618, left: 416 },
+    _e[MANAGER_OF_SHIPPING] = { top: 618, left: 555 },
+    _e[PRESIDENT_OF_BOMBAY] = { top: 618, left: 806 },
+    _e[PRESIDENT_OF_MADRAS] = { top: 618, left: 996 },
+    _e[PRESIDENT_OF_BENGAL] = { top: 618, left: 1185 },
     _e);
 var POWER_TOKEN_POSITIONS = [
     { top: 72, left: 276 },
     { top: 115, left: 276 },
     { top: 159, left: 251 },
     { top: 159, left: 301 },
+];
+var COMPANY_DEBT_SELECT_POSITIONS = [
+    { top: 157, left: 365.5 },
+    { top: 157, left: 400 },
+    { top: 157, left: 434 },
+    { top: 157, left: 468.5 },
+    { top: 157, left: 503 },
+    { top: 157, left: 537 },
+    { top: 157, left: 571.5 },
+    { top: 157, left: 606 },
+    { top: 157, left: 640 },
 ];
 var Board = (function () {
     function Board(game) {
@@ -2123,6 +2159,14 @@ var Board = (function () {
             elt.setAttribute('data-position', position);
             _this.ui.selectBoxes.appendChild(elt);
         });
+        Array.from(Array(9).keys()).forEach(function (value) {
+            var elt = (_this.selectBoxes["companyDebt_".concat(value)] =
+                document.createElement('div'));
+            elt.classList.add('joco-select-box');
+            elt.classList.add('joco-company-debt');
+            setAbsolutePosition(elt, BOARD_SCALE, COMPANY_DEBT_SELECT_POSITIONS[value]);
+            _this.ui.selectBoxes.appendChild(elt);
+        });
     };
     Board.prototype.setupShips = function (gamedatas) {
         var _this = this;
@@ -2139,10 +2183,12 @@ var Board = (function () {
         var _this = this;
         Object.entries(TREASURY_POSITIONS).forEach(function (_a) {
             var office = _a[0], position = _a[1];
-            _this.ui.treasuries.insertAdjacentHTML('afterbegin', tplTreasury(office, position));
-            _this.treasuries[office] = new ebg.counter();
-            _this.treasuries[office].create("joco_".concat(office, "_treasury"));
-            _this.treasuries[office].setValue(gamedatas.offices[office].treasury);
+            _this.treasuries[office] = new Treasury({
+                gamedatas: gamedatas,
+                office: office,
+                position: position,
+                container: _this.ui.treasuries,
+            });
         });
     };
     Board.prototype.updateArmyPieces = function (pieces) {
@@ -2397,10 +2443,6 @@ var Region = (function () {
     return Region;
 }());
 var tplBoard = function (gamedatas) { return "<div id=\"joco-board\">\n  <div id=\"joco_family_members\"></div>\n  <div id=\"joco_orders\"></div>\n  <div id=\"joco-regiments\"></div>\n  <div id=\"joco-power-tokens\"></div>\n  <div id=\"joco_ships\"></div>\n  <div id=\"joco_towers\"></div>\n  <div id=\"joco_treasuries\"></div>\n  <div id=\"joco-select-boxes\"></div>\n</div>"; };
-var tplTreasury = function (office, _a) {
-    var top = _a.top, left = _a.left;
-    return "\n<div class=\"joco_treasury\" style=\"top: calc(var(--boardScale) * ".concat(top, "px); left: calc(var(--boardScale) * ").concat(left, "px);\">\n  <span>").concat(_('£'), "</span>\n  <span class=\"joco_treasury_counter\" id=\"joco_").concat(office, "_treasury\"></span>\n</div>");
-};
 var createFamilyMember = function (familyId, familyMemberId) {
     var _a;
     var elt = document.createElement('div');
@@ -2410,6 +2452,76 @@ var createFamilyMember = function (familyId, familyMemberId) {
     elt.setAttribute('data-family', familyId);
     elt.setAttribute('data-number', "".concat(familyMemberNumber));
     return elt;
+};
+var Treasury = (function () {
+    function Treasury(props) {
+        this.setup(props);
+    }
+    Treasury.prototype.setup = function (_a) {
+        var container = _a.container, gamedatas = _a.gamedatas, office = _a.office, position = _a.position;
+        container.insertAdjacentHTML('afterbegin', tplTreasury(office, position));
+        this.element = document.getElementById("joco-treasury-".concat(office));
+        this.minusButton = document.getElementById("joco-treasury-".concat(office, "-minus-btn"));
+        this.plusButton = document.getElementById("joco-treasury-".concat(office, "-plus-btn"));
+        this.counter = new ebg.counter();
+        this.counter.create("joco_".concat(office, "_treasury"));
+        this.counter.setValue(gamedatas.offices[office].treasury);
+        this.setInactive();
+    };
+    Treasury.prototype.getButtonElement = function (type) {
+        return type === PLUS ? this.plusButton : this.minusButton;
+    };
+    Treasury.prototype.setActive = function () {
+        this.element.setAttribute('data-active', 'true');
+        this.active = true;
+    };
+    Treasury.prototype.setInactive = function () {
+        this.element.setAttribute('data-active', 'false');
+        this.active = false;
+    };
+    Treasury.prototype.handleClick = function (event) {
+        event.stopPropagation();
+        event.preventDefault();
+        if (!this.active) {
+            return;
+        }
+        var target = event.target;
+        if (!target.classList.contains('joco-button')) {
+            return;
+        }
+        var action = target.getAttribute('data-type');
+        if (action === 'plus') {
+            this.plus();
+        }
+        else if (action === 'minus') {
+            this.minus();
+        }
+    };
+    Treasury.prototype.getValue = function () {
+        return this.counter.getValue();
+    };
+    Treasury.prototype.toValue = function (value) {
+        return this.counter.toValue(value);
+    };
+    Treasury.prototype.plus = function () {
+        this.counter.incValue(1);
+    };
+    Treasury.prototype.minus = function () {
+        this.counter.incValue(-1);
+    };
+    Treasury.prototype.disableButton = function (type) {
+        var elt = type === 'minus' ? this.minusButton : this.plusButton;
+        elt.classList.add(DISABLED);
+    };
+    Treasury.prototype.enableButton = function (type) {
+        var elt = type === 'minus' ? this.minusButton : this.plusButton;
+        elt.classList.remove(DISABLED);
+    };
+    return Treasury;
+}());
+var tplTreasury = function (office, _a) {
+    var top = _a.top, left = _a.left;
+    return "\n<div id=\"joco-treasury-".concat(office, "\" class=\"joco-treasury\" style=\"top: calc(var(--boardScale) * ").concat(top, "px); left: calc(var(--boardScale) * ").concat(left, "px);\">\n  <div id=\"joco-treasury-").concat(office, "-minus-btn\" class=\"joco-button\" data-type=\"minus\"><i class=\"fa6 fa6-minus\"></i></div>\n  <div class=\"joco-container\">\n    <span>").concat(_('£'), "</span>\n    <span class=\"joco_treasury_counter\" id=\"joco_").concat(office, "_treasury\"></span>\n  </div>\n  <div id=\"joco-treasury-").concat(office, "-plus-btn\" class=\"joco-button\" data-type=\"plus\"><i class=\"fa6 fa6-plus\"></i></div>\n</div>");
 };
 var CrownClimate = (function () {
     function CrownClimate(game) {
@@ -2754,33 +2866,296 @@ var Chairman = (function () {
     Chairman.prototype.onEnteringState = function (args) {
         debug('Entering Chairman state');
         this.args = args;
+        this.companyBalance = args.companyBalance;
+        this.currentDebt = args.debtOptions.currentDebt;
         this.updateInterfaceInitialStep();
     };
     Chairman.prototype.onLeavingState = function () {
         debug('Leaving Chairman state');
+        this.deactivateTreasuries();
     };
-    Chairman.prototype.setDescription = function (activePlayerId, args) {
-        updatePageTitle(_('${tkn_playerName} may advance the Company Debt marker'), {
-            tkn_playerName: PlayerManager.getInstance()
-                .getPlayer(activePlayerId)
-                .getName(),
+    Chairman.prototype.setDescription = function (activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} may increase Company Debt and must allocate the Company Balance'), {
+            tkn_playerName: getPlayerName(activePlayerIds[0]),
         });
     };
     Chairman.prototype.updateInterfaceInitialStep = function () {
+        var _this = this;
         this.game.clearPossible();
-        updatePageTitle(_('${you} may advance the Company Debt marker'));
+        this.updatePageTitle();
+        this.setupTreasuries();
+        var board = Board.getInstance();
+        var interaction = Interaction.use();
+        this.args.debtOptions.noVote.forEach(function (value) {
+            if (value <= _this.currentDebt) {
+                return;
+            }
+            var elt = board.selectBoxes["companyDebt_".concat(value)];
+            interaction.onClick(elt, function () { return _this.handleDebtClick(value, false); });
+            elt.setAttribute('data-vote', 'false');
+        });
+        this.args.debtOptions.vote.forEach(function (value) {
+            if (value <= _this.currentDebt) {
+                return;
+            }
+            var elt = board.selectBoxes["companyDebt_".concat(value)];
+            interaction.onClick(elt, function () { return _this.handleDebtClick(value, true); });
+            elt.setAttribute('data-vote', 'true');
+        });
+        addPrimaryActionButton({
+            id: 'propose_btn',
+            text: _('Propose'),
+            callback: function () { return _this.performAction(true); },
+        });
+        addPrimaryActionButton({
+            id: 'commit_btn',
+            text: _('Commit'),
+            callback: function () { return _this.performAction(false); },
+            extraClasses: this.companyBalance > 0 ? DISABLED : '',
+        });
     };
-    Chairman.prototype.updateInterfaceConfirm = function (Chairman) {
+    Chairman.prototype.udpateInterfaceConfirmVote = function (value) {
+        var _this = this;
+        this.deactivateTreasuries();
         clearPossible();
-        var callback = function () {
-            return performAction('actChairman', {
-                Chairman: Chairman,
+        setSelected(Board.getInstance().selectBoxes["companyDebt_".concat(value)]);
+        updatePageTitle(_('Ask Court of Directors for consent to increase Company Debt to ${value}?'), {
+            value: value,
+        });
+        addConfirmButton(function () { return _this.performAction(true, value); });
+        addDangerActionButton({
+            id: 'cancel_btn',
+            text: _('Cancel'),
+            callback: function () { return _this.updateInterfaceInitialStep(); },
+        });
+    };
+    Chairman.prototype.updatePageTitle = function () {
+        console.log('balance', this.companyBalance);
+        if (this.companyBalance === 0) {
+            updatePageTitle(_('${you} may increase Company Debt'));
+        }
+        else {
+            updatePageTitle(_('${you} may increase Company Debt and must allocate the Company Balance'));
+        }
+    };
+    Chairman.prototype.performAction = function (propose, debtVote) {
+        var treasuries = {};
+        Object.entries(Board.getInstance().treasuries).forEach(function (_a) {
+            var office = _a[0], treasury = _a[1];
+            treasuries[office] = treasury.getValue();
+        });
+        performAction('actChairman', {
+            companyDebt: this.currentDebt,
+            debtVote: debtVote !== null && debtVote !== void 0 ? debtVote : null,
+            treasuries: treasuries,
+            propose: propose,
+        });
+    };
+    Chairman.prototype.deactivateTreasuries = function () {
+        Object.entries(Board.getInstance().treasuries).forEach(function (_a) {
+            var office = _a[0], treasury = _a[1];
+            treasury.setInactive();
+        });
+    };
+    Chairman.prototype.setupTreasuries = function () {
+        var _this = this;
+        var interaction = Interaction.use();
+        this.checkPlusDisabled();
+        Object.entries(Board.getInstance().treasuries).forEach(function (_a) {
+            var office = _a[0], treasury = _a[1];
+            treasury.setActive();
+            _this.checkMinusDisabled(office);
+            [PLUS, MINUS].forEach(function (type) {
+                interaction.onClick(treasury.getButtonElement(type), function () {
+                    return _this.handleClick(type, office);
+                });
             });
-        };
-        callback();
-        addCancelButton();
+        });
+    };
+    Chairman.prototype.checkMinusDisabled = function (office) {
+        var treasury = Board.getInstance().treasuries[office];
+        if (treasury.getValue() === this.args.initialTreasuries[office]) {
+            treasury.disableButton('minus');
+        }
+    };
+    Chairman.prototype.checkPlusDisabled = function () {
+        var treasuries = Object.values(Board.getInstance().treasuries);
+        if (this.companyBalance > 0) {
+            treasuries.forEach(function (treasury) {
+                treasury.enableButton(PLUS);
+            });
+            return;
+        }
+        else {
+            treasuries.forEach(function (treasury) {
+                treasury.disableButton(PLUS);
+            });
+        }
+    };
+    Chairman.prototype.updateCompanyBalance = function (value) {
+        return __awaiter(this, void 0, void 0, function () {
+            var board, increase;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        board = Board.getInstance();
+                        increase = value - this.currentDebt;
+                        clearPossible();
+                        this.currentDebt = value;
+                        this.companyBalance += increase * 5;
+                        return [4, Promise.all([
+                                board.movePawn('debt', value),
+                                board.movePawn('balance', this.companyBalance),
+                            ])];
+                    case 1:
+                        _a.sent();
+                        return [2];
+                }
+            });
+        });
+    };
+    Chairman.prototype.handleDebtClick = function (value, requiresVote) {
+        return __awaiter(this, void 0, void 0, function () {
+            var noVoteOptionCount, noVoteValue;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!requiresVote) return [3, 3];
+                        noVoteOptionCount = this.args.debtOptions.noVote.length;
+                        noVoteValue = noVoteOptionCount > 0
+                            ? this.args.debtOptions.noVote[noVoteOptionCount - 1]
+                            : 0;
+                        if (!(noVoteValue > this.currentDebt)) return [3, 2];
+                        return [4, this.updateCompanyBalance(noVoteValue)];
+                    case 1:
+                        _a.sent();
+                        _a.label = 2;
+                    case 2:
+                        this.udpateInterfaceConfirmVote(value);
+                        return [3, 5];
+                    case 3: return [4, this.updateCompanyBalance(value)];
+                    case 4:
+                        _a.sent();
+                        this.updateInterfaceInitialStep();
+                        _a.label = 5;
+                    case 5: return [2];
+                }
+            });
+        });
+    };
+    Chairman.prototype.handleClick = function (type, office) {
+        return __awaiter(this, void 0, void 0, function () {
+            var board, treasury;
+            return __generator(this, function (_a) {
+                board = Board.getInstance();
+                treasury = board.treasuries[office];
+                if (type === 'plus' && this.companyBalance > 0) {
+                    this.companyBalance--;
+                    treasury.plus();
+                    treasury.enableButton('minus');
+                    this.checkPlusDisabled();
+                    board.movePawn('balance', this.companyBalance);
+                }
+                else if (type === 'minus' &&
+                    treasury.getValue() > this.args.initialTreasuries[office]) {
+                    treasury.minus();
+                    this.checkMinusDisabled(office);
+                    this.companyBalance++;
+                    this.checkPlusDisabled();
+                    board.movePawn('balance', this.companyBalance);
+                }
+                this.updateInterfaceInitialStep();
+                return [2];
+            });
+        });
     };
     return Chairman;
+}());
+var ChairmanDebtConsent = (function () {
+    function ChairmanDebtConsent(game) {
+        this.game = game;
+    }
+    ChairmanDebtConsent.create = function (game) {
+        ChairmanDebtConsent.instance = new ChairmanDebtConsent(game);
+    };
+    ChairmanDebtConsent.getInstance = function () {
+        return ChairmanDebtConsent.instance;
+    };
+    ChairmanDebtConsent.prototype.onEnteringState = function (args) {
+        debug('Entering ChairmanDebtConsent state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    };
+    ChairmanDebtConsent.prototype.onLeavingState = function () {
+        debug('Leaving ChairmanDebtConsent state');
+    };
+    ChairmanDebtConsent.prototype.setDescription = function (activePlayerIds, args) {
+        this.args = args;
+        updatePageTitle(_('Other players may give consent to increase Company Debt to ${value}'), {
+            value: this.args.debt,
+        });
+    };
+    ChairmanDebtConsent.prototype.updateInterfaceInitialStep = function () {
+        var _this = this;
+        this.game.clearPossible();
+        updatePageTitle(_('${tkn_playerName} asks for your consent to increase Company Debt to ${value} (${required} more ${tkn_icon} required)'), {
+            value: this.args.debt,
+            tkn_playerName: getPlayerName(this.args.chairmanPlayerId),
+            required: this.args.remainingVotesRequired,
+            tkn_icon: SHARE,
+        });
+        setSelected(Board.getInstance().selectBoxes["companyDebt_".concat(this.args.debt)]);
+        addPrimaryActionButton({
+            id: 'yay_btn',
+            text: 'Yay',
+            callback: function () { return _this.performAction(true); },
+        });
+        addDangerActionButton({
+            id: 'nay_btn',
+            text: 'Nay',
+            callback: function () { return _this.performAction(false); },
+        });
+    };
+    ChairmanDebtConsent.prototype.performAction = function (yay) {
+        performAction('actChairmanDebtConsent', {
+            consent: yay,
+        });
+    };
+    return ChairmanDebtConsent;
+}());
+var DirectorOfTrade = (function () {
+    function DirectorOfTrade(game) {
+        this.game = game;
+    }
+    DirectorOfTrade.create = function (game) {
+        DirectorOfTrade.instance = new DirectorOfTrade(game);
+    };
+    DirectorOfTrade.getInstance = function () {
+        return DirectorOfTrade.instance;
+    };
+    DirectorOfTrade.prototype.onEnteringState = function (args) {
+        debug('Entering DirectorOfTrade state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    };
+    DirectorOfTrade.prototype.onLeavingState = function () {
+        debug('Leaving DirectorOfTrade state');
+    };
+    DirectorOfTrade.prototype.setDescription = function (activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} may Director of Trade'), {
+            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        });
+    };
+    DirectorOfTrade.prototype.updateInterfaceInitialStep = function () {
+        this.game.clearPossible();
+        updatePageTitle(_('${you} may play Director of Trade'));
+    };
+    DirectorOfTrade.prototype.performAction = function (yay) {
+        performAction('actDirectorOfTrade', {
+            consent: yay,
+        });
+    };
+    return DirectorOfTrade;
 }());
 var DraftCard = (function () {
     function DraftCard(game) {
@@ -2801,7 +3176,7 @@ var DraftCard = (function () {
     DraftCard.prototype.onLeavingState = function () {
         debug('Leaving DraftCard state');
     };
-    DraftCard.prototype.setDescription = function (activePlayerId, args) {
+    DraftCard.prototype.setDescription = function (activePlayerIds, args) {
         var _a, _b;
         if ((_a = args._private) === null || _a === void 0 ? void 0 : _a.selected) {
             (_b = args._private) === null || _b === void 0 ? void 0 : _b.selected.forEach(function (cardId) { return setSelected(cardId); });
@@ -2883,11 +3258,11 @@ var EnlistWriter = (function () {
     EnlistWriter.prototype.onLeavingState = function () {
         debug('Leaving EnlistWriter state');
     };
-    EnlistWriter.prototype.setDescription = function (activePlayerId, args) {
+    EnlistWriter.prototype.setDescription = function (activePlayerIds, args) {
         console.log('setDescription');
         updatePageTitle(_('${tkn_playerName} must select a region to place their writer'), {
             tkn_playerName: PlayerManager.getInstance()
-                .getPlayer(activePlayerId)
+                .getPlayer(activePlayerIds[0])
                 .getName(),
         });
     };
@@ -2936,10 +3311,10 @@ var FamilyAction = (function () {
     FamilyAction.prototype.onLeavingState = function () {
         debug('Leaving FamilyAction state');
     };
-    FamilyAction.prototype.setDescription = function (activePlayerId, args) {
+    FamilyAction.prototype.setDescription = function (activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} must perform a family action'), {
             tkn_playerName: PlayerManager.getInstance()
-                .getPlayer(activePlayerId)
+                .getPlayer(activePlayerIds[0])
                 .getName(),
         });
     };
@@ -3019,10 +3394,10 @@ var SeekShare = (function () {
     SeekShare.prototype.onLeavingState = function () {
         debug('Leaving SeekShare state');
     };
-    SeekShare.prototype.setDescription = function (activePlayerId, args) {
+    SeekShare.prototype.setDescription = function (activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} must place a family member on the Stock Exchange track'), {
             tkn_playerName: PlayerManager.getInstance()
-                .getPlayer(activePlayerId)
+                .getPlayer(activePlayerIds[0])
                 .getName(),
         });
     };

@@ -29,13 +29,13 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
   public function argsSeekShare()
   {
     $info = $this->ctx->getInfo();
-    $playerId = $info['activePlayerId'];
+    $playerId = $info['activePlayerIds'][0];
     $player = Players::get($playerId);
     $familyId = $player->getFamilyId();
     $family = Families::get($familyId);
 
     $data = [
-      'playerId' => $playerId,
+      'activePlayerIds' => [$playerId],
       'options' => $this->getOptions($family),
     ];
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace Bga\Games\JohnCompany\Models;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
@@ -11,6 +12,7 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Log;
 /*
  * Action: base class to handle atomic action
  */
+
 class AtomicAction
 {
   protected $ctx = null; // Contain ctx information : current node of flow tree
@@ -78,11 +80,13 @@ class AtomicAction
 
   public function checkPlayer()
   {
-    $activePlayerId = $this->ctx->getInfo()['activePlayerId'];
-    if(Players::getCurrentId() !== $activePlayerId) {
+    $currentPlayerId = Players::getCurrentId();
+    
+    $activePlayerIds = $this->ctx->getInfo()['activePlayerIds'];
+    if(!in_array($currentPlayerId, $activePlayerIds)) {
       throw new \feException("ERROR_002");
-    };
-    return $activePlayerId;
+    }
+    return $currentPlayerId;
   }
 
   public function getClassName()

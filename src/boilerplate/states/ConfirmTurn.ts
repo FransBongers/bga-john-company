@@ -55,10 +55,10 @@ class ConfirmTurn implements State {
         you: '${you}',
       },
     });
-    this.game.addConfirmButton(() =>
+    addConfirmButton(() =>
       this.game.framework().bgaPerformAction('actConfirmTurn')
     );
-    this.game.addUndoButtons(this.args);
+    addUndoButtons(this.args);
   }
 
   //  .##.....##.########.####.##.......####.########.##....##

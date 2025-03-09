@@ -43,10 +43,12 @@ trait DebugTrait
     // LondonSeasonCards::setupNewGame();
     // Notifications::log('memebers', FamilyMembers::getOnStockExchange());
     // AICards::setupNewGame();
-    Crown::drawCardAndSetClimate();
+    // Crown::drawCardAndSetClimate();
     // $presidencues = Offices::getMany([PRESIDENT_OF_MADRAS])->toArray();
-    // Notifications::log('offices', Offices::getAll()[CHAIRMAN]);
-    // Notifications::log('family', Offices::get(PRESIDENT_OF_MADRAS)->getFamilyId());
+    // Notifications::log('offices', Offices::getMany([DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING, PRESIDENT_OF_BENGAL, PRESIDENT_OF_BOMBAY PRESIDENT_OF_BOMBAY]));
+    // Offices::getMany([DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING, PRESIDENT_OF_BENGAL, PRESIDENT_OF_BOMBAY, PRESIDENT_OF_BOMBAY])
+;
+    Notifications::log('map', Players::getFamilyIdPlayerIdMap());
   }
 
 

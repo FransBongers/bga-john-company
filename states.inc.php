@@ -276,4 +276,26 @@ $machinestates = [
         'possibleactions' => ['act' . CHAIRMAN, 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
+
+    ST_CHAIRMAN_DEBT_CONSENT => [
+        'name' => CHAIRMAN_DEBT_CONSENT,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . CHAIRMAN_DEBT_CONSENT, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_DIRECTOR_OF_TRADE=> [
+        'name' => DIRECTOR_OF_TRADE,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . DIRECTOR_OF_TRADE, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
 ];

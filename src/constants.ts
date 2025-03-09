@@ -3,6 +3,9 @@
  */
 const BOARD_SCALE = 'boardScale';
 
+const PLUS = 'plus';
+const MINUS = 'minus';
+
 /**
  * Families
  */

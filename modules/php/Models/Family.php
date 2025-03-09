@@ -3,6 +3,7 @@
 namespace Bga\Games\JohnCompany\Models;
 
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Players;
 
@@ -60,6 +61,11 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   public function getPlayer()
   {
     return Players::getPlayerForFamily($this->id);
+  }
+
+  public function getShareCount()
+  {
+    return count(Company::getShares($this->getId()));
   }
 
   // TODO: include members on prizes in count

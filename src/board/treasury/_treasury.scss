@@ -1,0 +1,54 @@
+.joco-treasury {
+  position: absolute;
+  display: grid;
+  grid-template-columns: calc(var(--boardScale) * 30px) calc(
+      var(--boardScale) * 60px
+    ) calc(var(--boardScale) * 30px);
+  // gap: calc(var(--boardScale) * 4px);
+
+  .joco-container {
+    display: flex;
+    flex-direction: row;
+    gap: calc(var(--boardScale) * 4px);
+    font-weight: 700;
+    font-size: calc(var(--boardScale) * 30px);
+    justify-content: center;
+  }
+
+  .joco-button {
+    background-color: white;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(var(--boardScale) * 24px);
+    border: calc(var(--boardScale) * 1px) solid #060606;
+    box-shadow: 0 0 0 #000;
+    color: #060606;
+    text-shadow: none;
+    border-radius: calc(var(--boardScale) * 6px);
+    cursor: pointer;
+
+    i {
+      pointer-events: none;
+    }
+  }
+
+  .joco-button:hover {
+    background-color: #f0f0f0;
+  }
+
+  .joco-button.disabled {
+    background: #787878;
+    pointer-events: none;
+  }
+
+}
+
+.joco-treasury[data-active='false'] {
+  .joco-button {
+    cursor: auto;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}

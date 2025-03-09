@@ -52,7 +52,9 @@ const ST_PURCHASE_SHIPYARD = 28;
 const ST_PURCHASE_WORKSHOP = 29;
 const ST_SEEK_SHARE = 30;
 const ST_CHAIRMAN = 40;
+const ST_CHAIRMAN_DEBT_CONSENT = 41;
 
+const ST_DIRECTOR_OF_TRADE = 42;
 
 const DRAFT_CARD = 'DraftCard';
 const DRAFT_CARD_NEXT_STEP = 'DraftCardNextStep';
@@ -66,7 +68,8 @@ const PURCHASE_LUXURY = 'PurchaseLuxury';
 const PURCHASE_SHIPYARD = 'PurchaseShipyard';
 const PURCHASE_WORKSHOP = 'PurchaseWorkshop';
 const SEEK_SHARE = 'SeekShare';
-
+// Company Operations
+const CHAIRMAN_DEBT_CONSENT = 'ChairmanDebtConsent';
 
 /**
  * Company

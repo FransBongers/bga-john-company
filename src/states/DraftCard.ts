@@ -32,7 +32,7 @@ class DraftCard implements State {
     debug('Leaving DraftCard state');
   }
 
-  setDescription(activePlayerId: number, args: OnEnteringDraftCardArgs) {
+  setDescription(activePlayerIds: number[], args: OnEnteringDraftCardArgs) {
     if (args._private?.selected) {
       args._private?.selected.forEach((cardId) => setSelected(cardId));
     }

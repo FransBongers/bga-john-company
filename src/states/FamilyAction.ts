@@ -26,10 +26,10 @@ class FamilyAction implements State {
     debug('Leaving FamilyAction state');
   }
 
-  setDescription(activePlayerId: number, args: OnEnteringFamilyActionArgs) {
+  setDescription(activePlayerIds: number[] , args: OnEnteringFamilyActionArgs) {
     updatePageTitle(_('${tkn_playerName} must perform a family action'), {
       tkn_playerName: PlayerManager.getInstance()
-        .getPlayer(activePlayerId)
+        .getPlayer(activePlayerIds[0])
         .getName(),
     });
   }

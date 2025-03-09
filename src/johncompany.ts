@@ -56,8 +56,10 @@ class JohnCompany implements Game {
 
   private states = {
     Chairman,
+    ChairmanDebtConsent,
     ConfirmPartialTurn,
     ConfirmTurn,
+    DirectorOfTrade,
     DraftCard,
     EnlistWriter,
     FamilyAction,
@@ -197,19 +199,24 @@ class JohnCompany implements Game {
   //                  You can use this method to perform some user interface changes at this moment.
   public onEnteringState(stateName: string, args: any) {
     console.log('Entering state: ' + stateName, args);
-    const activePlayerId: number | undefined = args.args?.playerId;
-    console.log('activePlayerId',activePlayerId);
+    const activePlayerIds: number[] | undefined = args.args?.activePlayerIds;
+    const playerIsActiveAndStateExists =
+      this.framework().isCurrentPlayerActive() && this.states[stateName];
+
+    const currentPlayerId = this.getPlayerId();
     // UI changes for active player
     if (
-      this.framework().isCurrentPlayerActive() &&
-      this.states[stateName] &&
-      (!activePlayerId || activePlayerId === this.getPlayerId())
+      playerIsActiveAndStateExists &&
+      (!activePlayerIds || activePlayerIds.includes(currentPlayerId))
     ) {
       this.states[stateName].getInstance().onEnteringState(args.args);
     } else if (this.states[stateName]) {
       this.states[stateName]
         .getInstance()
-        .setDescription(Number(activePlayerId || args.active_player), args.args);
+        .setDescription(
+          activePlayerIds || Number(args.active_player),
+          args.args
+        );
     }
 
     // if (this.framework().isCurrentPlayerActive()) {
@@ -249,6 +256,9 @@ class JohnCompany implements Game {
   //                 You can use this method to perform some user interface changes at this moment.
   //
   public onLeavingState(stateName: string) {
+    if (this.states[stateName]) {
+      this.states[stateName].getInstance().onLeavingState();
+    }
     this.clearPossible();
   }
 
@@ -355,178 +365,178 @@ class JohnCompany implements Game {
     }
   }
 
-  addCancelButton(callback?: Function) {
-    this.addDangerActionButton({
-      id: 'cancel_btn',
-      text: _('Cancel'),
-      callback: () => {
-        if (callback) {
-          callback();
-        }
-        this.onCancel();
-      },
-    });
-  }
+  // addCancelButton(callback?: Function) {
+  //   this.addDangerActionButton({
+  //     id: 'cancel_btn',
+  //     text: _('Cancel'),
+  //     callback: () => {
+  //       if (callback) {
+  //         callback();
+  //       }
+  //       this.onCancel();
+  //     },
+  //   });
+  // }
 
-  addConfirmButton(callback: Function) {
-    this.addPrimaryActionButton({
-      id: 'confirm_btn',
-      text: _('Confirm'),
-      callback,
-    });
-  }
+  // addConfirmButton(callback: Function) {
+  //   this.addPrimaryActionButton({
+  //     id: 'confirm_btn',
+  //     text: _('Confirm'),
+  //     callback,
+  //   });
+  // }
 
-  addPassButton({
-    optionalAction,
-    text,
-  }: {
-    optionalAction: boolean;
-    text?: string;
-  }) {
-    if (optionalAction) {
-      this.addSecondaryActionButton({
-        id: 'pass_btn',
-        text: text ? _(text) : _('Pass'),
-        callback: () => {
-          // this.takeAction({
-          //   action: 'actPassOptionalAction',
-          //   atomicAction: false,
-          // });
-        },
-      });
-    }
-  }
+  // addPassButton({
+  //   optionalAction,
+  //   text,
+  // }: {
+  //   optionalAction: boolean;
+  //   text?: string;
+  // }) {
+  //   if (optionalAction) {
+  //     this.addSecondaryActionButton({
+  //       id: 'pass_btn',
+  //       text: text ? _(text) : _('Pass'),
+  //       callback: () => {
+  //         // this.takeAction({
+  //         //   action: 'actPassOptionalAction',
+  //         //   atomicAction: false,
+  //         // });
+  //       },
+  //     });
+  //   }
+  // }
 
-  addPlayerButton({
-    player,
-    callback,
-  }: {
-    player: BgaPlayer;
-    callback: Function | string;
-  }) {
-    const id = `select_${player.id}`;
+  // addPlayerButton({
+  //   player,
+  //   callback,
+  // }: {
+  //   player: BgaPlayer;
+  //   callback: Function | string;
+  // }) {
+  //   const id = `select_${player.id}`;
 
-    this.addPrimaryActionButton({
-      id,
-      text: player.name,
-      callback,
-    });
+  //   this.addPrimaryActionButton({
+  //     id,
+  //     text: player.name,
+  //     callback,
+  //   });
 
-    const node = document.getElementById(id);
-    node.style.backgroundColor = `#${player.color}`;
-  }
+  //   const node = document.getElementById(id);
+  //   node.style.backgroundColor = `#${player.color}`;
+  // }
 
-  addPrimaryActionButton({
-    id,
-    text,
-    callback,
-    extraClasses,
-  }: {
-    id: string;
-    text: string;
-    callback: Function | string;
-    extraClasses?: string;
-  }) {
-    if ($(id)) {
-      return;
-    }
-    this.framework().addActionButton(
-      id,
-      text,
-      callback,
-      'customActions',
-      false,
-      'blue'
-    );
-    if (extraClasses) {
-      dojo.addClass(id, extraClasses);
-    }
-  }
+  // addPrimaryActionButton({
+  //   id,
+  //   text,
+  //   callback,
+  //   extraClasses,
+  // }: {
+  //   id: string;
+  //   text: string;
+  //   callback: Function | string;
+  //   extraClasses?: string;
+  // }) {
+  //   if ($(id)) {
+  //     return;
+  //   }
+  //   this.framework().addActionButton(
+  //     id,
+  //     text,
+  //     callback,
+  //     'customActions',
+  //     false,
+  //     'blue'
+  //   );
+  //   if (extraClasses) {
+  //     dojo.addClass(id, extraClasses);
+  //   }
+  // }
 
-  addSecondaryActionButton({
-    id,
-    text,
-    callback,
-    extraClasses,
-  }: {
-    id: string;
-    text: string;
-    callback: Function | string;
-    extraClasses?: string;
-  }) {
-    if ($(id)) {
-      return;
-    }
-    this.framework().addActionButton(
-      id,
-      text,
-      callback,
-      'customActions',
-      false,
-      'gray'
-    );
-    if (extraClasses) {
-      dojo.addClass(id, extraClasses);
-    }
-  }
+  // addSecondaryActionButton({
+  //   id,
+  //   text,
+  //   callback,
+  //   extraClasses,
+  // }: {
+  //   id: string;
+  //   text: string;
+  //   callback: Function | string;
+  //   extraClasses?: string;
+  // }) {
+  //   if ($(id)) {
+  //     return;
+  //   }
+  //   this.framework().addActionButton(
+  //     id,
+  //     text,
+  //     callback,
+  //     'customActions',
+  //     false,
+  //     'gray'
+  //   );
+  //   if (extraClasses) {
+  //     dojo.addClass(id, extraClasses);
+  //   }
+  // }
 
-  addDangerActionButton({
-    id,
-    text,
-    callback,
-    extraClasses,
-  }: {
-    id: string;
-    text: string;
-    callback: Function | string;
-    extraClasses?: string;
-  }) {
-    if ($(id)) {
-      return;
-    }
-    this.framework().addActionButton(
-      id,
-      text,
-      callback,
-      'customActions',
-      false,
-      'red'
-    );
-    if (extraClasses) {
-      dojo.addClass(id, extraClasses);
-    }
-  }
+  // addDangerActionButton({
+  //   id,
+  //   text,
+  //   callback,
+  //   extraClasses,
+  // }: {
+  //   id: string;
+  //   text: string;
+  //   callback: Function | string;
+  //   extraClasses?: string;
+  // }) {
+  //   if ($(id)) {
+  //     return;
+  //   }
+  //   this.framework().addActionButton(
+  //     id,
+  //     text,
+  //     callback,
+  //     'customActions',
+  //     false,
+  //     'red'
+  //   );
+  //   if (extraClasses) {
+  //     dojo.addClass(id, extraClasses);
+  //   }
+  // }
 
-  addUndoButtons({ previousSteps, previousEngineChoices }: CommonStateArgs) {
-    const lastStep = Math.max(0, ...previousSteps);
-    if (lastStep > 0) {
-      // this.addDangerActionButton('btnUndoLastStep', _('Undo last step'), () => this.undoToStep(lastStep), 'restartAction');
-      this.addDangerActionButton({
-        id: 'undo_last_step_btn',
-        text: _('Undo last step'),
-        callback: () => {
-          // this.takeAction({
-          //   action: 'actUndoToStep',
-          //   args: {
-          //     stepId: lastStep,
-          //   },
-          //   checkAction: 'actRestart',
-          //   atomicAction: false,
-          // });
-        },
-      });
-    }
+  // addUndoButtons({ previousSteps, previousEngineChoices }: CommonStateArgs) {
+  //   const lastStep = Math.max(0, ...previousSteps);
+  //   if (lastStep > 0) {
+  //     // this.addDangerActionButton('btnUndoLastStep', _('Undo last step'), () => this.undoToStep(lastStep), 'restartAction');
+  //     this.addDangerActionButton({
+  //       id: 'undo_last_step_btn',
+  //       text: _('Undo last step'),
+  //       callback: () => {
+  //         // this.takeAction({
+  //         //   action: 'actUndoToStep',
+  //         //   args: {
+  //         //     stepId: lastStep,
+  //         //   },
+  //         //   checkAction: 'actRestart',
+  //         //   atomicAction: false,
+  //         // });
+  //       },
+  //     });
+  //   }
 
-    if (previousEngineChoices > 0) {
-      this.addDangerActionButton({
-        id: 'restart_btn',
-        text: _('Restart turn'),
-        callback: () => {
-          // this.takeAction({ action: 'actRestart', atomicAction: false }),
-        },
-      });
-    }
-  }
+  //   if (previousEngineChoices > 0) {
+  //     this.addDangerActionButton({
+  //       id: 'restart_btn',
+  //       text: _('Restart turn'),
+  //       callback: () => {
+  //         // this.takeAction({ action: 'actRestart', atomicAction: false }),
+  //       },
+  //     });
+  //   }
+  // }
 
   public clearInterface() {
     //  this.playerManager.clearInterface();

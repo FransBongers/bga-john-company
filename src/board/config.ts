@@ -19,7 +19,7 @@ const ORDERS_CONFIG: Record<string, AbsolutePosition> = {
   [ORDER_MADRAS_2]: { top: 447.5, left: 1118.5 },
 };
 const getCompanyBalanceConfig = (balance: number): AbsolutePosition => {
-  const left = 24 + 34.5 * balance;
+  const left = 24 + 34.5 * (balance % 40);
   return { top: 702, left };
 };
 
@@ -235,11 +235,11 @@ const towerConfig: Record<string, { bottom: number; left: number }> = {
 };
 
 const TREASURY_POSITIONS: Record<string, AbsolutePosition> = {
-  [DIRECTOR_OF_TRADE]: { top: 618, left: 456 },
-  [MANAGER_OF_SHIPPING]: { top: 618, left: 595 },
-  [PRESIDENT_OF_BOMBAY]: { top: 618, left: 846 },
-  [PRESIDENT_OF_MADRAS]: { top: 618, left: 1036 },
-  [PRESIDENT_OF_BENGAL]: { top: 618, left: 1225 },
+  [DIRECTOR_OF_TRADE]: { top: 618, left: 416 },
+  [MANAGER_OF_SHIPPING]: { top: 618, left: 555 },
+  [PRESIDENT_OF_BOMBAY]: { top: 618, left: 806 },
+  [PRESIDENT_OF_MADRAS]: { top: 618, left: 996 },
+  [PRESIDENT_OF_BENGAL]: { top: 618, left: 1185 },
 };
 
 const POWER_TOKEN_POSITIONS: AbsolutePosition[] = [
@@ -247,4 +247,16 @@ const POWER_TOKEN_POSITIONS: AbsolutePosition[] = [
   { top: 115, left: 276 },
   { top: 159, left: 251 },
   { top: 159, left: 301 },
+];
+
+const COMPANY_DEBT_SELECT_POSITIONS: AbsolutePosition[] = [
+  { top: 157, left: 365.5 },
+  { top: 157, left: 400 },
+  { top: 157, left: 434 },
+  { top: 157, left: 468.5 },
+  { top: 157, left: 503 },
+  { top: 157, left: 537 },
+  { top: 157, left: 571.5 },
+  { top: 157, left: 606 },
+  { top: 157, left: 640 },
 ];

@@ -33,10 +33,10 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
   public function argsEnlistWriter()
   {
     $info = $this->ctx->getInfo();
-    $playerId = $info['activePlayerId'];
+    $playerId = $info['activePlayerIds'][0];
 
     $data = [
-      'playerId' => $playerId,
+      'activePlayerIds' => [$playerId],
       'options' => $this->getOptions($playerId),
     ];
 
@@ -70,7 +70,7 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
   public function actEnlistWriter($args)
   {
     self::checkAction('actEnlistWriter');
-    $this->checkPlayer();
+    $playerId = $this->checkPlayer();
 
     $regionId = $args->regionId;
 
@@ -79,8 +79,6 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
     if (!in_array($regionId, $stateArgs['options'])) {
       throw new \feException("ERROR_004");
     }
-
-    $playerId = $stateArgs['playerId'];
 
     $this->performAction($playerId, $regionId);
 

@@ -60,7 +60,7 @@ class Board {
     [SOUTH_INDIAN]: [],
     [EAST_INDIAN]: [],
   };
-  private treasuries: Record<string, Counter> = {};
+  public treasuries: Record<string, Treasury> = {};
 
   constructor(game: GameAlias) {
     this.game = game;
@@ -220,6 +220,18 @@ class Board {
       elt.setAttribute('data-position', position);
       this.ui.selectBoxes.appendChild(elt);
     });
+    Array.from(Array(9).keys()).forEach((value) => {
+      const elt = (this.selectBoxes[`companyDebt_${value}`] =
+        document.createElement('div'));
+      elt.classList.add('joco-select-box');
+      elt.classList.add('joco-company-debt');
+      setAbsolutePosition(
+        elt,
+        BOARD_SCALE,
+        COMPANY_DEBT_SELECT_POSITIONS[value]
+      );
+      this.ui.selectBoxes.appendChild(elt);
+    });
   }
 
   private setupShips(gamedatas: GamedatasAlias) {
@@ -236,13 +248,12 @@ class Board {
 
   private setupTreasuries(gamedatas: GamedatasAlias) {
     Object.entries(TREASURY_POSITIONS).forEach(([office, position]) => {
-      this.ui.treasuries.insertAdjacentHTML(
-        'afterbegin',
-        tplTreasury(office, position)
-      );
-      this.treasuries[office] = new ebg.counter();
-      this.treasuries[office].create(`joco_${office}_treasury`);
-      this.treasuries[office].setValue(gamedatas.offices[office].treasury);
+      this.treasuries[office] = new Treasury({
+        gamedatas,
+        office,
+        position,
+        container: this.ui.treasuries,
+      });
     });
   }
 

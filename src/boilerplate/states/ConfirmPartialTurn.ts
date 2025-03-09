@@ -57,10 +57,10 @@ class ConfirmPartialTurn implements State {
         you: '${you}',
       },
     });
-    this.game.addConfirmButton(() =>
+    addConfirmButton(() =>
       this.game.framework().bgaPerformAction('actConfirmPartialTurn')
     );
-    this.game.addUndoButtons(this.args);
+    addUndoButtons(this.args);
   }
 
   //  .##.....##.########.####.##.......####.########.##....##

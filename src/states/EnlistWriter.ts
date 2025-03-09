@@ -26,11 +26,11 @@ class EnlistWriter implements State {
     debug('Leaving EnlistWriter state');
   }
 
-  setDescription(activePlayerId: number, args: OnEnteringEnlistWriterArgs) {
+  setDescription(activePlayerIds: number[], args: OnEnteringEnlistWriterArgs) {
     console.log('setDescription');
     updatePageTitle(_('${tkn_playerName} must select a region to place their writer'), {
       tkn_playerName: PlayerManager.getInstance()
-        .getPlayer(activePlayerId)
+        .getPlayer(activePlayerIds[0])
         .getName(),
     });
   }

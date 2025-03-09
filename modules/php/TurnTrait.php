@@ -7,6 +7,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Managers\AICards;
+use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Crown;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\Offices;
@@ -100,7 +101,7 @@ trait TurnTrait
           'action' => FAMILY_ACTION,
           'playerId' => 'all',
           'familyId' => Players::get($playerId)->getFamilyId(),
-          'activePlayerId' => $playerId,
+          'activePlayerIds' => [$playerId],
         ];
       }, $turnOrder),
     ];
@@ -145,7 +146,7 @@ trait TurnTrait
      * TODO: setup Engine if there are vacant offices,
      * otherwise Notif that there are no vacant offices
      */
-    $this->stSetupCompanyOperation();
+    $this->stSetupChairman();
   }
 
   // ..######...#######..##.....##.########.....###....##....##.##....##
@@ -164,17 +165,43 @@ trait TurnTrait
   // .##.....##.##........##.......##....##..##.....##....##.....##..##.....##.##...###
   // ..#######..##........########.##.....##.##.....##....##....####..#######..##....##
 
+  function stSetupChairman()
+  {
+    $offices = Company::getOfficesWithTreasury();
+
+    $initialTreasuries = [];
+
+    foreach($offices as $officeId => $office) {
+      $initialTreasuries[$officeId] = $office->getTreasury();
+    }
+
+    $node = [
+      'children' => [
+        [
+          'action' => CHAIRMAN,
+          'playerId' => 'all',
+          'activePlayerIds' => [Offices::get(CHAIRMAN)->getPlayerId()],
+          'initialTreasuries' => $initialTreasuries,
+          'initialDebt' => Company::getDebt(),
+        ]
+      ],
+    ];
+
+    Engine::setup($node, ['method' => 'stSetupCompanyOperation']);
+    Engine::proceed();
+  }
+
   function stSetupCompanyOperation()
   {
     $offices = Offices::getAll();
 
-    $officesInGame = [CHAIRMAN, DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING, MILITARY_AFFAIRS];
+    $officesInGame = [DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING, MILITARY_AFFAIRS];
     $node = [
       'children' => array_map(function ($officeId) use ($offices) {
         return [
           'action' => $officeId,
           'playerId' => 'all',
-          'activePlayerId' => $offices[$officeId]->getPlayerId(),
+          'activePlayerIds' => [$offices[$officeId]->getPlayerId()],
         ];
       }, $officesInGame),
     ];
