@@ -46,6 +46,10 @@ interface NotifIncreaseCompanyDebt extends NotifWithPlayerArgs {
   companyBalance: number;
 }
 
+interface NotifMakeCheck extends NotifWithPlayerArgs {
+  diceResults: number[];
+}
+
 interface NotifMoveFamilyMembers {
   familyMembers: JocoFamilyMember[];
 }
@@ -66,6 +70,10 @@ interface NotifPlaceShip extends NotifWithPlayerArgs {
 interface NotifPurchaseEnterprise extends NotifWithPlayerArgs {
   amount: number;
   type: string;
+}
+
+interface NotifReturnFamilyMemberToSupply extends NotifWithPlayerArgs {
+  familyMember: JocoFamilyMember;
 }
 
 interface NotifSeekShare extends NotifWithPlayerArgs {

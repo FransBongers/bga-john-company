@@ -2,6 +2,10 @@
 
 namespace Bga\Games\JohnCompany\Models;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Managers\Players;
+
 class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
 {
   protected $id;
@@ -40,5 +44,9 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
     return $this->jsonSerialize(); // Static datas are already in js file
   }
 
-  
+  public function returnToSupply()
+  {
+    $this->setLocation(Locations::familyMemberSupply($this->familyId));
+    Notifications::returnFamilyMemberToSupply(Players::getPlayerForFamily($this->familyId), $this);
+  }
 }

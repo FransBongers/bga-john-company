@@ -629,9 +629,8 @@ var moveToAnimation = function (_a) { return __awaiter(_this, [_a], void 0, func
                 top = toRect.top - fromRect.top;
                 left = toRect.left - fromRect.left;
                 originalPositionStyle = element.style.position;
-                element.style.top = "".concat(pxNumber(element.style.top) + top, "px");
-                element.style.left = "".concat(pxNumber(element.style.left) + left, "px");
-                element.style.position = 'relative';
+                element.style.top = "".concat(pxNumber(getComputedStyle(element).top) + top, "px");
+                element.style.left = "".concat(pxNumber(getComputedStyle(element).left) + left, "px");
                 return [4, game.animationManager.play(new BgaSlideAnimation({
                         element: element,
                         transitionTimingFunction: 'ease-in-out',
@@ -650,7 +649,8 @@ var moveToAnimation = function (_a) { return __awaiter(_this, [_a], void 0, func
     });
 }); };
 var pxNumber = function (px) {
-    if ((px || '').endsWith('px')) {
+    var value = px || '';
+    if (value.endsWith('px')) {
         return Number(px.slice(0, -2));
     }
     else {
@@ -841,11 +841,13 @@ var NotificationManager = (function () {
             'gainCash',
             'gainEnterprise',
             'increaseCompanyDebt',
+            'makeCheck',
             'moveFamilyMembers',
             'newCompanyShare',
             'nextPhase',
             'placeShip',
             'purchaseEnterprise',
+            'returnFamilyMemberToSupply',
             'seekShare',
             'setCrownClimate',
             'setupDone',
@@ -1116,6 +1118,13 @@ var NotificationManager = (function () {
             });
         });
     };
+    NotificationManager.prototype.notif_makeCheck = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2];
+            });
+        });
+    };
     NotificationManager.prototype.notif_moveFamilyMembers = function (notif) {
         return __awaiter(this, void 0, void 0, function () {
             var familyMembers, board;
@@ -1204,6 +1213,28 @@ var NotificationManager = (function () {
                         if (type === SHIPYARD) {
                             player.counters[SHIPS_COUNTER].incValue(1);
                         }
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_returnFamilyMemberToSupply = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, familyMember, playerId, element;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = notif.args, familyMember = _a.familyMember, playerId = _a.playerId;
+                        element = Board.getInstance().familyMembers[familyMember.id];
+                        return [4, moveToAnimation({
+                                game: this.game,
+                                element: element,
+                                toId: "joco-familyMembers-".concat(playerId),
+                                remove: true,
+                            })];
+                    case 1:
+                        _b.sent();
+                        this.getPlayer(playerId).counters[FAMILY_MEMBERS_COUNTER].incValue(1);
                         return [2];
                 }
             });
@@ -1400,7 +1431,9 @@ var JohnCompany = (function () {
             ChairmanDebtConsent: ChairmanDebtConsent,
             ConfirmPartialTurn: ConfirmPartialTurn,
             ConfirmTurn: ConfirmTurn,
-            DirectorOfTrade: DirectorOfTrade,
+            DirectorOfTradeSpecialEnvoy: DirectorOfTradeSpecialEnvoy,
+            DirectorOfTradeSpecialEnvoySuccess: DirectorOfTradeSpecialEnvoySuccess,
+            DirectorOfTradeTransfers: DirectorOfTradeTransfers,
             DraftCard: DraftCard,
             EnlistWriter: EnlistWriter,
             FamilyAction: FamilyAction,
@@ -2930,7 +2963,6 @@ var Chairman = (function () {
         });
     };
     Chairman.prototype.updatePageTitle = function () {
-        console.log('balance', this.companyBalance);
         if (this.companyBalance === 0) {
             updatePageTitle(_('${you} may increase Company Debt'));
         }
@@ -3123,39 +3155,182 @@ var ChairmanDebtConsent = (function () {
     };
     return ChairmanDebtConsent;
 }());
-var DirectorOfTrade = (function () {
-    function DirectorOfTrade(game) {
+var DirectorOfTradeSpecialEnvoy = (function () {
+    function DirectorOfTradeSpecialEnvoy(game) {
         this.game = game;
     }
-    DirectorOfTrade.create = function (game) {
-        DirectorOfTrade.instance = new DirectorOfTrade(game);
+    DirectorOfTradeSpecialEnvoy.create = function (game) {
+        DirectorOfTradeSpecialEnvoy.instance = new DirectorOfTradeSpecialEnvoy(game);
     };
-    DirectorOfTrade.getInstance = function () {
-        return DirectorOfTrade.instance;
+    DirectorOfTradeSpecialEnvoy.getInstance = function () {
+        return DirectorOfTradeSpecialEnvoy.instance;
     };
-    DirectorOfTrade.prototype.onEnteringState = function (args) {
-        debug('Entering DirectorOfTrade state');
+    DirectorOfTradeSpecialEnvoy.prototype.onEnteringState = function (args) {
+        debug('Entering DirectorOfTradeSpecialEnvoy state');
         this.args = args;
+        this.spend = args.proposal || 0;
         this.updateInterfaceInitialStep();
     };
-    DirectorOfTrade.prototype.onLeavingState = function () {
-        debug('Leaving DirectorOfTrade state');
+    DirectorOfTradeSpecialEnvoy.prototype.onLeavingState = function () {
+        debug('Leaving DirectorOfTradeSpecialEnvoy state');
     };
-    DirectorOfTrade.prototype.setDescription = function (activePlayerIds, args) {
-        updatePageTitle(_('${tkn_playerName} may Director of Trade'), {
+    DirectorOfTradeSpecialEnvoy.prototype.setDescription = function (activePlayerIds, args) {
+        if (args.proposal > 0) {
+            updatePageTitle(_('Special Envoy: ${tkn_playerName} proposes to spend ${amount} ${tkn_pound} to make a check'), {
+                tkn_playerName: getPlayerName(activePlayerIds[0]),
+                amount: args.proposal,
+                tkn_pound: 'pound',
+            });
+        }
+        else if (args.proposal === 0) {
+            updatePageTitle(_('Special Envoy: ${tkn_playerName} proposes not to make a check'), {
+                tkn_playerName: getPlayerName(activePlayerIds[0]),
+            });
+        }
+        else {
+            updatePageTitle(_('Special Envoy: ${tkn_playerName} may make a check'), {
+                tkn_playerName: getPlayerName(activePlayerIds[0]),
+            });
+        }
+    };
+    DirectorOfTradeSpecialEnvoy.prototype.updateInterfaceInitialStep = function () {
+        var _this = this;
+        this.game.clearPossible();
+        var available = this.args.treasury - this.spend;
+        updatePageTitle(_('Special Envoy: ${you} may spend 1 ${tkn_pound} per die'), {
+            available: available,
+            tkn_pound: 'pound',
+        });
+        addSecondaryActionButton({
+            id: 'minus_btn',
+            text: '-',
+            callback: function () {
+                _this.spend--;
+                _this.updateInterfaceInitialStep();
+            },
+            extraClasses: this.spend === 0 ? DISABLED : '',
+        });
+        addPrimaryActionButton({
+            id: 'make_check_btn',
+            text: formatStringRecursive(_('Roll ${number} dice'), {
+                number: this.spend,
+            }),
+            callback: function () { return _this.updateIntefaceConfirm(); },
+        });
+        addSecondaryActionButton({
+            id: 'plus_btn',
+            text: '+',
+            callback: function () {
+                _this.spend++;
+                _this.updateInterfaceInitialStep();
+            },
+            extraClasses: available === 0 ? DISABLED : '',
+        });
+        addPrimaryActionButton({
+            id: 'propose_btn',
+            text: _('Propose'),
+            callback: function () { return _this.performAction(false); },
+        });
+    };
+    DirectorOfTradeSpecialEnvoy.prototype.updateIntefaceConfirm = function () {
+        var _this = this;
+        clearPossible();
+        updatePageTitle(_('Special Envoy: make a check with ${number} dice?'), {
+            number: this.spend,
+        });
+        addConfirmButton(function () { return _this.performAction(true); });
+        addCancelButton();
+    };
+    DirectorOfTradeSpecialEnvoy.prototype.performAction = function (makeCheck) {
+        if (makeCheck === void 0) { makeCheck = false; }
+        performAction('actDirectorOfTradeSpecialEnvoy', {
+            spend: this.spend,
+            makeCheck: makeCheck,
+        });
+    };
+    return DirectorOfTradeSpecialEnvoy;
+}());
+var DirectorOfTradeSpecialEnvoySuccess = (function () {
+    function DirectorOfTradeSpecialEnvoySuccess(game) {
+        this.game = game;
+    }
+    DirectorOfTradeSpecialEnvoySuccess.create = function (game) {
+        DirectorOfTradeSpecialEnvoySuccess.instance =
+            new DirectorOfTradeSpecialEnvoySuccess(game);
+    };
+    DirectorOfTradeSpecialEnvoySuccess.getInstance = function () {
+        return DirectorOfTradeSpecialEnvoySuccess.instance;
+    };
+    DirectorOfTradeSpecialEnvoySuccess.prototype.onEnteringState = function (args) {
+        debug('Entering DirectorOfTradeSpecialEnvoySuccess state');
+        this.args = args;
+        this.spend = args.proposal || 0;
+        this.updateInterfaceInitialStep();
+    };
+    DirectorOfTradeSpecialEnvoySuccess.prototype.onLeavingState = function () {
+        debug('Leaving DirectorOfTradeSpecialEnvoySuccess state');
+    };
+    DirectorOfTradeSpecialEnvoySuccess.prototype.setDescription = function (activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} may open trade with China or may open a closed order'), {
             tkn_playerName: getPlayerName(activePlayerIds[0]),
         });
     };
-    DirectorOfTrade.prototype.updateInterfaceInitialStep = function () {
+    DirectorOfTradeSpecialEnvoySuccess.prototype.updateInterfaceInitialStep = function () {
         this.game.clearPossible();
-        updatePageTitle(_('${you} may play Director of Trade'));
+        var available = this.args.treasury - this.spend;
+        updatePageTitle(_('${you} may open trade with China or may open a closed order'), {});
     };
-    DirectorOfTrade.prototype.performAction = function (yay) {
-        performAction('actDirectorOfTrade', {
+    DirectorOfTradeSpecialEnvoySuccess.prototype.updateIntefaceConfirm = function () {
+        var _this = this;
+        clearPossible();
+        updatePageTitle(_('Special Envoy: make a check with ${number} dice?'), {
+            number: this.spend,
+        });
+        addConfirmButton(function () { return _this.performAction(true); });
+        addCancelButton();
+    };
+    DirectorOfTradeSpecialEnvoySuccess.prototype.performAction = function (makeCheck) {
+        if (makeCheck === void 0) { makeCheck = false; }
+        performAction('actDirectorOfTradeSpecialEnvoySuccess', {
+            spend: this.spend,
+            makeCheck: makeCheck,
+        });
+    };
+    return DirectorOfTradeSpecialEnvoySuccess;
+}());
+var DirectorOfTradeTransfers = (function () {
+    function DirectorOfTradeTransfers(game) {
+        this.game = game;
+    }
+    DirectorOfTradeTransfers.create = function (game) {
+        DirectorOfTradeTransfers.instance = new DirectorOfTradeTransfers(game);
+    };
+    DirectorOfTradeTransfers.getInstance = function () {
+        return DirectorOfTradeTransfers.instance;
+    };
+    DirectorOfTradeTransfers.prototype.onEnteringState = function (args) {
+        debug('Entering DirectorOfTradeTransfers state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    };
+    DirectorOfTradeTransfers.prototype.onLeavingState = function () {
+        debug('Leaving DirectorOfTradeTransfers state');
+    };
+    DirectorOfTradeTransfers.prototype.setDescription = function (activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} may move writers or ships'), {
+            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        });
+    };
+    DirectorOfTradeTransfers.prototype.updateInterfaceInitialStep = function () {
+        this.game.clearPossible();
+        updatePageTitle(_('${you} may transfer two ships'));
+    };
+    DirectorOfTradeTransfers.prototype.performAction = function (yay) {
+        performAction('actDirectorOfTradeTransfers', {
             consent: yay,
         });
     };
-    return DirectorOfTrade;
+    return DirectorOfTradeTransfers;
 }());
 var DraftCard = (function () {
     function DraftCard(game) {

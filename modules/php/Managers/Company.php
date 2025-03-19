@@ -3,6 +3,7 @@
 namespace Bga\Games\JohnCompany\Managers;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 
@@ -97,5 +98,26 @@ class Company
   public static function getRequiredNumberForShareMajority()
   {
     return floor(count(self::getShares()) / 2) + 1;
+  }
+
+  public static function rollDie()
+  {
+    return bga_rand(1, 6);
+  }
+
+  public static function makeCheck($numberOfDice)
+  {
+    if ($numberOfDice === 0) {
+      throw new \feException("ERROR_009");
+    }
+
+    $dieResults = [];
+    for ($i = 0; $i < $numberOfDice; $i++) {
+      $dieResults[] = self::rollDie();
+    }
+    $minResult = min($dieResults);
+    Notifications::log('dieResults', $dieResults);
+    Notifications::log('minResult', $minResult);
+    return $minResult;
   }
 }

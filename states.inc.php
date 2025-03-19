@@ -288,14 +288,47 @@ $machinestates = [
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
-    ST_DIRECTOR_OF_TRADE=> [
-        'name' => DIRECTOR_OF_TRADE,
+    ST_DIRECTOR_OF_TRADE_SPECIAL_ENVOY => [
+        'name' => DIRECTOR_OF_TRADE_SPECIAL_ENVOY,
         'type' => 'multipleactiveplayer',
         'description' => clienttranslate('${actplayer}'),
         'descriptionmyturn' => clienttranslate('${you}'),
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
-        'possibleactions' => ['act' . DIRECTOR_OF_TRADE, 'actTakeAtomicAction'],
+        'possibleactions' => ['act' . DIRECTOR_OF_TRADE_SPECIAL_ENVOY, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_DIRECTOR_OF_TRADE_SPECIAL_ENVOY_SUCCESS => [
+        'name' => DIRECTOR_OF_TRADE_SPECIAL_ENVOY_SUCCESS,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . DIRECTOR_OF_TRADE_SPECIAL_ENVOY_SUCCESS, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+    
+    ST_DIRECTOR_OF_TRADE_TRANSFERS => [
+        'name' => DIRECTOR_OF_TRADE_TRANSFERS,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . DIRECTOR_OF_TRADE_TRANSFERS, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_MANAGER_OF_SHIPPING => [
+        'name' => MANAGER_OF_SHIPPING,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . MANAGER_OF_SHIPPING, 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 ];

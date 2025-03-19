@@ -187,6 +187,32 @@ trait TurnTrait
       ],
     ];
 
+    // TODO: Governor General or Director of Trade callback
+    Engine::setup($node, ['method' => 'stSetupDirectorOfTrade']);
+    Engine::proceed();
+  }
+
+  function stSetupDirectorOfTrade()
+  {
+    $playerId = Offices::get(DIRECTOR_OF_TRADE)->getPlayerId();
+
+    $node = [
+      'children' => [
+        [
+          'action' => DIRECTOR_OF_TRADE_SPECIAL_ENVOY,
+          'playerId' => 'all',
+          'activePlayerIds' => [$playerId],
+          'optional' => true,
+        ],
+        [
+          'action' => DIRECTOR_OF_TRADE_TRANSFERS,
+          'playerId' => 'all',
+          'activePlayerIds' => [$playerId],
+          'optional' => true,
+        ]
+      ],
+    ];
+
     Engine::setup($node, ['method' => 'stSetupCompanyOperation']);
     Engine::proceed();
   }
@@ -195,7 +221,7 @@ trait TurnTrait
   {
     $offices = Offices::getAll();
 
-    $officesInGame = [DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING, MILITARY_AFFAIRS];
+    $officesInGame = [MANAGER_OF_SHIPPING, MILITARY_AFFAIRS];
     $node = [
       'children' => array_map(function ($officeId) use ($offices) {
         return [

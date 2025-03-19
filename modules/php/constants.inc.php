@@ -4,6 +4,13 @@ require_once 'gameoptions.inc.php';
 const CROWN_PLAYER_ID = 1;
 
 /**
+ * Checks
+ */
+const SUCCESS = 'success';
+const FAILURE = 'failure';
+const CATASTROPHIC_FAILURE = 'catastrophicFailure';
+
+/**
  * ScenarioIds
  */
 const THE_1710_SCENARIO = 'The1710Scenario';
@@ -54,7 +61,10 @@ const ST_SEEK_SHARE = 30;
 const ST_CHAIRMAN = 40;
 const ST_CHAIRMAN_DEBT_CONSENT = 41;
 
-const ST_DIRECTOR_OF_TRADE = 42;
+const ST_DIRECTOR_OF_TRADE_SPECIAL_ENVOY = 42;
+const ST_DIRECTOR_OF_TRADE_TRANSFERS = 43;
+const ST_MANAGER_OF_SHIPPING = 44;
+const ST_DIRECTOR_OF_TRADE_SPECIAL_ENVOY_SUCCESS = 45;
 
 const DRAFT_CARD = 'DraftCard';
 const DRAFT_CARD_NEXT_STEP = 'DraftCardNextStep';
@@ -70,6 +80,9 @@ const PURCHASE_WORKSHOP = 'PurchaseWorkshop';
 const SEEK_SHARE = 'SeekShare';
 // Company Operations
 const CHAIRMAN_DEBT_CONSENT = 'ChairmanDebtConsent';
+const DIRECTOR_OF_TRADE_SPECIAL_ENVOY = 'DirectorOfTradeSpecialEnvoy';
+const DIRECTOR_OF_TRADE_SPECIAL_ENVOY_SUCCESS = 'DirectorOfTradeSpecialEnvoySuccess';
+const DIRECTOR_OF_TRADE_TRANSFERS = 'DirectorOfTradeTransfers';
 
 /**
  * Company

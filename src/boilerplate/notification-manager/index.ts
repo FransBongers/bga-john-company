@@ -68,11 +68,13 @@ class NotificationManager {
       'gainCash',
       'gainEnterprise',
       'increaseCompanyDebt',
+      'makeCheck',
       'moveFamilyMembers',
       'newCompanyShare',
       'nextPhase',
       'placeShip',
       'purchaseEnterprise',
+      'returnFamilyMemberToSupply',
       'seekShare',
       'setCrownClimate',
       'setupDone',
@@ -322,6 +324,10 @@ class NotificationManager {
     ]);
   }
 
+  async notif_makeCheck(notif: Notif<NotifMakeCheck>) {
+    // TODO: animation
+  }
+
   async notif_moveFamilyMembers(notif: Notif<NotifMoveFamilyMembers>) {
     const { familyMembers } = notif.args;
     const board = Board.getInstance();
@@ -369,6 +375,20 @@ class NotificationManager {
     if (type === SHIPYARD) {
       player.counters[SHIPS_COUNTER].incValue(1);
     }
+  }
+
+  async notif_returnFamilyMemberToSupply(
+    notif: Notif<NotifReturnFamilyMemberToSupply>
+  ) {
+    const { familyMember, playerId } = notif.args;
+    const element = Board.getInstance().familyMembers[familyMember.id];
+    await moveToAnimation({
+      game: this.game,
+      element,
+      toId: `joco-familyMembers-${playerId}`,
+      remove: true,
+    });
+    this.getPlayer(playerId).counters[FAMILY_MEMBERS_COUNTER].incValue(1);
   }
 
   async notif_seekShare(notif: Notif<NotifSeekShare>) {

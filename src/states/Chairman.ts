@@ -134,7 +134,6 @@ class Chairman implements State {
   //  ..#######.....##....####.########.####....##.......##...
 
   private updatePageTitle() {
-    console.log('balance', this.companyBalance);
     // TODO: what if there is no options to increase debt?
     if (this.companyBalance === 0) {
       updatePageTitle(_('${you} may increase Company Debt'));

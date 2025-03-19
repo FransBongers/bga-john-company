@@ -230,6 +230,13 @@ class Notifications
     ]);
   }
 
+  public static function failCheck($player)
+  {
+    self::message(clienttranslate('${player_name} fails the check'), [
+      'player' => $player
+    ]);
+  }
+
   public static function gainEnterprise($player, $enterprise)
   {
     // Notifications::message(clienttranslate('${player_name} gains a ${enterprise}'), ['player' => $player, 'enterprise' => $type]);
@@ -293,6 +300,18 @@ class Notifications
     ]);
   }
 
+  public static function payFromTreasury($player, $office, $amount)
+  {
+    self::notifyAll('payFromTreasury', clienttranslate('${player_name} spends ${amount} ${tkn_pound} from the ${tkn_boldText_office} treasury'), [
+      'player' => $player,
+      'tkn_pound' => self::tknPound(),
+      'officeId' => $office->getId(),
+      'amount' => $amount,
+      'tkn_boldText_office' => $office->getTitle(),
+      'i18n' => ['tkn_boldText_office'],
+    ]);
+  }
+
   public static function placeShip($player, $ship)
   {
     // TODO: ship icon?
@@ -313,6 +332,44 @@ class Notifications
       'type' => $enterprise->getType(),
       'tkn_pound' => clienttranslate('Pounds'),
       'i18n' => ['tkn_boldText_enterprise'],
+    ]);
+  }
+
+  public static function returnFamilyMemberToSupply($player, $familyMember)
+  {
+    self::notifyAll('returnFamilyMemberToSupply', clienttranslate('${player_name} return a family member to their supply'), [
+      'player' => $player,
+      'familyMember' => $familyMember,
+    ]);
+  }
+
+  public static function makeCheck($player, $diceResults, $checkResult)
+  {
+    $translatedResultMap = [
+      SUCCESS => clienttranslate('success'),
+      FAILURE => clienttranslate('failure'),
+      CATASTROPHIC_FAILURE => clienttranslate('catastrophic failure')
+    ];
+
+    $args = [];
+    $log = '';
+
+    foreach ($diceResults as $index => $result) {
+      $key = 'die_' . $index;
+      $log = $log . implode('', [' ', '${', $key, '}']);
+      $args[$key] = $result;
+    }
+
+    Notifications::notifyAll('makeCheck', clienttranslate('${player_name} makes a check and rolls ${diceResultsLog}: the check is a ${tkn_boldText_checkResult}'), [
+      'player' => $player,
+      'diceResults' => $diceResults,
+      'diceResultsLog' => [
+        'log' => $log,
+        'args' => $args,
+      ],
+      // 'result' => $checkResult,
+      'tkn_boldText_checkResult' => $translatedResultMap[$checkResult],
+      'i18n' => ['tkn_boldText_checkResult']
     ]);
   }
 

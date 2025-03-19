@@ -19,7 +19,7 @@ class Board {
     ships: HTMLElement;
     treasuries: HTMLElement;
   };
-  private familyMembers: Record<string, HTMLElement> = {};
+  public familyMembers: Record<string, HTMLElement> = {};
   private armyPieces: Record<string, HTMLElement> = {};
   private ships: Record<string, HTMLElement> = {};
   public selectBoxes: Record<string, HTMLElement> = {};

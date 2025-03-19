@@ -23,10 +23,10 @@ const moveToAnimation = async ({
 
   const originalPositionStyle = element.style.position;
 
-  element.style.top = `${pxNumber(element.style.top) + top}px`;
-  element.style.left = `${pxNumber(element.style.left) + left}px`;
+  element.style.top = `${pxNumber(getComputedStyle(element).top) + top}px`;
+  element.style.left = `${pxNumber(getComputedStyle(element).left) + left}px`;
 
-  element.style.position = 'relative';
+  // element.style.position = 'relative';
   await game.animationManager.play(
     new BgaSlideAnimation<BgaAnimationWithOriginSettings>({
       element,
@@ -42,7 +42,8 @@ const moveToAnimation = async ({
 };
 
 const pxNumber = (px?: string): number => {
-  if ((px || '').endsWith('px')) {
+  const value = px || '';
+  if (value.endsWith('px')) {
     return Number(px.slice(0, -2));
   } else {
     return 0;

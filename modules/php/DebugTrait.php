@@ -23,6 +23,7 @@ use Bga\Games\JohnCompany\Managers\SetupCards;
 use Bga\Games\JohnCompany\Managers\Ships;
 use Bga\Games\JohnCompany\Models\Enterprise;
 use Bga\Games\JohnCompany\Models\FamilyMember;
+use Bga\Games\JohnCompany\JoCoUtils;
 
 trait DebugTrait
 {
@@ -47,8 +48,10 @@ trait DebugTrait
     // $presidencues = Offices::getMany([PRESIDENT_OF_MADRAS])->toArray();
     // Notifications::log('offices', Offices::getMany([DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING, PRESIDENT_OF_BENGAL, PRESIDENT_OF_BOMBAY PRESIDENT_OF_BOMBAY]));
     // Offices::getMany([DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING, PRESIDENT_OF_BENGAL, PRESIDENT_OF_BOMBAY, PRESIDENT_OF_BOMBAY])
-;
-    Notifications::log('map', Players::getFamilyIdPlayerIdMap());
+
+    // JoCoUtils::makeCheck(Players::get(), Offices::get(DIRECTOR_OF_TRADE), 1);
+    Notifications::log('map', Offices::get(DIRECTOR_OF_TRADE)->getFamilyMemberId());
+    
   }
 
 

@@ -121,7 +121,7 @@ class Chairman extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     // value to be voted for noeeds to be in options and greater than current company debt
     if ($debtVote !== null && ($debtVote <= Company::getDebt() || !in_array($debtVote, $stateArgs['debtOptions']['vote']))) {
-      throw new \feException("ERROR_009");
+      throw new \feException("9");
     }
     if ($debtVote !== null) {
       Notifications::message(clienttranslate('${player_name} asks for consent to increase Company Debt to ${tkn_boldText_value}'), [
