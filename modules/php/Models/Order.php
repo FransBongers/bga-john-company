@@ -2,6 +2,8 @@
 
 namespace Bga\Games\JohnCompany\Models;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+
 class Order extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
 {
   protected $id;
@@ -54,5 +56,17 @@ class Order extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implemen
   public function getRegionId()
   {
     return $this->regionId;
+  }
+
+  public function close($player)
+  {
+    $this->setStatus(CLOSED);
+    Notifications::changeOrderStatus($player, $this, CLOSED);
+  }
+
+  public function open($player)
+  {
+    $this->setStatus(OPEN);
+    Notifications::changeOrderStatus($player, $this, OPEN);
   }
 }

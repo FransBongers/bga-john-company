@@ -50,7 +50,7 @@ trait DebugTrait
     // Offices::getMany([DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING, PRESIDENT_OF_BENGAL, PRESIDENT_OF_BOMBAY, PRESIDENT_OF_BOMBAY])
 
     // JoCoUtils::makeCheck(Players::get(), Offices::get(DIRECTOR_OF_TRADE), 1);
-    Notifications::log('map', Offices::get(DIRECTOR_OF_TRADE)->getFamilyMemberId());
+    Notifications::log('closed orders', Orders::getClosedOrders());
     
   }
 

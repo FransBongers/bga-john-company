@@ -25,7 +25,7 @@ class Board {
   public selectBoxes: Record<string, HTMLElement> = {};
 
   private courtOfDirectors: JocoFamilyMember[] = [];
-  private orders: Record<string, HTMLElement> = {};
+  public orders: Record<string, HTMLElement> = {};
   private regions: Record<string, Region> = {};
   private armies: {
     regiments: {
@@ -92,7 +92,7 @@ class Board {
     this.ui = {
       board: document.getElementById('joco-board'),
       familyMembers: document.getElementById('joco_family_members'),
-      orders: document.getElementById('joco_orders'),
+      orders: document.getElementById('joco-orders'),
       regiments: document.getElementById('joco-regiments'),
       pawns: {},
       powerTokens: document.getElementById('joco-power-tokens'),
@@ -164,7 +164,7 @@ class Board {
     Object.keys(gamedatas.orders).forEach((orderId) => {
       const elt = (this.orders[orderId] = document.createElement('div'));
       // elt.id = orderId;
-      elt.classList.add('joco_order');
+      elt.classList.add('joco-order');
     });
     this.updateOrders(gamedatas);
   }

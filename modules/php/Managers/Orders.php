@@ -61,4 +61,12 @@ class Orders extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     // Notifications::log('orders', $orders);
     self::create($orders, null);
   }
+
+  public static function getClosedOrders()
+  {
+    $orders = self::getAll()->toArray();
+    return Utils::filter($orders, function ($order) {
+      return $order->getStatus() === CLOSED;
+    });
+  }
 }

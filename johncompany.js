@@ -834,6 +834,7 @@ var NotificationManager = (function () {
         var notifs = [
             'log',
             'message',
+            'changeOrderStatus',
             'companyOperationChairman',
             'draftCardPrivate',
             'draftNewCardsPrivate',
@@ -845,6 +846,7 @@ var NotificationManager = (function () {
             'moveFamilyMembers',
             'newCompanyShare',
             'nextPhase',
+            'payFromTreasury',
             'placeShip',
             'purchaseEnterprise',
             'returnFamilyMemberToSupply',
@@ -984,6 +986,16 @@ var NotificationManager = (function () {
                         _a.sent();
                         return [2];
                 }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_changeOrderStatus = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var order;
+            return __generator(this, function (_a) {
+                order = notif.args.order;
+                Board.getInstance().orders[order.id].setAttribute('data-status', order.status);
+                return [2];
             });
         });
     };
@@ -1178,6 +1190,16 @@ var NotificationManager = (function () {
                         _a.sent();
                         return [2];
                 }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_payFromTreasury = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, amount, officeId;
+            return __generator(this, function (_b) {
+                _a = notif.args, amount = _a.amount, officeId = _a.officeId;
+                Board.getInstance().treasuries[officeId].incValue(-amount);
+                return [2];
             });
         });
     };
@@ -2095,7 +2117,7 @@ var Board = (function () {
         this.ui = {
             board: document.getElementById('joco-board'),
             familyMembers: document.getElementById('joco_family_members'),
-            orders: document.getElementById('joco_orders'),
+            orders: document.getElementById('joco-orders'),
             regiments: document.getElementById('joco-regiments'),
             pawns: {},
             powerTokens: document.getElementById('joco-power-tokens'),
@@ -2140,7 +2162,7 @@ var Board = (function () {
         var _this = this;
         Object.keys(gamedatas.orders).forEach(function (orderId) {
             var elt = (_this.orders[orderId] = document.createElement('div'));
-            elt.classList.add('joco_order');
+            elt.classList.add('joco-order');
         });
         this.updateOrders(gamedatas);
     };
@@ -2475,7 +2497,7 @@ var Region = (function () {
     };
     return Region;
 }());
-var tplBoard = function (gamedatas) { return "<div id=\"joco-board\">\n  <div id=\"joco_family_members\"></div>\n  <div id=\"joco_orders\"></div>\n  <div id=\"joco-regiments\"></div>\n  <div id=\"joco-power-tokens\"></div>\n  <div id=\"joco_ships\"></div>\n  <div id=\"joco_towers\"></div>\n  <div id=\"joco_treasuries\"></div>\n  <div id=\"joco-select-boxes\"></div>\n</div>"; };
+var tplBoard = function (gamedatas) { return "<div id=\"joco-board\">\n  <div id=\"joco_family_members\"></div>\n  <div id=\"joco-orders\"></div>\n  <div id=\"joco-regiments\"></div>\n  <div id=\"joco-power-tokens\"></div>\n  <div id=\"joco_ships\"></div>\n  <div id=\"joco_towers\"></div>\n  <div id=\"joco_treasuries\"></div>\n  <div id=\"joco-select-boxes\"></div>\n</div>"; };
 var createFamilyMember = function (familyId, familyMemberId) {
     var _a;
     var elt = document.createElement('div');
@@ -2535,6 +2557,9 @@ var Treasury = (function () {
     };
     Treasury.prototype.toValue = function (value) {
         return this.counter.toValue(value);
+    };
+    Treasury.prototype.incValue = function (value) {
+        return this.counter.incValue(value);
     };
     Treasury.prototype.plus = function () {
         this.counter.incValue(1);
@@ -3264,7 +3289,6 @@ var DirectorOfTradeSpecialEnvoySuccess = (function () {
     DirectorOfTradeSpecialEnvoySuccess.prototype.onEnteringState = function (args) {
         debug('Entering DirectorOfTradeSpecialEnvoySuccess state');
         this.args = args;
-        this.spend = args.proposal || 0;
         this.updateInterfaceInitialStep();
     };
     DirectorOfTradeSpecialEnvoySuccess.prototype.onLeavingState = function () {
@@ -3276,24 +3300,29 @@ var DirectorOfTradeSpecialEnvoySuccess = (function () {
         });
     };
     DirectorOfTradeSpecialEnvoySuccess.prototype.updateInterfaceInitialStep = function () {
+        var _this = this;
         this.game.clearPossible();
-        var available = this.args.treasury - this.spend;
-        updatePageTitle(_('${you} may open trade with China or may open a closed order'), {});
+        updatePageTitle(_('${you} may open trade with China or may open a closed order'));
+        var board = Board.getInstance();
+        this.args.closedOrders.forEach(function (order) {
+            onClick(board.orders[order.id], function () { return _this.updateIntefaceConfirm(order); });
+        });
     };
-    DirectorOfTradeSpecialEnvoySuccess.prototype.updateIntefaceConfirm = function () {
+    DirectorOfTradeSpecialEnvoySuccess.prototype.updateIntefaceConfirm = function (order) {
         var _this = this;
         clearPossible();
-        updatePageTitle(_('Special Envoy: make a check with ${number} dice?'), {
-            number: this.spend,
+        updatePageTitle(_('Open closed order in ${region}?'), {
+            region: _(order.location),
         });
-        addConfirmButton(function () { return _this.performAction(true); });
+        setSelected(Board.getInstance().orders[order.id]);
+        addConfirmButton(function () { return _this.performAction(order, true); });
         addCancelButton();
     };
-    DirectorOfTradeSpecialEnvoySuccess.prototype.performAction = function (makeCheck) {
-        if (makeCheck === void 0) { makeCheck = false; }
+    DirectorOfTradeSpecialEnvoySuccess.prototype.performAction = function (order, perform) {
+        if (perform === void 0) { perform = false; }
         performAction('actDirectorOfTradeSpecialEnvoySuccess', {
-            spend: this.spend,
-            makeCheck: makeCheck,
+            orderId: order.id,
+            perform: perform,
         });
     };
     return DirectorOfTradeSpecialEnvoySuccess;

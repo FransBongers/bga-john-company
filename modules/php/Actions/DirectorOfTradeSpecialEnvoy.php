@@ -147,7 +147,7 @@ class DirectorOfTradeSpecialEnvoy extends \Bga\Games\JohnCompany\Models\AtomicAc
 
     Notifications::payFromTreasury($player, $office, $spend);
     $checkResult = JoCoUtils::makeCheck($player, $office, $spend);
-    if ($checkResult === SUCCESS && $office->getTreasury() > 0) {
+    if ($checkResult !== CATASTROPHIC_FAILURE && $office->getTreasury() > 0) {
       $action = [
         'action' => DIRECTOR_OF_TRADE_SPECIAL_ENVOY,
         'playerId' => 'all',

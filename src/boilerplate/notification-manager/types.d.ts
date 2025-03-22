@@ -13,6 +13,10 @@ interface NotifWithPlayerArgs {
   player_name: string;
 }
 
+interface NotifChangeOrderStatus extends NotifWithPlayerArgs {
+  order: JoCoOrder;
+}
+
 interface NotifCompanyOperationChairman extends NotifWithPlayerArgs {
   companyBalance: number,
   companyDebt: number;
@@ -61,6 +65,11 @@ interface NotifNewCompanyShare extends NotifWithPlayerArgs {
 
 interface NotifNextPhase {
   phase: string;
+}
+
+interface NotifPayFromTreasury extends NotifWithPlayerArgs {
+  officeId: string;
+  amount: number;
 }
 
 interface NotifPlaceShip extends NotifWithPlayerArgs {

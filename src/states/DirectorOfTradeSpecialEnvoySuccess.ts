@@ -1,13 +1,11 @@
 interface OnEnteringDirectorOfTradeSpecialEnvoySuccessArgs
   extends CommonStateArgs {
-  treasury: number;
-  proposal: number | null;
+  closedOrders: JoCoOrder[];
 }
 
 class DirectorOfTradeSpecialEnvoySuccess implements State {
   private static instance: DirectorOfTradeSpecialEnvoySuccess;
   private args: OnEnteringDirectorOfTradeSpecialEnvoySuccessArgs;
-  private spend: number;
 
   constructor(private game: GameAlias) {}
 
@@ -23,7 +21,6 @@ class DirectorOfTradeSpecialEnvoySuccess implements State {
   onEnteringState(args: OnEnteringDirectorOfTradeSpecialEnvoySuccessArgs) {
     debug('Entering DirectorOfTradeSpecialEnvoySuccess state');
     this.args = args;
-    this.spend = args.proposal || 0;
     this.updateInterfaceInitialStep();
   }
 
@@ -64,24 +61,27 @@ class DirectorOfTradeSpecialEnvoySuccess implements State {
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
 
-    const available = this.args.treasury - this.spend;
-
     updatePageTitle(
-      _('${you} may open trade with China or may open a closed order'),
-      {}
+      _('${you} may open trade with China or may open a closed order')
     );
+    const board = Board.getInstance();
+    this.args.closedOrders.forEach((order) => {
+      onClick(board.orders[order.id], () => this.updateIntefaceConfirm(order))
+      
+    })
 
     // addCancelButton();
   }
 
-  private updateIntefaceConfirm() {
+  private updateIntefaceConfirm(order: JoCoOrder) {
     clearPossible();
 
-    updatePageTitle(_('Special Envoy: make a check with ${number} dice?'), {
-      number: this.spend,
+    updatePageTitle(_('Open closed order in ${region}?'), {
+      region: _(order.location),
     });
+    setSelected(Board.getInstance().orders[order.id]);
 
-    addConfirmButton(() => this.performAction(true));
+    addConfirmButton(() => this.performAction(order, true));
     addCancelButton();
   }
 
@@ -93,10 +93,10 @@ class DirectorOfTradeSpecialEnvoySuccess implements State {
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  private performAction(makeCheck: boolean = false) {
+  private performAction(order: JoCoOrder, perform: boolean = false) {
     performAction('actDirectorOfTradeSpecialEnvoySuccess', {
-      spend: this.spend,
-      makeCheck,
+      orderId: order.id,
+      perform,
     });
   }
 

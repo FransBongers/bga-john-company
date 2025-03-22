@@ -61,6 +61,7 @@ class NotificationManager {
       'log',
       'message',
       // 'draftCard',
+      'changeOrderStatus',
       'companyOperationChairman',
       'draftCardPrivate',
       'draftNewCardsPrivate',
@@ -72,6 +73,7 @@ class NotificationManager {
       'moveFamilyMembers',
       'newCompanyShare',
       'nextPhase',
+      'payFromTreasury',
       'placeShip',
       'purchaseEnterprise',
       'returnFamilyMemberToSupply',
@@ -232,6 +234,14 @@ class NotificationManager {
     );
   }
 
+  async notif_changeOrderStatus(notif: Notif<NotifChangeOrderStatus>) {
+    const { order } = notif.args;
+    Board.getInstance().orders[order.id].setAttribute(
+      'data-status',
+      order.status
+    );
+  }
+
   async notif_companyOperationChairman(
     notif: Notif<NotifCompanyOperationChairman>
   ) {
@@ -356,6 +366,11 @@ class NotificationManager {
   async notif_nextPhase(notif: Notif<NotifNextPhase>) {
     const { phase } = notif.args;
     await Board.getInstance().movePawn('phase', phase);
+  }
+
+  async notif_payFromTreasury(notif: Notif<NotifPayFromTreasury>) {
+    const { amount, officeId } = notif.args;
+    Board.getInstance().treasuries[officeId].incValue(-amount);
   }
 
   async notif_placeShip(notif: Notif<NotifPlaceShip>) {

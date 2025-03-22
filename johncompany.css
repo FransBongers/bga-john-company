@@ -58,7 +58,7 @@
 #joco-power-tokens,
 #joco_towers,
 #joco_family_members,
-#joco_orders,
+#joco-orders,
 #joco_ships,
 #joco_treasuries {
   position: absolute;
@@ -66,19 +66,24 @@
   left: 0;
 }
 
-.joco_order {
+.joco-order {
   position: absolute;
   border-radius: 50%;
   height: calc(var(--leftColumnScale) * 46px);
   width: calc(var(--leftColumnScale) * 39.5px);
 }
 
-.joco_order[data-status=closed] {
+.joco-order[data-status=closed] {
   background-color: black;
 }
 
-.joco_order[data-status=filled] {
+.joco-order[data-status=filled] {
   background-color: lightgray;
+}
+
+.joco-order.selected {
+  cursor: pointer;
+  outline: calc(var(--boardScale) * 4px) solid blue;
 }
 
 .joco_pawn {
@@ -264,12 +269,15 @@
   border-radius: 50%;
 }
 
+.joco-order.selectable,
 .joco-select-box.selectable {
   cursor: pointer;
   display: block;
   outline: calc(var(--boardScale) * 4px) solid yellow;
 }
 
+.joco-order.selected,
+.joco-order.selectable:hover,
 .joco-select-box.selected,
 .joco-select-box.selectable:hover {
   cursor: pointer;

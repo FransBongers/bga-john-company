@@ -86,6 +86,10 @@ class Treasury {
     return this.counter.toValue(value);
   }
 
+  public incValue(value: number) {
+    return this.counter.incValue(value);
+  }
+
 
   public plus() {
     this.counter.incValue(1);

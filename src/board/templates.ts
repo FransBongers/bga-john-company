@@ -1,6 +1,6 @@
 const tplBoard = (gamedatas: GamedatasAlias ) => `<div id="joco-board">
   <div id="joco_family_members"></div>
-  <div id="joco_orders"></div>
+  <div id="joco-orders"></div>
   <div id="joco-regiments"></div>
   <div id="joco-power-tokens"></div>
   <div id="joco_ships"></div>

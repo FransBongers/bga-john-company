@@ -33,7 +33,7 @@ class DirectorOfTradeSpecialEnvoy implements State {
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringDirectorOfTradeSpecialEnvoySuccessArgs
+    args: OnEnteringDirectorOfTradeSpecialEnvoyArgs
   ) {
     if (args.proposal > 0) {
       updatePageTitle(

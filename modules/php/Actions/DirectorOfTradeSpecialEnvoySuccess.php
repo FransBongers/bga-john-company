@@ -16,6 +16,7 @@ use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
+use Bga\Games\JohnCompany\Managers\Orders;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 
@@ -45,12 +46,8 @@ class DirectorOfTradeSpecialEnvoySuccess extends \Bga\Games\JohnCompany\Models\A
 
   public function stDirectorOfTradeSpecialEnvoySuccess()
   {
-    // Get data
-    $args = $this->argsDirectorOfTradeSpecialEnvoySuccess();
 
-    if ($args['treasury'] === 0) {
-      $this->resolveAction(['automatic' => true]);
-    }
+
   }
 
   // ....###....########...######....######.
@@ -66,12 +63,10 @@ class DirectorOfTradeSpecialEnvoySuccess extends \Bga\Games\JohnCompany\Models\A
     $info = $this->ctx->getInfo();
     // $player = self::getPlayer();
     $playerId = $info['activePlayerIds'][0];
-    $proposal = isset($info['proposal']) ? $info['proposal'] : null;
 
     $data = [
       'activePlayerIds' => [$playerId],
-      'treasury' => Offices::get(DIRECTOR_OF_TRADE)->getTreasury(),
-      'proposal' => $proposal,
+      'closedOrders' => Orders::getClosedOrders(),
     ];
 
     return $data;
@@ -107,36 +102,22 @@ class DirectorOfTradeSpecialEnvoySuccess extends \Bga\Games\JohnCompany\Models\A
     self::checkAction('actDirectorOfTradeSpecialEnvoySuccess');
     $playerId = $this->checkPlayer();
 
+    $orderId = $args->orderId;
+    $perform = $args->perform;
+
     $stateArgs = $this->argsDirectorOfTradeSpecialEnvoySuccess();
 
     $player = Players::get($playerId);
 
-    $spend = $args->spend;
-    $makeCheck = $args->makeCheck;
-    if (!$makeCheck && $stateArgs['proposal'] !== $spend) {
-      $this->ctx->updateInfo('proposal', $spend);
+    $order = Utils::array_find($stateArgs['closedOrders'], function ($closedOrder) use ($orderId) {
+      return $closedOrder->getId() === $orderId;
+    });
 
-      $text = $spend === 0 ? clienttranslate('${player_name} proposes ${tkn_boldText_not} to make a check') : clienttranslate('${player_name} proposes to make a check with ${tkn_boldText_number} dice');
-
-      Notifications::message($text, [
-        'player' => $player,
-        'tkn_boldText_not' => clienttranslate('not'),
-        'tkn_boldText_number' => $spend,
-        'i18n' => ['tkn_boldText_not']
-      ]);
-
-      Engine::save();
-    } 
-    if (!$makeCheck) {
-      Engine::proceed();
-      return;
+    if ($order === null) {
+      throw new \feException("ERROR_011");
     }
-
-    $office = Offices::get(DIRECTOR_OF_TRADE);
-    $office->incTreasury(-$spend);
-    Notifications::payFromTreasury($player, $office, $spend);
-
-
+    Notifications::log('order', $order);
+    $order->open($player);
     $this->resolveAction([], true);
   }
 

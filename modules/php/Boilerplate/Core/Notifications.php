@@ -4,6 +4,7 @@ namespace Bga\Games\JohnCompany\Boilerplate\Core;
 
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
+use Bga\Games\JohnCompany\Managers\Regions;
 
 class Notifications
 {
@@ -166,6 +167,18 @@ class Notifications
       'player' => $player,
       'climate' => $climate,
       'tkn_climate' => $climate,
+    ]);
+  }
+
+  public static function changeOrderStatus($player, $order, $status)
+  {
+    $text = $status === OPEN ? clienttranslate('${player_name} opens an order in ${tkn_boldText_region}') : clienttranslate('${player_name} closes an order in ${tkn_boldText_region}');
+
+    self::notifyAll('changeOrderStatus', $text, [
+      'player' => $player,
+      'tkn_boldText_region' => Regions::get($order->getLocation())->getName(),
+      'order' => $order->jsonSerialize(),
+      'i18n' => ['tkn_boldText_region'],
     ]);
   }
 
