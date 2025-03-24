@@ -17,6 +17,7 @@
 @use './crown/crown';
 @use './icons';
 @use './negotiation/negotiation';
+@use './pieces';
 @use './player-areas/player-areas';
 @use './player-manager/playerPanel';
 @use './setup-area/setup-area';
@@ -95,71 +96,3 @@ html {
   visibility: visible;
 }
 
-.joco_family_member {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  border-radius: 50%;
-  height: calc(var(--tokenScale) * 46px);
-  width: calc(var(--tokenScale) * 39px);
-  outline: calc(var(--tokenScale) * 1px) solid black;
-  // transition-property: top, left;
-  // transition-duration: 700ms;
-  // transition-timing-function: ease;
-
-  svg {
-    height: calc(var(--tokenScale) * 42px);
-    width: calc(var(--tokenScale) * 35px);
-  }
-}
-
-.joco_family_member[data-family='Benyon'] {
-  background-color: base.$player-pink;
-  outline-color: base.$player-pink-dark;
-  svg {
-    fill: base.$player-pink-dark;
-  }
-}
-.joco_family_member[data-family='Hastings'] {
-  background-color: base.$player-blue;
-  outline-color: base.$player-blue-dark;
-  svg {
-    fill: base.$player-blue-dark;
-  }
-}
-.joco_family_member[data-family='Larkins'] {
-  background-color: base.$player-yellow;
-  outline-color: base.$player-yellow-dark;
-  svg {
-    fill: base.$player-yellow-dark;
-  }
-}
-.joco_family_member[data-family='Paxton'] {
-  background-color: base.$player-gray;
-  outline-color: base.$player-gray-dark;
-  svg {
-    fill: base.$player-gray-dark;
-  }
-}
-.joco_family_member[data-family='Sykes'] {
-  background-color: base.$player-purple;
-  outline-color: base.$player-purple-dark;
-  svg {
-    fill: base.$player-purple-dark;
-  }
-}
-.joco_family_member[data-family='Walsh'] {
-  background-color: base.$player-green;
-  outline-color: base.$player-green-dark;
-  svg {
-    fill: base.$player-green-dark;
-  }
-}
-// .joco_family_member[data-family='Crown'] {
-//   background-color: base.$crown-red;
-//   // background-color: #EE4B2B;
-// }
-// .joco_family_member[data-family='Crown'] svg {
-//   fill: black;
-// }

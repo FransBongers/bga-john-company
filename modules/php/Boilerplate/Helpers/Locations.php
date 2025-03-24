@@ -19,9 +19,9 @@ class Locations
     return 'setupCards_' . $familyId;
   }
 
-  public static function writers($presidencyId)
+  public static function writers($regionId)
   {
-    return 'Writers_' . $presidencyId;
+    return 'Writers_' . $regionId;
   }
 
   public static function officers($presidencyId)
@@ -32,6 +32,11 @@ class Locations
   public static function officerInTraining()
   {
     return OFFICER_IN_TRAINING;
+  }
+
+  public static function presidency($regionId)
+  {
+    return $regionId . 'Presidency';
   }
 
   public static function commander($presidencyId)

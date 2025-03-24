@@ -92,6 +92,7 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $familyMember = FamilyMembers::getMemberFor($familyId);
     $familyMember->setLocation(Locations::writers($regionId));
+    $familyMember->setPresidency(Locations::presidency($regionId));
 
     Notifications::enlistWriter($player, $familyMember, Regions::get($regionId));
 

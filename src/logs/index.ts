@@ -8,6 +8,7 @@ const LOG_TOKEN_POUND = 'pound';
 const LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
 const LOG_TOKEN_ICON = 'icon';
 const LOG_TOKEN_SETUP_CARD = 'setupCard';
+const LOG_TOKEN_FAMILY_MEMBER = 'familyMember'
 
 let tooltipIdCounter = 0;
 
@@ -32,6 +33,9 @@ const getTokenDiv = ({
     case LOG_TOKEN_ICON:
     case LOG_TOKEN_ENTERPRISE_ICON:
       return tplLogTokenIcon(value);
+    case LOG_TOKEN_FAMILY_MEMBER:
+      const [familyId, number] = value.split(':');
+      return createFamilyMember(familyId, Number(number), ['log-token']).outerHTML;
     case LOG_TOKEN_POUND:
       return tplLogTokenPound();
     case LOG_TOKEN_SETUP_CARD:

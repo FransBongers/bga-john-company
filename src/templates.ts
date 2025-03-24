@@ -27,8 +27,8 @@ const tplCrownPlayerPanel = (name: string, color: string) => {
 }
 
 const familyMember2 = `
-  <div class="joco_family_member2">
-    <div class="joco_family_member_icon">
+  <div class="joco-family-member2">
+    <div class="joco-family-member_icon">
     </div>
   </div>
 `;

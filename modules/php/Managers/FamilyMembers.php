@@ -17,6 +17,7 @@ class FamilyMembers extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   protected static $customFields = [
     'family_id',
     'fatigue',
+    'presidency',
   ];
   protected static $autoremovePrefix = false;
   protected static $autoreshuffle = false;
@@ -93,5 +94,14 @@ class FamilyMembers extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
       ->where(static::$prefix . 'location', 'LIKE', 'StockExchange' . '%')
       ->get()
       ->toArray();
+  }
+
+  // TODO: writers on orders?
+  public static function getWriters()
+  {
+    $allMembers = self::getAll()->toArray();
+    return Utils::filter($allMembers, function ($familyMember) {
+      return Utils::startsWith($familyMember->getLocation(),'Writers_');
+    });
   }
 }

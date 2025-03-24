@@ -128,6 +128,11 @@ span[style*='color:#c0c0c0'] {
   .joco-crown-climate-icon {
     --iconScale: 0.85;
   }
+
+  .joco-family-member {
+    display: inline-flex;
+    --tokenScale: 0.85;
+  }
 }
 
 .log > .roundedbox,
@@ -140,7 +145,13 @@ span[style*='color:#c0c0c0'] {
   }
 
   .joco-crown-climate-icon {
-    --iconScale: 0.85;
+    --iconScale: 0.9;
   }
 
+  .joco-family-member {
+    display: inline-flex;
+    --tokenScale: 0.8;
+    top: -4px;
+    margin-top: 4px;
+  }
 }

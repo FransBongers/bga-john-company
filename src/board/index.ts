@@ -21,7 +21,7 @@ class Board {
   };
   public familyMembers: Record<string, HTMLElement> = {};
   private armyPieces: Record<string, HTMLElement> = {};
-  private ships: Record<string, HTMLElement> = {};
+  public ships: Record<string, HTMLElement> = {};
   public selectBoxes: Record<string, HTMLElement> = {};
 
   private courtOfDirectors: JocoFamilyMember[] = [];
@@ -40,7 +40,7 @@ class Board {
       [MADRAS_PRESIDENCY]: [],
     },
   };
-  private writers: {
+  public writers: {
     Bengal: JocoFamilyMember[];
     Bombay: JocoFamilyMember[];
     Madras: JocoFamilyMember[];
@@ -51,10 +51,10 @@ class Board {
   };
   private officersInTraining: JocoFamilyMember[] = [];
   private powerTokens: Record<string, HTMLElement> = {};
-  private seas: {
-    westIndian: JocoShipBase[];
-    eastIndian: JocoShipBase[];
-    southIndian: JocoShipBase[];
+  public seas: {
+    westIndian: Array<JocoShipBase | null>;
+    eastIndian: Array<JocoShipBase | null>;
+    southIndian: Array<JocoShipBase | null>;
   } = {
     [WEST_INDIAN]: [],
     [SOUTH_INDIAN]: [],
@@ -91,7 +91,7 @@ class Board {
 
     this.ui = {
       board: document.getElementById('joco-board'),
-      familyMembers: document.getElementById('joco_family_members'),
+      familyMembers: document.getElementById('joco-family-members'),
       orders: document.getElementById('joco-orders'),
       regiments: document.getElementById('joco-regiments'),
       pawns: {},
@@ -142,7 +142,7 @@ class Board {
       // const familyMemberNumber = `${
       //   Number(familyMember.id.split('_')[2]) % 18
       // }`;
-      // elt.classList.add('joco_family_member');
+      // elt.classList.add('joco-family-member');
       // elt.insertAdjacentHTML(
       //   'afterbegin',
       //   familyMemberSvgs[familyMemberNumber] ?? familyMemberSvgs[1]
@@ -206,11 +206,18 @@ class Board {
 
   private setupSelectBoxes() {
     [BENGAL, BOMBAY, MADRAS].forEach((region) => {
-      const elt = (this.selectBoxes[`${region}_${WRITER}`] =
+      const elt = (this.selectBoxes[`Writers_${region}`] =
         document.createElement('div'));
       elt.classList.add('joco-select-box');
       elt.classList.add('joco-select-writer');
       elt.setAttribute('data-region', region);
+      this.ui.selectBoxes.appendChild(elt);
+    });
+    SEA_ZONES.forEach((seaZone) => {
+      const elt = (this.selectBoxes[seaZone] = document.createElement('div'));
+      elt.classList.add('joco-select-box');
+      elt.classList.add('joco-select-sea-zone');
+      setAbsolutePosition(elt, BOARD_SCALE, SEA_ZONE_SELECT_POSITIONS[seaZone]);
       this.ui.selectBoxes.appendChild(elt);
     });
     STOCK_EXCHANGE_POSITIONS.forEach((position) => {
@@ -437,12 +444,83 @@ class Board {
     this.updatePawn('turn', gamedatas.turn);
   }
 
+  public async moveShip({
+    ship,
+    index = 0,
+    from,
+  }: {
+    ship: JocoShipBase;
+    from?: string;
+    index?: number;
+  }) {
+    await Interaction.use().wait(index * 200);
+    const fromRect = this.ships[ship.id].getBoundingClientRect();
+    const fromIndex = this.seas[from].findIndex(
+      (shipInOldZone: JocoShipBase | null) => shipInOldZone?.id === ship.id
+    );
+    this.placeShip(ship);
+    if (fromIndex >= 0) {
+      this.seas[from][fromIndex] = null;
+    }
+    await this.game.animationManager.play(
+      new BgaSlideAnimation({
+        element: this.ships[ship.id],
+        transitionTimingFunction: 'ease-in-out',
+        fromRect,
+      })
+    );
+  }
+
+  public async moveWriter(writer: JocoFamilyMember, from: string) {
+    const fromRegion = this.getWriterRegion(from);
+    const toRegion = this.getWriterRegion(writer.location);
+    // Skip if wrtier is already in location, ie player already moved it when performing action
+    // and this is triggered by notif.
+    if (
+      this.writers[toRegion].some(
+        (writerInLocation: JocoFamilyMember) =>
+          writerInLocation.id === writer.id
+      )
+    ) {
+      return;
+    }
+
+    const remainingFamilyMembers = this.writers[fromRegion].filter(
+      (member: JocoFamilyMember) => member.id !== writer.id
+    );
+
+    this.writers[fromRegion] = [];
+    const promises = remainingFamilyMembers.map((member: JocoFamilyMember) =>
+      this.moveFamilyMember(member)
+    );
+    promises.push(this.moveFamilyMember(writer));
+    await Promise.all(promises);
+  }
+
   public async placeShip(ship: JocoShipBase, fromElement?: HTMLElement) {
     const { id, location } = ship;
     if ([SOUTH_INDIAN, WEST_INDIAN, EAST_INDIAN].includes(location)) {
-      this.ui.ships.appendChild(this.ships[id]);
-      const position = getShipPosition(location, this.seas[location].length);
-      this.seas[location].push(ship);
+      // Skip if ship is already in location, ie player already moved it when performing action
+      // and this is triggered by notif.
+      if (
+        this.seas[location].some(
+          (shipInLocation: JocoShipBase | null) =>
+            shipInLocation?.id === ship.id
+        )
+      ) {
+        return;
+      }
+      if (!this.ships[id].parentElement) {
+        this.ui.ships.appendChild(this.ships[id]);
+      }
+      const nullIndex = (this.seas[location] as JocoShipBase[]).findIndex(
+        (pos) => pos === null
+      );
+
+      const shipIndex = nullIndex >= 0 ? nullIndex : this.seas[location].length;
+
+      const position = getShipPosition(location, shipIndex);
+      this.seas[location][shipIndex] = ship;
       setAbsolutePosition(this.ships[id], BOARD_SCALE, position);
       if (fromElement) {
         await this.game.animationManager.play(
@@ -462,5 +540,20 @@ class Board {
     ships.forEach((ship) => {
       this.placeShip(ship);
     });
+  }
+
+  //  .##.....##.########.####.##.......####.########.##....##
+  //  .##.....##....##.....##..##........##.....##.....##..##.
+  //  .##.....##....##.....##..##........##.....##......####..
+  //  .##.....##....##.....##..##........##.....##.......##...
+  //  .##.....##....##.....##..##........##.....##.......##...
+  //  .##.....##....##.....##..##........##.....##.......##...
+  //  ..#######.....##....####.########.####....##.......##...
+
+  private getWriterRegion(location: string) {
+    if (location.startsWith('Writers')) {
+      return location.split('_')[1];
+    }
+    throw new Error('FE_ERROR_001');
   }
 }

@@ -15,6 +15,7 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
   protected $state;
   protected $familyId;
   protected $fatigue;
+  protected $presidency = null;
 
   public function __construct($row)
   {
@@ -29,6 +30,7 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
     'state' => ['family_member_state', 'int'],
     'familyId' => ['family_id', 'str'],
     'fatigue' => ['fatigue', 'int'],
+    'presidency' => ['presidency', 'str'],
   ];
 
 
@@ -48,5 +50,12 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
   {
     $this->setLocation(Locations::familyMemberSupply($this->familyId));
     Notifications::returnFamilyMemberToSupply(Players::getPlayerForFamily($this->familyId), $this);
+  }
+
+  public function moveWriter($player, $newLocation)
+  {
+    $from = $this->getLocation();
+    $this->setLocation($newLocation);
+    Notifications::moveWriter($player, $this, $from);
   }
 }

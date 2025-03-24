@@ -89,6 +89,7 @@ CREATE TABLE IF NOT EXISTS `family_members` (
   `family_member_location` varchar(32) NOT NULL,
   `family_member_state` int(10) DEFAULT 0,
   `family_id` varchar(16) NOT NULL,
+  `presidency` varchar(16) DEFAULT NULL,
   `fatigue` int(10) DEFAULT 0,
   PRIMARY KEY (`family_member_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;

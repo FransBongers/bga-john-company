@@ -58,6 +58,16 @@ interface NotifMoveFamilyMembers {
   familyMembers: JocoFamilyMember[];
 }
 
+interface NotifMoveShipArgs extends NotifWithPlayerArgs {
+  ship: JocoShipBase;
+  from: string;
+}
+
+interface NotifMoveWriterArgs extends NotifWithPlayerArgs {
+  writer: JocoFamilyMember;
+  from: string;
+}
+
 interface NotifNewCompanyShare extends NotifWithPlayerArgs {
   familyMember: JocoFamilyMember;
   debt: number;

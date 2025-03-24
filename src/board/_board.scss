@@ -17,7 +17,7 @@
 #joco-regiments,
 #joco-power-tokens,
 #joco_towers,
-#joco_family_members,
+#joco-family-members,
 #joco-orders,
 #joco_ships,
 #joco_treasuries {
@@ -124,14 +124,6 @@
   z-index: 6;
 }
 
-.joco-ship {
-  position: absolute;
-  background-image: url('img/ship_player.png');
-  width: calc(var(--tokenScale) * 40px);
-  height: calc(var(--tokenScale) * 36px);
-  background-size: 100% 100%;
-}
-
 .joco-power-token {
   position: absolute;
   box-sizing: border-box;
@@ -170,6 +162,12 @@
 .joco-select-box {
   position: absolute;
   display: none;
+}
+
+.joco-select-box.joco-select-sea-zone {
+  width: calc(var(--tokenScale) * 55px);
+  height: calc(var(--tokenScale) * 55px);
+  border-radius: calc(var(--boardScale) * 6px);
 }
 
 .joco-select-box.joco-select-writer {
@@ -234,7 +232,7 @@
 .joco-select-box.selectable {
   cursor: pointer;
   display: block;
-  outline: calc(var(--boardScale) * 4px) solid base.$selectable-color;
+  outline: calc(var(--boardScale) * 4px) solid base.$selectable-color !important;
 }
 
 .joco-order.selected,
@@ -243,7 +241,7 @@
 .joco-select-box.selectable:hover {
   cursor: pointer;
   display: block;
-  outline: calc(var(--boardScale) * 4px) solid base.$selected-color;
+  outline: calc(var(--boardScale) * 4px) solid base.$selected-color !important;
 }
 
 .joco-select-box.joco-company-debt[data-vote='true'] {

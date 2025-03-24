@@ -148,11 +148,17 @@ interface JocoFamily {
   victoryPoints: number;
 }
 
+type BengalPresidency = 'BengalPresidency';
+type BombayPresidency = 'BombayPresidency';
+type MadrasPresidency = 'MadrasPresidency';
+type JoCoPresidency = BengalPresidency | BombayPresidency | MadrasPresidency;
+
 interface JocoFamilyMember {
   id: string;
   location: string;
   state: number;
   familyId: string;
+  presidency: JoCoPresidency | null;
 }
 
 interface JoCoOfficeBase extends GamePiece {

@@ -194,6 +194,8 @@ const EAST_INDIAN = 'eastIndian';
 const SOUTH_INDIAN = 'southIndian';
 const UNFITTED = 'unfitted';
 
+const SEA_ZONES = [WEST_INDIAN, EAST_INDIAN, SOUTH_INDIAN];
+
 /**
  * Power tokens
  */
@@ -255,10 +257,4 @@ const LION = 'Lion';
 const BEAR = 'Bear';
 const PEACOCK = 'Peacock';
 
-const CROWN_CLIMATE = [
-  BULL,
-  STAG,
-  LION,
-  BEAR,
-  PEACOCK,
-];
+const CROWN_CLIMATE = [BULL, STAG, LION, BEAR, PEACOCK];

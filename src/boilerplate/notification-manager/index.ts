@@ -71,6 +71,8 @@ class NotificationManager {
       'increaseCompanyDebt',
       'makeCheck',
       'moveFamilyMembers',
+      'moveShip',
+      'moveWriter',
       'newCompanyShare',
       'nextPhase',
       'payFromTreasury',
@@ -347,6 +349,16 @@ class NotificationManager {
       )
     );
     board.updateFamilyMembers(familyMembers);
+  }
+
+  async notif_moveShip(notif: Notif<NotifMoveShipArgs>) {
+    const { from, ship } = notif.args;
+    await Board.getInstance().moveShip({ ship, from });
+  }
+
+  async notif_moveWriter(notif: Notif<NotifMoveWriterArgs>) {
+    const { from, writer } = notif.args;
+    await Board.getInstance().moveWriter(writer, from);
   }
 
   async notif_newCompanyShare(notif: Notif<NotifNewCompanyShare>) {

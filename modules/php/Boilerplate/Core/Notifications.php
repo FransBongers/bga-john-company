@@ -127,6 +127,13 @@ class Notifications
     return clienttranslate('Pounds');
   }
 
+  protected static function tknFamilyMember($familyMember)
+  {
+    $number = intval(explode('_', $familyMember->getId())[2]) % 18;
+    
+    return implode(':', [$familyMember->getFamilyId(), $number]);
+  }
+
   //  .##.....##.########.####.##.......####.########.##....##
   //  .##.....##....##.....##..##........##.....##.....##..##.
   //  .##.....##....##.....##..##........##.....##......####..
@@ -143,6 +150,27 @@ class Notifications
       WEST_INDIAN => clienttranslate('West Indian'),
     ];
     return $idNameMap[$seaId];
+  }
+
+  private static function getRegionNameForWriter($location)
+  {
+    $regionId = null;
+
+    if (Utils::startsWith($location, 'Writers')) {
+      $regionId = explode('_', $location)[1];
+    }
+
+    $idNameMap = [
+      BENGAL => clienttranslate('Bengal'),
+      BOMBAY => clienttranslate('Bombay'),
+      DELHI => clienttranslate('Delhi'),
+      HYDERABAD => clienttranslate('Hyderabad'),
+      MADRAS => clienttranslate('Madras'),
+      MARATHA => clienttranslate('Maratha'),
+      MYSORE => clienttranslate('Mysore'),
+      PUNJAB => clienttranslate('Punjab'),
+    ];
+    return isset($idNameMap[$regionId]) ? $idNameMap[$regionId] : 'Unmapped region';
   }
 
   // ..######......###....##.....##.########
@@ -383,6 +411,32 @@ class Notifications
       // 'result' => $checkResult,
       'tkn_boldText_checkResult' => $translatedResultMap[$checkResult],
       'i18n' => ['tkn_boldText_checkResult']
+    ]);
+  }
+
+  public static function moveShip($player, $ship, $from)
+  {
+    self::notifyAll('moveShip', clienttranslate('${player_name} moves the ${tkn_boldText_shipName} from ${tkn_boldText_from} to ${tkn_boldText_to}'), [
+      'player' => $player,
+      'ship' => $ship->jsonSerialize(),
+      'from' => $from,
+      'tkn_boldText_shipName' => $ship->getName(),
+      'tkn_boldText_from' => self::getSeaName($from),
+      'tkn_boldText_to' => self::getSeaName($ship->getLocation()),
+      'i18n' => ['tkn_boldText_shipName', 'tkn_boldText_from', 'tkn_boldText_to'],
+    ]);
+  }
+
+  public static function moveWriter($player, $writer, $from)
+  {
+    self::notifyAll('moveWriter', clienttranslate('${player_name} moves ${tkn_familyMember} from ${tkn_boldText_from} to ${tkn_boldText_to}'), [
+      'player' => $player,
+      'writer' => $writer->jsonSerialize(),
+      'from' => $from,
+      'tkn_familyMember' => self::tknFamilyMember($writer),
+      'tkn_boldText_from' => self::getRegionNameForWriter($from),
+      'tkn_boldText_to' => self::getRegionNameForWriter($writer->getLocation()),
+      'i18n' => ['tkn_boldText_from', 'tkn_boldText_to'],
     ]);
   }
 

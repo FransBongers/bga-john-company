@@ -1,12 +1,14 @@
-const createFamilyMember = (familyId: string, familyMemberId: number | string): HTMLElement => {
+const createFamilyMember = (familyId: string, familyMemberId: number | string, extraClasses?: string[]): HTMLElement => {
   const elt = document.createElement('div');
   const familyMemberNumber = typeof familyMemberId === 'number' ? familyMemberId : Number(familyMemberId.split('_')[2]) % 18;
 
-  elt.classList.add('joco_family_member');
+  elt.classList.add('joco-family-member');
   elt.insertAdjacentHTML(
     'afterbegin',
     familyMemberSvgs[familyMemberNumber] ?? familyMemberSvgs[1]
   );
+
+  (extraClasses || []).forEach((className) => elt.classList.add(className));
   
   // if (familyId === CROWN) {
   //   console.log('playersManager',PlayerManager.getInstance());

@@ -260,3 +260,9 @@ const COMPANY_DEBT_SELECT_POSITIONS: AbsolutePosition[] = [
   { top: 157, left: 606 },
   { top: 157, left: 640 },
 ];
+
+const SEA_ZONE_SELECT_POSITIONS: Record<string,AbsolutePosition> = {
+  [WEST_INDIAN]: { top: 377, left: 885 },
+  [SOUTH_INDIAN]: { top: 432, left: 1219 },
+  [EAST_INDIAN]: { top: 301, left: 1317 },
+};

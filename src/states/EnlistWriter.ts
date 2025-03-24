@@ -27,7 +27,6 @@ class EnlistWriter implements State {
   }
 
   setDescription(activePlayerIds: number[], args: OnEnteringEnlistWriterArgs) {
-    console.log('setDescription');
     updatePageTitle(_('${tkn_playerName} must select a region to place their writer'), {
       tkn_playerName: PlayerManager.getInstance()
         .getPlayer(activePlayerIds[0])
@@ -59,8 +58,7 @@ class EnlistWriter implements State {
     });
 
     [BENGAL, BOMBAY, MADRAS].forEach((region) => {
-      const box = Board.getInstance().selectBoxes[`${region}_${WRITER}`];
-      console.log('box', box);
+      const box = Board.getInstance().selectBoxes[`Writers_${region}`];
       onClick(box, () => this.updateInterfaceConfirm(region))
     });
   }

@@ -2,6 +2,8 @@
 
 namespace Bga\Games\JohnCompany\Models;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+
 class Ship extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
 {
   protected $id;
@@ -44,4 +46,10 @@ class Ship extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implement
     return $this->jsonSerialize(); // Static datas are already in js file
   }
 
+  public function moveTo($player, $newLocation)
+  {
+    $from = $this->getLocation();
+    $this->setLocation($newLocation);
+    Notifications::moveShip($player, $this, $from);
+  }
 }

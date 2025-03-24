@@ -124,6 +124,12 @@ const EAST_INDIAN = 'eastIndian';
 const SOUTH_INDIAN = 'southIndian';
 const UNFITTED = 'unfitted';
 
+const SEA_ZONES = [
+  WEST_INDIAN,
+  SOUTH_INDIAN,
+  EAST_INDIAN,
+];
+
 /**
  * Phases
  */
@@ -277,6 +283,12 @@ const REGIONS = [
   MARATHA,
   MYSORE,
   PUNJAB,
+];
+
+const HOME_REGIONS = [
+  BENGAL,
+  BOMBAY,
+  MADRAS,
 ];
 
 const BENGAL_PRESIDENCY = 'BengalPresidency';
@@ -466,5 +478,5 @@ const STOCK_EXCHANGE_POSITIONS = [
   STOCK_EXCHANGE_4,
   STOCK_EXCHANGE_3_RIGHT,
   STOCK_EXCHANGE_3_LEFT,
-  STOCK_EXCHANGE_2,  
+  STOCK_EXCHANGE_2,
 ];

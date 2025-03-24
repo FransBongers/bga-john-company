@@ -137,6 +137,7 @@ var WEST_INDIAN = 'westIndian';
 var EAST_INDIAN = 'eastIndian';
 var SOUTH_INDIAN = 'southIndian';
 var UNFITTED = 'unfitted';
+var SEA_ZONES = [WEST_INDIAN, EAST_INDIAN, SOUTH_INDIAN];
 var POWER_TOKEN_COMPANY_SHARE = 'companyShare';
 var POWER_TOKEN_MANUFACTURING = 'manufacturing';
 var POWER_TOKEN_SHIPPING = 'shipping';
@@ -178,13 +179,7 @@ var STAG = 'Stag';
 var LION = 'Lion';
 var BEAR = 'Bear';
 var PEACOCK = 'Peacock';
-var CROWN_CLIMATE = [
-    BULL,
-    STAG,
-    LION,
-    BEAR,
-    PEACOCK,
-];
+var CROWN_CLIMATE = [BULL, STAG, LION, BEAR, PEACOCK];
 var BgaAnimation = (function () {
     function BgaAnimation(animationFunction, settings) {
         this.animationFunction = animationFunction;
@@ -844,6 +839,8 @@ var NotificationManager = (function () {
             'increaseCompanyDebt',
             'makeCheck',
             'moveFamilyMembers',
+            'moveShip',
+            'moveWriter',
             'newCompanyShare',
             'nextPhase',
             'payFromTreasury',
@@ -1152,6 +1149,36 @@ var NotificationManager = (function () {
                     case 1:
                         _a.sent();
                         board.updateFamilyMembers(familyMembers);
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_moveShip = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, from, ship;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = notif.args, from = _a.from, ship = _a.ship;
+                        return [4, Board.getInstance().moveShip({ ship: ship, from: from })];
+                    case 1:
+                        _b.sent();
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_moveWriter = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, from, writer;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = notif.args, from = _a.from, writer = _a.writer;
+                        return [4, Board.getInstance().moveWriter(writer, from)];
+                    case 1:
+                        _b.sent();
                         return [2];
                 }
             });
@@ -1842,7 +1869,7 @@ var Bar = (function () {
     return Bar;
 }());
 var tplTabButton = function (text, index) { return "\n<div id=\"joco-bar-item-".concat(index, "\" class=\"joco-bar-item\">").concat(text, "</div>\n"); };
-var _a, _b, _c, _d, _e;
+var _a, _b, _c, _d, _e, _f;
 var ORDERS_CONFIG = (_a = {},
     _a[ORDER_PUNJAB_1] = { top: 22.5, left: 933 },
     _a[ORDER_DELHI_1] = { top: 15, left: 1069 },
@@ -2071,6 +2098,11 @@ var COMPANY_DEBT_SELECT_POSITIONS = [
     { top: 157, left: 606 },
     { top: 157, left: 640 },
 ];
+var SEA_ZONE_SELECT_POSITIONS = (_f = {},
+    _f[WEST_INDIAN] = { top: 377, left: 885 },
+    _f[SOUTH_INDIAN] = { top: 432, left: 1219 },
+    _f[EAST_INDIAN] = { top: 301, left: 1317 },
+    _f);
 var Board = (function () {
     function Board(game) {
         var _a, _b, _c;
@@ -2116,7 +2148,7 @@ var Board = (function () {
             .insertAdjacentHTML('afterbegin', tplBoard(gamedatas));
         this.ui = {
             board: document.getElementById('joco-board'),
-            familyMembers: document.getElementById('joco_family_members'),
+            familyMembers: document.getElementById('joco-family-members'),
             orders: document.getElementById('joco-orders'),
             regiments: document.getElementById('joco-regiments'),
             pawns: {},
@@ -2200,11 +2232,18 @@ var Board = (function () {
     Board.prototype.setupSelectBoxes = function () {
         var _this = this;
         [BENGAL, BOMBAY, MADRAS].forEach(function (region) {
-            var elt = (_this.selectBoxes["".concat(region, "_").concat(WRITER)] =
+            var elt = (_this.selectBoxes["Writers_".concat(region)] =
                 document.createElement('div'));
             elt.classList.add('joco-select-box');
             elt.classList.add('joco-select-writer');
             elt.setAttribute('data-region', region);
+            _this.ui.selectBoxes.appendChild(elt);
+        });
+        SEA_ZONES.forEach(function (seaZone) {
+            var elt = (_this.selectBoxes[seaZone] = document.createElement('div'));
+            elt.classList.add('joco-select-box');
+            elt.classList.add('joco-select-sea-zone');
+            setAbsolutePosition(elt, BOARD_SCALE, SEA_ZONE_SELECT_POSITIONS[seaZone]);
             _this.ui.selectBoxes.appendChild(elt);
         });
         STOCK_EXCHANGE_POSITIONS.forEach(function (position) {
@@ -2427,17 +2466,81 @@ var Board = (function () {
         this.updatePawn('phase', gamedatas.phase);
         this.updatePawn('turn', gamedatas.turn);
     };
+    Board.prototype.moveShip = function (_a) {
+        return __awaiter(this, arguments, void 0, function (_b) {
+            var fromRect, fromIndex;
+            var ship = _b.ship, _c = _b.index, index = _c === void 0 ? 0 : _c, from = _b.from;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
+                    case 0: return [4, Interaction.use().wait(index * 200)];
+                    case 1:
+                        _d.sent();
+                        fromRect = this.ships[ship.id].getBoundingClientRect();
+                        fromIndex = this.seas[from].findIndex(function (shipInOldZone) { return (shipInOldZone === null || shipInOldZone === void 0 ? void 0 : shipInOldZone.id) === ship.id; });
+                        this.placeShip(ship);
+                        if (fromIndex >= 0) {
+                            this.seas[from][fromIndex] = null;
+                        }
+                        return [4, this.game.animationManager.play(new BgaSlideAnimation({
+                                element: this.ships[ship.id],
+                                transitionTimingFunction: 'ease-in-out',
+                                fromRect: fromRect,
+                            }))];
+                    case 2:
+                        _d.sent();
+                        return [2];
+                }
+            });
+        });
+    };
+    Board.prototype.moveWriter = function (writer, from) {
+        return __awaiter(this, void 0, void 0, function () {
+            var fromRegion, toRegion, remainingFamilyMembers, promises;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        fromRegion = this.getWriterRegion(from);
+                        toRegion = this.getWriterRegion(writer.location);
+                        if (this.writers[toRegion].some(function (writerInLocation) {
+                            return writerInLocation.id === writer.id;
+                        })) {
+                            return [2];
+                        }
+                        remainingFamilyMembers = this.writers[fromRegion].filter(function (member) { return member.id !== writer.id; });
+                        this.writers[fromRegion] = [];
+                        promises = remainingFamilyMembers.map(function (member) {
+                            return _this.moveFamilyMember(member);
+                        });
+                        promises.push(this.moveFamilyMember(writer));
+                        return [4, Promise.all(promises)];
+                    case 1:
+                        _a.sent();
+                        return [2];
+                }
+            });
+        });
+    };
     Board.prototype.placeShip = function (ship, fromElement) {
         return __awaiter(this, void 0, void 0, function () {
-            var id, location, position;
+            var id, location, nullIndex, shipIndex, position;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         id = ship.id, location = ship.location;
                         if (![SOUTH_INDIAN, WEST_INDIAN, EAST_INDIAN].includes(location)) return [3, 2];
-                        this.ui.ships.appendChild(this.ships[id]);
-                        position = getShipPosition(location, this.seas[location].length);
-                        this.seas[location].push(ship);
+                        if (this.seas[location].some(function (shipInLocation) {
+                            return (shipInLocation === null || shipInLocation === void 0 ? void 0 : shipInLocation.id) === ship.id;
+                        })) {
+                            return [2];
+                        }
+                        if (!this.ships[id].parentElement) {
+                            this.ui.ships.appendChild(this.ships[id]);
+                        }
+                        nullIndex = this.seas[location].findIndex(function (pos) { return pos === null; });
+                        shipIndex = nullIndex >= 0 ? nullIndex : this.seas[location].length;
+                        position = getShipPosition(location, shipIndex);
+                        this.seas[location][shipIndex] = ship;
                         setAbsolutePosition(this.ships[id], BOARD_SCALE, position);
                         if (!fromElement) return [3, 2];
                         return [4, this.game.animationManager.play(new BgaSlideAnimation({
@@ -2458,6 +2561,12 @@ var Board = (function () {
         ships.forEach(function (ship) {
             _this.placeShip(ship);
         });
+    };
+    Board.prototype.getWriterRegion = function (location) {
+        if (location.startsWith('Writers')) {
+            return location.split('_')[1];
+        }
+        throw new Error('FE_ERROR_001');
     };
     return Board;
 }());
@@ -2497,13 +2606,14 @@ var Region = (function () {
     };
     return Region;
 }());
-var tplBoard = function (gamedatas) { return "<div id=\"joco-board\">\n  <div id=\"joco_family_members\"></div>\n  <div id=\"joco-orders\"></div>\n  <div id=\"joco-regiments\"></div>\n  <div id=\"joco-power-tokens\"></div>\n  <div id=\"joco_ships\"></div>\n  <div id=\"joco_towers\"></div>\n  <div id=\"joco_treasuries\"></div>\n  <div id=\"joco-select-boxes\"></div>\n</div>"; };
-var createFamilyMember = function (familyId, familyMemberId) {
+var tplBoard = function (gamedatas) { return "<div id=\"joco-board\">\n  <div id=\"joco-family-members\"></div>\n  <div id=\"joco-orders\"></div>\n  <div id=\"joco-regiments\"></div>\n  <div id=\"joco-power-tokens\"></div>\n  <div id=\"joco_ships\"></div>\n  <div id=\"joco_towers\"></div>\n  <div id=\"joco_treasuries\"></div>\n  <div id=\"joco-select-boxes\"></div>\n</div>"; };
+var createFamilyMember = function (familyId, familyMemberId, extraClasses) {
     var _a;
     var elt = document.createElement('div');
     var familyMemberNumber = typeof familyMemberId === 'number' ? familyMemberId : Number(familyMemberId.split('_')[2]) % 18;
-    elt.classList.add('joco_family_member');
+    elt.classList.add('joco-family-member');
     elt.insertAdjacentHTML('afterbegin', (_a = familyMemberSvgs[familyMemberNumber]) !== null && _a !== void 0 ? _a : familyMemberSvgs[1]);
+    (extraClasses || []).forEach(function (className) { return elt.classList.add(className); });
     elt.setAttribute('data-family', familyId);
     elt.setAttribute('data-number', "".concat(familyMemberNumber));
     return elt;
@@ -2695,6 +2805,7 @@ var LOG_TOKEN_POUND = 'pound';
 var LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
 var LOG_TOKEN_ICON = 'icon';
 var LOG_TOKEN_SETUP_CARD = 'setupCard';
+var LOG_TOKEN_FAMILY_MEMBER = 'familyMember';
 var tooltipIdCounter = 0;
 var getTokenDiv = function (_a) {
     var key = _a.key, value = _a.value, game = _a.game;
@@ -2710,6 +2821,9 @@ var getTokenDiv = function (_a) {
         case LOG_TOKEN_ICON:
         case LOG_TOKEN_ENTERPRISE_ICON:
             return tplLogTokenIcon(value);
+        case LOG_TOKEN_FAMILY_MEMBER:
+            var _b = value.split(':'), familyId = _b[0], number = _b[1];
+            return createFamilyMember(familyId, Number(number), ['log-token']).outerHTML;
         case LOG_TOKEN_POUND:
             return tplLogTokenPound();
         case LOG_TOKEN_SETUP_CARD:
@@ -3338,8 +3452,13 @@ var DirectorOfTradeTransfers = (function () {
         return DirectorOfTradeTransfers.instance;
     };
     DirectorOfTradeTransfers.prototype.onEnteringState = function (args) {
+        var _a;
         debug('Entering DirectorOfTradeTransfers state');
         this.args = args;
+        this.transfers = (_a = args.transfers) !== null && _a !== void 0 ? _a : {
+            ships: {},
+            writers: {},
+        };
         this.updateInterfaceInitialStep();
     };
     DirectorOfTradeTransfers.prototype.onLeavingState = function () {
@@ -3351,12 +3470,161 @@ var DirectorOfTradeTransfers = (function () {
         });
     };
     DirectorOfTradeTransfers.prototype.updateInterfaceInitialStep = function () {
+        var _this = this;
         this.game.clearPossible();
-        updatePageTitle(_('${you} may transfer two ships'));
+        var transferCount = this.getTransferCount();
+        if (transferCount === 2) {
+            this.updateInterfaceConfirm();
+            return;
+        }
+        updatePageTitle(_('${you} may make up to two transfers (${number} remaining)'), {
+            number: 2 - this.getTransferCount(),
+        });
+        var board = Board.getInstance();
+        Object.entries(this.args.options.writers).forEach(function (_a) {
+            var id = _a[0], data = _a[1];
+            return onClick(board.familyMembers[id], function () {
+                return _this.updateInterfaceSelectPresidency(data);
+            });
+        });
+        Object.entries(this.args.options.ships).forEach(function (_a) {
+            var id = _a[0], data = _a[1];
+            return onClick(board.ships[id], function () { return _this.updateInterfaceSelectSeaZone(data); });
+        });
+        if (this.getTransferCount() > 0) {
+            this.addCancelButton();
+        }
     };
-    DirectorOfTradeTransfers.prototype.performAction = function (yay) {
-        performAction('actDirectorOfTradeTransfers', {
-            consent: yay,
+    DirectorOfTradeTransfers.prototype.updateInterfaceSelectPresidency = function (_a) {
+        var _this = this;
+        var writer = _a.familyMember, locations = _a.locations;
+        clearPossible();
+        var board = Board.getInstance();
+        setSelected(board.familyMembers[writer.id]);
+        locations.forEach(function (newLocation) {
+            onClick(board.selectBoxes[newLocation], function () { return __awaiter(_this, void 0, void 0, function () {
+                var from;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.transfers.writers[writer.id] = {
+                                writer: writer,
+                                from: writer.location,
+                                to: newLocation,
+                            };
+                            from = writer.location;
+                            writer.location = newLocation;
+                            return [4, board.moveWriter(writer, from)];
+                        case 1:
+                            _a.sent();
+                            this.updateInterfaceInitialStep();
+                            return [2];
+                    }
+                });
+            }); });
+        });
+        this.addCancelButton();
+    };
+    DirectorOfTradeTransfers.prototype.updateInterfaceSelectSeaZone = function (_a) {
+        var _this = this;
+        var ship = _a.ship, locations = _a.locations;
+        clearPossible();
+        var board = Board.getInstance();
+        setSelected(board.ships[ship.id]);
+        locations.forEach(function (seaZone) {
+            onClick(board.selectBoxes[seaZone], function () { return __awaiter(_this, void 0, void 0, function () {
+                var from;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            clearPossible();
+                            from = ship.location;
+                            ship.location = seaZone;
+                            this.transfers.ships[ship.id] = {
+                                from: from,
+                                to: seaZone,
+                                ship: ship,
+                            };
+                            return [4, board.moveShip({ ship: ship, from: from })];
+                        case 1:
+                            _a.sent();
+                            this.updateInterfaceInitialStep();
+                            return [2];
+                    }
+                });
+            }); });
+        });
+        this.addCancelButton();
+    };
+    DirectorOfTradeTransfers.prototype.updateInterfaceConfirm = function () {
+        var _this = this;
+        updatePageTitle(_('Confirm transfers'));
+        addConfirmButton(function () {
+            performAction('actDirectorOfTradeTransfers', {
+                transfers: _this.transfers,
+            });
+        });
+        this.addCancelButton();
+    };
+    DirectorOfTradeTransfers.prototype.getTransferCount = function () {
+        return (Object.keys(this.transfers.ships).length +
+            Object.keys(this.transfers.writers).length);
+    };
+    DirectorOfTradeTransfers.prototype.returnPieces = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var board, _i, _a, data, _b, _c, data;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
+                    case 0:
+                        board = Board.getInstance();
+                        _i = 0, _a = Object.values(this.transfers.ships);
+                        _d.label = 1;
+                    case 1:
+                        if (!(_i < _a.length)) return [3, 4];
+                        data = _a[_i];
+                        data.ship.location = data.from;
+                        return [4, board.moveShip({ ship: data.ship, from: data.to })];
+                    case 2:
+                        _d.sent();
+                        _d.label = 3;
+                    case 3:
+                        _i++;
+                        return [3, 1];
+                    case 4:
+                        _b = 0, _c = Object.values(this.transfers.writers);
+                        _d.label = 5;
+                    case 5:
+                        if (!(_b < _c.length)) return [3, 8];
+                        data = _c[_b];
+                        data.writer.location = data.from;
+                        return [4, board.moveWriter(data.writer, data.to)];
+                    case 6:
+                        _d.sent();
+                        _d.label = 7;
+                    case 7:
+                        _b++;
+                        return [3, 5];
+                    case 8: return [2];
+                }
+            });
+        });
+    };
+    DirectorOfTradeTransfers.prototype.addCancelButton = function () {
+        var _this = this;
+        addDangerActionButton({
+            id: 'cancel_btn',
+            text: _('Cancel'),
+            callback: function () { return __awaiter(_this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4, this.returnPieces()];
+                        case 1:
+                            _a.sent();
+                            this.game.onCancel();
+                            return [2];
+                    }
+                });
+            }); },
         });
     };
     return DirectorOfTradeTransfers;
@@ -3463,7 +3731,6 @@ var EnlistWriter = (function () {
         debug('Leaving EnlistWriter state');
     };
     EnlistWriter.prototype.setDescription = function (activePlayerIds, args) {
-        console.log('setDescription');
         updatePageTitle(_('${tkn_playerName} must select a region to place their writer'), {
             tkn_playerName: PlayerManager.getInstance()
                 .getPlayer(activePlayerIds[0])
@@ -3477,8 +3744,7 @@ var EnlistWriter = (function () {
             tkn_icon: WRITER
         });
         [BENGAL, BOMBAY, MADRAS].forEach(function (region) {
-            var box = Board.getInstance().selectBoxes["".concat(region, "_").concat(WRITER)];
-            console.log('box', box);
+            var box = Board.getInstance().selectBoxes["Writers_".concat(region)];
             onClick(box, function () { return _this.updateInterfaceConfirm(region); });
         });
     };
@@ -3661,7 +3927,7 @@ var tplPlayArea = function () { return "\n  <div id=\"joco-play-area\">\n    <di
 var tplCrownPlayerPanel = function (name, color) {
     return "<div id=\"overall_player_board_1\" class=\"player-board\">\n            <div class=\"player_board_inner\" id=\"player_board_inner_".concat(color, "\">\n              <div class=\"emblemwrap\" id=\"avatarwrap_1\">\n                  <div class=\"pp_wakhan_avatar avatar emblem\" id=\"avatar_1\"></div>\n              </div>\n              <div class=\"player-name\" id=\"player_name_1\">\n                <a style=\"color: #").concat(color, "\">").concat(name, "</a>\n              </div>\n              <div id=\"player_board_1\" class=\"player_board_content\">\n                <div class=\"player_score\" style=\"margin-top: 5px;\">\n                  <span id=\"player_score_1\" class=\"player_score_value\"></span> <i class=\"fa fa-star\" id=\"icon_point_1\"></i>\n                </div>\n                <div class=\"player-board-game-specific-content\"></div>\n              </div>\n            </div>\n          </div>");
 };
-var familyMember2 = "\n  <div class=\"joco_family_member2\">\n    <div class=\"joco_family_member_icon\">\n    </div>\n  </div>\n";
+var familyMember2 = "\n  <div class=\"joco-family-member2\">\n    <div class=\"joco-family-member_icon\">\n    </div>\n  </div>\n";
 var familyMemberSvgs = {
     1: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 50.3 59.45\">\n  <g>\n    <path class=\"cls-1\" d=\"M29.59,5.96s.02.08.04.12c.15,0,.31,0,.46,0,.17,0,.37.12.5-.11-.19-.06-.39-.16-.58-.17-.13,0-.27.1-.41.16ZM27.82,8.23c.12-.21.18-.3.22-.4,0,0-.1-.08-.1-.08-.07.08-.15.17-.2.26-.02.03.03.1.08.22ZM21.05,8.65c-.04-.06-.08-.11-.12-.17-.03.04-.09.09-.08.12.02.07.08.13.12.19.02-.04.04-.08.08-.15ZM16.97,9.2c-.06,0-.12,0-.18,0,.06.23.12.46.18.69,0,0,.05.01.05.01.1-.25.09-.48-.05-.7ZM23.61,9.98c.07,0,.13,0,.2,0-.05-.17-.09-.33-.15-.49,0,0-.09.01-.09.02,0,.16.02.32.04.48ZM34.48,11.78c-.11-.1-.17-.15-.23-.21-.07-.07-.14-.15-.22-.21-.12-.1-.26-.18-.38-.27.11-.12.22-.25.33-.37.15-.16.28-.35.08-.51-.19-.16-.29.09-.41.2-.14.13-.28.32-.44.35-.2.04-.45-.02-.62-.13-.1-.07-.06-.32-.09-.49-.02-.1-.04-.2-.08-.29-.31-.72-.62-1.44-.94-2.16-.04-.08-.11-.18-.19-.21-.29-.11-.6-.2-.9-.28-.08-.02-.17.03-.26.04.04.08.06.19.12.24.47.39.82.87,1.16,1.39.32.5.27,1.01.34,1.52,0,.06-.09.16-.16.2-.38.19-.65.45-.7,1.03-.15-.28-.29-.43-.29-.58,0-.48-.21-.76-.62-1.02-.35-.22-.7-.41-1.17-.53.08.23.1.42.19.55.46.63.66,1.3.61,2.11-.03.5.16,1.03.75,1.23.11.04.32.05.37-.01.19-.24.43-.47.39-.82-.02-.21-.04-.42-.06-.63-.02-.24.28-.58.55-.59.37-.02.25.27.28.46.01.08-.01.19.03.23.07.06.2.1.27.07.07-.03.12-.15.16-.24.22-.45.22-.45.68-.25.11.05.21.12.4.24-1.01.18-1.65.72-2.11,1.47-.08.13-.14.42-.07.47.12.1.35.14.52.11.25-.04.49-.15.73-.24.18-.06.21-.18.05-.29-.11-.08-.24-.12-.36-.18-.08-.04-.15-.09-.23-.13.08-.07.15-.17.24-.2.5-.19,1.16.07,1.52.61.27.39.49.81.78,1.18.22.28.52.51.82.79.05-.11.13-.24.17-.39.05-.2.06-.41.08-.62.05-.41.1-.82.13-1.23.03-.44-.07-.56-.52-.71-.15-.05-.16-.09-.17-.27-.01-.33-.18-.65-.31-1.04-.1.23-.16.39-.25.6ZM31.3,15.16c0,.06-.03.11-.02.14.04.18.04.45.15.52.13.07.37-.02.54-.09.3-.13.59-.31.89-.46.21-.1.22-.19.05-.34-.46-.39-1-.28-1.52-.23-.03,0-.08.08-.08.13-.01.12,0,.24,0,.33ZM12.28,15.88c-.21.2-.36.34-.51.48-.13-.18-.28-.36-.38-.56-.02-.04.22-.28.29-.26.19.05.36.19.6.33ZM16,16.33c-.64.3-1.15.02-1.68-.04-.04,0-.11-.06-.11-.09,0-.05.04-.11.08-.14.04-.03.11-.06.16-.05.49.09.98.2,1.54.31ZM32.12,16.49c-.11.07-.2.14-.29.2.08.05.16.14.23.13.1-.01.18-.1.27-.16-.06-.05-.12-.09-.21-.17ZM25.9,15.55c.38,0,.76,0,1.14,0,.08,0,.15.08.22.12-.08.04-.16.1-.24.12-.23.05-.47.12-.7.11-1.05-.05-1.92.37-2.73.98-.14.11-.29.21-.45.29-.07.03-.17,0-.26,0,0-.07,0-.16.03-.22.03-.07.1-.13.16-.17.49-.31.86-.81,1.46-.96.45-.12.91-.24,1.36-.36,0,.03,0,.06,0,.09ZM13.05,16.34c-.51.15-.6.25-.56.61,0,.09.11.18.16.27.07-.07.18-.12.22-.2.08-.2.11-.41.19-.68ZM14.01,16.77c.61-.01,1.14.2,1.62.55.05.04.09.15.07.2-.01.04-.17.09-.18.07-.41-.45-1.05-.4-1.51-.74,0,0,0-.04,0-.09ZM37.99,14.63c-.03-.59,0-1.18-.58-1.59-.35-.25-.62-.6-.93-.9-.04-.04-.16-.07-.19-.04-.12.11-.22.25-.33.38.1.07.19.13.29.19.07.04.14.07.21.11.95.56,1.3,1.5,1.32,2.49.01.68-.34,1.36-.53,2.04-.04.15-.18.33.06.37.14.02.41.15.46-.18.14-.79.63-1.55.22-2.4-.06-.13,0-.31,0-.47ZM41.67,17.93c-.03-.31-.05-.57-.08-.84-.02-.17-.04-.33-.06-.5-.13.1-.28.18-.39.29-.1.09-.17.21-.24.33-.02.03.01.14.02.14.39-.02.48.37.75.58ZM23.05,15.97c-.55.55-1.07,1.14-1.67,1.64-.28.24-.71.31-1.07.45-.05.02-.16-.05-.18-.09-.02-.05.03-.14.07-.2.02-.03.06-.06.09-.07,1.02-.29,1.72-1.06,2.49-1.72.05-.05.13-.06.2-.09.02.03.04.06.07.09ZM34.7,18.23c-.08.14-.14.2-.15.27-.02.1-.02.21-.02.32.08-.04.18-.07.24-.14.41-.37.45-.93.71-1.38.02-.04-.02-.12-.03-.18-.27.58-.77.86-1.28,1.11-.02,0-.01.06-.03.13.17-.04.31-.07.56-.13ZM35.78,18.83c.53.12.88-.1,1.23-.3.05-.03.05-.16.07-.25-.09,0-.19-.04-.26,0-.33.16-.64.34-1.05.56ZM33.41,19.3c.1-.05.28-.13.44-.23.05-.03.1-.14.09-.19-.01-.05-.12-.09-.18-.1-.31-.01-.63-.02-.94,0-.06,0-.15.09-.15.14,0,.06.04.18.09.2.18.07.38.11.66.19ZM40.6,17.98c-.2.33-.35.56-.48.8-.18.31-.06.76.27.88.14.05.32.03.45-.02.05-.02.05-.23.03-.35-.07-.4-.16-.79-.27-1.3ZM19.21,20.17c-.36-.45-.42-.98-.47-1.51,0-.02.05-.08.07-.07.05,0,.1.03.15.05.01,0,.02.03.03.05.08.49.15.98.23,1.48ZM40.01,21.42c-.19-.16-.38-.31-.58-.47-.13-.13-.25-.29-.41-.38-.36-.2-.74-.37-1.12-.54-.93-.43-1.87-.57-2.87-.22-.21.08-.49-.03-.74-.04-.12,0-.25-.02-.37,0-.32.06-.65.14-.97.22-.06.02-.12.07-.17.1.03.05.06.1.1.13.41.29.9.37,1.36.52.1.03.17.12.25.19-.08.08-.15.21-.25.23-.21.05-.43.05-.66.07.18.13.33.29.52.36.19.07.44.12.6.04.14-.06.17-.35.3-.46.13-.11.46-.11.5-.22.16-.5.54-.45.91-.47.18,0,.35-.02.53-.04.56-.08,1.12-.13,1.65.17.25.14.52.24.78.37-.14,0-.29.02-.43.02-.23,0-.46-.02-.69-.03.47.24.94.38,1.42.5.09.02.21-.03.31-.05ZM29.46,21.53c-.19.09-.32.22-.43.2-.16-.03-.34-.13-.45-.25-.46-.55-.93-1.1-1.11-1.84-.06-.24-.07-.4.15-.48.23-.08.31.1.35.29,0,.04.03.07.04.11.1.66.46,1.15,1.02,1.52.14.09.24.25.43.45ZM23.3,22.16c.7.11,1.48-.24,2.08.38.02.02.1-.03.16-.05-.02-.06-.03-.15-.07-.19-.14-.11-.3-.19-.44-.3-.52-.39-1.17-.34-1.72.16ZM16.58,23.62c-.12-.48-.59-.88-1.06-.88-.09,0-.17.05-.26.08.06.07.1.15.18.19.37.21.75.4,1.14.61ZM36.84,24.01l.09-.08c-.18-.21-.37-.43-.56-.64-.03-.03-.15-.05-.15-.03-.03.06-.07.15-.04.19.06.11.14.22.23.3.13.1.29.18.43.26ZM15.9,24.05c-.34-.72-.95-1.05-1.61-.88-.1.03-.2.09-.29.16-.04.03-.04.11-.06.16.05.01.11.04.16.03.63-.13,1.17.03,1.64.46.03.03.09.03.16.06ZM12.47,24.44c.21-.29.41-.56.59-.83.3-.47.29-.48-.28-.53-.51-.05-.76.16-.54.69.09.2.14.42.23.67ZM14.42,26.12c-.17-.03-.29-.04-.4-.08-.05-.02-.11-.11-.1-.13.02-.06.09-.12.15-.13.29-.05.58-.09.87-.12.06,0,.15.05.18.11.02.03-.04.16-.08.17-.22.08-.45.14-.63.19ZM39.06,26.14s.07,0,.1,0c.03-.09.07-.18.08-.28,0-.07-.03-.14-.05-.21-.05.07-.12.13-.14.2-.02.09,0,.19.01.29ZM24.33,22.78c-.61.03-1.23,0-1.76.39-.1.08-.2.17-.27.28-.15.22-.27.46-.43.67-.21.28-.45.39-.82.17-.28-.16-.64-.19-.97-.26-.48-.11-.49-.21-.56-.67-.12-.82.07-1.7-.35-2.45-.18-.34,0-.42.18-.56.13-.1.19-.06.24.1.04.11.16.2.25.29.05-.11.1-.22.15-.33.04-.09.05-.22.12-.25.43-.22.73-.66,1.27-.69.19-.01.41-.16.54-.31.25-.31.59-.41.9-.27.44.21.7-.01.92-.29.25-.3.49-.5.91-.4.08.02.18-.05.28-.08.69-.19,1.28-.01,1.78.49.08.08.18.17.22.27.29.68.56,1.37.83,2.06.01.04-.01.09-.02.13-.04-.04-.12-.07-.12-.11-.02-.2-.11-.22-.27-.13-.21.13-.38.05-.53-.1-.19-.2-.38-.2-.64-.09-.23.09-.52.12-.76.08-1.13-.21-2.13.23-3.14.63-.2.08-.41.16-.59.28-.15.09-.32.2-.39.34-.09.2-.09.45-.12.67.18-.13.36-.26.53-.4.13-.11.23-.28.38-.36.75-.41,1.52-.78,2.4-.78.19,0,.38.04.57.1.53.16,1.04.36,1.57.48.38.09.57.28.67.64.03.1.19.27.24.26.37-.13.54.13.75.33.12.11.24.2.36.31.15.14.28.24.52.17.14-.04.38.08.5.2.14.14.14.27-.12.38-.38.15-.69.2-1.02-.1-.24-.22-.43-.2-.53.09-.17.49-.51.61-.97.59-.23-.01-.41.04-.55.26-.1.16-.27.28-.43.4-.35.28-.7.58-1.08.8-.24.14-.59.23-.84.17-.8-.2-1.58-.49-2.37-.75-.07-.02-.14-.08-.19-.14-.03-.04-.05-.12-.03-.16.01-.04.09-.08.14-.07.1.01.19.05.28.08.49.14.99.28,1.48.43.61.18,1.17.13,1.67-.31.48-.42.97-.81,1.45-1.22.1-.09.19-.21.25-.33.06-.13.16-.36.11-.39-.18-.14-.37-.06-.51.11-.13.15-.23.33-.38.45-.18.14-.33.5-.66.15-.07-.07-.36.06-.54.12-.28.09-.56.18-.84.3-.28.11-.46-.02-.62-.2-.18-.21-.24-.46-.13-.72.09-.24.23-.13.36-.01.37.32.46.3.57-.19.04-.19.14-.24.28-.2.17.05.31.15.47.21.07.03.15,0,.23.01,0-.09.03-.19,0-.25-.13-.22-.36-.3-.79-.29ZM38.27,24.68s-.07,0-.1,0c-.02.05-.06.1-.06.15,0,.24-.67.54.06.73.03,0,.03.18.03.28,0,.14-.06.27-.05.4,0,.07.11.13.17.19.04-.06.13-.12.13-.18-.05-.53-.12-1.06-.18-1.59ZM36.27,26.61c.24-.68,0-1.25-.25-1.83-.02-.06-.11-.09-.17-.13-.02.06-.06.13-.04.19.15.58.31,1.16.47,1.76ZM10.89,26.39s.05.02.08.04c-.01.06-.04.12-.03.17.04.12.1.22.16.33.08-.08.18-.14.23-.24.04-.08.07-.19.05-.27-.06-.21-.15-.41-.23-.62l-.27.59ZM38.63,27.06c.05-.06.11-.11.13-.17.01-.03-.03-.09-.05-.14-.07.05-.14.1-.21.15.04.04.07.09.13.16ZM32.04,27.18c-.07-.11-.13-.21-.19-.3-.02.06-.08.13-.07.18.02.08.09.15.14.22.04-.03.07-.06.12-.1ZM29.8,27.3c-.2-.2-.51-.35-.39-.74.01-.05.07-.08.11-.13.04.03.09.06.11.1.1.23.18.46.27.69-.03.02-.06.05-.1.07ZM14.02,27.6c-.43,0-.66-.25-.6-.58.03-.19.08-.39.17-.57.03-.07.22-.15.27-.12.56.34,1.03.06,1.5-.2.14-.07.29-.15.44-.16.09,0,.21.09.28.16.02.02-.06.17-.12.22-.36.31-.7.65-1.1.91-.27.18-.62.24-.84.32ZM34.54,25.5s.03.01.04.02c-.1.5-.19,1-.31,1.49-.06.25-.2.41-.51.39-.29-.02-.59,0-.88,0-.16,0-.23.15-.1.23.22.13.34.33.51.51.3.32.73.32,1.05-.02.71-.75.78-1.69.67-2.65-.03-.26-.21-.5-.33-.75-.02-.04-.1-.05-.15-.07-.02.05-.06.09-.05.14.01.23.04.47.06.7ZM43.63,26.39c-.09-.6-.45-1.04-.87-1.44-.02-.02-.16.03-.17.07-.04.13-.06.27-.05.41.03.74-.23,1.43-.35,2.14-.02.13-.09.26-.15.37-.11.22-.38.55-.32.62.24.3.53-.02.8-.06.04,0,.07-.04.11-.05.17-.04.2-.15.26-.31.19-.48.17-1.05.63-1.42.08-.06.08-.21.12-.33ZM34.03,29.25l.12-.11c.06-.04.12-.08.18-.12-.12-.04-.24-.09-.36-.12-.02,0-.07.04-.07.05.04.1.08.2.12.3ZM15.27,28.43c-.11.29-.22.57-.35.89-.21-.42.08-.66.22-.94.04.01.09.03.14.04ZM35.45,28.7c-.09.02-.2.02-.28.06-.22.11-.54.19-.61.36-.12.31-.41.24-.59.38-.08.07-.14.16-.21.25.12.01.27.07.37.03.27-.11.53-.25.76-.42.23-.17.41-.4.61-.61.17-.28.34-.56.51-.85.02-.03-.02-.1-.03-.15-.05.02-.13.02-.15.06-.13.3-.26.6-.38.9ZM34.27,30.49c-.06.08-.11.14-.1.15.1.09.21.17.32.24.02.01.08-.05.12-.08-.1-.1-.21-.19-.33-.31ZM38.63,31.05c.63,0,1.22-.13,1.71-.52.37-.28.67-.65.98-1,.1-.12.15-.29.22-.44-.14.08-.28.16-.41.25-.03.02-.03.08-.06.1-.87.75-1.71,1.58-3.02,1.32-.05,0-.11.07-.17.11.05.05.1.13.16.14.19.03.39.03.59.04ZM40.18,26.53c-.14-.52-.39-.89-.11-1.31.03-.05-.02-.15,0-.23.1-.59-.19-1.11-.28-1.66-.14-.88-.84-1.15-1.5-1.43-.56-.23-1.16-.36-1.74-.52-.14-.04-.3-.3-.43-.04-.02.05.21.24.34.35.06.04.16.02.23.05.6.26,1.23.46,1.77.8.46.28.95.64,1.02,1.23.1.94.28,1.88,0,2.83-.07.24-.12.54-.03.75.15.35.02.55-.19.79-.12.13-.18.3-.29.45-.45.64-.84,1.32-1.62,1.65-.58.25-.94.3-1.26.02-.1-.09-.24-.13-.36-.19.04.14.08.29.12.43.02.06.04.12.08.24-.19-.04-.35-.12-.41-.08-.15.11-.57-.62-.48.15,0,.02-.17.06-.26.1.06.13.08.31.18.39.15.12.34.22.54.06.03-.02.04-.11.02-.15-.29-.43.07-.33.28-.35,1.01-.12,2-.29,2.75-1.07.24-.25.43-.54.68-.78.21-.2.37-.4.39-.69.02-.23.06-.43.34-.19.17.14.31.06.39-.08.14-.23.26-.48.37-.73.05-.1,0-.28.07-.34.45-.37.45-.89.52-1.39.05-.42.07-.82-.22-1.19-.12-.15-.16-.36-.24-.54-.21-.47-.46-.92-.81-1.31.1.76.21,1.5.44,2.21.21.62,0,1.11-.32,1.74ZM39.05,31.77s.04-.07.06-.11c-.05-.02-.11-.06-.16-.05-.1.01-.2.05-.31.08.04.05.07.13.11.13.1,0,.2-.03.3-.05ZM40.86,31.64s-.02-.07-.03-.1c.22-.16.45-.3.65-.48.11-.1.16-.25.24-.38-.13.05-.27.09-.4.14-.13.05-.25.11-.38.16-.55.22-1.1.44-1.71.68.23.08.4.12.55.21.58.37,1.18.21,1.77.05.08-.02.15-.11.22-.16-.09-.06-.19-.16-.28-.16-.2,0-.41.03-.62.05ZM20.49,26.82c1.21.05,2,1.21,1.57,2.33-.1.27-.04.41.15.56,1.14.88,1.94,2.02,2.58,3.28.09.17.14.37.16.56.02.16-.02.32-.03.48-.09-.12-.2-.23-.28-.36-.59-1.04-1.27-1.99-2.15-2.81-.22-.2-.52-.37-.57-.73,0-.08-.2-.21-.26-.18-.11.04-.26.18-.25.27.04.52-.21.88-.58,1.17-.38.29-.83.34-1.3.3-.47-.04-.85.12-1.05.6-.13.3-.37.38-.68.35-.21-.02-.42-.03-.63,0-.37.04-.45,0-.45-.41,0-.19.07-.39.06-.58,0-.14-.07-.28-.12-.42-.13.06-.26.12-.39.19-.22.13-.42.29-.65.38-.08.03-.34-.16-.33-.21.07-.47-.24-.77-.45-1.11-.06-.1-.27-.26-.02-.39.17-.09.3,0,.39.15.22.39.55.63.99.68.53.06,1.06.02,1.47-.39.26-.26.5-.56.79-.79.13-.11.35-.19.53-.18.42.02.83.11,1.21-.13.04-.02.16,0,.16,0,0,.09.01.18,0,.27-.02.08-.06.15-.09.22.08-.01.17,0,.23-.04.14-.1.27-.23.41-.34.13-.11.27-.21.4-.31.09-.07.2-.13.26-.22.46-.68.04-1.63-.76-1.74-.18-.02-.36-.04-.52-.09-.09-.03-.17-.12-.26-.18.09-.06.17-.14.26-.18.07-.02.15.01.21.02ZM31.99,33.24c.15.02.28.02.41.05.13.03.27.07.36.15.19.19.35.42.53.61.06.07.2.15.26.12.14-.06.27-.16.36-.28.03-.04-.06-.21-.14-.28-.2-.19-.43-.34-.62-.53-.45-.45-.77-.42-1.16.16ZM14.02,35.14c-.02-.44.11-.82.42-1.13.12-.12.27-.21.38.02.1.22.24.18.37.06.55-.48,1.16-.41,1.78-.21.17.05.33.13.51.17.31.07.62.09.92-.08.6-.33,1.22-.39,1.89-.2.41.11.84.15,1.28-.03.22-.09.5-.05.74-.03.28.02.53.05.79-.14.12-.1.39-.13.54-.06.48.22.87.58,1.16,1.02.08.13.07.35.04.52-.02.08-.22.2-.28.17-1.26-.52-2.57-.38-3.88-.34-1.13.03-2.25.08-3.38.17-.41.03-.82.15-1.2.28-.26.09-.47.26-.55.57-.09.34-.22.38-.49.18-.18-.14-.35-.23-.59-.21-.3.03-.44-.13-.44-.43,0-.1,0-.2,0-.3ZM20.96,35.69c.27-.06.53-.13.81-.16.11,0,.31.08.33.15.02.13-.04.3-.12.4-.1.11-.27.17-.41.23-1.43.61-2.94.98-4.47,1.21-.29.04-.62-.09-.91-.21-.29-.12-.33-.44-.32-.71,0-.23.55-.63.85-.66.51-.04,1.03-.07,1.54-.1.9-.06,1.81-.13,2.71-.2,0,.02,0,.03.01.05ZM30.45,37.33c-.17.15-.26.26-.32.4-.06.14-.08.3-.09.55.29-.27.5-.53.41-.95ZM15.79,38.69s0,0,0,0c0,0,0,0,0,0v.02s0,0,0,0h0ZM14.14,37.86c.1-.13.14-.2.2-.25.14-.11.29-.2.44-.3,0,.19.06.4,0,.56-.13.31-.32.59-.51.86-.03.05-.23.04-.3-.01-.29-.23-.44-.92-.3-1.27.03-.08.12-.13.19-.19.05.06.1.11.13.18.05.11.07.22.15.44ZM15.79,38.7c-.06.33-.09.54-.15.74-.01.05-.11.09-.16.13-.04-.06-.13-.13-.12-.18.03-.25.08-.5.14-.74.02-.07.1-.13.16-.19.05.08.1.16.13.25,0,0,0,0,0,0ZM21.13,42.64c-.58-.12-1.16-.18-1.72.06-.05.02-.08.08-.13.11.05.04.09.11.14.13.62.22,1.17,0,1.71-.3ZM34.99,43.06c-.07-.07-.14-.21-.22-.22-.11,0-.31.07-.33.14-.08.43-.45.62-.71.9-.09.1-.19.2-.27.31-.03.05,0,.14.02.21,0,.01.1.01.15,0,.58-.21.97-.64,1.3-1.14.03-.05.03-.11.06-.2ZM30.94,46.39c-.13-.09-.21-.15-.3-.21-.05.08-.13.16-.12.24,0,.08.11.14.16.21.06-.06.12-.11.26-.24ZM28.62,48.1c.17-.24.34-.43.44-.65.05-.11,0-.37-.08-.4-.19-.09-.43-.1-.64-.14-.04.28-.11.56-.09.84,0,.11.21.2.38.34ZM35.68,44.5c-.08-.18-.12-.36-.18-.36-.14-.01-.32.02-.42.1-.45.36-.86.76-1.31,1.11-.47.36-.95.7-1.45,1.02-.41.26-.89.43-1.28.72-.72.52-1.48.95-2.29,1.31-.25.11-.5.24-.73.39-.25.17-.22.49.02.91.16.27.34.21.55.11,1.17-.61,2.36-1.21,3.42-2,1.11-.83,2.16-1.72,3.22-2.6.21-.18.32-.47.47-.69ZM21.74,50.09c.06-.03.11-.05.15-.09.37-.29.73-.61,1.13-.87.16-.11.4-.11.61-.12.37-.02.73.06,1.1-.14.38-.21,1.05.14,1.17.59.11.4.37.64.73.8.16.08.34.16.47-.05.11-.17.19-.37.02-.54-.2-.2-.23-.43-.28-.69-.06-.29-.15-.59-.31-.82-.34-.48-.78-1.14-1.37-1.32-.91-.29-2.06.25-2.36.36-.71.26-1.42,1.89-1.4,2.3.01.37.28.61.36.6ZM21.06,50.26c0,.14,0,.18,0,.22.02.18.06.38.3.33.22-.04.16-.23.14-.38,0-.04,0-.09-.02-.11-.08-.1-.17-.19-.25-.29-.07.1-.14.2-.17.23ZM25.3,51.31c-.1.19-.17.3-.2.41-.01.04.08.1.12.16.07-.1.16-.19.2-.3.02-.04-.05-.12-.12-.27ZM23.32,49.74c-.4.26-.34.62-.45.9-.22.57.13.88.47,1.21.3.29.63.13.95.04.09-.02.14-.15.21-.23-.07-.06-.13-.17-.21-.17-.73-.08-.84-.62-.9-1.2-.02-.17-.05-.34-.08-.55ZM19.32,53.84c.47.41.11.3-.2.22-.14-.14-.29-.28-.43-.42-.01-.01.07-.11.11-.17.16.12.32.23.51.37ZM15.06,52.01c-.03-.57-.06-1.08-.09-1.59,0-.1-.04-.21,0-.29.03-.08.13-.13.21-.19.05.07.13.13.14.21.08.47.12.94.23,1.4.19.81.48,1.59,1.1,2.19.39.38.77.78,1.17,1.15.12.11.31.16.47.24.12.06.61.26.71.35.12.11.13.63.23.76-.16.1-1.28-.32-1.46-.46-.6-.46-1.23-.92-1.72-1.49-.56-.65-1.03-1.4-.99-2.27ZM40.05,21.44c.5.69,1.22,1.05,1.98,1.36.09.04.21.03.28.08.51.39,1.01.79,1.51,1.17.31.24.24.71.47.9.31.25.45.54.54.88.19.73.3,1.45.14,2.21-.07.32-.08.66.17.99.17.22.19.54.02.84-.27.45-.42.92-.38,1.47.04.52-.29.87-.84.97-.58.1-1.05.34-1.3.91-.04.09-.17.14-.26.21-.18.13-.37.23-.53.38-.48.47-1.05.79-1.69.99-.33.1-.43.39-.51.66-.13.46-.37.75-.83.9-.41.13-.8.31-1.29.5.53.23.94.03,1.32-.08.58-.18,1.14-.46,1.71-.67.33-.12.68-.21,1.02-.28.54-.11,1.08-.19,1.62-.27.29-.04.35.03.27.3-.03.09-.07.19-.13.26-.62.74-1.08,1.68-1.49,2.52-.03.06-.02.14-.03.22.08-.03.19-.04.24-.09.13-.17.25-.35.35-.54.34-.71.9-1.43,1.24-2.14.04-.08.25.03.31.09.43.45.21.82-.11,1.19-.36.41-.76.8-1.07,1.25-.53.78-1.02,1.56-.83,2.61.12.66-.11,1.32-.51,1.89-.21.29-1.06.47-1.35.26-.25-.18-.49-.26-.8-.27-.51-.02-.94-.29-1.33-.6-.58-.45-1.15-.91-1.73-1.36-.09-.07-.33-.13-.34-.11-.09.18-.29.35-.08.58.67.69,5.05,4.99,5.92,5.8.27.25.28.24.44-.07.18-.33.38-.65.56-.97.25-.45.25-.46-.24-.48-.41-.02-.77-.14-1.06-.44-.06-.06-.08-.16-.12-.24.07-.02.15-.06.22-.06.5,0,1-.02,1.49,0,.33.01.56-.08.68-.42.1-.28.22-.55.38-.81.17-.28.02-.3-.19-.3-.52,0-1.03,0-1.56,0,.32-.75.37-.78,1.1-.75.92.04,1.17.25,1.52-1.06,0-.02.02-.04.02-.06q.17-.48-.37-.49c-.42,0-.83,0-1.25,0-.34-.01-.41-.14-.35-.46.04-.22.18-.23.34-.23.58,0,1.15,0,1.73,0,.46,0,.59-.16.61-.65,0-.15.08-.29.12-.44.11-.39,0-.57-.38-.59-.32-.01-.63.01-.95.02-.15,0-.31,0-.46-.03-.05,0-.14-.09-.14-.14,0-.25.31-.53.57-.53.38,0,.76-.04,1.13.02.43.07.62-.17.78-.47.04-.07.06-.15.08-.22.16-.7.06-.83-.67-.81-.16,0-.31,0-.5,0,.16-.45.35-.73.89-.69.58.04.62-.04.65-.63.04-.83.03-.84-.81-.84-.87,0-1.75,0-2.62,0h-.63c.58-.66.81-.72,1.53-.68.77.04,1.54.02,2.3,0,.42-.02.46-.08.47-.51,0-.33-.02-.66-.04-1-.31-.01-.62-.03-.93-.04-.1,0-.2,0-.3-.02-.03,0-.08-.08-.07-.12.02-.2.46-.58.66-.58.08,0,.16.02.24.02.56,0,.59-.04.57-.6,0-.22,0-.44.03-.65.03-.26-.07-.37-.33-.35-.08,0-.16,0-.24-.02-.11-.02-.3-.03-.31-.08-.04-.18-.03-.38-.02-.57,0-.02.09-.06.15-.06.16-.01.32-.01.48,0,.25,0,.3-.12.28-.34-.04-.29-.11-.59-.07-.87.04-.31-.07-.4-.34-.4-.1,0-.2,0-.3,0-.16-.02-.38.07-.36-.24.01-.25.04-.41.35-.43.49-.03.49-.05.48-.55,0-.23-.08-.47-.08-.7-.01-.37-.15-.54-.55-.48-.48.07-.44-.41-.68-.68.3-.02.55-.06.8-.06.22,0,.25-.15.26-.31,0-.03-.03-.07-.04-.11-.08-.32-.07-.74-.27-.93-.17-.17-.59-.08-.9-.09-.27,0-.54,0-.81,0-.08,0-.17.03-.24,0-.15-.07-.29-.17-.43-.26.13-.13.25-.35.4-.38.3-.07.63-.06.94-.03,1.04.11,1.22-.11.87-1.11-.16-.47-.19-.48-.67-.48-.08,0-.16.03-.24.02-.16-.02-.39.05-.42-.2-.03-.24.16-.48.39-.52.55-.09.59-.13.41-.65-.13-.37-.13-.82-.64-.97-.24-.07-.22-.41-.04-.64.05-.06.08-.17.06-.23-.17-.42-.36-.83-.56-1.24-.03-.05-.13-.1-.2-.1-.5.04-.67-.4-1.1-.65.17-.03.22-.04.27-.04.66.02.76-.12.53-.76-.22-.63-.4-.77-1.06-.77-.53,0-1.06.05-1.58.07-.26,0-.52.01-.77-.01-.26-.03-.39-.23-.37-.46,0-.09.22-.21.34-.22.35-.04.71-.04,1.07-.04.41,0,.83,0,1.24,0,.27,0,.32-.1.17-.32-.25-.35-.47-.73-.75-1.05-.09-.11-.32-.14-.48-.14-.64-.02-1.27,0-1.91,0-.18,0-.34.01-.45-.19-.21-.38-.15-.52.28-.52.45,0,.9.02,1.34.02.17,0,.33-.06.56-.11-.44-.53-.82-1.01-1.23-1.46-.09-.1-.29-.12-.43-.12-.41-.01-.82.01-1.24,0-.28,0-.57,0-.82-.1-.16-.07-.25-.32-.38-.48.07-.05.14-.14.21-.14.44-.02.87,0,1.31-.02.09,0,.19-.04.28-.06-.03-.11-.03-.25-.1-.32-.37-.35-.72-.77-1.17-1-.35-.18-.84-.19-1.25-.15-.82.07-1.58,0-2.25-.65.23-.03.41-.07.6-.08.3-.01.6,0,.89,0,.14,0,.27-.08.41-.12-.1-.09-.19-.19-.31-.26-.45-.25-.93-.45-1.36-.72-.66-.41-1.37-.51-2.11-.42-.54.07-.92-.17-1.26-.52-.05-.05-.05-.16-.08-.24-.02-.05-.04-.14-.08-.15-.62-.18-1.24-.37-1.87-.5-1.36-.28-2.74-.31-4.12-.41-1.08-.08-2.13.05-3.2.08-.45.01-.9.28-1.35.36-1.66.31-3.18.98-4.7,1.67-.76.35-1.51.72-2.27,1.08,0,.04.01.09.02.13.23.02.46.04.72.06-.32.46-.68.71-1.21.61-.62-.11-1.06.18-1.43.65-.18.23-.42.4-.61.62-.16.18-.13.33.15.33.34,0,.68,0,1.01,0,.14,0,.38-.05.33.2-.03.18,0,.46-.34.45-.52-.01-1.04.05-1.55-.02-.67-.09-1.03.33-1.41.71-.23.24-.4.54-.6.81-.04.06-.06.14-.09.21.09.03.17.08.26.08.89,0,1.79,0,2.68,0,.14,0,.27,0,.41,0,.14,0,.35-.06.33.2-.02.21,0,.46-.32.46-.76,0-1.51,0-2.27,0-.45,0-.9-.05-1.35-.04-.12,0-.28.08-.35.17-.26.34-.5.7-.74,1.07-.06.09-.06.2-.09.31.09.02.18.05.27.05,1.13,0,2.26-.01,3.38-.02.14,0,.28,0,.42,0,.16.02.2.12.09.24-.21.24-.44.42-.81.41-1.11-.02-2.23,0-3.34-.02-.31,0-.49.09-.62.34-.17.32-.33.63-.5.95-.14.26-.02.3.22.3.85,0,1.7,0,2.55,0,.12,0,.23.01.35.02-.1.64-.11.65-.68.64-.87-.02-1.73-.04-2.6-.05-.11,0-.26.1-.31.19-.17.36-.29.74-.44,1.1-.11.27-.02.35.25.35,1.03,0,2.07,0,3.1,0,.22,0,.43-.03.49.28.05.24.02.39-.27.38-.46,0-.91,0-1.37,0-.66,0-1.31.02-1.97,0-.36-.01-.62.07-.76.42-.04.11-.13.2-.18.31-.33.8-.28.88.59.88h2.73c-.03.16-.06.27-.06.38,0,.26-.16.28-.36.28-.96,0-1.93,0-2.89,0-.27,0-.44.05-.48.38-.03.26-.21.5-.28.77-.1.39-.05.46.36.46.69,0,1.38-.05,2.07-.05.47,0,.94.04,1.49.07-.34.41-.62.69-1.16.66-.87-.04-1.74,0-2.61-.01-.28,0-.42.08-.46.4-.13,1.08-.15,1.08.93,1.09.6,0,1.19,0,1.79-.01.14,0,.31-.06.29.16-.01.18.06.43-.21.49-.13.03-.28.02-.41.02-.74,0-1.47.01-2.21,0-.27,0-.4.08-.41.36-.01.33-.05.66-.08,1-.02.31.13.41.43.4.75-.02,1.51-.02,2.26,0,.54.01.54.04.71.63-.15.01-.3.03-.45.03-.82,0-1.63,0-2.45,0q-.63,0-.65.6c0,.08,0,.16,0,.24q-.11.77.67.77c1.17,0,2.34,0,3.52,0,.21,0,.45-.05.46.3,0,.24-.06.37-.33.36-.95-.03-1.91-.05-2.86-.06-.43,0-.86.04-1.29.06-.22,0-.27.14-.25.32.01.14.05.27.07.41.04.31-.02.71.16.89.15.15.56.06.86.06,1.07,0,2.15,0,3.22,0,.14,0,.32-.05.41.02.16.12.25.32.38.48-.15.05-.3.15-.45.15-1.39.01-2.77.01-4.16.01-.27,0-.42.07-.34.39.05.21.02.43.04.65.04.41.14.51.56.52,1.31.02,2.61.04,3.92.04.36,0,.71-.05,1.07-.05.18,0,.36.03.52.09.38.15.74.34,1.1.59-.13.01-.26.03-.39.03-1.33,0-2.66,0-3.99,0-.79,0-1.58,0-2.36,0-.25,0-.37.07-.3.34.04.15.02.32.05.47.11.51.32.67.85.67,1.97,0,3.93,0,5.9,0,.12,0,.24,0,.36,0,.33,0,.29.29.32.48.03.26-.21.17-.34.17-1.93,0-3.86,0-5.78,0q-.8,0-.78.79c.02.58.16.73.74.73,1.73,0,3.45-.02,5.18-.03.38,0,.76,0,1.13.04.13.01.29.11.37.22.18.27.12.4-.21.42-.44.02-.87.01-1.31.01-1.67,0-3.34,0-5.01-.01-.4,0-.41,0-.33.39.06.31.15.61.19.93.04.3.19.4.48.38.53-.04,1.07-.07,1.6-.07.47,0,.95.06,1.42.06,1.27.01,2.54.02,3.82,0,.33,0,.53.12.61.43.02.06-.08.21-.15.22-.15.04-.32.02-.47.02-2.13,0-4.25,0-6.37.01-.5,0-.51.02-.4.5.03.12.03.25.08.35.38.69.35.92,1.34.84.66-.05,1.33.02,2,.02.59,0,1.19-.02,1.78-.02.67,0,1.33,0,2,.01.45,0,.91.06,1.36,0,.72-.09,1.27.29,1.86.63-.75,0-1.5,0-2.25,0-.27,0-.55.03-.82.03-.32,0-.63-.01-.95-.03-.1,0-.2-.04-.29-.04-.98.02-1.96.06-2.94.08-.67.01-1.35.02-2.02,0-.34,0-.36.09-.23.38.13.3.19.64.31.95.09.23.28.29.53.28.67-.04,1.34-.06,2.01-.07.98-.01,1.96,0,2.94,0,1.49,0,2.98,0,4.47,0,.09,0,.19.02.4.05-.17.12-.24.18-.33.23-.76.4-1.58.4-2.41.39-1-.02-2.01.05-3.01.07-.25,0-.51-.08-.77-.07-.61.01-1.23.06-1.84.07-.47.01-.94,0-1.49,0,.31.49.62,1.01.97,1.48.08.1.32.12.48.12,1.23,0,2.47,0,3.7,0h.68c-.32.42-.57.7-1.09.68-.93-.05-1.87-.01-2.8-.01-.1,0-.19.03-.29.05.05.1.09.2.14.29.2.32.4.63.61.94.08.11.17.22.25.33.19.22.39.43.56.67.37.51.58.54,1.07.17.46-.35.86-.73,1.14-1.25.19-.36.43-.74.94-.96-.08.21-.09.39-.19.48-.66.63-.69,1.49-.79,2.3-.06.51-.07,1.05.32,1.52.15.18.45.84.5,1.11-.04.03-.4-.27-.43-.24-.41-.29-.83-.57-1.23-.87-.76-.57-1.47-1.19-2.07-1.92-1.17-1.43-2.4-2.84-3.29-4.48-.43-.8-.8-1.63-1.16-2.47-.29-.66-.54-1.34-.79-2.02-.11-.31-.18-.64-.27-.96-.1-.36-.2-.72-.31-1.07-.48-1.59-.77-3.21-1.05-4.84-.25-1.45-.3-2.92-.28-4.39.02-1.24-.02-2.49.04-3.72.06-1.04.2-2.08.36-3.12.14-.88.34-1.75.57-2.61.28-1.08.58-2.16.94-3.22.28-.84.65-1.65,1.02-2.46.38-.85.75-1.72,1.22-2.53.46-.8,1.07-1.51,1.55-2.3.45-.76,1.11-1.29,1.75-1.86.58-.53,1.06-1.18,1.66-1.69.72-.62,1.47-1.21,2.28-1.69,1.03-.6,2.11-1.15,3.22-1.59,1.04-.42,2.15-.66,3.23-1,.82-.26,1.65-.34,2.51-.37.53-.02,1.05-.17,1.57-.24.31-.04.63-.07.95-.06.67.02,1.34.06,2.01.11.9.07,1.8.14,2.66.46.07.03.14.07.22.09.72.19,1.48.3,2.16.58,1.18.5,2.39.91,3.52,1.54.95.52,1.86,1.12,2.82,1.62.18.1.34.26.49.4.4.37.8.76,1.21,1.13.67.61,1.29,1.25,1.74,2.06.18.32.48.58.72.87.86,1.05,1.55,2.2,2.1,3.43.25.58.57,1.13.8,1.72.25.67.42,1.37.64,2.06.17.56.32,1.14.55,1.68.17.41.13.86.28,1.25.42,1.13.51,2.31.72,3.48.15.84.23,1.69.33,2.53.02.23-.04.47-.03.7.02.61.06,1.22.07,1.84,0,.35-.05.71-.06,1.06-.07,2.63-.29,5.25-1,7.8-.29,1.04-.58,2.08-.92,3.1-.26.76-.59,1.5-.91,2.25-.22.52-.46,1.04-.71,1.55-.33.66-.72,1.29-1.13,1.9-.18.28-.31.6-.49.88-.61.96-1.32,1.82-2.23,2.53-.4.31-.69.77-1.07,1.11-.66.59-1.32,1.17-2.03,1.7-.58.43-1.2.82-1.85,1.15-1.24.64-2.48,1.27-3.85,1.61-.75.19-1.48.43-2.22.63-.32.08-.66.13-.99.16-1.08.11-2.15.25-3.23.3-.82.04-1.64-.03-2.46-.07-.41-.02-.49-.15-.39-.56.04-.15.05-.32.09-.47.08-.26.03-.69.56-.45.09.04.33-.17.46-.31.16-.17-.01-.3-.1-.46-.12-.23-.19-.49-.26-.74-.14-.55-.47-.91-1.03-.97-.52-.05-.79-.48-1.15-.75-.29-.21-.44-.6-.67-.89-.49-.64-.66-1.37-.7-2.15,0-.09-.05-.17-.07-.25-.07.06-.14.15-.2.18-.29.15-.35,1.82-.31,2.35-.09-.2-.23-.39-.25-.6-.08-.75-.1-1.49.08-2.24.14-.58.39-1.07.81-1.45.33-.3.74-.54,1.13-.75.31-.17,1.18-.5,1.23-.84.07-.48,0-.54-.5-.44-.84.17-2.24.76-2.91,1.27-.14.11-.51.47-.66.57-.04.03-.11.02-.17.03,0-.07-.02-.16,0-.21.07-.12.4-.47.49-.59-.17,0-.35-.05-.52-.02-.49.09-.97.21-1.45.31-.11.02-.22,0-.33,0,.09-.1.15-.23.26-.28.23-.11.48-.19.72-.26.25-.07.5-.11.75-.17.53-.12.61-.2.38-.66-.47-.95-.9-1.92-1.75-2.65-.57-.5-1.14-.96-1.81-1.31-.43-.23-.74-.58-1-.99-.6-.94-1.12-1.91-1.3-3.02-.1-.58-.11-1.18-.15-1.77-.06-.86-.07-1.73-.18-2.59-.05-.41-.93-.83-1.07-1-.16-.53-.53-1.25-.7-1.77-.03-.08-.12-.13-.19-.19-.02.09-.09.2-.07.26.22.52.46,1.04.69,1.56.01.32.78.89,1.02,1,.18.08.19.17.02.29-.46.32-1.01.3-1.46-.04-.5-.37-.8-.88-.94-1.46-.23-.94-.32-1.89-.16-2.86.04-.26.24-.34.32-.52.06-.14-.31-.08-.21-.38.14-.46.15-.53.65-.63.35-.07.65-.2.62-.63-.86.04-1.69.15-2.05,1.25-.36-.78-.93-1.31-.99-2.1-.05-.64-.07-1.27.39-1.79.12-.13.21-.29.31-.44.27-.41.64-.61,1.15-.56.29.03.59-.05.88-.05.34.01.69.07,1.01.1-.42-.68-1.36-.93-2.31-.55.17-.46.14-.88,0-1.32-.09-.29.08-.52.39-.54.33-.02.67.02.99.1.14.04.27.13.34-.03.04-.1.03-.29-.04-.37-.17-.19-.36-.37-.67-.24-.18.08-.38.12-.58.13-.12,0-.32-.05-.34-.12-.03-.11.02-.32.11-.37.44-.24.8-.65,1.38-.57.12.02.32-.03.35-.11.04-.09-.03-.26-.09-.37-.11-.2-.42-.19-.45-.51-.05-.67-.13-1.34.07-2,.03-.09.09-.18.15-.25.03-.04.12-.08.15-.06.06.03.11.1.12.16.03.09,0,.2.03.29.02.06.11.12.17.14.07.02.17-.04.23-.01.71.31.95-.34,1.34-.67.05-.04.02-.23-.03-.31-.17-.24-.37-.45-.55-.68-.07-.09-.17-.24.04-.24.5,0,.48-.35.49-.7.11.62.47,1.1.9,1.51.21.2.19.35.12.56-.14.39-.25.79-.43,1.17-.46.99-.48,2.06-.59,3.12,0,.04.04.13.06.13.18,0,.36,0,.54-.04.06-.01.09-.13.15-.18.21-.19.45-.2.72-.15.21.04.43.04.64.02.12-.01.28-.17.35-.13.17.09.31.24.43.39.16.2.25.46.42.64.33.36.7.68,1.13,1.1.1-.53-.31-1.07.4-1.28.1.36.3.77.31,1.18,0,.32-.22.64-.33.97-.13.41-.23.83-.35,1.24-.09.3,0,.79-.59.63-.02,0-.09.11-.09.17,0,.3-.17.36-.42.36-.22,0-.43.08-.65.08-.23,0-.47-.04-.68-.11-.11-.03-.26-.2-.25-.28.04-.19,0-.47.29-.51.22-.03.45-.01.68-.03.07,0,.14-.04.2-.06-.03-.07-.03-.15-.08-.19-.53-.49-1.12-.34-1.5.28-.15.25-.42.45-.58.73-.03.05-.28-.03-.43-.05-.4-.04-.45,0-.39.39.17,1.05.22,2.14-.11,3.11-.49,1.41-.25,2.76-.13,4.15.06.66.28,1.32.3,1.98.03.8,0,1.61.16,2.4.28,1.4.8,2.69,1.87,3.69.14.13.32.24.49.33.06.03.24,0,.25-.03.09-.34.42-.35.66-.46.87-.41,1.73-.88,2.7-1.04.15-.03.32-.04.47,0,.57.12,1.14.13,1.7.39.47.22,1.07.37,1.64.17.09-.03.19-.06.26-.12.5-.49,1.13-.7,1.79-.84.15-.03.29-.12.43-.19.21-.1.29-.25.2-.49-.07-.2-.09-.43-.17-.62-.07-.19-.16-.33.14-.38.03,0,.06-.16.06-.24-.03-.65.17-1.21.64-1.65.65-.62.84-1.36.57-2.21-.19-.6-.26-1.23-.64-1.78-.19-.28-.29-.68-.42-1.01-.18-.44-.29-.85-.48-1.29-.05-.1-.01-.24-.01-.37.13.07.3.1.37.21.11.18.19.4.23.61.13.69.39,1.31.85,1.84.1.11.14.28.21.43.17.37.34.72.82.75.17.01.24.12.26.32.08.79.1,1.57-.02,2.35-.04.27-.93,2.94-1.54,3.37-.09.06-.14.19-.18.3-.02.04,0,.13.04.15.03.02.12.01.16-.02.14-.11.27-.24.39-.37.18-.2.36-.4.52-.61.19-.25.36-.52.52-.78.21-.33.42-.66.6-1.01.68-1.32.88-2.7.44-4.14-.12-.39.07-.71.19-1.02.3-.72.68-1.41,1.05-2.1.07-.13.25-.25.39-.28.2-.04.41-.05.36.32-.05.37.48.65.86.5.03-.01.06-.16.03-.2-.08-.13-.2-.23-.28-.36-.02-.03,0-.11.01-.2.4.3.78.57,1.16.85.55.41,1.46.39,1.85,0-.38-.06-.8-.09-1.2-.2-.35-.09-.34-.17-.22-.51.09-.25.13-.53.15-.8,0-.08-.11-.17-.17-.26-.09.06-.18.11-.25.19-.04.04-.02.12-.05.17-.07.13-.15.25-.23.38-.12-.14-.26-.27-.34-.44-.14-.28.14-.7-.1-.88-.21-.17-.59-.13-.9-.17-.2-.03-.38-.04-.17-.3.03-.04.05-.12.03-.17-.26-.73.12-1.5-.16-2.22-.04-.11,0-.27.05-.39.11-.26.26-.51.39-.77.38.16.2.51.25.78.1.51.52.74.9.94.19.1.3.18.38.36.09.21.27.3.49.23.23-.07.3-.24.26-.47-.06-.34-.09-.66-.33-.98-.33-.43-.53-.95-.77-1.45-.03-.06.02-.17.07-.24.1-.16.21-.32.37-.55-.4.05-.71.09-1.02.11-.21.01-.39.06-.33-.34.04-.29.1-.39.34-.49.36-.16.72-.32,1.13-.3.15,0,.31-.04.49-.07-.22-.38-.5-.42-.83-.27-.42.2-.83.01-1.24.08,0-.05-.02-.1-.03-.16.32-.1.63-.25.96-.3.5-.07.08-.37.14-.54.06-.17-.17-.21-.34-.13-.22.09-.43.2-.65.28-.43.16-.83.06-1.19-.18-.89-.6-1.39-1.44-1.47-2.51-.01-.18.08-.36.17-.54.26.56.14,1.28.86,1.69-.11-.29-.2-.5-.26-.72-.06-.25-.1-.51-.09-.76,0-.15.11-.31.17-.46.09.11.19.22.27.34.09.13.17.26.26.39,0,.02.01.04.02.06h.01c.03.49.44.73.68,1.07.03.04.25,0,.35-.07.04-.03.02-.23-.03-.3-.07-.1-.2-.15-.31-.22-.23-.16-.46-.32-.69-.48,0,0,0-.02,0-.02-.01-.02-.02-.03-.03-.05-.17-.61-.07-1.21.11-1.79.09-.29.07-.41-.25-.39-.08,0-.16,0-.26-.02.12-.42.37-.67.8-.66.25,0,.22-.13.16-.24-.19-.34-.39-.68-.6-1-.1-.15-.25-.25-.38-.38-.42-.44-.83-.89-1.24-1.34-.3-.32-.61-.45-1.1-.35-.52.1-1.09.24-1.63-.03-.1-.05-.26.03-.39.05-.21.03-.45.15-.63.09-.89-.27-1.67,0-2.44.4-.37.19-.76.32-1.15.46-.07.02-.19-.01-.24-.07-.25-.27-.41-.13-.57.1-.07.09-.14.2-.24.24-.43.19-.87.37-1.32.53-.12.04-.27.01-.4-.01-.33-.06-.65-.11-.97-.19-.51-.14-.97-.08-1.39.26-.23.19-.39.1-.49-.17-.11-.32-.22-.63-.36-.94-.12-.26-.28-.5-.42-.74-.04.02-.09.03-.13.05.04.24.02.51.12.72.19.4.19.9.59,1.2.06.04.08.25.04.31-.23.32-.49.62-.72.93-.13.18-.22.13-.29-.03-.13-.31-.48-.55-.35-.97.01-.04-.14-.16-.23-.22-.28-.2-.41-.42-.33-.8.16-.79.26-1.58.15-2.4-.05-.34.29-.74.87-1.13-.03.33-.07.6-.07.88,0,.23.05.47.09.7,0,.04.07.07.11.1.04-.05.08-.09.11-.14.02-.03.03-.08.03-.11-.13-.81.07-1.61.18-2.4.03-.21.16-.44.3-.6.18-.2.42-.36.63-.53.13-.11.99-.2,1.07-.08.07.12.06.32.03.47-.12.57-.2,1.14.06,1.79.07-.17.14-.27.14-.38.02-.45-.01-.9.03-1.35.04-.42.15-.84.25-1.26.02-.09.15-.18.25-.23.27-.15.55-.32.84-.43.38-.14.78-.31,1.18-.33.28-.01.59.18.87.31.22.1.5.22.58.41.08.18-.1.45-.12.68-.04.41-.05.83-.06,1.25,0,.06.07.12.1.19.05-.07.14-.13.15-.21.09-.56.15-1.13.25-1.69.06-.33.16-.65.27-.97.11-.33.27-.54.7-.6.5-.07.95-.09,1.44.05.34.1.58.26.82.5.23.23.27.37.03.56-.64.52-.71,1.28-.87,2-.11.48-.16.97-.21,1.46-.01.1.08.2.12.31.06-.09.14-.17.18-.27.03-.07.04-.15.04-.23,0-.49.24-.89.47-1.31.21-.37.38-.77.52-1.17.46-1.35,1.45-1.86,2.81-1.91.92-.03,1.83.06,2.65.4.5.21.96.7,1.1,1.31.04.18.06.23.25.19.1-.02.24.01.33.07.38.26.75.5,1.24.38.08-.02.22.03.27.1.18.28.48.39.73.57.52.37.97.84,1.47,1.23.61.47,1.07,1.09,1.61,1.63.3.3.45.61.61.97.12.26.32.49.52.71.22.23.41.46.48.79.08.4.17.81.31,1.2.14.38.33.74.53,1.09.19.36.33.7.19,1.12-.11.34-.14.7-.26,1.03-.08.21-.25.39-.39.58-.29.38-.34.71-.04,1.04.07.08.44.04.53-.07.43-.49.72-1.07.94-1.69.02-.07-.08-.23-.16-.29-.25-.18-.21-.45-.24-.69-.05-.38.16-.53.54-.42.08.02.15.09.22.08.68-.11,1.2.08,1.58.7.18.3.51.51.77.77.49.49.73,1.08.65,1.76-.07.66-.17,1.33-.32,1.98-.13.57-1.03,1.3-1.53,1.17-.54-.13-1.17.09-1.62-.43-.11-.12-.32-.15-.5-.22,0,0-.01-.02-.02-.03,0,0-.02,0-.02,0h.01s.02.02.03.02ZM23.84.93c-1.31-.1-2.38.29-3.49.49-.75.14-1.4.65-2.2.59-.04,0-.08.02-.11.03-1.07.44-2.13.94-3.23,1.31-1.05.36-1.87,1.08-2.79,1.63-.5.3-.96.7-1.42,1.07-.32.26-.64.52-.93.82-.39.39-.82.77-1.1,1.24-.21.35-.46.63-.75.9-.19.18-.37.37-.52.57-.42.54-.8,1.11-1.23,1.64-.87,1.07-1.31,2.37-1.9,3.58-.24.49-.39,1.03-.59,1.54-.18.44-.39.86-.56,1.3-.21.55-.43,1.1-.59,1.66-.31,1.1-.63,2.21-.86,3.33-.18.85-.28,1.73-.25,2.61.01.5-.17,1-.2,1.51-.04.77.05,1.56-.06,2.32-.15,1.02-.03,2.01.03,3.01.05.85.16,1.69.23,2.54.11,1.34.24,2.68.63,3.97.38,1.24.76,2.47,1.17,3.7.45,1.36,1.01,2.66,1.69,3.91.37.69.86,1.32,1.31,1.97.48.69.97,1.37,1.46,2.06.06.08.12.16.19.23.45.46.76,1.02,1.27,1.46.68.58,1.23,1.33,2,1.82,1.14.74,2.18,1.64,3.47,2.16.22.09.4.25.61.36.21.11.41.23.63.31.41.15.85.25,1.25.43,1.21.55,2.46.95,3.79,1.08.26.02.51.17.78.2.84.09,1.69.18,2.54.21,1.14.04,2.29.06,3.42,0,.65-.03,1.29-.2,1.92-.38,1.12-.33,2.27-.59,3.37-1.02.9-.35,1.81-.68,2.7-1.06.56-.24,1.1-.52,1.63-.82.32-.18.61-.43.91-.64.74-.53,1.47-1.06,2.21-1.59.06-.04.1-.12.15-.19.52-.67,1.13-1.25,1.63-1.94.39-.54.97-.97,1.36-1.55.15-.23.24-.52.44-.69.51-.44.81-1.01,1.14-1.57.2-.33.29-.73.46-1.08.25-.53.54-1.04.78-1.58.22-.48.4-.98.6-1.47.11-.25.25-.49.34-.75.18-.55.26-1.12.49-1.65.53-1.21.78-2.49,1.08-3.76.2-.85.27-1.73.26-2.61,0-.48.17-.97.2-1.45.04-.77-.05-1.56.06-2.32.16-1.07.04-2.13-.04-3.18-.09-1.16-.27-2.32-.33-3.49-.08-1.82-.76-3.5-1.2-5.24-.19-.75-.57-1.46-.82-2.2-.48-1.41-1.11-2.75-1.92-4-.26-.4-.54-.77-.82-1.16-.53-.73-1.04-1.47-1.6-2.18-.4-.51-.78-1.02-1.27-1.46-.76-.68-1.41-1.48-2.3-2.02-.35-.22-.68-.48-1.02-.71-.55-.36-1.1-.71-1.66-1.05-.38-.23-.79-.42-1.19-.62-.18-.09-.35-.19-.53-.25-.38-.13-.8-.18-1.15-.38-1.44-.8-3.06-.95-4.63-1.3-.63-.14-1.29-.15-1.94-.2-.59-.05-1.18-.13-1.77-.13-.45,0-.91.09-1.2.12ZM25.17,0c.23,0,.46,0,.69.01.63.02,1.27.01,1.9.09.56.07,1.11.29,1.67.35,1.56.17,3.04.61,4.51,1.12.64.22,1.31.46,1.89.88.5.36,1.11.57,1.67.85.19.1.41.18.56.32.25.23.39.6.83.57.06,0,.12.14.19.21.11.11.21.28.35.31.64.17,1.01.67,1.43,1.11.31.33.68.61.99.94.57.62,1.13,1.26,1.67,1.91,1.04,1.24,1.89,2.6,2.7,4,.43.75.93,1.46,1.13,2.33.07.28.3.51.41.78.22.58.41,1.17.6,1.76.08.24.16.49.24.73.09.26.17.52.26.77.09.26.17.52.25.78.02.05.07.1.08.16.03.97.51,1.85.59,2.81.06.67.23,1.34.21,2.01-.02.63.11,1.23.11,1.85,0,.25.11.5.13.75.04.38.07.77.07,1.15,0,.79.01,1.59-.02,2.38-.02.47-.09.94-.14,1.41-.12,1.25-.21,2.5-.36,3.75-.07.56-.23,1.12-.36,1.67-.13.56-.25,1.11-.4,1.66-.12.45-.36.87-.43,1.32-.17,1.05-.72,1.97-.99,3-.11.42-.39.8-.58,1.21-.39.82-.74,1.66-1.17,2.45-.56,1.02-1.28,1.94-2.02,2.84-.47.58-.89,1.2-1.37,1.76-.36.43-.77.81-1.18,1.19-.42.39-.85.78-1.3,1.14-.72.56-1.41,1.2-2.22,1.6-.68.34-1.33.73-2.02,1.06-.55.26-1.13.45-1.7.66-.79.29-1.57.61-2.38.85-.81.24-1.63.41-2.46.58-.69.15-1.39.25-1.85.33-1.33,0-2.42.03-3.51,0-.76-.02-1.52-.14-2.27-.31-1.13-.26-2.28-.44-3.41-.72-.74-.18-1.46-.46-2.17-.74-.72-.28-1.47-.55-2.12-.97-.45-.29-.94-.48-1.4-.74-.15-.08-.27-.23-.39-.36-.15-.15-.24-.38-.52-.31-.05.01-.13-.02-.16-.06-.36-.62-1.13-.69-1.58-1.21-.42-.5-.9-.95-1.39-1.37-.92-.79-1.56-1.82-2.32-2.75-.53-.65-.93-1.4-1.38-2.12-.34-.54-.67-1.09-.98-1.65-.22-.39-.41-.81-.61-1.21-.2-.41-.37-.82-.59-1.22-.33-.59-.38-1.27-.61-1.89-.09-.24-.18-.48-.26-.72-.08-.22-.15-.44-.22-.66-.04-.13-.08-.26-.12-.39l-.02-.05c-.04-.13-.08-.26-.12-.39-.02-.06-.07-.11-.07-.16-.02-.97-.52-1.85-.59-2.82-.05-.67-.23-1.34-.22-2.01,0-.61-.09-1.2-.1-1.8,0-.27-.1-.54-.14-.81-.04-.36-.08-.73-.08-1.1,0-.83-.01-1.66.02-2.5.01-.45.1-.9.14-1.35.12-1.25.22-2.51.36-3.76.07-.56.23-1.12.36-1.67.13-.57.26-1.15.42-1.72.12-.43.33-.83.41-1.26.21-1.14.79-2.16,1.09-3.28.09-.33.34-.61.49-.93.31-.63.61-1.28.91-1.91.6-1.26,1.45-2.35,2.32-3.42.46-.56.86-1.16,1.33-1.71.35-.41.75-.78,1.14-1.15.44-.41.87-.83,1.34-1.19.72-.56,1.45-1.12,2.21-1.61.47-.31,1.03-.47,1.53-.74.81-.44,1.69-.69,2.54-1.04.68-.28,1.36-.68,2.07-.75.84-.09,1.55-.57,2.4-.57.34,0,.67-.18,1.01-.21.82-.06,1.64-.08,2.46-.1.2,0,.4,0,.6,0h.01Z\"/>\n  </g>\n</svg>",
     2: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 50.27 59.47\">\n  <g>\n    <path d=\"M14.56,8.34s.06.05.09.08c.87-.62,1.38-1.5,1.77-2.48.02-.04-.03-.1-.04-.15-.05.02-.12.02-.15.05-.16.2-.33.4-.47.61-.4.63-.8,1.26-1.19,1.89ZM13.86,9.35s-.06-.05-.09-.08c-.3.25-.6.5-.89.77-.26.24-.51.49-.76.75-.07.08-.09.2-.14.3.11-.04.24-.05.34-.11.21-.14.41-.31.62-.46.43-.3.64-.76.92-1.17ZM15.25,5.31c-.26.21-.45.41-.68.56-.55.39-1.1.76-1.65,1.14-.32.22-.68.41-.96.67-.55.5-1.02,1.09-1.59,1.57-.92.77-1.61,1.72-2.24,2.73-.08.13-.16.27-.24.41-.02.05-.02.11-.03.16.07.01.17.06.21.03.11-.07.2-.17.31-.25.22-.16.42-.37.67-.47,1.01-.4,1.83-1.09,2.61-1.81.4-.37.74-.81,1.11-1.22.36-.41.78-.78,1.05-1.24.2-.33.41-.61.67-.89.35-.37.71-.75.75-1.39ZM8.96,13.43c.08-.04.17-.08.25-.13.46-.3.93-.59,1.38-.91.4-.29.78-.61,1.16-.92.04-.03.03-.13.04-.19-.05,0-.11,0-.16.02-.09.05-.16.12-.24.17-.36.26-.72.53-1.09.78-.45.31-.91.62-1.36.93-.04.03-.06.1-.07.15,0,.02.05.05.1.09ZM8.59,13.58c-.05-.03-.1-.08-.13-.08-.18.06-.36.12-.54.2-.05.02-.06.11-.1.17.05,0,.11.04.16.03.17-.05.33-.11.49-.17.05-.02.07-.08.12-.15ZM6.92,14.35c.1.02.15.05.17.03.17-.08.34-.16.51-.25,0,0,0-.06-.01-.1-.18.05-.36.09-.53.15-.05.02-.07.08-.13.16ZM26.81,18.59s0,.05,0,.07c-.08-.01-.16-.06-.23-.04-.38.09-.77.17-1.13.31-.25.1-.31.36-.22.61.11.31.34.1.5.06.88-.22,1.76-.2,2.64.02.23.06.47.05.71.07-.14-.21-.25-.44-.43-.62-.13-.13-.33-.24-.51-.28-.44-.09-.88-.13-1.32-.2ZM20.24,20.54c-.03-.05-.05-.07-.05-.09,0-.09,0-.18,0-.27,0-.01.05-.02.07-.04,0,.11.01.21.02.32,0,.02-.02.03-.04.07ZM28.49,20.55c-.25-.19-.36-.27-.46-.34,0,0-.09.08-.08.1.07.12.15.25.24.36.02.02.13-.04.3-.11ZM36.62,20.86c.17,0,.35,0,.52.03.07.01.17.12.18.18,0,.06-.1.17-.17.18-.54.09-1.09.17-1.63.24-.04,0-.12-.03-.14-.07-.02-.03.02-.12.05-.14.38-.18.77-.36,1.16-.53.01.03.02.07.03.1ZM15.28,22.13s.05.06.07.09c.28-.19.57-.37.83-.58.06-.05.06-.19.08-.29-.09.02-.2.02-.26.07-.25.23-.49.47-.74.7ZM22.71,21.6c.01.47.53,1.42.88,1.62.1.06.24.13.32.1.13-.05.26-.16.32-.28.04-.08-.02-.3-.09-.33-.56-.21-.89-.63-1.14-1.14-.03-.06-.15-.09-.23-.13-.03.07-.06.13-.07.15ZM14.7,22.91l-.08-.12c-.2.14-.41.26-.59.41-.16.13-.3.29-.45.44-.08.09-.15.2-.22.3.15,0,.3.04.44,0,.1-.02.21-.11.28-.2.22-.28.42-.57.62-.85ZM38.24,23.15c-.87.6-1.55.25-1.92-.41-.18-.31-.35-.32-.61-.24-.13.04-.26.11-.39.15-.18.06-.34.1-.46-.11-.03-.06-.15-.08-.22-.12-.08.16-.17.16-.21,0-.01-.05.11-.21.15-.2.46.1.72-.28,1.09-.4.39-.13.8-.23,1.2-.33.62-.16,1.15-.02,1.61.46.53.55.78,1.17.55,1.94-.06.19-.11.32-.37.16-.33-.2-.65-.37-.42-.89ZM37.18,25.07c.35.1.71.19,1.06.3.05.01.08.05.13.08-.03.05-.06.13-.1.13-.23,0-.47.04-.68-.04-.24-.09-.44-.28-.66-.43,0,0,.01-.01.02-.02l.04-.04s.01-.01.02-.02l.15.04ZM29.15,27.09c.31-.43.62-.85.93-1.28.04.03.07.05.11.08-.16.54-.52.93-.93,1.28-.04-.03-.07-.05-.11-.08ZM8.62,25.96c.1.5-.06.89-.42,1.18-.03.03-.13.04-.14.03-.03-.04-.06-.12-.04-.16.19-.35.4-.7.6-1.05ZM25.1,27.64c.22-.47.52-.88.83-1.28.31-.4.65-.79.94-1.21,0,.44-1.08,1.95-1.78,2.49ZM32.46,24.38c-.02.22-.05.32-.03.42.08.41-.04.74-.39.98-.08.06-.12.18-.18.27.11.02.22.06.33.04.47-.07.93-.22,1.39-.23.83-.02,1.47.41,1.96,1.04.34.44.09,1.6-.37,1.9-.14.09-.38.12-.54.07-.26-.09-.49-.21-.79-.14-.12.03-.29-.09-.43-.15-.51-.22-1.01-.45-1.54,0-.19.16-.46.22-.7.31-.46.18-.82-.02-1.11-.35-.32-.35-.36-.78-.28-1.23,0-.05.06-.11.1-.13.23-.12.38-.28.39-.55,0-.07.07-.17.12-.18.75-.13,1.49-2.51,1.75-2.74.06-.06.16-.07.24-.11.03.09.08.17.08.26.01.22,0,.44,0,.53ZM41.09,29.78c-.02-.08-.04-.16-.04-.23,0-.01.06-.03.1-.05.02.07.04.13.05.2,0,.02-.05.04-.1.08ZM39.57,28.34c-.05.36-.03.65.08.92.11.27.31.51.6.78-.24-.61-.46-1.15-.68-1.7ZM33.49,29.18c.06.6.1,1.04.15,1.49,0,.03-.03.07-.04.1-.04-.02-.07-.03-.11-.05-.03-.02-.08-.04-.09-.07-.12-.45-.2-.91.1-1.47ZM15.66,30.53c.07.5.14,1,.22,1.5.01.08.09.16.14.23.04-.09.11-.18.12-.28.02-.16,0-.32,0-.47,0-.43-.06-.85.08-1.28.11-.33.1-.7.13-1.06,0-.08-.08-.16-.12-.24-.05.05-.1.1-.14.16-.28.43-.4.9-.41,1.43ZM36.35,32.11c.08-.27.2-.54.24-.82.03-.22-.01-.46-.07-.67-.11-.42-.27-.82-.39-1.24-.02-.08.03-.17.05-.26.07.05.17.08.21.14.49.74.72,1.56.74,2.44,0,.21.05.42.09.63,0,.04.02.08.03.12.02.34-.23.79-.45.75-.37-.06-.34-.38-.37-.65-.01-.14,0-.28,0-.42-.02,0-.04-.01-.06-.02ZM39.38,30.65s-.09,0-.13.01c-.22.9-.02,1.76.31,2.61,0,.02.12.04.14.02.04-.03.07-.12.05-.15-.19-.41.05-.91-.26-1.3-.05-.07-.04-.19-.05-.28-.02-.3-.04-.61-.06-.91ZM20.19,21.14s.07-.02.11-.02c.03.07.09.13.09.2-.03.43-.01.88-.14,1.29-.3.99-.75,1.95-1.46,2.69-.56.57-.83,1.28-1.25,1.91-.46.68-.52,1.51-.72,2.29-.2.78-.13,1.56.03,2.33.11.54.29,1.07.47,1.59.08.24.6-.24.79-.03.05.06.17.06.25.08.01-.11.06-.23.03-.32-.18-.6-.44-1.19-.39-1.84.02-.21.05-.44.01-.64-.21-1.02.25-1.92.57-2.83.18-.52.61-.95.9-1.44.37-.59.75-1.18,1.06-1.8.15-.32.12-.72.22-1.07.25-.94.37-1.9.38-2.86.01-.87.06-1.79-.65-2.48-.1-.1-.23-.2-.36-.24-.36-.12-.46-.06-.39.28.08.4.23.78.34,1.17.03.12.1.29.05.37-.4.65-.19,1.34-.16,2.01,0,.05.08.1.12.15.04-.06.1-.12.1-.19.01-.2,0-.39,0-.59ZM17.66,34.02c-.18-.08-.23-.11-.29-.12-.13-.02-.26-.04-.39-.05-.07,0-.14.01-.21.02.05.07.07.17.14.21.11.07.24.13.37.14.09,0,.19-.09.38-.2ZM17.03,26.05s-.07-.06-.11-.09c-.24.35-.69.41-.91.84-.41.78-1.05,1.45-1.38,2.25-.38.92-.87,1.8-.96,2.86-.07.82.04,1.56.25,2.32.06-.32.06-.65.1-.97.02-.21.13-.41.14-.62.03-.82.06-1.65.45-2.4.19-.37.47-.71.55-1.1.13-.61.57-.9.98-1.26.19-.16.31-.4.44-.61.03-.05-.02-.14-.03-.21-.06.03.2-.59.49-1.01ZM11.39,33.66c-.07.3-.13.49-.16.69,0,.03.14.11.21.12.05,0,.15-.11.14-.15-.04-.19-.11-.37-.2-.67ZM28.33,33.18c-.27-.02-.46-.37-.33-.6.11-.18.27-.34.41-.51.23-.29.48-.58.67-.9.12-.2.24-.26.43-.18.18.07.4.14.52.28.28.33.63.31.98.27.33-.04.68-.07.98-.21.59-.27,1.1-.09,1.55.24.34.25.64.3,1.03.16.38-.14.58-.04.78.31.14.24.24.49.36.74.03.07.05.18.1.21.7.38.28.88.13,1.34-.02.08-.14.21-.18.19-.1-.04-.25-.12-.26-.21-.13-.85-.83-1.04-1.47-1.3-.71-.29-1.47-.29-2.21-.4-.32-.05-.66.01-.99.05-.41.04-.82.09-1.23.17-.35.06-.69.15-1.03.24-.1.02-.19.07-.25.09ZM14.89,33.46c-.13.38-.22.78.03,1.16.02.03.17,0,.17,0,.02-.17.07-.34.04-.5-.04-.23-.15-.44-.23-.66ZM18.52,33.64v1.26c.3-.48.17-.88,0-1.26ZM28.92,27.98c-.08.23-.15.48-.26.7-.37.76-.77,1.5-1.14,2.27-.08.17-.11.39-.08.58.13,1,.28,1.99.42,2.99.03.22.01.45.01.67-.12-.19-.31-.36-.35-.56-.2-1.02-.53-2.01-.53-3.07,0-.39.08-.73.27-1.08.3-.53.52-1.09.81-1.63.19-.34.43-.64.66-.96.06.03.12.05.18.08ZM31.86,33.54c.75.17,1.59.36,2.43.55.05.01.13.07.13.1-.02.33.08.62.21.91.02.05-.04.17-.09.2-.05.03-.15,0-.21-.04-.11-.08-.19-.2-.3-.29-.14-.11-.28-.23-.44-.28-.5-.16-1.02-.28-1.53-.43-.17-.05-.34-.11-.47-.22-.12-.1-.19-.26-.28-.39.15-.03.29-.07.55-.13ZM9.66,35.2c.02-.17.02-.25.04-.32.09-.22.2-.44.29-.66.21.23-.02.46,0,.69,0,.08-.03.15-.06.23-.04.11-.09.23-.13.34-.06-.11-.12-.22-.14-.27ZM29.62,36.1c-.41-.13-.65-.48-.9-.83-.12-.18-.24-.36-.34-.55-.03-.05,0-.14,0-.21.06.02.16.02.19.07.36.5.7,1.01,1.05,1.51ZM39.97,30.36s-.08.04-.11.06c.03.11.03.23.08.34.3.66.62,1.31.92,1.97.16.36.24.75.42,1.1.22.43.3.84.14,1.3-.13.37-.2.75-.29,1.13-.03.11-.04.23-.06.35.22-.26.34-.55.46-.84.05-.12.09-.31.18-.35.21-.08.19-.21.2-.37.03-.74-.07-1.45-.43-2.12-.31-.56-.5-1.2-.96-1.68-.12-.12-.16-.32-.25-.47-.09-.15-.2-.28-.3-.42ZM37.76,36.96s.05.03.08.05c.15-.19.32-.37.45-.57.1-.16.43-.39-.07-.5-.03,0-.06-.17-.04-.25.14-.59.28-1.18.44-1.76.08-.28.09-.54-.12-.86-.16.74-.32,1.36-.44,1.98-.12.63-.2,1.27-.3,1.91ZM39.54,35.67s.1.03.15.05c-.1.38-.21.75-.3,1.13-.02.08.04.17.06.26.07-.06.17-.11.2-.19.29-.64.4-1.33.48-2.03,0-.07-.04-.14-.07-.21-.08.04-.2.07-.22.13-.12.28-.21.58-.31.86ZM36.12,36.63c-.12.29-.19.51-.3.72-.05.09-.16.14-.25.2.03-.08.08-.16.07-.24,0-.21-.04-.42-.07-.64-.03-.19-.02-.41.2-.4.12,0,.23.23.34.35ZM10.6,36.51c.29.34.43.69.3,1.1-.03.08-.08.15-.12.23-.07-.08-.21-.16-.21-.25,0-.36.02-.72.04-1.08ZM42.89,37.15c.34-.27.77-.48.66-1.11-.35.34-.75.57-.66,1.11,0,0,0,0-.01,0,0,.01-.02.03-.02.04-.18.13-.36.24-.52.39-.05.04-.03.17-.04.26.09-.03.21-.03.25-.08.12-.18.22-.37.32-.56.01,0,.03-.02.04-.03,0,0,0-.02,0-.02ZM40.41,37.66c.1-.09.2-.19.3-.28-.1.16-.21.32-.31.47,0-.07,0-.13.01-.2ZM10.05,37.6c.08.09.14.15.2.22-.04.02-.1.07-.12.06-.06-.03-.12-.08-.17-.13,0,0,.05-.07.1-.14ZM33.59,38c.14-.09.28-.21.43-.28.59-.3.79-.77.69-1.41-.01-.07.05-.15.08-.23.09.05.25.09.26.16.04.23.07.48.02.7-.11.52-.84,1.07-1.48,1.06ZM14.74,38c-.14-.08-.19-.13-.25-.14-.53-.08-1.02-.26-1.43-.64-.03-.02-.13-.02-.14,0-.02.04-.03.12,0,.16.07.09.14.2.24.25.38.19.77.38,1.17.54.08.03.22-.09.42-.18ZM16.03,37.03c-.14.33.15.79-.27,1.07-.05.03-.07.25.16.18.32-.1.33.06.28.31-.03.12,0,.27.03.39,0,.03.09.09.13.08.04-.01.11-.08.1-.12,0-.09-.07-.19-.06-.28.03-.38,0-.8.13-1.14.14-.37.44-.68.69-1,.13-.17.3-.33.54-.19.17.1.15-.03.17-.12.03-.23.05-.46.09-.68.07-.35-.09-.55-.41-.39-.46.23-1.08.2-1.32.79-.02.04-.09.07-.15.1-.42.17-.83.37-1.26.5-.59.17-1.56-.2-1.79-.67-.19-.38-.33-.8-.49-1.19-.07-.18-.14-.35-.22-.56-.28.4-.1.76-.1,1.12.02.82.47,1.39,1.06,1.83.38.28.9.39,1.36.57.38.15.69-.12,1.02-.23.13-.04.21-.24.31-.37ZM37.03,39.2c.51-.18.98-.58,1.29-1.06.32-.48.48-1.03.41-1.52q-1.27,1.13-1.7,2.58ZM40.41,37.63c-.13.09-.26.18-.38.29-.02.02,0,.1,0,.15.07-.03.13-.07.2-.1.03.28.19.35.41.19.37-.26.71-.57,1.08-.82.75-.51,1.23-1.18,1.36-2.09.01-.11.09-.21.13-.31.07-.16.19-.32.19-.48,0-.75,0-1.51-.47-2.16-.09-.13-.15-.29-.22-.44.04-.02.09-.04.13-.07.2.37.4.75.62,1.11.37.62.47,1.25.18,1.93-.06.14-.11.3-.15.45-.01.05,0,.15.01.16.06.02.15.04.21.01.3-.12.44-.38.52-.68.17-.69.13-1.4.17-2.1.05-.83-.11-1.63-.27-2.41-.24-1.18-.6-2.33-.93-3.48-.39-1.39-.81-2.76-1.22-4.15-.09-.32-.13-.66-.26-.96-.21-.47-.47-.91-.72-1.35-.37-.63-.83-1.23-1.12-1.89-.34-.75-.77-1.36-1.44-1.87-.62-.48-1.16-1.04-1.95-1.22-.3-.07-.6-.16-.91-.18-.39-.02-.73-.23-1.11-.28-.48-.07-.98-.04-1.46-.11-.86-.14-1.67.06-2.5.23-.63.13-1.28.19-1.91.28-.5.07-1.02.08-1.49.23-1.03.34-2.03.76-3.04,1.16-.06.02-.17.11-.16.13.03.08.08.19.16.22.1.04.23.02.35.02.53-.04,1.05-.04,1.59.07.37.08.82.12,1.16-.01.65-.26,1.25-.08,1.85.05.37.08.7.35,1.08.46.6.18,1,.63,1.43,1.02.28.25.48.61.45,1.05-.02.26.11.54.16.81.06.35.14.7.16,1.05.03.43-.09.53-.52.5-.2-.01-.39-.06-.58-.11-.26-.07-.42-.04-.4.29.01.22-.01.44-.06.65-.05.25-.37.43-.65.39-.3-.04-.23-.27-.23-.46,0-.32,0-.63-.04-.95-.02-.17-.05-.38-.17-.48-.13-.12-.34-.17-.52-.21-.03,0-.09.19-.16.25-.06.06-.19.11-.26.09-.19-.06-.36-.16-.54-.24-.18-.07-.32-.06-.48.1-.51.51-1.24.54-1.77.04.03.16.06.27.08.39.11.63.11.63.73.69.14.01.28.08.42.12-.11.11-.21.23-.33.32-.07.06-.18.07-.28.1-.82.21-1.68.23-2.45.65-.08.05-.26.03-.34-.02-.44-.34-1.05-.54-1.07-1.25,0-.06-.01-.14-.05-.17-.47-.32-.27-.81-.34-1.24-.03-.22-.07-.43-.11-.65-.05,0-.1,0-.15.01-.15.65-.09,1.32-.07,1.98.02.51.16,1.02.16,1.52,0,.51.32,1,.07,1.52-.02.04,0,.13.02.17.26.41.18.95.54,1.34.17.18.25.45.39.66.21.32.25.62.07.99-.39.83-.75,1.68-1.11,2.54-.11.27-.15.57-.22.85.04.01.09.02.13.04.06-.12.12-.23.17-.35.28-.67.55-1.35.86-2,.22-.48.51-.93.75-1.39.2-.38.37-.78.57-1.16.09-.17.22-.33.34-.48.03-.04.14-.06.15-.05.04.05.08.13.07.19,0,.07-.07.14-.1.21-.28.65-.54,1.31-.83,1.96-.16.34-.07.6.18.85.35.36.6.77.63,1.29,0,.08.03.16.07.22.38.56.39,1.18.39,1.82,0,.43.02.89.37,1.23.06.06.03.22.05.32.11.55.14,1.14.36,1.64.18.41.57.75.91,1.07.74.7,1.41,1.52,2.51,1.68.21.03.42.11.63.1.33,0,.66-.06.99-.11.66-.1,1.28.06,1.89.26.35.11.69.19,1.03.03.46-.21.93-.42,1.37-.65.18-.09.38-.23.48-.4.4-.66.71-1.38,1.15-2.01.39-.56.54-1.17.68-1.81.26-1.18.54-2.35.88-3.51.17-.6.22-1.2.21-1.81,0-.91-.14-1.81.04-2.72.05-.23.04-.47.08-.71.13-.82.13-1.7.44-2.44.55-1.29-.96-3.12-2.25-2.93-.08.01-.16.03-.23.03-.77-.1-1.36.32-1.94.72-.09.06-.12.23-.18.34-.06.12-.13.25-.2.37-.15-.09-.33-.15-.44-.27-.08-.09-.12-.26-.11-.39.02-.43.05-.87.1-1.3.01-.09.13-.19.22-.25.46-.29.94-.55,1.39-.85.21-.15.38-.16.6-.05.33.17.67.33,1.01.5.89.44,1.76.85,2.15,1.91.35.92.46,1.8.18,2.74-.08.27-.14.6-.07.86.2.77.05,1.53.08,2.29.01.41-.01.82.2,1.21.26.48.41,1.02.66,1.51.46.91.6,1.96,1.26,2.78.05.06.06.15.07.22.11.5.22.99.31,1.49.02.11.02.25-.03.35-.17.32-.19.63-.09.98.03.11-.02.28-.1.38-.38.49-.79.97-1.18,1.46,0-.1.06-.31-.12-.17-.15.11-.19.35-.28.54h0s0,.01,0,.01h0s0,0,0,0h0s0-.03,0-.03ZM39.06,38.36l-.1-.06c-.46.48-.91.95-1.36,1.42.32-.1,1.35-.66,1.39-.8.06-.18.05-.37.07-.56ZM16.09,40.29c.37-.13.82-.23,1.21-.45.28-.15.49-.45.69-.71.11-.15.16-.4-.06-.51-.06-.03-.24.14-.35.24-.21.2-.37.52-.62.61-.64.25-1.32.44-2.01.14-.07-.03-.18,0-.26,0,.05.09.07.25.15.28.39.14.79.25,1.26.4ZM32.39,40.48h0c.32.01.64.04.95,0,.88-.1,1.71-.34,2.42-.91.14-.11.25-.25.36-.38.03-.03.02-.1.03-.16-.07,0-.14,0-.2.03-.05.02-.1.07-.14.11-.62.7-1.44.8-2.31.73-.45-.03-.9-.09-1.36-.09s-.91.05-1.36.1c-.06,0-.16.08-.16.13,0,.08.03.21.09.24.19.09.4.17.61.19.35.03.71,0,1.07,0ZM12.01,41.08c-.17-.25-.34-.5-.5-.76-.03-.05.02-.14.03-.22.07.03.17.04.19.09.14.27.25.55.38.83-.04.02-.07.04-.11.06ZM10.82,43.77c-.04.05-.09.11-.13.17-.01-.04-.04-.08-.03-.11.03-.06.07-.12.11-.18.01.03.03.06.05.11ZM11.98,43.8c-.04.08-.07.14-.1.21-.05-.08-.12-.15-.14-.23-.01-.05.06-.12.09-.18.05.07.09.13.15.21ZM12.97,42.98c-.16.55-.3,1.09-.47,1.63-.02.07-.14.11-.21.16,0-.09-.04-.18-.01-.26.21-.58.33-1.18.24-1.8-.05-.3-.19-.59-.28-.89-.02-.06.03-.14.05-.21.06.03.16.04.19.09.24.38.57.73.38,1.26l.12.02ZM12.07,40.09c.53.1,1,.24,1.37.63.13.14.31.2.34.44,0,.09.13.19.23.24.54.33.73.85.83,1.44.09.53.19,1.05-.05,1.57-.06.12-.14.27-.25.31-.43.15-.86.27-1.3.4-.05.01-.11,0-.17,0,.01-.07,0-.15.04-.2.49-.76.38-1.57.14-2.35-.13-.44-.5-.8-.72-1.21-.2-.38-.5-.75-.45-1.24ZM12.02,45.54c-.05.07-.09.15-.14.23-.01-.04-.05-.09-.04-.12.04-.08.1-.15.16-.22,0,.03.02.07.03.11ZM11.08,45.96c.17-.44.33-.87.5-1.3.04-.09.14-.16.21-.24.04.1.14.2.12.28-.08.32-.16.64-.29.95-.1.23-.3.35-.53.31ZM18.97,19.02s-.05,0-.07.02c-.41.16-.97.12-1.13.7-.02.07-.1.13-.12.2-.12.44-.76.53-.72,1.07.23.07.5-.29.68,0,.19.31-.04.61-.17.89-.03.07-.12.1-.17.16-.75.72-3,2.43-3.13,2.55-.42.36-.86.68-1.29,1.02-.05.04-.11.04-.16.07-.38.27-.79.51-1.13.83-.36.35-2.09,2.26-2.31,3.06-.06.24-.3.42-.37.66-.19.65-.34,1.31-.49,1.97-.05.22-.25.43-.05.68.01.02-.08.1-.09.17-.02.09-.05.19-.04.28.02.15.07.29.11.43.1.4.2.8.31,1.19.03.11.17.21.16.31-.05.44.2.75.4,1.08.19.33.41.64.62.97-.12.02-.18-.01-.22-.07-.25-.35-.47-.73-.74-1.06-.5-.61-.81-1.29-.93-2.07,0-.07-.04-.16-.09-.19-.53-.38-.45-.9-.28-1.44l.21,1.17s.09-.02.13-.02c-.02-.35-.08-.7-.07-1.05.02-.85.07-1.7.12-2.55.04-.66.18-1.29.64-1.81.13-.14.19-.35.3-.51.35-.52.55-1.14,1.15-1.46.12-.06.19-.19.3-.28.45-.41.87-.89,1.37-1.22,1.41-.91,2.59-2.08,3.77-3.25.39-.39.83-.73,1.22-1.12.13-.13.41-.23.26-.52-.15.11-.34.18-.45.32-.33.4-.71.72-1.2.91l.8-.91s-.07-.06-.1-.09c-.52.47-1.05.92-1.54,1.42-.2.21-2.3,1.5-2.65,1.78-.61.49-1.19,1.03-1.79,1.54-.14.12-.29.21-.44.31,0-.16.06-.23.12-.31.27-.34.61-.65.77-1.04.12-.29.29-.49.49-.7.22-.23.41-.48.63-.7.19-.19.03-.27-.09-.35-.22-.15-.39-.02-.52.12-.27.31-.52.65-.78.97-.11.13-.23.29-.38.36-.79.37-1.27,1.03-1.72,1.73-.24.37-.09.98-.71,1.11-.05.01-.07.17-.12.26-.1.19-.17.42-.31.57-.66.7-.77,1.63-.85,2.48-.1,1-.33,2.04.2,3.07.36.71.66,1.44,1.08,2.13.17.27.24.61.34.92.02.05-.04.12-.07.17-.36-.23-.31.3-.55.31.01-.23.1-.49.02-.64-.23-.4-.53-.76-.8-1.14-.1-.15-.21-.3-.26-.46-.19-.6-.42-1.2-.5-1.81-.07-.59-.31-1.17-.15-1.8.13-.48.13-1,.23-1.5.09-.44.18-.89.37-1.29.62-1.28,1.6-2.31,2.41-3.47.29-.42.63-.81.96-1.24-.66-.42-1.31-.82-1.94-1.25-.59-.4-1.14-.85-1.71-1.27-.28-.21-.58-.4-.86-.61-.3-.23-.36-.04-.41.21-.07.33-.14.65-.24.97-.09.32-.22.62-.32.94-.12.4-.05.53.34.54.42.01.84.03,1.25-.02.4-.05.69.09.95.36.06.07.09.16.14.24-.09.03-.17.07-.26.07-.6,0-1.19,0-1.79,0-1.1.02-.82-.17-1.01.97,0,.04,0,.08,0,.12-.01.27.1.4.39.39.6,0,1.19,0,1.79,0,.13,0,.26.06.39.09-.07.16-.11.34-.22.46-.08.08-.25.1-.38.11-.34.01-.68,0-1.01,0q-1.22,0-1.22,1.23c0,.08.03.16.02.24-.02.32.17.4.41.33.36-.11.68-.01,1.01.06-.23.74-.26.61-.79.61-.71,0-.71,0-.77.72-.02.27-.14.63-.01.78.13.16.51.11.77.15-.06.54-.06.55-.53.6-.25.03-.36.12-.32.38.05.29.08.59.1.89.01.21.03.4.32.39.24,0,.28.15.29.35,0,.23-.09.3-.32.32-.09,0-.25.14-.26.22-.01.27.01.54.05.81.06.47.11.53.6.52.33,0,.52.15.65.41.08.16.03.28-.17.28-.26,0-.52,0-.77.02-.07,0-.19.13-.19.19.04.39.05.79.3,1.13.1.14.17.21.38.18.39-.05.79-.03,1.19-.03.44,0,.49.09.29.49-.04.07-.13.15-.2.16-.2.02-.4.01-.6.01-.8,0-.83.03-.78.84.03.55.21.73.76.73.14,0,.28,0,.42,0,.22.01.43.25.41.47-.03.28-.26.18-.42.18-.11,0-.23-.05-.35-.06-.23-.02-.34.09-.29.32.07.31.18.61.21.92.04.38.18.51.58.46.45-.05.91-.03,1.37-.03.26,0,.47.28.43.53-.05.27-.26.25-.47.24-.24-.02-.47-.06-.7-.06-.78.02-.85.13-.57.87.03.07.07.15.11.21.17.23.21.49.22.78.02.52.26.97.61,1.51.05-.34.1-.55.1-.76.01-.67.12-.82.78-.82.27,0,.44-.11.64-.26.48-.37.43-.93.55-1.44.12-.51.01-.9-.45-1.19-.59-.38-.83-1-.99-1.64-.09-.34-.08-.71.08-1.07.13.27.2.55.22.83.04.73.22,1.37.97,1.69.18.08.36.18.51.3.34.27.7.53.79.99.02.13-.04.28-.06.43-.08-.1-.15-.2-.23-.3-.05-.06-.1-.13-.16-.17-.11-.08-.19-.1-.26.07-.16.44-.43.85-.53,1.29-.15.7-.56.96-1.22.93-.08,0-.16.02-.24.01-.17-.01-.18.06-.18.21.02.54.02,1.08.04,1.62,0,.25.22.41.44.26.58-.4,1.15-.82,1.67-1.29.18-.16.16-.53.32-.73.17-.21.5-.29.59-.58.14-.45.41-.87.31-1.37-.05-.29-.1-.57-.15-.86-.04-.22-.03-.47-.14-.64-.26-.41-.59-.78-.88-1.17-.03-.03,0-.1-.01-.15.05,0,.12-.02.16,0,.19.14.39.27.55.45.43.47.8,1,1.26,1.42.51.46.78,1.05,1.07,1.62.13.25.1.58.14.87-.03,0-.07.01-.11.02-.11-.32-.21-.65-.33-.97-.03-.08-.11-.15-.17-.22-.04.08-.09.15-.11.24-.09.35-.17.71-.25,1.06-.05-.72-.09-1.41-.53-2.05-.29.9-.52,1.76-.86,2.57-.18.42-.53.77-.85,1.12-.19.21-.45.36-.68.53-.14.1-.29.21-.44.29-.65.33-.71.21-.22.97.06.1.16.18.23.28.16.22.32.19.49.02.25-.25.47-.54.74-.77.61-.51,1.22-1.01,1.51-1.8.02-.07.15-.1.23-.15.02.09.08.21.04.27-.22.43-.39.91-.72,1.25-.44.45-.82,1.04-1.52,1.18-.02,0-.03.02-.05.03-.22.08-.25.28-.18.44.05.1.24.17.37.18.15.02.32-.03.47-.08.8-.28,1.59-.56,2.41-.79.78-.22,1.51-.64,2.26-.97.11-.05.22-.14.33-.13.62.07,1.04-.35,1.49-.63.31-.19.65-.42.62-.97-.02-.37.06-.7-.24-1-.11-.1-.14-.28-.21-.42-.13-.24-.12-.34.2-.35.17,0,.45-.14.47-.26.05-.23-.05-.49-.09-.74,0-.01-.08-.03-.1-.02-.44.22-.56-.14-.78-.38-.32-.34-.53-.79-1.02-.96-.51-.18-1-.42-1.5-.63-.36-.15-.62-.37-.75-.76-.14-.41-.28-.82-.47-1.21-.16-.34-.27-.67-.16-1.03.05-.16.03-.21-.13-.22-.05,0-.08-.1-.13-.15.06,0,.13,0,.19,0,.11,0,.23-.02.35-.03-.07-.09-.15-.17-.22-.26-.29-.31-.64-.53-.61-1.06.04-.59.17-1.14.46-1.64.26-.46.58-.89.86-1.34.2-.32.43-.64.54-.99.14-.45.35-.81.69-1.15.27-.28.34-.74.7-.97.17-.68.76-1.05,1.19-1.53.44-.49,1.03-.83,1.31-1.48.1-.23.27-.47.47-.61.83-.59,1.25-1.45,1.61-2.34.4-.98.7-2,.6-3.09-.02-.22-.14-.42-.3-.42h0ZM26.8,48.01c-.5-.18-1.01-.32-1.48-.54-.5-.22-.97-.51-1.45-.77-.07-.04-.16-.07-.19-.13-.08-.14-.21-.33-.17-.44.09-.23.33-.27.55-.14.39.22.78.46,1.17.69.5.29,1.01.58,1.52.87.05.03.12.03.16.06.08.07.14.16.21.24-.1.05-.19.1-.32.16ZM27.48,47.98c.42-.03.83-.07,1.25-.1.04,0,.09.05.14.07-.03.04-.07.12-.1.12-.42,0-.85,0-1.27,0l-.02-.1ZM30.48,48.85c-.59.4-1.26.14-1.89.19-.05,0-.13-.13-.15-.21,0-.03.1-.14.15-.14.64,0,1.27,0,1.91,0,0,.05,0,.1-.01.15ZM29.68,50.62c-.09.03-.18.1-.26.09-.53-.03-1.07-.02-1.58-.14-.67-.16-1.32-.42-1.97-.66-.27-.1-.53-.24-.79-.39-.07-.04-.15-.21-.12-.24.06-.08.19-.18.28-.17.25.05.49.14.73.23.93.37,1.85.76,2.79,1.1.28.1.6.05.91.07,0,.03,0,.06,0,.1ZM41.28,41.26l-.02-.16c.35-.35.73-.59,1.29-.56.85.05,1.71.02,2.56.01.35,0,.55-.19.57-.52,0-.11-.04-.24-.02-.35.18-.77.18-.77-.57-.77-.18,0-.36,0-.54,0-.22,0-.44,0-.65-.02-.04,0-.11-.14-.1-.15.17-.2.24-.52.59-.52s.71-.02,1.06,0c.54.02.8-.15.93-.66.18-.71,0-.92-.75-.84-.06,0-.14.04-.17.02-.07-.06-.18-.15-.17-.21.06-.39.23-.5.72-.52.7-.02.81-.15.75-.84,0-.12-.07-.24-.04-.35.08-.28-.08-.29-.28-.3-.13-.01-.35.09-.34-.18,0-.22.03-.45.33-.47.06,0,.12-.03.18-.02.31,0,.44-.13.4-.44-.01-.1.02-.2.01-.3,0-.25.04-.54-.07-.75-.06-.11-.39-.06-.6-.1-.27-.05-.25-.28-.25-.46,0-.08.11-.19.19-.21.26-.05.64.02.77-.13.14-.16.05-.52.06-.79,0-.12.02-.24.03-.36.02-.23-.08-.33-.31-.32-.22,0-.44,0-.66,0-.32-.01-.45-.15-.46-.47,0-.33.26-.23.43-.25.22-.02.44.02.65.02.33,0,.38-.08.33-.39-.04-.25-.09-.5-.08-.75,0-.43.02-.45-.39-.46-.38-.01-.76,0-1.13,0-.34,0-.52-.19-.48-.51.03-.28.28-.12.43-.16.15-.04.31,0,.47,0,1.04.03,1.14-.09.91-1.14-.03-.16-.04-.32-.1-.46-.03-.08-.16-.16-.25-.16-.55,0-1.1.03-1.65.03-.39,0-.44-.07-.46-.44-.02-.38.25-.29.44-.29.5-.02.99-.01,1.49-.05.12,0,.34-.16.34-.22-.03-.33-.13-.65-.2-.97-.04-.19-.17-.25-.35-.25-.12,0-.24,0-.36,0-.48,0-.95,0-1.43,0-.29,0-.28-.24-.32-.42-.05-.26.16-.23.31-.23.34-.01.68-.03,1.01-.01,1.1.06,1.19-.05.82-1.12-.15-.42-.26-.49-.68-.47-.39.01-.78,0-1.18,0q.13-.66.57-.67c.95-.01,1.01-.09.7-1,0-.02-.02-.04-.02-.05-.19-.49-.27-.54-.83-.47-.06,0-.12.01-.18,0-.26,0-.5-.28-.47-.57.03-.28.27-.14.43-.17.08-.02.16,0,.24,0,.27.02.36-.1.28-.35-.03-.11-.09-.22-.13-.33-.25-.62-.56-1.14-1.38-.93-.26.07-.36-.12-.36-.34,0-.22.09-.34.36-.33.64.02.71-.1.5-.71-.03-.09-.07-.19-.11-.27-.36-.7-.73-1.4-1.09-2.1-.14-.28-.33-.56-.4-.86-.1-.47-.43-.63-.8-.81-.2-.1-.32-.04-.31.18.03.71.05,1.43.13,2.13.06.57.22,1.12.32,1.69.05.32-.1.51-.36.48-.25-.02-.38-.18-.44-.41-.06-.25-.16-.49-.23-.73-.21-.7-.44-1.39-.62-2.1-.17-.68-.52-1.33-.48-2.06,0-.04-.03-.07-.04-.11-.12-.52-.27-1.03-.35-1.55-.05-.32-.23-.44-.49-.51-.21-.06-.28.09-.25.22.18.82.36,1.65.57,2.46.11.43.29.84.28,1.31,0,.23.08.47.18.69.46,1.03.97,2.03,1.38,3.08.27.69.83,1.24.94,2,.01.07.08.14.14.19.45.37.55.95.64,1.43.16.79.24,1.65-.32,2.39-.08.11-.07.33-.03.48.21.74.46,1.47.67,2.21.27.95.47,1.91.78,2.85.3.9.71,1.77,1.03,2.66.17.46.34.96.35,1.44,0,.98.03,1.96-.22,2.92-.11.42-.2.87-.41,1.23-.58.98-1.17,1.95-1.88,2.84-.44.55-1.01.94-1.61,1.31.27-.35.54-.71.81-1.06-.04-.03-.07-.06-.11-.09-.17.13-.34.26-.5.4-.27.25-.56.47-.9.65-.69.37-1.34.82-2,1.24-.04.02-.04.09-.12.25.55-.26,1-.46,1.44-.67-.05.2-.15.35-.29.44-.61.36-1.21.76-1.86,1.04-.73.33-1.51.59-2.32.64-.58.03-.6.02-.72.57-.03.15-.05.32-.04.47,0,.52-.05,1.02-.3,1.49-.12.23-.08.45.05.68.21.36.3.73.06,1.12-.21.34-.21.64.06.97.22.27.3.56.03.91-.3.38-.07.84.42.88.21.02.3.08.4.26.16.27.38.51.59.74.08.09.23.14.35.18.43.15.87.26,1.28.43.38.16.75.56,1.08.51.33-.05.59-.52.87-.81.02-.02.02-.06.06-.19-.65.08-1.25.05-1.56-.65.27-.02.55-.07.82-.07.44,0,.87.07,1.3.06.17,0,.39-.08.51-.21.3-.3.56-.64.82-.97.11-.13.19-.29.29-.43-.18-.04-.36-.08-.55-.11-.08-.01-.16,0-.24,0-.93,0-1.85,0-2.78,0-.55,0-1.1,0-1.65,0-.18,0-.36-.04-.52-.1-.1-.04-.24-.18-.22-.23.03-.11.15-.26.25-.28.31-.07.63-.1.94-.11.87-.01,1.75-.02,2.62,0,.85.02,1.7.07,2.55.1.07,0,.17-.03.2-.08.25-.44.49-.9.74-1.34.15-.26.02-.3-.2-.3-.83,0-1.67,0-2.5,0-1.42,0-2.85,0-4.27,0-.2,0-.45,0-.48-.24-.03-.24.17-.38.41-.42.08-.01.16-.03.24-.03.77,0,1.55-.02,2.32-.02,1.55,0,3.1.01,4.65.02.36,0,.6-.12.69-.5.05-.21.18-.39.28-.59.23-.47.23-.48-.32-.48-.74,0-1.47,0-2.21,0-1.67,0-3.33,0-5,0-.13,0-.26-.1-.38-.16.09-.11.18-.24.28-.34.05-.05.15-.06.23-.06.67-.06,1.33-.15,2-.16,1.57-.01,3.14.02,4.7.03q1.29,0,1.71-1.23s.02-.08.04-.11c.09-.19,0-.25-.17-.26-.45-.01-.9-.04-1.36-.04-.74,0-1.48,0-2.22,0ZM25.64,51.11c.62.02,1.14.32,1.65.65.03.02.05.09.04.1-.03.04-.08.08-.12.08-.08,0-.17.02-.23-.01-.46-.23-.93-.47-1.39-.7.02-.04.04-.08.06-.12ZM29.03,3.66c-.02-.06.91-1.08,1.5-.89.51.17.91.29,1.72.51.26.07.51.2.77.31.31.13.6.33.93.39.49.1.91.32,1.33.57,1.11.67,2.25,1.3,3.35,1.99.34.21.6.56.9.83.88.81,1.79,1.59,2.39,2.66.17.3.46.55.68.82.88,1.08,1.6,2.26,2.15,3.54.24.56.56,1.09.77,1.66.26.67.43,1.38.65,2.06.21.66.45,1.3.63,1.96.22.83.4,1.68.58,2.52.13.64.23,1.29.35,1.93.26,1.45.33,2.9.28,4.37-.04,1.24,0,2.48-.05,3.72-.04.95-.13,1.9-.28,2.83-.16.99-.4,1.98-.65,2.95-.28,1.08-.58,2.16-.94,3.22-.33.95-.76,1.86-1.17,2.78-.32.73-.67,1.45-1.03,2.16-.1.2-.31.35-.42.55-.3.5-.54,1.04-.88,1.51-.48.66-1,1.28-1.61,1.83-.48.43-.95.89-1.39,1.36-.64.69-1.39,1.22-2.14,1.77-.88.64-1.88,1.08-2.81,1.62-.54.31-1.15.5-1.74.71-.31.11-.41.01-.39-.3.01-.19.09-.38.11-.58.05-.84.08-1.69.13-2.53.02-.29-.18-.25-.3-.19-.83.44-1.74.16-2.6.32-.09.02-.22-.07-.32-.12-.18-.1-.18-.23.01-.28.39-.11.8-.18,1.2-.27.28-.07.57-.14.85-.23.37-.12.74-.26,1.11-.41.24-.09,1.29-.67,1.3-.94.02-.5-.42-1.07-1.54-.12-.36.3-.92.21-1.38.31-.07.01-.15-.02-.22-.03.05-.07.08-.18.15-.21.46-.22.93-.44,1.41-.62.66-.25,1.19-.49,1.18-1.15,0-.21-.12-.46-.27-.61-.18-.17-.87.04-1.1.2-.19.13-.42.21-.63.31-.03-.03-.06-.06-.08-.09.12-.17.23-.35.4-.6-.92.1-1.77.19-2.61.28l-.03-.17c.25-.05.51-.15.76-.15.73.02,1.41-.16,2.06-.45.31-.13.62-.26.91-.43.18-.1.38-.25.47-.42.07-.14.06-.4-.03-.54-.12-.17-.32-.14-.53-.01-.56.36-1.12.74-1.73,1.01-.55.24-1.11.55-1.79.41-.46-.1-.95-.02-1.43-.04-.08,0-.16-.12-.24-.18.08-.04.17-.13.24-.12.93.09,1.8-.17,2.68-.37.83-.19,1.57-.61,2.25-1.12.11-.08.23-.15.32-.25.18-.22.44-.45.49-.71.11-.56.12-1.14.15-1.71,0-.09-.1-.18-.15-.28-.09.08-.21.15-.27.25-.04.07,0,.19,0,.29-.02.37-.06.72-.3,1.05-.68.92-1.58,1.38-2.71,1.47-1.06.08-2.04-.09-2.99-.56-1.23-.6-2.49-1.14-3.74-1.69-.32-.15-.66-.26-.98-.41-1.11-.55-1.75-1.43-1.95-2.66-.12-.72-.21-1.48-.51-2.12-.46-.97-.49-2-.66-3.01-.1-.58-.1-1.17-.15-1.76-.01-.14,0-.28-.04-.41-.03-.12-.12-.22-.18-.33-.04.12-.1.24-.1.35-.04.83.05,1.63.23,2.45.16.7.1,1.45.23,2.16.13.72.39,1.41.58,2.12.07.24.09.49.13.74-.22-.11-.46-.19-.65-.34-.19-.14-.32-.35-.48-.52-.34-.35-.64-.39-.97-.04-.32.34-.6.74-.86,1.13-.14.21.11.9.37,1.12.07.06.17.1.22.18.35.52,4.67,6.36,5.55,7.61.4.56.6,1.21.53,1.94-.11,1.34-.16,2.68-.25,4.02-.04.54-.12,1.08-.19,1.62,0,.05-.13.14-.2.13-.29-.02-.59-.06-.88-.09-.76-.09-1.53-.15-2.24-.48-.05-.02-.12-.02-.18-.03-.39-.05-.79-.08-1.12-.34-.06-.05-.15-.05-.23-.07-1.32-.3-2.54-.86-3.74-1.45-1.08-.53-2.13-1.14-3.11-1.83-1.05-.73-2.01-1.59-2.79-2.62-.52-.67-1.1-1.3-1.58-1.99-.6-.86-1.15-1.75-1.66-2.66-.41-.74-.77-1.52-1.08-2.3-.27-.68-.45-1.4-.68-2.11-.18-.56-.32-1.14-.55-1.68-.17-.41-.13-.86-.28-1.26-.43-1.12-.5-2.32-.73-3.48-.25-1.25-.31-2.52-.29-3.79.03-1.44-.02-2.88.05-4.32.05-1.04.2-2.08.36-3.11.14-.88.34-1.75.57-2.61.28-1.08.58-2.16.93-3.22.27-.8.64-1.57.97-2.35.21-.49.4-.98.66-1.45.3-.54.54-1.11.94-1.6.3-.38.5-.84.74-1.27.49-.88,1.2-1.57,1.91-2.27.43-.43.85-.87,1.31-1.28.66-.59,1.32-1.18,2.03-1.7.61-.45,1.28-.85,1.95-1.2,1.22-.63,2.45-1.25,3.81-1.57.73-.17,1.44-.42,2.17-.62.32-.09,1.04-.23,1.38-.26.62-.06.07.96,0,1.48-.02.19-.09.38-.15.57-.22.7-2.39,3.63-3.18,4.29-.34.28-.56.7-.83,1.06-.04.05-.04.15-.03.22.09.4.65.58,1.06.58,1.1,0,5.48-2.89,6.12-3.33,1.07-.75,3.46-2.98,4.02-3.53ZM26.49,58.52c1.29.1,2.35-.29,3.44-.49.75-.14,1.4-.65,2.2-.59.04,0,.08-.02.11-.03,1.09-.45,2.17-.95,3.28-1.33,1.03-.35,1.82-1.07,2.73-1.61.51-.3.96-.7,1.42-1.07.32-.26.64-.52.93-.82.39-.39.83-.77,1.1-1.24.22-.37.49-.66.79-.94.17-.16.33-.34.48-.53.41-.54.79-1.12,1.23-1.63.68-.79,1.01-1.77,1.5-2.67.53-.97.78-2.06,1.33-3.02.05-.08.07-.19.1-.28.24-.73.46-1.46.71-2.19.38-1.1.63-2.25.88-3.39.17-.82.26-1.65.24-2.5-.01-.5.17-1,.2-1.51.04-.77-.05-1.56.06-2.32.15-1.03.04-2.05-.03-3.07-.07-1.01-.18-2.01-.27-3.02-.04-.47-.09-.95-.15-1.42-.15-1.06-.42-2.08-.75-3.1-.14-.45-.26-.91-.4-1.36-.15-.44-.35-.87-.48-1.32-.38-1.34-.97-2.6-1.63-3.81-.5-.91-1.08-1.8-1.73-2.62-.49-.61-.9-1.28-1.41-1.88-.37-.43-.69-.88-1.13-1.27-.67-.6-1.23-1.34-2-1.83-1.15-.73-2.18-1.64-3.47-2.16-.22-.09-.4-.25-.61-.36-.21-.11-.41-.23-.63-.31-.41-.15-.85-.25-1.25-.43-1.21-.55-2.46-.96-3.79-1.09-.26-.03-.51-.18-.78-.2-.86-.09-1.72-.19-2.59-.22-1.12-.04-2.25-.05-3.36.01-.65.04-1.29.2-1.92.38-1.12.33-2.27.6-3.37,1.02-.88.34-1.75.74-2.64,1.02-1.08.34-1.91,1.08-2.84,1.64-.62.38-1.19.85-1.78,1.28-.08.06-.17.12-.22.2-.5.73-1.3,1.22-1.67,2.06-.02.05-.07.1-.11.14-.53.37-.93.85-1.27,1.4-.15.25-.28.54-.49.73-.56.5-.91,1.14-1.27,1.77-.16.29-.23.62-.37.93-.36.76-.74,1.52-1.09,2.29-.08.17-.05.42-.16.56-.32.41-.44.88-.57,1.36-.11.4-.18.82-.35,1.19-.54,1.24-.81,2.56-1.1,3.87-.18.82-.26,1.65-.25,2.5,0,.5-.17,1.01-.2,1.51-.04.77.05,1.56-.06,2.32-.15,1.01-.03,2.01.03,3.01.05.73.19,1.46.22,2.19.07,1.85.37,3.65.95,5.41.14.43.23.87.38,1.3.17.52.38,1.03.56,1.54.17.48.29.99.52,1.45.56,1.14,1.13,2.26,1.76,3.36.34.6.79,1.13,1.2,1.69.15.2.37.35.51.56.44.61.85,1.23,1.28,1.84.08.11.2.19.31.28.13.12.25.24.38.36.5.48.97.99,1.51,1.42.59.47,1.22.87,1.85,1.29.53.35,1.07.67,1.62.99.3.18.62.32.93.48.23.12.44.27.68.36.38.14.79.2,1.15.37,1.15.53,2.33.96,3.6,1.09.48.05.95.19,1.43.27.43.07.86.11,1.29.15.67.06,1.34.14,2.01.15.47,0,.95-.09,1.26-.12ZM23.09,0c1.53.03,3.02.03,4.5.1.5.02.99.22,1.49.32,1.02.21,2.06.37,3.07.62.72.18,1.42.45,2.12.73.72.29,1.5.52,2.11.97.65.48,1.57.53,2.01,1.3.04.06.16.08.24.11.07.02.19,0,.22.05.36.62,1.12.71,1.58,1.21.86.95,1.85,1.78,2.67,2.76.71.83,1.28,1.78,1.88,2.69.63.96,1.23,1.95,1.84,2.92.04.07.07.14.1.22.27.61.49,1.25.81,1.83.31.56.33,1.2.58,1.77.09.22.16.45.23.67.1.3.19.59.28.89.02.06,0,.12.02.18.18.6.37,1.19.53,1.79.17.66.32,1.32.34,2.02,0,.5.14.99.21,1.49.01.08.06.16.04.23-.12.63.08,1.24.1,1.86.02.56.15,1.11.19,1.67.03.45-.01.91-.01,1.36,0,1.07-.07,2.13-.23,3.18-.09.58-.09,1.18-.13,1.77-.05.74-.14,1.48-.33,2.21-.23.89-.38,1.81-.6,2.71-.1.41-.33.79-.4,1.21-.21,1.14-.79,2.16-1.08,3.28-.09.35-.35.65-.51.98-.3.62-.6,1.24-.9,1.86-.62,1.27-1.48,2.38-2.37,3.46-.43.53-.83,1.09-1.24,1.63-.38.49-.84.91-1.32,1.3-.13.1-.24.24-.37.35-.41.36-.83.71-1.25,1.06-.28.24-.57.48-.87.69-.33.23-.68.44-1.05.63-.54.28-1.09.52-1.64.79-.17.08-.33.2-.51.26-.71.22-1.38.52-2.04.86-.17.09-.38.11-.56.17-.34.11-.67.21-1.01.33-.09.03-.18.11-.27.11-.69,0-1.29.37-1.93.5-.88.19-1.79.28-2.7.34-1,.06-2.01.03-3.02.02-.91-.01-1.8-.19-2.68-.37-.83-.17-1.66-.3-2.48-.47-.46-.1-.92-.23-1.36-.38-.72-.25-1.45-.47-2.12-.81-.62-.31-1.3-.54-1.84-1.01-.11-.1-.29-.13-.44-.18-.4-.13-.77-.32-1-.7-.02-.03-.05-.08-.08-.09-.46-.1-.7-.56-1.08-.71-.45-.18-.77-.48-1.11-.78-.48-.44-.94-.9-1.39-1.39-.53-.58-1.03-1.18-1.54-1.78-1.05-1.25-1.92-2.63-2.74-4.04-.42-.73-.89-1.44-1.1-2.28-.07-.28-.31-.51-.41-.78-.22-.6-.41-1.21-.61-1.82-.09-.26-.19-.52-.29-.78-.07-.2-.13-.41-.2-.61-.09-.3-.19-.6-.28-.9-.01-.04-.05-.07-.05-.1-.03-1.1-.7-2.09-.55-3.22-.27-.43-.18-.91-.21-1.38-.02-.27-.02-.54-.04-.81,0-.13-.02-.27-.04-.4-.09-.64-.23-1.27-.27-1.91-.04-.74.02-1.48,0-2.23-.02-1.01.09-2.01.22-3.01.09-.66.04-1.34.11-2,.07-.64.21-1.27.34-1.91.19-.93.38-1.85.6-2.77.09-.37.24-.73.36-1.1.02-.06.07-.1.07-.16.16-1.16.8-2.16,1.06-3.28.08-.33.33-.61.49-.93.52-1.02.98-2.07,1.57-3.04.49-.81,1.13-1.52,1.7-2.27.41-.55.8-1.11,1.24-1.63.32-.38.63-.77,1.06-1.07.52-.36.95-.84,1.43-1.26.69-.6,1.41-1.17,2.19-1.64.5-.3,1.05-.52,1.59-.77.94-.42,1.88-.84,2.83-1.25.29-.12.6-.16.9-.25.94-.28,1.87-.62,2.82-.85.82-.19,1.66-.25,2.46-.36Z\"/>\n  </g>\n</svg>",

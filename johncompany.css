@@ -57,7 +57,7 @@
 #joco-regiments,
 #joco-power-tokens,
 #joco_towers,
-#joco_family_members,
+#joco-family-members,
 #joco-orders,
 #joco_ships,
 #joco_treasuries {
@@ -163,14 +163,6 @@
   z-index: 6;
 }
 
-.joco-ship {
-  position: absolute;
-  background-image: url("img/ship_player.png");
-  width: calc(var(--tokenScale) * 40px);
-  height: calc(var(--tokenScale) * 36px);
-  background-size: 100% 100%;
-}
-
 .joco-power-token {
   position: absolute;
   box-sizing: border-box;
@@ -209,6 +201,12 @@
 .joco-select-box {
   position: absolute;
   display: none;
+}
+
+.joco-select-box.joco-select-sea-zone {
+  width: calc(var(--tokenScale) * 55px);
+  height: calc(var(--tokenScale) * 55px);
+  border-radius: calc(var(--boardScale) * 6px);
 }
 
 .joco-select-box.joco-select-writer {
@@ -273,7 +271,7 @@
 .joco-select-box.selectable {
   cursor: pointer;
   display: block;
-  outline: calc(var(--boardScale) * 4px) solid yellow;
+  outline: calc(var(--boardScale) * 4px) solid yellow !important;
 }
 
 .joco-order.selected,
@@ -282,7 +280,7 @@
 .joco-select-box.selectable:hover {
   cursor: pointer;
   display: block;
-  outline: calc(var(--boardScale) * 4px) solid blue;
+  outline: calc(var(--boardScale) * 4px) solid blue !important;
 }
 
 .joco-select-box.joco-company-debt[data-vote=true] {
@@ -480,6 +478,104 @@ span[style*="color:#addb90"] {
   background-position-x: 60%;
 }
 
+.joco-family-member {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  border-radius: 50%;
+  height: calc(var(--tokenScale) * 46px);
+  width: calc(var(--tokenScale) * 39px);
+  outline: calc(var(--tokenScale) * 1px) solid black;
+}
+.joco-family-member svg {
+  height: calc(var(--tokenScale) * 42px);
+  width: calc(var(--tokenScale) * 35px);
+  pointer-events: none;
+}
+
+.joco-family-member[data-family=Benyon] {
+  background-color: #ffb1b9;
+  outline-color: #cd3263;
+}
+.joco-family-member[data-family=Benyon] svg {
+  fill: #cd3263;
+}
+
+.joco-family-member[data-family=Hastings] {
+  background-color: #99dae9;
+  outline-color: #006480;
+}
+.joco-family-member[data-family=Hastings] svg {
+  fill: #006480;
+}
+
+.joco-family-member[data-family=Larkins] {
+  background-color: #f9e08d;
+  outline-color: #9d5e16;
+}
+.joco-family-member[data-family=Larkins] svg {
+  fill: #9d5e16;
+}
+
+.joco-family-member[data-family=Paxton] {
+  background-color: #dbd9d6;
+  outline-color: #101820;
+}
+.joco-family-member[data-family=Paxton] svg {
+  fill: #101820;
+}
+
+.joco-family-member[data-family=Sykes] {
+  background-color: #c7b4e1;
+  outline-color: #880064;
+}
+.joco-family-member[data-family=Sykes] svg {
+  fill: #880064;
+}
+
+.joco-family-member[data-family=Walsh] {
+  background-color: #addb90;
+  outline-color: #2b5135;
+}
+.joco-family-member[data-family=Walsh] svg {
+  fill: #2b5135;
+}
+
+.joco-ship {
+  position: absolute;
+  background-image: url("img/ship_player.png");
+  width: calc(var(--tokenScale) * 40px);
+  height: calc(var(--tokenScale) * 36px);
+  background-size: 100% 100%;
+}
+
+.joco-family-member.selectable {
+  cursor: pointer;
+  outline: calc(var(--tokenScale) * 4px) solid yellow !important;
+  z-index: 1;
+}
+
+.joco-family-member.selectable:hover,
+.joco-family-member.selected {
+  cursor: pointer;
+  outline: calc(var(--tokenScale) * 4px) solid blue !important;
+  z-index: 1;
+}
+
+.joco-ship.selectable {
+  cursor: pointer;
+  filter: drop-shadow(calc(var(--tokenScale) * 4px) 0px 0px yellow) drop-shadow(calc(var(--tokenScale) * -4px) 0px 0px yellow) drop-shadow(0px calc(var(--tokenScale) * 4px) 0px yellow) drop-shadow(0px calc(var(--tokenScale) * -4px) 0px yellow);
+  z-index: 1;
+}
+
+.joco-ship.selectable:hover,
+.joco-ship.selected {
+  cursor: pointer;
+  filter: drop-shadow(calc(var(--tokenScale) * 4px) 0px 0px blue) drop-shadow(calc(var(--tokenScale) * -4px) 0px 0px blue) drop-shadow(0px calc(var(--tokenScale) * 4px) 0px blue) drop-shadow(0px calc(var(--tokenScale) * -4px) 0px blue);
+  z-index: 1;
+}
+
 .joco-player-area {
   display: flex;
   flex-direction: column;
@@ -494,7 +590,7 @@ span[style*="color:#addb90"] {
   flex-direction: column;
   gap: 8px;
 }
-.player-board-game-specific-content .joco_family_member {
+.player-board-game-specific-content .joco-family-member {
   --tokenScale: 1.043;
   position: relative;
   margin: 0px auto;
@@ -811,6 +907,11 @@ span[style*="color:#c0c0c0"] {
 #gameaction_status .joco-crown-climate-icon {
   --iconScale: 0.85;
 }
+#pagemaintitletext .joco-family-member,
+#gameaction_status .joco-family-member {
+  display: inline-flex;
+  --tokenScale: 0.85;
+}
 
 .log > .roundedbox,
 .log > .roundedboxinner {
@@ -823,7 +924,14 @@ span[style*="color:#c0c0c0"] {
 }
 .log > .roundedbox .joco-crown-climate-icon,
 .log > .roundedboxinner .joco-crown-climate-icon {
-  --iconScale: 0.85;
+  --iconScale: 0.9;
+}
+.log > .roundedbox .joco-family-member,
+.log > .roundedboxinner .joco-family-member {
+  display: inline-flex;
+  --tokenScale: 0.8;
+  top: -4px;
+  margin-top: 4px;
 }
 
 .joco_pound {
@@ -892,69 +1000,6 @@ html {
   opacity: 1;
   transition: visibility 0s ease-out, opacity 0.6s linear;
   visibility: visible;
-}
-
-.joco_family_member {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  border-radius: 50%;
-  height: calc(var(--tokenScale) * 46px);
-  width: calc(var(--tokenScale) * 39px);
-  outline: calc(var(--tokenScale) * 1px) solid black;
-}
-.joco_family_member svg {
-  height: calc(var(--tokenScale) * 42px);
-  width: calc(var(--tokenScale) * 35px);
-}
-
-.joco_family_member[data-family=Benyon] {
-  background-color: #ffb1b9;
-  outline-color: #cd3263;
-}
-.joco_family_member[data-family=Benyon] svg {
-  fill: #cd3263;
-}
-
-.joco_family_member[data-family=Hastings] {
-  background-color: #99dae9;
-  outline-color: #006480;
-}
-.joco_family_member[data-family=Hastings] svg {
-  fill: #006480;
-}
-
-.joco_family_member[data-family=Larkins] {
-  background-color: #f9e08d;
-  outline-color: #9d5e16;
-}
-.joco_family_member[data-family=Larkins] svg {
-  fill: #9d5e16;
-}
-
-.joco_family_member[data-family=Paxton] {
-  background-color: #dbd9d6;
-  outline-color: #101820;
-}
-.joco_family_member[data-family=Paxton] svg {
-  fill: #101820;
-}
-
-.joco_family_member[data-family=Sykes] {
-  background-color: #c7b4e1;
-  outline-color: #880064;
-}
-.joco_family_member[data-family=Sykes] svg {
-  fill: #880064;
-}
-
-.joco_family_member[data-family=Walsh] {
-  background-color: #addb90;
-  outline-color: #2b5135;
-}
-.joco_family_member[data-family=Walsh] svg {
-  fill: #2b5135;
 }
 
 /*# sourceMappingURL=johncompany.css.map */
