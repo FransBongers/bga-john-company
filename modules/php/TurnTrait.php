@@ -99,7 +99,7 @@ trait TurnTrait
       'children' => array_map(function ($playerId) {
         return [
           'action' => FAMILY_ACTION,
-          'playerId' => 'all',
+          'playerId' => 'some',
           'familyId' => Players::get($playerId)->getFamilyId(),
           'activePlayerIds' => [$playerId],
         ];
@@ -179,7 +179,7 @@ trait TurnTrait
       'children' => [
         [
           'action' => CHAIRMAN,
-          'playerId' => 'all',
+          'playerId' => 'some',
           'activePlayerIds' => [Offices::get(CHAIRMAN)->getPlayerId()],
           'initialTreasuries' => $initialTreasuries,
           'initialDebt' => Company::getDebt(),
@@ -200,13 +200,13 @@ trait TurnTrait
       'children' => [
         [
           'action' => DIRECTOR_OF_TRADE_SPECIAL_ENVOY,
-          'playerId' => 'all',
+          'playerId' => 'some',
           'activePlayerIds' => [$playerId],
           'optional' => true,
         ],
         [
           'action' => DIRECTOR_OF_TRADE_TRANSFERS,
-          'playerId' => 'all',
+          'playerId' => 'some',
           'activePlayerIds' => [$playerId],
           'optional' => true,
         ]
@@ -226,7 +226,7 @@ trait TurnTrait
       'children' => array_map(function ($officeId) use ($offices) {
         return [
           'action' => $officeId,
-          'playerId' => 'all',
+          'playerId' => 'some',
           'activePlayerIds' => [$offices[$officeId]->getPlayerId()],
         ];
       }, $officesInGame),

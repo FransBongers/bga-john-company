@@ -125,13 +125,14 @@ class FamilyAction extends \Bga\Games\JohnCompany\Models\AtomicAction
     if (in_array($familyAction, [ENLIST_WRITER, SEEK_SHARE])) {
       $action = [
         'action' => $familyAction,
-        'playerId' => 'all',
+        'playerId' => 'some',
         'activePlayerIds' => [$playerId]
       ];
       $this->ctx->insertAsBrother(Engine::buildTree($action));
     } else {
       AtomicActions::get($familyAction)->performAction($playerId);
     }
+    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
 
     $this->resolveAction([], true);
   }

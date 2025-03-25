@@ -111,6 +111,11 @@ class DirectorOfTradeTransfers implements State {
     );
 
     if (this.getTransferCount() > 0) {
+      addPrimaryActionButton({
+        id: 'done_btn',
+        text: _('Done'),
+        callback: () => this.updateInterfaceConfirm(),
+      });
       this.addCancelButton();
     }
   }
@@ -172,6 +177,7 @@ class DirectorOfTradeTransfers implements State {
   }
 
   private updateInterfaceConfirm() {
+    clearPossible();
     updatePageTitle(_('Confirm transfers'));
 
     addConfirmButton(() => {
@@ -200,7 +206,7 @@ class DirectorOfTradeTransfers implements State {
   // private async moveWriter(writer: JocoFamilyMember, from: string) {
   //   const board = Board.getInstance();
   //   const fromRegion = writer.location.split('_')[1];
-    
+
   //   const remainingFamilyMembers = board.writers[fromRegion].filter(
   //     (member: JocoFamilyMember) => member.id !== writer.id
   //   );
@@ -221,7 +227,7 @@ class DirectorOfTradeTransfers implements State {
       await board.moveShip({ ship: data.ship, from: data.to });
     }
     for (let data of Object.values(this.transfers.writers)) {
-      data.writer.location = data.from
+      data.writer.location = data.from;
       await board.moveWriter(data.writer, data.to);
     }
   }

@@ -39,13 +39,15 @@ class Chairman implements State {
   }
 
   setDescription(activePlayerIds: number[], args: OnEnteringChairmanArgs) {
+    console.log('setDescription Chairman')
     updatePageTitle(
       _(
         '${tkn_playerName} may increase Company Debt and must allocate the Company Balance'
       ),
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
-      }
+      },
+      true
     );
   }
 

@@ -5,7 +5,7 @@ namespace Bga\Games\JohnCompany\Actions;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
-
+use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Players;
@@ -83,6 +83,7 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $this->performAction($playerId, $position, $price);
 
+    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
     $this->resolveAction([], true);
   }
 

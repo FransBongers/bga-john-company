@@ -169,10 +169,9 @@ class Interaction {
     nonActivePlayers: boolean = false
   ) {
     const title = this.game.format_string_recursive(_(text), args);
+    this.game.gamedatas.gamestate.descriptionmyturn = title;
     if (nonActivePlayers) {
       this.game.gamedatas.gamestate.description = title;
-    } else {
-      this.game.gamedatas.gamestate.descriptionmyturn = title;
     }
     this.game.framework().updatePageTitle();
   }

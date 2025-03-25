@@ -119,6 +119,21 @@ class Engine
       self::proceedToState($node, $isUndo);
       return;
     }
+    // Multi active node with some players active
+    if ($playerId == 'some') {
+      Game::get()->gamestate->jumpToState(ST_RESOLVE_STACK);
+      // TODO: handle crown
+      $activePlayerIds = $node->getInfo()['activePlayerIds'];
+      Game::get()->gamestate->setPlayersMultiactive($activePlayerIds, 'not_used', false);
+
+      // Ensure no undo
+      Log::checkpoint();
+      Globals::setEngineChoices(0);
+
+      // Proceed to do the action
+      self::proceedToState($node, $isUndo);
+      return;
+    }
 
     // Confirm partial turn in case next unresolved node in tree
     // activates a different player and player has made choices

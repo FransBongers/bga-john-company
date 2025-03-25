@@ -82,6 +82,7 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $this->performAction($playerId, $regionId);
 
+    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
     $this->resolveAction([], true);
   }
 

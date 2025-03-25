@@ -65,6 +65,7 @@ class JohnCompany implements Game {
     DraftCard,
     EnlistWriter,
     FamilyAction,
+    ManagerOfShipping,
     PlayerTurn,
     SeekShare,
   };

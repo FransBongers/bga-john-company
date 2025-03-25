@@ -769,11 +769,9 @@ var Interaction = (function () {
     Interaction.prototype.clientUpdatePageTitle = function (text, args, nonActivePlayers) {
         if (nonActivePlayers === void 0) { nonActivePlayers = false; }
         var title = this.game.format_string_recursive(_(text), args);
+        this.game.gamedatas.gamestate.descriptionmyturn = title;
         if (nonActivePlayers) {
             this.game.gamedatas.gamestate.description = title;
-        }
-        else {
-            this.game.gamedatas.gamestate.descriptionmyturn = title;
         }
         this.game.framework().updatePageTitle();
     };
@@ -1486,6 +1484,7 @@ var JohnCompany = (function () {
             DraftCard: DraftCard,
             EnlistWriter: EnlistWriter,
             FamilyAction: FamilyAction,
+            ManagerOfShipping: ManagerOfShipping,
             PlayerTurn: PlayerTurn,
             SeekShare: SeekShare,
         };
@@ -3047,9 +3046,10 @@ var Chairman = (function () {
         this.deactivateTreasuries();
     };
     Chairman.prototype.setDescription = function (activePlayerIds, args) {
+        console.log('setDescription Chairman');
         updatePageTitle(_('${tkn_playerName} may increase Company Debt and must allocate the Company Balance'), {
             tkn_playerName: getPlayerName(activePlayerIds[0]),
-        });
+        }, true);
     };
     Chairman.prototype.updateInterfaceInitialStep = function () {
         var _this = this;
@@ -3264,7 +3264,7 @@ var ChairmanDebtConsent = (function () {
         this.args = args;
         updatePageTitle(_('Other players may give consent to increase Company Debt to ${value}'), {
             value: this.args.debt,
-        });
+        }, true);
     };
     ChairmanDebtConsent.prototype.updateInterfaceInitialStep = function () {
         var _this = this;
@@ -3319,17 +3319,17 @@ var DirectorOfTradeSpecialEnvoy = (function () {
                 tkn_playerName: getPlayerName(activePlayerIds[0]),
                 amount: args.proposal,
                 tkn_pound: 'pound',
-            });
+            }, true);
         }
         else if (args.proposal === 0) {
             updatePageTitle(_('Special Envoy: ${tkn_playerName} proposes not to make a check'), {
                 tkn_playerName: getPlayerName(activePlayerIds[0]),
-            });
+            }, true);
         }
         else {
             updatePageTitle(_('Special Envoy: ${tkn_playerName} may make a check'), {
                 tkn_playerName: getPlayerName(activePlayerIds[0]),
-            });
+            }, true);
         }
     };
     DirectorOfTradeSpecialEnvoy.prototype.updateInterfaceInitialStep = function () {
@@ -3492,6 +3492,11 @@ var DirectorOfTradeTransfers = (function () {
             return onClick(board.ships[id], function () { return _this.updateInterfaceSelectSeaZone(data); });
         });
         if (this.getTransferCount() > 0) {
+            addPrimaryActionButton({
+                id: 'done_btn',
+                text: _('Done'),
+                callback: function () { return _this.updateInterfaceConfirm(); },
+            });
             this.addCancelButton();
         }
     };
@@ -3558,6 +3563,7 @@ var DirectorOfTradeTransfers = (function () {
     };
     DirectorOfTradeTransfers.prototype.updateInterfaceConfirm = function () {
         var _this = this;
+        clearPossible();
         updatePageTitle(_('Confirm transfers'));
         addConfirmButton(function () {
             performAction('actDirectorOfTradeTransfers', {
@@ -3786,7 +3792,7 @@ var FamilyAction = (function () {
             tkn_playerName: PlayerManager.getInstance()
                 .getPlayer(activePlayerIds[0])
                 .getName(),
-        });
+        }, true);
     };
     FamilyAction.prototype.updateInterfaceInitialStep = function () {
         this.game.clearPossible();
@@ -3821,6 +3827,70 @@ var FamilyAction = (function () {
         }
     };
     return FamilyAction;
+}());
+var ManagerOfShipping = (function () {
+    function ManagerOfShipping(game) {
+        this.game = game;
+    }
+    ManagerOfShipping.create = function (game) {
+        ManagerOfShipping.instance = new ManagerOfShipping(game);
+    };
+    ManagerOfShipping.getInstance = function () {
+        return ManagerOfShipping.instance;
+    };
+    ManagerOfShipping.prototype.onEnteringState = function (args) {
+        debug('Entering ManagerOfShipping state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    };
+    ManagerOfShipping.prototype.onLeavingState = function () {
+        debug('Leaving ManagerOfShipping state');
+    };
+    ManagerOfShipping.prototype.setDescription = function (activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} may fit, buy and lease ships'), {
+            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        }, true);
+    };
+    ManagerOfShipping.prototype.updateInterfaceInitialStep = function () {
+        this.game.clearPossible();
+        updatePageTitle(_('${you} may fit, buy and lease or ships'));
+        var board = Board.getInstance();
+    };
+    ManagerOfShipping.prototype.updateInterfaceConfirm = function () {
+        updatePageTitle(_('Confirm transfers'));
+        addConfirmButton(function () {
+            performAction('actManagerOfShipping', {});
+        });
+        this.addCancelButton();
+    };
+    ManagerOfShipping.prototype.returnPieces = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var board;
+            return __generator(this, function (_a) {
+                board = Board.getInstance();
+                return [2];
+            });
+        });
+    };
+    ManagerOfShipping.prototype.addCancelButton = function () {
+        var _this = this;
+        addDangerActionButton({
+            id: 'cancel_btn',
+            text: _('Cancel'),
+            callback: function () { return __awaiter(_this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4, this.returnPieces()];
+                        case 1:
+                            _a.sent();
+                            this.game.onCancel();
+                            return [2];
+                    }
+                });
+            }); },
+        });
+    };
+    return ManagerOfShipping;
 }());
 var PlayerTurn = (function () {
     function PlayerTurn(game) {

@@ -38,7 +38,8 @@ class ChairmanDebtConsent implements State {
       _('Other players may give consent to increase Company Debt to ${value}'),
       {
         value: this.args.debt,
-      }
+      },
+      true,
     );
   }
 

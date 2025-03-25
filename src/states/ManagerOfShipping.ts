@@ -1,38 +1,48 @@
-interface OnEnteringFamilyActionArgs extends CommonStateArgs {
-  options: Record<string, boolean>;
-}
+interface OnEnteringManagerOfShippingArgs extends CommonStateArgs {}
 
-class FamilyAction implements State {
-  private static instance: FamilyAction;
-  private args: OnEnteringFamilyActionArgs;
+class ManagerOfShipping implements State {
+  private static instance: ManagerOfShipping;
+  private args: OnEnteringManagerOfShippingArgs;
+  // private transfers: {
+  //   ships: Record<string, { ship: JocoShipBase; from: string; to: string }>;
+  //   writers: Record<
+  //     string,
+  //     { writer: JocoFamilyMember; from: string; to: string }
+  //   >;
+  // };
 
   constructor(private game: GameAlias) {}
 
   public static create(game: JohnCompany) {
-    FamilyAction.instance = new FamilyAction(game);
+    ManagerOfShipping.instance = new ManagerOfShipping(game);
   }
 
   public static getInstance() {
-    return FamilyAction.instance;
+    return ManagerOfShipping.instance;
   }
 
-  onEnteringState(args: OnEnteringFamilyActionArgs) {
-    debug('Entering FamilyAction state');
+  onEnteringState(args: OnEnteringManagerOfShippingArgs) {
+    debug('Entering ManagerOfShipping state');
     this.args = args;
+    // this.transfers = args.transfers ?? {
+    //   ships: {},
+    //   writers: {},
+    // };
     this.updateInterfaceInitialStep();
   }
 
   onLeavingState() {
-    debug('Leaving FamilyAction state');
+    debug('Leaving ManagerOfShipping state');
   }
 
-  setDescription(activePlayerIds: number[], args: OnEnteringFamilyActionArgs) {
+  setDescription(
+    activePlayerIds: number,
+    args: OnEnteringManagerOfShippingArgs
+  ) {
     updatePageTitle(
-      _('${tkn_playerName} must perform a family action'),
+      _('${tkn_playerName} may fit, buy and lease ships'),
       {
-        tkn_playerName: PlayerManager.getInstance()
-          .getPlayer(activePlayerIds[0])
-          .getName(),
+        tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
       true
     );
@@ -57,44 +67,21 @@ class FamilyAction implements State {
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
 
-    updatePageTitle(_('${you} must select a family action'));
+    updatePageTitle(_('${you} may fit, buy and lease or ships'));
+    const board = Board.getInstance();
 
-    this.addButton(ENLIST_WRITER, WRITER, _('Enlist ${tkn_icon}'));
-    this.addButton(
-      ENLIST_OFFICER,
-      OFFICER_IN_TRAINING,
-      _('Enlist ${tkn_icon}')
-    );
-    this.addButton(PURCHASE_LUXURY, LUXURY, _('Purchase ${tkn_icon}'));
-    this.addButton(PURCHASE_SHIPYARD, SHIPYARD, _('Purchase ${tkn_icon}'));
-    this.addButton(PURCHASE_WORKSHOP, WORKSHOP, _('Purchase ${tkn_icon}'));
-    this.addButton(SEEK_SHARE, SHARE, _('Seek ${tkn_icon}'));
+    // if (this.getTransferCount() > 0) {
+    //   this.addCancelButton();
+    // }
   }
 
-  private updateInterfaceConfirm(familyAction: string) {
-    clearPossible();
+  private updateInterfaceConfirm() {
+    updatePageTitle(_('Confirm transfers'));
 
-    // let text: string;
-    // const args: Record<string, string> = {};
-
-    // switch (familyAction) {
-    //   case ENLIST_WRITER:
-    //     text = _('Enlist Writer ${tkn_icon}?');
-    //     args['tkn_icon'] = 'Writer';
-    // }
-
-    // updatePageTitle(text, args);
-
-    const callback = () =>
-      performAction('actFamilyAction', {
-        familyAction,
-      });
-
-    // addConfirmButton(callback);
-
-    callback();
-
-    addCancelButton();
+    addConfirmButton(() => {
+      performAction('actManagerOfShipping', {});
+    });
+    this.addCancelButton();
   }
 
   //  .##.....##.########.####.##.......####.########.##....##
@@ -105,16 +92,17 @@ class FamilyAction implements State {
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  private addButton(action: string, icon: string, text: string) {
-    if (this.args.options[action]) {
-      addSecondaryActionButton({
-        id: `${action}_btn`,
-        text: formatStringRecursive(text, {
-          tkn_icon: icon,
-        }),
-        callback: () => this.updateInterfaceConfirm(action),
-      });
-    }
+  private async returnPieces() {
+    const board = Board.getInstance();
+
+    // for (let data of Object.values(this.transfers.ships)) {
+    //   data.ship.location = data.from;
+    //   await board.moveShip({ ship: data.ship, from: data.to });
+    // }
+    // for (let data of Object.values(this.transfers.writers)) {
+    //   data.writer.location = data.from
+    //   await board.moveWriter(data.writer, data.to);
+    // }
   }
 
   //  ..######..##.......####..######..##....##
@@ -132,4 +120,15 @@ class FamilyAction implements State {
   // .##.....##.#########.##..####.##.....##.##.......##.............##
   // .##.....##.##.....##.##...###.##.....##.##.......##.......##....##
   // .##.....##.##.....##.##....##.########..########.########..######.
+
+  private addCancelButton() {
+    addDangerActionButton({
+      id: 'cancel_btn',
+      text: _('Cancel'),
+      callback: async () => {
+        await this.returnPieces();
+        this.game.onCancel();
+      },
+    });
+  }
 }

@@ -44,19 +44,25 @@ class DirectorOfTradeSpecialEnvoy implements State {
           tkn_playerName: getPlayerName(activePlayerIds[0]),
           amount: args.proposal,
           tkn_pound: 'pound',
-        }
+        },
+        true
       );
     } else if (args.proposal === 0) {
       updatePageTitle(
         _('Special Envoy: ${tkn_playerName} proposes not to make a check'),
         {
           tkn_playerName: getPlayerName(activePlayerIds[0]),
-        }
+        },
+        true
       );
     } else {
-      updatePageTitle(_('Special Envoy: ${tkn_playerName} may make a check'), {
-        tkn_playerName: getPlayerName(activePlayerIds[0]),
-      });
+      updatePageTitle(
+        _('Special Envoy: ${tkn_playerName} may make a check'),
+        {
+          tkn_playerName: getPlayerName(activePlayerIds[0]),
+        },
+        true
+      );
     }
   }
 

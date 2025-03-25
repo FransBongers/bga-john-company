@@ -116,8 +116,10 @@ class DirectorOfTradeSpecialEnvoySuccess extends \Bga\Games\JohnCompany\Models\A
     if ($order === null) {
       throw new \feException("ERROR_011");
     }
-    Notifications::log('order', $order);
+    
     $order->open($player);
+
+    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
     $this->resolveAction([], true);
   }
 

@@ -139,7 +139,7 @@ class Chairman extends \Bga\Games\JohnCompany\Models\AtomicAction
       $this->ctx->insertBefore(
         new LeafNode([
           'action' => CHAIRMAN_DEBT_CONSENT,
-          'playerId' => 'all',
+          'playerId' => 'some',
           'activePlayerIds' => Utils::filter($playerIdsWithShare, function ($pId) use ($playerId) {
             return $pId !== $playerId;
           }),
@@ -156,6 +156,7 @@ class Chairman extends \Bga\Games\JohnCompany\Models\AtomicAction
     if ($propose) {
       Engine::proceed();
     } else {
+      Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
       $this->resolveAction([], true);
     }
   }
