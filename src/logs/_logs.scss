@@ -112,6 +112,9 @@ span[style*='color:#c0c0c0'] {
   // .joco-icon[data-icon="OfficerInTraining"] {
   //   --iconScale: 0.85;
   // }
+  .joco-ship {
+    --tokenScale: 0.9;
+  }
 }
 
 #pagemaintitletext,
@@ -132,6 +135,10 @@ span[style*='color:#c0c0c0'] {
   .joco-family-member {
     display: inline-flex;
     --tokenScale: 0.85;
+  }
+
+  .joco-ship {
+    --tokenScale: 0.9;
   }
 }
 

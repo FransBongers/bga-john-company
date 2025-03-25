@@ -385,6 +385,17 @@ span[style*="color:#addb90"] {
   text-shadow: 1px 0 0 black, 0 1px 0 black, -1px 0 0 black, 0 -1px 0 black, 1px 1px 0 black, -1px 1px 0 black, 1px -1px 0 black, -1px -1px 0 black !important;
 }
 
+#page-title {
+  min-height: 52px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#pagemaintitle_wrap {
+  flex-grow: 1;
+}
+
 .joco-crown-climate-row {
   --iconScale: 1;
   width: 100%;
@@ -544,10 +555,25 @@ span[style*="color:#addb90"] {
 
 .joco-ship {
   position: absolute;
-  background-image: url("img/ship_player.png");
   width: calc(var(--tokenScale) * 40px);
   height: calc(var(--tokenScale) * 36px);
   background-size: 100% 100%;
+}
+
+.joco-ship[data-type=CompanyShip] {
+  background-image: url("img/ship_company.png");
+}
+
+.joco-ship[data-type=ExtraShip] {
+  background-image: url("img/ship_extra.png");
+}
+
+.joco-ship[data-type=playerOwnedShip] {
+  background-image: url("img/ship_player.png");
+}
+
+.joco-ship[data-type=playerOwnedShip][data-fatigued="1"] {
+  background-image: url("img/ship_player_fatigued.png");
 }
 
 .joco-family-member.selectable {
@@ -890,6 +916,9 @@ span[style*="color:#c0c0c0"] {
   --iconScale: 0.75;
   --tokenScale: 0.6;
 }
+#customActions .joco-ship {
+  --tokenScale: 0.9;
+}
 
 #pagemaintitletext,
 #gameaction_status {
@@ -911,6 +940,10 @@ span[style*="color:#c0c0c0"] {
 #gameaction_status .joco-family-member {
   display: inline-flex;
   --tokenScale: 0.85;
+}
+#pagemaintitletext .joco-ship,
+#gameaction_status .joco-ship {
+  --tokenScale: 0.9;
 }
 
 .log > .roundedbox,

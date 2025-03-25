@@ -136,6 +136,7 @@ CREATE TABLE IF NOT EXISTS `ships` (
   `ship_location` varchar(32) NOT NULL,
   `ship_state` int(10) DEFAULT 0,
   `fatigued` tinyint(1) DEFAULT 0,
+  `owner` int(10) DEFAULT NULL,
   `type` varchar(32) NOT NULL,
   PRIMARY KEY (`ship_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;

@@ -63,9 +63,13 @@ class DirectorOfTradeTransfers implements State {
     activePlayerIds: number,
     args: OnEnteringDirectorOfTradeTransfersArgs
   ) {
-    updatePageTitle(_('${tkn_playerName} may move writers or ships'), {
-      tkn_playerName: getPlayerName(activePlayerIds[0]),
-    });
+    updatePageTitle(
+      _('${tkn_playerName} may move writers or ships'),
+      {
+        tkn_playerName: getPlayerName(activePlayerIds[0]),
+      },
+      true
+    );
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########
@@ -118,6 +122,7 @@ class DirectorOfTradeTransfers implements State {
       });
       this.addCancelButton();
     }
+    addPassButton(this.args.optionalAction);
   }
 
   private updateInterfaceSelectPresidency({

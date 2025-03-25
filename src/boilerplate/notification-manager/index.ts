@@ -381,15 +381,25 @@ class NotificationManager {
   }
 
   async notif_payFromTreasury(notif: Notif<NotifPayFromTreasury>) {
-    const { amount, officeId } = notif.args;
-    Board.getInstance().treasuries[officeId].incValue(-amount);
+    const { treasury, officeId } = notif.args;
+    Board.getInstance().treasuries[officeId].toValue(treasury);
   }
 
   async notif_placeShip(notif: Notif<NotifPlaceShip>) {
     const { playerId, ship } = notif.args;
+    let placedShip = ship;
+
+    const isOtherShip = [EXTRA_SHIP, COMPANY_SHIP].includes(ship.type);
+
     const player = this.getPlayer(playerId);
-    player.counters[SHIPS_COUNTER].incValue(-1);
-    await Board.getInstance().placeShip(ship, player.ui[SHIPS_COUNTER]);
+
+    const board = Board.getInstance();
+    if (isOtherShip) {
+      placedShip = board.updateOtherShip(ship, ship.type as OtherShipType);
+    } else if (!board.shipAlreadyInZone(ship.id, ship.location)) {
+      player.counters[SHIPS_COUNTER].incValue(-1);
+    }
+    await board.placeShip(placedShip, player.ui[SHIPS_COUNTER]);
   }
 
   async notif_purchaseEnterprise(notif: Notif<NotifPurchaseEnterprise>) {

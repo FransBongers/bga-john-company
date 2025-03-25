@@ -34,3 +34,7 @@ const tplLogTokenPlayerName = ({
   name: string;
   color: string;
 }) => `<span class="playername" style="color:#${color};">${name}</span>`;
+
+const tknShipValue = ({name, type, fatigued }: {name: string; type: string; fatigued: 0 | 1}): string => {
+  return [type, name, fatigued].join(':');
+}

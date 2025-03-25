@@ -188,9 +188,13 @@ interface JocoRegionStatic {
   name: string;
 }
 
+type OtherShipType = 'ExtraShip' | 'CompanyShip';
+
 interface JocoShipBase extends GamePiece {
   type: string;
-  fatigued: boolean;
+  fatigued: 0 | 1;
+  name: string;
+  owner: number | null;
 }
 
 type JoCoSetupCard = JoCoSetupCardBase & JocoSetupCardStatic;

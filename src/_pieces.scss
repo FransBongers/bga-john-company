@@ -73,11 +73,28 @@
 
 .joco-ship {
   position: absolute;
-  background-image: url('img/ship_player.png');
+  
   width: calc(var(--tokenScale) * 40px);
   height: calc(var(--tokenScale) * 36px);
   background-size: 100% 100%;
 }
+
+.joco-ship[data-type="CompanyShip"] {
+  background-image: url('img/ship_company.png');
+}
+
+.joco-ship[data-type="ExtraShip"] {
+  background-image: url('img/ship_extra.png');
+}
+
+.joco-ship[data-type="playerOwnedShip"] {
+  background-image: url('img/ship_player.png');
+}
+
+.joco-ship[data-type="playerOwnedShip"][data-fatigued="1"] {
+  background-image: url('img/ship_player_fatigued.png');
+}
+
 
 .joco-family-member.selectable {
   cursor: pointer;

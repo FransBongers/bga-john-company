@@ -80,6 +80,7 @@ interface NotifNextPhase {
 interface NotifPayFromTreasury extends NotifWithPlayerArgs {
   officeId: string;
   amount: number;
+  treasury: number;
 }
 
 interface NotifPlaceShip extends NotifWithPlayerArgs {

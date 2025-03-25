@@ -197,6 +197,12 @@ const UNFITTED = 'unfitted';
 const SEA_ZONES = [WEST_INDIAN, EAST_INDIAN, SOUTH_INDIAN];
 
 /**
+ * Ship types
+ */
+const COMPANY_SHIP = 'CompanyShip';
+const EXTRA_SHIP = 'ExtraShip';
+
+/**
  * Power tokens
  */
 const POWER_TOKEN_COMPANY_SHARE = 'companyShare';

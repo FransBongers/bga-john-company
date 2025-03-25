@@ -114,7 +114,7 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
           }
         }
       }
-      
+
       Notifications::setupFamilyMembers($player, $familyMembers);
       Notifications::gainCash($player, $cash);
       if ($isPrimeMinister) {
@@ -126,20 +126,13 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
         $type = $item['type'];
 
         $enterprise = Enterprises::getTopOf(Locations::enterpriseSupply($type));
-        $enterprise->setLocation($familyId);
-        // Notifications::message(clienttranslate('${player_name} gains a ${enterprise}'), ['player' => $player, 'enterprise' => $type]);
+        $enterprise->changeOwner($familyId);
+
         Notifications::gainEnterprise($player, $enterprise);
 
-        if ($type === SHIPYARD) {
-          $value = $item['value'];
+        if ($type === SHIPYARD && in_array($item['value'], SEA_ZONES)) {
           $ship = $enterprise->getShip();
-          if ($value === UNFITTED) {
-            // TODO: make this the default value for Ships?
-            $ship->setLocation($enterprise->getId());
-          } else {
-            $ship->setLocation($value);
-            Notifications::placeShip($player, $ship);
-          }
+          $ship->place($player, $item['value']);
         }
       }
       // Random Blackmail card

@@ -99,7 +99,7 @@ class DirectorOfTradeSpecialEnvoy extends \Bga\Games\JohnCompany\Models\AtomicAc
     // $player = self::getPlayer();
     // Stats::incPassActionCount($player->getId(), 1);
     // Engine::resolve(PASS);
-    $this->resolveAction(PASS);
+    $this->resolveAction(PASS, true);
   }
 
   public function actDirectorOfTradeSpecialEnvoy($args)
@@ -135,7 +135,7 @@ class DirectorOfTradeSpecialEnvoy extends \Bga\Games\JohnCompany\Models\AtomicAc
     $office = Offices::get(DIRECTOR_OF_TRADE);
     $office->incTreasury(-$spend);
 
-    Notifications::payFromTreasury($player, $office, $spend);
+    Notifications::payFromTreasury($player, $office, $spend, $office->getTreasury());
     $checkResult = JoCoUtils::makeCheck($player, $office, $spend);
     if ($checkResult !== CATASTROPHIC_FAILURE && $office->getTreasury() > 0) {
       $action = [

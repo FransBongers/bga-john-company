@@ -15,7 +15,8 @@ class Ships extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   protected static $prefix = 'ship_';
   protected static $customFields = [
     'fatigued',
-    'type'
+    'type',
+    'owner',
   ];
   protected static $autoremovePrefix = false;
   protected static $autoreshuffle = false;

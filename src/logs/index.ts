@@ -6,9 +6,11 @@ const LOG_TOKEN_PLAYER_NAME = 'playerName';
 const LOG_TOKEN_CLIMATE = 'climate';
 const LOG_TOKEN_POUND = 'pound';
 const LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
+const LOG_TOKEN_FAMILY_MEMBER = 'familyMember'
 const LOG_TOKEN_ICON = 'icon';
 const LOG_TOKEN_SETUP_CARD = 'setupCard';
-const LOG_TOKEN_FAMILY_MEMBER = 'familyMember'
+const LOG_TOKEN_SHIP = 'ship';
+
 
 let tooltipIdCounter = 0;
 
@@ -40,6 +42,9 @@ const getTokenDiv = ({
       return tplLogTokenPound();
     case LOG_TOKEN_SETUP_CARD:
       return tplLogTokenSetupCard(value);
+    case LOG_TOKEN_SHIP:
+      const [type, name, fatigued] = value.split(':');
+      return createShip({type, name, fatigued: Number(fatigued) as 0 | 1, extraClasses: ['log-token']}).outerHTML;
     case LOG_TOKEN_NEW_LINE:
       return '<br class="joco-new-line">';
     case LOG_TOKEN_PLAYER_NAME:

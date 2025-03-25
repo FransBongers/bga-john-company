@@ -18,11 +18,11 @@ use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 use Bga\Games\JohnCompany\Models\Office;
 
-class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
+class MilitaryAffairs extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
   public function getState()
   {
-    return ST_MANAGER_OF_SHIPPING;
+    return ST_MILITARY_AFFAIRS;
   }
 
   // ....###....########...######....######.
@@ -33,33 +33,16 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
   // .##.....##.##....##..##....##..##....##
   // .##.....##.##.....##..######....######.
 
-  public function argsManagerOfShipping()
+  public function argsMilitaryAffairs()
   {
     $info = $this->ctx->getInfo();
     // $player = self::getPlayer();
     $activePlayerId = $info['activePlayerIds'][0];
 
-    $enterprises = Enterprises::getAll();
-    $map = Families::getFamilyIdPlayerIdMap();
-
-    $playerShips = [];
-    $otherShips = [];
-    $ships = Ships::getAll();
-
-    foreach ($ships as $ship) {
-      if ($ship->isUnfitted()) {
-        $playerShips[] = $ship;
-      } else if ($ship->isOtherShip() && $ship->isInSupply()) {
-        $otherShips[] = $ship;
-      }
-    }
-
 
     $data = [
       'activePlayerIds' => [$activePlayerId],
-      'playerShips' => $playerShips,
-      'otherShips' => $otherShips,
-      'treasury' => Offices::get(MANAGER_OF_SHIPPING)->getTreasury(),
+
     ];
 
     return $data;
@@ -81,65 +64,19 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
   // .##.....##.##....##....##.....##..##.....##.##...###
   // .##.....##..######.....##....####..#######..##....##
 
-  public function actPassManagerOfShipping()
+  public function actPassMilitaryAffairs()
   {
     $player = self::getPlayer();
     // Stats::incPassActionCount($player->getId(), 1);
     // Engine::resolve(PASS);
-    $this->resolveAction(PASS);
+    $this->resolveAction(PASS, true);
   }
 
-  public function actManagerOfShipping($args)
+  public function actMilitaryAffairs($args)
   {
-    self::checkAction('actManagerOfShipping');
+    self::checkAction('actMilitaryAffairs');
     $playerId = $this->checkPlayer();
 
-    $playerShips = $args->playerShips;
-    $companyShips = $args->companyShips;
-    $extraShips = $args->extraShips;
-
-    $office = Offices::get(MANAGER_OF_SHIPPING);
-    $player = Players::get($playerId);
-
-    $stateArgs = $this->argsManagerOfShipping();
-
-    $playerShipCount = 0;
-    $totalPayment = 0;
-    // Place player ships
-    foreach($playerShips as $shipId => $seaZone) {
-      $ship = Utils::array_find($stateArgs['playerShips'], function ($playerShip) use ($shipId) {
-        return $shipId === $playerShip->getId();
-      });
-      if ($ship === null) {
-        throw new \feException("ERROR_014");
-      }
-      $playerShipCount++;
-      $ship->place($ship->getOwner(), $seaZone);
-      $totalPayment += 3;
-    }
-
-    // Place company ships
-    foreach($companyShips as $shipId => $seaZone) {
-      if ($playerShipCount < count($stateArgs['playerShips'])) {
-        throw new \feException("ERROR_014");
-      }
-      $this->placeOtherShip($stateArgs, $player, $shipId, $seaZone, COMPANY_SHIP);
-      $totalPayment += 5;
-    }
-
-    // Place extra ships
-    foreach($extraShips as $shipId => $seaZone) {
-      $this->placeOtherShip($stateArgs, $player, $shipId, $seaZone, EXTRA_SHIP);
-      $totalPayment += 2;
-    }
-    $office->incTreasury(-$totalPayment);
-    $treasury = $office->getTreasury();
-    
-    if ($treasury < 0 || $treasury > 2) {
-      throw new \feException("ERROR_016");
-    }
-
-    Notifications::payFromTreasury($player, $office, $totalPayment, $treasury);
 
     $this->resolveAction([], true);
   }
@@ -152,13 +89,4 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  private function placeOtherShip($stateArgs, $player, $shipId, $seaZone, $type) {
-    $ship = Utils::array_find($stateArgs['otherShips'], function ($otherShip) use ($shipId) {
-      return $shipId === $otherShip->getId();
-    });
-    if ($ship === null) {
-      throw new \feException("ERROR_015");
-    }
-    $ship->place($player, $seaZone, $type);
-  }
 }

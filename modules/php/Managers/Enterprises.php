@@ -50,7 +50,7 @@ class Enterprises extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   {
     $shipyards = [];
     foreach (SHIP_NAMES as $index => $shipId) {
-      $shipyardId = 'shipyard_' . ($index + 1);
+      $shipyardId = implode('_', [SHIPYARD, $index + 1]);
       $shipyards[$shipyardId] = [
         'id' => $shipyardId,
         'location' => Locations::enterpriseSupply(SHIPYARD),
@@ -63,21 +63,21 @@ class Enterprises extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 
     self::create([
       [
-        "id" => "workshop_{INDEX}",
+        "id" => WORKSHOP . "_{INDEX}",
         "nbr" => 20,
         "nbrStart" => 1,
         'location' => Locations::enterpriseSupply(WORKSHOP),
         'type' => WORKSHOP,
       ],
       [
-        "id" => "luxury_{INDEX}",
+        "id" => LUXURY . "_{INDEX}",
         "nbr" => 16,
         "nbrStart" => 1,
         'location' => Locations::enterpriseSupply(LUXURY),
         'type' => LUXURY,
       ]
     ]);
-    foreach([LUXURY, SHIPYARD, WORKSHOP] as $enterpriseType) {
+    foreach ([LUXURY, SHIPYARD, WORKSHOP] as $enterpriseType) {
       self::shuffle(Locations::enterpriseSupply($enterpriseType));
     }
   }

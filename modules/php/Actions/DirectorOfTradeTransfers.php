@@ -136,7 +136,7 @@ class DirectorOfTradeTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
     $player = self::getPlayer();
     // Stats::incPassActionCount($player->getId(), 1);
     // Engine::resolve(PASS);
-    $this->resolveAction(PASS);
+    $this->resolveAction(PASS, true);
   }
 
   public function actDirectorOfTradeTransfers($args)

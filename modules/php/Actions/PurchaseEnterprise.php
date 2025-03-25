@@ -28,7 +28,8 @@ class PurchaseEnterprise extends \Bga\Games\JohnCompany\Models\AtomicAction
     $family = $player->getFamily();
 
     $enterprise = Enterprises::getTopOf(Locations::enterpriseSupply($enterpriseType));
-    $enterprise->setLocation($family->getId());
+
+    $enterprise->changeOwner($family->getId());
 
     $amount = $this->enterprisePrice[$enterpriseType];
 
@@ -36,6 +37,7 @@ class PurchaseEnterprise extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     // Notifications::pay($player, $amount);
     Notifications::purchaseEnterprise($player, $enterprise, $amount);
+
 
     // TODO: insert action for bonus action
   }

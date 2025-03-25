@@ -22,3 +22,16 @@ const createFamilyMember = (familyId: string, familyMemberId: number | string, e
   elt.setAttribute('data-number', `${familyMemberNumber}`);
   return elt;
 }
+
+// TODO: use id to get name
+const createShip = ({name, type, fatigued, extraClasses }: {name: string; type: string; fatigued: 0 | 1; extraClasses?: string[]}): HTMLElement => {
+  const elt = document.createElement('div');
+  
+  elt.classList.add('joco-ship');
+  (extraClasses || []).forEach((className) => elt.classList.add(className));
+
+  elt.setAttribute('data-type', type);
+  elt.setAttribute('data-fatigued', `${fatigued}`);
+
+  return elt;
+}

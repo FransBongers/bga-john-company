@@ -138,6 +138,8 @@ var EAST_INDIAN = 'eastIndian';
 var SOUTH_INDIAN = 'southIndian';
 var UNFITTED = 'unfitted';
 var SEA_ZONES = [WEST_INDIAN, EAST_INDIAN, SOUTH_INDIAN];
+var COMPANY_SHIP = 'CompanyShip';
+var EXTRA_SHIP = 'ExtraShip';
 var POWER_TOKEN_COMPANY_SHARE = 'companyShare';
 var POWER_TOKEN_MANUFACTURING = 'manufacturing';
 var POWER_TOKEN_SHIPPING = 'shipping';
@@ -676,6 +678,13 @@ var Interaction = (function () {
     Interaction.use = function () {
         return Interaction.instance;
     };
+    Interaction.prototype.addPlayerButton = function (_a) {
+        var id = _a.id, text = _a.text, playerId = _a.playerId, callback = _a.callback, extraClasses = _a.extraClasses;
+        this.addSecondaryActionButton({ id: id, text: text, callback: callback, extraClasses: "player-button ".concat(extraClasses) });
+        var elt = document.getElementById(id);
+        var playerColor = PlayerManager.getInstance().getPlayer(playerId).getColor();
+        elt.style.backgroundColor = '#' + playerColor;
+    };
     Interaction.prototype.addPrimaryActionButton = function (_a) {
         var id = _a.id, text = _a.text, callback = _a.callback, extraClasses = _a.extraClasses;
         if ($(id)) {
@@ -732,13 +741,14 @@ var Interaction = (function () {
             dojo.addClass(id, extraClasses);
         }
     };
-    Interaction.prototype.addPassButton = function (_a) {
-        var optionalAction = _a.optionalAction, text = _a.text;
+    Interaction.prototype.addPassButton = function (optionalAction, text) {
+        var _this = this;
         if (optionalAction) {
             this.addSecondaryActionButton({
                 id: 'pass_btn',
                 text: text ? _(text) : _('Pass'),
                 callback: function () {
+                    return _this.game.framework().bgaPerformAction('actPassOptionalAction');
                 },
             });
         }
@@ -1220,24 +1230,32 @@ var NotificationManager = (function () {
     };
     NotificationManager.prototype.notif_payFromTreasury = function (notif) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, amount, officeId;
+            var _a, treasury, officeId;
             return __generator(this, function (_b) {
-                _a = notif.args, amount = _a.amount, officeId = _a.officeId;
-                Board.getInstance().treasuries[officeId].incValue(-amount);
+                _a = notif.args, treasury = _a.treasury, officeId = _a.officeId;
+                Board.getInstance().treasuries[officeId].toValue(treasury);
                 return [2];
             });
         });
     };
     NotificationManager.prototype.notif_placeShip = function (notif) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, playerId, ship, player;
+            var _a, playerId, ship, placedShip, isOtherShip, player, board;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         _a = notif.args, playerId = _a.playerId, ship = _a.ship;
+                        placedShip = ship;
+                        isOtherShip = [EXTRA_SHIP, COMPANY_SHIP].includes(ship.type);
                         player = this.getPlayer(playerId);
-                        player.counters[SHIPS_COUNTER].incValue(-1);
-                        return [4, Board.getInstance().placeShip(ship, player.ui[SHIPS_COUNTER])];
+                        board = Board.getInstance();
+                        if (isOtherShip) {
+                            placedShip = board.updateOtherShip(ship, ship.type);
+                        }
+                        else if (!board.shipAlreadyInZone(ship.id, ship.location)) {
+                            player.counters[SHIPS_COUNTER].incValue(-1);
+                        }
+                        return [4, board.placeShip(placedShip, player.ui[SHIPS_COUNTER])];
                     case 1:
                         _b.sent();
                         return [2];
@@ -1422,6 +1440,10 @@ var addConfirmButton = function (callback) {
 var addDangerActionButton = function (props) {
     Interaction.use().addDangerActionButton(props);
 };
+var addPassButton = function (optionalAction, text) {
+    return Interaction.use().addPassButton(optionalAction, text);
+};
+var addPlayerButton = function (props) { return Interaction.use().addPlayerButton(props); };
 var addPrimaryActionButton = function (props) { return Interaction.use().addPrimaryActionButton(props); };
 var addSecondaryActionButton = function (props) { return Interaction.use().addSecondaryActionButton(props); };
 var addUndoButtons = function (props) {
@@ -2264,11 +2286,8 @@ var Board = (function () {
     Board.prototype.setupShips = function (gamedatas) {
         var _this = this;
         Object.values(gamedatas.ships).forEach(function (_a) {
-            var id = _a.id, type = _a.type, fatigued = _a.fatigued;
-            var elt = (_this.ships[id] = document.createElement('div'));
-            elt.classList.add('joco-ship');
-            elt.setAttribute('data-type', type);
-            elt.setAttribute('data-fatigued', fatigued ? 'true' : 'false');
+            var id = _a.id, name = _a.name, type = _a.type, fatigued = _a.fatigued;
+            _this.ships[id] = createShip({ name: name, type: type, fatigued: fatigued });
         });
         this.updateShips(Object.values(gamedatas.ships));
     };
@@ -2492,6 +2511,19 @@ var Board = (function () {
             });
         });
     };
+    Board.prototype.removeShip = function (shipId, seaZone) {
+        return __awaiter(this, void 0, void 0, function () {
+            var fromIndex;
+            return __generator(this, function (_a) {
+                this.ships[shipId].remove();
+                fromIndex = this.seas[seaZone].findIndex(function (shipInOldZone) { return (shipInOldZone === null || shipInOldZone === void 0 ? void 0 : shipInOldZone.id) === shipId; });
+                if (fromIndex >= 0) {
+                    this.seas[seaZone][fromIndex] = null;
+                }
+                return [2];
+            });
+        });
+    };
     Board.prototype.moveWriter = function (writer, from) {
         return __awaiter(this, void 0, void 0, function () {
             var fromRegion, toRegion, remainingFamilyMembers, promises;
@@ -2520,17 +2552,24 @@ var Board = (function () {
             });
         });
     };
+    Board.prototype.updateOtherShip = function (ship, type) {
+        this.ships[ship.id].setAttribute('data-type', type);
+        ship.type = type;
+        ship.name = type === 'ExtraShip' ? _('Extra Ship') : _('Company Ship');
+        return ship;
+    };
+    Board.prototype.shipAlreadyInZone = function (shipId, location) {
+        return this.seas[location].some(function (shipInLocation) { return (shipInLocation === null || shipInLocation === void 0 ? void 0 : shipInLocation.id) === shipId; });
+    };
     Board.prototype.placeShip = function (ship, fromElement) {
         return __awaiter(this, void 0, void 0, function () {
-            var id, location, nullIndex, shipIndex, position;
+            var id, location, nullIndex, shipIndex, position, enterprise, player;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         id = ship.id, location = ship.location;
-                        if (![SOUTH_INDIAN, WEST_INDIAN, EAST_INDIAN].includes(location)) return [3, 2];
-                        if (this.seas[location].some(function (shipInLocation) {
-                            return (shipInLocation === null || shipInLocation === void 0 ? void 0 : shipInLocation.id) === ship.id;
-                        })) {
+                        if (![SOUTH_INDIAN, WEST_INDIAN, EAST_INDIAN].includes(location)) return [3, 3];
+                        if (this.shipAlreadyInZone(id, location)) {
                             return [2];
                         }
                         if (!this.ships[id].parentElement) {
@@ -2550,7 +2589,15 @@ var Board = (function () {
                     case 1:
                         _a.sent();
                         _a.label = 2;
-                    case 2: return [2];
+                    case 2: return [3, 4];
+                    case 3:
+                        if (location.startsWith(SHIPYARD)) {
+                            enterprise = this.game.gamedatas.enterprises[location];
+                            player = PlayerManager.getInstance().getPlayerForFamily(enterprise.location);
+                            player.counters[SHIPS_COUNTER].incValue(1);
+                        }
+                        _a.label = 4;
+                    case 4: return [2];
                 }
             });
         });
@@ -2615,6 +2662,15 @@ var createFamilyMember = function (familyId, familyMemberId, extraClasses) {
     (extraClasses || []).forEach(function (className) { return elt.classList.add(className); });
     elt.setAttribute('data-family', familyId);
     elt.setAttribute('data-number', "".concat(familyMemberNumber));
+    return elt;
+};
+var createShip = function (_a) {
+    var name = _a.name, type = _a.type, fatigued = _a.fatigued, extraClasses = _a.extraClasses;
+    var elt = document.createElement('div');
+    elt.classList.add('joco-ship');
+    (extraClasses || []).forEach(function (className) { return elt.classList.add(className); });
+    elt.setAttribute('data-type', type);
+    elt.setAttribute('data-fatigued', "".concat(fatigued));
     return elt;
 };
 var Treasury = (function () {
@@ -2802,9 +2858,10 @@ var LOG_TOKEN_PLAYER_NAME = 'playerName';
 var LOG_TOKEN_CLIMATE = 'climate';
 var LOG_TOKEN_POUND = 'pound';
 var LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
+var LOG_TOKEN_FAMILY_MEMBER = 'familyMember';
 var LOG_TOKEN_ICON = 'icon';
 var LOG_TOKEN_SETUP_CARD = 'setupCard';
-var LOG_TOKEN_FAMILY_MEMBER = 'familyMember';
+var LOG_TOKEN_SHIP = 'ship';
 var tooltipIdCounter = 0;
 var getTokenDiv = function (_a) {
     var key = _a.key, value = _a.value, game = _a.game;
@@ -2827,6 +2884,9 @@ var getTokenDiv = function (_a) {
             return tplLogTokenPound();
         case LOG_TOKEN_SETUP_CARD:
             return tplLogTokenSetupCard(value);
+        case LOG_TOKEN_SHIP:
+            var _c = value.split(':'), type_1 = _c[0], name_1 = _c[1], fatigued = _c[2];
+            return createShip({ type: type_1, name: name_1, fatigued: Number(fatigued), extraClasses: ['log-token'] }).outerHTML;
         case LOG_TOKEN_NEW_LINE:
             return '<br class="joco-new-line">';
         case LOG_TOKEN_PLAYER_NAME:
@@ -2858,6 +2918,10 @@ var tplLogTokenSetupCard = function (id) {
 var tplLogTokenPlayerName = function (_a) {
     var name = _a.name, color = _a.color;
     return "<span class=\"playername\" style=\"color:#".concat(color, ";\">").concat(name, "</span>");
+};
+var tknShipValue = function (_a) {
+    var name = _a.name, type = _a.type, fatigued = _a.fatigued;
+    return [type, name, fatigued].join(':');
 };
 var Negotiation = (function () {
     function Negotiation(game) {
@@ -3370,6 +3434,7 @@ var DirectorOfTradeSpecialEnvoy = (function () {
             text: _('Propose'),
             callback: function () { return _this.performAction(false); },
         });
+        addPassButton(this.args.optionalAction);
     };
     DirectorOfTradeSpecialEnvoy.prototype.updateIntefaceConfirm = function () {
         var _this = this;
@@ -3411,7 +3476,7 @@ var DirectorOfTradeSpecialEnvoySuccess = (function () {
     DirectorOfTradeSpecialEnvoySuccess.prototype.setDescription = function (activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} may open trade with China or may open a closed order'), {
             tkn_playerName: getPlayerName(activePlayerIds[0]),
-        });
+        }, true);
     };
     DirectorOfTradeSpecialEnvoySuccess.prototype.updateInterfaceInitialStep = function () {
         var _this = this;
@@ -3467,7 +3532,7 @@ var DirectorOfTradeTransfers = (function () {
     DirectorOfTradeTransfers.prototype.setDescription = function (activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} may move writers or ships'), {
             tkn_playerName: getPlayerName(activePlayerIds[0]),
-        });
+        }, true);
     };
     DirectorOfTradeTransfers.prototype.updateInterfaceInitialStep = function () {
         var _this = this;
@@ -3499,6 +3564,7 @@ var DirectorOfTradeTransfers = (function () {
             });
             this.addCancelButton();
         }
+        addPassButton(this.args.optionalAction);
     };
     DirectorOfTradeTransfers.prototype.updateInterfaceSelectPresidency = function (_a) {
         var _this = this;
@@ -3841,6 +3907,10 @@ var ManagerOfShipping = (function () {
     ManagerOfShipping.prototype.onEnteringState = function (args) {
         debug('Entering ManagerOfShipping state');
         this.args = args;
+        this.placedCompanyShips = {};
+        this.placedExtraShips = {};
+        this.placedPlayerShips = {};
+        this.treasury = this.args.treasury;
         this.updateInterfaceInitialStep();
     };
     ManagerOfShipping.prototype.onLeavingState = function () {
@@ -3852,14 +3922,131 @@ var ManagerOfShipping = (function () {
         }, true);
     };
     ManagerOfShipping.prototype.updateInterfaceInitialStep = function () {
+        var _this = this;
         this.game.clearPossible();
-        updatePageTitle(_('${you} may fit, buy and lease or ships'));
+        if (this.treasury < 2) {
+            this.updateInterfaceConfirm();
+            return;
+        }
+        updatePageTitle(_('${you} may fit, buy and lease ships (£${amount} remaining)'), { amount: this.treasury });
         var board = Board.getInstance();
+        var playerShipsAvailable = false;
+        this.args.playerShips.forEach(function (ship) {
+            var id = ship.id, type = ship.type, name = ship.name, fatigued = ship.fatigued, playerId = ship.owner;
+            if (_this.placedPlayerShips[ship.id] || _this.treasury < 3) {
+                return;
+            }
+            playerShipsAvailable = true;
+            addPlayerButton({
+                id: "".concat(ship.id, "_btn"),
+                text: formatStringRecursive(_('Fit ${tkn_ship}'), {
+                    tkn_ship: tknShipValue({ type: type, name: name, fatigued: fatigued }),
+                }),
+                playerId: playerId,
+                callback: function () {
+                    _this.updateInterfaceSelectSeaZone(ship, playerId);
+                },
+            });
+        });
+        if (this.treasury >= 2) {
+            addSecondaryActionButton({
+                id: 'extraShip_btn',
+                text: formatStringRecursive(_('Lease ${tkn_ship}'), {
+                    tkn_ship: tknShipValue({
+                        type: EXTRA_SHIP,
+                        name: _('Extra Ship'),
+                        fatigued: 0,
+                    }),
+                }),
+                callback: function () {
+                    var ship = _this.args.otherShips.pop();
+                    ship.type = EXTRA_SHIP;
+                    _this.updateInterfaceSelectSeaZone(ship);
+                },
+            });
+        }
+        if (!playerShipsAvailable && this.treasury >= 5) {
+            addSecondaryActionButton({
+                id: 'companyShip_btn',
+                text: formatStringRecursive(_('Buy ${tkn_ship}'), {
+                    tkn_ship: tknShipValue({
+                        type: COMPANY_SHIP,
+                        name: _('Company Ship'),
+                        fatigued: 0,
+                    }),
+                }),
+                callback: function () {
+                    var ship = _this.args.otherShips.pop();
+                    ship.type = COMPANY_SHIP;
+                    _this.updateInterfaceSelectSeaZone(ship);
+                },
+            });
+        }
+        if (this.treasury === 2) {
+            addPrimaryActionButton({
+                id: 'done_btn',
+                text: _('Done'),
+                callback: function () { return _this.updateInterfaceConfirm(); },
+            });
+        }
+        if (Object.keys(this.placedPlayerShips).length > 0 ||
+            Object.keys(this.placedExtraShips).length > 0 ||
+            Object.keys(this.placedCompanyShips).length > 0) {
+            this.addCancelButton();
+        }
+    };
+    ManagerOfShipping.prototype.updateInterfaceSelectSeaZone = function (ship, playerId) {
+        var _this = this;
+        clearPossible();
+        var board = Board.getInstance();
+        updatePageTitle(_('${you} must select a sea zone'));
+        SEA_ZONES.forEach(function (seaZone) {
+            onClick(board.selectBoxes[seaZone], function () { return __awaiter(_this, void 0, void 0, function () {
+                var fromElt, player;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            ship.location = seaZone;
+                            fromElt = undefined;
+                            clearPossible();
+                            if (playerId) {
+                                this.placedPlayerShips[ship.id] = seaZone;
+                                player = PlayerManager.getInstance().getPlayer(playerId);
+                                player.counters[SHIPS_COUNTER].incValue(-1);
+                                fromElt = player.ui[SHIPS_COUNTER];
+                                this.pay(3);
+                            }
+                            else if (ship.type === EXTRA_SHIP) {
+                                ship = board.updateOtherShip(ship, EXTRA_SHIP);
+                                this.placedExtraShips[ship.id] = seaZone;
+                                this.pay(2);
+                            }
+                            else {
+                                ship = board.updateOtherShip(ship, COMPANY_SHIP);
+                                this.placedCompanyShips[ship.id] = seaZone;
+                                this.pay(5);
+                            }
+                            return [4, board.placeShip(ship, fromElt)];
+                        case 1:
+                            _a.sent();
+                            this.updateInterfaceInitialStep();
+                            return [2];
+                    }
+                });
+            }); });
+        });
+        this.addCancelButton();
     };
     ManagerOfShipping.prototype.updateInterfaceConfirm = function () {
-        updatePageTitle(_('Confirm transfers'));
+        var _this = this;
+        clearPossible();
+        updatePageTitle(_('Confirm ship placement'));
         addConfirmButton(function () {
-            performAction('actManagerOfShipping', {});
+            performAction('actManagerOfShipping', {
+                playerShips: _this.placedPlayerShips,
+                extraShips: _this.placedExtraShips,
+                companyShips: _this.placedCompanyShips,
+            });
         });
         this.addCancelButton();
     };
@@ -3868,6 +4055,25 @@ var ManagerOfShipping = (function () {
             var board;
             return __generator(this, function (_a) {
                 board = Board.getInstance();
+                [
+                    this.placedCompanyShips,
+                    this.placedExtraShips,
+                    this.placedPlayerShips,
+                ].forEach(function (category) {
+                    Object.entries(category).forEach(function (_a) {
+                        var shipId = _a[0], seaZone = _a[1];
+                        board.removeShip(shipId, seaZone);
+                    });
+                });
+                return [2];
+            });
+        });
+    };
+    ManagerOfShipping.prototype.pay = function (amount) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                this.treasury -= amount;
+                Board.getInstance().treasuries[MANAGER_OF_SHIPPING].toValue(this.treasury);
                 return [2];
             });
         });

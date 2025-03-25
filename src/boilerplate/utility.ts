@@ -25,6 +25,17 @@ const addDangerActionButton = (props: {
   Interaction.use().addDangerActionButton(props);
 };
 
+const addPassButton = (optionalAction: boolean, text?: string) =>
+  Interaction.use().addPassButton(optionalAction, text);
+
+const addPlayerButton = (props: {
+  id: string;
+  text: string;
+  playerId: number;
+  callback: Function | string;
+  extraClasses?: string;
+}) => Interaction.use().addPlayerButton(props);
+
 const addPrimaryActionButton = (props: {
   id: string;
   text: string;

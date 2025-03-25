@@ -17,6 +17,26 @@ class Interaction {
     return Interaction.instance;
   }
 
+  public addPlayerButton({
+    id,
+    text,
+    playerId,
+    callback,
+    extraClasses
+  }: {
+    id: string;
+    text: string;
+    playerId: number;
+    callback: Function | string;
+    extraClasses?: string;
+  }) {
+    this.addSecondaryActionButton({id, text, callback, extraClasses: `player-button ${extraClasses}`});
+    const elt = document.getElementById(id);
+    const playerColor = PlayerManager.getInstance().getPlayer(playerId).getColor();
+    // TODO: use classes so hover effect does not break?
+    elt.style.backgroundColor = '#' + playerColor;
+  }
+
   public addPrimaryActionButton({
     id,
     text,
@@ -104,23 +124,13 @@ class Interaction {
     }
   }
 
-  public addPassButton({
-    optionalAction,
-    text,
-  }: {
-    optionalAction: boolean;
-    text?: string;
-  }) {
+  public addPassButton(optionalAction: boolean, text?: string) {
     if (optionalAction) {
       this.addSecondaryActionButton({
         id: 'pass_btn',
         text: text ? _(text) : _('Pass'),
-        callback: () => {
-          // this.game.takeAction({
-          //   action: 'actPassOptionalAction',
-          //   atomicAction: false,
-          // });
-        },
+        callback: () =>
+          this.game.framework().bgaPerformAction('actPassOptionalAction'),
       });
     }
   }

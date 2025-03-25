@@ -341,13 +341,14 @@ class Notifications
     ]);
   }
 
-  public static function payFromTreasury($player, $office, $amount)
+  public static function payFromTreasury($player, $office, $amount, $treasury)
   {
     self::notifyAll('payFromTreasury', clienttranslate('${player_name} spends ${amount} ${tkn_pound} from the ${tkn_boldText_office} treasury'), [
       'player' => $player,
       'tkn_pound' => self::tknPound(),
       'officeId' => $office->getId(),
       'amount' => $amount,
+      'treasury' => $treasury,
       'tkn_boldText_office' => $office->getTitle(),
       'i18n' => ['tkn_boldText_office'],
     ]);

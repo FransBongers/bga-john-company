@@ -242,13 +242,8 @@ class Board {
   }
 
   private setupShips(gamedatas: GamedatasAlias) {
-    Object.values(gamedatas.ships).forEach(({ id, type, fatigued }) => {
-      const elt = (this.ships[id] = document.createElement('div'));
-
-      elt.classList.add('joco-ship');
-
-      elt.setAttribute('data-type', type);
-      elt.setAttribute('data-fatigued', fatigued ? 'true' : 'false');
+    Object.values(gamedatas.ships).forEach(({ id, name, type, fatigued }) => {
+      this.ships[id] = createShip({ name, type, fatigued });
     });
     this.updateShips(Object.values(gamedatas.ships));
   }
@@ -471,6 +466,16 @@ class Board {
     );
   }
 
+  public async removeShip(shipId: string, seaZone: string) {
+    this.ships[shipId].remove();
+    const fromIndex = this.seas[seaZone].findIndex(
+      (shipInOldZone: JocoShipBase | null) => shipInOldZone?.id === shipId
+    );
+    if (fromIndex >= 0) {
+      this.seas[seaZone][fromIndex] = null;
+    }
+  }
+
   public async moveWriter(writer: JocoFamilyMember, from: string) {
     const fromRegion = this.getWriterRegion(from);
     const toRegion = this.getWriterRegion(writer.location);
@@ -497,17 +502,28 @@ class Board {
     await Promise.all(promises);
   }
 
+  public updateOtherShip(
+    ship: JocoShipBase,
+    type: OtherShipType
+  ): JocoShipBase {
+    this.ships[ship.id].setAttribute('data-type', type);
+    ship.type = type;
+    ship.name = type === 'ExtraShip' ? _('Extra Ship') : _('Company Ship');
+    return ship;
+  }
+
+  public shipAlreadyInZone(shipId: string, location: string) {
+    return this.seas[location].some(
+      (shipInLocation: JocoShipBase | null) => shipInLocation?.id === shipId
+    );
+  }
+
   public async placeShip(ship: JocoShipBase, fromElement?: HTMLElement) {
     const { id, location } = ship;
     if ([SOUTH_INDIAN, WEST_INDIAN, EAST_INDIAN].includes(location)) {
       // Skip if ship is already in location, ie player already moved it when performing action
       // and this is triggered by notif.
-      if (
-        this.seas[location].some(
-          (shipInLocation: JocoShipBase | null) =>
-            shipInLocation?.id === ship.id
-        )
-      ) {
+      if (this.shipAlreadyInZone(id, location)) {
         return;
       }
       if (!this.ships[id].parentElement) {
@@ -531,9 +547,15 @@ class Board {
           })
         );
       }
+    } else if (location.startsWith(SHIPYARD)) {
+      // Unfitted
+      // TODO: place on cards in player area
+      const enterprise = this.game.gamedatas.enterprises[location];
+      const player = PlayerManager.getInstance().getPlayerForFamily(
+        enterprise.location
+      );
+      player.counters[SHIPS_COUNTER].incValue(1);
     }
-    // TODO:
-    // Unfitted ships
   }
 
   private updateShips(ships: JocoShipBase[]) {

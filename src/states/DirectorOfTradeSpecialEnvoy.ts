@@ -129,6 +129,7 @@ class DirectorOfTradeSpecialEnvoy implements State {
       callback: () => this.performAction(false),
     });
     // addCancelButton();
+    addPassButton(this.args.optionalAction);
   }
 
   private updateIntefaceConfirm() {

@@ -295,7 +295,7 @@ $machinestates = [
         'descriptionmyturn' => clienttranslate('${you}'),
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
-        'possibleactions' => ['act' . DIRECTOR_OF_TRADE_SPECIAL_ENVOY, 'actTakeAtomicAction'],
+        'possibleactions' => ['act' . DIRECTOR_OF_TRADE_SPECIAL_ENVOY, 'actPassOptionalAction', 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
@@ -309,7 +309,7 @@ $machinestates = [
         'possibleactions' => ['act' . DIRECTOR_OF_TRADE_SPECIAL_ENVOY_SUCCESS, 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
-    
+
     ST_DIRECTOR_OF_TRADE_TRANSFERS => [
         'name' => DIRECTOR_OF_TRADE_TRANSFERS,
         'type' => 'multipleactiveplayer',
@@ -317,7 +317,7 @@ $machinestates = [
         'descriptionmyturn' => clienttranslate('${you}'),
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
-        'possibleactions' => ['act' . DIRECTOR_OF_TRADE_TRANSFERS, 'actTakeAtomicAction'],
+        'possibleactions' => ['act' . DIRECTOR_OF_TRADE_TRANSFERS, 'actPassOptionalAction', 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
@@ -329,6 +329,17 @@ $machinestates = [
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
         'possibleactions' => ['act' . MANAGER_OF_SHIPPING, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_MILITARY_AFFAIRS => [
+        'name' => MILITARY_AFFAIRS,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . MILITARY_AFFAIRS, 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 ];

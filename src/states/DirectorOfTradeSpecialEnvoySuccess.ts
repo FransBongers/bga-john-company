@@ -38,7 +38,8 @@ class DirectorOfTradeSpecialEnvoySuccess implements State {
       ),
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
-      }
+      },
+      true
     );
   }
 
