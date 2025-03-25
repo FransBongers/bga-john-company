@@ -65,7 +65,9 @@ const ST_DIRECTOR_OF_TRADE_SPECIAL_ENVOY = 42;
 const ST_DIRECTOR_OF_TRADE_TRANSFERS = 43;
 const ST_MANAGER_OF_SHIPPING = 44;
 const ST_DIRECTOR_OF_TRADE_SPECIAL_ENVOY_SUCCESS = 45;
-const ST_MILITARY_AFFAIRS = 46;
+const ST_MILITARY_AFFAIRS_TRANSFERS = 46;
+const ST_MILITARY_AFFAIRS_ASSIGN = 47;
+const ST_PRESIDENCY_DECIDE_ORDER = 49;
 
 const DRAFT_CARD = 'DraftCard';
 const DRAFT_CARD_NEXT_STEP = 'DraftCardNextStep';
@@ -84,6 +86,9 @@ const CHAIRMAN_DEBT_CONSENT = 'ChairmanDebtConsent';
 const DIRECTOR_OF_TRADE_SPECIAL_ENVOY = 'DirectorOfTradeSpecialEnvoy';
 const DIRECTOR_OF_TRADE_SPECIAL_ENVOY_SUCCESS = 'DirectorOfTradeSpecialEnvoySuccess';
 const DIRECTOR_OF_TRADE_TRANSFERS = 'DirectorOfTradeTransfers';
+const MILITARY_AFFAIRS_TRANSFERS = 'MilitaryAffairsTransfers';
+const MILITARY_AFFAIRS_ASSIGN = 'MilitaryAffairsAssign';
+const PRESIDENCY_DECIDE_ORDER = 'PresidencyDecideOrder';
 
 /**
  * Company

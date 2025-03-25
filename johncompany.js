@@ -1507,6 +1507,8 @@ var JohnCompany = (function () {
             EnlistWriter: EnlistWriter,
             FamilyAction: FamilyAction,
             ManagerOfShipping: ManagerOfShipping,
+            MilitaryAffairsAssign: MilitaryAffairsAssign,
+            MilitaryAffairsTransfers: MilitaryAffairsTransfers,
             PlayerTurn: PlayerTurn,
             SeekShare: SeekShare,
         };
@@ -4097,6 +4099,385 @@ var ManagerOfShipping = (function () {
         });
     };
     return ManagerOfShipping;
+}());
+var MilitaryAffairsAssign = (function () {
+    function MilitaryAffairsAssign(game) {
+        this.game = game;
+    }
+    MilitaryAffairsAssign.create = function (game) {
+        MilitaryAffairsAssign.instance = new MilitaryAffairsAssign(game);
+    };
+    MilitaryAffairsAssign.getInstance = function () {
+        return MilitaryAffairsAssign.instance;
+    };
+    MilitaryAffairsAssign.prototype.onEnteringState = function (args) {
+        debug('Entering MilitaryAffairsAssign state');
+        this.args = args;
+        this.placedCompanyShips = {};
+        this.placedExtraShips = {};
+        this.placedPlayerShips = {};
+        this.treasury = this.args.treasury;
+        this.updateInterfaceInitialStep();
+    };
+    MilitaryAffairsAssign.prototype.onLeavingState = function () {
+        debug('Leaving MilitaryAffairsAssign state');
+    };
+    MilitaryAffairsAssign.prototype.setDescription = function (activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} may fit, buy and lease ships'), {
+            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        }, true);
+    };
+    MilitaryAffairsAssign.prototype.updateInterfaceInitialStep = function () {
+        var _this = this;
+        this.game.clearPossible();
+        if (this.treasury < 2) {
+            this.updateInterfaceConfirm();
+            return;
+        }
+        updatePageTitle(_('${you} may fit, buy and lease ships (£${amount} remaining)'), { amount: this.treasury });
+        var board = Board.getInstance();
+        var playerShipsAvailable = false;
+        this.args.playerShips.forEach(function (ship) {
+            var id = ship.id, type = ship.type, name = ship.name, fatigued = ship.fatigued, playerId = ship.owner;
+            if (_this.placedPlayerShips[ship.id] || _this.treasury < 3) {
+                return;
+            }
+            playerShipsAvailable = true;
+            addPlayerButton({
+                id: "".concat(ship.id, "_btn"),
+                text: formatStringRecursive(_('Fit ${tkn_ship}'), {
+                    tkn_ship: tknShipValue({ type: type, name: name, fatigued: fatigued }),
+                }),
+                playerId: playerId,
+                callback: function () {
+                    _this.updateInterfaceSelectSeaZone(ship, playerId);
+                },
+            });
+        });
+        if (this.treasury >= 2) {
+            addSecondaryActionButton({
+                id: 'extraShip_btn',
+                text: formatStringRecursive(_('Lease ${tkn_ship}'), {
+                    tkn_ship: tknShipValue({
+                        type: EXTRA_SHIP,
+                        name: _('Extra Ship'),
+                        fatigued: 0,
+                    }),
+                }),
+                callback: function () {
+                    var ship = _this.args.otherShips.pop();
+                    ship.type = EXTRA_SHIP;
+                    _this.updateInterfaceSelectSeaZone(ship);
+                },
+            });
+        }
+        if (!playerShipsAvailable && this.treasury >= 5) {
+            addSecondaryActionButton({
+                id: 'companyShip_btn',
+                text: formatStringRecursive(_('Buy ${tkn_ship}'), {
+                    tkn_ship: tknShipValue({
+                        type: COMPANY_SHIP,
+                        name: _('Company Ship'),
+                        fatigued: 0,
+                    }),
+                }),
+                callback: function () {
+                    var ship = _this.args.otherShips.pop();
+                    ship.type = COMPANY_SHIP;
+                    _this.updateInterfaceSelectSeaZone(ship);
+                },
+            });
+        }
+        if (this.treasury === 2) {
+            addPrimaryActionButton({
+                id: 'done_btn',
+                text: _('Done'),
+                callback: function () { return _this.updateInterfaceConfirm(); },
+            });
+        }
+        if (Object.keys(this.placedPlayerShips).length > 0 ||
+            Object.keys(this.placedExtraShips).length > 0 ||
+            Object.keys(this.placedCompanyShips).length > 0) {
+            this.addCancelButton();
+        }
+    };
+    MilitaryAffairsAssign.prototype.updateInterfaceSelectSeaZone = function (ship, playerId) {
+        var _this = this;
+        clearPossible();
+        var board = Board.getInstance();
+        updatePageTitle(_('${you} must select a sea zone'));
+        SEA_ZONES.forEach(function (seaZone) {
+            onClick(board.selectBoxes[seaZone], function () { return __awaiter(_this, void 0, void 0, function () {
+                var fromElt, player;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            ship.location = seaZone;
+                            fromElt = undefined;
+                            clearPossible();
+                            if (playerId) {
+                                this.placedPlayerShips[ship.id] = seaZone;
+                                player = PlayerManager.getInstance().getPlayer(playerId);
+                                player.counters[SHIPS_COUNTER].incValue(-1);
+                                fromElt = player.ui[SHIPS_COUNTER];
+                                this.pay(3);
+                            }
+                            else if (ship.type === EXTRA_SHIP) {
+                                ship = board.updateOtherShip(ship, EXTRA_SHIP);
+                                this.placedExtraShips[ship.id] = seaZone;
+                                this.pay(2);
+                            }
+                            else {
+                                ship = board.updateOtherShip(ship, COMPANY_SHIP);
+                                this.placedCompanyShips[ship.id] = seaZone;
+                                this.pay(5);
+                            }
+                            return [4, board.placeShip(ship, fromElt)];
+                        case 1:
+                            _a.sent();
+                            this.updateInterfaceInitialStep();
+                            return [2];
+                    }
+                });
+            }); });
+        });
+        this.addCancelButton();
+    };
+    MilitaryAffairsAssign.prototype.updateInterfaceConfirm = function () {
+        var _this = this;
+        clearPossible();
+        updatePageTitle(_('Confirm ship placement'));
+        addConfirmButton(function () {
+            performAction('actMilitaryAffairsAssign', {
+                playerShips: _this.placedPlayerShips,
+                extraShips: _this.placedExtraShips,
+                companyShips: _this.placedCompanyShips,
+            });
+        });
+        this.addCancelButton();
+    };
+    MilitaryAffairsAssign.prototype.returnPieces = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var board;
+            return __generator(this, function (_a) {
+                board = Board.getInstance();
+                [
+                    this.placedCompanyShips,
+                    this.placedExtraShips,
+                    this.placedPlayerShips,
+                ].forEach(function (category) {
+                    Object.entries(category).forEach(function (_a) {
+                        var shipId = _a[0], seaZone = _a[1];
+                        board.removeShip(shipId, seaZone);
+                    });
+                });
+                return [2];
+            });
+        });
+    };
+    MilitaryAffairsAssign.prototype.pay = function (amount) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                this.treasury -= amount;
+                Board.getInstance().treasuries[MANAGER_OF_SHIPPING].toValue(this.treasury);
+                return [2];
+            });
+        });
+    };
+    MilitaryAffairsAssign.prototype.addCancelButton = function () {
+        var _this = this;
+        addDangerActionButton({
+            id: 'cancel_btn',
+            text: _('Cancel'),
+            callback: function () { return __awaiter(_this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4, this.returnPieces()];
+                        case 1:
+                            _a.sent();
+                            this.game.onCancel();
+                            return [2];
+                    }
+                });
+            }); },
+        });
+    };
+    return MilitaryAffairsAssign;
+}());
+var MilitaryAffairsTransfers = (function () {
+    function MilitaryAffairsTransfers(game) {
+        this.game = game;
+    }
+    MilitaryAffairsTransfers.create = function (game) {
+        MilitaryAffairsTransfers.instance = new MilitaryAffairsTransfers(game);
+    };
+    MilitaryAffairsTransfers.getInstance = function () {
+        return MilitaryAffairsTransfers.instance;
+    };
+    MilitaryAffairsTransfers.prototype.onEnteringState = function (args) {
+        var _a;
+        debug('Entering MilitaryAffairsTransfers state');
+        this.args = args;
+        this.transfers = (_a = args.transfers) !== null && _a !== void 0 ? _a : {
+            ships: {},
+            writers: {},
+        };
+        this.updateInterfaceInitialStep();
+    };
+    MilitaryAffairsTransfers.prototype.onLeavingState = function () {
+        debug('Leaving MilitaryAffairsTransfers state');
+    };
+    MilitaryAffairsTransfers.prototype.setDescription = function (activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} may make Army transfers'), {
+            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        }, true);
+    };
+    MilitaryAffairsTransfers.prototype.updateInterfaceInitialStep = function () {
+        this.game.clearPossible();
+        var transferCount = this.getTransferCount();
+        if (transferCount === 2) {
+            this.updateInterfaceConfirm();
+            return;
+        }
+        updatePageTitle(_('${you} may make up to two Army transfers (${number} remaining)'), {
+            number: 2 - this.getTransferCount(),
+        });
+        addPassButton(this.args.optionalAction);
+    };
+    MilitaryAffairsTransfers.prototype.updateInterfaceSelectPresidency = function (_a) {
+        var _this = this;
+        var writer = _a.familyMember, locations = _a.locations;
+        clearPossible();
+        var board = Board.getInstance();
+        setSelected(board.familyMembers[writer.id]);
+        locations.forEach(function (newLocation) {
+            onClick(board.selectBoxes[newLocation], function () { return __awaiter(_this, void 0, void 0, function () {
+                var from;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.transfers.writers[writer.id] = {
+                                writer: writer,
+                                from: writer.location,
+                                to: newLocation,
+                            };
+                            from = writer.location;
+                            writer.location = newLocation;
+                            return [4, board.moveWriter(writer, from)];
+                        case 1:
+                            _a.sent();
+                            this.updateInterfaceInitialStep();
+                            return [2];
+                    }
+                });
+            }); });
+        });
+        this.addCancelButton();
+    };
+    MilitaryAffairsTransfers.prototype.updateInterfaceSelectSeaZone = function (_a) {
+        var _this = this;
+        var ship = _a.ship, locations = _a.locations;
+        clearPossible();
+        var board = Board.getInstance();
+        setSelected(board.ships[ship.id]);
+        locations.forEach(function (seaZone) {
+            onClick(board.selectBoxes[seaZone], function () { return __awaiter(_this, void 0, void 0, function () {
+                var from;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            clearPossible();
+                            from = ship.location;
+                            ship.location = seaZone;
+                            this.transfers.ships[ship.id] = {
+                                from: from,
+                                to: seaZone,
+                                ship: ship,
+                            };
+                            return [4, board.moveShip({ ship: ship, from: from })];
+                        case 1:
+                            _a.sent();
+                            this.updateInterfaceInitialStep();
+                            return [2];
+                    }
+                });
+            }); });
+        });
+        this.addCancelButton();
+    };
+    MilitaryAffairsTransfers.prototype.updateInterfaceConfirm = function () {
+        var _this = this;
+        clearPossible();
+        updatePageTitle(_('Confirm transfers'));
+        addConfirmButton(function () {
+            performAction('actMilitaryAffairsTransfers', {
+                transfers: _this.transfers,
+            });
+        });
+        this.addCancelButton();
+    };
+    MilitaryAffairsTransfers.prototype.getTransferCount = function () {
+        return (Object.keys(this.transfers.ships).length +
+            Object.keys(this.transfers.writers).length);
+    };
+    MilitaryAffairsTransfers.prototype.returnPieces = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var board, _i, _a, data, _b, _c, data;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
+                    case 0:
+                        board = Board.getInstance();
+                        _i = 0, _a = Object.values(this.transfers.ships);
+                        _d.label = 1;
+                    case 1:
+                        if (!(_i < _a.length)) return [3, 4];
+                        data = _a[_i];
+                        data.ship.location = data.from;
+                        return [4, board.moveShip({ ship: data.ship, from: data.to })];
+                    case 2:
+                        _d.sent();
+                        _d.label = 3;
+                    case 3:
+                        _i++;
+                        return [3, 1];
+                    case 4:
+                        _b = 0, _c = Object.values(this.transfers.writers);
+                        _d.label = 5;
+                    case 5:
+                        if (!(_b < _c.length)) return [3, 8];
+                        data = _c[_b];
+                        data.writer.location = data.from;
+                        return [4, board.moveWriter(data.writer, data.to)];
+                    case 6:
+                        _d.sent();
+                        _d.label = 7;
+                    case 7:
+                        _b++;
+                        return [3, 5];
+                    case 8: return [2];
+                }
+            });
+        });
+    };
+    MilitaryAffairsTransfers.prototype.addCancelButton = function () {
+        var _this = this;
+        addDangerActionButton({
+            id: 'cancel_btn',
+            text: _('Cancel'),
+            callback: function () { return __awaiter(_this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4, this.returnPieces()];
+                        case 1:
+                            _a.sent();
+                            this.game.onCancel();
+                            return [2];
+                    }
+                });
+            }); },
+        });
+    };
+    return MilitaryAffairsTransfers;
 }());
 var PlayerTurn = (function () {
     function PlayerTurn(game) {

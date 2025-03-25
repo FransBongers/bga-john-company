@@ -66,6 +66,8 @@ class JohnCompany implements Game {
     EnlistWriter,
     FamilyAction,
     ManagerOfShipping,
+    MilitaryAffairsAssign,
+    MilitaryAffairsTransfers,
     PlayerTurn,
     SeekShare,
   };

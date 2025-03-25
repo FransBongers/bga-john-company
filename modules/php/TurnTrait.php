@@ -213,21 +213,66 @@ trait TurnTrait
       ],
     ];
 
-    Engine::setup($node, ['method' => 'stSetupCompanyOperation']);
+    Engine::setup($node, ['method' => 'stSetupManagerOfShipping']);
     Engine::proceed();
   }
 
-  function stSetupCompanyOperation()
+  function stSetupManagerOfShipping()
   {
     $offices = Offices::getAll();
 
-    $officesInGame = [MANAGER_OF_SHIPPING, MILITARY_AFFAIRS];
+    $officesInGame = [MANAGER_OF_SHIPPING];
     $node = [
       'children' => array_map(function ($officeId) use ($offices) {
         return [
           'action' => $officeId,
           'playerId' => 'some',
           'activePlayerIds' => [$offices[$officeId]->getPlayerId()],
+        ];
+      }, $officesInGame),
+    ];
+
+    Engine::setup($node, ['method' => 'stSetupMilitaryAffairs']);
+    Engine::proceed();
+  }
+
+  function stSetupMilitaryAffairs()
+  {
+    $playerId = Offices::get(MILITARY_AFFAIRS)->getPlayerId();
+
+    $node = [
+      'children' => [
+        [
+          'action' => MILITARY_AFFAIRS_TRANSFERS,
+          'playerId' => 'some',
+          'activePlayerIds' => [$playerId],
+          'optional' => true,
+        ],
+        [
+          'action' => MILITARY_AFFAIRS_ASSIGN,
+          'playerId' => 'some',
+          'activePlayerIds' => [$playerId],
+          'optional' => true,
+        ]
+      ],
+    ];
+
+    Engine::setup($node, ['method' => 'stSetupPresidencyOperations']);
+    Engine::proceed();
+  }
+
+  function stSetupPresidencyOperations()
+  {
+    $offices = Offices::getAll();
+
+    $officesInGame = [PRESIDENT_OF_BOMBAY, PRESIDENT_OF_MADRAS, PRESIDENT_OF_BENGAL];
+    $node = [
+      'children' => array_map(function ($officeId) use ($offices) {
+        return [
+          'action' => PRESIDENCY_DECIDE_ORDER,
+          'playerId' => 'some',
+          'activePlayerIds' => [$offices[$officeId]->getPlayerId()],
+          'officeId' => $officeId,
         ];
       }, $officesInGame),
     ];

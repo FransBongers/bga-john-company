@@ -332,14 +332,36 @@ $machinestates = [
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
-    ST_MILITARY_AFFAIRS => [
-        'name' => MILITARY_AFFAIRS,
+    ST_MILITARY_AFFAIRS_TRANSFERS => [
+        'name' => MILITARY_AFFAIRS_TRANSFERS,
         'type' => 'multipleactiveplayer',
         'description' => clienttranslate('${actplayer}'),
         'descriptionmyturn' => clienttranslate('${you}'),
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
-        'possibleactions' => ['act' . MILITARY_AFFAIRS, 'actTakeAtomicAction'],
+        'possibleactions' => ['act' . MILITARY_AFFAIRS_TRANSFERS, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_MILITARY_AFFAIRS_ASSIGN => [
+        'name' => MILITARY_AFFAIRS_ASSIGN,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . MILITARY_AFFAIRS_ASSIGN, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_PRESIDENCY_DECIDE_ORDER => [
+        'name' => PRESIDENCY_DECIDE_ORDER,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . PRESIDENCY_DECIDE_ORDER, 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 ];

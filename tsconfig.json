@@ -64,6 +64,8 @@
     "src/states/EnlistWriter.ts",
     "src/states/FamilyAction.ts",
     "src/states/ManagerOfShipping.ts",
+    "src/states/MilitaryAffairsAssign.ts",
+    "src/states/MilitaryAffairsTransfers.ts",
     "src/states/PlayerTurn.ts",
     "src/states/SeekShare.ts",
     "src/static-data/index.ts",

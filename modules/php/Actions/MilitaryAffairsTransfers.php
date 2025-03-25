@@ -18,11 +18,11 @@ use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 use Bga\Games\JohnCompany\Models\Office;
 
-class MilitaryAffairs extends \Bga\Games\JohnCompany\Models\AtomicAction
+class MilitaryAffairsTransfers extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
   public function getState()
   {
-    return ST_MILITARY_AFFAIRS;
+    return ST_MILITARY_AFFAIRS_TRANSFERS;
   }
 
   // ....###....########...######....######.
@@ -33,7 +33,7 @@ class MilitaryAffairs extends \Bga\Games\JohnCompany\Models\AtomicAction
   // .##.....##.##....##..##....##..##....##
   // .##.....##.##.....##..######....######.
 
-  public function argsMilitaryAffairs()
+  public function argsMilitaryAffairsTransfers()
   {
     $info = $this->ctx->getInfo();
     // $player = self::getPlayer();
@@ -64,7 +64,7 @@ class MilitaryAffairs extends \Bga\Games\JohnCompany\Models\AtomicAction
   // .##.....##.##....##....##.....##..##.....##.##...###
   // .##.....##..######.....##....####..#######..##....##
 
-  public function actPassMilitaryAffairs()
+  public function actPassMilitaryAffairsTransfers()
   {
     $player = self::getPlayer();
     // Stats::incPassActionCount($player->getId(), 1);
@@ -72,9 +72,9 @@ class MilitaryAffairs extends \Bga\Games\JohnCompany\Models\AtomicAction
     $this->resolveAction(PASS, true);
   }
 
-  public function actMilitaryAffairs($args)
+  public function actMilitaryAffairsTransfers($args)
   {
-    self::checkAction('actMilitaryAffairs');
+    self::checkAction('actMilitaryAffairsTransfers');
     $playerId = $this->checkPlayer();
 
 
