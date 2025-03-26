@@ -35,3 +35,10 @@ const createShip = ({name, type, fatigued, extraClasses }: {name: string; type: 
 
   return elt;
 }
+
+const createRegiment = (extraClasses: string[] = []): HTMLElement => {
+  const elt = document.createElement('div');
+  elt.classList.add('joco-regiment');
+  extraClasses.forEach((className) => elt.classList.add(className));
+  return elt;
+}

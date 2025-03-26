@@ -79,7 +79,7 @@ class PurchaseShipyard extends \Bga\Games\JohnCompany\Actions\PurchaseEnterprise
   {
     $treasury = $family->getTreasury();
 
-    return $treasury >= 2 && Enterprises::countInLocation(Locations::enterpriseSupply(LUXURY)) > 0;
+    return $treasury >= 2 && Enterprises::countInLocation(Locations::supplyEnterprises(LUXURY)) > 0;
   }
 
   // ..######..########...#######..##......##.##....##

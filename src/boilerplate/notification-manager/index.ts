@@ -71,6 +71,7 @@ class NotificationManager {
       'increaseCompanyDebt',
       'makeCheck',
       'moveFamilyMembers',
+      'moveRegiment',
       'moveShip',
       'moveWriter',
       'newCompanyShare',
@@ -349,6 +350,11 @@ class NotificationManager {
       )
     );
     board.updateFamilyMembers(familyMembers);
+  }
+
+  async notif_moveRegiment(notif: Notif<NotifMoveRegiment>) {
+    const { from, regiment } = notif.args;
+    await Board.getInstance().moveRegimentBetweenArmies(regiment, from);
   }
 
   async notif_moveShip(notif: Notif<NotifMoveShipArgs>) {

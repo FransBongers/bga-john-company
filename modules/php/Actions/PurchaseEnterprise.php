@@ -27,7 +27,7 @@ class PurchaseEnterprise extends \Bga\Games\JohnCompany\Models\AtomicAction
     $player = Players::get($playerId);
     $family = $player->getFamily();
 
-    $enterprise = Enterprises::getTopOf(Locations::enterpriseSupply($enterpriseType));
+    $enterprise = Enterprises::getTopOf(Locations::supplyEnterprises($enterpriseType));
 
     $enterprise->changeOwner($family->getId());
 

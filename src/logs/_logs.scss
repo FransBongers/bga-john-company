@@ -140,13 +140,17 @@ span[style*='color:#c0c0c0'] {
   .joco-ship {
     --tokenScale: 0.9;
   }
+
+  .joco-regiment {
+    --tokenScale: 1;
+  }
 }
 
 .log > .roundedbox,
 .log > .roundedboxinner {
   --tokenScale: 0.6;
   --iconScale: 0.7;
-  
+
   .joco-setup-card {
     --cardScale: 0.74;
   }
@@ -160,5 +164,9 @@ span[style*='color:#c0c0c0'] {
     --tokenScale: 0.8;
     top: -4px;
     margin-top: 4px;
+  }
+
+  .joco-regiment {
+    --tokenScale: 0.8;
   }
 }

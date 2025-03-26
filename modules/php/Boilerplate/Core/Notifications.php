@@ -127,10 +127,16 @@ class Notifications
     return clienttranslate('Pounds');
   }
 
+  protected static function tknRegiment()
+  {
+    return clienttranslate('Regiment');
+  }
+
+
   protected static function tknFamilyMember($familyMember)
   {
     $number = intval(explode('_', $familyMember->getId())[2]) % 18;
-    
+
     return implode(':', [$familyMember->getFamilyId(), $number]);
   }
 
@@ -141,6 +147,16 @@ class Notifications
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private static function getRegionNameForArmy($armyId)
+  {
+    $idNameMap = [
+      BENGAL_ARMY => clienttranslate('Bengal'),
+      BOMBAY_ARMY => clienttranslate('Bombay'),
+      MADRAS_ARMY => clienttranslate('Madras'),
+    ];
+    return $idNameMap[$armyId];
+  }
 
   private static function getSeaName($seaId)
   {
@@ -412,6 +428,19 @@ class Notifications
       // 'result' => $checkResult,
       'tkn_boldText_checkResult' => $translatedResultMap[$checkResult],
       'i18n' => ['tkn_boldText_checkResult']
+    ]);
+  }
+
+  public static function moveRegiment($player, $regiment, $from)
+  {
+    self::notifyAll('moveRegiment', clienttranslate('${player_name} moves ${tkn_regiment} from the army of ${tkn_boldText_from} to the army of ${tkn_boldText_to}'), [
+      'player' => $player,
+      'regiment' => $regiment->jsonSerialize(),
+      'from' => $from,
+      'tkn_regiment' => self::tknRegiment(),
+      'tkn_boldText_from' => self::getRegionNameForArmy($from),
+      'tkn_boldText_to' => self::getRegionNameForArmy($regiment->getLocation()),
+      'i18n' => ['tkn_boldText_from', 'tkn_boldText_to'],
     ]);
   }
 

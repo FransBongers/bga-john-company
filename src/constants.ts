@@ -186,6 +186,18 @@ const BENGAL_PRESIDENCY = 'BengalPresidency';
 const BOMBAY_PRESIDENCY = 'BombayPresidency';
 const MADRAS_PRESIDENCY = 'MadrasPresidency';
 
+const BENGAL_ARMY = 'Army_Bengal';
+const BOMBAY_ARMY = 'Army_Bombay';
+const MADRAS_ARMY = 'Army_Madras';
+
+const ARMIES = [BENGAL_ARMY, BOMBAY_ARMY, MADRAS_ARMY];
+
+const ARMY_REGION_MAP = {
+  [BENGAL_ARMY]: BENGAL,
+  [BOMBAY_ARMY]: BOMBAY,
+  [MADRAS_ARMY]: MADRAS,
+};
+
 /**
  * Ship locations
  */

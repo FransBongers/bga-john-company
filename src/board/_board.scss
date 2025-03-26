@@ -80,11 +80,11 @@
   position: absolute;
   background-image: url('img/regiment.jpg');
   background-size: 100% 100%;
-  width: calc(var(--boardScale) * 35px);
-  height: calc(var(--boardScale) * 35px);
-  top: calc(var(--boardScale) * 22px);
-  left: calc(var(--boardScale) * 694px);
-  border: calc(var(--boardScale) * 1px) solid black;
+  width: calc(var(--tokenScale) * 35px);
+  height: calc(var(--tokenScale) * 35px);
+  // top: calc(var(--tokenScale) * 22px);
+  // left: calc(var(--tokenScale) * 694px);
+  border: calc(var(--tokenScale) * 1px) solid black;
   border-radius: 12%;
 }
 
@@ -164,6 +164,13 @@
   display: none;
 }
 
+.joco-select-box.joco-select-army {
+  width: calc(var(--tokenScale) * 160px);
+  height: calc(var(--tokenScale) * 110px);
+  border-radius: calc(var(--boardScale) * 6px);
+}
+
+
 .joco-select-box.joco-select-sea-zone {
   width: calc(var(--tokenScale) * 55px);
   height: calc(var(--tokenScale) * 55px);
@@ -228,6 +235,7 @@
   border-radius: 50%;
 }
 
+.joco-regiment.selectable,
 .joco-order.selectable,
 .joco-select-box.selectable {
   cursor: pointer;
@@ -235,6 +243,8 @@
   outline: calc(var(--boardScale) * 4px) solid base.$selectable-color !important;
 }
 
+.joco-regiment.selected,
+.joco-regiment.selectable:hover,
 .joco-order.selected,
 .joco-order.selectable:hover,
 .joco-select-box.selected,

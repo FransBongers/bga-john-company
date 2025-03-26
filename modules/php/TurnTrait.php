@@ -252,7 +252,6 @@ trait TurnTrait
           'action' => MILITARY_AFFAIRS_ASSIGN,
           'playerId' => 'some',
           'activePlayerIds' => [$playerId],
-          'optional' => true,
         ]
       ],
     ];

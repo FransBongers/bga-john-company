@@ -2,7 +2,7 @@
 
 namespace Bga\Games\JohnCompany\ArmyPieces;
 
-use Bga\Games\JohnCompany\Managers\Ships;
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 
 class Regiment extends \Bga\Games\JohnCompany\Models\ArmyPiece
 {
@@ -11,5 +11,12 @@ class Regiment extends \Bga\Games\JohnCompany\Models\ArmyPiece
     parent::__construct($row);
     $this->name = clienttranslate('Regiment');
     $this->type = REGIMENT;
+  }
+
+  public function moveTo($player, $newLocation)
+  {
+    $from = $this->getLocation();
+    $this->setLocation($newLocation);
+    Notifications::moveRegiment($player, $this, $from);
   }
 }

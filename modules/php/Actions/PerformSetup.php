@@ -125,7 +125,7 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
       foreach ($enterprises as $item) {
         $type = $item['type'];
 
-        $enterprise = Enterprises::getTopOf(Locations::enterpriseSupply($type));
+        $enterprise = Enterprises::getTopOf(Locations::supplyEnterprises($type));
         $enterprise->changeOwner($familyId);
 
         Notifications::gainEnterprise($player, $enterprise);

@@ -4,14 +4,61 @@ namespace Bga\Games\JohnCompany\Boilerplate\Helpers;
 
 class Locations
 {
-  public static function familyMemberSupply($familyId)
+  public static function armyOf($regionId)
   {
-    return 'supply_' . $familyId;
+    return 'Army_' . $regionId;
+  }
+
+  public static function commander($presidencyId)
+  {
+    return 'Commander_' . $presidencyId;
   }
 
   public static function draft($familyId)
   {
     return 'draft_' . $familyId;
+  }
+
+  public static function familyMemberSupply($familyId)
+  {
+    return 'supply_' . $familyId;
+  }
+
+  // public static function officers($presidencyId)
+  // {
+  //   return 'Officers_' . $presidencyId;
+  // }
+
+  public static function officerInTraining()
+  {
+    return OFFICER_IN_TRAINING;
+  }
+
+  public static function supplyEnterprises($type)
+  {
+    return 'supply_' . $type;
+  }
+
+
+  public static function supplyOtherShips()
+  {
+    return SUPPLY_OTHER_SHIPS;
+  }
+
+  public static function supplyRegiments()
+  {
+    return SUPPLY_REGIMENTS;
+  }
+
+  public static function supplyPlayerShips()
+  {
+    return SUPPLY_PLAYER_SHIPS;
+  }
+
+
+  public static function presidency($regionId)
+  {
+    return $regionId . 'Presidency';
   }
 
   public static function setupCards($familyId)
@@ -24,45 +71,11 @@ class Locations
     return 'Writers_' . $regionId;
   }
 
-  public static function officers($presidencyId)
-  {
-    return 'Officers_' . $presidencyId;
-  }
 
-  public static function officerInTraining()
-  {
-    return OFFICER_IN_TRAINING;
-  }
 
-  public static function presidency($regionId)
-  {
-    return $regionId . 'Presidency';
-  }
 
-  public static function commander($presidencyId)
-  {
-    return 'Commander_' . $presidencyId;
-  }
 
-  public static function playerShipsSupply()
-  {
-    return SUPPLY_PLAYER_SHIPS;
-  }
 
-  public static function otherShipsSupply()
-  {
-    return SUPPLY_OTHER_SHIPS;
-  }
-
-  public static function enterpriseSupply($type)
-  {
-    return 'supply_' . $type;
-  }
-
-  public static function regimentsSupply()
-  {
-    return SUPPLY_REGIMENTS;
-  }
 
   public static function londonSeasonPool($type)
   {

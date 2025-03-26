@@ -104,4 +104,12 @@ class FamilyMembers extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
       return Utils::startsWith($familyMember->getLocation(),'Writers_');
     });
   }
+
+  public static function getOfficers()
+  {
+    $allMembers = self::getAll()->toArray();
+    return Utils::filter($allMembers, function ($familyMember) {
+      return Utils::startsWith($familyMember->getLocation(),'Officers_');
+    });
+  }
 }

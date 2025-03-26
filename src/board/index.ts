@@ -20,24 +20,24 @@ class Board {
     treasuries: HTMLElement;
   };
   public familyMembers: Record<string, HTMLElement> = {};
-  private armyPieces: Record<string, HTMLElement> = {};
+  public armyPieces: Record<string, HTMLElement> = {};
   public ships: Record<string, HTMLElement> = {};
   public selectBoxes: Record<string, HTMLElement> = {};
 
   private courtOfDirectors: JocoFamilyMember[] = [];
   public orders: Record<string, HTMLElement> = {};
   private regions: Record<string, Region> = {};
-  private armies: {
+  public armies: {
     regiments: {
-      BengalPresidency: JocoArmyPieceBase[];
-      BombayPresidency: JocoArmyPieceBase[];
-      MadrasPresidency: JocoArmyPieceBase[];
+      Army_Bengal: JocoArmyPieceBase[];
+      Army_Bombay: JocoArmyPieceBase[];
+      Army_Madras: JocoArmyPieceBase[];
     };
   } = {
     regiments: {
-      [BENGAL_PRESIDENCY]: [],
-      [BOMBAY_PRESIDENCY]: [],
-      [MADRAS_PRESIDENCY]: [],
+      [BENGAL_ARMY]: [],
+      [BOMBAY_ARMY]: [],
+      [MADRAS_ARMY]: [],
     },
   };
   public writers: {
@@ -116,8 +116,7 @@ class Board {
   private setupArmyPieces(gamedatas: GamedatasAlias) {
     Object.entries(gamedatas.armyPieces).forEach(([id, piece]) => {
       if (id.startsWith('Regiment')) {
-        const elt = (this.armyPieces[id] = document.createElement('div'));
-        elt.classList.add('joco-regiment');
+        this.armyPieces[id] = createRegiment();
       }
     });
     this.updateArmyPieces(Object.values(gamedatas.armyPieces));
@@ -205,6 +204,13 @@ class Board {
   }
 
   private setupSelectBoxes() {
+    ARMIES.forEach((army) => {
+      const elt = (this.selectBoxes[army] = document.createElement('div'));
+      elt.classList.add('joco-select-box');
+      elt.classList.add('joco-select-army');
+      setAbsolutePosition(elt, BOARD_SCALE, ARMY_SELECT_POSITIONS[army]);
+      this.ui.selectBoxes.appendChild(elt);
+    });
     [BENGAL, BOMBAY, MADRAS].forEach((region) => {
       const elt = (this.selectBoxes[`Writers_${region}`] =
         document.createElement('div'));
@@ -268,14 +274,17 @@ class Board {
   // ..#######..##........########..##.....##....##....########.....#######..####
 
   updateArmyPieces(pieces: JocoArmyPieceBase[]) {
-    this.ui.regiments.replaceChildren();
+    // this.ui.regiments.replaceChildren();
     pieces.forEach((piece) => {
       if (piece.location.startsWith('supply')) {
         return;
       }
       if (piece.id.startsWith('Regiment')) {
         const elt = this.armyPieces[piece.id];
-        this.ui.regiments.appendChild(elt);
+        if (!this.armyPieces[piece.id].parentElement) {
+          this.ui.regiments.appendChild(elt);
+        }
+        
         setAbsolutePosition(
           elt,
           BOARD_SCALE,
@@ -285,7 +294,7 @@ class Board {
             piece.exhausted
           )
         );
-        this.armies.regiments[piece.location].push(elt);
+        this.armies.regiments[piece.location].push(piece);
       }
     });
   }
@@ -437,6 +446,49 @@ class Board {
     this.updatePawn('standing', standing);
     this.updatePawn('phase', gamedatas.phase);
     this.updatePawn('turn', gamedatas.turn);
+  }
+
+  public async moveRegiment(regiment: JocoArmyPieceBase, index: number = 0) {
+    await Interaction.use().wait(index * 200);
+
+    const fromRect = this.armyPieces[regiment.id].getBoundingClientRect();
+
+    this.updateArmyPieces([regiment]);
+    await this.game.animationManager.play(
+      new BgaSlideAnimation({
+        element: this.armyPieces[regiment.id],
+        transitionTimingFunction: 'ease-in-out',
+        fromRect,
+      })
+    );
+  }
+
+  public async moveRegimentBetweenArmies(
+    regiment: JocoArmyPieceBase,
+    from: string
+  ) {
+    // Skip if regiment is already in location, ie player already moved it when performing action
+    // and this is triggered by notif.
+    if (
+      this.armies.regiments[regiment.location].some(
+        (regimentInLocation: JocoFamilyMember) =>
+          regimentInLocation.id === regiment.id
+      )
+    ) {
+      return;
+    }
+
+    const remainingRegiments = this.armies.regiments[from].filter(
+      (piece: JocoArmyPieceBase) => piece.id !== regiment.id
+    );
+
+    this.armies.regiments[from] = [];
+    const promises = remainingRegiments.map((remaining: JocoArmyPieceBase) =>
+      this.moveRegiment(remaining)
+    );
+
+    promises.push(this.moveRegiment(regiment));
+    await Promise.all(promises);
   }
 
   public async moveShip({

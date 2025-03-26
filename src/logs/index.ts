@@ -8,9 +8,11 @@ const LOG_TOKEN_POUND = 'pound';
 const LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
 const LOG_TOKEN_FAMILY_MEMBER = 'familyMember'
 const LOG_TOKEN_ICON = 'icon';
+const LOG_TOKEN_REGIMENT = 'regiment';
 const LOG_TOKEN_SETUP_CARD = 'setupCard';
 const LOG_TOKEN_SHIP = 'ship';
 
+const CLASS_LOG_TOKEN = 'log-token';
 
 let tooltipIdCounter = 0;
 
@@ -37,14 +39,16 @@ const getTokenDiv = ({
       return tplLogTokenIcon(value);
     case LOG_TOKEN_FAMILY_MEMBER:
       const [familyId, number] = value.split(':');
-      return createFamilyMember(familyId, Number(number), ['log-token']).outerHTML;
+      return createFamilyMember(familyId, Number(number), [CLASS_LOG_TOKEN]).outerHTML;
     case LOG_TOKEN_POUND:
       return tplLogTokenPound();
+    case LOG_TOKEN_REGIMENT:
+      return createRegiment([CLASS_LOG_TOKEN]).outerHTML;
     case LOG_TOKEN_SETUP_CARD:
       return tplLogTokenSetupCard(value);
     case LOG_TOKEN_SHIP:
       const [type, name, fatigued] = value.split(':');
-      return createShip({type, name, fatigued: Number(fatigued) as 0 | 1, extraClasses: ['log-token']}).outerHTML;
+      return createShip({type, name, fatigued: Number(fatigued) as 0 | 1, extraClasses: [CLASS_LOG_TOKEN]}).outerHTML;
     case LOG_TOKEN_NEW_LINE:
       return '<br class="joco-new-line">';
     case LOG_TOKEN_PLAYER_NAME:

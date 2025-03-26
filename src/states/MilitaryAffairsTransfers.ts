@@ -1,13 +1,22 @@
-
 interface OnEnteringMilitaryAffairsTransfersArgs extends CommonStateArgs {
   options: {
-
+    officers: Record<
+      string,
+      { familyMember: JocoFamilyMember; locations: string[] }
+    >;
+    regiments: Record<
+      string,
+      { regiment: JocoArmyPieceBase; locations: string[] }
+    >;
   };
   transfers: {
-    ships: Record<string, { ship: JocoShipBase; from: string; to: string }>;
-    writers: Record<
+    regiments: Record<
       string,
-      { writer: JocoFamilyMember; from: string; to: string }
+      { regiment: JocoArmyPieceBase; from: string; to: string }
+    >;
+    officers: Record<
+      string,
+      { officer: JocoFamilyMember; from: string; to: string }
     >;
   } | null;
 }
@@ -16,10 +25,13 @@ class MilitaryAffairsTransfers implements State {
   private static instance: MilitaryAffairsTransfers;
   private args: OnEnteringMilitaryAffairsTransfersArgs;
   private transfers: {
-    ships: Record<string, { ship: JocoShipBase; from: string; to: string }>;
-    writers: Record<
+    regiments: Record<
       string,
-      { writer: JocoFamilyMember; from: string; to: string }
+      { regiment: JocoArmyPieceBase; from: string; to: string }
+    >;
+    officers: Record<
+      string,
+      { officer: JocoFamilyMember; from: string; to: string }
     >;
   };
 
@@ -37,8 +49,8 @@ class MilitaryAffairsTransfers implements State {
     debug('Entering MilitaryAffairsTransfers state');
     this.args = args;
     this.transfers = args.transfers ?? {
-      ships: {},
-      writers: {},
+      officers: {},
+      regiments: {},
     };
     this.updateInterfaceInitialStep();
   }
@@ -91,83 +103,89 @@ class MilitaryAffairsTransfers implements State {
         number: 2 - this.getTransferCount(),
       }
     );
-    // const board = Board.getInstance();
-    // Object.entries(this.args.options.writers).forEach(([id, data]) =>
-    //   onClick(board.familyMembers[id], () =>
-    //     this.updateInterfaceSelectPresidency(data)
-    //   )
-    // );
+    const board = Board.getInstance();
+    Object.entries(this.args.options.regiments).forEach(([id, data]) => {
+      if (this.transfers.regiments[id]) {
+        return;
+      }
+      onClick(board.armyPieces[id], () =>
+        this.updateInterfaceSelectArmyForRegiment(data)
+      );
+    });
 
     // Object.entries(this.args.options.ships).forEach(([id, data]) =>
     //   onClick(board.ships[id], () => this.updateInterfaceSelectSeaZone(data))
     // );
 
-    // if (this.getTransferCount() > 0) {
-    //   addPrimaryActionButton({
-    //     id: 'done_btn',
-    //     text: _('Done'),
-    //     callback: () => this.updateInterfaceConfirm(),
-    //   });
-    //   this.addCancelButton();
-    // }
-    addPassButton(this.args.optionalAction);
-  }
-
-  private updateInterfaceSelectPresidency({
-    familyMember: writer,
-    locations,
-  }: {
-    familyMember: JocoFamilyMember;
-    locations: string[];
-  }) {
-    clearPossible();
-    const board = Board.getInstance();
-    setSelected(board.familyMembers[writer.id]);
-
-    locations.forEach((newLocation) => {
-      onClick(board.selectBoxes[newLocation], async () => {
-        this.transfers.writers[writer.id] = {
-          writer,
-          from: writer.location,
-          to: newLocation,
-        };
-        const from = writer.location;
-        writer.location = newLocation;
-        await board.moveWriter(writer, from);
-        this.updateInterfaceInitialStep();
+    if (this.getTransferCount() > 0) {
+      addPrimaryActionButton({
+        id: 'done_btn',
+        text: _('Done'),
+        callback: () => this.updateInterfaceConfirm(),
       });
-    });
-
-    this.addCancelButton();
+      this.addCancelButton();
+    } else {
+      addPassButton(this.args.optionalAction);
+    }
   }
 
-  private updateInterfaceSelectSeaZone({
-    ship,
+  private updateInterfaceSelectArmyForRegiment({
+    regiment,
     locations,
   }: {
-    ship: JocoShipBase;
+    regiment: JocoArmyPieceBase;
     locations: string[];
   }) {
     clearPossible();
     const board = Board.getInstance();
-    setSelected(board.ships[ship.id]);
 
-    locations.forEach((seaZone) => {
-      onClick(board.selectBoxes[seaZone], async () => {
-        clearPossible();
-        const from = ship.location;
-        ship.location = seaZone;
-        this.transfers.ships[ship.id] = {
+    setSelected(board.armyPieces[regiment.id]);
+
+    locations.forEach((to) => {
+      onClick(board.selectBoxes[to], async () => {
+        const from = regiment.location;
+        this.transfers.regiments[regiment.id] = {
+          regiment,
           from,
-          to: seaZone,
-          ship,
+          to,
         };
-        await board.moveShip({ ship, from });
+        regiment.location = to;
+        clearPossible();
+        await board.moveRegimentBetweenArmies(regiment, from);
         this.updateInterfaceInitialStep();
       });
     });
+
     this.addCancelButton();
   }
+
+  // private updateInterfaceSelectSeaZone({
+  //   ship,
+  //   locations,
+  // }: {
+  //   ship: JocoShipBase;
+  //   locations: string[];
+  // }) {
+  //   clearPossible();
+  //   const board = Board.getInstance();
+  //   setSelected(board.ships[ship.id]);
+
+  //   locations.forEach((seaZone) => {
+  //     onClick(board.selectBoxes[seaZone], async () => {
+  //       clearPossible();
+  //       const from = ship.location;
+  //       ship.location = seaZone;
+  //       this.transfers.ships[ship.id] = {
+  //         from,
+  //         to: seaZone,
+  //         ship,
+  //       };
+  //       await board.moveShip({ ship, from });
+  //       this.updateInterfaceInitialStep();
+  //     });
+  //   });
+  //   this.addCancelButton();
+  // }
 
   private updateInterfaceConfirm() {
     clearPossible();
@@ -191,38 +209,24 @@ class MilitaryAffairsTransfers implements State {
 
   private getTransferCount() {
     return (
-      Object.keys(this.transfers.ships).length +
-      Object.keys(this.transfers.writers).length
+      Object.keys(this.transfers.officers).length +
+      Object.keys(this.transfers.regiments).length
     );
   }
 
-  // private async moveWriter(writer: JocoFamilyMember, from: string) {
-  //   const board = Board.getInstance();
-  //   const fromRegion = writer.location.split('_')[1];
 
-  //   const remainingFamilyMembers = board.writers[fromRegion].filter(
-  //     (member: JocoFamilyMember) => member.id !== writer.id
-  //   );
-
-  //   board.writers[fromRegion] = [];
-  //   const promises = remainingFamilyMembers.map((member: JocoFamilyMember) =>
-  //     board.moveFamilyMember(member)
-  //   );
-  //   promises.push(board.moveFamilyMember(writer));
-  //   await Promise.all(promises);
-  // }
 
   private async returnPieces() {
     const board = Board.getInstance();
 
-    for (let data of Object.values(this.transfers.ships)) {
-      data.ship.location = data.from;
-      await board.moveShip({ ship: data.ship, from: data.to });
+    for (let data of Object.values(this.transfers.regiments)) {
+      data.regiment.location = data.from;
+      await board.moveRegimentBetweenArmies(data.regiment, data.to);
     }
-    for (let data of Object.values(this.transfers.writers)) {
-      data.writer.location = data.from;
-      await board.moveWriter(data.writer, data.to);
-    }
+    // for (let data of Object.values(this.transfers.writers)) {
+    //   data.writer.location = data.from;
+    //   await board.moveWriter(data.writer, data.to);
+    // }
   }
 
   //  ..######..##.......####..######..##....##

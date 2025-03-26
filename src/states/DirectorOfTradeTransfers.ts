@@ -121,8 +121,9 @@ class DirectorOfTradeTransfers implements State {
         callback: () => this.updateInterfaceConfirm(),
       });
       this.addCancelButton();
+    } else {
+      addPassButton(this.args.optionalAction);
     }
-    addPassButton(this.args.optionalAction);
   }
 
   private updateInterfaceSelectPresidency({
@@ -207,22 +208,6 @@ class DirectorOfTradeTransfers implements State {
       Object.keys(this.transfers.writers).length
     );
   }
-
-  // private async moveWriter(writer: JocoFamilyMember, from: string) {
-  //   const board = Board.getInstance();
-  //   const fromRegion = writer.location.split('_')[1];
-
-  //   const remainingFamilyMembers = board.writers[fromRegion].filter(
-  //     (member: JocoFamilyMember) => member.id !== writer.id
-  //   );
-
-  //   board.writers[fromRegion] = [];
-  //   const promises = remainingFamilyMembers.map((member: JocoFamilyMember) =>
-  //     board.moveFamilyMember(member)
-  //   );
-  //   promises.push(board.moveFamilyMember(writer));
-  //   await Promise.all(promises);
-  // }
 
   private async returnPieces() {
     const board = Board.getInstance();

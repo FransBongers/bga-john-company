@@ -152,7 +152,6 @@ class DirectorOfTradeTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
     $player = Players::get($playerId);
 
     foreach ($shipTransfers as $shipId => $data) {
-      Notifications::log('shipTransfer', $shipId);
       $to = $data->to;
       if (!(isset($stateArgs['options']['ships'][$shipId]) && in_array($to, $stateArgs['options']['ships'][$shipId]['locations']))) {
         throw new \feException("ERROR_012");

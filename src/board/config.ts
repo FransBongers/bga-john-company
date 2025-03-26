@@ -86,16 +86,16 @@ const getGroupPosition = (
 };
 
 const getRegimentPosition = (
-  presidency: string,
+  location: string,
   index: number,
   exhausted: boolean
 ): AbsolutePosition => {
-  switch (presidency) {
-    case BOMBAY_PRESIDENCY:
+  switch (location) {
+    case BOMBAY_ARMY:
       return getGroupPosition(22, 694, index, 4);
-    case BENGAL_PRESIDENCY:
+    case BENGAL_ARMY:
       return getGroupPosition(408, 694, index, 4);
-    case MADRAS_PRESIDENCY:
+    case MADRAS_ARMY:
       return getGroupPosition(215, 694, index, 4);
     default:
       return { top: 0, left: 0 };
@@ -248,6 +248,12 @@ const POWER_TOKEN_POSITIONS: AbsolutePosition[] = [
   { top: 159, left: 251 },
   { top: 159, left: 301 },
 ];
+
+const ARMY_SELECT_POSITIONS: Record<string,AbsolutePosition> = {
+  [BOMBAY_ARMY]: { top: 21, left: 692 },
+  [MADRAS_ARMY]: { top: 214, left: 692 },
+  [BENGAL_ARMY]: { top: 407, left: 692 },
+};
 
 const COMPANY_DEBT_SELECT_POSITIONS: AbsolutePosition[] = [
   { top: 157, left: 365.5 },

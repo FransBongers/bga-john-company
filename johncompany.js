@@ -1,4 +1,4 @@
-var _a, _b;
+var _a, _b, _c;
 var BOARD_SCALE = 'boardScale';
 var PLUS = 'plus';
 var MINUS = 'minus';
@@ -133,6 +133,15 @@ var PUNJAB = 'Punjab';
 var BENGAL_PRESIDENCY = 'BengalPresidency';
 var BOMBAY_PRESIDENCY = 'BombayPresidency';
 var MADRAS_PRESIDENCY = 'MadrasPresidency';
+var BENGAL_ARMY = 'Army_Bengal';
+var BOMBAY_ARMY = 'Army_Bombay';
+var MADRAS_ARMY = 'Army_Madras';
+var ARMIES = [BENGAL_ARMY, BOMBAY_ARMY, MADRAS_ARMY];
+var ARMY_REGION_MAP = (_b = {},
+    _b[BENGAL_ARMY] = BENGAL,
+    _b[BOMBAY_ARMY] = BOMBAY,
+    _b[MADRAS_ARMY] = MADRAS,
+    _b);
 var WEST_INDIAN = 'westIndian';
 var EAST_INDIAN = 'eastIndian';
 var SOUTH_INDIAN = 'southIndian';
@@ -151,12 +160,12 @@ var POWER_TOKENS = [
     POWER_TOKEN_SHIPPING,
     POWER_TOKEN_SOCIAL,
 ];
-var POWER_TOKEN_ICON_MAP = (_b = {},
-    _b[POWER_TOKEN_COMPANY_SHARE] = SHARE,
-    _b[POWER_TOKEN_MANUFACTURING] = WORKSHOP,
-    _b[POWER_TOKEN_SHIPPING] = SHIPYARD,
-    _b[POWER_TOKEN_SOCIAL] = LUXURY,
-    _b);
+var POWER_TOKEN_ICON_MAP = (_c = {},
+    _c[POWER_TOKEN_COMPANY_SHARE] = SHARE,
+    _c[POWER_TOKEN_MANUFACTURING] = WORKSHOP,
+    _c[POWER_TOKEN_SHIPPING] = SHIPYARD,
+    _c[POWER_TOKEN_SOCIAL] = LUXURY,
+    _c);
 var ENLIST_WRITER = 'EnlistWriter';
 var ENLIST_OFFICER = 'EnlistOfficer';
 var PURCHASE_LUXURY = 'PurchaseLuxury';
@@ -847,6 +856,7 @@ var NotificationManager = (function () {
             'increaseCompanyDebt',
             'makeCheck',
             'moveFamilyMembers',
+            'moveRegiment',
             'moveShip',
             'moveWriter',
             'newCompanyShare',
@@ -1157,6 +1167,21 @@ var NotificationManager = (function () {
                     case 1:
                         _a.sent();
                         board.updateFamilyMembers(familyMembers);
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_moveRegiment = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, from, regiment;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = notif.args, from = _a.from, regiment = _a.regiment;
+                        return [4, Board.getInstance().moveRegimentBetweenArmies(regiment, from)];
+                    case 1:
+                        _b.sent();
                         return [2];
                 }
             });
@@ -1892,7 +1917,7 @@ var Bar = (function () {
     return Bar;
 }());
 var tplTabButton = function (text, index) { return "\n<div id=\"joco-bar-item-".concat(index, "\" class=\"joco-bar-item\">").concat(text, "</div>\n"); };
-var _a, _b, _c, _d, _e, _f;
+var _a, _b, _c, _d, _e, _f, _g;
 var ORDERS_CONFIG = (_a = {},
     _a[ORDER_PUNJAB_1] = { top: 22.5, left: 933 },
     _a[ORDER_DELHI_1] = { top: 15, left: 1069 },
@@ -1969,13 +1994,13 @@ var getGroupPosition = function (top, left, index, rowSize) {
         left: left + 39 * column,
     };
 };
-var getRegimentPosition = function (presidency, index, exhausted) {
-    switch (presidency) {
-        case BOMBAY_PRESIDENCY:
+var getRegimentPosition = function (location, index, exhausted) {
+    switch (location) {
+        case BOMBAY_ARMY:
             return getGroupPosition(22, 694, index, 4);
-        case BENGAL_PRESIDENCY:
+        case BENGAL_ARMY:
             return getGroupPosition(408, 694, index, 4);
-        case MADRAS_PRESIDENCY:
+        case MADRAS_ARMY:
             return getGroupPosition(215, 694, index, 4);
         default:
             return { top: 0, left: 0 };
@@ -2110,6 +2135,11 @@ var POWER_TOKEN_POSITIONS = [
     { top: 159, left: 251 },
     { top: 159, left: 301 },
 ];
+var ARMY_SELECT_POSITIONS = (_f = {},
+    _f[BOMBAY_ARMY] = { top: 21, left: 692 },
+    _f[MADRAS_ARMY] = { top: 214, left: 692 },
+    _f[BENGAL_ARMY] = { top: 407, left: 692 },
+    _f);
 var COMPANY_DEBT_SELECT_POSITIONS = [
     { top: 157, left: 365.5 },
     { top: 157, left: 400 },
@@ -2121,11 +2151,11 @@ var COMPANY_DEBT_SELECT_POSITIONS = [
     { top: 157, left: 606 },
     { top: 157, left: 640 },
 ];
-var SEA_ZONE_SELECT_POSITIONS = (_f = {},
-    _f[WEST_INDIAN] = { top: 377, left: 885 },
-    _f[SOUTH_INDIAN] = { top: 432, left: 1219 },
-    _f[EAST_INDIAN] = { top: 301, left: 1317 },
-    _f);
+var SEA_ZONE_SELECT_POSITIONS = (_g = {},
+    _g[WEST_INDIAN] = { top: 377, left: 885 },
+    _g[SOUTH_INDIAN] = { top: 432, left: 1219 },
+    _g[EAST_INDIAN] = { top: 301, left: 1317 },
+    _g);
 var Board = (function () {
     function Board(game) {
         var _a, _b, _c;
@@ -2138,9 +2168,9 @@ var Board = (function () {
         this.regions = {};
         this.armies = {
             regiments: (_a = {},
-                _a[BENGAL_PRESIDENCY] = [],
-                _a[BOMBAY_PRESIDENCY] = [],
-                _a[MADRAS_PRESIDENCY] = [],
+                _a[BENGAL_ARMY] = [],
+                _a[BOMBAY_ARMY] = [],
+                _a[MADRAS_ARMY] = [],
                 _a),
         };
         this.writers = (_b = {},
@@ -2195,8 +2225,7 @@ var Board = (function () {
         Object.entries(gamedatas.armyPieces).forEach(function (_a) {
             var id = _a[0], piece = _a[1];
             if (id.startsWith('Regiment')) {
-                var elt = (_this.armyPieces[id] = document.createElement('div'));
-                elt.classList.add('joco-regiment');
+                _this.armyPieces[id] = createRegiment();
             }
         });
         this.updateArmyPieces(Object.values(gamedatas.armyPieces));
@@ -2254,6 +2283,13 @@ var Board = (function () {
     };
     Board.prototype.setupSelectBoxes = function () {
         var _this = this;
+        ARMIES.forEach(function (army) {
+            var elt = (_this.selectBoxes[army] = document.createElement('div'));
+            elt.classList.add('joco-select-box');
+            elt.classList.add('joco-select-army');
+            setAbsolutePosition(elt, BOARD_SCALE, ARMY_SELECT_POSITIONS[army]);
+            _this.ui.selectBoxes.appendChild(elt);
+        });
         [BENGAL, BOMBAY, MADRAS].forEach(function (region) {
             var elt = (_this.selectBoxes["Writers_".concat(region)] =
                 document.createElement('div'));
@@ -2307,16 +2343,17 @@ var Board = (function () {
     };
     Board.prototype.updateArmyPieces = function (pieces) {
         var _this = this;
-        this.ui.regiments.replaceChildren();
         pieces.forEach(function (piece) {
             if (piece.location.startsWith('supply')) {
                 return;
             }
             if (piece.id.startsWith('Regiment')) {
                 var elt = _this.armyPieces[piece.id];
-                _this.ui.regiments.appendChild(elt);
+                if (!_this.armyPieces[piece.id].parentElement) {
+                    _this.ui.regiments.appendChild(elt);
+                }
                 setAbsolutePosition(elt, BOARD_SCALE, getRegimentPosition(piece.location, _this.armies.regiments[piece.location].length, piece.exhausted));
-                _this.armies.regiments[piece.location].push(elt);
+                _this.armies.regiments[piece.location].push(piece);
             }
         });
     };
@@ -2485,6 +2522,55 @@ var Board = (function () {
         this.updatePawn('standing', standing);
         this.updatePawn('phase', gamedatas.phase);
         this.updatePawn('turn', gamedatas.turn);
+    };
+    Board.prototype.moveRegiment = function (regiment_1) {
+        return __awaiter(this, arguments, void 0, function (regiment, index) {
+            var fromRect;
+            if (index === void 0) { index = 0; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, Interaction.use().wait(index * 200)];
+                    case 1:
+                        _a.sent();
+                        fromRect = this.armyPieces[regiment.id].getBoundingClientRect();
+                        this.updateArmyPieces([regiment]);
+                        return [4, this.game.animationManager.play(new BgaSlideAnimation({
+                                element: this.armyPieces[regiment.id],
+                                transitionTimingFunction: 'ease-in-out',
+                                fromRect: fromRect,
+                            }))];
+                    case 2:
+                        _a.sent();
+                        return [2];
+                }
+            });
+        });
+    };
+    Board.prototype.moveRegimentBetweenArmies = function (regiment, from) {
+        return __awaiter(this, void 0, void 0, function () {
+            var remainingRegiments, promises;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (this.armies.regiments[regiment.location].some(function (regimentInLocation) {
+                            return regimentInLocation.id === regiment.id;
+                        })) {
+                            return [2];
+                        }
+                        remainingRegiments = this.armies.regiments[from].filter(function (piece) { return piece.id !== regiment.id; });
+                        this.armies.regiments[from] = [];
+                        promises = remainingRegiments.map(function (remaining) {
+                            return _this.moveRegiment(remaining);
+                        });
+                        promises.push(this.moveRegiment(regiment));
+                        return [4, Promise.all(promises)];
+                    case 1:
+                        _a.sent();
+                        return [2];
+                }
+            });
+        });
     };
     Board.prototype.moveShip = function (_a) {
         return __awaiter(this, arguments, void 0, function (_b) {
@@ -2675,6 +2761,13 @@ var createShip = function (_a) {
     elt.setAttribute('data-fatigued', "".concat(fatigued));
     return elt;
 };
+var createRegiment = function (extraClasses) {
+    if (extraClasses === void 0) { extraClasses = []; }
+    var elt = document.createElement('div');
+    elt.classList.add('joco-regiment');
+    extraClasses.forEach(function (className) { return elt.classList.add(className); });
+    return elt;
+};
 var Treasury = (function () {
     function Treasury(props) {
         this.setup(props);
@@ -2862,8 +2955,10 @@ var LOG_TOKEN_POUND = 'pound';
 var LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
 var LOG_TOKEN_FAMILY_MEMBER = 'familyMember';
 var LOG_TOKEN_ICON = 'icon';
+var LOG_TOKEN_REGIMENT = 'regiment';
 var LOG_TOKEN_SETUP_CARD = 'setupCard';
 var LOG_TOKEN_SHIP = 'ship';
+var CLASS_LOG_TOKEN = 'log-token';
 var tooltipIdCounter = 0;
 var getTokenDiv = function (_a) {
     var key = _a.key, value = _a.value, game = _a.game;
@@ -2881,14 +2976,16 @@ var getTokenDiv = function (_a) {
             return tplLogTokenIcon(value);
         case LOG_TOKEN_FAMILY_MEMBER:
             var _b = value.split(':'), familyId = _b[0], number = _b[1];
-            return createFamilyMember(familyId, Number(number), ['log-token']).outerHTML;
+            return createFamilyMember(familyId, Number(number), [CLASS_LOG_TOKEN]).outerHTML;
         case LOG_TOKEN_POUND:
             return tplLogTokenPound();
+        case LOG_TOKEN_REGIMENT:
+            return createRegiment([CLASS_LOG_TOKEN]).outerHTML;
         case LOG_TOKEN_SETUP_CARD:
             return tplLogTokenSetupCard(value);
         case LOG_TOKEN_SHIP:
             var _c = value.split(':'), type_1 = _c[0], name_1 = _c[1], fatigued = _c[2];
-            return createShip({ type: type_1, name: name_1, fatigued: Number(fatigued), extraClasses: ['log-token'] }).outerHTML;
+            return createShip({ type: type_1, name: name_1, fatigued: Number(fatigued), extraClasses: [CLASS_LOG_TOKEN] }).outerHTML;
         case LOG_TOKEN_NEW_LINE:
             return '<br class="joco-new-line">';
         case LOG_TOKEN_PLAYER_NAME:
@@ -3566,7 +3663,9 @@ var DirectorOfTradeTransfers = (function () {
             });
             this.addCancelButton();
         }
-        addPassButton(this.args.optionalAction);
+        else {
+            addPassButton(this.args.optionalAction);
+        }
     };
     DirectorOfTradeTransfers.prototype.updateInterfaceSelectPresidency = function (_a) {
         var _this = this;
@@ -4128,78 +4227,9 @@ var MilitaryAffairsAssign = (function () {
         }, true);
     };
     MilitaryAffairsAssign.prototype.updateInterfaceInitialStep = function () {
-        var _this = this;
         this.game.clearPossible();
-        if (this.treasury < 2) {
-            this.updateInterfaceConfirm();
-            return;
-        }
-        updatePageTitle(_('${you} may fit, buy and lease ships (£${amount} remaining)'), { amount: this.treasury });
         var board = Board.getInstance();
         var playerShipsAvailable = false;
-        this.args.playerShips.forEach(function (ship) {
-            var id = ship.id, type = ship.type, name = ship.name, fatigued = ship.fatigued, playerId = ship.owner;
-            if (_this.placedPlayerShips[ship.id] || _this.treasury < 3) {
-                return;
-            }
-            playerShipsAvailable = true;
-            addPlayerButton({
-                id: "".concat(ship.id, "_btn"),
-                text: formatStringRecursive(_('Fit ${tkn_ship}'), {
-                    tkn_ship: tknShipValue({ type: type, name: name, fatigued: fatigued }),
-                }),
-                playerId: playerId,
-                callback: function () {
-                    _this.updateInterfaceSelectSeaZone(ship, playerId);
-                },
-            });
-        });
-        if (this.treasury >= 2) {
-            addSecondaryActionButton({
-                id: 'extraShip_btn',
-                text: formatStringRecursive(_('Lease ${tkn_ship}'), {
-                    tkn_ship: tknShipValue({
-                        type: EXTRA_SHIP,
-                        name: _('Extra Ship'),
-                        fatigued: 0,
-                    }),
-                }),
-                callback: function () {
-                    var ship = _this.args.otherShips.pop();
-                    ship.type = EXTRA_SHIP;
-                    _this.updateInterfaceSelectSeaZone(ship);
-                },
-            });
-        }
-        if (!playerShipsAvailable && this.treasury >= 5) {
-            addSecondaryActionButton({
-                id: 'companyShip_btn',
-                text: formatStringRecursive(_('Buy ${tkn_ship}'), {
-                    tkn_ship: tknShipValue({
-                        type: COMPANY_SHIP,
-                        name: _('Company Ship'),
-                        fatigued: 0,
-                    }),
-                }),
-                callback: function () {
-                    var ship = _this.args.otherShips.pop();
-                    ship.type = COMPANY_SHIP;
-                    _this.updateInterfaceSelectSeaZone(ship);
-                },
-            });
-        }
-        if (this.treasury === 2) {
-            addPrimaryActionButton({
-                id: 'done_btn',
-                text: _('Done'),
-                callback: function () { return _this.updateInterfaceConfirm(); },
-            });
-        }
-        if (Object.keys(this.placedPlayerShips).length > 0 ||
-            Object.keys(this.placedExtraShips).length > 0 ||
-            Object.keys(this.placedCompanyShips).length > 0) {
-            this.addCancelButton();
-        }
     };
     MilitaryAffairsAssign.prototype.updateInterfaceSelectSeaZone = function (ship, playerId) {
         var _this = this;
@@ -4319,8 +4349,8 @@ var MilitaryAffairsTransfers = (function () {
         debug('Entering MilitaryAffairsTransfers state');
         this.args = args;
         this.transfers = (_a = args.transfers) !== null && _a !== void 0 ? _a : {
-            ships: {},
-            writers: {},
+            officers: {},
+            regiments: {},
         };
         this.updateInterfaceInitialStep();
     };
@@ -4333,6 +4363,7 @@ var MilitaryAffairsTransfers = (function () {
         }, true);
     };
     MilitaryAffairsTransfers.prototype.updateInterfaceInitialStep = function () {
+        var _this = this;
         this.game.clearPossible();
         var transferCount = this.getTransferCount();
         if (transferCount === 2) {
@@ -4342,59 +4373,49 @@ var MilitaryAffairsTransfers = (function () {
         updatePageTitle(_('${you} may make up to two Army transfers (${number} remaining)'), {
             number: 2 - this.getTransferCount(),
         });
-        addPassButton(this.args.optionalAction);
-    };
-    MilitaryAffairsTransfers.prototype.updateInterfaceSelectPresidency = function (_a) {
-        var _this = this;
-        var writer = _a.familyMember, locations = _a.locations;
-        clearPossible();
         var board = Board.getInstance();
-        setSelected(board.familyMembers[writer.id]);
-        locations.forEach(function (newLocation) {
-            onClick(board.selectBoxes[newLocation], function () { return __awaiter(_this, void 0, void 0, function () {
-                var from;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            this.transfers.writers[writer.id] = {
-                                writer: writer,
-                                from: writer.location,
-                                to: newLocation,
-                            };
-                            from = writer.location;
-                            writer.location = newLocation;
-                            return [4, board.moveWriter(writer, from)];
-                        case 1:
-                            _a.sent();
-                            this.updateInterfaceInitialStep();
-                            return [2];
-                    }
-                });
-            }); });
+        Object.entries(this.args.options.regiments).forEach(function (_a) {
+            var id = _a[0], data = _a[1];
+            if (_this.transfers.regiments[id]) {
+                return;
+            }
+            onClick(board.armyPieces[id], function () {
+                return _this.updateInterfaceSelectArmyForRegiment(data);
+            });
         });
-        this.addCancelButton();
+        if (this.getTransferCount() > 0) {
+            addPrimaryActionButton({
+                id: 'done_btn',
+                text: _('Done'),
+                callback: function () { return _this.updateInterfaceConfirm(); },
+            });
+            this.addCancelButton();
+        }
+        else {
+            addPassButton(this.args.optionalAction);
+        }
     };
-    MilitaryAffairsTransfers.prototype.updateInterfaceSelectSeaZone = function (_a) {
+    MilitaryAffairsTransfers.prototype.updateInterfaceSelectArmyForRegiment = function (_a) {
         var _this = this;
-        var ship = _a.ship, locations = _a.locations;
+        var regiment = _a.regiment, locations = _a.locations;
         clearPossible();
         var board = Board.getInstance();
-        setSelected(board.ships[ship.id]);
-        locations.forEach(function (seaZone) {
-            onClick(board.selectBoxes[seaZone], function () { return __awaiter(_this, void 0, void 0, function () {
+        setSelected(board.armyPieces[regiment.id]);
+        locations.forEach(function (to) {
+            onClick(board.selectBoxes[to], function () { return __awaiter(_this, void 0, void 0, function () {
                 var from;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            clearPossible();
-                            from = ship.location;
-                            ship.location = seaZone;
-                            this.transfers.ships[ship.id] = {
+                            from = regiment.location;
+                            this.transfers.regiments[regiment.id] = {
+                                regiment: regiment,
                                 from: from,
-                                to: seaZone,
-                                ship: ship,
+                                to: to,
                             };
-                            return [4, board.moveShip({ ship: ship, from: from })];
+                            regiment.location = to;
+                            clearPossible();
+                            return [4, board.moveRegimentBetweenArmies(regiment, from)];
                         case 1:
                             _a.sent();
                             this.updateInterfaceInitialStep();
@@ -4417,44 +4438,30 @@ var MilitaryAffairsTransfers = (function () {
         this.addCancelButton();
     };
     MilitaryAffairsTransfers.prototype.getTransferCount = function () {
-        return (Object.keys(this.transfers.ships).length +
-            Object.keys(this.transfers.writers).length);
+        return (Object.keys(this.transfers.officers).length +
+            Object.keys(this.transfers.regiments).length);
     };
     MilitaryAffairsTransfers.prototype.returnPieces = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var board, _i, _a, data, _b, _c, data;
-            return __generator(this, function (_d) {
-                switch (_d.label) {
+            var board, _i, _a, data;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
                         board = Board.getInstance();
-                        _i = 0, _a = Object.values(this.transfers.ships);
-                        _d.label = 1;
+                        _i = 0, _a = Object.values(this.transfers.regiments);
+                        _b.label = 1;
                     case 1:
                         if (!(_i < _a.length)) return [3, 4];
                         data = _a[_i];
-                        data.ship.location = data.from;
-                        return [4, board.moveShip({ ship: data.ship, from: data.to })];
+                        data.regiment.location = data.from;
+                        return [4, board.moveRegimentBetweenArmies(data.regiment, data.to)];
                     case 2:
-                        _d.sent();
-                        _d.label = 3;
+                        _b.sent();
+                        _b.label = 3;
                     case 3:
                         _i++;
                         return [3, 1];
-                    case 4:
-                        _b = 0, _c = Object.values(this.transfers.writers);
-                        _d.label = 5;
-                    case 5:
-                        if (!(_b < _c.length)) return [3, 8];
-                        data = _c[_b];
-                        data.writer.location = data.from;
-                        return [4, board.moveWriter(data.writer, data.to)];
-                    case 6:
-                        _d.sent();
-                        _d.label = 7;
-                    case 7:
-                        _b++;
-                        return [3, 5];
-                    case 8: return [2];
+                    case 4: return [2];
                 }
             });
         });

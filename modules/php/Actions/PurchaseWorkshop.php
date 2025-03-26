@@ -79,7 +79,7 @@ class PurchaseWorkshop extends \Bga\Games\JohnCompany\Actions\PurchaseEnterprise
   {
     $treasury = $family->getTreasury();
 
-    return $treasury >= 5 && Enterprises::countInLocation(Locations::enterpriseSupply(LUXURY)) > 0;
+    return $treasury >= 5 && Enterprises::countInLocation(Locations::supplyEnterprises(LUXURY)) > 0;
   }
 
   // ..######..########...#######..##......##.##....##

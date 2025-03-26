@@ -121,7 +121,7 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
     // Place company ships
     foreach($companyShips as $shipId => $seaZone) {
       if ($playerShipCount < count($stateArgs['playerShips'])) {
-        throw new \feException("ERROR_014");
+        throw new \feException("ERROR_015");
       }
       $this->placeOtherShip($stateArgs, $player, $shipId, $seaZone, COMPANY_SHIP);
       $totalPayment += 5;
@@ -140,6 +140,7 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
     }
 
     Notifications::payFromTreasury($player, $office, $totalPayment, $treasury);
+    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
 
     $this->resolveAction([], true);
   }
@@ -157,7 +158,7 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
       return $shipId === $otherShip->getId();
     });
     if ($ship === null) {
-      throw new \feException("ERROR_015");
+      throw new \feException("ERROR_017");
     }
     $ship->place($player, $seaZone, $type);
   }

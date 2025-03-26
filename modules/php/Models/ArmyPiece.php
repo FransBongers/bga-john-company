@@ -49,5 +49,4 @@ class ArmyPiece extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impl
     // Notifications::log('getUiData card model', []);
     return $this->jsonSerialize(); // Static datas are already in js file
   }
-
 }

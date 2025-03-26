@@ -53,15 +53,15 @@ class ArmyPieces extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
         "id" => REGIMENT . "_{INDEX}",
         "nbr" => 20,
         "nbrStart" => 1,
-        'location' => Locations::regimentsSupply(),
+        'location' => Locations::supplyRegiments(),
         'exhausted' => 0,
       ],
     ]);
 
-    self::shuffle(Locations::regimentsSupply());
+    self::shuffle(Locations::supplyRegiments());
 
-    foreach(PRESIDENCIES as $presidency) {
-      self::pickForLocation($startingRegiments, Locations::regimentsSupply(), $presidency);
+    foreach (HOME_REGIONS as $regionId) {
+      self::pickForLocation($startingRegiments, Locations::supplyRegiments(), Locations::armyOf($regionId));
     }
 
     $localAlliances = [];
@@ -77,5 +77,20 @@ class ArmyPieces extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     }
 
     self::create($localAlliances, null);
+  }
+
+  // ..######...########.########.########.########.########...######.
+  // .##....##..##..........##.......##....##.......##.....##.##....##
+  // .##........##..........##.......##....##.......##.....##.##......
+  // .##...####.######......##.......##....######...########...######.
+  // .##....##..##..........##.......##....##.......##...##.........##
+  // .##....##..##..........##.......##....##.......##....##..##....##
+  // ..######...########....##.......##....########.##.....##..######.
+
+  public static function getRegiments()
+  {
+    return self::getSelectQuery()
+      ->where(static::$prefix . 'id', 'LIKE', 'Regiment_' . '%')
+      ->get();
   }
 }

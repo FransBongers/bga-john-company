@@ -50,8 +50,10 @@ trait DebugTrait
     // Offices::getMany([DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING, PRESIDENT_OF_BENGAL, PRESIDENT_OF_BOMBAY, PRESIDENT_OF_BOMBAY])
 
     // JoCoUtils::makeCheck(Players::get(), Offices::get(DIRECTOR_OF_TRADE), 1);
-    Notifications::log('closed orders', Orders::getClosedOrders());
-    
+    // Notifications::log('regiments', ArmyPieces::getRegiments()->toArray());
+    ArmyPieces::get('Regiment_3')->setLocation(Locations::armyOf(BOMBAY));
+    ArmyPieces::get('Regiment_16')->setLocation(Locations::armyOf(BENGAL));
+    ArmyPieces::get('Regiment_6')->setLocation(Locations::armyOf(MADRAS));
   }
 
 

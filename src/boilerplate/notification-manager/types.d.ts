@@ -58,6 +58,11 @@ interface NotifMoveFamilyMembers {
   familyMembers: JocoFamilyMember[];
 }
 
+interface NotifMoveRegiment extends NotifWithPlayerArgs {
+  regiment: JocoArmyPieceBase;
+  from: string;
+}
+
 interface NotifMoveShipArgs extends NotifWithPlayerArgs {
   ship: JocoShipBase;
   from: string;

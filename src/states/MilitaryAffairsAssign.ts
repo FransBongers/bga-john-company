@@ -69,85 +69,85 @@ class MilitaryAffairsAssign implements State {
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
 
-    if (this.treasury < 2) {
-      this.updateInterfaceConfirm();
-      return;
-    }
+    // if (this.treasury < 2) {
+    //   this.updateInterfaceConfirm();
+    //   return;
+    // }
 
-    updatePageTitle(
-      _('${you} may fit, buy and lease ships (£${amount} remaining)'),
-      { amount: this.treasury }
-    );
+    // updatePageTitle(
+    //   _('${you} may fit, buy and lease ships (£${amount} remaining)'),
+    //   { amount: this.treasury }
+    // );
     const board = Board.getInstance();
 
     let playerShipsAvailable = false;
 
-    this.args.playerShips.forEach((ship) => {
-      const { id, type, name, fatigued, owner: playerId } = ship;
-      if (this.placedPlayerShips[ship.id] || this.treasury < 3) {
-        return;
-      }
-      playerShipsAvailable = true;
-      addPlayerButton({
-        id: `${ship.id}_btn`,
-        text: formatStringRecursive(_('Fit ${tkn_ship}'), {
-          tkn_ship: tknShipValue({ type, name, fatigued }),
-        }),
-        playerId,
-        callback: () => {
-          this.updateInterfaceSelectSeaZone(ship, playerId);
-        },
-      });
-    });
-    if (this.treasury >= 2) {
-      addSecondaryActionButton({
-        id: 'extraShip_btn',
-        text: formatStringRecursive(_('Lease ${tkn_ship}'), {
-          tkn_ship: tknShipValue({
-            type: EXTRA_SHIP,
-            name: _('Extra Ship'),
-            fatigued: 0,
-          }),
-        }),
-        callback: () => {
-          const ship = this.args.otherShips.pop();
-          ship.type = EXTRA_SHIP;
-          this.updateInterfaceSelectSeaZone(ship);
-        },
-      });
-    }
-    if (!playerShipsAvailable && this.treasury >= 5) {
-      addSecondaryActionButton({
-        id: 'companyShip_btn',
-        text: formatStringRecursive(_('Buy ${tkn_ship}'), {
-          tkn_ship: tknShipValue({
-            type: COMPANY_SHIP,
-            name: _('Company Ship'),
-            fatigued: 0,
-          }),
-        }),
-        callback: () => {
-          const ship = this.args.otherShips.pop();
-          ship.type = COMPANY_SHIP;
-          this.updateInterfaceSelectSeaZone(ship);
-        },
-      });
-    }
+    // this.args.playerShips.forEach((ship) => {
+    //   const { id, type, name, fatigued, owner: playerId } = ship;
+    //   if (this.placedPlayerShips[ship.id] || this.treasury < 3) {
+    //     return;
+    //   }
+    //   playerShipsAvailable = true;
+    //   addPlayerButton({
+    //     id: `${ship.id}_btn`,
+    //     text: formatStringRecursive(_('Fit ${tkn_ship}'), {
+    //       tkn_ship: tknShipValue({ type, name, fatigued }),
+    //     }),
+    //     playerId,
+    //     callback: () => {
+    //       this.updateInterfaceSelectSeaZone(ship, playerId);
+    //     },
+    //   });
+    // });
+    // if (this.treasury >= 2) {
+    //   addSecondaryActionButton({
+    //     id: 'extraShip_btn',
+    //     text: formatStringRecursive(_('Lease ${tkn_ship}'), {
+    //       tkn_ship: tknShipValue({
+    //         type: EXTRA_SHIP,
+    //         name: _('Extra Ship'),
+    //         fatigued: 0,
+    //       }),
+    //     }),
+    //     callback: () => {
+    //       const ship = this.args.otherShips.pop();
+    //       ship.type = EXTRA_SHIP;
+    //       this.updateInterfaceSelectSeaZone(ship);
+    //     },
+    //   });
+    // }
+    // if (!playerShipsAvailable && this.treasury >= 5) {
+    //   addSecondaryActionButton({
+    //     id: 'companyShip_btn',
+    //     text: formatStringRecursive(_('Buy ${tkn_ship}'), {
+    //       tkn_ship: tknShipValue({
+    //         type: COMPANY_SHIP,
+    //         name: _('Company Ship'),
+    //         fatigued: 0,
+    //       }),
+    //     }),
+    //     callback: () => {
+    //       const ship = this.args.otherShips.pop();
+    //       ship.type = COMPANY_SHIP;
+    //       this.updateInterfaceSelectSeaZone(ship);
+    //     },
+    //   });
+    // }
 
-    if (this.treasury === 2) {
-      addPrimaryActionButton({
-        id: 'done_btn',
-        text: _('Done'),
-        callback: () => this.updateInterfaceConfirm(),
-      });
-    }
-    if (
-      Object.keys(this.placedPlayerShips).length > 0 ||
-      Object.keys(this.placedExtraShips).length > 0 ||
-      Object.keys(this.placedCompanyShips).length > 0
-    ) {
-      this.addCancelButton();
-    }
+    // if (this.treasury === 2) {
+    //   addPrimaryActionButton({
+    //     id: 'done_btn',
+    //     text: _('Done'),
+    //     callback: () => this.updateInterfaceConfirm(),
+    //   });
+    // }
+    // if (
+    //   Object.keys(this.placedPlayerShips).length > 0 ||
+    //   Object.keys(this.placedExtraShips).length > 0 ||
+    //   Object.keys(this.placedCompanyShips).length > 0
+    // ) {
+    //   this.addCancelButton();
+    // }
   }
 
   private updateInterfaceSelectSeaZone(ship: JocoShipBase, playerId?: number) {
