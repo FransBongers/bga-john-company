@@ -21,4 +21,14 @@ class PresidentOfBengal extends \Bga\Games\JohnCompany\Models\Office
   {
     return BENGAL;
   }
+
+  public function getSeaZone()
+  {
+    return EAST_INDIAN;
+  }
+
+  public function getHomePortOrderId()
+  {
+    return ORDER_BENGAL_2;
+  }
 }

@@ -52,10 +52,8 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
     Notifications::returnFamilyMemberToSupply(Players::getPlayerForFamily($this->familyId), $this);
   }
 
-  public function moveWriter($player, $newLocation)
-  {
-    $from = $this->getLocation();
-    $this->setLocation($newLocation);
-    Notifications::moveWriter($player, $this, $from);
+  public function moveTo($player, $to) {
+    Notifications::moveFamilyMember($player, $this, $to);
+    $this->setLocation($to);
   }
 }

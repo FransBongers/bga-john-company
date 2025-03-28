@@ -21,4 +21,14 @@ class PresidentOfMadras extends \Bga\Games\JohnCompany\Models\Office
   {
     return MADRAS;
   }
+
+  public function getSeaZone()
+  {
+    return SOUTH_INDIAN;
+  }
+
+  public function getHomePortOrderId()
+  {
+    return ORDER_MADRAS_1;
+  }
 }

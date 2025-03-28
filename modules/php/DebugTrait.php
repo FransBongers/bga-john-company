@@ -24,6 +24,7 @@ use Bga\Games\JohnCompany\Managers\Ships;
 use Bga\Games\JohnCompany\Models\Enterprise;
 use Bga\Games\JohnCompany\Models\FamilyMember;
 use Bga\Games\JohnCompany\JoCoUtils;
+use Bga\Games\JohnCompany\Managers\AtomicActions;
 
 trait DebugTrait
 {
@@ -51,9 +52,11 @@ trait DebugTrait
 
     // JoCoUtils::makeCheck(Players::get(), Offices::get(DIRECTOR_OF_TRADE), 1);
     // Notifications::log('regiments', ArmyPieces::getRegiments()->toArray());
-    ArmyPieces::get('Regiment_3')->setLocation(Locations::armyOf(BOMBAY));
-    ArmyPieces::get('Regiment_16')->setLocation(Locations::armyOf(BENGAL));
-    ArmyPieces::get('Regiment_6')->setLocation(Locations::armyOf(MADRAS));
+    // ArmyPieces::get('Regiment_3')->setLocation(Locations::armyOf(BOMBAY));
+    // ArmyPieces::get('Regiment_16')->setLocation(Locations::armyOf(BENGAL));
+    // ArmyPieces::get('Regiment_6')->setLocation(Locations::armyOf(MADRAS));
+
+    AtomicActions::get(PRESIDENCY_TRADE)->getOrderOptions(Offices::get(PRESIDENT_OF_MADRAS));
   }
 
 

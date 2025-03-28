@@ -68,6 +68,8 @@ const ST_DIRECTOR_OF_TRADE_SPECIAL_ENVOY_SUCCESS = 45;
 const ST_MILITARY_AFFAIRS_TRANSFERS = 46;
 const ST_MILITARY_AFFAIRS_ASSIGN = 47;
 const ST_PRESIDENCY_DECIDE_ORDER = 49;
+const ST_PRESIDENCY_TRADE = 50;
+const ST_PRESIDENCY_TRADE_FILL_ORDERS = 51;
 
 const DRAFT_CARD = 'DraftCard';
 const DRAFT_CARD_NEXT_STEP = 'DraftCardNextStep';
@@ -89,6 +91,8 @@ const DIRECTOR_OF_TRADE_TRANSFERS = 'DirectorOfTradeTransfers';
 const MILITARY_AFFAIRS_TRANSFERS = 'MilitaryAffairsTransfers';
 const MILITARY_AFFAIRS_ASSIGN = 'MilitaryAffairsAssign';
 const PRESIDENCY_DECIDE_ORDER = 'PresidencyDecideOrder';
+const PRESIDENCY_TRADE = 'PresidencyTrade';
+const PRESIDENCY_TRADE_FILL_ORDERS = 'PresidencyTradeFillOrders';
 
 /**
  * Company
@@ -325,6 +329,9 @@ const ARMY_REGION_MAP = [
   MADRAS_ARMY => MADRAS,
 ];
 
+const BENGAL_WRITERS = 'Writers_Bengal';
+const BOMBAY_WRITERS = 'Writers_Bombay';
+const MADRAS_WRITERS = 'Writers_Madras';
 
 /**
  * OrderIds
@@ -504,3 +511,8 @@ const STOCK_EXCHANGE_POSITIONS = [
   STOCK_EXCHANGE_3_LEFT,
   STOCK_EXCHANGE_2,
 ];
+
+/**
+ * Other
+ */
+const TRADE = 'trade';

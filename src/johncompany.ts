@@ -69,6 +69,9 @@ class JohnCompany implements Game {
     MilitaryAffairsAssign,
     MilitaryAffairsTransfers,
     PlayerTurn,
+    PresidencyDecideOrder,
+    PresidencyTrade,
+    PresidencyTradeFillOrders,
     SeekShare,
   };
 

@@ -6,6 +6,8 @@ const BOARD_SCALE = 'boardScale';
 const PLUS = 'plus';
 const MINUS = 'minus';
 
+const TRADE = 'trade';
+
 /**
  * Families
  */
@@ -185,6 +187,12 @@ const PUNJAB = 'Punjab';
 const BENGAL_PRESIDENCY = 'BengalPresidency';
 const BOMBAY_PRESIDENCY = 'BombayPresidency';
 const MADRAS_PRESIDENCY = 'MadrasPresidency';
+
+const BENGAL_WRITERS = 'Writers_Bengal';
+const BOMBAY_WRITERS = 'Writers_Bombay';
+const MADRAS_WRITERS = 'Writers_Madras';
+
+const WRITER_LOCATIONS = [BENGAL_WRITERS, BOMBAY_WRITERS, MADRAS_WRITERS];
 
 const BENGAL_ARMY = 'Army_Bengal';
 const BOMBAY_ARMY = 'Army_Bombay';

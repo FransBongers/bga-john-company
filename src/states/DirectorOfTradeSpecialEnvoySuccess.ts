@@ -67,7 +67,7 @@ class DirectorOfTradeSpecialEnvoySuccess implements State {
     );
     const board = Board.getInstance();
     this.args.closedOrders.forEach((order) => {
-      onClick(board.orders[order.id], () => this.updateIntefaceConfirm(order))
+      onClick(board.ui.orders[order.id], () => this.updateIntefaceConfirm(order))
       
     })
 
@@ -80,7 +80,7 @@ class DirectorOfTradeSpecialEnvoySuccess implements State {
     updatePageTitle(_('Open closed order in ${region}?'), {
       region: _(order.location),
     });
-    setSelected(Board.getInstance().orders[order.id]);
+    setSelected(Board.getInstance().ui.orders[order.id]);
 
     addConfirmButton(() => this.performAction(order, true));
     addCancelButton();

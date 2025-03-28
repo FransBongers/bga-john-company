@@ -2,30 +2,35 @@ class Board {
   private static instance: Board;
   private game: GameAlias;
 
-  private ui: {
-    board: HTMLElement;
-    orders: HTMLElement;
-    familyMembers: HTMLElement;
-    regiments: HTMLElement;
-    pawns: {
-      balance?: HTMLElement;
-      standing?: HTMLElement;
-      debt?: HTMLElement;
-      turn?: HTMLElement;
-      phase?: HTMLElement;
+  public ui: {
+    containers: {
+      board: HTMLElement;
+      orders: HTMLElement;
+      familyMembers: HTMLElement;
+      regiments: HTMLElement;
+      pawns: {
+        balance?: HTMLElement;
+        standing?: HTMLElement;
+        debt?: HTMLElement;
+        turn?: HTMLElement;
+        phase?: HTMLElement;
+      };
+      powerTokens: HTMLElement;
+      selectBoxes: HTMLElement;
+      ships: HTMLElement;
+      treasuries: HTMLElement;
     };
-    powerTokens: HTMLElement;
-    selectBoxes: HTMLElement;
-    ships: HTMLElement;
-    treasuries: HTMLElement;
+    armyPieces: Record<string, HTMLElement>;
+    familyMembers: Record<string, HTMLElement>;
+    orders: Record<string, HTMLElement>;
+    ships: Record<string, HTMLElement>;
+    selectBoxes: Record<string, HTMLElement>;
   };
-  public familyMembers: Record<string, HTMLElement> = {};
-  public armyPieces: Record<string, HTMLElement> = {};
-  public ships: Record<string, HTMLElement> = {};
-  public selectBoxes: Record<string, HTMLElement> = {};
+  // Locations with ids for position in location
+  public familyMembers: Record<string, JocoFamilyMember[]> = {};
 
-  private courtOfDirectors: JocoFamilyMember[] = [];
-  public orders: Record<string, HTMLElement> = {};
+  // private courtOfDirectors: JocoFamilyMember[] = [];
+
   private regions: Record<string, Region> = {};
   public armies: {
     regiments: {
@@ -40,16 +45,15 @@ class Board {
       [MADRAS_ARMY]: [],
     },
   };
-  public writers: {
-    Bengal: JocoFamilyMember[];
-    Bombay: JocoFamilyMember[];
-    Madras: JocoFamilyMember[];
-  } = {
-    [BENGAL]: [],
-    [BOMBAY]: [],
-    [MADRAS]: [],
-  };
-  private officersInTraining: JocoFamilyMember[] = [];
+  // public writers: {
+  //   Bengal: JocoFamilyMember[];
+  //   Bombay: JocoFamilyMember[];
+  //   Madras: JocoFamilyMember[];
+  // } = {
+  //   [BENGAL]: [],
+  //   [BOMBAY]: [],
+  //   [MADRAS]: [],
+  // };
   private powerTokens: Record<string, HTMLElement> = {};
   public seas: {
     westIndian: Array<JocoShipBase | null>;
@@ -90,18 +94,25 @@ class Board {
       .insertAdjacentHTML('afterbegin', tplBoard(gamedatas));
 
     this.ui = {
-      board: document.getElementById('joco-board'),
-      familyMembers: document.getElementById('joco-family-members'),
-      orders: document.getElementById('joco-orders'),
-      regiments: document.getElementById('joco-regiments'),
-      pawns: {},
-      powerTokens: document.getElementById('joco-power-tokens'),
-      selectBoxes: document.getElementById('joco-select-boxes'),
-      ships: document.getElementById('joco_ships'),
-      treasuries: document.getElementById('joco_treasuries'),
+      containers: {
+        board: document.getElementById('joco-board'),
+        familyMembers: document.getElementById('joco-family-members'),
+        orders: document.getElementById('joco-orders'),
+        regiments: document.getElementById('joco-regiments'),
+        pawns: {},
+        powerTokens: document.getElementById('joco-power-tokens'),
+        selectBoxes: document.getElementById('joco-select-boxes'),
+        ships: document.getElementById('joco_ships'),
+        treasuries: document.getElementById('joco_treasuries'),
+      },
+      armyPieces: {},
+      familyMembers: {},
+      orders: {},
+      selectBoxes: {},
+      ships: {},
     };
 
-    // this.ui.board.insertAdjacentHTML('afterbegin', familyMember);
+    // this.ui.containers.board.insertAdjacentHTML('afterbegin', familyMember);
     this.setupArmyPieces(gamedatas);
     this.setupOrders(gamedatas);
     this.setupRegions(gamedatas);
@@ -116,7 +127,7 @@ class Board {
   private setupArmyPieces(gamedatas: GamedatasAlias) {
     Object.entries(gamedatas.armyPieces).forEach(([id, piece]) => {
       if (id.startsWith('Regiment')) {
-        this.armyPieces[id] = createRegiment();
+        this.ui.armyPieces[id] = createRegiment();
       }
     });
     this.updateArmyPieces(Object.values(gamedatas.armyPieces));
@@ -124,7 +135,7 @@ class Board {
 
   private setupFamilyMembers(gamedatas: GamedatasAlias) {
     Object.values(gamedatas.familyMembers).forEach(({ id, familyId }) => {
-      this.familyMembers[id] = createFamilyMember(
+      this.ui.familyMembers[id] = createFamilyMember(
         familyId === CROWN
           ? COLOR_FAMILY_MAP[
               HEX_COLOR_COLOR_MAP[
@@ -136,6 +147,15 @@ class Board {
           : familyId,
         id
       );
+      [
+        COURT_OF_DIRECTORS,
+        OFFICER_IN_TRAINING,
+        ...WRITER_LOCATIONS,
+        ...ARMIES,
+      ].forEach((location) => {
+        this.familyMembers[location] = [];
+      });
+
       // const elt = (this.familyMembers[familyMember.id] =
       //   document.createElement('div'));
       // const familyMemberNumber = `${
@@ -161,7 +181,7 @@ class Board {
 
   private setupOrders(gamedatas: GamedatasAlias) {
     Object.keys(gamedatas.orders).forEach((orderId) => {
-      const elt = (this.orders[orderId] = document.createElement('div'));
+      const elt = (this.ui.orders[orderId] = document.createElement('div'));
       // elt.id = orderId;
       elt.classList.add('joco-order');
     });
@@ -176,14 +196,15 @@ class Board {
 
   private setupPawns(gamedatas: GamedatasAlias) {
     ['balance', 'standing', 'debt', 'turn', 'phase'].forEach((pawn) => {
-      const elt = (this.ui.pawns[pawn] = document.createElement('div'));
+      const elt = (this.ui.containers.pawns[pawn] =
+        document.createElement('div'));
       elt.id = pawn;
       elt.classList.add('joco_pawn');
       elt.setAttribute(
         'data-color',
         pawn === 'turn' ? 'black' : pawn === 'phase' ? 'silver' : 'red'
       );
-      this.ui.board.appendChild(elt);
+      this.ui.containers.board.appendChild(elt);
     });
 
     this.updatePawns(gamedatas);
@@ -191,50 +212,53 @@ class Board {
 
   private setupPowerTokens(gamedatas) {
     POWER_TOKENS.forEach((token) => {
-      const elt = (this.ui.powerTokens[token] = document.createElement('div'));
+      const elt = (this.ui.containers.powerTokens[token] =
+        document.createElement('div'));
       elt.classList.add('joco-power-token');
       elt.setAttribute('data-type', token);
       const iconElt = document.createElement('div');
       iconElt.classList.add('joco-icon');
       iconElt.setAttribute('data-icon', POWER_TOKEN_ICON_MAP[token]);
       elt.appendChild(iconElt);
-      this.ui.powerTokens.appendChild(elt);
+      this.ui.containers.powerTokens.appendChild(elt);
     });
     this.updatePowerTokens(gamedatas);
   }
 
   private setupSelectBoxes() {
     ARMIES.forEach((army) => {
-      const elt = (this.selectBoxes[army] = document.createElement('div'));
+      const elt = (this.ui.selectBoxes[army] = document.createElement('div'));
       elt.classList.add('joco-select-box');
       elt.classList.add('joco-select-army');
       setAbsolutePosition(elt, BOARD_SCALE, ARMY_SELECT_POSITIONS[army]);
-      this.ui.selectBoxes.appendChild(elt);
+      this.ui.containers.selectBoxes.appendChild(elt);
     });
     [BENGAL, BOMBAY, MADRAS].forEach((region) => {
-      const elt = (this.selectBoxes[`Writers_${region}`] =
+      const elt = (this.ui.selectBoxes[`Writers_${region}`] =
         document.createElement('div'));
       elt.classList.add('joco-select-box');
       elt.classList.add('joco-select-writer');
       elt.setAttribute('data-region', region);
-      this.ui.selectBoxes.appendChild(elt);
+      this.ui.containers.selectBoxes.appendChild(elt);
     });
     SEA_ZONES.forEach((seaZone) => {
-      const elt = (this.selectBoxes[seaZone] = document.createElement('div'));
+      const elt = (this.ui.selectBoxes[seaZone] =
+        document.createElement('div'));
       elt.classList.add('joco-select-box');
       elt.classList.add('joco-select-sea-zone');
       setAbsolutePosition(elt, BOARD_SCALE, SEA_ZONE_SELECT_POSITIONS[seaZone]);
-      this.ui.selectBoxes.appendChild(elt);
+      this.ui.containers.selectBoxes.appendChild(elt);
     });
     STOCK_EXCHANGE_POSITIONS.forEach((position) => {
-      const elt = (this.selectBoxes[position] = document.createElement('div'));
+      const elt = (this.ui.selectBoxes[position] =
+        document.createElement('div'));
       elt.classList.add('joco-select-box');
       elt.classList.add('joco-seek-share');
       elt.setAttribute('data-position', position);
-      this.ui.selectBoxes.appendChild(elt);
+      this.ui.containers.selectBoxes.appendChild(elt);
     });
     Array.from(Array(9).keys()).forEach((value) => {
-      const elt = (this.selectBoxes[`companyDebt_${value}`] =
+      const elt = (this.ui.selectBoxes[`companyDebt_${value}`] =
         document.createElement('div'));
       elt.classList.add('joco-select-box');
       elt.classList.add('joco-company-debt');
@@ -243,13 +267,13 @@ class Board {
         BOARD_SCALE,
         COMPANY_DEBT_SELECT_POSITIONS[value]
       );
-      this.ui.selectBoxes.appendChild(elt);
+      this.ui.containers.selectBoxes.appendChild(elt);
     });
   }
 
   private setupShips(gamedatas: GamedatasAlias) {
     Object.values(gamedatas.ships).forEach(({ id, name, type, fatigued }) => {
-      this.ships[id] = createShip({ name, type, fatigued });
+      this.ui.ships[id] = createShip({ name, type, fatigued });
     });
     this.updateShips(Object.values(gamedatas.ships));
   }
@@ -260,7 +284,7 @@ class Board {
         gamedatas,
         office,
         position,
-        container: this.ui.treasuries,
+        container: this.ui.containers.treasuries,
       });
     });
   }
@@ -274,17 +298,17 @@ class Board {
   // ..#######..##........########..##.....##....##....########.....#######..####
 
   updateArmyPieces(pieces: JocoArmyPieceBase[]) {
-    // this.ui.regiments.replaceChildren();
+    // this.ui.containers.regiments.replaceChildren();
     pieces.forEach((piece) => {
       if (piece.location.startsWith('supply')) {
         return;
       }
       if (piece.id.startsWith('Regiment')) {
-        const elt = this.armyPieces[piece.id];
-        if (!this.armyPieces[piece.id].parentElement) {
-          this.ui.regiments.appendChild(elt);
+        const elt = this.ui.armyPieces[piece.id];
+        if (!this.ui.armyPieces[piece.id].parentElement) {
+          this.ui.containers.regiments.appendChild(elt);
         }
-        
+
         setAbsolutePosition(
           elt,
           BOARD_SCALE,
@@ -305,49 +329,108 @@ class Board {
       if (location.startsWith('supply')) {
         return;
       }
-      if (!this.familyMembers[id].parentElement) {
-        this.ui.familyMembers.appendChild(this.familyMembers[id]);
+      if (!this.ui.familyMembers[id].parentElement) {
+        this.ui.containers.familyMembers.appendChild(this.ui.familyMembers[id]);
       }
 
       let position: AbsolutePosition = { top: 0, left: 0 };
 
-      if (location === COURT_OF_DIRECTORS) {
-        position = getCourtOfDirectorsPosition(this.courtOfDirectors.length);
-        this.courtOfDirectors.push(familyMember);
-      } else if (location === OFFICER_IN_TRAINING) {
-        position = getOfficersInTrainingPosition(
-          this.officersInTraining.length
-        );
-        this.officersInTraining.push(familyMember);
-      } else if (location.startsWith(WRITER)) {
-        const regionId = location.split('_')[1];
-        position = getWriterPosition(regionId, this.writers[regionId].length);
-        this.writers[regionId].push(familyMember);
-      } else if (location.startsWith(OFFICER)) {
-      } else if (location.startsWith('StockExchange')) {
-        position = getStockExchangePosition(location);
-      } else {
-        position = FAMILY_MEMBER_OFFICE_CONFIG[location];
+      switch (location) {
+        case COURT_OF_DIRECTORS:
+          position = getCourtOfDirectorsPosition(
+            this.familyMembers[COURT_OF_DIRECTORS].length
+          );
+          this.familyMembers[COURT_OF_DIRECTORS].push(familyMember);
+          break;
+        case OFFICER_IN_TRAINING:
+          position = getOfficersInTrainingPosition(
+            this.familyMembers[OFFICER_IN_TRAINING].length
+          );
+          this.familyMembers[OFFICER_IN_TRAINING].push(familyMember);
+          break;
+        case BENGAL_WRITERS:
+        case BOMBAY_WRITERS:
+        case MADRAS_WRITERS:
+          position = getWriterPosition(
+            location,
+            this.familyMembers[location].length
+          );
+          this.familyMembers[location].push(familyMember);
+          break;
+        case BENGAL_ARMY:
+        case BOMBAY_ARMY:
+        case MADRAS_ARMY:
+          position = getOfficerPosition(
+            location,
+            this.familyMembers[location].length
+          );
+          this.familyMembers[location].push(familyMember);
+          break;
+        case STOCK_EXCHANGE_2:
+        case STOCK_EXCHANGE_3_LEFT:
+        case STOCK_EXCHANGE_3_RIGHT:
+        case STOCK_EXCHANGE_4:
+        case STOCK_EXCHANGE_5:
+          position = getStockExchangePosition(location);
+          break;
+        default:
+          position = FAMILY_MEMBER_OFFICE_CONFIG[location];
+          break;
       }
-      setAbsolutePosition(this.familyMembers[id], BOARD_SCALE, position);
+
+      setAbsolutePosition(this.ui.familyMembers[id], BOARD_SCALE, position);
     });
   }
 
-  public async moveFamilyMember(
-    familyMember: JocoFamilyMember,
-    index: number = 0
-  ) {
+  public async moveFamilyMember({
+    familyMember,
+    index = 0,
+  }: {
+    familyMember: JocoFamilyMember;
+    index?: number;
+  }) {
     await Interaction.use().wait(index * 200);
     const fromRect =
-      this.familyMembers[familyMember.id].getBoundingClientRect();
+      this.ui.familyMembers[familyMember.id].getBoundingClientRect();
     this.updateFamilyMembers([familyMember]);
     await this.game.animationManager.play(
       new BgaSlideAnimation({
-        element: this.familyMembers[familyMember.id],
+        element: this.ui.familyMembers[familyMember.id],
         transitionTimingFunction: 'ease-in-out',
         fromRect,
       })
     );
+  }
+
+  public async moveFamilyMemberBetweenLocations(
+    familyMember: JocoFamilyMember,
+    to: string // key of this.familyMember
+  ) {
+
+    const from = familyMember.location;
+    familyMember.location = to;
+
+    // Skip if family member is already in location, ie player already moved it when performing action
+    // and this is triggered by notif.
+    if (
+      this.familyMembers[familyMember.location].some(
+        (memberInLocation: JocoFamilyMember) =>
+          memberInLocation.id === familyMember.id
+      )
+    ) {
+      return;
+    }
+
+    const remainingFamilyMembers = this.familyMembers[from].filter(
+      (member: JocoFamilyMember) => member.id !== familyMember.id
+    );
+
+    this.familyMembers[from] = [];
+    const promises = remainingFamilyMembers.map((member: JocoFamilyMember) =>
+      this.moveFamilyMember({ familyMember: member })
+    );
+    promises.push(this.moveFamilyMember({ familyMember }));
+    await Promise.all(promises);
   }
 
   async placeFamilyMembers(
@@ -365,7 +448,7 @@ class Board {
       this.updateFamilyMembers([familyMember]);
       await this.game.animationManager.play(
         new BgaSlideAnimation({
-          element: this.familyMembers[id],
+          element: this.ui.familyMembers[id],
           transitionTimingFunction: 'ease-in-out',
           fromRect,
         })
@@ -381,43 +464,49 @@ class Board {
   }
 
   updateOrders(gamedatas: GamedatasAlias) {
-    this.ui.orders.replaceChildren();
+    this.ui.containers.orders.replaceChildren();
     Object.entries(gamedatas.orders).forEach(([orderId, order]) => {
       setAbsolutePosition(
-        this.orders[orderId],
+        this.ui.orders[orderId],
         BOARD_SCALE,
         ORDERS_CONFIG[orderId]
       );
       // this.orders[orderId].style.top = `calc(var(--boardScale) * ${ORDERS_CONFIG[orderId].top}px)`
       // this.orders[orderId].style.left = `calc(var(--boardScale) * ${ORDERS_CONFIG[orderId].left}px)`
-      this.orders[orderId].setAttribute('data-status', order.status);
-      this.ui.orders.appendChild(this.orders[orderId]);
+      this.ui.orders[orderId].setAttribute('data-status', order.status);
+      this.ui.containers.orders.appendChild(this.ui.orders[orderId]);
     });
   }
 
   private updatePowerTokens(gamedatas: GamedatasAlias) {
     gamedatas.powerTokens.forEach((token, index) => {
       setAbsolutePosition(
-        this.ui.powerTokens[token],
+        this.ui.containers.powerTokens[token],
         BOARD_SCALE,
         POWER_TOKEN_POSITIONS[index]
       );
     });
   }
 
-  async movePawn(type: keyof typeof this.ui.pawns, value: string | number) {
-    const fromRect = this.ui.pawns[type].getBoundingClientRect();
+  async movePawn(
+    type: keyof typeof this.ui.containers.pawns,
+    value: string | number
+  ) {
+    const fromRect = this.ui.containers.pawns[type].getBoundingClientRect();
     this.updatePawn(type, value);
     await this.game.animationManager.play(
       new BgaSlideAnimation({
-        element: this.ui.pawns[type],
+        element: this.ui.containers.pawns[type],
         transitionTimingFunction: 'ease-in-out',
         fromRect,
       })
     );
   }
 
-  updatePawn(type: keyof typeof this.ui.pawns, value: string | number) {
+  updatePawn(
+    type: keyof typeof this.ui.containers.pawns,
+    value: string | number
+  ) {
     let position: AbsolutePosition;
     switch (type) {
       case 'balance':
@@ -436,7 +525,7 @@ class Board {
         position = TURN_CONFIG[value as string];
         break;
     }
-    setAbsolutePosition(this.ui.pawns[type], BOARD_SCALE, position);
+    setAbsolutePosition(this.ui.containers.pawns[type], BOARD_SCALE, position);
   }
 
   updatePawns(gamedatas: GamedatasAlias) {
@@ -451,12 +540,12 @@ class Board {
   public async moveRegiment(regiment: JocoArmyPieceBase, index: number = 0) {
     await Interaction.use().wait(index * 200);
 
-    const fromRect = this.armyPieces[regiment.id].getBoundingClientRect();
+    const fromRect = this.ui.armyPieces[regiment.id].getBoundingClientRect();
 
     this.updateArmyPieces([regiment]);
     await this.game.animationManager.play(
       new BgaSlideAnimation({
-        element: this.armyPieces[regiment.id],
+        element: this.ui.armyPieces[regiment.id],
         transitionTimingFunction: 'ease-in-out',
         fromRect,
       })
@@ -501,7 +590,7 @@ class Board {
     index?: number;
   }) {
     await Interaction.use().wait(index * 200);
-    const fromRect = this.ships[ship.id].getBoundingClientRect();
+    const fromRect = this.ui.ships[ship.id].getBoundingClientRect();
     const fromIndex = this.seas[from].findIndex(
       (shipInOldZone: JocoShipBase | null) => shipInOldZone?.id === ship.id
     );
@@ -511,7 +600,7 @@ class Board {
     }
     await this.game.animationManager.play(
       new BgaSlideAnimation({
-        element: this.ships[ship.id],
+        element: this.ui.ships[ship.id],
         transitionTimingFunction: 'ease-in-out',
         fromRect,
       })
@@ -519,7 +608,7 @@ class Board {
   }
 
   public async removeShip(shipId: string, seaZone: string) {
-    this.ships[shipId].remove();
+    this.ui.ships[shipId].remove();
     const fromIndex = this.seas[seaZone].findIndex(
       (shipInOldZone: JocoShipBase | null) => shipInOldZone?.id === shipId
     );
@@ -528,37 +617,11 @@ class Board {
     }
   }
 
-  public async moveWriter(writer: JocoFamilyMember, from: string) {
-    const fromRegion = this.getWriterRegion(from);
-    const toRegion = this.getWriterRegion(writer.location);
-    // Skip if wrtier is already in location, ie player already moved it when performing action
-    // and this is triggered by notif.
-    if (
-      this.writers[toRegion].some(
-        (writerInLocation: JocoFamilyMember) =>
-          writerInLocation.id === writer.id
-      )
-    ) {
-      return;
-    }
-
-    const remainingFamilyMembers = this.writers[fromRegion].filter(
-      (member: JocoFamilyMember) => member.id !== writer.id
-    );
-
-    this.writers[fromRegion] = [];
-    const promises = remainingFamilyMembers.map((member: JocoFamilyMember) =>
-      this.moveFamilyMember(member)
-    );
-    promises.push(this.moveFamilyMember(writer));
-    await Promise.all(promises);
-  }
-
   public updateOtherShip(
     ship: JocoShipBase,
     type: OtherShipType
   ): JocoShipBase {
-    this.ships[ship.id].setAttribute('data-type', type);
+    this.ui.ships[ship.id].setAttribute('data-type', type);
     ship.type = type;
     ship.name = type === 'ExtraShip' ? _('Extra Ship') : _('Company Ship');
     return ship;
@@ -578,8 +641,8 @@ class Board {
       if (this.shipAlreadyInZone(id, location)) {
         return;
       }
-      if (!this.ships[id].parentElement) {
-        this.ui.ships.appendChild(this.ships[id]);
+      if (!this.ui.ships[id].parentElement) {
+        this.ui.containers.ships.appendChild(this.ui.ships[id]);
       }
       const nullIndex = (this.seas[location] as JocoShipBase[]).findIndex(
         (pos) => pos === null
@@ -589,11 +652,11 @@ class Board {
 
       const position = getShipPosition(location, shipIndex);
       this.seas[location][shipIndex] = ship;
-      setAbsolutePosition(this.ships[id], BOARD_SCALE, position);
+      setAbsolutePosition(this.ui.ships[id], BOARD_SCALE, position);
       if (fromElement) {
         await this.game.animationManager.play(
           new BgaSlideAnimation({
-            element: this.ships[id],
+            element: this.ui.ships[id],
             transitionTimingFunction: 'ease-in-out',
             fromRect: fromElement.getBoundingClientRect(),
           })
@@ -623,11 +686,4 @@ class Board {
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
-
-  private getWriterRegion(location: string) {
-    if (location.startsWith('Writers')) {
-      return location.split('_')[1];
-    }
-    throw new Error('FE_ERROR_001');
-  }
 }

@@ -1,16 +1,18 @@
 interface OnEnteringMilitaryAffairsAssignArgs extends CommonStateArgs {
-  playerShips: JocoShipBase[];
-  otherShips: JocoShipBase[];
-  treasury: number;
+  armies: string[];
+  officersInTraining: Record<string, JocoFamilyMember>;
 }
 
 class MilitaryAffairsAssign implements State {
   private static instance: MilitaryAffairsAssign;
   private args: OnEnteringMilitaryAffairsAssignArgs;
-  private placedCompanyShips: Record<string, string>;
-  private placedExtraShips: Record<string, string>;
-  private placedPlayerShips: Record<string, string>;
-  private treasury: number;
+  private assignedOfficers: Record<
+    string,
+    {
+      officer: JocoFamilyMember;
+      to: string;
+    }
+  >;
 
   constructor(private game: GameAlias) {}
 
@@ -25,10 +27,7 @@ class MilitaryAffairsAssign implements State {
   onEnteringState(args: OnEnteringMilitaryAffairsAssignArgs) {
     debug('Entering MilitaryAffairsAssign state');
     this.args = args;
-    this.placedCompanyShips = {};
-    this.placedExtraShips = {};
-    this.placedPlayerShips = {};
-    this.treasury = this.args.treasury;
+    this.assignedOfficers = {};
 
     this.updateInterfaceInitialStep();
   }
@@ -42,7 +41,7 @@ class MilitaryAffairsAssign implements State {
     args: OnEnteringMilitaryAffairsAssignArgs
   ) {
     updatePageTitle(
-      _('${tkn_playerName} may fit, buy and lease ships'),
+      _('${tkn_playerName} must assign officers-in-training'),
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
@@ -69,118 +68,41 @@ class MilitaryAffairsAssign implements State {
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
 
-    // if (this.treasury < 2) {
-    //   this.updateInterfaceConfirm();
-    //   return;
-    // }
+    if (
+      Object.keys(this.assignedOfficers).length ===
+      Object.keys(this.args.officersInTraining).length
+    ) {
+      this.updateInterfaceConfirm();
+      return;
+    }
 
-    // updatePageTitle(
-    //   _('${you} may fit, buy and lease ships (£${amount} remaining)'),
-    //   { amount: this.treasury }
-    // );
+    updatePageTitle(_('${you} must assign all officers-in-training'));
     const board = Board.getInstance();
 
-    let playerShipsAvailable = false;
-
-    // this.args.playerShips.forEach((ship) => {
-    //   const { id, type, name, fatigued, owner: playerId } = ship;
-    //   if (this.placedPlayerShips[ship.id] || this.treasury < 3) {
-    //     return;
-    //   }
-    //   playerShipsAvailable = true;
-    //   addPlayerButton({
-    //     id: `${ship.id}_btn`,
-    //     text: formatStringRecursive(_('Fit ${tkn_ship}'), {
-    //       tkn_ship: tknShipValue({ type, name, fatigued }),
-    //     }),
-    //     playerId,
-    //     callback: () => {
-    //       this.updateInterfaceSelectSeaZone(ship, playerId);
-    //     },
-    //   });
-    // });
-    // if (this.treasury >= 2) {
-    //   addSecondaryActionButton({
-    //     id: 'extraShip_btn',
-    //     text: formatStringRecursive(_('Lease ${tkn_ship}'), {
-    //       tkn_ship: tknShipValue({
-    //         type: EXTRA_SHIP,
-    //         name: _('Extra Ship'),
-    //         fatigued: 0,
-    //       }),
-    //     }),
-    //     callback: () => {
-    //       const ship = this.args.otherShips.pop();
-    //       ship.type = EXTRA_SHIP;
-    //       this.updateInterfaceSelectSeaZone(ship);
-    //     },
-    //   });
-    // }
-    // if (!playerShipsAvailable && this.treasury >= 5) {
-    //   addSecondaryActionButton({
-    //     id: 'companyShip_btn',
-    //     text: formatStringRecursive(_('Buy ${tkn_ship}'), {
-    //       tkn_ship: tknShipValue({
-    //         type: COMPANY_SHIP,
-    //         name: _('Company Ship'),
-    //         fatigued: 0,
-    //       }),
-    //     }),
-    //     callback: () => {
-    //       const ship = this.args.otherShips.pop();
-    //       ship.type = COMPANY_SHIP;
-    //       this.updateInterfaceSelectSeaZone(ship);
-    //     },
-    //   });
-    // }
-
-    // if (this.treasury === 2) {
-    //   addPrimaryActionButton({
-    //     id: 'done_btn',
-    //     text: _('Done'),
-    //     callback: () => this.updateInterfaceConfirm(),
-    //   });
-    // }
-    // if (
-    //   Object.keys(this.placedPlayerShips).length > 0 ||
-    //   Object.keys(this.placedExtraShips).length > 0 ||
-    //   Object.keys(this.placedCompanyShips).length > 0
-    // ) {
-    //   this.addCancelButton();
-    // }
-  }
-
-  private updateInterfaceSelectSeaZone(ship: JocoShipBase, playerId?: number) {
-    clearPossible();
-
-    const board = Board.getInstance();
-
-    updatePageTitle(_('${you} must select a sea zone'));
-
-    SEA_ZONES.forEach((seaZone) => {
-      onClick(board.selectBoxes[seaZone], async () => {
-        ship.location = seaZone;
-        let fromElt = undefined;
-        clearPossible();
-        if (playerId) {
-          // Player Ship
-          this.placedPlayerShips[ship.id] = seaZone;
-          const player = PlayerManager.getInstance().getPlayer(playerId);
-          player.counters[SHIPS_COUNTER].incValue(-1);
-          fromElt = player.ui[SHIPS_COUNTER];
-          this.pay(3);
-        } else if (ship.type === EXTRA_SHIP) {
-          ship = board.updateOtherShip(ship, EXTRA_SHIP);
-          this.placedExtraShips[ship.id] = seaZone;
-          this.pay(2);
-        } else {
-          // Company ship
-          ship = board.updateOtherShip(ship, COMPANY_SHIP);
-          this.placedCompanyShips[ship.id] = seaZone;
-          this.pay(5);
+    Object.entries(this.args.officersInTraining).forEach(
+      ([officerId, officer]) => {
+        if (this.assignedOfficers[officerId]) {
+          return;
         }
 
-        await board.placeShip(ship, fromElt);
+        onClick(board.ui.familyMembers[officerId], () =>
+          this.updateInterfaceSelectArmy(officer)
+        );
+      }
+    );
+  }
+
+  private updateInterfaceSelectArmy(officer: JocoFamilyMember) {
+    clearPossible();
+    const board = Board.getInstance();
+
+    setSelected(board.ui.familyMembers[officer.id]);
+
+    this.args.armies.forEach((to) => {
+      onClick(board.ui.selectBoxes[to], async () => {
+        clearPossible();
+        await board.moveFamilyMemberBetweenLocations(officer, to);
+        this.assignedOfficers[officer.id] = { officer, to };
         this.updateInterfaceInitialStep();
       });
     });
@@ -191,13 +113,13 @@ class MilitaryAffairsAssign implements State {
   private updateInterfaceConfirm() {
     clearPossible();
 
-    updatePageTitle(_('Confirm ship placement'));
+    updatePageTitle(_('Assign officers?'));
 
     addConfirmButton(() => {
       performAction('actMilitaryAffairsAssign', {
-        playerShips: this.placedPlayerShips,
-        extraShips: this.placedExtraShips,
-        companyShips: this.placedCompanyShips,
+        assignedOfficers: Object.values(this.assignedOfficers).map(
+          ({ officer, to }) => ({ familyMemberId: officer.id, to })
+        ),
       });
     });
     this.addCancelButton();
@@ -214,20 +136,12 @@ class MilitaryAffairsAssign implements State {
   private async returnPieces() {
     const board = Board.getInstance();
 
-    [
-      this.placedCompanyShips,
-      this.placedExtraShips,
-      this.placedPlayerShips,
-    ].forEach((category) => {
-      Object.entries(category).forEach(([shipId, seaZone]) => {
-        board.removeShip(shipId, seaZone);
-      });
-    });
-  }
-
-  private async pay(amount: number) {
-    this.treasury -= amount;
-    Board.getInstance().treasuries[MANAGER_OF_SHIPPING].toValue(this.treasury);
+    for (const { officer, to } of Object.values(this.assignedOfficers)) {
+      await board.moveFamilyMemberBetweenLocations(
+        officer,
+        OFFICER_IN_TRAINING
+      );
+    }
   }
 
   //  ..######..##.......####..######..##....##

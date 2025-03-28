@@ -74,7 +74,7 @@ class ChairmanDebtConsent implements State {
       }
     );
     setSelected(
-      Board.getInstance().selectBoxes[`companyDebt_${this.args.debt}`]
+      Board.getInstance().ui.selectBoxes[`companyDebt_${this.args.debt}`]
     );
     addPrimaryActionButton({
       id: 'yay_btn',

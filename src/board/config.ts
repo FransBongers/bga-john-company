@@ -77,12 +77,40 @@ const getGroupPosition = (
   index: number,
   rowSize: number
 ): AbsolutePosition => {
-  const row = Math.floor(index / 4);
+  const row = Math.floor(index / rowSize);
   const column = index % 4;
   return {
     top: top + 46 * row,
     left: left + 39 * column,
   };
+};
+
+const getRegimentGroupPosition = (
+  top: number,
+  left: number,
+  index: number,
+  rowSize: number
+): AbsolutePosition => {
+  const row = Math.floor(index / rowSize);
+  const column = index % 4;
+  return {
+    top: top + 46 * row,
+    left: left + 10 * column,
+  };
+};
+
+const getOfficerPosition = (army: string, index: number): AbsolutePosition => {
+  console.log('getOfficerPosition', army, index);
+  switch (army) {
+    case BOMBAY_ARMY:
+      return getGroupPosition(22, 760, index, 3);
+    case BENGAL_ARMY:
+      return getGroupPosition(408, 760, index, 3);
+    case MADRAS_ARMY:
+      return getGroupPosition(215, 760, index, 3);
+    default:
+      return { top: 0, left: 0 };
+  }
 };
 
 const getRegimentPosition = (
@@ -92,11 +120,11 @@ const getRegimentPosition = (
 ): AbsolutePosition => {
   switch (location) {
     case BOMBAY_ARMY:
-      return getGroupPosition(22, 694, index, 4);
+      return getRegimentGroupPosition(22, 694, index, 4);
     case BENGAL_ARMY:
-      return getGroupPosition(408, 694, index, 4);
+      return getRegimentGroupPosition(408, 694, index, 4);
     case MADRAS_ARMY:
-      return getGroupPosition(215, 694, index, 4);
+      return getRegimentGroupPosition(215, 694, index, 4);
     default:
       return { top: 0, left: 0 };
   }
@@ -109,15 +137,15 @@ const getOfficersInTrainingPosition = (index: number) =>
   getGroupPosition(602, 692, index, 3);
 
 const getWriterPosition = (
-  presidency: string,
+  location: string,
   index: number
 ): AbsolutePosition => {
-  switch (presidency) {
-    case BOMBAY:
+  switch (location) {
+    case BOMBAY_WRITERS:
       return getGroupPosition(602, 894, index, 3);
-    case BENGAL:
+    case BENGAL_WRITERS:
       return getGroupPosition(602, 1273, index, 3);
-    case MADRAS:
+    case MADRAS_WRITERS:
       return getGroupPosition(602, 1084, index, 3);
     default:
       return { top: 0, left: 0 };
@@ -249,7 +277,7 @@ const POWER_TOKEN_POSITIONS: AbsolutePosition[] = [
   { top: 159, left: 301 },
 ];
 
-const ARMY_SELECT_POSITIONS: Record<string,AbsolutePosition> = {
+const ARMY_SELECT_POSITIONS: Record<string, AbsolutePosition> = {
   [BOMBAY_ARMY]: { top: 21, left: 692 },
   [MADRAS_ARMY]: { top: 214, left: 692 },
   [BENGAL_ARMY]: { top: 407, left: 692 },
@@ -267,7 +295,7 @@ const COMPANY_DEBT_SELECT_POSITIONS: AbsolutePosition[] = [
   { top: 157, left: 640 },
 ];
 
-const SEA_ZONE_SELECT_POSITIONS: Record<string,AbsolutePosition> = {
+const SEA_ZONE_SELECT_POSITIONS: Record<string, AbsolutePosition> = {
   [WEST_INDIAN]: { top: 377, left: 885 },
   [SOUTH_INDIAN]: { top: 432, left: 1219 },
   [EAST_INDIAN]: { top: 301, left: 1317 },

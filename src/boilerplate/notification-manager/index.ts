@@ -70,10 +70,10 @@ class NotificationManager {
       'gainEnterprise',
       'increaseCompanyDebt',
       'makeCheck',
+      'moveFamilyMember',
       'moveFamilyMembers',
       'moveRegiment',
       'moveShip',
-      'moveWriter',
       'newCompanyShare',
       'nextPhase',
       'payFromTreasury',
@@ -239,7 +239,7 @@ class NotificationManager {
 
   async notif_changeOrderStatus(notif: Notif<NotifChangeOrderStatus>) {
     const { order } = notif.args;
-    Board.getInstance().orders[order.id].setAttribute(
+    Board.getInstance().ui.orders[order.id].setAttribute(
       'data-status',
       order.status
     );
@@ -341,12 +341,19 @@ class NotificationManager {
     // TODO: animation
   }
 
+  async notif_moveFamilyMember(notif: Notif<NotifMoveFamilyMember>) {
+    const { familyMember, to } = notif.args;
+    const board = Board.getInstance();
+
+    await board.moveFamilyMemberBetweenLocations(familyMember, to)
+  }
+
   async notif_moveFamilyMembers(notif: Notif<NotifMoveFamilyMembers>) {
     const { familyMembers } = notif.args;
     const board = Board.getInstance();
     await Promise.all(
       familyMembers.map(async (familyMember, index) =>
-        board.moveFamilyMember(familyMember, index)
+        board.moveFamilyMember({familyMember, index})
       )
     );
     board.updateFamilyMembers(familyMembers);
@@ -362,11 +369,6 @@ class NotificationManager {
     await Board.getInstance().moveShip({ ship, from });
   }
 
-  async notif_moveWriter(notif: Notif<NotifMoveWriterArgs>) {
-    const { from, writer } = notif.args;
-    await Board.getInstance().moveWriter(writer, from);
-  }
-
   async notif_newCompanyShare(notif: Notif<NotifNewCompanyShare>) {
     const { playerId, familyMember, debt } = notif.args;
 
@@ -375,7 +377,7 @@ class NotificationManager {
     const board = Board.getInstance();
 
     await Promise.all([
-      board.moveFamilyMember(familyMember),
+      board.moveFamilyMember({familyMember}),
       board.movePawn('debt', debt),
     ]);
     player.counters[SHARES_COUNTER].incValue(1);
@@ -424,7 +426,7 @@ class NotificationManager {
     notif: Notif<NotifReturnFamilyMemberToSupply>
   ) {
     const { familyMember, playerId } = notif.args;
-    const element = Board.getInstance().familyMembers[familyMember.id];
+    const element = Board.getInstance().ui.familyMembers[familyMember.id];
     await moveToAnimation({
       game: this.game,
       element,

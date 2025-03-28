@@ -339,7 +339,7 @@ $machinestates = [
         'descriptionmyturn' => clienttranslate('${you}'),
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
-        'possibleactions' => ['act' . MILITARY_AFFAIRS_TRANSFERS, 'actTakeAtomicAction'],
+        'possibleactions' => ['act' . MILITARY_AFFAIRS_TRANSFERS, 'actPassOptionalAction',  'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
@@ -364,4 +364,27 @@ $machinestates = [
         'possibleactions' => ['act' . PRESIDENCY_DECIDE_ORDER, 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
+
+    ST_PRESIDENCY_TRADE => [
+        'name' => PRESIDENCY_TRADE,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . PRESIDENCY_TRADE, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_PRESIDENCY_TRADE_FILL_ORDERS => [
+        'name' => PRESIDENCY_TRADE_FILL_ORDERS,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . PRESIDENCY_TRADE_FILL_ORDERS, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
 ];

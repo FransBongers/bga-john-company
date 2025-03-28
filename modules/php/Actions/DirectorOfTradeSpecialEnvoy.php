@@ -133,9 +133,8 @@ class DirectorOfTradeSpecialEnvoy extends \Bga\Games\JohnCompany\Models\AtomicAc
     }
 
     $office = Offices::get(DIRECTOR_OF_TRADE);
-    $office->incTreasury(-$spend);
-
-    Notifications::payFromTreasury($player, $office, $spend, $office->getTreasury());
+    $office->pay($player, $spend);
+    
     $checkResult = JoCoUtils::makeCheck($player, $office, $spend);
     if ($checkResult !== CATASTROPHIC_FAILURE && $office->getTreasury() > 0) {
       $action = [
@@ -153,9 +152,8 @@ class DirectorOfTradeSpecialEnvoy extends \Bga\Games\JohnCompany\Models\AtomicAc
         'activePlayerIds' => [$playerId]
       ];
       $this->ctx->insertAsBrother(Engine::buildTree($action));
-    } else {
-      Notifications::failCheck($player);
     }
+
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
 
     $this->resolveAction([], true);

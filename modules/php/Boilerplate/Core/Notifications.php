@@ -189,6 +189,23 @@ class Notifications
     return isset($idNameMap[$regionId]) ? $idNameMap[$regionId] : 'Unmapped region';
   }
 
+  private static function getLocationNameForFamilyMember($location)
+  {
+    $locationNameMap = [
+      BENGAL_WRITERS  => clienttranslate('Bengal'),
+      BOMBAY_WRITERS => clienttranslate('Bombay'),
+      MADRAS_WRITERS => clienttranslate('Madras'),
+      BENGAL_ARMY => clienttranslate('army of Bengal'),
+      BOMBAY_ARMY => clienttranslate('army of Bombay'),
+      MADRAS_ARMY => clienttranslate('army of Madras'),
+      OFFICER_IN_TRAINING => clienttranslate('officers-in-training')
+    ];
+    if (!isset($locationNameMap[$location])) {
+      throw new \feException("ERROR_021");
+    }
+    return $locationNameMap[$location];
+  }
+
   // ..######......###....##.....##.########
   // .##....##....##.##...###...###.##......
   // .##.........##...##..####.####.##......
@@ -284,13 +301,6 @@ class Notifications
       'tkn_boldText_regionName' => $region->getName(),
       'familyMember' => $familyMember,
       'i18n' => ['tkn_boldText_regionName'],
-    ]);
-  }
-
-  public static function failCheck($player)
-  {
-    self::message(clienttranslate('${player_name} fails the check'), [
-      'player' => $player
     ]);
   }
 
@@ -431,6 +441,19 @@ class Notifications
     ]);
   }
 
+  public static function moveFamilyMember($player, $familyMember, $to)
+  {
+    self::notifyAll('moveFamilyMember', clienttranslate('${player_name} moves ${tkn_familyMember} from ${tkn_boldText_from} to ${tkn_boldText_to}'), [
+      'player' => $player,
+      'familyMember' => $familyMember->jsonSerialize(),
+      'to' => $to,
+      'tkn_familyMember' => self::tknFamilyMember($familyMember),
+      'tkn_boldText_from' => self::getLocationNameForFamilyMember($familyMember->getLocation()),
+      'tkn_boldText_to' => self::getLocationNameForFamilyMember($to),
+      'i18n' => ['tkn_boldText_from', 'tkn_boldText_to'],
+    ]);
+  }
+
   public static function moveRegiment($player, $regiment, $from)
   {
     self::notifyAll('moveRegiment', clienttranslate('${player_name} moves ${tkn_regiment} from the army of ${tkn_boldText_from} to the army of ${tkn_boldText_to}'), [
@@ -454,19 +477,6 @@ class Notifications
       'tkn_boldText_from' => self::getSeaName($from),
       'tkn_boldText_to' => self::getSeaName($ship->getLocation()),
       'i18n' => ['tkn_boldText_shipName', 'tkn_boldText_from', 'tkn_boldText_to'],
-    ]);
-  }
-
-  public static function moveWriter($player, $writer, $from)
-  {
-    self::notifyAll('moveWriter', clienttranslate('${player_name} moves ${tkn_familyMember} from ${tkn_boldText_from} to ${tkn_boldText_to}'), [
-      'player' => $player,
-      'writer' => $writer->jsonSerialize(),
-      'from' => $from,
-      'tkn_familyMember' => self::tknFamilyMember($writer),
-      'tkn_boldText_from' => self::getRegionNameForWriter($from),
-      'tkn_boldText_to' => self::getRegionNameForWriter($writer->getLocation()),
-      'i18n' => ['tkn_boldText_from', 'tkn_boldText_to'],
     ]);
   }
 

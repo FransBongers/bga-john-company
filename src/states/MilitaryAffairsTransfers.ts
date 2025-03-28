@@ -108,7 +108,7 @@ class MilitaryAffairsTransfers implements State {
       if (this.transfers.regiments[id]) {
         return;
       }
-      onClick(board.armyPieces[id], () =>
+      onClick(board.ui.armyPieces[id], () =>
         this.updateInterfaceSelectArmyForRegiment(data)
       );
     });
@@ -139,10 +139,10 @@ class MilitaryAffairsTransfers implements State {
     clearPossible();
     const board = Board.getInstance();
 
-    setSelected(board.armyPieces[regiment.id]);
+    setSelected(board.ui.armyPieces[regiment.id]);
 
     locations.forEach((to) => {
-      onClick(board.selectBoxes[to], async () => {
+      onClick(board.ui.selectBoxes[to], async () => {
         const from = regiment.location;
         this.transfers.regiments[regiment.id] = {
           regiment,
@@ -225,7 +225,7 @@ class MilitaryAffairsTransfers implements State {
     }
     // for (let data of Object.values(this.transfers.writers)) {
     //   data.writer.location = data.from;
-    //   await board.moveWriter(data.writer, data.to);
+    //   await board.moveFamilyMemberBetweenLocations(data.writer, data.to);
     // }
   }
 

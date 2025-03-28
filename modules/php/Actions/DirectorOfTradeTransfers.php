@@ -167,7 +167,7 @@ class DirectorOfTradeTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
       }
       $familyMember = $stateArgs['options']['writers'][$writerId]['familyMember'];
       // $familyMember->setLocation($to);
-      $familyMember->moveWriter($player, $to);
+      $familyMember->moveTo($player, $to);
     }
 
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');

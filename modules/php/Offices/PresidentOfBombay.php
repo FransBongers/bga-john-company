@@ -21,4 +21,14 @@ class PresidentOfBombay extends \Bga\Games\JohnCompany\Models\Office
   {
     return BOMBAY;
   }
+
+  public function getSeaZone()
+  {
+    return WEST_INDIAN;
+  }
+
+  public function getHomePortOrderId()
+  {
+    return ORDER_BOMBAY_3;
+  }
 }

@@ -2,6 +2,7 @@ var _a, _b, _c;
 var BOARD_SCALE = 'boardScale';
 var PLUS = 'plus';
 var MINUS = 'minus';
+var TRADE = 'trade';
 var BENYON = 'Benyon';
 var HASTINGS = 'Hastings';
 var LARKINS = 'Larkins';
@@ -133,6 +134,10 @@ var PUNJAB = 'Punjab';
 var BENGAL_PRESIDENCY = 'BengalPresidency';
 var BOMBAY_PRESIDENCY = 'BombayPresidency';
 var MADRAS_PRESIDENCY = 'MadrasPresidency';
+var BENGAL_WRITERS = 'Writers_Bengal';
+var BOMBAY_WRITERS = 'Writers_Bombay';
+var MADRAS_WRITERS = 'Writers_Madras';
+var WRITER_LOCATIONS = [BENGAL_WRITERS, BOMBAY_WRITERS, MADRAS_WRITERS];
 var BENGAL_ARMY = 'Army_Bengal';
 var BOMBAY_ARMY = 'Army_Bombay';
 var MADRAS_ARMY = 'Army_Madras';
@@ -855,10 +860,10 @@ var NotificationManager = (function () {
             'gainEnterprise',
             'increaseCompanyDebt',
             'makeCheck',
+            'moveFamilyMember',
             'moveFamilyMembers',
             'moveRegiment',
             'moveShip',
-            'moveWriter',
             'newCompanyShare',
             'nextPhase',
             'payFromTreasury',
@@ -1009,7 +1014,7 @@ var NotificationManager = (function () {
             var order;
             return __generator(this, function (_a) {
                 order = notif.args.order;
-                Board.getInstance().orders[order.id].setAttribute('data-status', order.status);
+                Board.getInstance().ui.orders[order.id].setAttribute('data-status', order.status);
                 return [2];
             });
         });
@@ -1152,6 +1157,22 @@ var NotificationManager = (function () {
             });
         });
     };
+    NotificationManager.prototype.notif_moveFamilyMember = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, familyMember, to, board;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = notif.args, familyMember = _a.familyMember, to = _a.to;
+                        board = Board.getInstance();
+                        return [4, board.moveFamilyMemberBetweenLocations(familyMember, to)];
+                    case 1:
+                        _b.sent();
+                        return [2];
+                }
+            });
+        });
+    };
     NotificationManager.prototype.notif_moveFamilyMembers = function (notif) {
         return __awaiter(this, void 0, void 0, function () {
             var familyMembers, board;
@@ -1162,7 +1183,7 @@ var NotificationManager = (function () {
                         familyMembers = notif.args.familyMembers;
                         board = Board.getInstance();
                         return [4, Promise.all(familyMembers.map(function (familyMember, index) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
-                                return [2, board.moveFamilyMember(familyMember, index)];
+                                return [2, board.moveFamilyMember({ familyMember: familyMember, index: index })];
                             }); }); }))];
                     case 1:
                         _a.sent();
@@ -1202,21 +1223,6 @@ var NotificationManager = (function () {
             });
         });
     };
-    NotificationManager.prototype.notif_moveWriter = function (notif) {
-        return __awaiter(this, void 0, void 0, function () {
-            var _a, from, writer;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        _a = notif.args, from = _a.from, writer = _a.writer;
-                        return [4, Board.getInstance().moveWriter(writer, from)];
-                    case 1:
-                        _b.sent();
-                        return [2];
-                }
-            });
-        });
-    };
     NotificationManager.prototype.notif_newCompanyShare = function (notif) {
         return __awaiter(this, void 0, void 0, function () {
             var _a, playerId, familyMember, debt, player, board;
@@ -1227,7 +1233,7 @@ var NotificationManager = (function () {
                         player = this.getPlayer(playerId);
                         board = Board.getInstance();
                         return [4, Promise.all([
-                                board.moveFamilyMember(familyMember),
+                                board.moveFamilyMember({ familyMember: familyMember }),
                                 board.movePawn('debt', debt),
                             ])];
                     case 1:
@@ -1315,7 +1321,7 @@ var NotificationManager = (function () {
                 switch (_b.label) {
                     case 0:
                         _a = notif.args, familyMember = _a.familyMember, playerId = _a.playerId;
-                        element = Board.getInstance().familyMembers[familyMember.id];
+                        element = Board.getInstance().ui.familyMembers[familyMember.id];
                         return [4, moveToAnimation({
                                 game: this.game,
                                 element: element,
@@ -1535,6 +1541,9 @@ var JohnCompany = (function () {
             MilitaryAffairsAssign: MilitaryAffairsAssign,
             MilitaryAffairsTransfers: MilitaryAffairsTransfers,
             PlayerTurn: PlayerTurn,
+            PresidencyDecideOrder: PresidencyDecideOrder,
+            PresidencyTrade: PresidencyTrade,
+            PresidencyTradeFillOrders: PresidencyTradeFillOrders,
             SeekShare: SeekShare,
         };
         console.log('johncompany constructor');
@@ -1987,21 +1996,42 @@ var TURN_CONFIG = {
     endGameScoring: { top: 138, left: 199.5 },
 };
 var getGroupPosition = function (top, left, index, rowSize) {
-    var row = Math.floor(index / 4);
+    var row = Math.floor(index / rowSize);
     var column = index % 4;
     return {
         top: top + 46 * row,
         left: left + 39 * column,
     };
 };
+var getRegimentGroupPosition = function (top, left, index, rowSize) {
+    var row = Math.floor(index / rowSize);
+    var column = index % 4;
+    return {
+        top: top + 46 * row,
+        left: left + 10 * column,
+    };
+};
+var getOfficerPosition = function (army, index) {
+    console.log('getOfficerPosition', army, index);
+    switch (army) {
+        case BOMBAY_ARMY:
+            return getGroupPosition(22, 760, index, 3);
+        case BENGAL_ARMY:
+            return getGroupPosition(408, 760, index, 3);
+        case MADRAS_ARMY:
+            return getGroupPosition(215, 760, index, 3);
+        default:
+            return { top: 0, left: 0 };
+    }
+};
 var getRegimentPosition = function (location, index, exhausted) {
     switch (location) {
         case BOMBAY_ARMY:
-            return getGroupPosition(22, 694, index, 4);
+            return getRegimentGroupPosition(22, 694, index, 4);
         case BENGAL_ARMY:
-            return getGroupPosition(408, 694, index, 4);
+            return getRegimentGroupPosition(408, 694, index, 4);
         case MADRAS_ARMY:
-            return getGroupPosition(215, 694, index, 4);
+            return getRegimentGroupPosition(215, 694, index, 4);
         default:
             return { top: 0, left: 0 };
     }
@@ -2012,13 +2042,13 @@ var getCourtOfDirectorsPosition = function (index) {
 var getOfficersInTrainingPosition = function (index) {
     return getGroupPosition(602, 692, index, 3);
 };
-var getWriterPosition = function (presidency, index) {
-    switch (presidency) {
-        case BOMBAY:
+var getWriterPosition = function (location, index) {
+    switch (location) {
+        case BOMBAY_WRITERS:
             return getGroupPosition(602, 894, index, 3);
-        case BENGAL:
+        case BENGAL_WRITERS:
             return getGroupPosition(602, 1273, index, 3);
-        case MADRAS:
+        case MADRAS_WRITERS:
             return getGroupPosition(602, 1084, index, 3);
         default:
             return { top: 0, left: 0 };
@@ -2158,13 +2188,8 @@ var SEA_ZONE_SELECT_POSITIONS = (_g = {},
     _g);
 var Board = (function () {
     function Board(game) {
-        var _a, _b, _c;
+        var _a, _b;
         this.familyMembers = {};
-        this.armyPieces = {};
-        this.ships = {};
-        this.selectBoxes = {};
-        this.courtOfDirectors = [];
-        this.orders = {};
         this.regions = {};
         this.armies = {
             regiments: (_a = {},
@@ -2173,18 +2198,12 @@ var Board = (function () {
                 _a[MADRAS_ARMY] = [],
                 _a),
         };
-        this.writers = (_b = {},
-            _b[BENGAL] = [],
-            _b[BOMBAY] = [],
-            _b[MADRAS] = [],
-            _b);
-        this.officersInTraining = [];
         this.powerTokens = {};
-        this.seas = (_c = {},
-            _c[WEST_INDIAN] = [],
-            _c[SOUTH_INDIAN] = [],
-            _c[EAST_INDIAN] = [],
-            _c);
+        this.seas = (_b = {},
+            _b[WEST_INDIAN] = [],
+            _b[SOUTH_INDIAN] = [],
+            _b[EAST_INDIAN] = [],
+            _b);
         this.treasuries = {};
         this.game = game;
         this.setup(game.gamedatas);
@@ -2200,15 +2219,22 @@ var Board = (function () {
             .getElementById('joco')
             .insertAdjacentHTML('afterbegin', tplBoard(gamedatas));
         this.ui = {
-            board: document.getElementById('joco-board'),
-            familyMembers: document.getElementById('joco-family-members'),
-            orders: document.getElementById('joco-orders'),
-            regiments: document.getElementById('joco-regiments'),
-            pawns: {},
-            powerTokens: document.getElementById('joco-power-tokens'),
-            selectBoxes: document.getElementById('joco-select-boxes'),
-            ships: document.getElementById('joco_ships'),
-            treasuries: document.getElementById('joco_treasuries'),
+            containers: {
+                board: document.getElementById('joco-board'),
+                familyMembers: document.getElementById('joco-family-members'),
+                orders: document.getElementById('joco-orders'),
+                regiments: document.getElementById('joco-regiments'),
+                pawns: {},
+                powerTokens: document.getElementById('joco-power-tokens'),
+                selectBoxes: document.getElementById('joco-select-boxes'),
+                ships: document.getElementById('joco_ships'),
+                treasuries: document.getElementById('joco_treasuries'),
+            },
+            armyPieces: {},
+            familyMembers: {},
+            orders: {},
+            selectBoxes: {},
+            ships: {},
         };
         this.setupArmyPieces(gamedatas);
         this.setupOrders(gamedatas);
@@ -2225,7 +2251,7 @@ var Board = (function () {
         Object.entries(gamedatas.armyPieces).forEach(function (_a) {
             var id = _a[0], piece = _a[1];
             if (id.startsWith('Regiment')) {
-                _this.armyPieces[id] = createRegiment();
+                _this.ui.armyPieces[id] = createRegiment();
             }
         });
         this.updateArmyPieces(Object.values(gamedatas.armyPieces));
@@ -2234,18 +2260,24 @@ var Board = (function () {
         var _this = this;
         Object.values(gamedatas.familyMembers).forEach(function (_a) {
             var id = _a.id, familyId = _a.familyId;
-            _this.familyMembers[id] = createFamilyMember(familyId === CROWN
+            _this.ui.familyMembers[id] = createFamilyMember(familyId === CROWN
                 ? COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[PlayerManager.getInstance()
                     .getPlayer(CROWN_PLAYER_ID)
                     .getColor()]]
                 : familyId, id);
+            __spreadArray(__spreadArray([
+                COURT_OF_DIRECTORS,
+                OFFICER_IN_TRAINING
+            ], WRITER_LOCATIONS, true), ARMIES, true).forEach(function (location) {
+                _this.familyMembers[location] = [];
+            });
         });
         this.updateFamilyMembers(Object.values(gamedatas.familyMembers));
     };
     Board.prototype.setupOrders = function (gamedatas) {
         var _this = this;
         Object.keys(gamedatas.orders).forEach(function (orderId) {
-            var elt = (_this.orders[orderId] = document.createElement('div'));
+            var elt = (_this.ui.orders[orderId] = document.createElement('div'));
             elt.classList.add('joco-order');
         });
         this.updateOrders(gamedatas);
@@ -2259,73 +2291,77 @@ var Board = (function () {
     Board.prototype.setupPawns = function (gamedatas) {
         var _this = this;
         ['balance', 'standing', 'debt', 'turn', 'phase'].forEach(function (pawn) {
-            var elt = (_this.ui.pawns[pawn] = document.createElement('div'));
+            var elt = (_this.ui.containers.pawns[pawn] =
+                document.createElement('div'));
             elt.id = pawn;
             elt.classList.add('joco_pawn');
             elt.setAttribute('data-color', pawn === 'turn' ? 'black' : pawn === 'phase' ? 'silver' : 'red');
-            _this.ui.board.appendChild(elt);
+            _this.ui.containers.board.appendChild(elt);
         });
         this.updatePawns(gamedatas);
     };
     Board.prototype.setupPowerTokens = function (gamedatas) {
         var _this = this;
         POWER_TOKENS.forEach(function (token) {
-            var elt = (_this.ui.powerTokens[token] = document.createElement('div'));
+            var elt = (_this.ui.containers.powerTokens[token] =
+                document.createElement('div'));
             elt.classList.add('joco-power-token');
             elt.setAttribute('data-type', token);
             var iconElt = document.createElement('div');
             iconElt.classList.add('joco-icon');
             iconElt.setAttribute('data-icon', POWER_TOKEN_ICON_MAP[token]);
             elt.appendChild(iconElt);
-            _this.ui.powerTokens.appendChild(elt);
+            _this.ui.containers.powerTokens.appendChild(elt);
         });
         this.updatePowerTokens(gamedatas);
     };
     Board.prototype.setupSelectBoxes = function () {
         var _this = this;
         ARMIES.forEach(function (army) {
-            var elt = (_this.selectBoxes[army] = document.createElement('div'));
+            var elt = (_this.ui.selectBoxes[army] = document.createElement('div'));
             elt.classList.add('joco-select-box');
             elt.classList.add('joco-select-army');
             setAbsolutePosition(elt, BOARD_SCALE, ARMY_SELECT_POSITIONS[army]);
-            _this.ui.selectBoxes.appendChild(elt);
+            _this.ui.containers.selectBoxes.appendChild(elt);
         });
         [BENGAL, BOMBAY, MADRAS].forEach(function (region) {
-            var elt = (_this.selectBoxes["Writers_".concat(region)] =
+            var elt = (_this.ui.selectBoxes["Writers_".concat(region)] =
                 document.createElement('div'));
             elt.classList.add('joco-select-box');
             elt.classList.add('joco-select-writer');
             elt.setAttribute('data-region', region);
-            _this.ui.selectBoxes.appendChild(elt);
+            _this.ui.containers.selectBoxes.appendChild(elt);
         });
         SEA_ZONES.forEach(function (seaZone) {
-            var elt = (_this.selectBoxes[seaZone] = document.createElement('div'));
+            var elt = (_this.ui.selectBoxes[seaZone] =
+                document.createElement('div'));
             elt.classList.add('joco-select-box');
             elt.classList.add('joco-select-sea-zone');
             setAbsolutePosition(elt, BOARD_SCALE, SEA_ZONE_SELECT_POSITIONS[seaZone]);
-            _this.ui.selectBoxes.appendChild(elt);
+            _this.ui.containers.selectBoxes.appendChild(elt);
         });
         STOCK_EXCHANGE_POSITIONS.forEach(function (position) {
-            var elt = (_this.selectBoxes[position] = document.createElement('div'));
+            var elt = (_this.ui.selectBoxes[position] =
+                document.createElement('div'));
             elt.classList.add('joco-select-box');
             elt.classList.add('joco-seek-share');
             elt.setAttribute('data-position', position);
-            _this.ui.selectBoxes.appendChild(elt);
+            _this.ui.containers.selectBoxes.appendChild(elt);
         });
         Array.from(Array(9).keys()).forEach(function (value) {
-            var elt = (_this.selectBoxes["companyDebt_".concat(value)] =
+            var elt = (_this.ui.selectBoxes["companyDebt_".concat(value)] =
                 document.createElement('div'));
             elt.classList.add('joco-select-box');
             elt.classList.add('joco-company-debt');
             setAbsolutePosition(elt, BOARD_SCALE, COMPANY_DEBT_SELECT_POSITIONS[value]);
-            _this.ui.selectBoxes.appendChild(elt);
+            _this.ui.containers.selectBoxes.appendChild(elt);
         });
     };
     Board.prototype.setupShips = function (gamedatas) {
         var _this = this;
         Object.values(gamedatas.ships).forEach(function (_a) {
             var id = _a.id, name = _a.name, type = _a.type, fatigued = _a.fatigued;
-            _this.ships[id] = createShip({ name: name, type: type, fatigued: fatigued });
+            _this.ui.ships[id] = createShip({ name: name, type: type, fatigued: fatigued });
         });
         this.updateShips(Object.values(gamedatas.ships));
     };
@@ -2337,7 +2373,7 @@ var Board = (function () {
                 gamedatas: gamedatas,
                 office: office,
                 position: position,
-                container: _this.ui.treasuries,
+                container: _this.ui.containers.treasuries,
             });
         });
     };
@@ -2348,9 +2384,9 @@ var Board = (function () {
                 return;
             }
             if (piece.id.startsWith('Regiment')) {
-                var elt = _this.armyPieces[piece.id];
-                if (!_this.armyPieces[piece.id].parentElement) {
-                    _this.ui.regiments.appendChild(elt);
+                var elt = _this.ui.armyPieces[piece.id];
+                if (!_this.ui.armyPieces[piece.id].parentElement) {
+                    _this.ui.containers.regiments.appendChild(elt);
                 }
                 setAbsolutePosition(elt, BOARD_SCALE, getRegimentPosition(piece.location, _this.armies.regiments[piece.location].length, piece.exhausted));
                 _this.armies.regiments[piece.location].push(piece);
@@ -2364,51 +2400,90 @@ var Board = (function () {
             if (location.startsWith('supply')) {
                 return;
             }
-            if (!_this.familyMembers[id].parentElement) {
-                _this.ui.familyMembers.appendChild(_this.familyMembers[id]);
+            if (!_this.ui.familyMembers[id].parentElement) {
+                _this.ui.containers.familyMembers.appendChild(_this.ui.familyMembers[id]);
             }
             var position = { top: 0, left: 0 };
-            if (location === COURT_OF_DIRECTORS) {
-                position = getCourtOfDirectorsPosition(_this.courtOfDirectors.length);
-                _this.courtOfDirectors.push(familyMember);
+            switch (location) {
+                case COURT_OF_DIRECTORS:
+                    position = getCourtOfDirectorsPosition(_this.familyMembers[COURT_OF_DIRECTORS].length);
+                    _this.familyMembers[COURT_OF_DIRECTORS].push(familyMember);
+                    break;
+                case OFFICER_IN_TRAINING:
+                    position = getOfficersInTrainingPosition(_this.familyMembers[OFFICER_IN_TRAINING].length);
+                    _this.familyMembers[OFFICER_IN_TRAINING].push(familyMember);
+                    break;
+                case BENGAL_WRITERS:
+                case BOMBAY_WRITERS:
+                case MADRAS_WRITERS:
+                    position = getWriterPosition(location, _this.familyMembers[location].length);
+                    _this.familyMembers[location].push(familyMember);
+                    break;
+                case BENGAL_ARMY:
+                case BOMBAY_ARMY:
+                case MADRAS_ARMY:
+                    position = getOfficerPosition(location, _this.familyMembers[location].length);
+                    _this.familyMembers[location].push(familyMember);
+                    break;
+                case STOCK_EXCHANGE_2:
+                case STOCK_EXCHANGE_3_LEFT:
+                case STOCK_EXCHANGE_3_RIGHT:
+                case STOCK_EXCHANGE_4:
+                case STOCK_EXCHANGE_5:
+                    position = getStockExchangePosition(location);
+                    break;
+                default:
+                    position = FAMILY_MEMBER_OFFICE_CONFIG[location];
+                    break;
             }
-            else if (location === OFFICER_IN_TRAINING) {
-                position = getOfficersInTrainingPosition(_this.officersInTraining.length);
-                _this.officersInTraining.push(familyMember);
-            }
-            else if (location.startsWith(WRITER)) {
-                var regionId = location.split('_')[1];
-                position = getWriterPosition(regionId, _this.writers[regionId].length);
-                _this.writers[regionId].push(familyMember);
-            }
-            else if (location.startsWith(OFFICER)) {
-            }
-            else if (location.startsWith('StockExchange')) {
-                position = getStockExchangePosition(location);
-            }
-            else {
-                position = FAMILY_MEMBER_OFFICE_CONFIG[location];
-            }
-            setAbsolutePosition(_this.familyMembers[id], BOARD_SCALE, position);
+            setAbsolutePosition(_this.ui.familyMembers[id], BOARD_SCALE, position);
         });
     };
-    Board.prototype.moveFamilyMember = function (familyMember_1) {
-        return __awaiter(this, arguments, void 0, function (familyMember, index) {
+    Board.prototype.moveFamilyMember = function (_a) {
+        return __awaiter(this, arguments, void 0, function (_b) {
             var fromRect;
-            if (index === void 0) { index = 0; }
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var familyMember = _b.familyMember, _c = _b.index, index = _c === void 0 ? 0 : _c;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
                     case 0: return [4, Interaction.use().wait(index * 200)];
                     case 1:
-                        _a.sent();
-                        fromRect = this.familyMembers[familyMember.id].getBoundingClientRect();
+                        _d.sent();
+                        fromRect = this.ui.familyMembers[familyMember.id].getBoundingClientRect();
                         this.updateFamilyMembers([familyMember]);
                         return [4, this.game.animationManager.play(new BgaSlideAnimation({
-                                element: this.familyMembers[familyMember.id],
+                                element: this.ui.familyMembers[familyMember.id],
                                 transitionTimingFunction: 'ease-in-out',
                                 fromRect: fromRect,
                             }))];
                     case 2:
+                        _d.sent();
+                        return [2];
+                }
+            });
+        });
+    };
+    Board.prototype.moveFamilyMemberBetweenLocations = function (familyMember, to) {
+        return __awaiter(this, void 0, void 0, function () {
+            var from, remainingFamilyMembers, promises;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        from = familyMember.location;
+                        familyMember.location = to;
+                        if (this.familyMembers[familyMember.location].some(function (memberInLocation) {
+                            return memberInLocation.id === familyMember.id;
+                        })) {
+                            return [2];
+                        }
+                        remainingFamilyMembers = this.familyMembers[from].filter(function (member) { return member.id !== familyMember.id; });
+                        this.familyMembers[from] = [];
+                        promises = remainingFamilyMembers.map(function (member) {
+                            return _this.moveFamilyMember({ familyMember: member });
+                        });
+                        promises.push(this.moveFamilyMember({ familyMember: familyMember }));
+                        return [4, Promise.all(promises)];
+                    case 1:
                         _a.sent();
                         return [2];
                 }
@@ -2436,7 +2511,7 @@ var Board = (function () {
                                         player.counters[FAMILY_MEMBERS_COUNTER].incValue(-1);
                                         this.updateFamilyMembers([familyMember]);
                                         return [4, this.game.animationManager.play(new BgaSlideAnimation({
-                                                element: this.familyMembers[id],
+                                                element: this.ui.familyMembers[id],
                                                 transitionTimingFunction: 'ease-in-out',
                                                 fromRect: fromRect,
                                             }))];
@@ -2460,18 +2535,18 @@ var Board = (function () {
     };
     Board.prototype.updateOrders = function (gamedatas) {
         var _this = this;
-        this.ui.orders.replaceChildren();
+        this.ui.containers.orders.replaceChildren();
         Object.entries(gamedatas.orders).forEach(function (_a) {
             var orderId = _a[0], order = _a[1];
-            setAbsolutePosition(_this.orders[orderId], BOARD_SCALE, ORDERS_CONFIG[orderId]);
-            _this.orders[orderId].setAttribute('data-status', order.status);
-            _this.ui.orders.appendChild(_this.orders[orderId]);
+            setAbsolutePosition(_this.ui.orders[orderId], BOARD_SCALE, ORDERS_CONFIG[orderId]);
+            _this.ui.orders[orderId].setAttribute('data-status', order.status);
+            _this.ui.containers.orders.appendChild(_this.ui.orders[orderId]);
         });
     };
     Board.prototype.updatePowerTokens = function (gamedatas) {
         var _this = this;
         gamedatas.powerTokens.forEach(function (token, index) {
-            setAbsolutePosition(_this.ui.powerTokens[token], BOARD_SCALE, POWER_TOKEN_POSITIONS[index]);
+            setAbsolutePosition(_this.ui.containers.powerTokens[token], BOARD_SCALE, POWER_TOKEN_POSITIONS[index]);
         });
     };
     Board.prototype.movePawn = function (type, value) {
@@ -2480,10 +2555,10 @@ var Board = (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        fromRect = this.ui.pawns[type].getBoundingClientRect();
+                        fromRect = this.ui.containers.pawns[type].getBoundingClientRect();
                         this.updatePawn(type, value);
                         return [4, this.game.animationManager.play(new BgaSlideAnimation({
-                                element: this.ui.pawns[type],
+                                element: this.ui.containers.pawns[type],
                                 transitionTimingFunction: 'ease-in-out',
                                 fromRect: fromRect,
                             }))];
@@ -2513,7 +2588,7 @@ var Board = (function () {
                 position = TURN_CONFIG[value];
                 break;
         }
-        setAbsolutePosition(this.ui.pawns[type], BOARD_SCALE, position);
+        setAbsolutePosition(this.ui.containers.pawns[type], BOARD_SCALE, position);
     };
     Board.prototype.updatePawns = function (gamedatas) {
         var _a = gamedatas.company, balance = _a.balance, debt = _a.debt, standing = _a.standing;
@@ -2532,10 +2607,10 @@ var Board = (function () {
                     case 0: return [4, Interaction.use().wait(index * 200)];
                     case 1:
                         _a.sent();
-                        fromRect = this.armyPieces[regiment.id].getBoundingClientRect();
+                        fromRect = this.ui.armyPieces[regiment.id].getBoundingClientRect();
                         this.updateArmyPieces([regiment]);
                         return [4, this.game.animationManager.play(new BgaSlideAnimation({
-                                element: this.armyPieces[regiment.id],
+                                element: this.ui.armyPieces[regiment.id],
                                 transitionTimingFunction: 'ease-in-out',
                                 fromRect: fromRect,
                             }))];
@@ -2581,14 +2656,14 @@ var Board = (function () {
                     case 0: return [4, Interaction.use().wait(index * 200)];
                     case 1:
                         _d.sent();
-                        fromRect = this.ships[ship.id].getBoundingClientRect();
+                        fromRect = this.ui.ships[ship.id].getBoundingClientRect();
                         fromIndex = this.seas[from].findIndex(function (shipInOldZone) { return (shipInOldZone === null || shipInOldZone === void 0 ? void 0 : shipInOldZone.id) === ship.id; });
                         this.placeShip(ship);
                         if (fromIndex >= 0) {
                             this.seas[from][fromIndex] = null;
                         }
                         return [4, this.game.animationManager.play(new BgaSlideAnimation({
-                                element: this.ships[ship.id],
+                                element: this.ui.ships[ship.id],
                                 transitionTimingFunction: 'ease-in-out',
                                 fromRect: fromRect,
                             }))];
@@ -2603,7 +2678,7 @@ var Board = (function () {
         return __awaiter(this, void 0, void 0, function () {
             var fromIndex;
             return __generator(this, function (_a) {
-                this.ships[shipId].remove();
+                this.ui.ships[shipId].remove();
                 fromIndex = this.seas[seaZone].findIndex(function (shipInOldZone) { return (shipInOldZone === null || shipInOldZone === void 0 ? void 0 : shipInOldZone.id) === shipId; });
                 if (fromIndex >= 0) {
                     this.seas[seaZone][fromIndex] = null;
@@ -2612,36 +2687,8 @@ var Board = (function () {
             });
         });
     };
-    Board.prototype.moveWriter = function (writer, from) {
-        return __awaiter(this, void 0, void 0, function () {
-            var fromRegion, toRegion, remainingFamilyMembers, promises;
-            var _this = this;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        fromRegion = this.getWriterRegion(from);
-                        toRegion = this.getWriterRegion(writer.location);
-                        if (this.writers[toRegion].some(function (writerInLocation) {
-                            return writerInLocation.id === writer.id;
-                        })) {
-                            return [2];
-                        }
-                        remainingFamilyMembers = this.writers[fromRegion].filter(function (member) { return member.id !== writer.id; });
-                        this.writers[fromRegion] = [];
-                        promises = remainingFamilyMembers.map(function (member) {
-                            return _this.moveFamilyMember(member);
-                        });
-                        promises.push(this.moveFamilyMember(writer));
-                        return [4, Promise.all(promises)];
-                    case 1:
-                        _a.sent();
-                        return [2];
-                }
-            });
-        });
-    };
     Board.prototype.updateOtherShip = function (ship, type) {
-        this.ships[ship.id].setAttribute('data-type', type);
+        this.ui.ships[ship.id].setAttribute('data-type', type);
         ship.type = type;
         ship.name = type === 'ExtraShip' ? _('Extra Ship') : _('Company Ship');
         return ship;
@@ -2660,17 +2707,17 @@ var Board = (function () {
                         if (this.shipAlreadyInZone(id, location)) {
                             return [2];
                         }
-                        if (!this.ships[id].parentElement) {
-                            this.ui.ships.appendChild(this.ships[id]);
+                        if (!this.ui.ships[id].parentElement) {
+                            this.ui.containers.ships.appendChild(this.ui.ships[id]);
                         }
                         nullIndex = this.seas[location].findIndex(function (pos) { return pos === null; });
                         shipIndex = nullIndex >= 0 ? nullIndex : this.seas[location].length;
                         position = getShipPosition(location, shipIndex);
                         this.seas[location][shipIndex] = ship;
-                        setAbsolutePosition(this.ships[id], BOARD_SCALE, position);
+                        setAbsolutePosition(this.ui.ships[id], BOARD_SCALE, position);
                         if (!fromElement) return [3, 2];
                         return [4, this.game.animationManager.play(new BgaSlideAnimation({
-                                element: this.ships[id],
+                                element: this.ui.ships[id],
                                 transitionTimingFunction: 'ease-in-out',
                                 fromRect: fromElement.getBoundingClientRect(),
                             }))];
@@ -2695,12 +2742,6 @@ var Board = (function () {
         ships.forEach(function (ship) {
             _this.placeShip(ship);
         });
-    };
-    Board.prototype.getWriterRegion = function (location) {
-        if (location.startsWith('Writers')) {
-            return location.split('_')[1];
-        }
-        throw new Error('FE_ERROR_001');
     };
     return Board;
 }());
@@ -3225,7 +3266,7 @@ var Chairman = (function () {
             if (value <= _this.currentDebt) {
                 return;
             }
-            var elt = board.selectBoxes["companyDebt_".concat(value)];
+            var elt = board.ui.selectBoxes["companyDebt_".concat(value)];
             interaction.onClick(elt, function () { return _this.handleDebtClick(value, false); });
             elt.setAttribute('data-vote', 'false');
         });
@@ -3233,7 +3274,7 @@ var Chairman = (function () {
             if (value <= _this.currentDebt) {
                 return;
             }
-            var elt = board.selectBoxes["companyDebt_".concat(value)];
+            var elt = board.ui.selectBoxes["companyDebt_".concat(value)];
             interaction.onClick(elt, function () { return _this.handleDebtClick(value, true); });
             elt.setAttribute('data-vote', 'true');
         });
@@ -3253,7 +3294,7 @@ var Chairman = (function () {
         var _this = this;
         this.deactivateTreasuries();
         clearPossible();
-        setSelected(Board.getInstance().selectBoxes["companyDebt_".concat(value)]);
+        setSelected(Board.getInstance().ui.selectBoxes["companyDebt_".concat(value)]);
         updatePageTitle(_('Ask Court of Directors for consent to increase Company Debt to ${value}?'), {
             value: value,
         });
@@ -3438,7 +3479,7 @@ var ChairmanDebtConsent = (function () {
             required: this.args.remainingVotesRequired,
             tkn_icon: SHARE,
         });
-        setSelected(Board.getInstance().selectBoxes["companyDebt_".concat(this.args.debt)]);
+        setSelected(Board.getInstance().ui.selectBoxes["companyDebt_".concat(this.args.debt)]);
         addPrimaryActionButton({
             id: 'yay_btn',
             text: 'Yay',
@@ -3583,7 +3624,7 @@ var DirectorOfTradeSpecialEnvoySuccess = (function () {
         updatePageTitle(_('${you} may open trade with China or may open a closed order'));
         var board = Board.getInstance();
         this.args.closedOrders.forEach(function (order) {
-            onClick(board.orders[order.id], function () { return _this.updateIntefaceConfirm(order); });
+            onClick(board.ui.orders[order.id], function () { return _this.updateIntefaceConfirm(order); });
         });
     };
     DirectorOfTradeSpecialEnvoySuccess.prototype.updateIntefaceConfirm = function (order) {
@@ -3592,7 +3633,7 @@ var DirectorOfTradeSpecialEnvoySuccess = (function () {
         updatePageTitle(_('Open closed order in ${region}?'), {
             region: _(order.location),
         });
-        setSelected(Board.getInstance().orders[order.id]);
+        setSelected(Board.getInstance().ui.orders[order.id]);
         addConfirmButton(function () { return _this.performAction(order, true); });
         addCancelButton();
     };
@@ -3647,13 +3688,13 @@ var DirectorOfTradeTransfers = (function () {
         var board = Board.getInstance();
         Object.entries(this.args.options.writers).forEach(function (_a) {
             var id = _a[0], data = _a[1];
-            return onClick(board.familyMembers[id], function () {
+            return onClick(board.ui.familyMembers[id], function () {
                 return _this.updateInterfaceSelectPresidency(data);
             });
         });
         Object.entries(this.args.options.ships).forEach(function (_a) {
             var id = _a[0], data = _a[1];
-            return onClick(board.ships[id], function () { return _this.updateInterfaceSelectSeaZone(data); });
+            return onClick(board.ui.ships[id], function () { return _this.updateInterfaceSelectSeaZone(data); });
         });
         if (this.getTransferCount() > 0) {
             addPrimaryActionButton({
@@ -3672,10 +3713,9 @@ var DirectorOfTradeTransfers = (function () {
         var writer = _a.familyMember, locations = _a.locations;
         clearPossible();
         var board = Board.getInstance();
-        setSelected(board.familyMembers[writer.id]);
+        setSelected(board.ui.familyMembers[writer.id]);
         locations.forEach(function (newLocation) {
-            onClick(board.selectBoxes[newLocation], function () { return __awaiter(_this, void 0, void 0, function () {
-                var from;
+            onClick(board.ui.selectBoxes[newLocation], function () { return __awaiter(_this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -3684,9 +3724,7 @@ var DirectorOfTradeTransfers = (function () {
                                 from: writer.location,
                                 to: newLocation,
                             };
-                            from = writer.location;
-                            writer.location = newLocation;
-                            return [4, board.moveWriter(writer, from)];
+                            return [4, board.moveFamilyMemberBetweenLocations(writer, newLocation)];
                         case 1:
                             _a.sent();
                             this.updateInterfaceInitialStep();
@@ -3702,9 +3740,9 @@ var DirectorOfTradeTransfers = (function () {
         var ship = _a.ship, locations = _a.locations;
         clearPossible();
         var board = Board.getInstance();
-        setSelected(board.ships[ship.id]);
+        setSelected(board.ui.ships[ship.id]);
         locations.forEach(function (seaZone) {
-            onClick(board.selectBoxes[seaZone], function () { return __awaiter(_this, void 0, void 0, function () {
+            onClick(board.ui.selectBoxes[seaZone], function () { return __awaiter(_this, void 0, void 0, function () {
                 var from;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
@@ -3769,8 +3807,7 @@ var DirectorOfTradeTransfers = (function () {
                     case 5:
                         if (!(_b < _c.length)) return [3, 8];
                         data = _c[_b];
-                        data.writer.location = data.from;
-                        return [4, board.moveWriter(data.writer, data.to)];
+                        return [4, board.moveFamilyMemberBetweenLocations(data.writer, data.from)];
                     case 6:
                         _d.sent();
                         _d.label = 7;
@@ -3917,13 +3954,13 @@ var EnlistWriter = (function () {
             tkn_icon: WRITER
         });
         [BENGAL, BOMBAY, MADRAS].forEach(function (region) {
-            var box = Board.getInstance().selectBoxes["Writers_".concat(region)];
+            var box = Board.getInstance().ui.selectBoxes["Writers_".concat(region)];
             onClick(box, function () { return _this.updateInterfaceConfirm(region); });
         });
     };
     EnlistWriter.prototype.updateInterfaceConfirm = function (regionId) {
         clearPossible();
-        setSelected(Board.getInstance().selectBoxes["".concat(regionId, "_").concat(WRITER)]);
+        setSelected(Board.getInstance().ui.selectBoxes["".concat(regionId, "_").concat(WRITER)]);
         updatePageTitle(_('Enlist ${tkn_icon} in ${regionName}?'), {
             tkn_icon: WRITER,
             regionName: _(StaticData.get().region(regionId).name),
@@ -4102,7 +4139,7 @@ var ManagerOfShipping = (function () {
         var board = Board.getInstance();
         updatePageTitle(_('${you} must select a sea zone'));
         SEA_ZONES.forEach(function (seaZone) {
-            onClick(board.selectBoxes[seaZone], function () { return __awaiter(_this, void 0, void 0, function () {
+            onClick(board.ui.selectBoxes[seaZone], function () { return __awaiter(_this, void 0, void 0, function () {
                 var fromElt, player;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
@@ -4212,59 +4249,52 @@ var MilitaryAffairsAssign = (function () {
     MilitaryAffairsAssign.prototype.onEnteringState = function (args) {
         debug('Entering MilitaryAffairsAssign state');
         this.args = args;
-        this.placedCompanyShips = {};
-        this.placedExtraShips = {};
-        this.placedPlayerShips = {};
-        this.treasury = this.args.treasury;
+        this.assignedOfficers = {};
         this.updateInterfaceInitialStep();
     };
     MilitaryAffairsAssign.prototype.onLeavingState = function () {
         debug('Leaving MilitaryAffairsAssign state');
     };
     MilitaryAffairsAssign.prototype.setDescription = function (activePlayerIds, args) {
-        updatePageTitle(_('${tkn_playerName} may fit, buy and lease ships'), {
+        updatePageTitle(_('${tkn_playerName} must assign officers-in-training'), {
             tkn_playerName: getPlayerName(activePlayerIds[0]),
         }, true);
     };
     MilitaryAffairsAssign.prototype.updateInterfaceInitialStep = function () {
+        var _this = this;
         this.game.clearPossible();
+        if (Object.keys(this.assignedOfficers).length ===
+            Object.keys(this.args.officersInTraining).length) {
+            this.updateInterfaceConfirm();
+            return;
+        }
+        updatePageTitle(_('${you} must assign all officers-in-training'));
         var board = Board.getInstance();
-        var playerShipsAvailable = false;
+        Object.entries(this.args.officersInTraining).forEach(function (_a) {
+            var officerId = _a[0], officer = _a[1];
+            if (_this.assignedOfficers[officerId]) {
+                return;
+            }
+            onClick(board.ui.familyMembers[officerId], function () {
+                return _this.updateInterfaceSelectArmy(officer);
+            });
+        });
     };
-    MilitaryAffairsAssign.prototype.updateInterfaceSelectSeaZone = function (ship, playerId) {
+    MilitaryAffairsAssign.prototype.updateInterfaceSelectArmy = function (officer) {
         var _this = this;
         clearPossible();
         var board = Board.getInstance();
-        updatePageTitle(_('${you} must select a sea zone'));
-        SEA_ZONES.forEach(function (seaZone) {
-            onClick(board.selectBoxes[seaZone], function () { return __awaiter(_this, void 0, void 0, function () {
-                var fromElt, player;
+        setSelected(board.ui.familyMembers[officer.id]);
+        this.args.armies.forEach(function (to) {
+            onClick(board.ui.selectBoxes[to], function () { return __awaiter(_this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            ship.location = seaZone;
-                            fromElt = undefined;
                             clearPossible();
-                            if (playerId) {
-                                this.placedPlayerShips[ship.id] = seaZone;
-                                player = PlayerManager.getInstance().getPlayer(playerId);
-                                player.counters[SHIPS_COUNTER].incValue(-1);
-                                fromElt = player.ui[SHIPS_COUNTER];
-                                this.pay(3);
-                            }
-                            else if (ship.type === EXTRA_SHIP) {
-                                ship = board.updateOtherShip(ship, EXTRA_SHIP);
-                                this.placedExtraShips[ship.id] = seaZone;
-                                this.pay(2);
-                            }
-                            else {
-                                ship = board.updateOtherShip(ship, COMPANY_SHIP);
-                                this.placedCompanyShips[ship.id] = seaZone;
-                                this.pay(5);
-                            }
-                            return [4, board.placeShip(ship, fromElt)];
+                            return [4, board.moveFamilyMemberBetweenLocations(officer, to)];
                         case 1:
                             _a.sent();
+                            this.assignedOfficers[officer.id] = { officer: officer, to: to };
                             this.updateInterfaceInitialStep();
                             return [2];
                     }
@@ -4276,41 +4306,38 @@ var MilitaryAffairsAssign = (function () {
     MilitaryAffairsAssign.prototype.updateInterfaceConfirm = function () {
         var _this = this;
         clearPossible();
-        updatePageTitle(_('Confirm ship placement'));
+        updatePageTitle(_('Assign officers?'));
         addConfirmButton(function () {
             performAction('actMilitaryAffairsAssign', {
-                playerShips: _this.placedPlayerShips,
-                extraShips: _this.placedExtraShips,
-                companyShips: _this.placedCompanyShips,
+                assignedOfficers: Object.values(_this.assignedOfficers).map(function (_a) {
+                    var officer = _a.officer, to = _a.to;
+                    return ({ familyMemberId: officer.id, to: to });
+                }),
             });
         });
         this.addCancelButton();
     };
     MilitaryAffairsAssign.prototype.returnPieces = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var board;
-            return __generator(this, function (_a) {
-                board = Board.getInstance();
-                [
-                    this.placedCompanyShips,
-                    this.placedExtraShips,
-                    this.placedPlayerShips,
-                ].forEach(function (category) {
-                    Object.entries(category).forEach(function (_a) {
-                        var shipId = _a[0], seaZone = _a[1];
-                        board.removeShip(shipId, seaZone);
-                    });
-                });
-                return [2];
-            });
-        });
-    };
-    MilitaryAffairsAssign.prototype.pay = function (amount) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                this.treasury -= amount;
-                Board.getInstance().treasuries[MANAGER_OF_SHIPPING].toValue(this.treasury);
-                return [2];
+            var board, _i, _a, _b, officer, to;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        board = Board.getInstance();
+                        _i = 0, _a = Object.values(this.assignedOfficers);
+                        _c.label = 1;
+                    case 1:
+                        if (!(_i < _a.length)) return [3, 4];
+                        _b = _a[_i], officer = _b.officer, to = _b.to;
+                        return [4, board.moveFamilyMemberBetweenLocations(officer, OFFICER_IN_TRAINING)];
+                    case 2:
+                        _c.sent();
+                        _c.label = 3;
+                    case 3:
+                        _i++;
+                        return [3, 1];
+                    case 4: return [2];
+                }
             });
         });
     };
@@ -4379,7 +4406,7 @@ var MilitaryAffairsTransfers = (function () {
             if (_this.transfers.regiments[id]) {
                 return;
             }
-            onClick(board.armyPieces[id], function () {
+            onClick(board.ui.armyPieces[id], function () {
                 return _this.updateInterfaceSelectArmyForRegiment(data);
             });
         });
@@ -4400,9 +4427,9 @@ var MilitaryAffairsTransfers = (function () {
         var regiment = _a.regiment, locations = _a.locations;
         clearPossible();
         var board = Board.getInstance();
-        setSelected(board.armyPieces[regiment.id]);
+        setSelected(board.ui.armyPieces[regiment.id]);
         locations.forEach(function (to) {
-            onClick(board.selectBoxes[to], function () { return __awaiter(_this, void 0, void 0, function () {
+            onClick(board.ui.selectBoxes[to], function () { return __awaiter(_this, void 0, void 0, function () {
                 var from;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
@@ -4510,6 +4537,274 @@ var PlayerTurn = (function () {
     };
     return PlayerTurn;
 }());
+var PresidencyDecideOrder = (function () {
+    function PresidencyDecideOrder(game) {
+        this.game = game;
+    }
+    PresidencyDecideOrder.create = function (game) {
+        PresidencyDecideOrder.instance = new PresidencyDecideOrder(game);
+    };
+    PresidencyDecideOrder.getInstance = function () {
+        return PresidencyDecideOrder.instance;
+    };
+    PresidencyDecideOrder.prototype.onEnteringState = function (args) {
+        debug('Entering PresidencyDecideOrder state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    };
+    PresidencyDecideOrder.prototype.onLeavingState = function () {
+        debug('Leaving PresidencyDecideOrder state');
+    };
+    PresidencyDecideOrder.prototype.setDescription = function (activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} must choose which is next to act'), {
+            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        }, true);
+    };
+    PresidencyDecideOrder.prototype.updateInterfaceInitialStep = function () {
+        var _this = this;
+        this.game.clearPossible();
+        updatePageTitle(_('${you} must choose which is next to act'));
+        var board = Board.getInstance();
+        if (this.args.trade) {
+            addPrimaryActionButton({ id: 'trade_btn', text: _('Trade'), callback: function () { return _this.updateInterfaceConfirm(TRADE); } });
+        }
+    };
+    PresidencyDecideOrder.prototype.updateInterfaceConfirm = function (next) {
+        clearPossible();
+        switch (next) {
+            case TRADE:
+                updatePageTitle(_('Perform the Trade action?'));
+                break;
+            default:
+        }
+        addConfirmButton(function () {
+            performAction('actPresidencyDecideOrder', {
+                next: next
+            });
+        });
+        addCancelButton();
+    };
+    return PresidencyDecideOrder;
+}());
+var PresidencyTrade = (function () {
+    function PresidencyTrade(game) {
+        this.game = game;
+    }
+    PresidencyTrade.create = function (game) {
+        PresidencyTrade.instance = new PresidencyTrade(game);
+    };
+    PresidencyTrade.getInstance = function () {
+        return PresidencyTrade.instance;
+    };
+    PresidencyTrade.prototype.onEnteringState = function (args) {
+        debug('Entering PresidencyTrade state');
+        this.args = args;
+        this.spend = args.proposal || 0;
+        this.selectedRegionIds = [this.args.options.homeRegionId];
+        this.updateInterfaceInitialStep();
+    };
+    PresidencyTrade.prototype.onLeavingState = function () {
+        debug('Leaving PresidencyTrade state');
+    };
+    PresidencyTrade.prototype.setDescription = function (activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} must choose regions to trade with and spend ${tkn_pound} to make a check'), {
+            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            amount: args.proposal,
+            tkn_pound: 'pound',
+        }, true);
+    };
+    PresidencyTrade.prototype.updateInterfaceInitialStep = function () {
+        var _this = this;
+        clearPossible();
+        if (this.selectedRegionIds.length === Object.keys(this.args.options.regions).length) {
+            this.setMinSpendAmount();
+            return;
+        }
+        updatePageTitle(_('${you} must select the regions in which you wish to trade'));
+        var staticData = StaticData.get();
+        Object.entries(this.args.options.regions).forEach(function (_a) {
+            var regionId = _a[0], region = _a[1];
+            if (_this.selectedRegionIds.includes(regionId)) {
+                return;
+            }
+            addPrimaryActionButton({ id: "".concat(regionId, "_btn"), text: _(staticData.region(regionId).name), callback: function () {
+                    _this.selectedRegionIds.push(regionId);
+                    _this.updateInterfaceInitialStep();
+                } });
+        });
+        addPrimaryActionButton({ id: 'done_btn', text: _('Done'), callback: function () { return _this.setMinSpendAmount(); } });
+        if (this.selectedRegionIds.length > 1) {
+            addCancelButton();
+        }
+    };
+    PresidencyTrade.prototype.setMinSpendAmount = function () {
+        this.spend = this.selectedRegionIds.length;
+        Board.getInstance().treasuries[this.args.officeId].incValue(-this.selectedRegionIds.length);
+        this.updateInterfaceMakeCheck();
+    };
+    PresidencyTrade.prototype.updateInterfaceMakeCheck = function () {
+        var _this = this;
+        clearPossible();
+        var penalty = this.selectedRegionIds.length - 1;
+        var available = this.args.treasury - this.spend;
+        var minSpend = this.selectedRegionIds.length;
+        updatePageTitle(_('Trade: ${you} may spend 1 ${tkn_pound} per die'), {
+            available: available,
+            tkn_pound: 'pound',
+        });
+        var treasuryCounter = Board.getInstance().treasuries[this.args.officeId];
+        addSecondaryActionButton({
+            id: 'minus_btn',
+            text: '-',
+            callback: function () {
+                _this.spend--;
+                treasuryCounter.incValue(1);
+                _this.updateInterfaceMakeCheck();
+            },
+            extraClasses: this.spend <= minSpend ? DISABLED : '',
+        });
+        addPrimaryActionButton({
+            id: 'make_check_btn',
+            text: formatStringRecursive(_('Roll ${number} dice'), {
+                number: Math.max(this.spend - penalty, 0),
+            }),
+            callback: function () { return _this.updateIntefaceConfirm(); },
+            extraClasses: this.spend <= penalty ? DISABLED : '',
+        });
+        addSecondaryActionButton({
+            id: 'plus_btn',
+            text: '+',
+            callback: function () {
+                _this.spend++;
+                treasuryCounter.incValue(-1);
+                _this.updateInterfaceMakeCheck();
+            },
+            extraClasses: available === 0 ? DISABLED : '',
+        });
+        this.addCancelButton();
+    };
+    PresidencyTrade.prototype.updateIntefaceConfirm = function () {
+        var _this = this;
+        clearPossible();
+        updatePageTitle(_('Make a check with ${number} dice to trade in ${tradeLog}?'), {
+            number: this.spend,
+            tradeLog: this.getTradeLog()
+        });
+        addConfirmButton(function () { return _this.performAction(true); });
+        this.addCancelButton();
+    };
+    PresidencyTrade.prototype.getTradeLog = function () {
+        var log = [];
+        var args = {};
+        var staticData = StaticData.get();
+        this.selectedRegionIds.forEach(function (regionId, index) {
+            var key = "key_".concat(index);
+            log.push(['${', key, '}'].join(''));
+            args[key] = _(staticData.region(regionId).name);
+        });
+        return {
+            log: log.join(', '),
+            args: args,
+        };
+    };
+    PresidencyTrade.prototype.performAction = function (makeCheck) {
+        if (makeCheck === void 0) { makeCheck = false; }
+        performAction('actPresidencyTrade', {
+            selectedRegionIds: this.selectedRegionIds,
+            spend: this.spend,
+            makeCheck: makeCheck,
+        });
+    };
+    PresidencyTrade.prototype.addCancelButton = function () {
+        var _this = this;
+        addDangerActionButton({
+            id: 'cancel_btn',
+            text: _('Cancel'),
+            callback: function () { return __awaiter(_this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    Board.getInstance().treasuries[this.args.officeId].toValue(this.args.treasury),
+                        this.game.onCancel();
+                    return [2];
+                });
+            }); },
+        });
+    };
+    return PresidencyTrade;
+}());
+var PresidencyTradeFillOrders = (function () {
+    function PresidencyTradeFillOrders(game) {
+        this.game = game;
+    }
+    PresidencyTradeFillOrders.create = function (game) {
+        PresidencyTradeFillOrders.instance = new PresidencyTradeFillOrders(game);
+    };
+    PresidencyTradeFillOrders.getInstance = function () {
+        return PresidencyTradeFillOrders.instance;
+    };
+    PresidencyTradeFillOrders.prototype.onEnteringState = function (args) {
+        debug('Entering PresidencyTradeFillOrders state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    };
+    PresidencyTradeFillOrders.prototype.onLeavingState = function () {
+        debug('Leaving PresidencyTradeFillOrders state');
+    };
+    PresidencyTradeFillOrders.prototype.setDescription = function (activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} must fill orders'), {
+            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        }, true);
+    };
+    PresidencyTradeFillOrders.prototype.updateInterfaceInitialStep = function () {
+        clearPossible();
+        updatePageTitle(_('${you} must fill orders'));
+    };
+    PresidencyTradeFillOrders.prototype.updateIntefaceConfirm = function () {
+        var _this = this;
+        clearPossible();
+        updatePageTitle(_('Make a check with ${number} dice to trade in ${tradeLog}?'), {
+            number: this.spend,
+            tradeLog: this.getTradeLog()
+        });
+        addConfirmButton(function () { return _this.performAction(true); });
+        this.addCancelButton();
+    };
+    PresidencyTradeFillOrders.prototype.getTradeLog = function () {
+        var log = [];
+        var args = {};
+        var staticData = StaticData.get();
+        this.selectedRegionIds.forEach(function (regionId, index) {
+            var key = "key_".concat(index);
+            log.push(['${', key, '}'].join(''));
+            args[key] = _(staticData.region(regionId).name);
+        });
+        return {
+            log: log.join(', '),
+            args: args,
+        };
+    };
+    PresidencyTradeFillOrders.prototype.performAction = function (makeCheck) {
+        if (makeCheck === void 0) { makeCheck = false; }
+        performAction('actPresidencyTradeFillOrders', {
+            selectedRegionIds: this.selectedRegionIds,
+            spend: this.spend,
+            makeCheck: makeCheck,
+        });
+    };
+    PresidencyTradeFillOrders.prototype.addCancelButton = function () {
+        var _this = this;
+        addDangerActionButton({
+            id: 'cancel_btn',
+            text: _('Cancel'),
+            callback: function () { return __awaiter(_this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    this.game.onCancel();
+                    return [2];
+                });
+            }); },
+        });
+    };
+    return PresidencyTradeFillOrders;
+}());
 var SeekShare = (function () {
     function SeekShare(game) {
         this.game = game;
@@ -4543,13 +4838,13 @@ var SeekShare = (function () {
         });
         Object.entries(this.args.options).forEach(function (_a) {
             var position = _a[0], price = _a[1];
-            var box = Board.getInstance().selectBoxes[position];
+            var box = Board.getInstance().ui.selectBoxes[position];
             onClick(box, function () { return _this.updateInterfaceConfirm(position, price); });
         });
     };
     SeekShare.prototype.updateInterfaceConfirm = function (position, price) {
         clearPossible();
-        setSelected(Board.getInstance().selectBoxes[position]);
+        setSelected(Board.getInstance().ui.selectBoxes[position]);
         updatePageTitle(_('Pay ${amount} ${tkn_pound} to seek a ${tkn_icon}?'), {
             amount: price,
             tkn_pound: _('Pounds'),

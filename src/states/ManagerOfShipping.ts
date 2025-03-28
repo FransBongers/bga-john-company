@@ -158,7 +158,7 @@ class ManagerOfShipping implements State {
     updatePageTitle(_('${you} must select a sea zone'));
 
     SEA_ZONES.forEach((seaZone) => {
-      onClick(board.selectBoxes[seaZone], async () => {
+      onClick(board.ui.selectBoxes[seaZone], async () => {
         ship.location = seaZone;
         let fromElt = undefined;
         clearPossible();

@@ -66,7 +66,7 @@ class SeekShare implements State {
     );
 
     Object.entries(this.args.options).forEach(([position, price]) => {
-      const box = Board.getInstance().selectBoxes[position];
+      const box = Board.getInstance().ui.selectBoxes[position];
       onClick(box, () => this.updateInterfaceConfirm(position, price));
     });
   }
@@ -74,7 +74,7 @@ class SeekShare implements State {
   private updateInterfaceConfirm(position: string, price: number) {
     clearPossible();
 
-    setSelected(Board.getInstance().selectBoxes[position]);
+    setSelected(Board.getInstance().ui.selectBoxes[position]);
 
     updatePageTitle(_('Pay ${amount} ${tkn_pound} to seek a ${tkn_icon}?'), {
       amount: price,

@@ -105,13 +105,13 @@ class DirectorOfTradeTransfers implements State {
     );
     const board = Board.getInstance();
     Object.entries(this.args.options.writers).forEach(([id, data]) =>
-      onClick(board.familyMembers[id], () =>
+      onClick(board.ui.familyMembers[id], () =>
         this.updateInterfaceSelectPresidency(data)
       )
     );
 
     Object.entries(this.args.options.ships).forEach(([id, data]) =>
-      onClick(board.ships[id], () => this.updateInterfaceSelectSeaZone(data))
+      onClick(board.ui.ships[id], () => this.updateInterfaceSelectSeaZone(data))
     );
 
     if (this.getTransferCount() > 0) {
@@ -135,18 +135,16 @@ class DirectorOfTradeTransfers implements State {
   }) {
     clearPossible();
     const board = Board.getInstance();
-    setSelected(board.familyMembers[writer.id]);
+    setSelected(board.ui.familyMembers[writer.id]);
 
     locations.forEach((newLocation) => {
-      onClick(board.selectBoxes[newLocation], async () => {
+      onClick(board.ui.selectBoxes[newLocation], async () => {
         this.transfers.writers[writer.id] = {
           writer,
           from: writer.location,
           to: newLocation,
         };
-        const from = writer.location;
-        writer.location = newLocation;
-        await board.moveWriter(writer, from);
+        await board.moveFamilyMemberBetweenLocations(writer, newLocation);
         this.updateInterfaceInitialStep();
       });
     });
@@ -163,10 +161,10 @@ class DirectorOfTradeTransfers implements State {
   }) {
     clearPossible();
     const board = Board.getInstance();
-    setSelected(board.ships[ship.id]);
+    setSelected(board.ui.ships[ship.id]);
 
     locations.forEach((seaZone) => {
-      onClick(board.selectBoxes[seaZone], async () => {
+      onClick(board.ui.selectBoxes[seaZone], async () => {
         clearPossible();
         const from = ship.location;
         ship.location = seaZone;
@@ -217,8 +215,7 @@ class DirectorOfTradeTransfers implements State {
       await board.moveShip({ ship: data.ship, from: data.to });
     }
     for (let data of Object.values(this.transfers.writers)) {
-      data.writer.location = data.from;
-      await board.moveWriter(data.writer, data.to);
+      await board.moveFamilyMemberBetweenLocations(data.writer, data.from);
     }
   }
 

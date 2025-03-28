@@ -2,6 +2,7 @@
 
 namespace Bga\Games\JohnCompany\Models;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Players;
@@ -91,5 +92,11 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     // TODO:
     // Remove any fatigue on office card
     // Move office card to supply
+  }
+
+  public function pay($player, $amount)
+  {
+    $this->incTreasury(-$amount);
+    Notifications::payFromTreasury($player, $this, $amount, $this->getTreasury());
   }
 }

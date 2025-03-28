@@ -1,37 +1,45 @@
-interface OnEnteringEnlistWriterArgs extends CommonStateArgs {
+interface OnEnteringPresidencyTradeFillOrdersArgs extends CommonStateArgs {
 
 }
 
-class EnlistWriter implements State {
-  private static instance: EnlistWriter;
-  private args: OnEnteringEnlistWriterArgs;
+class PresidencyTradeFillOrders implements State {
+  private static instance: PresidencyTradeFillOrders;
+  private args: OnEnteringPresidencyTradeFillOrdersArgs;
+  private spend: number;
+  private selectedRegionIds: string[];
 
   constructor(private game: GameAlias) {}
 
   public static create(game: JohnCompany) {
-    EnlistWriter.instance = new EnlistWriter(game);
+    PresidencyTradeFillOrders.instance = new PresidencyTradeFillOrders(game);
   }
 
   public static getInstance() {
-    return EnlistWriter.instance;
+    return PresidencyTradeFillOrders.instance;
   }
 
-  onEnteringState(args: OnEnteringEnlistWriterArgs) {
-    debug('Entering EnlistWriter state');
+  onEnteringState(args: OnEnteringPresidencyTradeFillOrdersArgs) {
+    debug('Entering PresidencyTradeFillOrders state');
     this.args = args;
+    // this.spend = args.proposal || 0;
+    // this.selectedRegionIds = [this.args.options.homeRegionId];
     this.updateInterfaceInitialStep();
   }
 
   onLeavingState() {
-    debug('Leaving EnlistWriter state');
+    debug('Leaving PresidencyTradeFillOrders state');
   }
 
-  setDescription(activePlayerIds: number[], args: OnEnteringEnlistWriterArgs) {
-    updatePageTitle(_('${tkn_playerName} must select a region to place their writer'), {
-      tkn_playerName: PlayerManager.getInstance()
-        .getPlayer(activePlayerIds[0])
-        .getName(),
-    });
+  setDescription(activePlayerIds: number, args: OnEnteringPresidencyTradeFillOrdersArgs) {
+    updatePageTitle(
+      _(
+        '${tkn_playerName} must fill orders'
+      ),
+      {
+        tkn_playerName: getPlayerName(activePlayerIds[0]),
+      },
+      true
+    );
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########
@@ -51,37 +59,26 @@ class EnlistWriter implements State {
   // ..######.....##....########.##.........######.
 
   private updateInterfaceInitialStep() {
-    this.game.clearPossible();
-
-    updatePageTitle(_('${you} must select a region to place ${tkn_icon}'), {
-      tkn_icon: WRITER
-    });
-
-    [BENGAL, BOMBAY, MADRAS].forEach((region) => {
-      const box = Board.getInstance().ui.selectBoxes[`Writers_${region}`];
-      onClick(box, () => this.updateInterfaceConfirm(region))
-    });
-  }
-
-  private updateInterfaceConfirm(regionId: string) {
     clearPossible();
 
-    setSelected(Board.getInstance().ui.selectBoxes[`${regionId}_${WRITER}`])
 
-    updatePageTitle(_('Enlist ${tkn_icon} in ${regionName}?'), {
-      tkn_icon: WRITER,
-      regionName: _(StaticData.get().region(regionId).name),
+    updatePageTitle(_('${you} must fill orders'));
+
+
+  }
+
+
+
+  private updateIntefaceConfirm() {
+    clearPossible();
+
+    updatePageTitle(_('Make a check with ${number} dice to trade in ${tradeLog}?'), {
+      number: this.spend,
+      tradeLog: this.getTradeLog()
     });
 
-    const callback = () => performAction('actEnlistWriter', {
-      regionId,
-    });
-
-    addConfirmButton(callback);
-
-    // callback();
-
-    addCancelButton();
+    addConfirmButton(() => this.performAction(true));
+    this.addCancelButton();
   }
 
   //  .##.....##.########.####.##.......####.########.##....##
@@ -91,6 +88,32 @@ class EnlistWriter implements State {
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private getTradeLog() {
+    let log: string[] = [];
+    const args = {};
+
+    const staticData = StaticData.get();
+
+    this.selectedRegionIds.forEach((regionId, index) => {
+      const key = `key_${index}`;
+      log.push(['${',key,'}'].join(''));
+      args[key] = _(staticData.region(regionId).name);
+    })
+
+    return {
+      log: log.join(', '),
+      args,
+    }
+  }
+
+  private performAction(makeCheck: boolean = false) {
+    performAction('actPresidencyTradeFillOrders', {
+      selectedRegionIds: this.selectedRegionIds,
+      spend: this.spend,
+      makeCheck,
+    });
+  }
 
   //  ..######..##.......####..######..##....##
   //  .##....##.##........##..##....##.##...##.
@@ -107,4 +130,15 @@ class EnlistWriter implements State {
   // .##.....##.#########.##..####.##.....##.##.......##.............##
   // .##.....##.##.....##.##...###.##.....##.##.......##.......##....##
   // .##.....##.##.....##.##....##.########..########.########..######.
+
+  private addCancelButton() {
+    addDangerActionButton({
+      id: 'cancel_btn',
+      text: _('Cancel'),
+      callback: async () => {
+        // Board.getInstance().treasuries[this.args.officeId].toValue(this.args.treasury),
+        this.game.onCancel();
+      },
+    });
+  }
 }

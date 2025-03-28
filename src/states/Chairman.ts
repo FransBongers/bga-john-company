@@ -80,7 +80,7 @@ class Chairman implements State {
       if (value <= this.currentDebt) {
         return;
       }
-      const elt = board.selectBoxes[`companyDebt_${value}`];
+      const elt = board.ui.selectBoxes[`companyDebt_${value}`];
       interaction.onClick(elt, () => this.handleDebtClick(value, false));
       elt.setAttribute('data-vote', 'false');
     });
@@ -88,7 +88,7 @@ class Chairman implements State {
       if (value <= this.currentDebt) {
         return;
       }
-      const elt = board.selectBoxes[`companyDebt_${value}`];
+      const elt = board.ui.selectBoxes[`companyDebt_${value}`];
       interaction.onClick(elt, () => this.handleDebtClick(value, true));
       elt.setAttribute('data-vote', 'true');
     });
@@ -108,7 +108,7 @@ class Chairman implements State {
   private udpateInterfaceConfirmVote(value: number) {
     this.deactivateTreasuries();
     clearPossible();
-    setSelected(Board.getInstance().selectBoxes[`companyDebt_${value}`]);
+    setSelected(Board.getInstance().ui.selectBoxes[`companyDebt_${value}`]);
 
     updatePageTitle(
       _(

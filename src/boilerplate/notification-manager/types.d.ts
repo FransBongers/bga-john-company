@@ -54,6 +54,11 @@ interface NotifMakeCheck extends NotifWithPlayerArgs {
   diceResults: number[];
 }
 
+interface NotifMoveFamilyMember {
+  familyMember: JocoFamilyMember;
+  to: string;
+}
+
 interface NotifMoveFamilyMembers {
   familyMembers: JocoFamilyMember[];
 }
