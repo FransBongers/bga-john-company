@@ -77,7 +77,7 @@ class PresidencyTrade implements State {
       return;
     }
 
-    updatePageTitle(_('${you} must select the regions in which you wish to trade'));
+    updatePageTitle(_('Trade check: ${you} must select the regions in which you wish to trade'));
 
     const staticData = StaticData.get();
 

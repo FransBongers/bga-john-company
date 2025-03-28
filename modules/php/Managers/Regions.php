@@ -35,7 +35,7 @@ class Regions extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     return new $className($data);
   }
 
-    /**
+  /**
    * getStaticUiData : return static data
    */
   public static function getStaticUiData()
@@ -66,12 +66,12 @@ class Regions extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     $regions = [];
     foreach (REGIONS as $regionId) {
 
-        $regions[$regionId] = [
-          'id' => $regionId,
-          'location' => 'India',
-          'strength' => $scenarioData[$regionId]['strength'],
-          'control' => isset($scenarioData[$regionId]['control']) ? $scenarioData[$regionId]['control'] : null,
-        ];
+      $regions[$regionId] = [
+        'id' => $regionId,
+        'location' => 'India',
+        'strength' => $scenarioData[$regionId]['strength'],
+        'control' => isset($scenarioData[$regionId]['control']) ? $scenarioData[$regionId]['control'] : null,
+      ];
     }
 
     Notifications::log('regions', $regions);

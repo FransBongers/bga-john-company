@@ -97,11 +97,15 @@ class FamilyMembers extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   }
 
   // TODO: writers on orders?
-  public static function getWriters()
+  public static function getWriters($regionId = null)
   {
     $allMembers = self::getAll()->toArray();
-    return Utils::filter($allMembers, function ($familyMember) {
-      return Utils::startsWith($familyMember->getLocation(),'Writers_');
+    return Utils::filter($allMembers, function ($familyMember) use ($regionId) {
+      $location = $familyMember->getLocation();
+      if ($regionId !== null) {
+        return $location === Locations::writers($regionId);
+      } 
+      return Utils::startsWith($location,'Writers_');
     });
   }
 

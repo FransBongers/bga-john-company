@@ -127,6 +127,7 @@ interface JohnCompanyGamedatas extends Gamedatas {
   regions: Record<string, JocoRegionBase>;
   ships: Record<string, JocoShipBase>;
   staticData: {
+    orders: Record<string, JoCoOrderStatic>;
     regions: Record<string, JocoRegionStatic>;
     setupCards: Record<string, JocoSetupCardStatic>;
   };
@@ -170,6 +171,15 @@ interface JoCoOrder {
   id: string;
   location: string;
   status: 'open' | 'closed' | 'filled' | 'string';
+}
+
+interface JoCoOrderStatic {
+  connectedOrders: string[];
+  filledValue: number;
+  homePort: string | null;
+  northenPriority: number;
+  regionId: string;
+  value: number;
 }
 
 interface JocoArmyPieceBase extends GamePiece {

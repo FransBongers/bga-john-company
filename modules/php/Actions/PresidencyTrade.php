@@ -134,6 +134,7 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
         'action' => PRESIDENCY_TRADE_FILL_ORDERS,
         'playerId' => 'some',
         'activePlayerIds' => [$playerId],
+        'officeId' => $officeId,
         'regionIds' => $selectedRegionIds,
       ];
       $this->ctx->insertAsBrother(Engine::buildTree($action));

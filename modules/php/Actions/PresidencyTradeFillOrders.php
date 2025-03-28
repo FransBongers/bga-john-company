@@ -13,6 +13,7 @@ use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Orders;
 use Bga\Games\JohnCompany\Managers\Ships;
@@ -41,9 +42,19 @@ class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidenc
     // $player = self::getPlayer();
     $activePlayerId = $info['activePlayerIds'][0];
 
+    $office = Offices::get($info['officeId']);
+    $regionIds = $info['regionIds'];
 
-    $data = [];
+    $options = $this->getOrderOptions($office, $regionIds);
 
+    $data = [
+      'activePlayerIds' => [$activePlayerId],
+      'orders' => $options['orders'],
+      'homePortOrderId' => $options['homePortOrderId'],
+      'officeId' => $info['officeId'],
+      'writers' => FamilyMembers::getWriters($office->getRegionId()),
+      'numberOfOrdersToFill' => min($options['shipCount'], count($options['orders'])),
+    ];
     return $data;
   }
 

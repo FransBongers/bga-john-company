@@ -24,6 +24,14 @@ class StaticData {
   // .##....##.##..........##....##.....##.##.......
   // ..######..########....##.....#######..##.......
 
+  public order(id: string): JoCoOrderStatic {
+    const order = this.staticData.orders[id];
+    if (!order) {
+      throw new Error('FE_ERROR_001');
+    }
+    return order;
+  }
+
   public region(id: string) {
     return this.staticData.regions[id];
   }

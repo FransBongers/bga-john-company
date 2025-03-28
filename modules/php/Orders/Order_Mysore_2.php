@@ -15,6 +15,7 @@ class Order_Mysore_2 extends \Bga\Games\JohnCompany\Models\Order
     $this->connectedOrders = [
       ORDER_HYDERABAD_1,
       ORDER_MADRAS_2,
+      ORDER_MYSORE_1,
     ];
   }
 

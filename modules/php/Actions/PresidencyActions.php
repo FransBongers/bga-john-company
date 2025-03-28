@@ -26,7 +26,7 @@ class PresidencyActions extends \Bga\Games\JohnCompany\Models\AtomicAction
    * - Orders need to be connected and open
    * - Max number of regions depends on treasury (player needs to roll at least one die)
    */
-  public function getOrderOptions($office)
+  public function getOrderOptions($office, $regionIds = null)
   {
     $shipCount = Ships::countInLocation($office->getSeaZone());
 
@@ -61,6 +61,9 @@ class PresidencyActions extends \Bga\Games\JohnCompany\Models\AtomicAction
         if ($connectedOrder->getStatus() !== OPEN) {
           continue;
         }
+        if($regionIds !== null && !in_array($connectedOrder->getRegionId(), $regionIds)) {
+          continue;
+        }
 
         $queue[] = $connectedOrderId;
         $visited[$connectedOrderId] = $visited[$currentOrderId] + 1;
@@ -84,6 +87,7 @@ class PresidencyActions extends \Bga\Games\JohnCompany\Models\AtomicAction
       'regions' => $possibleRegions,
       'homePortOrderId' => $homePortOrderId,
       'homeRegionId' => $office->getRegionId(),
+      'shipCount' => $shipCount,
     ];
 
   }

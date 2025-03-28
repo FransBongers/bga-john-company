@@ -373,6 +373,25 @@ class Board {
         case STOCK_EXCHANGE_5:
           position = getStockExchangePosition(location);
           break;
+        case ORDER_PUNJAB_1:
+        case ORDER_DELHI_1:
+        case ORDER_DELHI_2:
+        case ORDER_DELHI_3:
+        case ORDER_BENGAL_1:
+        case ORDER_BENGAL_2:
+        case ORDER_BOMBAY_1:
+        case ORDER_BOMBAY_2:
+        case ORDER_BOMBAY_3:
+        case ORDER_MARATHA_1:
+        case ORDER_MARATHA_2:
+        case ORDER_MARATHA_3:
+        case ORDER_HYDERABAD_1:
+        case ORDER_MYSORE_1:
+        case ORDER_MYSORE_2:
+        case ORDER_MADRAS_1:
+        case ORDER_MADRAS_2:
+          position = ORDERS_CONFIG[location];
+          break;
         default:
           position = FAMILY_MEMBER_OFFICE_CONFIG[location];
           break;
@@ -406,13 +425,13 @@ class Board {
     familyMember: JocoFamilyMember,
     to: string // key of this.familyMember
   ) {
-
     const from = familyMember.location;
     familyMember.location = to;
 
     // Skip if family member is already in location, ie player already moved it when performing action
     // and this is triggered by notif.
     if (
+      this.familyMembers[familyMember.location] &&
       this.familyMembers[familyMember.location].some(
         (memberInLocation: JocoFamilyMember) =>
           memberInLocation.id === familyMember.id
@@ -421,14 +440,17 @@ class Board {
       return;
     }
 
-    const remainingFamilyMembers = this.familyMembers[from].filter(
-      (member: JocoFamilyMember) => member.id !== familyMember.id
-    );
+    let promises = [];
+    if (this.familyMembers[from]) {
+      const remainingFamilyMembers = this.familyMembers[from].filter(
+        (member: JocoFamilyMember) => member.id !== familyMember.id
+      );
+      this.familyMembers[from] = [];
+      promises = remainingFamilyMembers.map((member: JocoFamilyMember) =>
+        this.moveFamilyMember({ familyMember: member })
+      );
+    }
 
-    this.familyMembers[from] = [];
-    const promises = remainingFamilyMembers.map((member: JocoFamilyMember) =>
-      this.moveFamilyMember({ familyMember: member })
-    );
     promises.push(this.moveFamilyMember({ familyMember }));
     await Promise.all(promises);
   }

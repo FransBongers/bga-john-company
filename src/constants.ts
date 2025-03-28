@@ -98,6 +98,13 @@ const COUNTERS = [
 ];
 
 /**
+ * Order status
+ */
+const CLOSED = 'closed';
+const FILLED = 'filled';
+const OPEN = 'open';
+
+/**
  * OrderIds
  */
 const ORDER_PUNJAB_1 = 'Order_Punjab_1';

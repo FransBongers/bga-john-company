@@ -65,6 +65,9 @@ var COUNTERS = [
     SHIPYARDS_COUNTER,
     LUXURIES_COUNTER,
 ];
+var CLOSED = 'closed';
+var FILLED = 'filled';
+var OPEN = 'open';
 var ORDER_PUNJAB_1 = 'Order_Punjab_1';
 var ORDER_DELHI_1 = 'Order_Delhi_1';
 var ORDER_DELHI_2 = 'Order_Delhi_2';
@@ -2432,6 +2435,25 @@ var Board = (function () {
                 case STOCK_EXCHANGE_5:
                     position = getStockExchangePosition(location);
                     break;
+                case ORDER_PUNJAB_1:
+                case ORDER_DELHI_1:
+                case ORDER_DELHI_2:
+                case ORDER_DELHI_3:
+                case ORDER_BENGAL_1:
+                case ORDER_BENGAL_2:
+                case ORDER_BOMBAY_1:
+                case ORDER_BOMBAY_2:
+                case ORDER_BOMBAY_3:
+                case ORDER_MARATHA_1:
+                case ORDER_MARATHA_2:
+                case ORDER_MARATHA_3:
+                case ORDER_HYDERABAD_1:
+                case ORDER_MYSORE_1:
+                case ORDER_MYSORE_2:
+                case ORDER_MADRAS_1:
+                case ORDER_MADRAS_2:
+                    position = ORDERS_CONFIG[location];
+                    break;
                 default:
                     position = FAMILY_MEMBER_OFFICE_CONFIG[location];
                     break;
@@ -2464,23 +2486,27 @@ var Board = (function () {
     };
     Board.prototype.moveFamilyMemberBetweenLocations = function (familyMember, to) {
         return __awaiter(this, void 0, void 0, function () {
-            var from, remainingFamilyMembers, promises;
+            var from, promises, remainingFamilyMembers;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         from = familyMember.location;
                         familyMember.location = to;
-                        if (this.familyMembers[familyMember.location].some(function (memberInLocation) {
-                            return memberInLocation.id === familyMember.id;
-                        })) {
+                        if (this.familyMembers[familyMember.location] &&
+                            this.familyMembers[familyMember.location].some(function (memberInLocation) {
+                                return memberInLocation.id === familyMember.id;
+                            })) {
                             return [2];
                         }
-                        remainingFamilyMembers = this.familyMembers[from].filter(function (member) { return member.id !== familyMember.id; });
-                        this.familyMembers[from] = [];
-                        promises = remainingFamilyMembers.map(function (member) {
-                            return _this.moveFamilyMember({ familyMember: member });
-                        });
+                        promises = [];
+                        if (this.familyMembers[from]) {
+                            remainingFamilyMembers = this.familyMembers[from].filter(function (member) { return member.id !== familyMember.id; });
+                            this.familyMembers[from] = [];
+                            promises = remainingFamilyMembers.map(function (member) {
+                                return _this.moveFamilyMember({ familyMember: member });
+                            });
+                        }
                         promises.push(this.moveFamilyMember({ familyMember: familyMember }));
                         return [4, Promise.all(promises)];
                     case 1:
@@ -4620,7 +4646,7 @@ var PresidencyTrade = (function () {
             this.setMinSpendAmount();
             return;
         }
-        updatePageTitle(_('${you} must select the regions in which you wish to trade'));
+        updatePageTitle(_('Trade check: ${you} must select the regions in which you wish to trade'));
         var staticData = StaticData.get();
         Object.entries(this.args.options.regions).forEach(function (_a) {
             var regionId = _a[0], region = _a[1];
@@ -4744,6 +4770,8 @@ var PresidencyTradeFillOrders = (function () {
     PresidencyTradeFillOrders.prototype.onEnteringState = function (args) {
         debug('Entering PresidencyTradeFillOrders state');
         this.args = args;
+        this.filledOrders = {};
+        this.board = Board.getInstance();
         this.updateInterfaceInitialStep();
     };
     PresidencyTradeFillOrders.prototype.onLeavingState = function () {
@@ -4755,40 +4783,136 @@ var PresidencyTradeFillOrders = (function () {
         }, true);
     };
     PresidencyTradeFillOrders.prototype.updateInterfaceInitialStep = function () {
+        var _this = this;
+        console.log('initital', this.filledOrders);
         clearPossible();
-        updatePageTitle(_('${you} must fill orders'));
+        var numberOfFilledOrders = Object.keys(this.filledOrders).length;
+        if (numberOfFilledOrders === this.args.numberOfOrdersToFill) {
+            this.updateIntefaceConfirm();
+            return;
+        }
+        var placedWriters = Object.values(this.filledOrders);
+        var availableWriters = this.args.writers.filter(function (writer) { return !placedWriters.includes(writer.id); });
+        if (availableWriters.length === 0) {
+            this.updateInterfaceSelectOrder();
+        }
+        updatePageTitle(_('Fill orders: ${you} must select a a writer'));
+        availableWriters.forEach(function (writer) {
+            onClick(_this.board.ui.familyMembers[writer.id], function () {
+                _this.updateInterfaceSelectOrder(writer);
+            });
+        });
+        if (numberOfFilledOrders > 0) {
+            this.addCancelButton();
+        }
+    };
+    PresidencyTradeFillOrders.prototype.updateInterfaceSelectOrder = function (writer) {
+        var _this = this;
+        clearPossible();
+        if (writer) {
+            setSelected(this.board.ui.familyMembers[writer.id]);
+        }
+        updatePageTitle(_('Fill orders: ${you} must select an order'));
+        console.log('available', this.getAvailableOrderIds());
+        this.getAvailableOrderIds().forEach(function (orderId) {
+            onClick(_this.board.ui.orders[orderId], function () { return __awaiter(_this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.filledOrders[orderId] = (writer === null || writer === void 0 ? void 0 : writer.id) || FILLED;
+                            if (!writer) return [3, 2];
+                            console.log('writer');
+                            return [4, this.board.moveFamilyMemberBetweenLocations(writer, orderId)];
+                        case 1:
+                            _a.sent();
+                            return [3, 3];
+                        case 2:
+                            console.log('else');
+                            this.board.ui.orders[orderId].setAttribute('data-status', FILLED);
+                            _a.label = 3;
+                        case 3:
+                            this.updateInterfaceInitialStep();
+                            return [2];
+                    }
+                });
+            }); });
+        });
+        this.addCancelButton();
     };
     PresidencyTradeFillOrders.prototype.updateIntefaceConfirm = function () {
         var _this = this;
         clearPossible();
-        updatePageTitle(_('Make a check with ${number} dice to trade in ${tradeLog}?'), {
-            number: this.spend,
-            tradeLog: this.getTradeLog()
-        });
+        updatePageTitle(_('Fill orders: confirm?'));
         addConfirmButton(function () { return _this.performAction(true); });
         this.addCancelButton();
     };
-    PresidencyTradeFillOrders.prototype.getTradeLog = function () {
-        var log = [];
-        var args = {};
+    PresidencyTradeFillOrders.prototype.getAvailableOrderIds = function () {
+        var filledOrderIds = Object.keys(this.filledOrders);
+        if (filledOrderIds.length === 0) {
+            return [this.args.homePortOrderId];
+        }
         var staticData = StaticData.get();
-        this.selectedRegionIds.forEach(function (regionId, index) {
-            var key = "key_".concat(index);
-            log.push(['${', key, '}'].join(''));
-            args[key] = _(staticData.region(regionId).name);
+        var orderIds = [];
+        Object.values(this.args.orders).forEach(function (order) {
+            if (filledOrderIds.includes(order.id)) {
+                return;
+            }
+            var staticOrder = staticData.order(order.id);
+            var connectedOrderHasBeenFilled = filledOrderIds.some(function (orderId) {
+                return staticOrder.connectedOrders.includes(orderId);
+            });
+            if (connectedOrderHasBeenFilled && !orderIds.includes(order.id)) {
+                orderIds.push(order.id);
+            }
         });
-        return {
-            log: log.join(', '),
-            args: args,
-        };
+        return orderIds;
+    };
+    PresidencyTradeFillOrders.prototype.returnPieces = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _loop_2, this_1, _i, _a, _b, orderId, filledBy;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        _loop_2 = function (orderId, filledBy) {
+                            var writer;
+                            return __generator(this, function (_d) {
+                                switch (_d.label) {
+                                    case 0:
+                                        if (!(filledBy === FILLED)) return [3, 1];
+                                        this_1.board.ui.orders[orderId].setAttribute('data-status', OPEN);
+                                        return [3, 3];
+                                    case 1:
+                                        writer = this_1.args.writers.find(function (writer) { return writer.id === filledBy; });
+                                        writer.location = orderId;
+                                        return [4, this_1.board.moveFamilyMemberBetweenLocations(writer, 'Writers_Bombay')];
+                                    case 2:
+                                        _d.sent();
+                                        _d.label = 3;
+                                    case 3: return [2];
+                                }
+                            });
+                        };
+                        this_1 = this;
+                        _i = 0, _a = Object.entries(this.filledOrders);
+                        _c.label = 1;
+                    case 1:
+                        if (!(_i < _a.length)) return [3, 4];
+                        _b = _a[_i], orderId = _b[0], filledBy = _b[1];
+                        return [5, _loop_2(orderId, filledBy)];
+                    case 2:
+                        _c.sent();
+                        _c.label = 3;
+                    case 3:
+                        _i++;
+                        return [3, 1];
+                    case 4: return [2];
+                }
+            });
+        });
     };
     PresidencyTradeFillOrders.prototype.performAction = function (makeCheck) {
         if (makeCheck === void 0) { makeCheck = false; }
-        performAction('actPresidencyTradeFillOrders', {
-            selectedRegionIds: this.selectedRegionIds,
-            spend: this.spend,
-            makeCheck: makeCheck,
-        });
+        performAction('actPresidencyTradeFillOrders', {});
     };
     PresidencyTradeFillOrders.prototype.addCancelButton = function () {
         var _this = this;
@@ -4797,6 +4921,7 @@ var PresidencyTradeFillOrders = (function () {
             text: _('Cancel'),
             callback: function () { return __awaiter(_this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
+                    this.returnPieces();
                     this.game.onCancel();
                     return [2];
                 });
@@ -4870,6 +4995,13 @@ var StaticData = (function () {
     };
     StaticData.get = function () {
         return StaticData.instance;
+    };
+    StaticData.prototype.order = function (id) {
+        var order = this.staticData.orders[id];
+        if (!order) {
+            throw new Error('FE_ERROR_001');
+        }
+        return order;
     };
     StaticData.prototype.region = function (id) {
         return this.staticData.regions[id];
