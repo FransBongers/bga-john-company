@@ -1,5 +1,6 @@
 interface OnEnteringPresidencyTradeFillOrdersArgs extends CommonStateArgs {
   homePortOrderId: string;
+  companyBalance: number;
   orders: Record<string, JoCoOrder>;
   writers: JocoFamilyMember[];
   numberOfOrdersToFill: number;
@@ -8,9 +9,9 @@ interface OnEnteringPresidencyTradeFillOrdersArgs extends CommonStateArgs {
 class PresidencyTradeFillOrders implements State {
   private static instance: PresidencyTradeFillOrders;
   private args: OnEnteringPresidencyTradeFillOrdersArgs;
-  private spend: number;
-  private filledOrders: Record<string, string>; // orderId / familyMemberId or 'filled' if not available
+  private filledOrders: Array<{ orderId: string; filledBy: string }>; // orderId / familyMemberId or 'filled' if not available
   private board: Board;
+  private balance: number;
 
   constructor(private game: GameAlias) {}
 
@@ -25,10 +26,9 @@ class PresidencyTradeFillOrders implements State {
   onEnteringState(args: OnEnteringPresidencyTradeFillOrdersArgs) {
     debug('Entering PresidencyTradeFillOrders state');
     this.args = args;
-    this.filledOrders = {};
+    this.filledOrders = [];
     this.board = Board.getInstance();
-    // this.spend = args.proposal || 0;
-    // this.selectedRegionIds = [this.args.options.homeRegionId];
+    this.balance = this.args.companyBalance;
     this.updateInterfaceInitialStep();
   }
 
@@ -75,25 +75,28 @@ class PresidencyTradeFillOrders implements State {
    * back to 1.
    */
   private updateInterfaceInitialStep() {
-    console.log('initital', this.filledOrders);
     clearPossible();
 
-    const numberOfFilledOrders = Object.keys(this.filledOrders).length;
+    const numberOfFilledOrders = this.filledOrders.length;
     if (numberOfFilledOrders === this.args.numberOfOrdersToFill) {
       this.updateIntefaceConfirm();
       return;
     }
 
-    const placedWriters = Object.values(this.filledOrders);
+    const placedWriters = this.filledOrders.map(
+      (filledOrder) => filledOrder.filledBy
+    );
+
     const availableWriters = this.args.writers.filter(
       (writer) => !placedWriters.includes(writer.id)
     );
 
     if (availableWriters.length === 0) {
       this.updateInterfaceSelectOrder();
+      return;
     }
 
-    updatePageTitle(_('Fill orders: ${you} must select a a writer'));
+    updatePageTitle(_('Fill orders: ${you} must select a writer'));
 
     availableWriters.forEach((writer) => {
       onClick(this.board.ui.familyMembers[writer.id], () => {
@@ -115,27 +118,25 @@ class PresidencyTradeFillOrders implements State {
 
     updatePageTitle(_('Fill orders: ${you} must select an order'));
 
-    console.log('available', this.getAvailableOrderIds());
-
     this.getAvailableOrderIds().forEach((orderId) => {
       onClick(this.board.ui.orders[orderId], async () => {
-        this.filledOrders[orderId] = writer?.id || FILLED;
+        this.filledOrders.push({ orderId, filledBy: writer?.id || FILLED });
+        const promises: Promise<void>[] = [];
+        const order = StaticData.get().order(orderId);
+        // TODO: half values when using firms and already filled
+        this.balance += order.value;
         if (writer) {
-          console.log('writer');
-          await this.board.moveFamilyMemberBetweenLocations(writer, orderId);
+          promises.push(
+            this.board.moveFamilyMemberBetweenLocations(writer, orderId)
+          );
         } else {
-          console.log('else');
           this.board.ui.orders[orderId].setAttribute('data-status', FILLED);
         }
+        promises.push(this.board.movePawn('balance', this.balance));
+        await Promise.all(promises);
         this.updateInterfaceInitialStep();
       });
     });
-    // Object.values(this.args.writers).forEach((writer: JocoFamilyMember) => {
-    //   onClick(this.board.ui.familyMembers[writer.id], () => {
-    //     this.filledOrders[orderId] = writer.id;
-    //     this.updateInterfaceInitialStep();
-    //   });
-    // });
 
     this.addCancelButton();
   }
@@ -158,7 +159,7 @@ class PresidencyTradeFillOrders implements State {
   //  ..#######.....##....####.########.####....##.......##...
 
   private getAvailableOrderIds() {
-    const filledOrderIds = Object.keys(this.filledOrders);
+    const filledOrderIds = this.filledOrders.map((filledOrder) => filledOrder.orderId);
     if (filledOrderIds.length === 0) {
       // No orders selected yet
       return [this.args.homePortOrderId];
@@ -182,9 +183,9 @@ class PresidencyTradeFillOrders implements State {
     return orderIds;
   }
 
-
   private async returnPieces() {
-    for (let [orderId, filledBy] of Object.entries(this.filledOrders)) {
+    for (let {orderId, filledBy} of this.filledOrders) {
+      const promises: Promise<void>[] = [];
       if (filledBy === FILLED) {
         this.board.ui.orders[orderId].setAttribute('data-status', OPEN);
       } else {
@@ -192,21 +193,19 @@ class PresidencyTradeFillOrders implements State {
           (writer) => writer.id === filledBy
         );
         writer.location = orderId;
-        await this.board.moveFamilyMemberBetweenLocations(
-          writer,
-          'Writers_Bombay'
+        promises.push(
+          this.board.moveFamilyMemberBetweenLocations(writer, 'Writers_Bombay')
         );
       }
+      this.balance = this.balance - StaticData.get().order(orderId).value;
+      promises.push(this.board.movePawn('balance', this.balance));
+      await Promise.all(promises);
     }
-    // for (let data of Object.values(this.transfers.writers)) {
-    //   await board.moveFamilyMemberBetweenLocations(data.writer, data.from);
-    // }
   }
 
   private performAction(makeCheck: boolean = false) {
     performAction('actPresidencyTradeFillOrders', {
-      // selectedRegionIds: this.selectedRegionIds,
-      // spend: this.spend,
+      filledOrders: this.filledOrders,
       // makeCheck,
     });
   }
@@ -232,7 +231,7 @@ class PresidencyTradeFillOrders implements State {
       id: 'cancel_btn',
       text: _('Cancel'),
       callback: async () => {
-        this.returnPieces();
+        await this.returnPieces();
         this.game.onCancel();
       },
     });

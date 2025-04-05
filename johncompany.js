@@ -4770,8 +4770,9 @@ var PresidencyTradeFillOrders = (function () {
     PresidencyTradeFillOrders.prototype.onEnteringState = function (args) {
         debug('Entering PresidencyTradeFillOrders state');
         this.args = args;
-        this.filledOrders = {};
+        this.filledOrders = [];
         this.board = Board.getInstance();
+        this.balance = this.args.companyBalance;
         this.updateInterfaceInitialStep();
     };
     PresidencyTradeFillOrders.prototype.onLeavingState = function () {
@@ -4784,19 +4785,19 @@ var PresidencyTradeFillOrders = (function () {
     };
     PresidencyTradeFillOrders.prototype.updateInterfaceInitialStep = function () {
         var _this = this;
-        console.log('initital', this.filledOrders);
         clearPossible();
-        var numberOfFilledOrders = Object.keys(this.filledOrders).length;
+        var numberOfFilledOrders = this.filledOrders.length;
         if (numberOfFilledOrders === this.args.numberOfOrdersToFill) {
             this.updateIntefaceConfirm();
             return;
         }
-        var placedWriters = Object.values(this.filledOrders);
+        var placedWriters = this.filledOrders.map(function (filledOrder) { return filledOrder.filledBy; });
         var availableWriters = this.args.writers.filter(function (writer) { return !placedWriters.includes(writer.id); });
         if (availableWriters.length === 0) {
             this.updateInterfaceSelectOrder();
+            return;
         }
-        updatePageTitle(_('Fill orders: ${you} must select a a writer'));
+        updatePageTitle(_('Fill orders: ${you} must select a writer'));
         availableWriters.forEach(function (writer) {
             onClick(_this.board.ui.familyMembers[writer.id], function () {
                 _this.updateInterfaceSelectOrder(writer);
@@ -4813,24 +4814,26 @@ var PresidencyTradeFillOrders = (function () {
             setSelected(this.board.ui.familyMembers[writer.id]);
         }
         updatePageTitle(_('Fill orders: ${you} must select an order'));
-        console.log('available', this.getAvailableOrderIds());
         this.getAvailableOrderIds().forEach(function (orderId) {
             onClick(_this.board.ui.orders[orderId], function () { return __awaiter(_this, void 0, void 0, function () {
+                var promises, order;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            this.filledOrders[orderId] = (writer === null || writer === void 0 ? void 0 : writer.id) || FILLED;
-                            if (!writer) return [3, 2];
-                            console.log('writer');
-                            return [4, this.board.moveFamilyMemberBetweenLocations(writer, orderId)];
+                            this.filledOrders.push({ orderId: orderId, filledBy: (writer === null || writer === void 0 ? void 0 : writer.id) || FILLED });
+                            promises = [];
+                            order = StaticData.get().order(orderId);
+                            this.balance += order.value;
+                            if (writer) {
+                                promises.push(this.board.moveFamilyMemberBetweenLocations(writer, orderId));
+                            }
+                            else {
+                                this.board.ui.orders[orderId].setAttribute('data-status', FILLED);
+                            }
+                            promises.push(this.board.movePawn('balance', this.balance));
+                            return [4, Promise.all(promises)];
                         case 1:
                             _a.sent();
-                            return [3, 3];
-                        case 2:
-                            console.log('else');
-                            this.board.ui.orders[orderId].setAttribute('data-status', FILLED);
-                            _a.label = 3;
-                        case 3:
                             this.updateInterfaceInitialStep();
                             return [2];
                     }
@@ -4847,7 +4850,7 @@ var PresidencyTradeFillOrders = (function () {
         this.addCancelButton();
     };
     PresidencyTradeFillOrders.prototype.getAvailableOrderIds = function () {
-        var filledOrderIds = Object.keys(this.filledOrders);
+        var filledOrderIds = this.filledOrders.map(function (filledOrder) { return filledOrder.orderId; });
         if (filledOrderIds.length === 0) {
             return [this.args.homePortOrderId];
         }
@@ -4874,30 +4877,34 @@ var PresidencyTradeFillOrders = (function () {
                 switch (_c.label) {
                     case 0:
                         _loop_2 = function (orderId, filledBy) {
-                            var writer;
+                            var promises, writer;
                             return __generator(this, function (_d) {
                                 switch (_d.label) {
                                     case 0:
-                                        if (!(filledBy === FILLED)) return [3, 1];
-                                        this_1.board.ui.orders[orderId].setAttribute('data-status', OPEN);
-                                        return [3, 3];
+                                        promises = [];
+                                        if (filledBy === FILLED) {
+                                            this_1.board.ui.orders[orderId].setAttribute('data-status', OPEN);
+                                        }
+                                        else {
+                                            writer = this_1.args.writers.find(function (writer) { return writer.id === filledBy; });
+                                            writer.location = orderId;
+                                            promises.push(this_1.board.moveFamilyMemberBetweenLocations(writer, 'Writers_Bombay'));
+                                        }
+                                        this_1.balance = this_1.balance - StaticData.get().order(orderId).value;
+                                        promises.push(this_1.board.movePawn('balance', this_1.balance));
+                                        return [4, Promise.all(promises)];
                                     case 1:
-                                        writer = this_1.args.writers.find(function (writer) { return writer.id === filledBy; });
-                                        writer.location = orderId;
-                                        return [4, this_1.board.moveFamilyMemberBetweenLocations(writer, 'Writers_Bombay')];
-                                    case 2:
                                         _d.sent();
-                                        _d.label = 3;
-                                    case 3: return [2];
+                                        return [2];
                                 }
                             });
                         };
                         this_1 = this;
-                        _i = 0, _a = Object.entries(this.filledOrders);
+                        _i = 0, _a = this.filledOrders;
                         _c.label = 1;
                     case 1:
                         if (!(_i < _a.length)) return [3, 4];
-                        _b = _a[_i], orderId = _b[0], filledBy = _b[1];
+                        _b = _a[_i], orderId = _b.orderId, filledBy = _b.filledBy;
                         return [5, _loop_2(orderId, filledBy)];
                     case 2:
                         _c.sent();
@@ -4912,7 +4919,9 @@ var PresidencyTradeFillOrders = (function () {
     };
     PresidencyTradeFillOrders.prototype.performAction = function (makeCheck) {
         if (makeCheck === void 0) { makeCheck = false; }
-        performAction('actPresidencyTradeFillOrders', {});
+        performAction('actPresidencyTradeFillOrders', {
+            filledOrders: this.filledOrders,
+        });
     };
     PresidencyTradeFillOrders.prototype.addCancelButton = function () {
         var _this = this;
@@ -4921,9 +4930,13 @@ var PresidencyTradeFillOrders = (function () {
             text: _('Cancel'),
             callback: function () { return __awaiter(_this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    this.returnPieces();
-                    this.game.onCancel();
-                    return [2];
+                    switch (_a.label) {
+                        case 0: return [4, this.returnPieces()];
+                        case 1:
+                            _a.sent();
+                            this.game.onCancel();
+                            return [2];
+                    }
                 });
             }); },
         });

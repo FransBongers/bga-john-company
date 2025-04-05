@@ -49,6 +49,7 @@ class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidenc
 
     $data = [
       'activePlayerIds' => [$activePlayerId],
+      'companyBalance' => Company::getBalance(),
       'orders' => $options['orders'],
       'homePortOrderId' => $options['homePortOrderId'],
       'officeId' => $info['officeId'],
@@ -87,54 +88,9 @@ class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidenc
     self::checkAction('actPresidencyTradeFillOrders');
     $playerId = $this->checkPlayer();
 
-    $selectedRegionIds = $args->selectedRegionIds;
-    $spend = $args->spend;
-    $makeCheck = $args->makeCheck; // TODO: use to differentiate between propose and act
+    Notifications::log('args', $args);
 
-    $stageArgs = $this->argsPresidencyTradeFillOrders();
-    $options = $stageArgs['options'];
-    $officeId = $stageArgs['officeId'];
-
-    if (!$this->canBePerformed($officeId)) {
-      throw new \feException("ERROR_023");
-    }
-
-    // All regions need to be withing range
-    foreach ($selectedRegionIds as $regionId) {
-      $region = Utils::array_find($stageArgs['options']['regions'], function ($region) use ($regionId) {
-        return $region->getId() === $regionId;
-      });
-      if ($region === null) {
-        throw new \feException("ERROR_024");
-      }
-    }
-
-    // Home region needs to be selected
-    if (!in_array($options['homeRegionId'], $selectedRegionIds)) {
-      throw new \feException("ERROR_025");
-    }
-
-    // Treasury needs to have required cash
-    if ($stageArgs['treasury'] < $spend) {
-      throw new \feException("ERROR_026");
-    }
-
-    $office = Offices::get($officeId);
-    $player = Players::get($playerId);
-
-    $penalty = count($selectedRegionIds) - 1;
-    $numberOfDice = $spend - $penalty;
-    $checkResult = JoCoUtils::makeCheck($player, $office, $spend);
-
-    Notifications::log('actPresidencyTradeFillOrders', $args);
-    if ($checkResult === SUCCESS) {
-      $action = [
-        'action' => DIRECTOR_OF_TRADE_SPECIAL_ENVOY_SUCCESS,
-        'playerId' => 'some',
-        'activePlayerIds' => [$playerId]
-      ];
-      $this->ctx->insertAsBrother(Engine::buildTree($action));
-    }
+  
 
     // $this->resolveAction([], true);
   }
