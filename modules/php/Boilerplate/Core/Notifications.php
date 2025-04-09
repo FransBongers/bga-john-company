@@ -304,6 +304,29 @@ class Notifications
     ]);
   }
 
+  public static function fillOrder($player, $order, $filledByWriter, $familyMember = null, $from = null)
+  {
+    $text = $filledByWriter ?
+      clienttranslate('${player_name} places ${tkn_familyMember} on an order with value of ${amount} ${tkn_pound} in ${tkn_boldText_regionName}') :
+      clienttranslate('${player_name} places a filled order token on an order with value of ${amount} ${tkn_pound} in ${tkn_boldText_regionName}');
+
+    $args = [
+      'player' => $player,
+      'amount' => $order->getValue(),
+      'from' => $from,
+      'tkn_boldText_regionName' => $order->getRegion()->getName(),
+      'tkn_pound' => self::tknPound(),
+      'order' => $order->jsonSerialize(),
+      'familyMember' => $familyMember,
+      'i18n' => ['tkn_boldText_regionName'],
+    ];
+    if ($filledByWriter) {
+      $args['tkn_familyMember'] = self::tknFamilyMember($familyMember);
+    }
+
+    self::notifyAll('fillOrder', $text, $args);
+  }
+
   public static function gainEnterprise($player, $enterprise)
   {
     // Notifications::message(clienttranslate('${player_name} gains a ${enterprise}'), ['player' => $player, 'enterprise' => $type]);
@@ -334,6 +357,17 @@ class Notifications
       'player' => $player,
       'amount' => $cash,
       'tkn_pound' => clienttranslate('Pounds')
+    ]);
+  }
+
+  public static function increaseCompanyBalance($player, $companyBalance, $companyBalanceIncrease)
+  {
+    self::notifyAll('increaseCompanyBalance', clienttranslate('${player_name} increases Company Balance by ${tkn_boldText_amount} ${tkn_pound}'), [
+      'player' => $player,
+      'tkn_boldText_amount' => $companyBalanceIncrease,
+      'companyBalance' => $companyBalance,
+      'tkn_pound' => clienttranslate('Pounds'),
+      'i18n' => ['tkn_boldText_value'],
     ]);
   }
 

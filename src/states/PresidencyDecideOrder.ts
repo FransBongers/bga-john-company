@@ -1,5 +1,6 @@
 interface OnEnteringPresidencyDecideOrderArgs extends CommonStateArgs {
   trade: boolean;
+  done: boolean;
   Commander: boolean;
   governors: Record<string, boolean>;
 }
@@ -66,7 +67,9 @@ class PresidencyDecideOrder implements State {
     if (this.args.trade) {
       addPrimaryActionButton({id: 'trade_btn', text: _('Trade'), callback: () => this.updateInterfaceConfirm(TRADE)})
     }
-
+    if (this.args.done) {
+      addPrimaryActionButton({id: 'done_btn', text: _('Done'), callback: () => this.updateInterfaceConfirm(DONE)})
+    }
   }
 
 
@@ -76,6 +79,9 @@ class PresidencyDecideOrder implements State {
     switch(next) {
       case TRADE:
         updatePageTitle(_('Perform the Trade action?'));
+        break;
+      case DONE:
+        updatePageTitle(_('Done?'));
         break;
       default:    
     }

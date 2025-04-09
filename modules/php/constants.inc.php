@@ -379,6 +379,7 @@ const ORDERS = [
  */
 const CLOSED = 'closed';
 const FILLED = 'filled';
+const FILLED_BY_WRITER = 'filledByWriter';
 const OPEN = 'open';
 
 /**
@@ -516,3 +517,4 @@ const STOCK_EXCHANGE_POSITIONS = [
  * Other
  */
 const TRADE = 'trade';
+const DONE = 'done';

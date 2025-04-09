@@ -3,6 +3,7 @@
 namespace Bga\Games\JohnCompany\Models;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Managers\Regions;
 
 class Order extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
 {
@@ -53,6 +54,11 @@ class Order extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implemen
     return $this->jsonSerialize(); // Static datas are already in js file
   }
 
+  public function getRegion()
+  {
+    return Regions::get($this->regionId);
+  }
+
   public function getRegionId()
   {
     return $this->regionId;
@@ -62,6 +68,20 @@ class Order extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implemen
   {
     $this->setStatus(CLOSED);
     Notifications::changeOrderStatus($player, $this, CLOSED);
+  }
+
+  public function fill($player, $familyMember = null)
+  {
+    $from = null;
+    if ($familyMember !== null) {
+      $from = $familyMember->getLocation();
+      $familyMember->setLocation($this->getId());
+      $this->setStatus(FILLED_BY_WRITER);
+    } else {
+      $this->setStatus(FILLED);
+    }
+
+    Notifications::fillOrder($player, $this, $familyMember !== null, $familyMember, $from);
   }
 
   public function open($player)

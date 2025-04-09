@@ -133,6 +133,7 @@ class PresidencyTradeFillOrders implements State {
           this.board.ui.orders[orderId].setAttribute('data-status', FILLED);
         }
         promises.push(this.board.movePawn('balance', this.balance));
+        clearPossible();
         await Promise.all(promises);
         this.updateInterfaceInitialStep();
       });

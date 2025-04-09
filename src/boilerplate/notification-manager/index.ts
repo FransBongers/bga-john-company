@@ -66,8 +66,10 @@ class NotificationManager {
       'draftCardPrivate',
       'draftNewCardsPrivate',
       'enlistFamilyMember',
+      'fillOrder',
       'gainCash',
       'gainEnterprise',
+      'increaseCompanyBalance',
       'increaseCompanyDebt',
       'makeCheck',
       'moveFamilyMember',
@@ -277,6 +279,20 @@ class NotificationManager {
     );
   }
 
+  async notif_fillOrder(notif: Notif<NotifFillOrder>) {
+    const { familyMember, order, from } = notif.args;
+    const promises: Promise<void>[] = [];
+    const board = Board.getInstance();
+    if (familyMember) {
+      const to = familyMember.location;
+      familyMember.location = from;
+      promises.push(board.moveFamilyMemberBetweenLocations(familyMember, to));
+    } else {
+      board.ui.orders[order.id].setAttribute('data-status', FILLED);
+    }
+    await Promise.all(promises);
+  }
+
   async notif_gainEnterprise(notif: Notif<NotifGainEnterprise>) {
     const { playerId, type } = notif.args;
 
@@ -328,6 +344,13 @@ class NotificationManager {
     await Promise.all(promises);
   }
 
+  async notif_increaseCompanyBalance(notif: Notif<NotifIncreaseCompanyDebt>) {
+    const { companyBalance } = notif.args;
+    const board = Board.getInstance();
+
+    await board.movePawn('balance', companyBalance);
+  }
+
   async notif_increaseCompanyDebt(notif: Notif<NotifIncreaseCompanyDebt>) {
     const { companyBalance, companyDebt } = notif.args;
     const board = Board.getInstance();
@@ -345,7 +368,7 @@ class NotificationManager {
     const { familyMember, to } = notif.args;
     const board = Board.getInstance();
 
-    await board.moveFamilyMemberBetweenLocations(familyMember, to)
+    await board.moveFamilyMemberBetweenLocations(familyMember, to);
   }
 
   async notif_moveFamilyMembers(notif: Notif<NotifMoveFamilyMembers>) {
@@ -353,7 +376,7 @@ class NotificationManager {
     const board = Board.getInstance();
     await Promise.all(
       familyMembers.map(async (familyMember, index) =>
-        board.moveFamilyMember({familyMember, index})
+        board.moveFamilyMember({ familyMember, index })
       )
     );
     board.updateFamilyMembers(familyMembers);
@@ -377,7 +400,7 @@ class NotificationManager {
     const board = Board.getInstance();
 
     await Promise.all([
-      board.moveFamilyMember({familyMember}),
+      board.moveFamilyMember({ familyMember }),
       board.movePawn('debt', debt),
     ]);
     player.counters[SHARES_COUNTER].incValue(1);

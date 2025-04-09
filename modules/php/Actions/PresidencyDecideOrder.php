@@ -39,10 +39,13 @@ class PresidencyDecideOrder extends \Bga\Games\JohnCompany\Models\AtomicAction
     // $player = self::getPlayer();
     $activePlayerId = $info['activePlayerIds'][0];
 
+    $canTrade = AtomicActions::get(PRESIDENCY_TRADE)->canBePerformed($info['officeId']);
+    $commanderTurn = false;
 
     $data = [
       'activePlayerIds' => [$activePlayerId],
-      'trade' => AtomicActions::get(PRESIDENCY_TRADE)->canBePerformed($info['officeId']),
+      'trade' => $canTrade,
+      'done' => !($canTrade || $commanderTurn),
     ];
 
     return $data;
@@ -98,6 +101,8 @@ class PresidencyDecideOrder extends \Bga\Games\JohnCompany\Models\AtomicAction
         Engine::save();
         Engine::proceed();
         return;
+        break;
+      case DONE:
         break;
       default:
         throw new \feException("ERROR_023");

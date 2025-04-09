@@ -18,7 +18,7 @@ interface NotifChangeOrderStatus extends NotifWithPlayerArgs {
 }
 
 interface NotifCompanyOperationChairman extends NotifWithPlayerArgs {
-  companyBalance: number,
+  companyBalance: number;
   companyDebt: number;
   debtIncreased: boolean;
   treasuries: Record<string, number>;
@@ -37,12 +37,23 @@ interface NotifEnlistFamilyMember extends NotifWithPlayerArgs {
   familyMember: JocoFamilyMember;
 }
 
+interface NotifFillOrder extends NotifWithPlayerArgs {
+  amount: number;
+  order: JoCoOrder;
+  from: string | null;
+  familyMember: JocoFamilyMember | null;
+}
+
 interface NotifGainCash extends NotifWithPlayerArgs {
   amount: number;
 }
 
 interface NotifGainEnterprise extends NotifWithPlayerArgs {
   type: string;
+}
+
+interface NotifIncreaseCompanyBalance extends NotifWithPlayerArgs {
+  companyBalance: number;
 }
 
 interface NotifIncreaseCompanyDebt extends NotifWithPlayerArgs {

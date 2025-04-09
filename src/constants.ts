@@ -6,6 +6,7 @@ const BOARD_SCALE = 'boardScale';
 const PLUS = 'plus';
 const MINUS = 'minus';
 
+const DONE = 'done';
 const TRADE = 'trade';
 
 /**

@@ -88,11 +88,80 @@ class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidenc
     self::checkAction('actPresidencyTradeFillOrders');
     $playerId = $this->checkPlayer();
 
+    $filledOrders = $args->filledOrders;
+
+    $stateArgs = $this->argsPresidencyTradeFillOrders();
+    $orders = $stateArgs['orders'];
+    $writers = $stateArgs['writers'];
+
     Notifications::log('args', $args);
+    if (count($filledOrders) !== $stateArgs['numberOfOrdersToFill']) {
+      throw new \feException("ERROR_028");
+    }
 
-  
+    $ordersThatCanBeFilled = [$stateArgs['homePortOrderId']];
+    $companyBalanceIncrease = 0;
 
-    // $this->resolveAction([], true);
+    $player = Players::get($playerId);
+
+    $familyIncome = [
+      $player->getFamilyId() => count($filledOrders), // player performing the action is president
+    ];
+
+    foreach ($filledOrders as $index => $data) {
+      $orderId = $data->orderId;
+      $filledBy = $data->filledBy;
+
+      if (!in_array($orderId, $ordersThatCanBeFilled)) {
+        throw new \feException("ERROR_029");
+      }
+      $order = $orders[$orderId];
+
+      $ordersThatCanBeFilled = array_merge($ordersThatCanBeFilled, $order->getConnectedOrders());
+
+      // There are still writers to place but according to input a filled token was placed
+      if (count($writers) > 0 && $filledBy === FILLED) {
+        throw new \feException("ERROR_030");
+      }
+      $familyMember = null;
+
+      $filledByWriter = Utils::startsWith($filledBy, 'familyMember');
+      if ($filledByWriter) {
+        $familyMember = Utils::array_find($writers, function ($writer) use ($filledBy) {
+          return $writer->getId() === $filledBy;
+        });
+        if ($familyMember === null) {
+          throw new \feException("ERROR_031");
+        }
+
+        $familyId = $familyMember->getFamilyId();
+        if (isset($familyIncome[$familyId])) {
+          $familyIncome[$familyId] += 1;
+        } else {
+          $familyIncome[$familyId] = 1;
+        }
+
+        // $familyMember->setLocation($orderId);
+        // Return writer from available writers array
+        $writers = Utils::filter($writers, function ($writer) use ($filledBy) {
+          return $writer->getId() !== $filledBy;
+        });
+      }
+
+      $companyBalanceIncrease += $order->getValue();
+      $order->fill($player, $familyMember);
+      $families = Families::getAll();
+    }
+
+    $companyBalance = Company::incBalance($companyBalanceIncrease);
+    Notifications::increaseCompanyBalance($player, $companyBalance, $companyBalanceIncrease);
+
+    foreach ($familyIncome as $familyId => $amount) {
+      $families[$familyId]->gainCash($amount);
+    }
+
+
+    $this->resolveAction([], true);
   }
 
   //  .##.....##.########.####.##.......####.########.##....##

@@ -2,6 +2,7 @@ var _a, _b, _c;
 var BOARD_SCALE = 'boardScale';
 var PLUS = 'plus';
 var MINUS = 'minus';
+var DONE = 'done';
 var TRADE = 'trade';
 var BENYON = 'Benyon';
 var HASTINGS = 'Hastings';
@@ -859,8 +860,10 @@ var NotificationManager = (function () {
             'draftCardPrivate',
             'draftNewCardsPrivate',
             'enlistFamilyMember',
+            'fillOrder',
             'gainCash',
             'gainEnterprise',
+            'increaseCompanyBalance',
             'increaseCompanyDebt',
             'makeCheck',
             'moveFamilyMember',
@@ -1070,6 +1073,31 @@ var NotificationManager = (function () {
             });
         });
     };
+    NotificationManager.prototype.notif_fillOrder = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, familyMember, order, from, promises, board, to;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = notif.args, familyMember = _a.familyMember, order = _a.order, from = _a.from;
+                        promises = [];
+                        board = Board.getInstance();
+                        if (familyMember) {
+                            to = familyMember.location;
+                            familyMember.location = from;
+                            promises.push(board.moveFamilyMemberBetweenLocations(familyMember, to));
+                        }
+                        else {
+                            board.ui.orders[order.id].setAttribute('data-status', FILLED);
+                        }
+                        return [4, Promise.all(promises)];
+                    case 1:
+                        _b.sent();
+                        return [2];
+                }
+            });
+        });
+    };
     NotificationManager.prototype.notif_gainEnterprise = function (notif) {
         return __awaiter(this, void 0, void 0, function () {
             var _a, playerId, type, player;
@@ -1129,6 +1157,22 @@ var NotificationManager = (function () {
                         return [4, Promise.all(promises)];
                     case 2:
                         _b.sent();
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_increaseCompanyBalance = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var companyBalance, board;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        companyBalance = notif.args.companyBalance;
+                        board = Board.getInstance();
+                        return [4, board.movePawn('balance', companyBalance)];
+                    case 1:
+                        _a.sent();
                         return [2];
                 }
             });
@@ -4594,12 +4638,18 @@ var PresidencyDecideOrder = (function () {
         if (this.args.trade) {
             addPrimaryActionButton({ id: 'trade_btn', text: _('Trade'), callback: function () { return _this.updateInterfaceConfirm(TRADE); } });
         }
+        if (this.args.done) {
+            addPrimaryActionButton({ id: 'done_btn', text: _('Done'), callback: function () { return _this.updateInterfaceConfirm(DONE); } });
+        }
     };
     PresidencyDecideOrder.prototype.updateInterfaceConfirm = function (next) {
         clearPossible();
         switch (next) {
             case TRADE:
                 updatePageTitle(_('Perform the Trade action?'));
+                break;
+            case DONE:
+                updatePageTitle(_('Done?'));
                 break;
             default:
         }
@@ -4831,6 +4881,7 @@ var PresidencyTradeFillOrders = (function () {
                                 this.board.ui.orders[orderId].setAttribute('data-status', FILLED);
                             }
                             promises.push(this.board.movePawn('balance', this.balance));
+                            clearPossible();
                             return [4, Promise.all(promises)];
                         case 1:
                             _a.sent();

@@ -3,6 +3,7 @@
 namespace Bga\Games\JohnCompany\Models;
 
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Players;
@@ -77,5 +78,11 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   public function pay($amount)
   {
     $this->incTreasury(-$amount);
+  }
+
+  public function gainCash($amount)
+  {
+    $this->incTreasury($amount);
+    Notifications::gainCash($this->getPlayer(), $amount);
   }
 }
