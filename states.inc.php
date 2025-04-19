@@ -362,7 +362,7 @@ $machinestates = [
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
         'possibleactions' => ['act' . PRESIDENCY_DECIDE_ORDER, 'actTakeAtomicAction'],
-        'transitions' => ['next' => ST_RESOLVE_STACK],
+        'transitions' => ['next' => ST_RESOLVE_STACK, BONUSES],
     ],
 
     ST_PRESIDENCY_TRADE => [
@@ -386,5 +386,23 @@ $machinestates = [
         'possibleactions' => ['act' . PRESIDENCY_TRADE_FILL_ORDERS, 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
+    
+    ST_BONUSES => [
+        'name' => BONUSES,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [PARLIAMENT_MEETS],
+    ],
 
+    ST_PARLIAMENT_MEETS => [
+        'name' => PARLIAMENT_MEETS,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . PARLIAMENT_MEETS, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
 ];

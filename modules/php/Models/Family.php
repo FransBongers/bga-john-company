@@ -4,7 +4,9 @@ namespace Bga\Games\JohnCompany\Models;
 
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Managers\Company;
+use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Players;
 
@@ -57,6 +59,15 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   public function hasChairmanMarker()
   {
     return $this->hasChairmanMarker === 1;
+  }
+
+  public function getEnterprises()
+  {
+    $enterprises = Enterprises::getAll()->toArray();
+    $familyId = $this->getId();
+    return Utils::filter($enterprises, function ($enterprise) use ($familyId) {
+      return $enterprise->getLocation() === $familyId;
+    });
   }
 
   public function getPlayer()

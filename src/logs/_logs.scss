@@ -170,3 +170,20 @@ span[style*='color:#c0c0c0'] {
     --tokenScale: 0.8;
   }
 }
+
+.notif_nextPhase {
+  .roundedboxinner,
+  .roundedbox {
+    // background-color: base.$light-blue;
+    // background-color: rgb(1, 97, 140);
+    font-weight: bold;
+    text-align: center;
+  }
+}
+
+.notif_nextPhase {
+  .roundedbox {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+  }
+}

@@ -66,6 +66,7 @@
     "src/states/ManagerOfShipping.ts",
     "src/states/MilitaryAffairsAssign.ts",
     "src/states/MilitaryAffairsTransfers.ts",
+    "src/states/ParliamentMeets.ts",
     "src/states/PlayerTurn.ts",
     "src/states/PresidencyDecideOrder.ts",
     "src/states/PresidencyTrade.ts",

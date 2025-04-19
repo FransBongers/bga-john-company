@@ -342,7 +342,21 @@ class Notifications
   public static function nextPhase($phase)
   {
     $phaseNameMap = [
-      FAMILY => clienttranslate('Family phase')
+      FAMILY => clienttranslate('Family phase'),
+      HIRING => clienttranslate('Hiring'),
+      CHAIRMAN => clienttranslate('Chairman'),
+      DIRECTOR_OF_TRADE => clienttranslate('Director of Trade'),
+      MANAGER_OF_SHIPPING => clienttranslate('Manager of Shipping'),
+      MILITARY_AFFAIRS => clienttranslate('Military Affairs'),
+      BOMBAY_PRESIDENCY => clienttranslate('Bombay Presidency'),
+      MADRAS_PRESIDENCY => clienttranslate('Madras Presidency'),
+      BENGAL_PRESIDENCY => clienttranslate('Bengal Presidency'),
+      SUPERINTENDENT_OF_TRADE_IN_CHINA => clienttranslate('Superintendent of Trade in China'),
+      BONUSES => clienttranslate('Bonuses'),
+      REVENUE => clienttranslate('Revenue'),
+      EVENTS_IN_INDIA => clienttranslate('Events in India'),
+      PARLIAMENT_MEETS => clienttranslate('Parliament Meets'),
+      UPKEEP_AND_REFRESH => clienttranslate('Upkeep & Refresh'),
     ];
     $text = isset($phaseNameMap[$phase]) ? $phaseNameMap[$phase] : $phase;
 

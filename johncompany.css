@@ -982,6 +982,17 @@ span[style*="color:#c0c0c0"] {
   --tokenScale: 0.8;
 }
 
+.notif_nextPhase .roundedboxinner,
+.notif_nextPhase .roundedbox {
+  font-weight: bold;
+  text-align: center;
+}
+
+.notif_nextPhase .roundedbox {
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+}
+
 .joco_pound {
   background-image: url("img/pound.png");
   background-size: 100% 100%;

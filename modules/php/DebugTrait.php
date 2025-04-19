@@ -56,7 +56,8 @@ trait DebugTrait
     // ArmyPieces::get('Regiment_16')->setLocation(Locations::armyOf(BENGAL));
     // ArmyPieces::get('Regiment_6')->setLocation(Locations::armyOf(MADRAS));
 
-    AtomicActions::get(PRESIDENCY_TRADE)->getOrderOptions(Offices::get(PRESIDENT_OF_MADRAS));
+    Notifications::log('callback', Globals::getCallbackEngineResolved());
+    // Notifications::log('enterprises', Families::get(HASTINGS)->getEnterprises());
   }
 
 

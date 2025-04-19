@@ -17,7 +17,7 @@ class Shipyard extends \Bga\Games\JohnCompany\Models\Enterprise
     $this->votes = 1;
   }
 
-  public function getIncome()
+  public function getBonus()
   {
     return Ships::get($this->shipId)->getLocation() === $this->id ? 0 : 1;
   }

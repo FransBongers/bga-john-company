@@ -71,11 +71,16 @@ const ST_PRESIDENCY_DECIDE_ORDER = 49;
 const ST_PRESIDENCY_TRADE = 50;
 const ST_PRESIDENCY_TRADE_FILL_ORDERS = 51;
 
+const ST_BONUSES = 60;
+const ST_PARLIAMENT_MEETS = 70;
+
+const BONUSES = 'Bonuses';
 const DRAFT_CARD = 'DraftCard';
 const DRAFT_CARD_NEXT_STEP = 'DraftCardNextStep';
 const PERFORM_SETUP = 'PerformSetup';
 const FAMILY_ACTION = 'FamilyAction';
 const NEW_COMPANY_SHARES = 'NewCompanyShares';
+const PARLIAMENT_MEETS = 'ParliamentMeets';
 // Family Actions
 const ENLIST_WRITER = 'EnlistWriter';
 const ENLIST_OFFICER = 'EnlistOfficer';
@@ -93,6 +98,7 @@ const MILITARY_AFFAIRS_ASSIGN = 'MilitaryAffairsAssign';
 const PRESIDENCY_DECIDE_ORDER = 'PresidencyDecideOrder';
 const PRESIDENCY_TRADE = 'PresidencyTrade';
 const PRESIDENCY_TRADE_FILL_ORDERS = 'PresidencyTradeFillOrders';
+
 
 /**
  * Company
@@ -148,6 +154,9 @@ const LONDON_SEASON = 'londonSeason';
 const FAMILY = 'family';
 const FIRMS = 'firms';
 const HIRING = 'hiring';
+const REVENUE = 'revenue';
+const EVENTS_IN_INDIA = 'eventsInIndia';
+const UPKEEP_AND_REFRESH = 'upkeepAndRefresh';
 
 /**
  * Families
@@ -222,7 +231,7 @@ const PRESIDENT_OF_BOMBAY = 'PresidentOfBombay';
 const PRESIDENT_OF_MADRAS = 'PresidentOfMadras';
 const PRESIDENT_OF_BENGAL = 'PresidentOfBengal';
 const GOVERNOR_GENERAL = 'GovernorGeneral';
-const SUPERINTENDENT_OF_TRADE_IN_CHINE = 'SuperintendentOfTradeInChina';
+const SUPERINTENDENT_OF_TRADE_IN_CHINA = 'SuperintendentOfTradeInChina';
 const GOVERNOR_OF_BOMBAY = 'GovernorOfBombay';
 const GOVERNOR_OF_MADRAS = 'GovernorOfMadras';
 const GOVERNOR_OF_BENGAL = 'GovernorOfBengal';
@@ -241,7 +250,7 @@ const OFFICES = [
   PRESIDENT_OF_MADRAS,
   PRESIDENT_OF_BENGAL,
   GOVERNOR_GENERAL,
-  SUPERINTENDENT_OF_TRADE_IN_CHINE,
+  SUPERINTENDENT_OF_TRADE_IN_CHINA,
   GOVERNOR_OF_BOMBAY,
   GOVERNOR_OF_MADRAS,
   GOVERNOR_OF_BENGAL,

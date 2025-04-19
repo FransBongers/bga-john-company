@@ -57,6 +57,19 @@ const PHASE_CONFIG: Record<string, AbsolutePosition> = {
   [FAMILY]: { top: 466, left: 226 },
   [FIRMS]: { top: 534, left: 223 },
   [HIRING]: { top: 592, left: 223 },
+  [CHAIRMAN]: { top: 658, left: 223 },
+  [DIRECTOR_OF_TRADE]: { top: 658, left: 398 },
+  [MANAGER_OF_SHIPPING]: { top: 658, left: 536 },
+  [MILITARY_AFFAIRS]: { top: 658, left: 671 },
+  [BOMBAY_PRESIDENCY]: { top: 658, left: 808 },
+  [MADRAS_PRESIDENCY]: { top: 658, left: 998 },
+  [BENGAL_PRESIDENCY]: { top: 658, left: 1188 },
+  [SUPERINTENDENT_OF_TRADE_IN_CHINA]: { top: 600, left: 1385 },
+  [BONUSES]: { top: 540, left: 1380 },
+  [REVENUE]: { top: 464, left: 1380 },
+  [EVENTS_IN_INDIA]: { top: 399, left: 1384 },
+  [PARLIAMENT_MEETS]: { top: 332, left: 1375 },
+  [UPKEEP_AND_REFRESH]: { top: 277, left: 1382 },
 };
 
 const TURN_CONFIG: Record<string | number, AbsolutePosition> = {
@@ -237,7 +250,7 @@ const FAMILY_MEMBER_OFFICE_CONFIG: Record<string, AbsolutePosition> = {
   [PRESIDENT_OF_MADRAS]: { top: 662, left: 1021 },
   [PRESIDENT_OF_BENGAL]: { top: 662, left: 1210 },
   [GOVERNOR_GENERAL]: { top: 662, left: 420 },
-  [SUPERINTENDENT_OF_TRADE_IN_CHINE]: { top: 662, left: 1400 },
+  [SUPERINTENDENT_OF_TRADE_IN_CHINA]: { top: 662, left: 1400 },
   [GOVERNOR_OF_BOMBAY]: { top: 289, left: 964 },
   [GOVERNOR_OF_MADRAS]: { top: 500, left: 1119 },
   [GOVERNOR_OF_BENGAL]: { top: 107, left: 1349 },

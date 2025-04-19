@@ -61,6 +61,11 @@ const LONDON_SEASON = 'londonSeason';
 const FAMILY = 'family';
 const FIRMS = 'firms';
 const HIRING = 'hiring';
+const BONUSES = 'Bonuses';
+const REVENUE = 'revenue';
+const EVENTS_IN_INDIA = 'eventsInIndia';
+const PARLIAMENT_MEETS = 'ParliamentMeets';
+const UPKEEP_AND_REFRESH = 'upkeepAndRefresh';
 
 /**
  * Setup
@@ -157,7 +162,7 @@ const PRESIDENT_OF_BOMBAY = 'PresidentOfBombay';
 const PRESIDENT_OF_MADRAS = 'PresidentOfMadras';
 const PRESIDENT_OF_BENGAL = 'PresidentOfBengal';
 const GOVERNOR_GENERAL = 'GovernorGeneral';
-const SUPERINTENDENT_OF_TRADE_IN_CHINE = 'SuperintendentOfTradeInChina';
+const SUPERINTENDENT_OF_TRADE_IN_CHINA = 'SuperintendentOfTradeInChina';
 const GOVERNOR_OF_BOMBAY = 'GovernorOfBombay';
 const GOVERNOR_OF_MADRAS = 'GovernorOfMadras';
 const GOVERNOR_OF_BENGAL = 'GovernorOfBengal';

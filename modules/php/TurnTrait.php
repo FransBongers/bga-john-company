@@ -61,12 +61,13 @@ trait TurnTrait
       'action' => PERFORM_SETUP,
     ];
 
-    // If crown in in the game we need to draw card to set initial climate
-    $callback = Globals::getCrownInGame() ? 'stSetupCrownClimate' : 'stSetupFamilyActions';
 
+    // If crown in in the game we need to draw card to set initial climate
+    $callback = Globals::getCrownInGame() ? 'stSetupCrownClimate' : 'stStartOfRound';
     Engine::setup($node, ['method' => $callback]);
     Engine::proceed();
   }
+
 
   function stSetupCrownClimate()
   {
@@ -74,6 +75,40 @@ trait TurnTrait
 
     $this->stSetupFamilyActions();
   }
+
+  function stStartOfRound()
+  {
+    // TODO: move round marker
+
+    $this->stSetupLondonSeason();
+  }
+
+
+  // .##........#######..##....##.########...#######..##....##
+  // .##.......##.....##.###...##.##.....##.##.....##.###...##
+  // .##.......##.....##.####..##.##.....##.##.....##.####..##
+  // .##.......##.....##.##.##.##.##.....##.##.....##.##.##.##
+  // .##.......##.....##.##..####.##.....##.##.....##.##..####
+  // .##.......##.....##.##...###.##.....##.##.....##.##...###
+  // .########..#######..##....##.########...#######..##....##
+
+  // ..######..########....###.....######...#######..##....##
+  // .##....##.##.........##.##...##....##.##.....##.###...##
+  // .##.......##........##...##..##.......##.....##.####..##
+  // ..######..######...##.....##..######..##.....##.##.##.##
+  // .......##.##.......#########.......##.##.....##.##..####
+  // .##....##.##.......##.....##.##....##.##.....##.##...###
+  // ..######..########.##.....##..######...#######..##....##
+
+  function stSetupLondonSeason()
+  {
+    /**
+     * Skip in first round of scenario,
+     * otherwise setup
+     */
+    $this->stSetupFamilyActions();
+  }
+
 
   // .########....###....##.....##.####.##.......##....##
   // .##.........##.##...###...###..##..##........##..##.
@@ -85,8 +120,7 @@ trait TurnTrait
 
   function stSetupFamilyActions()
   {
-    Globals::setPhase(FAMILY);
-    Notifications::nextPhase(FAMILY);
+    $this->updatePhase(FAMILY);
 
     $chairmanFamilyId = Utils::filter(Families::getAll()->toArray(), function ($family) {
       return $family->hasChairmanMarker();
@@ -142,6 +176,8 @@ trait TurnTrait
 
   function stSetupHiring()
   {
+    $this->updatePhase(HIRING);
+    Notifications::message(clienttranslate('No open positions'), []);
     /**
      * TODO: setup Engine if there are vacant offices,
      * otherwise Notif that there are no vacant offices
@@ -167,11 +203,12 @@ trait TurnTrait
 
   function stSetupChairman()
   {
+    $this->updatePhase(CHAIRMAN);
     $offices = Company::getOfficesWithTreasury();
 
     $initialTreasuries = [];
 
-    foreach($offices as $officeId => $office) {
+    foreach ($offices as $officeId => $office) {
       $initialTreasuries[$officeId] = $office->getTreasury();
     }
 
@@ -194,6 +231,7 @@ trait TurnTrait
 
   function stSetupDirectorOfTrade()
   {
+    $this->updatePhase(DIRECTOR_OF_TRADE);
     $playerId = Offices::get(DIRECTOR_OF_TRADE)->getPlayerId();
 
     $node = [
@@ -219,6 +257,7 @@ trait TurnTrait
 
   function stSetupManagerOfShipping()
   {
+    $this->updatePhase(MANAGER_OF_SHIPPING);
     $offices = Offices::getAll();
 
     $officesInGame = [MANAGER_OF_SHIPPING];
@@ -238,6 +277,7 @@ trait TurnTrait
 
   function stSetupMilitaryAffairs()
   {
+    $this->updatePhase(MILITARY_AFFAIRS);
     $playerId = Offices::get(MILITARY_AFFAIRS)->getPlayerId();
 
     $node = [
@@ -256,28 +296,104 @@ trait TurnTrait
       ],
     ];
 
-    Engine::setup($node, ['method' => 'stSetupPresidencyOperations']);
+    Engine::setup($node, ['method' => 'stSetupBombayPresidencyOperations']);
     Engine::proceed();
   }
 
-  function stSetupPresidencyOperations()
+  function stSetupBombayPresidencyOperations()
   {
-    $offices = Offices::getAll();
+    $this->updatePhase(BOMBAY_PRESIDENCY);
+    
+    $node = $this->setupPresidencyOperations(BOMBAY_PRESIDENCY);
 
-    $officesInGame = [PRESIDENT_OF_BOMBAY, PRESIDENT_OF_MADRAS, PRESIDENT_OF_BENGAL];
+    Engine::setup($node, ['method' => 'stSetupMadrasPresidencyOperations']);
+    Engine::proceed();
+  }
+
+  function stSetupMadrasPresidencyOperations()
+  {
+    $this->updatePhase(MADRAS_PRESIDENCY);
+    
+    $node = $this->setupPresidencyOperations(MADRAS_PRESIDENCY);
+
+    Engine::setup($node, ['method' => 'stSetupBengalPresidencyOperations']);
+    Engine::proceed();
+  }
+
+  function stSetupBengalPresidencyOperations()
+  {
+    $this->updatePhase(BENGAL_PRESIDENCY);
+    
+    $node = $this->setupPresidencyOperations(BENGAL_PRESIDENCY);
+
+    Engine::setup($node, ['method' => 'stSetupSuperintendentOfTradeInChina']);
+    Engine::proceed();
+  }
+
+  function stSetupSuperintendentOfTradeInChina()
+  {
+    if (false) {
+      $this->updatePhase(SUPERINTENDENT_OF_TRADE_IN_CHINA);
+    }
+    
+
+    $this->stSetupBonuses();
+  }
+
+  function stSetupBonuses()
+  {
+    $this->updatePhase(BONUSES);
+
     $node = [
-      'children' => array_map(function ($officeId) use ($offices) {
-        return [
-          'action' => PRESIDENCY_DECIDE_ORDER,
-          'playerId' => 'some',
-          'activePlayerIds' => [$offices[$officeId]->getPlayerId()],
-          'officeId' => $officeId,
-        ];
-      }, $officesInGame),
+      'children' => [
+        [
+          'action' => BONUSES,
+          // 'playerId' => 'some',
+          // 'activePlayerIds' => [],
+        ],
+      ],
     ];
 
-    Engine::setup($node, ['method' => 'setupGameTurn']);
+    Engine::setup($node, ['method' => 'stSetupRevenue']);
     Engine::proceed();
+  }
+
+  function stSetupRevenue()
+  {
+    $this->updatePhase(REVENUE);
+    $this->stSetupEventsInIndia();
+  }
+
+  function stSetupEventsInIndia()
+  {
+    $this->updatePhase(EVENTS_IN_INDIA);
+    $this->stSetupParliamentMeets();
+  }
+
+  function stSetupParliamentMeets()
+  {
+    $this->updatePhase(PARLIAMENT_MEETS);
+
+    $node = [
+      'children' => [
+        [
+          'action' => PARLIAMENT_MEETS,
+          'playerId' => 'some',
+          // TODO: actual prime minister player
+          'activePlayerIds' => [Players::getAll()->toArray()[0]->getId()],
+        ],
+      ],
+    ];
+
+    Engine::setup($node, ['method' => 'stSetupUpkeepAndRefresh']);
+    Engine::proceed();
+    
+  }
+
+  function stSetupUpkeepAndRefresh()
+  {
+    $this->updatePhase(UPKEEP_AND_REFRESH);
+    $this->stStartOfRound();
   }
 
   function setupGameTurn() {}
@@ -333,5 +449,31 @@ trait TurnTrait
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
+  function setupPresidencyOperations($presidency)
+  {
+    $presidencyOfficeMap = [
+      BOMBAY_PRESIDENCY => PRESIDENT_OF_BOMBAY,
+      MADRAS_PRESIDENCY => PRESIDENT_OF_MADRAS,
+      BENGAL_PRESIDENCY => PRESIDENT_OF_BENGAL,
+    ];
 
+    $office = Offices::get($presidencyOfficeMap[$presidency]);
+
+    return [
+      'children' => [
+        [
+          'action' => PRESIDENCY_DECIDE_ORDER,
+          'playerId' => 'some',
+          'activePlayerIds' => [$office->getPlayerId()],
+          'officeId' => $office->getId(),
+        ]
+      ],
+    ];
+  }
+
+  function updatePhase($phase)
+  {
+    Globals::setPhase($phase);
+    Notifications::nextPhase($phase);
+  }
 }

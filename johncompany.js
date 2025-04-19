@@ -40,6 +40,11 @@ var LONDON_SEASON = 'londonSeason';
 var FAMILY = 'family';
 var FIRMS = 'firms';
 var HIRING = 'hiring';
+var BONUSES = 'Bonuses';
+var REVENUE = 'revenue';
+var EVENTS_IN_INDIA = 'eventsInIndia';
+var PARLIAMENT_MEETS = 'ParliamentMeets';
+var UPKEEP_AND_REFRESH = 'upkeepAndRefresh';
 var OFFICE = 'office';
 var COMPANY_SHARE = 'companyShare';
 var CASH = 'cash';
@@ -113,7 +118,7 @@ var PRESIDENT_OF_BOMBAY = 'PresidentOfBombay';
 var PRESIDENT_OF_MADRAS = 'PresidentOfMadras';
 var PRESIDENT_OF_BENGAL = 'PresidentOfBengal';
 var GOVERNOR_GENERAL = 'GovernorGeneral';
-var SUPERINTENDENT_OF_TRADE_IN_CHINE = 'SuperintendentOfTradeInChina';
+var SUPERINTENDENT_OF_TRADE_IN_CHINA = 'SuperintendentOfTradeInChina';
 var GOVERNOR_OF_BOMBAY = 'GovernorOfBombay';
 var GOVERNOR_OF_MADRAS = 'GovernorOfMadras';
 var GOVERNOR_OF_BENGAL = 'GovernorOfBengal';
@@ -2030,6 +2035,19 @@ var PHASE_CONFIG = (_b = {},
     _b[FAMILY] = { top: 466, left: 226 },
     _b[FIRMS] = { top: 534, left: 223 },
     _b[HIRING] = { top: 592, left: 223 },
+    _b[CHAIRMAN] = { top: 658, left: 223 },
+    _b[DIRECTOR_OF_TRADE] = { top: 658, left: 398 },
+    _b[MANAGER_OF_SHIPPING] = { top: 658, left: 536 },
+    _b[MILITARY_AFFAIRS] = { top: 658, left: 671 },
+    _b[BOMBAY_PRESIDENCY] = { top: 658, left: 808 },
+    _b[MADRAS_PRESIDENCY] = { top: 658, left: 998 },
+    _b[BENGAL_PRESIDENCY] = { top: 658, left: 1188 },
+    _b[SUPERINTENDENT_OF_TRADE_IN_CHINA] = { top: 600, left: 1385 },
+    _b[BONUSES] = { top: 540, left: 1380 },
+    _b[REVENUE] = { top: 464, left: 1380 },
+    _b[EVENTS_IN_INDIA] = { top: 399, left: 1384 },
+    _b[PARLIAMENT_MEETS] = { top: 332, left: 1375 },
+    _b[UPKEEP_AND_REFRESH] = { top: 277, left: 1382 },
     _b);
 var TURN_CONFIG = {
     1: { top: 138, left: 199.5 },
@@ -2176,7 +2194,7 @@ var FAMILY_MEMBER_OFFICE_CONFIG = (_c = {},
     _c[PRESIDENT_OF_MADRAS] = { top: 662, left: 1021 },
     _c[PRESIDENT_OF_BENGAL] = { top: 662, left: 1210 },
     _c[GOVERNOR_GENERAL] = { top: 662, left: 420 },
-    _c[SUPERINTENDENT_OF_TRADE_IN_CHINE] = { top: 662, left: 1400 },
+    _c[SUPERINTENDENT_OF_TRADE_IN_CHINA] = { top: 662, left: 1400 },
     _c[GOVERNOR_OF_BOMBAY] = { top: 289, left: 964 },
     _c[GOVERNOR_OF_MADRAS] = { top: 500, left: 1119 },
     _c[GOVERNOR_OF_BENGAL] = { top: 107, left: 1349 },
@@ -4582,6 +4600,40 @@ var MilitaryAffairsTransfers = (function () {
         });
     };
     return MilitaryAffairsTransfers;
+}());
+var ParliamentMeets = (function () {
+    function ParliamentMeets(game) {
+        this.game = game;
+    }
+    ParliamentMeets.create = function (game) {
+        ParliamentMeets.instance = new ParliamentMeets(game);
+    };
+    ParliamentMeets.getInstance = function () {
+        return ParliamentMeets.instance;
+    };
+    ParliamentMeets.prototype.onEnteringState = function (args) {
+        debug('Entering ParliamentMeets state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    };
+    ParliamentMeets.prototype.onLeavingState = function () {
+        debug('Leaving ParliamentMeets state');
+    };
+    ParliamentMeets.prototype.setDescription = function (activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} meets'), {
+            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        }, true);
+    };
+    ParliamentMeets.prototype.updateInterfaceInitialStep = function () {
+        this.game.clearPossible();
+        updatePageTitle(_('${you} must meet Parliament'));
+        var board = Board.getInstance();
+    };
+    ParliamentMeets.prototype.updateInterfaceConfirm = function () {
+        clearPossible();
+        updatePageTitle(_('Assign officers?'));
+    };
+    return ParliamentMeets;
 }());
 var PlayerTurn = (function () {
     function PlayerTurn(game) {
