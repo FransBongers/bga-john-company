@@ -417,7 +417,20 @@ trait TurnTrait
   function stSetupEventsInIndia()
   {
     $this->updatePhase(EVENTS_IN_INDIA);
-    $this->stSetupParliamentMeets();
+
+    $node = [
+      'children' => [
+        [
+          'action' => EVENTS_IN_INDIA_STORMS,
+        ],
+        [
+          'action' => EVENTS_IN_INDIA_RESOLVE_EVENT,
+        ],
+      ],
+    ];
+
+    Engine::setup($node, ['method' => 'stSetupParliamentMeets']);
+    Engine::proceed();
   }
 
   // .########.....###....########..##.......####....###....##.....##.########.##....##.########

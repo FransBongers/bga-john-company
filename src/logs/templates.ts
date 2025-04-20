@@ -17,9 +17,13 @@ const tlpLogTokenText = ({
 
 /* ------- GAME SPECIFIC LOG TOKENS ------- */
 
-const tplLogTokenClimate = (climate: string) => `<div class="log_token joco-crown-climate-icon" data-climate="${climate}"></div>`
+const tplLogTokenClimate = (climate: string) =>
+  `<div class="log_token joco-crown-climate-icon" data-climate="${climate}"></div>`;
 
 const tplLogTokenPound = () => `<div class="log_token joco_pound"></div>`;
+
+const tplLogTokenStormDie = (side: string) =>
+  `<div class="log_token joco-storm-die" data-side="${side}"></div>`;
 
 const tplLogTokenIcon = (type: string) =>
   `<div class="log-token joco-icon" data-icon="${type}"></div>`;
@@ -35,6 +39,14 @@ const tplLogTokenPlayerName = ({
   color: string;
 }) => `<span class="playername" style="color:#${color};">${name}</span>`;
 
-const tknShipValue = ({name, type, fatigued }: {name: string; type: string; fatigued: 0 | 1}): string => {
+const tknShipValue = ({
+  name,
+  type,
+  fatigued,
+}: {
+  name: string;
+  type: string;
+  fatigued: 0 | 1;
+}): string => {
   return [type, name, fatigued].join(':');
-}
+};

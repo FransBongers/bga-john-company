@@ -441,6 +441,22 @@ $machinestates = [
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
+    ST_EVENTS_IN_INDIA_STORMS => [
+        'name' => EVENTS_IN_INDIA_STORMS,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_EVENTS_IN_INDIA_RESOLVE_EVENT => [
+        'name' => EVENTS_IN_INDIA_RESOLVE_EVENT,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
 
     ST_PARLIAMENT_MEETS => [
         'name' => PARLIAMENT_MEETS,

@@ -68,6 +68,12 @@ CREATE TABLE IF NOT EXISTS `enterprises` (
   `type` varchar(32) NOT NULL,
   PRIMARY KEY (`enterprise_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+CREATE TABLE IF NOT EXISTS `event_tiles` (
+  `event_tile_id` varchar(20) NOT NULL,
+  `event_tile_location` varchar(16) NOT NULL,
+  `event_tile_state` int(10) DEFAULT 0,
+  PRIMARY KEY (`event_tile_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 CREATE TABLE IF NOT EXISTS `families` (
   `family_id` varchar(16) NOT NULL,
   `family_location` varchar(32) NOT NULL,

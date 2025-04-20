@@ -1,0 +1,26 @@
+.joco-storm-die {
+  background-image: url('img/storm_die.png');
+  background-size: 500% 100%;
+  width: calc(var(--iconScale) * 50px);
+  height: calc(var(--iconScale) * 50px);
+}
+
+.joco-storm-die[data-side="four"] {
+  background-position-x: 0%;
+}
+
+.joco-storm-die[data-side="oneAll"] {
+  background-position-x: 25%;
+}
+
+.joco-storm-die[data-side="threeSouth"] {
+  background-position-x: 50%;
+}
+
+.joco-storm-die[data-side="twoEast"] {
+  background-position-x: 75%;
+}
+
+.joco-storm-die[data-side="twoWest"] {
+  background-position-x: 100%;
+}

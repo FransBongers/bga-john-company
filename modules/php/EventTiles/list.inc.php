@@ -1,0 +1,23 @@
+<?php
+$eventTileIds = [
+  'EventTile_01',
+  'EventTile_02',
+  'EventTile_03',
+  'EventTile_04',
+  'EventTile_05',
+  'EventTile_06',
+  'EventTile_07',
+  'EventTile_08',
+  'EventTile_09',
+  'EventTile_10',
+  'EventTile_11',
+  'EventTile_12',
+  'EventTile_13',
+  'EventTile_14',
+  'EventTile_15',
+  'EventTile_16',
+  'EventTile_17',
+  'EventTile_18',
+  'EventTile_19',
+  'EventTile_20',
+];

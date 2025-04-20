@@ -3117,6 +3117,7 @@ var LOG_TOKEN_ICON = 'icon';
 var LOG_TOKEN_REGIMENT = 'regiment';
 var LOG_TOKEN_SETUP_CARD = 'setupCard';
 var LOG_TOKEN_SHIP = 'ship';
+var LOG_TOKEN_STORM_DIE = 'stormDie';
 var CLASS_LOG_TOKEN = 'log-token';
 var tooltipIdCounter = 0;
 var getTokenDiv = function (_a) {
@@ -3145,6 +3146,8 @@ var getTokenDiv = function (_a) {
         case LOG_TOKEN_SHIP:
             var _c = value.split(':'), type_1 = _c[0], name_1 = _c[1], fatigued = _c[2];
             return createShip({ type: type_1, name: name_1, fatigued: Number(fatigued), extraClasses: [CLASS_LOG_TOKEN] }).outerHTML;
+        case LOG_TOKEN_STORM_DIE:
+            return tplLogTokenStormDie(value);
         case LOG_TOKEN_NEW_LINE:
             return '<br class="joco-new-line">';
         case LOG_TOKEN_PLAYER_NAME:
@@ -3165,8 +3168,13 @@ var tlpLogTokenText = function (_a) {
     var text = _a.text, tooltipId = _a.tooltipId, _b = _a.italic, italic = _b === void 0 ? false : _b;
     return "<span ".concat(tooltipId ? "id=\"".concat(tooltipId, "\" class=\"log_tooltip\"") : '', " style=\"font-weight: 700;").concat(italic ? ' font-style: italic;' : '', "\">").concat(_(text), "</span>");
 };
-var tplLogTokenClimate = function (climate) { return "<div class=\"log_token joco-crown-climate-icon\" data-climate=\"".concat(climate, "\"></div>"); };
+var tplLogTokenClimate = function (climate) {
+    return "<div class=\"log_token joco-crown-climate-icon\" data-climate=\"".concat(climate, "\"></div>");
+};
 var tplLogTokenPound = function () { return "<div class=\"log_token joco_pound\"></div>"; };
+var tplLogTokenStormDie = function (side) {
+    return "<div class=\"log_token joco-storm-die\" data-side=\"".concat(side, "\"></div>");
+};
 var tplLogTokenIcon = function (type) {
     return "<div class=\"log-token joco-icon\" data-icon=\"".concat(type, "\"></div>");
 };

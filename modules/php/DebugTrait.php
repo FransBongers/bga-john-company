@@ -25,6 +25,7 @@ use Bga\Games\JohnCompany\Models\Enterprise;
 use Bga\Games\JohnCompany\Models\FamilyMember;
 use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Managers\AtomicActions;
+use Bga\Games\JohnCompany\Managers\EventTiles;
 
 trait DebugTrait
 {
@@ -55,9 +56,10 @@ trait DebugTrait
     // ArmyPieces::get('Regiment_3')->setLocation(Locations::armyOf(BOMBAY));
     // ArmyPieces::get('Regiment_16')->setLocation(Locations::armyOf(BENGAL));
     // ArmyPieces::get('Regiment_6')->setLocation(Locations::armyOf(MADRAS));
-    Company::incBalance(-20);
-    // Notifications::log('regiments', Ships::getShipsInSeaZones());
-    // Notifications::log('enterprises', Families::get(HASTINGS)->getEnterprises());
+    // EventTiles::setupNewGame();
+    
+
+    Notifications::log('result', EventTiles::getTopOf(DECK));
   }
 
 

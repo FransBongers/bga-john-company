@@ -34,6 +34,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     'turn' => 'int',
     'options' => 'obj',
     'powerTokens' => 'obj',
+    'eventsToResolve' => 'int',
   ];
 
   protected static $table = 'global_variables';
@@ -163,6 +164,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     self::setCrownInGame(count($players) <= 2);
     self::setCrown([]);
     self::setDeregulation(false);
+    self::setEventsToResolve(0);
     self::setPowerTokens([
       POWER_TOKEN_SOCIAL,
       POWER_TOKEN_COMPANY_SHARE,

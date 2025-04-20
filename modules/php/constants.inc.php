@@ -78,15 +78,20 @@ const ST_REVENUE_CHECK_EXPECTATIONS = 63;
 const ST_REVENUE_ROYAL_PARDON = 64;
 const ST_REVENUE_PAY_DIVIDENDS = 65;
 
-const ST_PARLIAMENT_MEETS = 70;
+const ST_EVENTS_IN_INDIA_STORMS = 70;
+const ST_EVENTS_IN_INDIA_RESOLVE_EVENT = 71;
+
+const ST_PARLIAMENT_MEETS = 75;
 
 const BONUSES = 'Bonuses';
 const DRAFT_CARD = 'DraftCard';
 const DRAFT_CARD_NEXT_STEP = 'DraftCardNextStep';
-const PERFORM_SETUP = 'PerformSetup';
+const EVENTS_IN_INDIA_STORMS = 'EventsInIndiaStorms';
+const EVENTS_IN_INDIA_RESOLVE_EVENT = 'EventsInIndiaResolveEvent';
 const FAMILY_ACTION = 'FamilyAction';
 const NEW_COMPANY_SHARES = 'NewCompanyShares';
 const PARLIAMENT_MEETS = 'ParliamentMeets';
+const PERFORM_SETUP = 'PerformSetup';
 const REVENUE_EMERGENCY_LOANS = 'RevenueEmergencyLoans';
 const REVENUE_EXPENSES = 'RevenueExpenses';
 const REVENUE_CHECK_EXPECTATIONS = 'RevenueCheckExpectations';
@@ -356,6 +361,13 @@ const BOMBAY_WRITERS = 'Writers_Bombay';
 const MADRAS_WRITERS = 'Writers_Madras';
 
 /**
+ * Shapes on map
+ */
+const CIRCLE = 'circle';
+const SQUARE = 'square';
+const TRIANGLE = 'triangle';
+
+/**
  * OrderIds
  */
 const ORDER_PUNJAB_1 = 'Order_Punjab_1';
@@ -540,3 +552,25 @@ const STOCK_EXCHANGE_POSITIONS = [
  */
 const TRADE = 'trade';
 const DONE = 'done';
+
+/**
+ * Event Types
+ */
+const FOREIGN_INVASION = 'ForeignInvasion';
+const LEADER = 'Leader';
+const PEACE = 'Peace';
+const RESOLVE_CRISIS = 'ResolveCrisis';
+const SHUFFLE = 'Shuffle';
+const TURMOIL = 'Turmoil';
+const WINDFALL = 'Windfall';
+
+/**
+ * Storm Die
+ */
+const FOUR = 'four';
+const TWO_EAST = 'twoEast';
+const TWO_WEST = 'twoWest';
+const THREE_SOUTH = 'threeSouth';
+const ONE_ALL = 'oneAll';
+
+const STORM_DIE = [FOUR, TWO_EAST, ONE_ALL, THREE_SOUTH, TWO_WEST, FOUR];
