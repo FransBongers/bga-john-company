@@ -93,4 +93,17 @@ class ArmyPieces extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
       ->where(static::$prefix . 'id', 'LIKE', 'Regiment_' . '%')
       ->get();
   }
+
+  public static function getRegimentsInArmies()
+  {
+    $regiments = self::getRegiments()->toArray();
+
+    $armyLocations = array_map(function ($regionId) {
+      return Locations::armyOf($regionId);
+    }, HOME_REGIONS);
+
+    return Utils::filter($regiments, function ($regiment) use ($armyLocations) {
+      return in_array($regiment->getLocation(), $armyLocations);
+    });
+  }
 }

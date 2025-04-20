@@ -55,8 +55,8 @@ trait DebugTrait
     // ArmyPieces::get('Regiment_3')->setLocation(Locations::armyOf(BOMBAY));
     // ArmyPieces::get('Regiment_16')->setLocation(Locations::armyOf(BENGAL));
     // ArmyPieces::get('Regiment_6')->setLocation(Locations::armyOf(MADRAS));
-
-    Notifications::log('callback', Globals::getCallbackEngineResolved());
+    Company::incBalance(-20);
+    // Notifications::log('regiments', Ships::getShipsInSeaZones());
     // Notifications::log('enterprises', Families::get(HASTINGS)->getEnterprises());
   }
 

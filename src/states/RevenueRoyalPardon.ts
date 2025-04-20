@@ -1,41 +1,38 @@
-interface OnEnteringDirectorOfTradeSpecialEnvoySuccessArgs
-  extends CommonStateArgs {
-  closedOrders: JoCoOrder[];
+interface OnEnteringRevenueRoyalPardonArgs extends CommonStateArgs {
+
 }
 
-class DirectorOfTradeSpecialEnvoySuccess implements State {
-  private static instance: DirectorOfTradeSpecialEnvoySuccess;
-  private args: OnEnteringDirectorOfTradeSpecialEnvoySuccessArgs;
+class RevenueRoyalPardon implements State {
+  private static instance: RevenueRoyalPardon;
+  private args: OnEnteringRevenueRoyalPardonArgs;
 
   constructor(private game: GameAlias) {}
 
   public static create(game: JohnCompany) {
-    DirectorOfTradeSpecialEnvoySuccess.instance =
-      new DirectorOfTradeSpecialEnvoySuccess(game);
+    RevenueRoyalPardon.instance = new RevenueRoyalPardon(game);
   }
 
   public static getInstance() {
-    return DirectorOfTradeSpecialEnvoySuccess.instance;
+    return RevenueRoyalPardon.instance;
   }
 
-  onEnteringState(args: OnEnteringDirectorOfTradeSpecialEnvoySuccessArgs) {
-    debug('Entering DirectorOfTradeSpecialEnvoySuccess state');
+  onEnteringState(args: OnEnteringRevenueRoyalPardonArgs) {
+    debug('Entering RevenueRoyalPardon state');
     this.args = args;
+
     this.updateInterfaceInitialStep();
   }
 
   onLeavingState() {
-    debug('Leaving DirectorOfTradeSpecialEnvoySuccess state');
+    debug('Leaving RevenueRoyalPardon state');
   }
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringDirectorOfTradeSpecialEnvoyArgs
+    args: OnEnteringRevenueRoyalPardonArgs
   ) {
     updatePageTitle(
-      _(
-        '${tkn_playerName} may open trade with China or may open a closed order'
-      ),
+      _('${tkn_playerName} may pay dividends'),
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
@@ -62,27 +59,21 @@ class DirectorOfTradeSpecialEnvoySuccess implements State {
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
 
-    updatePageTitle(
-      _('${you} may open trade with China or may open a closed order')
-    );
-    const board = Board.getInstance();
-    this.args.closedOrders.forEach((order) => {
-      onClick(board.ui.orders[order.id], () => this.updateInterfaceConfirm(order))
-      
-    })
+    updatePageTitle(_('${you} may pay dividends'));
 
-    // addCancelButton();
   }
 
-  private updateInterfaceConfirm(order: JoCoOrder) {
+
+  private updateInterfaceConfirm(next: string) {
     clearPossible();
 
-    updatePageTitle(_('Open closed order in ${region}?'), {
-      region: _(order.location),
-    });
-    setSelected(Board.getInstance().ui.orders[order.id]);
 
-    addConfirmButton(() => this.performAction(order, true));
+
+    addConfirmButton(() => {
+      performAction('actRevenueRoyalPardon', {
+        next
+      });
+    });
     addCancelButton();
   }
 
@@ -94,12 +85,6 @@ class DirectorOfTradeSpecialEnvoySuccess implements State {
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  private performAction(order: JoCoOrder, perform: boolean = false) {
-    performAction('actDirectorOfTradeSpecialEnvoySuccess', {
-      orderId: order.id,
-      perform,
-    });
-  }
 
   //  ..######..##.......####..######..##....##
   //  .##....##.##........##..##....##.##...##.
@@ -116,4 +101,6 @@ class DirectorOfTradeSpecialEnvoySuccess implements State {
   // .##.....##.#########.##..####.##.....##.##.......##.............##
   // .##.....##.##.....##.##...###.##.....##.##.......##.......##....##
   // .##.....##.##.....##.##....##.########..########.########..######.
+
+
 }

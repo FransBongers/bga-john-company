@@ -72,6 +72,8 @@ class JohnCompany implements Game {
     PresidencyDecideOrder,
     PresidencyTrade,
     PresidencyTradeFillOrders,
+    RevenuePayDividends,
+    RevenueRoyalPardon,
     SeekShare,
   };
 

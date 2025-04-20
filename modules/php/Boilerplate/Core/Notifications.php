@@ -122,12 +122,12 @@ class Notifications
     }
   }
 
-  protected static function tknPound()
+  public static function tknPound()
   {
     return clienttranslate('Pounds');
   }
 
-  protected static function tknRegiment()
+  public static function tknRegiment()
   {
     return clienttranslate('Regiment');
   }
@@ -283,6 +283,16 @@ class Notifications
     ]);
   }
 
+  public static function emergencyLoans($companyDebt, $numberOfEmergencyLoans, $remainingExpenses)
+  {
+    self::notifyAll('moveCompanyDebt', clienttranslate('The Company must take ${number} emergency loan(s) to cover remaining ${tkn_boldText_amount} ${tkn_pound} of expenses'), [
+      'tkn_boldText_amount' => $remainingExpenses,
+      'tkn_pound' => self::tknPound(),
+      'number' => $numberOfEmergencyLoans,
+      'companyDebt' => $companyDebt,
+    ]);
+  }
+
   public static function enlistOfficer($player, $familyMember)
   {
     self::notifyAll('enlistFamilyMember', clienttranslate('${player_name} enlists ${tkn_icon}'), [
@@ -376,7 +386,7 @@ class Notifications
 
   public static function increaseCompanyBalance($player, $companyBalance, $companyBalanceIncrease)
   {
-    self::notifyAll('increaseCompanyBalance', clienttranslate('${player_name} increases Company Balance by ${tkn_boldText_amount} ${tkn_pound}'), [
+    self::notifyAll('moveCompanyBalance', clienttranslate('${player_name} increases Company Balance by ${tkn_boldText_amount} ${tkn_pound}'), [
       'player' => $player,
       'tkn_boldText_amount' => $companyBalanceIncrease,
       'companyBalance' => $companyBalance,
@@ -387,12 +397,24 @@ class Notifications
 
   public static function increaseCompanyDebt($player, $companyDebt, $companyBalance)
   {
-    self::notifyAll('increaseCompanyDebt', clienttranslate('${player_name} increases Company Debt to ${tkn_boldText_value}'), [
+    self::notifyAll('moveCompanyDebt', clienttranslate('${player_name} increases Company Debt to ${tkn_boldText_value}'), [
       'player' => $player,
       'tkn_boldText_value' => $companyDebt,
       'companyDebt' => $companyDebt,
       'companyBalance' => $companyBalance,
       'i18n' => ['tkn_boldText_value'],
+    ]);
+  }
+
+  public static function adjustCompanyStanding($companyStanding, $numberOfSpaces)
+  {
+    $text = $numberOfSpaces < 0 ?
+      clienttranslate('Company Standing moves ${tkn_boldText_spaces} space to the left') :
+      clienttranslate('Company Standing moves ${tkn_boldText_spaces} space to the right');
+
+    self::notifyAll('moveCompanyStanding', $text, [
+      'tkn_boldText_spaces' => abs($numberOfSpaces),
+      'companyStanding' => $companyStanding,
     ]);
   }
 
@@ -412,6 +434,22 @@ class Notifications
       'familyMember' => $familyMember,
       'debt' => $debt,
       'i18n' => ['tkn_boldText_court']
+    ]);
+  }
+
+  public static function payDividends($player, $numberOfDividends, $companyBalance, $totalCost)
+  {
+    $text = $numberOfDividends === 1 ?
+      clienttranslate('${player_name} spends ${amount} ${tkn_pound} from the Company Balance to pay ${tkn_boldText_one} dividend') :
+      clienttranslate('${player_name} spends ${amount} ${tkn_pound} from the Company Balance to pay ${tkn_boldText_number} dividends');
+
+    self::notifyAll('moveCompanyBalance', $text, [
+      'player' => $player,
+      'tkn_pound' => self::tknPound(),
+      'amount' => $totalCost,
+      'companyBalance' => $companyBalance,
+      'tkn_boldText_number' => $numberOfDividends,
+      'tkn_boldText_one' => 1,
     ]);
   }
 
@@ -525,6 +563,15 @@ class Notifications
       'tkn_boldText_from' => self::getSeaName($from),
       'tkn_boldText_to' => self::getSeaName($ship->getLocation()),
       'i18n' => ['tkn_boldText_shipName', 'tkn_boldText_from', 'tkn_boldText_to'],
+    ]);
+  }
+
+  public static function payCompanyExpenses($companyBalance)
+  {
+    self::notifyAll('moveCompanyBalance', clienttranslate('Company Balance is lowered to ${tkn_boldText_amount} ${tkn_pound}'), [
+      'tkn_boldText_amount' => $companyBalance,
+      'companyBalance' => $companyBalance,
+      'tkn_pound' => clienttranslate('Pounds'),
     ]);
   }
 

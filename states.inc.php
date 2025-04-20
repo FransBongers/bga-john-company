@@ -386,14 +386,61 @@ $machinestates = [
         'possibleactions' => ['act' . PRESIDENCY_TRADE_FILL_ORDERS, 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
-    
+
     ST_BONUSES => [
         'name' => BONUSES,
         'description' => '',
         'type' => 'game',
         'action' => 'stAtomicAction',
-        'transitions' => [PARLIAMENT_MEETS],
+        'transitions' => [],
     ],
+
+    ST_REVENUE_EXPENSES => [
+        'name' => REVENUE_EXPENSES,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_REVENUE_EMERGENCY_LOANS => [
+        'name' => REVENUE_EMERGENCY_LOANS,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_REVENUE_CHECK_EXPECTATIONS => [
+        'name' => REVENUE_CHECK_EXPECTATIONS,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_REVENUE_PAY_DIVIDENDS => [
+        'name' => REVENUE_PAY_DIVIDENDS,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . REVENUE_PAY_DIVIDENDS, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_REVENUE_ROYAL_PARDON => [
+        'name' => REVENUE_ROYAL_PARDON,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . REVENUE_ROYAL_PARDON, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
 
     ST_PARLIAMENT_MEETS => [
         'name' => PARLIAMENT_MEETS,

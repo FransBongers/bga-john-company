@@ -110,7 +110,7 @@ class DirectorOfTradeSpecialEnvoy implements State {
       text: formatStringRecursive(_('Roll ${number} dice'), {
         number: this.spend,
       }),
-      callback: () => this.updateIntefaceConfirm(),
+      callback: () => this.updateInterfaceConfirm(),
     });
 
     addSecondaryActionButton({
@@ -132,7 +132,7 @@ class DirectorOfTradeSpecialEnvoy implements State {
     addPassButton(this.args.optionalAction);
   }
 
-  private updateIntefaceConfirm() {
+  private updateInterfaceConfirm() {
     clearPossible();
 
     updatePageTitle(_('Special Envoy: make a check with ${number} dice?'), {

@@ -22,7 +22,7 @@ class Interaction {
     text,
     playerId,
     callback,
-    extraClasses
+    extraClasses,
   }: {
     id: string;
     text: string;
@@ -30,9 +30,16 @@ class Interaction {
     callback: Function | string;
     extraClasses?: string;
   }) {
-    this.addSecondaryActionButton({id, text, callback, extraClasses: `player-button ${extraClasses}`});
+    this.addSecondaryActionButton({
+      id,
+      text,
+      callback,
+      extraClasses: `player-button ${extraClasses}`,
+    });
     const elt = document.getElementById(id);
-    const playerColor = PlayerManager.getInstance().getPlayer(playerId).getColor();
+    const playerColor = PlayerManager.getInstance()
+      .getPlayer(playerId)
+      .getColor();
     // TODO: use classes so hover effect does not break?
     elt.style.backgroundColor = '#' + playerColor;
   }
@@ -81,7 +88,10 @@ class Interaction {
     }
   }
 
-  addCancelButton(callback?: Function) {
+  addCancelButton({
+    callback,
+    extraClasses,
+  }: { callback?: Function; extraClasses?: string } = {}) {
     this.addDangerActionButton({
       id: 'cancel_btn',
       text: _('Cancel'),
@@ -91,6 +101,7 @@ class Interaction {
         }
         this.game.onCancel();
       },
+      extraClasses,
     });
   }
 

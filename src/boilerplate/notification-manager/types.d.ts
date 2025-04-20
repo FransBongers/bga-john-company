@@ -52,17 +52,21 @@ interface NotifGainEnterprise extends NotifWithPlayerArgs {
   type: string;
 }
 
-interface NotifIncreaseCompanyBalance extends NotifWithPlayerArgs {
-  companyBalance: number;
-}
-
-interface NotifIncreaseCompanyDebt extends NotifWithPlayerArgs {
-  companyDebt: number;
-  companyBalance: number;
-}
-
 interface NotifMakeCheck extends NotifWithPlayerArgs {
   diceResults: number[];
+}
+
+interface NotifMoveCompanyBalance {
+  companyBalance: number;
+}
+
+interface NotifMoveCompanyDebt {
+  companyDebt: number;
+  companyBalance?: number;
+}
+
+interface NotifMoveCompanyStanding {
+  companyStanding: number;
 }
 
 interface NotifMoveFamilyMember {

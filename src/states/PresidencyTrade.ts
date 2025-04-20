@@ -136,7 +136,7 @@ class PresidencyTrade implements State {
       text: formatStringRecursive(_('Roll ${number} dice'), {
         number: Math.max(this.spend - penalty, 0),
       }),
-      callback: () => this.updateIntefaceConfirm(),
+      callback: () => this.updateInterfaceConfirm(),
       extraClasses: this.spend <= penalty ? DISABLED : '',
     });
 
@@ -160,7 +160,7 @@ class PresidencyTrade implements State {
     this.addCancelButton();
   }
 
-  private updateIntefaceConfirm() {
+  private updateInterfaceConfirm() {
     clearPossible();
 
     updatePageTitle(_('Make a check with ${number} dice to trade in ${tradeLog}?'), {

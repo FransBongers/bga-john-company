@@ -79,7 +79,7 @@ class PresidencyTradeFillOrders implements State {
 
     const numberOfFilledOrders = this.filledOrders.length;
     if (numberOfFilledOrders === this.args.numberOfOrdersToFill) {
-      this.updateIntefaceConfirm();
+      this.updateInterfaceConfirm();
       return;
     }
 
@@ -142,7 +142,7 @@ class PresidencyTradeFillOrders implements State {
     this.addCancelButton();
   }
 
-  private updateIntefaceConfirm() {
+  private updateInterfaceConfirm() {
     clearPossible();
 
     updatePageTitle(_('Fill orders: confirm?'));

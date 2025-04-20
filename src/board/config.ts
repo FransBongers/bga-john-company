@@ -39,7 +39,7 @@ const getCompanyDebtConfig = (debt: number): AbsolutePosition => {
 };
 
 const COMPANY_STANDING_CONFIG: Record<string, AbsolutePosition> = {
-  fail: { top: 63, left: 370 },
+  0: { top: 63, left: 370 },
   4: { top: 63, left: 409 },
   6: { top: 63, left: 448 },
   8: { top: 63, left: 487 },

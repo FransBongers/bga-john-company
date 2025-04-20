@@ -703,9 +703,16 @@ var Interaction = (function () {
     };
     Interaction.prototype.addPlayerButton = function (_a) {
         var id = _a.id, text = _a.text, playerId = _a.playerId, callback = _a.callback, extraClasses = _a.extraClasses;
-        this.addSecondaryActionButton({ id: id, text: text, callback: callback, extraClasses: "player-button ".concat(extraClasses) });
+        this.addSecondaryActionButton({
+            id: id,
+            text: text,
+            callback: callback,
+            extraClasses: "player-button ".concat(extraClasses),
+        });
         var elt = document.getElementById(id);
-        var playerColor = PlayerManager.getInstance().getPlayer(playerId).getColor();
+        var playerColor = PlayerManager.getInstance()
+            .getPlayer(playerId)
+            .getColor();
         elt.style.backgroundColor = '#' + playerColor;
     };
     Interaction.prototype.addPrimaryActionButton = function (_a) {
@@ -732,8 +739,9 @@ var Interaction = (function () {
             dojo.addClass(id, extraClasses);
         }
     };
-    Interaction.prototype.addCancelButton = function (callback) {
+    Interaction.prototype.addCancelButton = function (_a) {
         var _this = this;
+        var _b = _a === void 0 ? {} : _a, callback = _b.callback, extraClasses = _b.extraClasses;
         this.addDangerActionButton({
             id: 'cancel_btn',
             text: _('Cancel'),
@@ -743,6 +751,7 @@ var Interaction = (function () {
                 }
                 _this.game.onCancel();
             },
+            extraClasses: extraClasses,
         });
     };
     Interaction.prototype.addConfirmButton = function (callback) {
@@ -868,9 +877,10 @@ var NotificationManager = (function () {
             'fillOrder',
             'gainCash',
             'gainEnterprise',
-            'increaseCompanyBalance',
-            'increaseCompanyDebt',
             'makeCheck',
+            'moveCompanyBalance',
+            'moveCompanyDebt',
+            'moveCompanyStanding',
             'moveFamilyMember',
             'moveFamilyMembers',
             'moveRegiment',
@@ -1167,7 +1177,14 @@ var NotificationManager = (function () {
             });
         });
     };
-    NotificationManager.prototype.notif_increaseCompanyBalance = function (notif) {
+    NotificationManager.prototype.notif_makeCheck = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2];
+            });
+        });
+    };
+    NotificationManager.prototype.notif_moveCompanyBalance = function (notif) {
         return __awaiter(this, void 0, void 0, function () {
             var companyBalance, board;
             return __generator(this, function (_a) {
@@ -1183,18 +1200,19 @@ var NotificationManager = (function () {
             });
         });
     };
-    NotificationManager.prototype.notif_increaseCompanyDebt = function (notif) {
+    NotificationManager.prototype.notif_moveCompanyDebt = function (notif) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, companyBalance, companyDebt, board;
+            var _a, companyBalance, companyDebt, board, promises;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         _a = notif.args, companyBalance = _a.companyBalance, companyDebt = _a.companyDebt;
                         board = Board.getInstance();
-                        return [4, Promise.all([
-                                board.movePawn('debt', companyDebt),
-                                board.movePawn('balance', companyBalance),
-                            ])];
+                        promises = [board.movePawn('debt', companyDebt)];
+                        if (companyBalance) {
+                            promises.push(board.movePawn('balance', companyBalance));
+                        }
+                        return [4, Promise.all(promises)];
                     case 1:
                         _b.sent();
                         return [2];
@@ -1202,10 +1220,19 @@ var NotificationManager = (function () {
             });
         });
     };
-    NotificationManager.prototype.notif_makeCheck = function (notif) {
+    NotificationManager.prototype.notif_moveCompanyStanding = function (notif) {
         return __awaiter(this, void 0, void 0, function () {
+            var companyStanding, board;
             return __generator(this, function (_a) {
-                return [2];
+                switch (_a.label) {
+                    case 0:
+                        companyStanding = notif.args.companyStanding;
+                        board = Board.getInstance();
+                        return [4, board.movePawn('standing', companyStanding)];
+                    case 1:
+                        _a.sent();
+                        return [2];
+                }
             });
         });
     };
@@ -1514,8 +1541,9 @@ var ConfirmTurn = (function () {
 var isDebug = window.location.host == 'studio.boardgamearena.com' ||
     window.location.hash.indexOf('debug') > -1;
 var debug = isDebug ? console.info.bind(window.console) : function () { };
-var addCancelButton = function (callback) {
-    Interaction.use().addCancelButton(callback);
+var addCancelButton = function (props) {
+    if (props === void 0) { props = {}; }
+    Interaction.use().addCancelButton(props);
 };
 var addConfirmButton = function (callback) {
     Interaction.use().addConfirmButton(callback);
@@ -1596,6 +1624,8 @@ var JohnCompany = (function () {
             PresidencyDecideOrder: PresidencyDecideOrder,
             PresidencyTrade: PresidencyTrade,
             PresidencyTradeFillOrders: PresidencyTradeFillOrders,
+            RevenuePayDividends: RevenuePayDividends,
+            RevenueRoyalPardon: RevenueRoyalPardon,
             SeekShare: SeekShare,
         };
         console.log('johncompany constructor');
@@ -2017,7 +2047,7 @@ var getCompanyDebtConfig = function (debt) {
     return COMPANY_DEBT_CONFIG[debt];
 };
 var COMPANY_STANDING_CONFIG = {
-    fail: { top: 63, left: 370 },
+    0: { top: 63, left: 370 },
     4: { top: 63, left: 409 },
     6: { top: 63, left: 448 },
     8: { top: 63, left: 487 },
@@ -3646,7 +3676,7 @@ var DirectorOfTradeSpecialEnvoy = (function () {
             text: formatStringRecursive(_('Roll ${number} dice'), {
                 number: this.spend,
             }),
-            callback: function () { return _this.updateIntefaceConfirm(); },
+            callback: function () { return _this.updateInterfaceConfirm(); },
         });
         addSecondaryActionButton({
             id: 'plus_btn',
@@ -3664,7 +3694,7 @@ var DirectorOfTradeSpecialEnvoy = (function () {
         });
         addPassButton(this.args.optionalAction);
     };
-    DirectorOfTradeSpecialEnvoy.prototype.updateIntefaceConfirm = function () {
+    DirectorOfTradeSpecialEnvoy.prototype.updateInterfaceConfirm = function () {
         var _this = this;
         clearPossible();
         updatePageTitle(_('Special Envoy: make a check with ${number} dice?'), {
@@ -3712,10 +3742,10 @@ var DirectorOfTradeSpecialEnvoySuccess = (function () {
         updatePageTitle(_('${you} may open trade with China or may open a closed order'));
         var board = Board.getInstance();
         this.args.closedOrders.forEach(function (order) {
-            onClick(board.ui.orders[order.id], function () { return _this.updateIntefaceConfirm(order); });
+            onClick(board.ui.orders[order.id], function () { return _this.updateInterfaceConfirm(order); });
         });
     };
-    DirectorOfTradeSpecialEnvoySuccess.prototype.updateIntefaceConfirm = function (order) {
+    DirectorOfTradeSpecialEnvoySuccess.prototype.updateInterfaceConfirm = function (order) {
         var _this = this;
         clearPossible();
         updatePageTitle(_('Open closed order in ${region}?'), {
@@ -4796,7 +4826,7 @@ var PresidencyTrade = (function () {
             text: formatStringRecursive(_('Roll ${number} dice'), {
                 number: Math.max(this.spend - penalty, 0),
             }),
-            callback: function () { return _this.updateIntefaceConfirm(); },
+            callback: function () { return _this.updateInterfaceConfirm(); },
             extraClasses: this.spend <= penalty ? DISABLED : '',
         });
         addSecondaryActionButton({
@@ -4811,7 +4841,7 @@ var PresidencyTrade = (function () {
         });
         this.addCancelButton();
     };
-    PresidencyTrade.prototype.updateIntefaceConfirm = function () {
+    PresidencyTrade.prototype.updateInterfaceConfirm = function () {
         var _this = this;
         clearPossible();
         updatePageTitle(_('Make a check with ${number} dice to trade in ${tradeLog}?'), {
@@ -4890,7 +4920,7 @@ var PresidencyTradeFillOrders = (function () {
         clearPossible();
         var numberOfFilledOrders = this.filledOrders.length;
         if (numberOfFilledOrders === this.args.numberOfOrdersToFill) {
-            this.updateIntefaceConfirm();
+            this.updateInterfaceConfirm();
             return;
         }
         var placedWriters = this.filledOrders.map(function (filledOrder) { return filledOrder.filledBy; });
@@ -4945,7 +4975,7 @@ var PresidencyTradeFillOrders = (function () {
         });
         this.addCancelButton();
     };
-    PresidencyTradeFillOrders.prototype.updateIntefaceConfirm = function () {
+    PresidencyTradeFillOrders.prototype.updateInterfaceConfirm = function () {
         var _this = this;
         clearPossible();
         updatePageTitle(_('Fill orders: confirm?'));
@@ -5045,6 +5075,131 @@ var PresidencyTradeFillOrders = (function () {
         });
     };
     return PresidencyTradeFillOrders;
+}());
+var RevenuePayDividends = (function () {
+    function RevenuePayDividends(game) {
+        this.game = game;
+    }
+    RevenuePayDividends.create = function (game) {
+        RevenuePayDividends.instance = new RevenuePayDividends(game);
+    };
+    RevenuePayDividends.getInstance = function () {
+        return RevenuePayDividends.instance;
+    };
+    RevenuePayDividends.prototype.onEnteringState = function (args) {
+        debug('Entering RevenuePayDividends state');
+        this.args = args;
+        this.selectedNumberOfDividends = 0;
+        this.updateInterfaceInitialStep();
+    };
+    RevenuePayDividends.prototype.onLeavingState = function () {
+        debug('Leaving RevenuePayDividends state');
+    };
+    RevenuePayDividends.prototype.setDescription = function (activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} may pay dividends'), {
+            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        }, true);
+    };
+    RevenuePayDividends.prototype.updateInterfaceInitialStep = function () {
+        var _this = this;
+        this.game.clearPossible();
+        updatePageTitle(_('${you} may pay up to ${maxNumber} dividends for ${amount} ${tkn_pound} each'), {
+            maxNumber: this.args.maxNumberOfDividends,
+            amount: this.args.costPerDividend,
+            tkn_pound: 'pound',
+        });
+        addSecondaryActionButton({
+            id: 'minus_btn',
+            text: '-',
+            callback: function () {
+                _this.selectedNumberOfDividends--;
+                _this.updateInterfaceInitialStep();
+            },
+            extraClasses: this.selectedNumberOfDividends === 0 ? DISABLED : '',
+        });
+        addSecondaryActionButton({
+            id: 'plus_btn',
+            text: '+',
+            callback: function () {
+                _this.selectedNumberOfDividends++;
+                _this.updateInterfaceInitialStep();
+            },
+            extraClasses: this.selectedNumberOfDividends === this.args.maxNumberOfDividends
+                ? DISABLED
+                : '',
+        });
+        addPrimaryActionButton({
+            id: 'make_check_btn',
+            text: formatStringRecursive(_('Pay ${number} dividend(s)'), {
+                number: this.selectedNumberOfDividends,
+            }),
+            callback: function () { return _this.updateInterfaceConfirm(); },
+        });
+        addCancelButton({
+            extraClasses: this.selectedNumberOfDividends === 0 ? DISABLED : '',
+        });
+    };
+    RevenuePayDividends.prototype.updateInterfaceConfirm = function () {
+        var _this = this;
+        clearPossible();
+        if (this.selectedNumberOfDividends === 0) {
+            updatePageTitle(_('Do not pay any dividends?'));
+        }
+        else {
+            updatePageTitle(this.selectedNumberOfDividends === 1
+                ? _('Spend ${amount} ${tkn_pound} to pay ${number} dividend?')
+                : _('Spend ${amount} ${tkn_pound} to pay ${number} dividends?'), {
+                number: this.selectedNumberOfDividends,
+                amount: this.args.costPerDividend * this.selectedNumberOfDividends,
+                tkn_pound: 'pound',
+            });
+        }
+        addConfirmButton(function () {
+            performAction('actRevenuePayDividends', {
+                numberOfDividends: _this.selectedNumberOfDividends,
+            });
+        });
+        addCancelButton();
+    };
+    return RevenuePayDividends;
+}());
+var RevenueRoyalPardon = (function () {
+    function RevenueRoyalPardon(game) {
+        this.game = game;
+    }
+    RevenueRoyalPardon.create = function (game) {
+        RevenueRoyalPardon.instance = new RevenueRoyalPardon(game);
+    };
+    RevenueRoyalPardon.getInstance = function () {
+        return RevenueRoyalPardon.instance;
+    };
+    RevenueRoyalPardon.prototype.onEnteringState = function (args) {
+        debug('Entering RevenueRoyalPardon state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    };
+    RevenueRoyalPardon.prototype.onLeavingState = function () {
+        debug('Leaving RevenueRoyalPardon state');
+    };
+    RevenueRoyalPardon.prototype.setDescription = function (activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} may pay dividends'), {
+            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        }, true);
+    };
+    RevenueRoyalPardon.prototype.updateInterfaceInitialStep = function () {
+        this.game.clearPossible();
+        updatePageTitle(_('${you} may pay dividends'));
+    };
+    RevenueRoyalPardon.prototype.updateInterfaceConfirm = function (next) {
+        clearPossible();
+        addConfirmButton(function () {
+            performAction('actRevenueRoyalPardon', {
+                next: next
+            });
+        });
+        addCancelButton();
+    };
+    return RevenueRoyalPardon;
 }());
 var SeekShare = (function () {
     function SeekShare(game) {

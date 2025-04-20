@@ -72,6 +72,12 @@ const ST_PRESIDENCY_TRADE = 50;
 const ST_PRESIDENCY_TRADE_FILL_ORDERS = 51;
 
 const ST_BONUSES = 60;
+const ST_REVENUE_EXPENSES = 61;
+const ST_REVENUE_EMERGENCY_LOANS = 62;
+const ST_REVENUE_CHECK_EXPECTATIONS = 63;
+const ST_REVENUE_ROYAL_PARDON = 64;
+const ST_REVENUE_PAY_DIVIDENDS = 65;
+
 const ST_PARLIAMENT_MEETS = 70;
 
 const BONUSES = 'Bonuses';
@@ -81,6 +87,11 @@ const PERFORM_SETUP = 'PerformSetup';
 const FAMILY_ACTION = 'FamilyAction';
 const NEW_COMPANY_SHARES = 'NewCompanyShares';
 const PARLIAMENT_MEETS = 'ParliamentMeets';
+const REVENUE_EMERGENCY_LOANS = 'RevenueEmergencyLoans';
+const REVENUE_EXPENSES = 'RevenueExpenses';
+const REVENUE_CHECK_EXPECTATIONS = 'RevenueCheckExpectations';
+const REVENUE_ROYAL_PARDON = 'RevenueRoyalPardon';
+const REVENUE_PAY_DIVIDENDS = 'RevenuePayDividends';
 // Family Actions
 const ENLIST_WRITER = 'EnlistWriter';
 const ENLIST_OFFICER = 'EnlistOfficer';
@@ -106,6 +117,8 @@ const PRESIDENCY_TRADE_FILL_ORDERS = 'PresidencyTradeFillOrders';
 const BALANCE = 'balance';
 const DEBT = 'debt';
 const STANDING = 'standing';
+
+const COMPANY_EXPECTATIONS = [0, 4, 6, 8, 10, 12, 14, 16];
 
 /**
  * Crown

@@ -79,6 +79,25 @@ class Company
     return Globals::getCompany()[STANDING];
   }
 
+  public static function setStanding($value)
+  {
+    self::set(STANDING, $value);
+  }
+
+
+  public static function adjustStanding($numberOfSpaces)
+  {
+    $currentStanding = self::getStanding();
+    $index = Utils::array_find_index(COMPANY_EXPECTATIONS, function ($item) use ($currentStanding) {
+      return $item === $currentStanding;
+    });
+    $newIndex = min(16, max(0, $index + $numberOfSpaces));
+    $newStanding = COMPANY_EXPECTATIONS[$newIndex];
+    self::setStanding($newStanding);
+    Notifications::adjustCompanyStanding($newStanding, $numberOfSpaces);
+    // TODO: company failure
+  }
+
   public static function getOfficesWithTreasury()
   {
     // TODO: Governor General

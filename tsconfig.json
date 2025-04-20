@@ -71,6 +71,8 @@
     "src/states/PresidencyDecideOrder.ts",
     "src/states/PresidencyTrade.ts",
     "src/states/PresidencyTradeFillOrders.ts",
+    "src/states/RevenuePayDividends.ts",
+    "src/states/RevenueRoyalPardon.ts",
     "src/states/SeekShare.ts",
     "src/static-data/index.ts",
     "src/templates.ts"

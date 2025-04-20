@@ -69,9 +69,10 @@ class NotificationManager {
       'fillOrder',
       'gainCash',
       'gainEnterprise',
-      'increaseCompanyBalance',
-      'increaseCompanyDebt',
       'makeCheck',
+      'moveCompanyBalance',
+      'moveCompanyDebt',
+      'moveCompanyStanding',
       'moveFamilyMember',
       'moveFamilyMembers',
       'moveRegiment',
@@ -344,24 +345,33 @@ class NotificationManager {
     await Promise.all(promises);
   }
 
-  async notif_increaseCompanyBalance(notif: Notif<NotifIncreaseCompanyDebt>) {
+  async notif_makeCheck(notif: Notif<NotifMakeCheck>) {
+    // TODO: animation
+  }
+
+  async notif_moveCompanyBalance(notif: Notif<NotifMoveCompanyBalance>) {
     const { companyBalance } = notif.args;
     const board = Board.getInstance();
 
     await board.movePawn('balance', companyBalance);
   }
 
-  async notif_increaseCompanyDebt(notif: Notif<NotifIncreaseCompanyDebt>) {
+  async notif_moveCompanyDebt(notif: Notif<NotifMoveCompanyDebt>) {
     const { companyBalance, companyDebt } = notif.args;
     const board = Board.getInstance();
-    await Promise.all([
-      board.movePawn('debt', companyDebt),
-      board.movePawn('balance', companyBalance),
-    ]);
-  }
+    const promises = [board.movePawn('debt', companyDebt)];
+    if (companyBalance) {
+      promises.push(board.movePawn('balance', companyBalance));
+    }
 
-  async notif_makeCheck(notif: Notif<NotifMakeCheck>) {
-    // TODO: animation
+    await Promise.all(promises);
+  }
+  
+  async notif_moveCompanyStanding(notif: Notif<NotifMoveCompanyStanding>) {
+    const { companyStanding } = notif.args;
+    const board = Board.getInstance();
+
+    await board.movePawn('standing', companyStanding);
   }
 
   async notif_moveFamilyMember(notif: Notif<NotifMoveFamilyMember>) {

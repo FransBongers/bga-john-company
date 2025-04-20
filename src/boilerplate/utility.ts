@@ -8,8 +8,10 @@ const isDebug =
   window.location.hash.indexOf('debug') > -1;
 const debug = isDebug ? console.info.bind(window.console) : () => {};
 
-const addCancelButton = (callback?: Function) => {
-  Interaction.use().addCancelButton(callback);
+const addCancelButton = (
+  props: { callback?: Function; extraClasses?: string } = {}
+) => {
+  Interaction.use().addCancelButton(props);
 };
 
 const addConfirmButton = (callback: Function) => {
