@@ -30,6 +30,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     'company' => 'obj',
     'crown' => 'obj',
     'deregulation' => 'bool',
+    'elephant' => 'obj',
     'phase' => 'str',
     'turn' => 'int',
     'options' => 'obj',

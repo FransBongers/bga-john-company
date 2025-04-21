@@ -17,5 +17,15 @@ class Punjab extends \Bga\Games\JohnCompany\Models\Region
     $this->orderIds = [
       ORDER_PUNJAB_1,
     ];
+    $this->adjacentRegionBorderMap = [
+      BOMBAY => BOMBAY_PUNJAB_BORDER,
+      DELHI => DELHI_PUNJAB_BORDER,
+    ];
+    $this->shapeAdjacentRegionMap = [
+      TRIANGLE => BOMBAY,
+      CIRCLE => BOMBAY,
+      SQUARE => DELHI,
+    ];
+    $this->adjacentRegionsInClockwiseOrder = [DELHI, BOMBAY];
   }
 }

@@ -34,4 +34,8 @@ class Region {
       }
     }
   }
+
+  public updateUnrest(value: number) {
+    // TODO: implementation
+  }
 }

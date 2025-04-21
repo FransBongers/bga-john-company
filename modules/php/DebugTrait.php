@@ -25,6 +25,7 @@ use Bga\Games\JohnCompany\Models\Enterprise;
 use Bga\Games\JohnCompany\Models\FamilyMember;
 use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Managers\AtomicActions;
+use Bga\Games\JohnCompany\Managers\Elephant;
 use Bga\Games\JohnCompany\Managers\EventTiles;
 
 trait DebugTrait
@@ -58,8 +59,8 @@ trait DebugTrait
     // ArmyPieces::get('Regiment_6')->setLocation(Locations::armyOf(MADRAS));
     // EventTiles::setupNewGame();
     
-
-    Notifications::log('result', EventTiles::getTopOf(DECK));
+    // Elephant::setupNewGame();
+    Notifications::log('result', Regions::get(MARATHA)->getOrders());
   }
 
 

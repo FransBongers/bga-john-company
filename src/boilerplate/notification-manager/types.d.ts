@@ -29,6 +29,11 @@ interface NotifDraftNewCardsPrivateArgs {
   lastCard: boolean;
 }
 
+interface NotifElephantMarch {
+  location: string;
+  facing: string;
+}
+
 interface NotifDraftCardPrivateArgs extends NotifWithPlayerArgs {
   cardIds: string[];
 }
@@ -132,4 +137,14 @@ interface NotifSetCrownClimate extends NotifWithPlayerArgs {
 
 interface NotifSetupFamilyMembers extends NotifWithPlayerArgs {
   familyMembers: JocoFamilyMember[];
+}
+
+interface NotifUpdateTowerLevel {
+  regionId: string;
+  strength: number;
+}
+
+interface NotifUpdateUnrest {
+  regionId: string;
+  unrest: number;
 }

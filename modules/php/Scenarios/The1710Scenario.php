@@ -58,6 +58,9 @@ class The1710Scenario extends \Bga\Games\JohnCompany\Models\Scenario
       MADRAS => 1,
     ];
     $this->passedLaws = [];
-    $this->elephant = null;
+    $this->elephant = [
+      'location' => DELHI_MARATHA_BORDER,
+      'facing' => DELHI,
+    ];
   }
 }

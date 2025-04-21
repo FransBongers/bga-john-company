@@ -30,6 +30,7 @@ use Bga\Games\JohnCompany\Managers\AICards;
 use Bga\Games\JohnCompany\Managers\ArmyPieces;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Crown;
+use Bga\Games\JohnCompany\Managers\Elephant;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\EventTiles;
 use Bga\Games\JohnCompany\Managers\Families;
@@ -352,6 +353,7 @@ class Game extends \Table
             'phase' => Globals::getPhase(),
             'armyPieces' => ArmyPieces::getAll(),
             'company' => Company::get(),
+            'elephant' => Elephant::get(),
             'enterprises' => Enterprises::getAll(),
             'families' => Families::getAll(),
             'familyMembers' => FamilyMembers::getAll(),
@@ -400,6 +402,7 @@ class Game extends \Table
 
         Scenarios::setupNewGame($players, $options);
         ArmyPieces::setupNewGame();
+        Elephant::setupNewGame();
         Enterprises::setupNewGame();
         EventTiles::setupNewGame();
         Families::setupNewGame($players);

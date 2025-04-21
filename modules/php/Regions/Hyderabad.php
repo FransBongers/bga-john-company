@@ -20,5 +20,17 @@ class Hyderabad extends \Bga\Games\JohnCompany\Models\Region
     $this->orderIds = [
       ORDER_HYDERABAD_1,
     ];
+    $this->adjacentRegionBorderMap = [
+      BOMBAY => BOMBAY_HYDERABAD_BORDER,
+      MADRAS => HYDERABAD_MADRAS_BORDER,
+      MARATHA => HYDERABAD_MARATHA_BORDER,
+      MYSORE => HYDERABAD_MYSORE_BORDER,
+    ];
+    $this->shapeAdjacentRegionMap = [
+      TRIANGLE => MARATHA,
+      CIRCLE => MADRAS,
+      SQUARE => BOMBAY,
+    ];
+    $this->adjacentRegionsInClockwiseOrder = [MADRAS, MYSORE, BOMBAY, MARATHA];
   }
 }

@@ -13,9 +13,14 @@ class Company
     THE_1710_SCENARIO
   ];
 
-  public static function get()
+  public static function get($key = null)
   {
-    return Globals::getCompany();
+    $item = Globals::getCompany();
+    if ($key === null) {
+      return $item;
+    } else {
+      return $item[$key];
+    }
   }
 
   public static function setupNewGame()

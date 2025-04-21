@@ -50,6 +50,11 @@ class Scenario implements \JsonSerializable
   {
     return $this->companyTreasuries;
   }
+  
+  public function getElephant()
+  {
+    return $this->elephant;
+  }
 
   public function getOrders()
   {

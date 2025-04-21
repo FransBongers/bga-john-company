@@ -20,6 +20,8 @@ const tlpLogTokenText = ({
 const tplLogTokenClimate = (climate: string) =>
   `<div class="log_token joco-crown-climate-icon" data-climate="${climate}"></div>`;
 
+const tplLogTokenElephant = () => '<div class="log_token joco_elephant"></div>';
+
 const tplLogTokenPound = () => `<div class="log_token joco_pound"></div>`;
 
 const tplLogTokenStormDie = (side: string) =>

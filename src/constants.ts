@@ -183,6 +183,23 @@ const WRITER = 'Writer';
 const COURT_OF_DIRECTORS = 'CourtOfDirectors';
 
 /**
+ * Borders
+ */
+const BENGAL_DELHI_BORDER = 'Bengal_Delhi_border';
+const BENGAL_MARATHA_BORDER = 'Bengal_Maratha_border';
+const BOMBAY_DELHI_BORDER = 'Bombay_Delhi_border';
+const BOMBAY_HYDERABAD_BORDER = 'Bombay_Hyderabad_border';
+const BOMBAY_MARATHA_BORDER = 'Bombay_Maratha_border';
+const BOMBAY_MYSORE_BORDER = 'Bombay_Mysore_border';
+const BOMBAY_PUNJAB_BORDER = 'Bombay_Punjab_border';
+const DELHI_MARATHA_BORDER = 'Delhi_Maratha_border';
+const DELHI_PUNJAB_BORDER = 'Delhi_Punjab_border';
+const HYDERABAD_MADRAS_BORDER = 'Hyderabad_Madras_border';
+const HYDERABAD_MARATHA_BORDER = 'Hyderabad_Maratha_border';
+const HYDERABAD_MYSORE_BORDER = 'Hyderabad_Mysore_border';
+const MADRAS_MYSORE_BORDER = 'Madras_Mysore_border'
+
+/**
  * RegionIds
  */
 const BENGAL = 'Bengal';

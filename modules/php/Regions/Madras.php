@@ -19,5 +19,15 @@ class Madras extends \Bga\Games\JohnCompany\Models\Region
       ORDER_MADRAS_1,
       ORDER_MADRAS_2,
     ];
+    $this->adjacentRegionBorderMap = [
+      HYDERABAD => HYDERABAD_MADRAS_BORDER,
+      MYSORE => MADRAS_MYSORE_BORDER,
+    ];
+    $this->shapeAdjacentRegionMap = [
+      TRIANGLE => MYSORE,
+      CIRCLE => HYDERABAD,
+      SQUARE => MYSORE,
+    ];
+    $this->adjacentRegionsInClockwiseOrder = [MYSORE, HYDERABAD];
   }
 }

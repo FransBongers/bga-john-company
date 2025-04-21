@@ -21,6 +21,7 @@ class Board {
       treasuries: HTMLElement;
     };
     armyPieces: Record<string, HTMLElement>;
+    elephant: HTMLElement;
     familyMembers: Record<string, HTMLElement>;
     orders: Record<string, HTMLElement>;
     ships: Record<string, HTMLElement>;
@@ -31,7 +32,7 @@ class Board {
 
   // private courtOfDirectors: JocoFamilyMember[] = [];
 
-  private regions: Record<string, Region> = {};
+  public regions: Record<string, Region> = {};
   public armies: {
     regiments: {
       Army_Bengal: JocoArmyPieceBase[];
@@ -106,6 +107,7 @@ class Board {
         treasuries: document.getElementById('joco_treasuries'),
       },
       armyPieces: {},
+      elephant: document.getElementById('joco-elephant'),
       familyMembers: {},
       orders: {},
       selectBoxes: {},
@@ -114,6 +116,7 @@ class Board {
 
     // this.ui.containers.board.insertAdjacentHTML('afterbegin', familyMember);
     this.setupArmyPieces(gamedatas);
+    this.updateElephant(gamedatas.elephant);
     this.setupOrders(gamedatas);
     this.setupRegions(gamedatas);
     this.setupPawns(gamedatas);
@@ -184,6 +187,7 @@ class Board {
       const elt = (this.ui.orders[orderId] = document.createElement('div'));
       // elt.id = orderId;
       elt.classList.add('joco-order');
+      elt.id = orderId;
     });
     this.updateOrders(gamedatas);
   }
@@ -321,6 +325,11 @@ class Board {
         this.armies.regiments[piece.location].push(piece);
       }
     });
+  }
+
+  updateElephant({ location, facing }: { location: string; facing: string }) {
+    this.ui.elephant.setAttribute('data-location', location);
+    this.ui.elephant.setAttribute('data-facing', facing);
   }
 
   updateFamilyMembers(familyMembers: JocoFamilyMember[]) {

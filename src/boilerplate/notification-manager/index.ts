@@ -65,6 +65,7 @@ class NotificationManager {
       'companyOperationChairman',
       'draftCardPrivate',
       'draftNewCardsPrivate',
+      'elephantMarch',
       'enlistFamilyMember',
       'fillOrder',
       'gainCash',
@@ -87,6 +88,8 @@ class NotificationManager {
       'setCrownClimate',
       'setupDone',
       'setupFamilyMembers',
+      'updateTowerLevel',
+      'updateUnrest',
     ];
 
     // example: https://github.com/thoun/knarr/blob/main/src/knarr.ts
@@ -270,6 +273,12 @@ class NotificationManager {
     const { cardIds, lastCard } = notif.args;
 
     SetupArea.getInstance().newCards(cardIds, lastCard);
+  }
+
+  async notif_elephantMarch(notif: Notif<NotifElephantMarch>) {
+    const board = Board.getInstance();
+    board.updateElephant(notif.args);
+    await Interaction.use().wait(500);
   }
 
   async notif_enlistFamilyMember(notif: Notif<NotifEnlistFamilyMember>) {
@@ -494,5 +503,15 @@ class NotificationManager {
       familyMembers,
       this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER]
     );
+  }
+
+  async notif_updateTowerLevel(notif: Notif<NotifUpdateTowerLevel>) {
+    const {regionId, strength} = notif.args;
+    Board.getInstance().regions[regionId].updateStrength(strength);
+  }
+
+  async notif_updateUnrest(notif: Notif<NotifUpdateUnrest>) {
+    const {regionId, unrest} = notif.args;
+    Board.getInstance().regions[regionId].updateUnrest(unrest);
   }
 }

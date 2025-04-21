@@ -84,9 +84,13 @@ class Order extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implemen
     Notifications::fillOrder($player, $this, $familyMember !== null, $familyMember, $from);
   }
 
-  public function open($player)
+  public function open($player = null)
   {
     $this->setStatus(OPEN);
-    Notifications::changeOrderStatus($player, $this, OPEN);
+    if ($player === null) {
+      Notifications::changeOrderStatusByGame($this, OPEN);
+    } else {
+      Notifications::changeOrderStatus($player, $this, OPEN);
+    }
   }
 }

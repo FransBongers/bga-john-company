@@ -132,6 +132,19 @@ var OFFICER = 'Officer';
 var OFFICER_IN_TRAINING = 'OfficerInTraining';
 var WRITER = 'Writer';
 var COURT_OF_DIRECTORS = 'CourtOfDirectors';
+var BENGAL_DELHI_BORDER = 'Bengal_Delhi_border';
+var BENGAL_MARATHA_BORDER = 'Bengal_Maratha_border';
+var BOMBAY_DELHI_BORDER = 'Bombay_Delhi_border';
+var BOMBAY_HYDERABAD_BORDER = 'Bombay_Hyderabad_border';
+var BOMBAY_MARATHA_BORDER = 'Bombay_Maratha_border';
+var BOMBAY_MYSORE_BORDER = 'Bombay_Mysore_border';
+var BOMBAY_PUNJAB_BORDER = 'Bombay_Punjab_border';
+var DELHI_MARATHA_BORDER = 'Delhi_Maratha_border';
+var DELHI_PUNJAB_BORDER = 'Delhi_Punjab_border';
+var HYDERABAD_MADRAS_BORDER = 'Hyderabad_Madras_border';
+var HYDERABAD_MARATHA_BORDER = 'Hyderabad_Maratha_border';
+var HYDERABAD_MYSORE_BORDER = 'Hyderabad_Mysore_border';
+var MADRAS_MYSORE_BORDER = 'Madras_Mysore_border';
 var BENGAL = 'Bengal';
 var BOMBAY = 'Bombay';
 var DELHI = 'Delhi';
@@ -873,6 +886,7 @@ var NotificationManager = (function () {
             'companyOperationChairman',
             'draftCardPrivate',
             'draftNewCardsPrivate',
+            'elephantMarch',
             'enlistFamilyMember',
             'fillOrder',
             'gainCash',
@@ -895,6 +909,8 @@ var NotificationManager = (function () {
             'setCrownClimate',
             'setupDone',
             'setupFamilyMembers',
+            'updateTowerLevel',
+            'updateUnrest',
         ];
         notifs.forEach(function (notifName) {
             _this.subscriptions.push(dojo.subscribe(notifName, _this, function (notifDetails) {
@@ -1070,6 +1086,22 @@ var NotificationManager = (function () {
                 _a = notif.args, cardIds = _a.cardIds, lastCard = _a.lastCard;
                 SetupArea.getInstance().newCards(cardIds, lastCard);
                 return [2];
+            });
+        });
+    };
+    NotificationManager.prototype.notif_elephantMarch = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var board;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        board = Board.getInstance();
+                        board.updateElephant(notif.args);
+                        return [4, Interaction.use().wait(500)];
+                    case 1:
+                        _a.sent();
+                        return [2];
+                }
             });
         });
     };
@@ -1463,6 +1495,26 @@ var NotificationManager = (function () {
                         _b.sent();
                         return [2];
                 }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_updateTowerLevel = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, regionId, strength;
+            return __generator(this, function (_b) {
+                _a = notif.args, regionId = _a.regionId, strength = _a.strength;
+                Board.getInstance().regions[regionId].updateStrength(strength);
+                return [2];
+            });
+        });
+    };
+    NotificationManager.prototype.notif_updateUnrest = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, regionId, unrest;
+            return __generator(this, function (_b) {
+                _a = notif.args, regionId = _a.regionId, unrest = _a.unrest;
+                Board.getInstance().regions[regionId].updateUnrest(unrest);
+                return [2];
             });
         });
     };
@@ -2326,12 +2378,14 @@ var Board = (function () {
                 treasuries: document.getElementById('joco_treasuries'),
             },
             armyPieces: {},
+            elephant: document.getElementById('joco-elephant'),
             familyMembers: {},
             orders: {},
             selectBoxes: {},
             ships: {},
         };
         this.setupArmyPieces(gamedatas);
+        this.updateElephant(gamedatas.elephant);
         this.setupOrders(gamedatas);
         this.setupRegions(gamedatas);
         this.setupPawns(gamedatas);
@@ -2374,6 +2428,7 @@ var Board = (function () {
         Object.keys(gamedatas.orders).forEach(function (orderId) {
             var elt = (_this.ui.orders[orderId] = document.createElement('div'));
             elt.classList.add('joco-order');
+            elt.id = orderId;
         });
         this.updateOrders(gamedatas);
     };
@@ -2487,6 +2542,11 @@ var Board = (function () {
                 _this.armies.regiments[piece.location].push(piece);
             }
         });
+    };
+    Board.prototype.updateElephant = function (_a) {
+        var location = _a.location, facing = _a.facing;
+        this.ui.elephant.setAttribute('data-location', location);
+        this.ui.elephant.setAttribute('data-facing', facing);
     };
     Board.prototype.updateFamilyMembers = function (familyMembers) {
         var _this = this;
@@ -2897,9 +2957,11 @@ var Region = (function () {
             }
         }
     };
+    Region.prototype.updateUnrest = function (value) {
+    };
     return Region;
 }());
-var tplBoard = function (gamedatas) { return "<div id=\"joco-board\">\n  <div id=\"joco-family-members\"></div>\n  <div id=\"joco-orders\"></div>\n  <div id=\"joco-regiments\"></div>\n  <div id=\"joco-power-tokens\"></div>\n  <div id=\"joco_ships\"></div>\n  <div id=\"joco_towers\"></div>\n  <div id=\"joco_treasuries\"></div>\n  <div id=\"joco-select-boxes\"></div>\n</div>"; };
+var tplBoard = function (gamedatas) { return "<div id=\"joco-board\">\n  <div id=\"joco-family-members\"></div>\n  <div id=\"joco-orders\"></div>\n  <div id=\"joco-regiments\"></div>\n  <div id=\"joco-power-tokens\"></div>\n  <div id=\"joco_ships\"></div>\n  <div id=\"joco_towers\"></div>\n  <div id=\"joco_treasuries\"></div>\n  <div id=\"joco-select-boxes\"></div>\n  <div id=\"joco-elephant\"></div>\n</div>"; };
 var createFamilyMember = function (familyId, familyMemberId, extraClasses) {
     var _a;
     var elt = document.createElement('div');
@@ -3111,6 +3173,7 @@ var LOG_TOKEN_NEW_LINE = 'newLine';
 var LOG_TOKEN_PLAYER_NAME = 'playerName';
 var LOG_TOKEN_CLIMATE = 'climate';
 var LOG_TOKEN_POUND = 'pound';
+var LOG_TOKEN_ELEPHANT = 'elephant';
 var LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
 var LOG_TOKEN_FAMILY_MEMBER = 'familyMember';
 var LOG_TOKEN_ICON = 'icon';
@@ -3134,6 +3197,8 @@ var getTokenDiv = function (_a) {
         case LOG_TOKEN_ICON:
         case LOG_TOKEN_ENTERPRISE_ICON:
             return tplLogTokenIcon(value);
+        case LOG_TOKEN_ELEPHANT:
+            return tplLogTokenElephant();
         case LOG_TOKEN_FAMILY_MEMBER:
             var _b = value.split(':'), familyId = _b[0], number = _b[1];
             return createFamilyMember(familyId, Number(number), [CLASS_LOG_TOKEN]).outerHTML;
@@ -3171,6 +3236,7 @@ var tlpLogTokenText = function (_a) {
 var tplLogTokenClimate = function (climate) {
     return "<div class=\"log_token joco-crown-climate-icon\" data-climate=\"".concat(climate, "\"></div>");
 };
+var tplLogTokenElephant = function () { return '<div class="log_token joco_elephant"></div>'; };
 var tplLogTokenPound = function () { return "<div class=\"log_token joco_pound\"></div>"; };
 var tplLogTokenStormDie = function (side) {
     return "<div class=\"log_token joco-storm-die\" data-side=\"".concat(side, "\"></div>");

@@ -117,6 +117,10 @@ interface JohnCompanyGamedatas extends Gamedatas {
     color: string;
     climate?: Climate;
   };
+  elephant: {
+    location: string;
+    facing: string;
+  };
   enterprises: Record<string, JoCoEnterPriseBase>
   families: Record<string, JocoFamily>;
   familyMembers: Record<string, JocoFamilyMember>;

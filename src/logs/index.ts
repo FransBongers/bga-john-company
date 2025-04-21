@@ -5,6 +5,7 @@ const LOG_TOKEN_PLAYER_NAME = 'playerName';
 // Game specific
 const LOG_TOKEN_CLIMATE = 'climate';
 const LOG_TOKEN_POUND = 'pound';
+const LOG_TOKEN_ELEPHANT = 'elephant';
 const LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
 const LOG_TOKEN_FAMILY_MEMBER = 'familyMember'
 const LOG_TOKEN_ICON = 'icon';
@@ -38,6 +39,8 @@ const getTokenDiv = ({
     case LOG_TOKEN_ICON:
     case LOG_TOKEN_ENTERPRISE_ICON:
       return tplLogTokenIcon(value);
+    case LOG_TOKEN_ELEPHANT:
+      return tplLogTokenElephant();
     case LOG_TOKEN_FAMILY_MEMBER:
       const [familyId, number] = value.split(':');
       return createFamilyMember(familyId, Number(number), [CLASS_LOG_TOKEN]).outerHTML;

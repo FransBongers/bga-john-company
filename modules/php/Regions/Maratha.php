@@ -21,5 +21,17 @@ class Maratha extends \Bga\Games\JohnCompany\Models\Region
       ORDER_MARATHA_2,
       ORDER_MARATHA_3,
     ];
+    $this->adjacentRegionBorderMap = [
+      BENGAL => BENGAL_MARATHA_BORDER,
+      DELHI => DELHI_MARATHA_BORDER,
+      HYDERABAD => HYDERABAD_MARATHA_BORDER,
+      BOMBAY => BOMBAY_MARATHA_BORDER,
+    ];
+    $this->shapeAdjacentRegionMap = [
+      TRIANGLE => BENGAL,
+      CIRCLE => BOMBAY,
+      SQUARE => DELHI,
+    ];
+    $this->adjacentRegionsInClockwiseOrder = [HYDERABAD, BOMBAY, DELHI, BENGAL];
   }
 }

@@ -243,6 +243,17 @@ class Notifications
     ]);
   }
 
+  public static function changeOrderStatusByGame($order, $status)
+  {
+    $text = $status === OPEN ? clienttranslate('An order in ${tkn_boldText_region} is opened') : clienttranslate('An order in ${tkn_boldText_region} is closed');
+
+    self::notifyAll('changeOrderStatus', $text, [
+      'tkn_boldText_region' => Regions::get($order->getLocation())->getName(),
+      'order' => $order->jsonSerialize(),
+      'i18n' => ['tkn_boldText_region'],
+    ]);
+  }
+
   public static function companyOperationChairman($player, $companyDebt, $debtIncreased, $updatedTreasuries, $companyBalance)
   {
     $text = clienttranslate('${player_name} increases Company Debt to ${tkn_boldText_debtValue} and allocates funds to office treasuries');
@@ -281,6 +292,33 @@ class Notifications
       'cardIds' => $cardIds,
       'lastCard' => $lastCard,
     ]);
+  }
+
+  public static function elephantMarch($elephant)
+  {
+    $location = $elephant[LOCATION];
+    $text = clienttranslate('The ${tkn_elephant} marches');
+    $args = [
+      'tkn_elephant' => 'Elephant',
+      LOCATION => $elephant[LOCATION],
+      FACING => $elephant[FACING],
+    ];
+
+    $regions = Regions::getAll();
+
+    if (in_array($location, REGIONS)) {
+      $text = clienttranslate('The ${tkn_elephant} marches to {tkn_boldText_region}');
+      $args['tkn_boldText_region'] = $regions[$location]->getName();
+      $args['i18n'] = ['tkn_boldText_region'];
+    } else {
+      $text = clienttranslate('The ${tkn_elephant} marches to the border between ${tkn_boldText_region1} and ${tkn_boldText_region2} and points towards ${tkn_boldText_region3}');
+      $args['tkn_boldText_region1'] = $regions[BORDERS_CONNECTED_REGIONS_MAP[$location][0]]->getName();
+      $args['tkn_boldText_region2'] = $regions[BORDERS_CONNECTED_REGIONS_MAP[$location][1]]->getName();
+      $args['tkn_boldText_region3'] = $regions[$elephant[FACING]]->getName();
+      $args['i18n'] = ['tkn_boldText_region1', 'tkn_boldText_region2', 'tkn_boldText_region3'];
+    }
+
+    self::notifyAll('elephantMarch', $text, $args);
   }
 
   public static function emergencyLoans($companyDebt, $numberOfEmergencyLoans, $remainingExpenses)
@@ -575,6 +613,15 @@ class Notifications
     ]);
   }
 
+  public static function removeUnrest($region)
+  {
+    self::notifyAll('updateUnrest', clienttranslate('All unrest in ${tkn_boldText_region} is removed'), [
+      'tkn_boldText_region' => $region->getName(),
+      'regionId' => $region->getId(),
+      'unrest' => $region->getUnrest(),
+    ]);
+  }
+
   public static function seekShare($player, $familyMember, $amount)
   {
     self::notifyAll('seekShare', clienttranslate('${player_name} pays ${amount} ${tkn_pound} to seek a ${tkn_icon}'), [
@@ -620,6 +667,24 @@ class Notifications
       'player' => $player,
       'setupCardsLog' => $setupCardsLog,
       'tkn_newLine' => '',
+    ]);
+  }
+
+  public static function updateTowerLevel($region, $change)
+  {
+    $text = '';
+    if ($change === 1) {
+      $text = clienttranslate('A tower level is added to ${tkn_boldText_region}');
+    } else if ($change > 0) {
+    } else if ($change === -1) {
+    } else if ($change < 0) {
+    }
+
+    self::notifyAll('updateTowerLevel', $text, [
+      'regionId' => $region->getId(),
+      'strength' => $region->getStrength(),
+      'tkn_boldText_region' => $region->getName(),
+      'i18n' => ['tkn_boldText_region']
     ]);
   }
 }

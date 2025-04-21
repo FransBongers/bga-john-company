@@ -22,5 +22,18 @@ class Bombay extends \Bga\Games\JohnCompany\Models\Region
       ORDER_BOMBAY_2,
       ORDER_BOMBAY_3
     ];
+    $this->adjacentRegionBorderMap = [
+      DELHI => BOMBAY_DELHI_BORDER,
+      HYDERABAD => BOMBAY_HYDERABAD_BORDER,
+      MARATHA => BOMBAY_MARATHA_BORDER,
+      MYSORE => BOMBAY_MYSORE_BORDER,
+      PUNJAB => BOMBAY_PUNJAB_BORDER,
+    ];
+    $this->shapeAdjacentRegionMap = [
+      TRIANGLE => PUNJAB,
+      CIRCLE => MARATHA,
+      SQUARE => HYDERABAD,
+    ];
+    $this->adjacentRegionsInClockwiseOrder = [PUNJAB, DELHI, MARATHA, HYDERABAD, MYSORE];
   }
 }

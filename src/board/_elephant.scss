@@ -1,0 +1,217 @@
+.joco_elephant,
+#joco-elephant {
+  position: absolute;
+  background-image: url('img/elephant.svg');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  height: calc(var(--tokenScale) * 51px);
+  width: calc(var(--tokenScale) * 60px);
+  transition: transform 500ms ease-in-out, top 500ms ease-in-out, left 500ms ease-in-out;
+}
+
+#joco-elephant[data-location="Bengal"] {
+  top: calc(var(--tokenScale) * 60px);
+  left: calc(var(--tokenScale) * 1291px);
+  transform: scaleX(-1);
+}
+
+#joco-elephant[data-location="Bombay"] {
+  top: calc(var(--tokenScale) * 143px);
+  left: calc(var(--tokenScale) * 900px);
+}
+
+#joco-elephant[data-location="Delhi"] {
+  top: calc(var(--tokenScale) * 2px);
+  left: calc(var(--tokenScale) * 1117px);
+}
+
+#joco-elephant[data-location="Hyderabad"] {
+  top: calc(var(--tokenScale) * 255px);
+  left: calc(var(--tokenScale) * 1092px);
+  transform: scaleX(-1);
+}
+
+#joco-elephant[data-location="Madras"] {
+  top: calc(var(--tokenScale) * 366px);
+  left: calc(var(--tokenScale) * 1100px);
+}
+
+#joco-elephant[data-location="Maratha"] {
+  top: calc(var(--tokenScale) * 168px);
+  left: calc(var(--tokenScale) * 1167px);
+  transform: scaleX(-1);
+}
+
+#joco-elephant[data-location="Mysore"] {
+  top: calc(var(--tokenScale) * 451px);
+  left: calc(var(--tokenScale) * 1022px);
+}
+
+#joco-elephant[data-location="Punjab"] {
+  top: calc(var(--tokenScale) * 2px);
+  left: calc(var(--tokenScale) * 874px);
+}
+
+#joco-elephant[data-location="Bengal_Delhi_border"][data-facing="Bengal"] {
+  top: calc(var(--tokenScale) * 44px);
+  left: calc(var(--tokenScale) * 1240px);
+  transform: rotate(7deg);
+}
+
+#joco-elephant[data-location="Bengal_Delhi_border"][data-facing="Delhi"] {
+  top: calc(var(--tokenScale) * 50px);
+  left: calc(var(--tokenScale) * 1236px);
+  transform: scaleX(-1) rotate(-38deg);
+}
+
+#joco-elephant[data-location="Bengal_Maratha_border"][data-facing="Bengal"] {
+  top: calc(var(--tokenScale) * 164px);
+  left: calc(var(--tokenScale) * 1288px);
+  transform: rotate(-56deg);
+}
+
+#joco-elephant[data-location="Bengal_Maratha_border"][data-facing="Maratha"] {
+  top: calc(var(--tokenScale) * 164px);
+  left: calc(var(--tokenScale) * 1288px);
+  transform: scaleX(-1) rotate(31deg);
+}
+
+#joco-elephant[data-location="Bombay_Delhi_border"][data-facing="Bombay"] {
+  top: calc(var(--tokenScale) * 83px);
+  left: calc(var(--tokenScale) * 986px);
+  transform:  scaleX(-1) rotate(34deg);
+}
+
+#joco-elephant[data-location="Bombay_Delhi_border"][data-facing="Delhi"] {
+  top: calc(var(--tokenScale) * 83px);
+  left: calc(var(--tokenScale) * 986px);
+  transform: rotate(-56deg);
+}
+
+#joco-elephant[data-location="Bombay_Hyderabad_border"][data-facing="Bombay"] {
+  top: calc(var(--tokenScale) * 235px);
+  left: calc(var(--tokenScale) * 999px);
+  transform: scaleX(-1) rotate(-24deg);
+}
+
+#joco-elephant[data-location="Bombay_Hyderabad_border"][data-facing="Hyderabad"] {
+  top: calc(var(--tokenScale) * 229px);
+  left: calc(var(--tokenScale) * 991px);
+  transform: rotate(4deg);
+}
+
+#joco-elephant[data-location="Bombay_Maratha_border"][data-facing="Bombay"] {
+  top: calc(var(--tokenScale) * 123px);
+  left: calc(var(--tokenScale) * 1004px);
+  transform: scaleX(-1) rotate(-4deg);
+}
+
+#joco-elephant[data-location="Bombay_Maratha_border"][data-facing="Maratha"] {
+  top: calc(var(--tokenScale) * 123px);
+  left: calc(var(--tokenScale) * 1004px);
+  transform: rotate(-4deg);
+}
+
+#joco-elephant[data-location="Bombay_Mysore_border"][data-facing="Bombay"] {
+  top: calc(var(--tokenScale) * 333px);
+  left: calc(var(--tokenScale) * 969px);
+  transform: scaleX(-1) rotate(-77deg);
+}
+
+#joco-elephant[data-location="Bombay_Mysore_border"][data-facing="Mysore"] {
+  top: calc(var(--tokenScale) * 315px);
+  left: calc(var(--tokenScale) * 975px);
+  transform: rotate(40deg);
+}
+
+#joco-elephant[data-location="Bombay_Punjab_border"][data-facing="Bombay"] {
+  top: calc(var(--tokenScale) * 72px);
+  left: calc(var(--tokenScale) * 874px);
+  transform: rotate(45deg);
+}
+
+#joco-elephant[data-location="Bombay_Punjab_border"][data-facing="Punjab"] {
+  top: calc(var(--tokenScale) * 82px);
+  left: calc(var(--tokenScale) * 874px);
+  transform: scaleX(-1) rotate(-77deg);
+}
+
+#joco-elephant[data-location="Delhi_Maratha_border"][data-facing="Delhi"] {
+  top: calc(var(--tokenScale) * 68px);
+  left: calc(var(--tokenScale) * 1124px);
+  transform: scaleX(-1) rotate(-75deg);
+}
+
+#joco-elephant[data-location="Delhi_Maratha_border"][data-facing="Maratha"] {
+  top: calc(var(--tokenScale) * 81px);
+  left: calc(var(--tokenScale) * 1059px);
+  transform: scaleX(-1) rotate(41deg);
+}
+
+#joco-elephant[data-location="Delhi_Punjab_border"][data-facing="Delhi"] {
+  top: calc(var(--tokenScale) * 6px);
+  left: calc(var(--tokenScale) * 974px);
+  transform: rotate(22deg);
+}
+
+#joco-elephant[data-location="Delhi_Punjab_border"][data-facing="Punjab"] {
+  top: calc(var(--tokenScale) * 2px);
+  left: calc(var(--tokenScale) * 977px);
+  transform: scaleX(-1) rotate(-36deg);
+}
+
+#joco-elephant[data-location="Hyderabad_Madras_border"][data-facing="Hyderabad"] {
+  top: calc(var(--tokenScale) * 345px);
+  left: calc(var(--tokenScale) * 1092px);
+  transform: rotate(-78deg);
+}
+
+#joco-elephant[data-location="Hyderabad_Madras_border"][data-facing="Madras"] {
+  top: calc(var(--tokenScale) * 343px);
+  left: calc(var(--tokenScale) * 1094px);
+  transform: scaleX(-1) rotate(52deg);
+}
+
+#joco-elephant[data-location="Hyderabad_Maratha_border"][data-facing="Hyderabad"] {
+  top: calc(var(--tokenScale) * 229px);
+  left: calc(var(--tokenScale) * 1122px);
+  transform: scaleX(-1) rotate(23deg);
+}
+
+#joco-elephant[data-location="Hyderabad_Maratha_border"][data-facing="Maratha"] {
+  top: calc(var(--tokenScale) * 229px);
+  left: calc(var(--tokenScale) * 1115px);
+  transform: rotate(-56deg);
+}
+
+#joco-elephant[data-location="Hyderabad_Mysore_border"][data-facing="Hyderabad"] {
+  top: calc(var(--tokenScale) * 324px);
+  left: calc(var(--tokenScale) * 1044px);
+  transform: rotate(-44deg);
+}
+
+#joco-elephant[data-location="Hyderabad_Mysore_border"][data-facing="Mysore"] {
+  top: calc(var(--tokenScale) * 317px);
+  left: calc(var(--tokenScale) * 1044px);
+  transform: scaleX(-1) rotate(32deg);
+}
+
+#joco-elephant[data-location="Madras_Mysore_border"][data-facing="Madras"] {
+  top: calc(var(--tokenScale) * 451px);
+  left: calc(var(--tokenScale) * 1059px);
+}
+
+#joco-elephant[data-location="Madras_Mysore_border"][data-facing="Mysore"] {
+  top: calc(var(--tokenScale) * 456px);
+  left: calc(var(--tokenScale) * 1059px);
+  transform: scaleX(-1);
+}
+
+
+
+
+
+
+
+
+

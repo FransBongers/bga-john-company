@@ -19,5 +19,16 @@ class Mysore extends \Bga\Games\JohnCompany\Models\Region
       ORDER_MYSORE_1,
       ORDER_MYSORE_2,
     ];
+    $this->adjacentRegionBorderMap = [
+      BOMBAY => BOMBAY_MYSORE_BORDER,
+      HYDERABAD => HYDERABAD_MYSORE_BORDER,
+      MADRAS => MADRAS_MYSORE_BORDER,
+    ];
+    $this->shapeAdjacentRegionMap = [
+      TRIANGLE => HYDERABAD,
+      CIRCLE => BOMBAY,
+      SQUARE => MADRAS,
+    ];
+    $this->adjacentRegionsInClockwiseOrder = [BOMBAY, HYDERABAD, MADRAS];
   }
 }

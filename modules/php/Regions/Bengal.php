@@ -19,5 +19,15 @@ class Bengal extends \Bga\Games\JohnCompany\Models\Region
       ORDER_BENGAL_1,
       ORDER_BENGAL_2,
     ];
+    $this->adjacentRegionBorderMap = [
+      DELHI => BENGAL_DELHI_BORDER,
+      MARATHA => BENGAL_MARATHA_BORDER,
+    ];
+    $this->shapeAdjacentRegionMap = [
+      TRIANGLE => DELHI,
+      SQUARE => DELHI,
+      CIRCLE => MARATHA,
+    ];
+    $this->adjacentRegionsInClockwiseOrder = [DELHI, MARATHA];
   }
 }
