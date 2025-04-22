@@ -58,9 +58,10 @@ trait DebugTrait
     // ArmyPieces::get('Regiment_16')->setLocation(Locations::armyOf(BENGAL));
     // ArmyPieces::get('Regiment_6')->setLocation(Locations::armyOf(MADRAS));
     // EventTiles::setupNewGame();
-    
+    // Globals::setCascadedRegions([]);
     // Elephant::setupNewGame();
-    Notifications::log('result', Regions::get(MARATHA)->getOrders());
+    // Notifications::log('result', Regions::get(MARATHA)->getOrders());
+    Regions::get(PUNJAB)->closeNorthernMostOpenOrder();
   }
 
 

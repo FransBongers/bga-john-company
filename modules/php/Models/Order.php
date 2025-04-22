@@ -3,6 +3,7 @@
 namespace Bga\Games\JohnCompany\Models;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Regions;
 
 class Order extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
@@ -64,10 +65,27 @@ class Order extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implemen
     return $this->regionId;
   }
 
-  public function close($player)
+  public function isClosed()
   {
+    return $this->status === CLOSED;
+  }
+
+  public function close($player = null)
+  {
+    if ($this->status === FILLED_BY_WRITER) {
+      $writers = FamilyMembers::getInLocation($this->id);
+      // Note should always only be one writer
+      foreach($writers as $writer) {
+        $writer->returnToSupply();
+      }
+    }
     $this->setStatus(CLOSED);
-    Notifications::changeOrderStatus($player, $this, CLOSED);
+    if ($player === null) {
+      Notifications::changeOrderStatusByGame($this, CLOSED);
+    } else {
+      Notifications::changeOrderStatus($player, $this, CLOSED);
+    }
+    
   }
 
   public function fill($player, $familyMember = null)

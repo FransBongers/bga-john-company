@@ -27,6 +27,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     'draftSetup' => 'bool',
     // Other
     // 'activePlayerId' => 'int',
+    'cascadedRegions' => 'obj',
     'company' => 'obj',
     'crown' => 'obj',
     'deregulation' => 'bool',
@@ -161,6 +162,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
    */
   public static function setupNewGame($players, $options)
   {
+    self::setCascadedRegions([]);
     self::setPhase(SETUP);
     self::setCrownInGame(count($players) <= 2);
     self::setCrown([]);

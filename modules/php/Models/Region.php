@@ -2,6 +2,7 @@
 
 namespace Bga\Games\JohnCompany\Models;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Managers\Orders;
@@ -120,5 +121,60 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     }
     $this->setUnrest(0);
     Notifications::removeUnrest($this);
+  }
+
+  public function cascade()
+  {
+    $cascadedRegions = Globals::getCascadedRegions();
+    if (in_array($this->id, $cascadedRegions)) {
+      // Region already cascaded
+      return;
+    }
+    Notifications::message(clienttranslate('A Cascade occurs in ${tkn_boldText_region}'), [
+      'tkn_boldText_region' => $this->getName(),
+      'i18n' => ['tkn_boldText_region'],
+    ]);
+    $cascadedRegions[] = $this->id;
+    Globals::setCascadedRegions($cascadedRegions);
+
+    $orders = Orders::getAll();
+
+    foreach($this->orderIds as $orderId) {
+      $connectedOrders = $orders[$orderId]->getConnectedOrders();
+      foreach($connectedOrders as $connectedOrderId) {
+        if (in_array($connectedOrderId, $this->orderIds)) {
+          // Order is connected order in the same region;
+          continue;
+        }
+
+        $connectedOrder = $orders[$connectedOrderId];
+        if ($connectedOrder->isClosed()) {
+          $region = $connectedOrder->getRegion();
+          $region->closeNorthernMostOpenOrder();
+        } else {
+          $connectedOrder->close();
+        }
+      }
+    }
+  }
+
+  public function closeNorthernMostOpenOrder()
+  {
+    // Order ids for each region are listed from north to south
+    $orders = Orders::getMany($this->orderIds);
+
+    $orderClosed = false;
+    foreach($orders as $orderId => $order) {
+      if ($order->isClosed()) {
+        continue;
+      }
+      $order->close();
+      $orderClosed = true;
+      break;
+    }
+
+    if (!$orderClosed) {
+      $this->cascade();
+    }
   }
 }
