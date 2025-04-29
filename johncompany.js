@@ -156,6 +156,11 @@ var PUNJAB = 'Punjab';
 var BENGAL_PRESIDENCY = 'BengalPresidency';
 var BOMBAY_PRESIDENCY = 'BombayPresidency';
 var MADRAS_PRESIDENCY = 'MadrasPresidency';
+var PRESIDENCIES = [
+    BENGAL_PRESIDENCY,
+    BOMBAY_PRESIDENCY,
+    MADRAS_PRESIDENCY,
+];
 var BENGAL_WRITERS = 'Writers_Bengal';
 var BOMBAY_WRITERS = 'Writers_Bombay';
 var MADRAS_WRITERS = 'Writers_Madras';
@@ -909,8 +914,7 @@ var NotificationManager = (function () {
             'setCrownClimate',
             'setupDone',
             'setupFamilyMembers',
-            'updateTowerLevel',
-            'updateUnrest',
+            'updateRegion',
         ];
         notifs.forEach(function (notifName) {
             _this.subscriptions.push(dojo.subscribe(notifName, _this, function (notifDetails) {
@@ -1498,22 +1502,12 @@ var NotificationManager = (function () {
             });
         });
     };
-    NotificationManager.prototype.notif_updateTowerLevel = function (notif) {
+    NotificationManager.prototype.notif_updateRegion = function (notif) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, regionId, strength;
-            return __generator(this, function (_b) {
-                _a = notif.args, regionId = _a.regionId, strength = _a.strength;
-                Board.getInstance().regions[regionId].updateStrength(strength);
-                return [2];
-            });
-        });
-    };
-    NotificationManager.prototype.notif_updateUnrest = function (notif) {
-        return __awaiter(this, void 0, void 0, function () {
-            var _a, regionId, unrest;
-            return __generator(this, function (_b) {
-                _a = notif.args, regionId = _a.regionId, unrest = _a.unrest;
-                Board.getInstance().regions[regionId].updateUnrest(unrest);
+            var region;
+            return __generator(this, function (_a) {
+                region = notif.args.region;
+                Board.getInstance().regions[region.id].update(region);
                 return [2];
             });
         });
@@ -1668,6 +1662,7 @@ var JohnCompany = (function () {
             DirectorOfTradeTransfers: DirectorOfTradeTransfers,
             DraftCard: DraftCard,
             EnlistWriter: EnlistWriter,
+            EventsInIndiaCrisisDefense: EventsInIndiaCrisisDefense,
             FamilyAction: FamilyAction,
             ManagerOfShipping: ManagerOfShipping,
             MilitaryAffairsAssign: MilitaryAffairsAssign,
@@ -2927,6 +2922,7 @@ var Region = (function () {
     function Region(id, game, data) {
         this.id = id;
         this.game = game;
+        this.data = data;
         this.setup(data);
     }
     Region.prototype.setup = function (data) {
@@ -2935,8 +2931,14 @@ var Region = (function () {
         elt.style.bottom = "calc(var(--boardScale) * ".concat(towerConfig[data.id].bottom, "px)");
         elt.style.left = "calc(var(--boardScale) * ".concat(towerConfig[data.id].left, "px)");
         var towerTop = document.createElement('div');
-        towerTop.classList.add('joco_tower_top');
+        towerTop.classList.add('joco-tower-top');
         elt.appendChild(towerTop);
+        var flagElt = document.createElement('div');
+        flagElt.classList.add('joco-tower-flag');
+        towerTop.appendChild(flagElt);
+        var spanWithStar = document.createElement('span');
+        flagElt.appendChild(spanWithStar);
+        spanWithStar.innerText = '*';
         for (var i = 0; i < 6; i++) {
             var towerLevel = document.createElement('div');
             towerLevel.classList.add('joco_tower_level');
@@ -2944,8 +2946,37 @@ var Region = (function () {
         }
         document.getElementById('joco_towers').appendChild(elt);
         this.updateStrength(data.strength);
+        this.updateCapital(data.isCapital);
+        this.updateEmpire(data.isCapital, data.control);
+    };
+    Region.prototype.update = function (region) {
+        if (this.data.strength !== region.strength) {
+            this.updateStrength(region.strength);
+        }
+        if (this.data.isCapital !== region.isCapital) {
+            this.updateCapital(region.isCapital);
+        }
+        if (this.data.control !== region.control) {
+            this.updateEmpire(region.isCapital, region.control);
+        }
+    };
+    Region.prototype.updateCapital = function (isCapital) {
+        this.data.isCapital = isCapital;
+        this.tower.children[0].setAttribute('data-capital', isCapital ? 'true' : 'false');
+        if (isCapital) {
+            this.updateEmpire(isCapital, null);
+        }
+    };
+    Region.prototype.updateEmpire = function (isCapital, control) {
+        this.data.control = control;
+        var isPartOfEmpire = isCapital || (control !== null && !PRESIDENCIES.includes(control));
+        this.tower.children[0].setAttribute('data-empire', isPartOfEmpire ? 'true' : 'false');
+        if (isPartOfEmpire) {
+            this.tower.children[0].setAttribute('data-empire-id', isCapital ? this.id : control);
+        }
     };
     Region.prototype.updateStrength = function (value) {
+        this.data.strength = value;
         var children = this.tower.children;
         for (var i = 0; i < children.length; i++) {
             var child = children[i];
@@ -2958,6 +2989,7 @@ var Region = (function () {
         }
     };
     Region.prototype.updateUnrest = function (value) {
+        this.data.unrest = value;
     };
     return Region;
 }());
@@ -4164,6 +4196,40 @@ var EnlistWriter = (function () {
         addCancelButton();
     };
     return EnlistWriter;
+}());
+var EventsInIndiaCrisisDefense = (function () {
+    function EventsInIndiaCrisisDefense(game) {
+        this.game = game;
+    }
+    EventsInIndiaCrisisDefense.create = function (game) {
+        EventsInIndiaCrisisDefense.instance = new EventsInIndiaCrisisDefense(game);
+    };
+    EventsInIndiaCrisisDefense.getInstance = function () {
+        return EventsInIndiaCrisisDefense.instance;
+    };
+    EventsInIndiaCrisisDefense.prototype.onEnteringState = function (args) {
+        debug('Entering EventsInIndiaCrisisDefense state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    };
+    EventsInIndiaCrisisDefense.prototype.onLeavingState = function () {
+        debug('Leaving EventsInIndiaCrisisDefense state');
+    };
+    EventsInIndiaCrisisDefense.prototype.setDescription = function (activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} may exhaust defenders'), {
+            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        }, true);
+    };
+    EventsInIndiaCrisisDefense.prototype.updateInterfaceInitialStep = function () {
+        this.game.clearPossible();
+        updatePageTitle(_('${you} must meet Parliament'));
+        var board = Board.getInstance();
+    };
+    EventsInIndiaCrisisDefense.prototype.updateInterfaceConfirm = function () {
+        clearPossible();
+        updatePageTitle(_('Assign officers?'));
+    };
+    return EventsInIndiaCrisisDefense;
 }());
 var FamilyAction = (function () {
     function FamilyAction(game) {

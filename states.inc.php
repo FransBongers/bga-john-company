@@ -103,7 +103,7 @@ $machinestates = [
         'name' => 'resolveStack',
         'type' => 'game',
         'action' => 'stResolveStack',
-        'transitions' => [],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
     ST_CONFIRM_TURN => [
@@ -457,6 +457,16 @@ $machinestates = [
         'transitions' => [],
     ],
 
+    ST_EVENTS_IN_INDIA_CRISIS_DEFENSE => [
+        'name' => EVENTS_IN_INDIA_CRISIS_DEFENSE,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . EVENTS_IN_INDIA_CRISIS_DEFENSE, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
 
     ST_PARLIAMENT_MEETS => [
         'name' => PARLIAMENT_MEETS,
@@ -467,5 +477,21 @@ $machinestates = [
         'action' => 'stAtomicAction',
         'possibleactions' => ['act' . PARLIAMENT_MEETS, 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_FOREIGN_INVASION => [
+        'name' => FOREIGN_INVASION,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_FOREIGN_INVASION_END => [
+        'name' => FOREIGN_INVASION_END,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
     ],
 ];

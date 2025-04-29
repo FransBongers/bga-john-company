@@ -3,6 +3,7 @@
 namespace Bga\Games\JohnCompany\Managers;
 
 use Bga\GameFramework\Notify;
+use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
@@ -64,6 +65,7 @@ class Regions extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     $scenarioData = Scenarios::get()->getRegions();
 
     $regions = [];
+    $empires = [];
     foreach (REGIONS as $regionId) {
 
       $regions[$regionId] = [
@@ -72,10 +74,29 @@ class Regions extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
         'strength' => $scenarioData[$regionId]['strength'],
         'control' => isset($scenarioData[$regionId]['control']) ? $scenarioData[$regionId]['control'] : null,
       ];
+
+      if (isset($scenarioData[$regionId]['isCapital']) && $scenarioData[$regionId]['isCapital']) {
+        $empires[] = $regionId;
+      }
     }
 
-    Notifications::log('regions', $regions);
-
     self::create($regions, null);
+
+    for ($i = 0; $i < 3; $i++) {
+      if (!isset($empires[$i])) {
+        $empires[$i] = null;
+      }
+    }
+    Globals::setEmpires($empires);
   }
+
+  // .##.....##.########.####.##.......####.########.##....##
+  // .##.....##....##.....##..##........##.....##.....##..##.
+  // .##.....##....##.....##..##........##.....##......####..
+  // .##.....##....##.....##..##........##.....##.......##...
+  // .##.....##....##.....##..##........##.....##.......##...
+  // .##.....##....##.....##..##........##.....##.......##...
+  // ..#######.....##....####.########.####....##.......##...
+
+
 }

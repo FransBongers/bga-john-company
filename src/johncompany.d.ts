@@ -195,7 +195,8 @@ interface JocoRegionBase {
   control: string | null;
   looted: boolean;
   strength: number;
-  untest: number;
+  unrest: number;
+  isCapital: boolean;
 }
 
 interface JocoRegionStatic {

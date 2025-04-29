@@ -4,8 +4,12 @@ namespace Bga\Games\JohnCompany\Models;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
+use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Orders;
+use Bga\Games\JohnCompany\Managers\Regions;
 
 class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
 {
@@ -59,6 +63,7 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     unset($data['state']);
     unset($data['location']);
     $data['looted'] = $this->looted === 1;
+    $data['isCapital'] = in_array($this->id, Globals::getEmpires());
     return $data;
   }
 
@@ -67,8 +72,23 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     return $this->jsonSerialize(); // Static datas are already in js file
   }
 
+  public function becomePartOfEmpire($capitalRegion)
+  {
+    $this->setControl($capitalRegion->getId());
+    Notifications::regionBecomesPartOfEmpire($this, $capitalRegion);
+  }
+
+  public function becomeSovereign()
+  {
+    $this->setControl(null);
+    Notifications::regionBecomesSovereign($this);
+  }
+
   public function incTowerLevel($change)
   {
+    if ($this->strength === 0 && $change < 0) {
+      return;
+    }
     $this->incStrength($change);
     Notifications::updateTowerLevel($this, $change);
   }
@@ -104,6 +124,11 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     });
   }
 
+  public function isCapital()
+  {
+    return in_array($this->id, Globals::getEmpires());
+  }
+
   public function isCompanyControlled()
   {
     return in_array($this->control, PRESIDENCIES);
@@ -112,6 +137,11 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   public function isDominatedByRegion()
   {
     return in_array($this->control, REGIONS);
+  }
+
+  public function isSovereign()
+  {
+    return $this->control === null;
   }
 
   public function removeUnrest()
@@ -158,6 +188,24 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     }
   }
 
+  public function closeAllOrders()
+  {
+    $orders = Orders::getMany($this->orderIds);
+
+    $orderClosed = false;
+    foreach($orders as $orderId => $order) {
+      if ($order->isClosed()) {
+        continue;
+      }
+      $order->close();
+      $orderClosed = true;
+    }
+
+    if (!$orderClosed) {
+      $this->cascade();
+    }
+  }
+
   public function closeNorthernMostOpenOrder()
   {
     // Order ids for each region are listed from north to south
@@ -175,6 +223,66 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
 
     if (!$orderClosed) {
       $this->cascade();
+    }
+  }
+
+  public function formEmpire()
+  {
+    $empires = Globals::getEmpires();
+    $empireCreated = false;
+    for($i = 0; $i < count($empires); $i++) {
+      if ($empires[$i] !== null) {
+        continue;
+      }
+
+      $empires[$i] = $this->getId();
+      $empireCreated = true;
+      Globals::setEmpires($empires);
+      break;
+    }
+
+    if ($empireCreated) {
+      Notifications::formEmpire($this);
+    } else {
+      Notifications::message(clienttranslate('A new empire cannot be formed'));
+    }
+    return $empireCreated;
+  }
+
+  /**
+   * @return FamilyMember
+   */
+  public function getActingCommander()
+  {
+    $presidency = $this->getControl();
+    $familyMembers = FamilyMembers::getInLocation(Locations::commander(PRESIDENCY_HOME_REGION_MAP[$presidency]))->toArray();
+    // Should always only be 1
+    if (count($familyMembers) > 0) {
+      return $familyMembers[0];
+    }
+    $militaryAffairs = Offices::get(MILITARY_AFFAIRS)->getFamilyMember();
+    if ($militaryAffairs !== null) {
+      return $militaryAffairs;
+    }
+    return Offices::get(CHAIRMAN)->getFamilyMember();
+  }
+
+  public function shatterEmpire()
+  {
+    Notifications::shatterEmpire($this);
+
+    $empires = Globals::getEmpires();
+    $index = Utils::array_find_index($empires, function ($regionId) {
+      return $regionId === $this->getId();
+    });
+    $empires[$index] = null;
+    Globals::setEmpires($empires);
+
+    $regions = Regions::getAll();
+    foreach($regions as $region) {
+      if ($region->getControl() === $this->getId()) {
+        $region->becomeSovereign();
+      }
     }
   }
 }

@@ -32,6 +32,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     'crown' => 'obj',
     'deregulation' => 'bool',
     'elephant' => 'obj',
+    'empires' => 'obj',
     'phase' => 'str',
     'turn' => 'int',
     'options' => 'obj',
@@ -174,6 +175,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
       POWER_TOKEN_SHIPPING,
       POWER_TOKEN_MANUFACTURING,
     ]);
+    self::setEmpires([null, null, null]);
     // 
     // Game options - Note game option values are always a string
     self::setScenarioId(SCENARIO_OPTION_SCENARIO_ID_MAP[intval($options[OPTION_SCENARIO])]);

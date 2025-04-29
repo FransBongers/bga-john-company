@@ -32,7 +32,8 @@ class The1710Scenario extends \Bga\Games\JohnCompany\Models\Scenario
         'strength' => 1
       ],
       DELHI => [
-        'strength' => 1
+        'strength' => 1,
+        'isCapital' => 1,
       ],
       HYDERABAD => [
         'strength' => 1

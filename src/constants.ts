@@ -218,6 +218,12 @@ const BENGAL_PRESIDENCY = 'BengalPresidency';
 const BOMBAY_PRESIDENCY = 'BombayPresidency';
 const MADRAS_PRESIDENCY = 'MadrasPresidency';
 
+const PRESIDENCIES = [
+  BENGAL_PRESIDENCY,
+  BOMBAY_PRESIDENCY,
+  MADRAS_PRESIDENCY,
+];
+
 const BENGAL_WRITERS = 'Writers_Bengal';
 const BOMBAY_WRITERS = 'Writers_Bombay';
 const MADRAS_WRITERS = 'Writers_Madras';

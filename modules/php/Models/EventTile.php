@@ -42,7 +42,7 @@ class EventTile extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
 
   public function resolveEvent($regionId)
   {
-    Notifications::message('Resolve ${title} in ${regionId}', [
+    Notifications::message('Resolve ${title}. Top of draw stack shows ${regionId}', [
       'title' => $this->title,
       'regionId' => $regionId
     ]);

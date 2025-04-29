@@ -113,4 +113,9 @@ class Elephant
 
     Notifications::elephantMarch(self::get());
   }
+
+  public static function isOnBorder()
+  {
+    return in_array(self::getLocation(), BORDERS);
+  }
 }

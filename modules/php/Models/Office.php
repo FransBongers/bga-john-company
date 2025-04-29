@@ -67,6 +67,14 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     return $player === null ? null : $player->getId();
   }
 
+  public function getFamilyMember()
+  {
+    if ($this->familyMemberId === null) {
+      return null;
+    }
+    return FamilyMembers::get($this->familyMemberId);
+  }
+
   public function getFamilyId()
   {
     if ($this->familyMemberId === null) {

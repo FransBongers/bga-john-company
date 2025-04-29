@@ -80,15 +80,20 @@ const ST_REVENUE_PAY_DIVIDENDS = 65;
 
 const ST_EVENTS_IN_INDIA_STORMS = 70;
 const ST_EVENTS_IN_INDIA_RESOLVE_EVENT = 71;
+const ST_EVENTS_IN_INDIA_CRISIS_DEFENSE = 73;
+const ST_FOREIGN_INVASION = 74;
+const ST_FOREIGN_INVASION_END = 75;
 
-const ST_PARLIAMENT_MEETS = 75;
+const ST_PARLIAMENT_MEETS = 80;
 
 const BONUSES = 'Bonuses';
 const DRAFT_CARD = 'DraftCard';
 const DRAFT_CARD_NEXT_STEP = 'DraftCardNextStep';
+const EVENTS_IN_INDIA_CRISIS_DEFENSE = 'EventsInIndiaCrisisDefense';
 const EVENTS_IN_INDIA_STORMS = 'EventsInIndiaStorms';
 const EVENTS_IN_INDIA_RESOLVE_EVENT = 'EventsInIndiaResolveEvent';
 const FAMILY_ACTION = 'FamilyAction';
+const FOREIGN_INVASION_END = 'ForeignInvasionEnd';
 const NEW_COMPANY_SHARES = 'NewCompanyShares';
 const PARLIAMENT_MEETS = 'ParliamentMeets';
 const PERFORM_SETUP = 'PerformSetup';
@@ -605,10 +610,10 @@ const DONE = 'done';
 /**
  * Event Types
  */
-const FOREIGN_INVASION = 'ForeignInvasion';
+const FOREIGN_INVASION = 'ForeignInvasion'; // Doubles as action name
 const LEADER = 'Leader';
 const PEACE = 'Peace';
-const RESOLVE_CRISIS = 'ResolveCrisis';
+const CRISIS = 'Crisis';
 const SHUFFLE = 'Shuffle';
 const TURMOIL = 'Turmoil';
 const WINDFALL = 'Windfall';

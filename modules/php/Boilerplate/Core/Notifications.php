@@ -273,6 +273,32 @@ class Notifications
     ]);
   }
 
+  public static function crisis($attackerName, $defenderName, $isInvasion)
+  {
+    $text = $isInvasion ?
+      clienttranslate('${tkn_boldText_attacker} invades ${tkn_boldText_defender}') :
+      clienttranslate('${tkn_boldText_attacker} rebels against ${tkn_boldText_defender}');
+
+    Notifications::message($text, [
+      'tkn_boldText_attacker' => $attackerName,
+      'tkn_boldText_defender' => $defenderName,
+      'i18n' => ['tkn_boldText_attacker', 'tkn_boldText_defender'],
+    ]);
+  }
+
+  public static function crisisResult($attackStrength, $defenderStrength)
+  {
+    $text = $attackStrength > $defenderStrength ?
+      clienttranslate('The attack succeeds with a total of ${tkn_boldText_attackerTotal} vs ${tkn_boldText_defenderTotal}') :
+      clienttranslate('The attack fails with a total of ${tkn_boldText_attackerTotal} vs ${tkn_boldText_defenderTotal}');
+
+    Notifications::message($text, [
+      'tkn_boldText_attackerTotal' => $attackStrength,
+      'tkn_boldText_defenderTotal' => $defenderStrength,
+    ]);
+  }
+
+
   public static function draftCard($player, $cards)
   {
     self::notify($player, 'draftCardPrivate', clienttranslate('You draft a card'), [
@@ -373,6 +399,17 @@ class Notifications
     }
 
     self::notifyAll('fillOrder', $text, $args);
+  }
+
+  public static function foreignInvasion($regionName, $strength)
+  {
+    $text = clienttranslate('Foreign Invasion in ${tkn_boldText_defender} with a strength of ${tkn_boldText_strength}');
+
+    Notifications::message($text, [
+      'tkn_boldText_defender' => $regionName,
+      'tkn_boldText_strength' => $strength,
+      'i18n' => ['tkn_boldText_defender'],
+    ]);
   }
 
   public static function gainEnterprise($player, $enterprise)
@@ -527,6 +564,25 @@ class Notifications
     ]);
   }
 
+  public static function regionBecomesPartOfEmpire($region, $capital)
+  {
+    self::notifyAll('updateRegion', clienttranslate('${tkn_boldText_region} becomes part of the ${tkn_boldText_capital} empire'), [
+      'tkn_boldText_region' => $region->getName(),
+      'tkn_boldText_capital' => $capital->getName(),
+      'region' => $region->jsonSerialize(),
+      'i18n' => ['tkn_boldText_region']
+    ]);
+  }
+
+  public static function regionBecomesSovereign($region)
+  {
+    self::notifyAll('updateRegion', clienttranslate('${tkn_boldText_region} becomes sovereign'), [
+      'tkn_boldText_region' => $region->getName(),
+      'region' => $region->jsonSerialize(),
+      'i18n' => ['tkn_boldText_region']
+    ]);
+  }
+
   public static function returnFamilyMemberToSupply($player, $familyMember)
   {
     self::notifyAll('returnFamilyMemberToSupply', clienttranslate('${player_name} return a family member to their supply'), [
@@ -615,10 +671,10 @@ class Notifications
 
   public static function removeUnrest($region)
   {
-    self::notifyAll('updateUnrest', clienttranslate('All unrest in ${tkn_boldText_region} is removed'), [
+    self::notifyAll('updateRegion', clienttranslate('All unrest in ${tkn_boldText_region} is removed'), [
       'tkn_boldText_region' => $region->getName(),
-      'regionId' => $region->getId(),
-      'unrest' => $region->getUnrest(),
+      'region' => $region->jsonSerialize(),
+      'i18n' => ['tkn_boldText_region']
     ]);
   }
 
@@ -670,6 +726,24 @@ class Notifications
     ]);
   }
 
+  public static function formEmpire($region)
+  {
+    self::notifyAll('updateRegion', clienttranslate('The ${tkn_boldText_region} empire is formed'), [
+      'region' => $region->jsonSerialize(),
+      'tkn_boldText_region' => $region->getName(),
+      'i18n' => ['tkn_boldText_region']
+    ]);
+  }
+
+  public static function shatterEmpire($region)
+  {
+    self::notifyAll('updateRegion', clienttranslate('The ${tkn_boldText_region} empire shatters'), [
+      'region' => $region->jsonSerialize(),
+      'tkn_boldText_region' => $region->getName(),
+      'i18n' => ['tkn_boldText_region']
+    ]);
+  }
+
   public static function updateTowerLevel($region, $change)
   {
     $text = '';
@@ -677,12 +751,12 @@ class Notifications
       $text = clienttranslate('A tower level is added to ${tkn_boldText_region}');
     } else if ($change > 0) {
     } else if ($change === -1) {
+      $text = clienttranslate('${tkn_boldText_region} loses a tower level');
     } else if ($change < 0) {
     }
 
-    self::notifyAll('updateTowerLevel', $text, [
-      'regionId' => $region->getId(),
-      'strength' => $region->getStrength(),
+    self::notifyAll('updateRegion', $text, [
+      'region' => $region->jsonSerialize(),
       'tkn_boldText_region' => $region->getName(),
       'i18n' => ['tkn_boldText_region']
     ]);

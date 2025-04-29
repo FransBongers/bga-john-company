@@ -27,6 +27,7 @@ use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\Elephant;
 use Bga\Games\JohnCompany\Managers\EventTiles;
+use Bga\Games\JohnCompany\Managers\ResolveCrisis;
 
 trait DebugTrait
 {
@@ -36,7 +37,7 @@ trait DebugTrait
 
   function debug_test()
   {
-      // Company::setDebt(0);
+    // Company::setDebt(0);
 
     // Orders::get(ORDER_BENGAL_2)->setStatus(FILLED);
     // Orders::setupNewGame();
@@ -60,8 +61,19 @@ trait DebugTrait
     // EventTiles::setupNewGame();
     // Globals::setCascadedRegions([]);
     // Elephant::setupNewGame();
-    // Notifications::log('result', Regions::get(MARATHA)->getOrders());
-    Regions::get(PUNJAB)->closeNorthernMostOpenOrder();
+    // Notifications::log('result', Regions::get(MARATHA));
+    // Regions::get(PUNJAB)->closeNorthernMostOpenOrder();
+    // EventTiles::shuffle(DECK);
+    // Notifications::log('tiles', EventTiles::getInLocationOrdered(DECK)->toArray());
+    // Globals::setEmpires([DELHI, null, null]);
+
+    // Notifications::log('empires', Globals::getEmpires());
+    // $created = Regions::createEmpire(MADRAS);
+    // Notifications::log('created', $created);
+    Notifications::log('defender', ResolveCrisis::getDefenderStrengthInvasion(Regions::getAll(), Regions::get(BENGAL)));
+    // Regions::get(DELHI)->setControl(BENGAL_PRESIDENCY);
+    // EventTiles::insertOnTop('EventTile_18', DECK);
+    // EventTiles::insertOnTop('EventTile_14', DECK);
   }
 
 

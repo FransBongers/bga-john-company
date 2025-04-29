@@ -62,6 +62,7 @@
     "src/states/DirectorOfTradeTransfers.ts",
     "src/states/DraftCard.ts",
     "src/states/EnlistWriter.ts",
+    "src/states/EventsInIndiaCrisisDefense.ts",
     "src/states/FamilyAction.ts",
     "src/states/ManagerOfShipping.ts",
     "src/states/MilitaryAffairsAssign.ts",

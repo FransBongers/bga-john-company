@@ -64,6 +64,7 @@ class JohnCompany implements Game {
     DirectorOfTradeTransfers,
     DraftCard,
     EnlistWriter,
+    EventsInIndiaCrisisDefense,
     FamilyAction,
     ManagerOfShipping,
     MilitaryAffairsAssign,

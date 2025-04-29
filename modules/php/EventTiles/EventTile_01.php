@@ -2,7 +2,7 @@
 
 namespace Bga\Games\JohnCompany\EventTiles;
 
-class EventTile_01 extends \Bga\Games\JohnCompany\EventTiles\ResolveCrisis
+class EventTile_01 extends \Bga\Games\JohnCompany\EventTiles\Crisis
 {
   public function __construct($row)
   {

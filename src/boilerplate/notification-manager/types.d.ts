@@ -139,12 +139,6 @@ interface NotifSetupFamilyMembers extends NotifWithPlayerArgs {
   familyMembers: JocoFamilyMember[];
 }
 
-interface NotifUpdateTowerLevel {
-  regionId: string;
-  strength: number;
-}
-
-interface NotifUpdateUnrest {
-  regionId: string;
-  unrest: number;
+interface NotifUpdateRegion {
+  region: JocoRegionBase;
 }

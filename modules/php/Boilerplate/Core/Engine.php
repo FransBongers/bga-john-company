@@ -124,7 +124,7 @@ class Engine
       Game::get()->gamestate->jumpToState(ST_RESOLVE_STACK);
       // TODO: handle crown
       $activePlayerIds = $node->getInfo()['activePlayerIds'];
-      Game::get()->gamestate->setPlayersMultiactive($activePlayerIds, 'not_used', false);
+      Game::get()->gamestate->setPlayersMultiactive($activePlayerIds, 'next', false);
 
       // Ensure no undo
       Log::checkpoint();

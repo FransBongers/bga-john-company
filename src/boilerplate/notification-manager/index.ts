@@ -88,8 +88,7 @@ class NotificationManager {
       'setCrownClimate',
       'setupDone',
       'setupFamilyMembers',
-      'updateTowerLevel',
-      'updateUnrest',
+      'updateRegion',
     ];
 
     // example: https://github.com/thoun/knarr/blob/main/src/knarr.ts
@@ -375,7 +374,7 @@ class NotificationManager {
 
     await Promise.all(promises);
   }
-  
+
   async notif_moveCompanyStanding(notif: Notif<NotifMoveCompanyStanding>) {
     const { companyStanding } = notif.args;
     const board = Board.getInstance();
@@ -505,13 +504,8 @@ class NotificationManager {
     );
   }
 
-  async notif_updateTowerLevel(notif: Notif<NotifUpdateTowerLevel>) {
-    const {regionId, strength} = notif.args;
-    Board.getInstance().regions[regionId].updateStrength(strength);
-  }
-
-  async notif_updateUnrest(notif: Notif<NotifUpdateUnrest>) {
-    const {regionId, unrest} = notif.args;
-    Board.getInstance().regions[regionId].updateUnrest(unrest);
+  async notif_updateRegion(notif: Notif<NotifUpdateRegion>) {
+    const { region } = notif.args;
+    Board.getInstance().regions[region.id].update(region);
   }
 }

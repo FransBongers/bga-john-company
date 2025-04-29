@@ -2,32 +2,21 @@
 
 namespace Bga\Games\JohnCompany\Actions;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
-use Bga\Games\JohnCompany\Managers\ArmyPieces;
-use Bga\Games\JohnCompany\Managers\Company;
-use Bga\Games\JohnCompany\Managers\EventTiles;
-use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\Players;
-use Bga\Games\JohnCompany\Managers\Ships;
-
+use Bga\Games\JohnCompany\Managers\SetupCards;
 use Bga\Games\JohnCompany\Models\SetupCard;
 
-class EventsInIndiaStorms extends \Bga\Games\JohnCompany\Models\AtomicAction
+class ForeignInvasionEnd extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
-  protected $stormDieEventCountMap = [
-    ONE_ALL => 1,
-    TWO_EAST => 2,
-    TWO_WEST => 2,
-    THREE_SOUTH => 3,
-    FOUR => 4,
-  ];
-
   public function getState()
   {
-    return ST_EVENTS_IN_INDIA_STORMS;
+    return ST_FOREIGN_INVASION_END;
   }
 
   // ..######..########....###....########.########
@@ -47,18 +36,13 @@ class EventsInIndiaStorms extends \Bga\Games\JohnCompany\Models\AtomicAction
   // .##.....##..######.....##....####..#######..##....##
 
 
-  public function stEventsInIndiaStorms()
+  public function stForeignInvasionEnd()
   {
     /**
-     * 1. Roll storm die
-     * 2. Resolve storm
-     * 3. Set Global with number of events to handle
+     * TODO:
+     * conditional elephant march
      */
-    $side = EventTiles::rollStormDie();
-
-    $numberOfEvents = $this->stormDieEventCountMap[$side];
-
-    Globals::setEventsToResolve($numberOfEvents);
+    Globals::setCascadedRegions([]);
 
     $this->resolveAction(['automatic' => true]);
   }

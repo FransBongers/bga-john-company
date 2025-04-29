@@ -74,4 +74,18 @@ class EventTiles extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     $tile = self::getTopOf(DECK);
     return $tile->getRegionId();
   }
+
+  public static function rollStormDie()
+  {
+    $players = Players::getAll()->toArray();
+    // 1. Roll storm die
+    $playerToRollTheStormDie = $players[bga_rand(0, count($players) - 1)];
+
+    $side = STORM_DIE[bga_rand(0, 5)];
+    Notifications::message(clienttranslate('${player_name} rolls ${tkn_stormDie} with the storm die'), [
+      'player' => $playerToRollTheStormDie,
+      'tkn_stormDie' => $side
+    ]);
+    return $side;
+  }
 }
