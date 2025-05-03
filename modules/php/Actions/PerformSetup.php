@@ -11,6 +11,7 @@ use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
+use Bga\Games\JohnCompany\Managers\PrimeMinister;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 
 class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
@@ -118,7 +119,7 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
       Notifications::setupFamilyMembers($player, $familyMembers);
       Notifications::gainCash($player, $cash);
       if ($isPrimeMinister) {
-        // TODO: assign
+        PrimeMinister::changePrimeMinister($familyId);
       }
 
       // Enterprises

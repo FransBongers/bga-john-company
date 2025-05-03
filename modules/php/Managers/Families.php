@@ -54,6 +54,8 @@ class Families extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   public static function setupNewGame($players = null, $options = null)
   {
     $families = [];
+    $crownInTheGame = count($players) <= 2;
+
     foreach (FAMILIES as $familyId) {
       if (Utils::array_some($players, function ($player) use ($familyId) {
         return FAMILY_COLOR_MAP[$familyId] ===  HEX_COLOR_COLOR_MAP[$player->getColor()];
@@ -61,12 +63,14 @@ class Families extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
         $families[$familyId] = [
           'id' => $familyId,
           'location' => 'London',
+          'crown_promise_cubes' => $crownInTheGame ? 12 / (count($players) + 1) : 0,
         ];
     }
-    if (count($players) <= 2) {
+    if ($crownInTheGame) {
       $families[CROWN] = [
         'id' => CROWN,
         'location' => 'London',
+        'crown_promise_cubes' => 12 / (count($players) + 1),
       ];
     }
 

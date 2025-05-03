@@ -174,7 +174,7 @@ const SEA_ZONES = [
  */
 const SETUP = 'setup'; // Only used during start of game
 const LONDON_SEASON = 'londonSeason';
-const FAMILY = 'family';
+const FAMILY = 'family'; // Also used for Prime Minister global
 const FIRMS = 'firms';
 const HIRING = 'hiring';
 const REVENUE = 'revenue';
@@ -370,7 +370,7 @@ const BORDERS_CONNECTED_REGIONS_MAP = [
   BOMBAY_PUNJAB_BORDER => [BOMBAY, PUNJAB],
   DELHI_MARATHA_BORDER => [DELHI, MARATHA],
   DELHI_PUNJAB_BORDER => [DELHI, PUNJAB],
-  HYDERABAD_MADRAS_BORDER => [HYDERABAD,MADRAS],
+  HYDERABAD_MADRAS_BORDER => [HYDERABAD, MADRAS],
   HYDERABAD_MARATHA_BORDER => [HYDERABAD, MARATHA],
   HYDERABAD_MYSORE_BORDER => [HYDERABAD, MYSORE],
   MADRAS_MYSORE_BORDER => [MADRAS, MYSORE],
@@ -632,3 +632,80 @@ const THREE_SOUTH = 'threeSouth';
 const ONE_ALL = 'oneAll';
 
 const STORM_DIE = [FOUR, TWO_EAST, ONE_ALL, THREE_SOUTH, TWO_WEST, FOUR];
+
+/**
+ * Prime Minister
+ */
+const DIAL = 'dial';
+const BONUS = 'bonus';
+const POWER = 'power';
+const TAX = 'tax';
+const START_SCENARIO = 'startScenario';
+const TYPE = 'type';
+const TARGET = 'target';
+const WINDOW_TAX = 'windowTax';
+
+const PRIME_MINISTER_DIAL = [
+  [
+    TYPE => POWER,
+    TARGET => WORKSHOP,
+    START_SCENARIO => 1710,
+  ],
+  [
+    TYPE => TAX,
+    TARGET => SHARE,
+  ],
+  [
+    TYPE => POWER,
+    TARGET => SHIPYARD,
+  ],
+  [
+    TYPE => TAX,
+    TARGET => LUXURY,
+    WINDOW_TAX => true,
+  ],
+  [
+    TYPE => POWER,
+    TARGET => SHARE,
+  ],
+  [
+    TYPE => BONUS,
+    TARGET => WORKSHOP,
+  ],
+  [
+    TYPE => POWER,
+    TARGET => SHIPYARD,
+    START_SCENARIO => 1758,
+  ],
+  [
+    TYPE => POWER,
+    TARGET => LUXURY,
+  ],
+  [
+    TYPE => TAX,
+    TARGET => SHIPYARD,
+    WINDOW_TAX => true,
+  ],
+  [
+    TYPE => BONUS,
+    TARGET => SHARE,
+  ],
+  [
+    TYPE => TAX,
+    TARGET => WORKSHOP,
+    START_SCENARIO => 1813,
+  ],
+  [
+    TYPE => BONUS,
+    TARGET => WORKSHOP,
+  ],
+  [
+    TYPE => TAX,
+    TARGET => LUXURY,
+    WINDOW_TAX => true,
+  ],
+  [
+    TYPE => TAX,
+    TARGET => SHIPYARD,
+  ],
+];

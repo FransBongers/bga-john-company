@@ -231,6 +231,16 @@ class Notifications
     ]);
   }
 
+  public static function changePrimeMinister($player, $familyId)
+  {
+    self::notifyAll('changePrimeMinister', clienttranslate('${player_name} becomes ${tkn_boldText_primeMinister}'), [
+      'player' => $player,
+      'tkn_boldText_primeMinister' => clienttranslate('Prime Minister'),
+      'familyId' => $familyId,
+      'i18n' => ['tkn_boldText_primeMinister'],
+    ]);
+  }
+
   public static function changeOrderStatus($player, $order, $status)
   {
     $text = $status === OPEN ? clienttranslate('${player_name} opens an order in ${tkn_boldText_region}') : clienttranslate('${player_name} closes an order in ${tkn_boldText_region}');
@@ -585,7 +595,7 @@ class Notifications
 
   public static function returnFamilyMemberToSupply($player, $familyMember)
   {
-    self::notifyAll('returnFamilyMemberToSupply', clienttranslate('${player_name} return a family member to their supply'), [
+    self::notifyAll('returnFamilyMemberToSupply', clienttranslate('${player_name} returns a family member to their supply'), [
       'player' => $player,
       'familyMember' => $familyMember,
     ]);
