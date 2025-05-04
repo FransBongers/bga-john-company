@@ -53,4 +53,9 @@ class Crown
 
     return $presidencies[0];
   }
+
+  public static function isInGame()
+  {
+    return Globals::getCrownInGame();
+  }
 }

@@ -212,12 +212,18 @@ trait TurnTrait
       $initialTreasuries[$officeId] = $office->getTreasury();
     }
 
+    $chairman = Offices::get(CHAIRMAN);
+    $family = $chairman->getFamily();
+    if (Crown::isInGame() && $family->getId() !== CROWN && $family->getCrownPromiseCubes() > 0) {
+      $family->payPromiseCubes(1);
+    }
+
     $node = [
       'children' => [
         [
           'action' => CHAIRMAN,
           'playerId' => 'some',
-          'activePlayerIds' => [Offices::get(CHAIRMAN)->getPlayerId()],
+          'activePlayerIds' => [$chairman->getPlayerId()],
           'initialTreasuries' => $initialTreasuries,
           'initialDebt' => Company::getDebt(),
         ]

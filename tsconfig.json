@@ -44,6 +44,7 @@
     "src/board/treasury/templates.ts",
     "src/crown/climate.ts",
     "src/crown/templates.ts",
+    "src/icons/templates.ts",
     "src/setup-area/index.ts",
     "src/setup-area/templates.ts",
     "src/logs/index.ts",

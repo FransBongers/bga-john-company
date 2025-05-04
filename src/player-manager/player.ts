@@ -66,20 +66,25 @@ class JocoPlayer {
       return;
     }
 
-    node.insertAdjacentHTML('afterbegin', tplPlayerCounters(this.playerId));
-
     const familyId =
       this.familyId === CROWN
         ? COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[this.getColor()]]
         : this.familyId;
-    const elt = createFamilyMember(familyId, Math.floor(Math.random() * 18));
-    elt.id = `joco-familyMembers-${this.playerId}`;
 
-    document
-      .getElementById(`joco-counters-${this.playerId}-row-1`)
-      .insertAdjacentElement('afterbegin', elt);
+    node.insertAdjacentHTML(
+      'afterbegin',
+      tplPlayerCounters({
+        playerId: this.playerId,
+        familyId,
+        crownInGame: this.game.gameOptions.crownEnabled,
+      })
+    );
 
-    COUNTERS.forEach((counter) => {
+    const counters = [...COUNTERS];
+    if (this.game.gameOptions.crownEnabled) {
+      counters.push(PROMISE_CUBES_COUNTER);
+    }
+    counters.forEach((counter) => {
       this.counters[counter] = new ebg.counter();
       this.counters[counter].create(`joco-${counter}-counter-${this.playerId}`);
       this.ui[counter] = document.getElementById(
@@ -109,7 +114,8 @@ class JocoPlayer {
     this.counters[SHARES_COUNTER].setValue(
       Object.values(gamedatas.familyMembers).filter(
         ({ familyId, location }) =>
-          familyId === this.familyId && (location === COURT_OF_DIRECTORS || location === CHAIRMAN)
+          familyId === this.familyId &&
+          (location === COURT_OF_DIRECTORS || location === CHAIRMAN)
       ).length
     );
     this.counters[SHIPYARDS_COUNTER].setValue(
@@ -127,6 +133,11 @@ class JocoPlayer {
         ({ type, location }) => type === WORKSHOP && location === this.familyId
       ).length
     );
+    if (this.game.gameOptions.crownEnabled) {
+      this.counters[PROMISE_CUBES_COUNTER].setValue(
+        gamedatas.families[this.familyId].crownPromiseCubes
+      );
+    }
   }
 
   // ..######...########.########.########.########.########...######.

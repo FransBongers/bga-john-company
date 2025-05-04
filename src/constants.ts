@@ -92,6 +92,7 @@ const SHARES_COUNTER = 'shares';
 const WORKSHOPS_COUNTER = 'workshops';
 const SHIPYARDS_COUNTER = 'shipyards';
 const LUXURIES_COUNTER = 'luxuries';
+const PROMISE_CUBES_COUNTER = 'promiseCubes';
 
 const COUNTERS = [
   FAMILY_MEMBERS_COUNTER,

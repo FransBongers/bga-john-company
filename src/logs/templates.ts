@@ -24,6 +24,8 @@ const tplLogTokenElephant = () => '<div class="log_token joco_elephant"></div>';
 
 const tplLogTokenPound = () => `<div class="log_token joco_pound"></div>`;
 
+const tplLogTokenPromiseCube = () => '<div class="log_token joco-promise-cube"></div>'
+
 const tplLogTokenStormDie = (side: string) =>
   `<div class="log_token joco-storm-die" data-side="${side}"></div>`;
 

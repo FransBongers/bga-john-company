@@ -785,6 +785,13 @@ span[style*="color:#addb90"] {
   background-position-x: 60%;
 }
 
+.joco-promise-cube {
+  background-image: url("img/cubes.png");
+  background-size: 200% 100%;
+  width: calc(var(--iconScale) * 41px);
+  height: calc(var(--iconScale) * 48px);
+}
+
 .joco-family-member {
   display: flex;
   justify-content: center;
@@ -914,6 +921,11 @@ span[style*="color:#addb90"] {
 }
 .player-board-game-specific-content .joco-family-member {
   --tokenScale: 1.043;
+  position: relative;
+  margin: 0px auto;
+}
+.player-board-game-specific-content .joco-promise-cube {
+  --iconScale: 1;
   position: relative;
   margin: 0px auto;
 }

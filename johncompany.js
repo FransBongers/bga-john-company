@@ -62,6 +62,7 @@ var SHARES_COUNTER = 'shares';
 var WORKSHOPS_COUNTER = 'workshops';
 var SHIPYARDS_COUNTER = 'shipyards';
 var LUXURIES_COUNTER = 'luxuries';
+var PROMISE_CUBES_COUNTER = 'promiseCubes';
 var COUNTERS = [
     FAMILY_MEMBERS_COUNTER,
     CASH_COUNTER,
@@ -914,6 +915,7 @@ var NotificationManager = (function () {
             'setCrownClimate',
             'setupDone',
             'setupFamilyMembers',
+            'transferPromiseCubes',
             'updateRegion',
         ];
         notifs.forEach(function (notifName) {
@@ -1495,6 +1497,53 @@ var NotificationManager = (function () {
                     case 0:
                         _a = notif.args, familyMembers = _a.familyMembers, playerId = _a.playerId;
                         return [4, Board.getInstance().placeFamilyMembers(familyMembers, this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER])];
+                    case 1:
+                        _b.sent();
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_transferPromiseCubes = function (notif) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, playerCubes, crownCubes, playerId, amount, fromElement, fromRect, toElement, player, crown, promises;
+            var _this = this;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = notif.args, playerCubes = _a.playerCubes, crownCubes = _a.crownCubes, playerId = _a.playerId, amount = _a.amount;
+                        fromElement = document.getElementById("joco-promiseCubes-".concat(playerId));
+                        fromRect = fromElement.getBoundingClientRect();
+                        toElement = document.getElementById("joco-promiseCubes-".concat(CROWN_PLAYER_ID));
+                        player = this.getPlayer(playerId);
+                        crown = this.getPlayer(CROWN_PLAYER_ID);
+                        promises = Array.from(Array(Math.abs(amount)).keys()).map(function (_, index) { return __awaiter(_this, void 0, void 0, function () {
+                            var element;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: return [4, this.game.framework().wait(index * 150)];
+                                    case 1:
+                                        _a.sent();
+                                        player.counters[PROMISE_CUBES_COUNTER].incValue(-1);
+                                        element = document.createElement('div');
+                                        element.classList.add('log_token');
+                                        element.classList.add('joco-promise-cube');
+                                        element.classList.add('animation');
+                                        toElement.insertAdjacentElement('afterbegin', element);
+                                        return [4, this.game.animationManager.play(new BgaSlideAnimation({
+                                                element: element,
+                                                transitionTimingFunction: 'ease-in-out',
+                                                fromRect: fromRect,
+                                            }))];
+                                    case 2:
+                                        _a.sent();
+                                        element.remove();
+                                        crown.counters[PROMISE_CUBES_COUNTER].incValue(1);
+                                        return [2];
+                                }
+                            });
+                        }); });
+                        return [4, Promise.all(promises)];
                     case 1:
                         _b.sent();
                         return [2];
@@ -3210,6 +3259,7 @@ var LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
 var LOG_TOKEN_FAMILY_MEMBER = 'familyMember';
 var LOG_TOKEN_ICON = 'icon';
 var LOG_TOKEN_REGIMENT = 'regiment';
+var LOG_TOKEN_PROMISE_CUBE = 'promiseCube';
 var LOG_TOKEN_SETUP_CARD = 'setupCard';
 var LOG_TOKEN_SHIP = 'ship';
 var LOG_TOKEN_STORM_DIE = 'stormDie';
@@ -3236,6 +3286,8 @@ var getTokenDiv = function (_a) {
             return createFamilyMember(familyId, Number(number), [CLASS_LOG_TOKEN]).outerHTML;
         case LOG_TOKEN_POUND:
             return tplLogTokenPound();
+        case LOG_TOKEN_PROMISE_CUBE:
+            return tplLogTokenPromiseCube();
         case LOG_TOKEN_REGIMENT:
             return createRegiment([CLASS_LOG_TOKEN]).outerHTML;
         case LOG_TOKEN_SETUP_CARD:
@@ -3270,6 +3322,7 @@ var tplLogTokenClimate = function (climate) {
 };
 var tplLogTokenElephant = function () { return '<div class="log_token joco_elephant"></div>'; };
 var tplLogTokenPound = function () { return "<div class=\"log_token joco_pound\"></div>"; };
+var tplLogTokenPromiseCube = function () { return '<div class="log_token joco-promise-cube"></div>'; };
 var tplLogTokenStormDie = function (side) {
     return "<div class=\"log_token joco-storm-die\" data-side=\"".concat(side, "\"></div>");
 };
@@ -3400,16 +3453,19 @@ var JocoPlayer = (function () {
         if (!node) {
             return;
         }
-        node.insertAdjacentHTML('afterbegin', tplPlayerCounters(this.playerId));
         var familyId = this.familyId === CROWN
             ? COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[this.getColor()]]
             : this.familyId;
-        var elt = createFamilyMember(familyId, Math.floor(Math.random() * 18));
-        elt.id = "joco-familyMembers-".concat(this.playerId);
-        document
-            .getElementById("joco-counters-".concat(this.playerId, "-row-1"))
-            .insertAdjacentElement('afterbegin', elt);
-        COUNTERS.forEach(function (counter) {
+        node.insertAdjacentHTML('afterbegin', tplPlayerCounters({
+            playerId: this.playerId,
+            familyId: familyId,
+            crownInGame: this.game.gameOptions.crownEnabled,
+        }));
+        var counters = __spreadArray([], COUNTERS, true);
+        if (this.game.gameOptions.crownEnabled) {
+            counters.push(PROMISE_CUBES_COUNTER);
+        }
+        counters.forEach(function (counter) {
             _this.counters[counter] = new ebg.counter();
             _this.counters[counter].create("joco-".concat(counter, "-counter-").concat(_this.playerId));
             _this.ui[counter] = document.getElementById("joco-".concat(counter, "-").concat(_this.playerId));
@@ -3425,7 +3481,8 @@ var JocoPlayer = (function () {
         }).length);
         this.counters[SHARES_COUNTER].setValue(Object.values(gamedatas.familyMembers).filter(function (_a) {
             var familyId = _a.familyId, location = _a.location;
-            return familyId === _this.familyId && (location === COURT_OF_DIRECTORS || location === CHAIRMAN);
+            return familyId === _this.familyId &&
+                (location === COURT_OF_DIRECTORS || location === CHAIRMAN);
         }).length);
         this.counters[SHIPYARDS_COUNTER].setValue(Object.values(gamedatas.enterprises).filter(function (_a) {
             var type = _a.type, location = _a.location;
@@ -3439,6 +3496,9 @@ var JocoPlayer = (function () {
             var type = _a.type, location = _a.location;
             return type === WORKSHOP && location === _this.familyId;
         }).length);
+        if (this.game.gameOptions.crownEnabled) {
+            this.counters[PROMISE_CUBES_COUNTER].setValue(gamedatas.families[this.familyId].crownPromiseCubes);
+        }
     };
     JocoPlayer.prototype.getColor = function () {
         return this.playerColor;
@@ -3451,7 +3511,16 @@ var JocoPlayer = (function () {
     };
     return JocoPlayer;
 }());
-var tplPlayerCounters = function (playerId) { return "\n<div id=\"joco-counters-".concat(playerId, "-row-1\" class=\"joco-counters-row\">\n  <div id=\"joco-cash-").concat(playerId, "\" class=\"log_token joco_pound\"></div>\n  <div id=\"joco-ships-").concat(playerId, "\" class=\"joco-ship\" data-type=\"playerOwnedShip\"></div>\n  <div></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-familyMembers-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-cash-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-ships-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"></div>\n</div>\n<div class=\"joco-counters-row\">\n  <div id=\"joco-shares-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"Share\"></div>\n  <div id=\"joco-workshops-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"Workshop\"></div>\n  <div id=\"joco-shipyards-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"Shipyard\"></div>\n  <div id=\"joco-luxuries-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"Luxury\"></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-shares-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-workshops-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-shipyards-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-luxuries-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n</div>\n"); };
+var tplPlayerCounters = function (_a) {
+    var crownInGame = _a.crownInGame, familyId = _a.familyId, playerId = _a.playerId;
+    var elt = createFamilyMember(familyId, Math.floor(Math.random() * 18));
+    elt.id = "joco-familyMembers-".concat(playerId);
+    return "\n<div id=\"joco-counters-".concat(playerId, "-row-1\" class=\"joco-counters-row\">\n  ").concat(elt.outerHTML, "\n  <div id=\"joco-cash-").concat(playerId, "\" class=\"log_token joco_pound\"></div>\n  <div id=\"joco-ships-").concat(playerId, "\" class=\"joco-ship\" data-type=\"playerOwnedShip\"></div>\n  ").concat(crownInGame
+        ? "<div id=\"joco-promiseCubes-".concat(playerId, "\" class=\"joco-promise-cube\"></div>")
+        : '<div></div>', "\n  <div class=\"joco-counter-container\"><span id=\"joco-familyMembers-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-cash-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-ships-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  ").concat(crownInGame
+        ? "<div class=\"joco-counter-container\"><span id=\"joco-promiseCubes-counter-".concat(playerId, "\" class=\"joco-counter\"></span></div>")
+        : '<div class="joco-counter-container"></div>', "\n</div>\n<div class=\"joco-counters-row\">\n  <div id=\"joco-shares-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"Share\"></div>\n  <div id=\"joco-workshops-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"Workshop\"></div>\n  <div id=\"joco-shipyards-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"Shipyard\"></div>\n  <div id=\"joco-luxuries-").concat(playerId, "\" class=\"joco-icon\" data-icon=\"Luxury\"></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-shares-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-workshops-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-shipyards-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n  <div class=\"joco-counter-container\"><span id=\"joco-luxuries-counter-").concat(playerId, "\" class=\"joco-counter\"></span></div>\n</div>\n");
+};
 var Chairman = (function () {
     function Chairman(game) {
         this.game = game;

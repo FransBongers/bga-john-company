@@ -88,6 +88,7 @@ class NotificationManager {
       'setCrownClimate',
       'setupDone',
       'setupFamilyMembers',
+      'transferPromiseCubes',
       'updateRegion',
     ];
 
@@ -502,6 +503,46 @@ class NotificationManager {
       familyMembers,
       this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER]
     );
+  }
+
+  async notif_transferPromiseCubes(notif: Notif<NotifTransferPromiseCubes>) {
+    const { playerCubes, crownCubes, playerId, amount } = notif.args;
+    // Player pays to crown
+
+    const fromElement = document.getElementById(
+      `joco-promiseCubes-${playerId}`
+    );
+    const fromRect = fromElement.getBoundingClientRect();
+    const toElement = document.getElementById(
+      `joco-promiseCubes-${CROWN_PLAYER_ID}`
+    );
+
+    const player = this.getPlayer(playerId);
+    const crown = this.getPlayer(CROWN_PLAYER_ID);
+
+    const promises = Array.from(Array(Math.abs(amount)).keys()).map(
+      async (_, index) => {
+        await this.game.framework().wait(index * 150);
+        player.counters[PROMISE_CUBES_COUNTER].incValue(-1);
+        const element = document.createElement('div');
+        element.classList.add('log_token');
+        element.classList.add('joco-promise-cube');
+        element.classList.add('animation');
+        toElement.insertAdjacentElement('afterbegin', element);
+
+        await this.game.animationManager.play(
+          new BgaSlideAnimation({
+            element,
+            transitionTimingFunction: 'ease-in-out',
+            fromRect,
+          })
+        );
+        element.remove();
+        crown.counters[PROMISE_CUBES_COUNTER].incValue(1);
+      }
+    );
+
+    await Promise.all(promises);
   }
 
   async notif_updateRegion(notif: Notif<NotifUpdateRegion>) {

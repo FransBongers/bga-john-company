@@ -9,6 +9,12 @@
     margin: 0px auto;
   }
 
+  .joco-promise-cube {
+    --iconScale: 1;
+    position: relative;
+    margin: 0px auto;
+  }
+
   .joco_pound {
     --tokenScale: 0.96;
   }
@@ -22,7 +28,7 @@
   .joco-counter-container {
     display: flex;
   }
-  
+
   .joco-counter {
     // position: relative;
     margin: 0px auto;

@@ -10,6 +10,7 @@ const LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
 const LOG_TOKEN_FAMILY_MEMBER = 'familyMember'
 const LOG_TOKEN_ICON = 'icon';
 const LOG_TOKEN_REGIMENT = 'regiment';
+const LOG_TOKEN_PROMISE_CUBE = 'promiseCube';
 const LOG_TOKEN_SETUP_CARD = 'setupCard';
 const LOG_TOKEN_SHIP = 'ship';
 const LOG_TOKEN_STORM_DIE = 'stormDie';
@@ -46,6 +47,8 @@ const getTokenDiv = ({
       return createFamilyMember(familyId, Number(number), [CLASS_LOG_TOKEN]).outerHTML;
     case LOG_TOKEN_POUND:
       return tplLogTokenPound();
+    case LOG_TOKEN_PROMISE_CUBE:
+      return tplLogTokenPromiseCube();
     case LOG_TOKEN_REGIMENT:
       return createRegiment([CLASS_LOG_TOKEN]).outerHTML;
     case LOG_TOKEN_SETUP_CARD:

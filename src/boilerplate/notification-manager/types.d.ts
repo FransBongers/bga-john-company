@@ -139,6 +139,12 @@ interface NotifSetupFamilyMembers extends NotifWithPlayerArgs {
   familyMembers: JocoFamilyMember[];
 }
 
+interface NotifTransferPromiseCubes extends NotifWithPlayerArgs {
+  amount: number;
+  playerCubes: number;
+  crownCubes: number;
+}
+
 interface NotifUpdateRegion {
   region: JocoRegionBase;
 }

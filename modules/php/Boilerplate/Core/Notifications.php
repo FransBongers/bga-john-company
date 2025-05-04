@@ -127,6 +127,11 @@ class Notifications
     return clienttranslate('Pounds');
   }
 
+  public static function tknPromiseCube()
+  {
+    return clienttranslate('Promise Cubes');
+  }
+
   public static function tknRegiment()
   {
     return clienttranslate('Regiment');
@@ -548,6 +553,20 @@ class Notifications
       'treasury' => $treasury,
       'tkn_boldText_office' => $office->getTitle(),
       'i18n' => ['tkn_boldText_office'],
+    ]);
+  }
+
+  public static function payPromiseCubes($player, $amount, $playerCubes, $crownCubes)
+  {
+    self::notifyAll('transferPromiseCubes', clienttranslate('${player_name} pays ${tkn_boldText_amount} ${tkn_promiseCube} to the ${tkn_boldText_crown}'), [
+      'player' => $player,
+      'tkn_promiseCube' => self::tknPromiseCube(),
+      'amount' => $amount,
+      'playerCubes' => $playerCubes,
+      'crownCubes' => $crownCubes,
+      'tkn_boldText_amount' => $amount,
+      'tkn_boldText_crown' => clienttranslate('Crown'),
+      'i18n' => ['tkn_boldText_crown'],
     ]);
   }
 

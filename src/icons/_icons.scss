@@ -28,3 +28,10 @@
 .joco-icon[data-icon='OfficerInTraining'] {
   background-position-x: 60%;
 }
+
+.joco-promise-cube {
+  background-image: url('img/cubes.png');
+  background-size: 200% 100%;
+  width: calc(var(--iconScale) * 41px);
+  height: calc(var(--iconScale) * 48px);
+}

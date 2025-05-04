@@ -7,6 +7,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Enterprises;
+use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Players;
 
@@ -89,6 +90,14 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   public function pay($amount)
   {
     $this->incTreasury(-$amount);
+  }
+
+  public function payPromiseCubes($amount)
+  {
+    $crown = Families::get(CROWN);
+    $this->incCrownPromiseCubes(-$amount);
+    $crown->incCrownPromiseCubes($amount);
+    Notifications::payPromiseCubes($this->getPlayer(), $amount, $this->getCrownPromiseCubes(), $crown->getCrownPromiseCubes());
   }
 
   public function gainCash($amount)
