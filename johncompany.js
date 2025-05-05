@@ -1506,25 +1506,29 @@ var NotificationManager = (function () {
     };
     NotificationManager.prototype.notif_transferPromiseCubes = function (notif) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, playerCubes, crownCubes, playerId, amount, fromElement, fromRect, toElement, player, crown, promises;
+            var _a, playerId, amount, fromElement, fromRect, toElement, fromPlayer, toPlayer, promises;
             var _this = this;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        _a = notif.args, playerCubes = _a.playerCubes, crownCubes = _a.crownCubes, playerId = _a.playerId, amount = _a.amount;
-                        fromElement = document.getElementById("joco-promiseCubes-".concat(playerId));
+                        _a = notif.args, playerId = _a.playerId, amount = _a.amount;
+                        fromElement = amount < 0
+                            ? document.getElementById("joco-promiseCubes-".concat(playerId))
+                            : document.getElementById("joco-promiseCubes-".concat(CROWN_PLAYER_ID));
                         fromRect = fromElement.getBoundingClientRect();
-                        toElement = document.getElementById("joco-promiseCubes-".concat(CROWN_PLAYER_ID));
-                        player = this.getPlayer(playerId);
-                        crown = this.getPlayer(CROWN_PLAYER_ID);
+                        toElement = amount < 0
+                            ? document.getElementById("joco-promiseCubes-".concat(CROWN_PLAYER_ID))
+                            : document.getElementById("joco-promiseCubes-".concat(playerId));
+                        fromPlayer = amount < 0 ? this.getPlayer(playerId) : this.getPlayer(CROWN_PLAYER_ID);
+                        toPlayer = amount < 0 ? this.getPlayer(CROWN_PLAYER_ID) : this.getPlayer(playerId);
                         promises = Array.from(Array(Math.abs(amount)).keys()).map(function (_, index) { return __awaiter(_this, void 0, void 0, function () {
                             var element;
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
-                                    case 0: return [4, this.game.framework().wait(index * 150)];
+                                    case 0: return [4, this.game.framework().wait(index * 250)];
                                     case 1:
                                         _a.sent();
-                                        player.counters[PROMISE_CUBES_COUNTER].incValue(-1);
+                                        fromPlayer.counters[PROMISE_CUBES_COUNTER].incValue(-1);
                                         element = document.createElement('div');
                                         element.classList.add('log_token');
                                         element.classList.add('joco-promise-cube');
@@ -1538,7 +1542,7 @@ var NotificationManager = (function () {
                                     case 2:
                                         _a.sent();
                                         element.remove();
-                                        crown.counters[PROMISE_CUBES_COUNTER].incValue(1);
+                                        toPlayer.counters[PROMISE_CUBES_COUNTER].incValue(1);
                                         return [2];
                                 }
                             });
@@ -3524,6 +3528,7 @@ var tplPlayerCounters = function (_a) {
 var Chairman = (function () {
     function Chairman(game) {
         this.game = game;
+        this.crownInGame = this.game.gameOptions.crownEnabled;
     }
     Chairman.create = function (game) {
         Chairman.instance = new Chairman(game);
@@ -3564,7 +3569,8 @@ var Chairman = (function () {
             elt.setAttribute('data-vote', 'false');
         });
         this.args.debtOptions.vote.forEach(function (value) {
-            if (value <= _this.currentDebt) {
+            if (value <= _this.currentDebt ||
+                (_this.crownInGame && !_this.args.debtOptions.promiseCubeCost[value])) {
                 return;
             }
             var elt = board.ui.selectBoxes["companyDebt_".concat(value)];
@@ -3588,9 +3594,21 @@ var Chairman = (function () {
         this.deactivateTreasuries();
         clearPossible();
         setSelected(Board.getInstance().ui.selectBoxes["companyDebt_".concat(value)]);
-        updatePageTitle(_('Ask Court of Directors for consent to increase Company Debt to ${value}?'), {
-            value: value,
-        });
+        if (this.crownInGame) {
+            updatePageTitle(_('Ask Court of Directors for consent to increase Company Debt to ${value}? ${you} will need to pay ${number} ${tkn_promiseCube} to ${tkn_playerName_crown}'), {
+                value: value,
+                number: this.args.debtOptions.promiseCubeCost[value],
+                tkn_promiseCube: 'Promise Cube',
+                tkn_playerName_crown: PlayerManager.getInstance()
+                    .getPlayer(CROWN_PLAYER_ID)
+                    .getName(),
+            });
+        }
+        else {
+            updatePageTitle(_('Ask Court of Directors for consent to increase Company Debt to ${value}?'), {
+                value: value,
+            });
+        }
         addConfirmButton(function () { return _this.performAction(true, value); });
         addDangerActionButton({
             id: 'cancel_btn',

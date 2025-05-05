@@ -506,24 +506,26 @@ class NotificationManager {
   }
 
   async notif_transferPromiseCubes(notif: Notif<NotifTransferPromiseCubes>) {
-    const { playerCubes, crownCubes, playerId, amount } = notif.args;
+    const { playerId, amount } = notif.args;
     // Player pays to crown
 
-    const fromElement = document.getElementById(
-      `joco-promiseCubes-${playerId}`
-    );
+    const fromElement =
+      amount < 0
+        ? document.getElementById(`joco-promiseCubes-${playerId}`)
+        : document.getElementById(`joco-promiseCubes-${CROWN_PLAYER_ID}`);
     const fromRect = fromElement.getBoundingClientRect();
-    const toElement = document.getElementById(
-      `joco-promiseCubes-${CROWN_PLAYER_ID}`
-    );
+    const toElement =
+      amount < 0
+        ? document.getElementById(`joco-promiseCubes-${CROWN_PLAYER_ID}`)
+        : document.getElementById(`joco-promiseCubes-${playerId}`);
 
-    const player = this.getPlayer(playerId);
-    const crown = this.getPlayer(CROWN_PLAYER_ID);
+    const fromPlayer = amount < 0 ? this.getPlayer(playerId) : this.getPlayer(CROWN_PLAYER_ID);
+    const toPlayer = amount < 0 ? this.getPlayer(CROWN_PLAYER_ID) : this.getPlayer(playerId);
 
     const promises = Array.from(Array(Math.abs(amount)).keys()).map(
       async (_, index) => {
-        await this.game.framework().wait(index * 150);
-        player.counters[PROMISE_CUBES_COUNTER].incValue(-1);
+        await this.game.framework().wait(index * 250);
+        fromPlayer.counters[PROMISE_CUBES_COUNTER].incValue(-1);
         const element = document.createElement('div');
         element.classList.add('log_token');
         element.classList.add('joco-promise-cube');
@@ -538,7 +540,7 @@ class NotificationManager {
           })
         );
         element.remove();
-        crown.counters[PROMISE_CUBES_COUNTER].incValue(1);
+        toPlayer.counters[PROMISE_CUBES_COUNTER].incValue(1);
       }
     );
 

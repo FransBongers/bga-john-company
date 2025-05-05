@@ -10,14 +10,31 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\Company;
+use Bga\Games\JohnCompany\Managers\Crown;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 
 class Chairman extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
+  protected $crownFirstAdvancementCost = [
+    BULL => 1,
+    STAG => 2,
+    LION => 3,
+    BEAR => 4,
+    PEACOCK => 6,
+  ];
+  protected $crownBalanceFavor = [
+    BULL => 3,
+    STAG => 4,
+    LION => 4,
+    BEAR => 4,
+    PEACOCK => 5,
+  ];
+
   public function getState()
   {
     return ST_CHAIRMAN;
@@ -40,7 +57,8 @@ class Chairman extends \Bga\Games\JohnCompany\Models\AtomicAction
     $initialTreasuries = $info['initialTreasuries'];
 
     $player = Players::get($playerId);
-    $playerShareCount = $player->getFamily()->getShareCount();
+    $family = $player->getFamily();
+    $playerShareCount = $family->getShareCount();
     $requiredShareCount = max(Company::getRequiredNumberForShareMajority() - $playerShareCount, 0);
 
     $currentDebt = Company::getDebt();
@@ -58,8 +76,26 @@ class Chairman extends \Bga\Games\JohnCompany\Models\AtomicAction
       }
       if ($value <= $initialDebt + 3 || $requiredShareCount <= 0) {
         $debtOptions['noVote'][] = $value;
-      } else {
-        $debtOptions['vote'][] = $value;
+        continue;
+      }
+
+      $debtOptions['vote'][] = $value;
+    }
+
+    if (Crown::isInGame() && count(Company::getShares(CROWN)) > 0) {
+      $debtOptions['promiseCubeCost'] = [];
+      $debtOptions['crownVotes'] = count(Company::getShares(CROWN));
+
+      $climate = Crown::getClimate();
+      $promiseCubesChairman = $family->getCrownPromiseCubes();
+
+      $cumulativeCost = 0;
+
+      foreach ($debtOptions['vote'] as $value) {
+        $cumulativeCost += $value === $initialDebt + 4 ? $this->crownFirstAdvancementCost[$climate] : 1;
+        if ($cumulativeCost <= $promiseCubesChairman) {
+          $debtOptions['promiseCubeCost'][$value] = $cumulativeCost;
+        }
       }
     }
 
@@ -69,6 +105,7 @@ class Chairman extends \Bga\Games\JohnCompany\Models\AtomicAction
       'initialDebt' => $initialDebt,
       'initialTreasuries' => $initialTreasuries,
       'debtOptions' => $debtOptions,
+      'crownPromiseCubes' => $family->getCrownPromiseCubes(),
     ];
 
     return $data;
@@ -113,41 +150,19 @@ class Chairman extends \Bga\Games\JohnCompany\Models\AtomicAction
     $propose = $args->propose;
 
     $stateArgs = $this->argsChairman();
-    $this->updateGame($stateArgs, $playerId, $companyDebt, $treasuries);
+    $updatedTreasuries = $this->updateGame($stateArgs, $playerId, $companyDebt, $treasuries);
 
     if (!$propose && Company::getBalance() > 0) {
       throw new \feException("ERROR_008");
     }
 
-    // value to be voted for noeeds to be in options and greater than current company debt
-    if ($debtVote !== null && ($debtVote <= Company::getDebt() || !in_array($debtVote, $stateArgs['debtOptions']['vote']))) {
-      throw new \feException("9");
-    }
+    $saveAndProceed = false;
+
     if ($debtVote !== null) {
-      Notifications::message(clienttranslate('${player_name} asks for consent to increase Company Debt to ${tkn_boldText_value}'), [
-        'player' => Players::get($playerId),
-        'tkn_boldText_value' => $debtVote,
-      ]);
+      $saveAndProceed = $this->handleDebtVote($debtVote, $stateArgs, $playerId);
+    }
 
-      $families = Families::getAll();
-
-      $playerIdsWithShare = array_values(array_unique(array_map(function ($familyMember) use ($families) {
-        return $families[$familyMember->getFamilyId()]->getPlayer()->getId();
-      }, Company::getShares())));
-
-
-      $this->ctx->insertBefore(
-        new LeafNode([
-          'action' => CHAIRMAN_DEBT_CONSENT,
-          'playerId' => 'some',
-          'activePlayerIds' => Utils::filter($playerIdsWithShare, function ($pId) use ($playerId) {
-            return $pId !== $playerId;
-          }),
-          'yay' => [$playerId],
-          'nay' => [],
-          'debt' => $debtVote,
-        ])
-      );
+    if ($saveAndProceed) {
       Engine::save();
       Engine::proceed();
       return;
@@ -155,10 +170,17 @@ class Chairman extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     if ($propose) {
       Engine::proceed();
-    } else {
-      Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
-      $this->resolveAction([], true);
+      return;
     }
+
+    // Gain promise cubes from the crown
+    if (Crown::isInGame()) {
+      $this->gainPromiseCubesForAllocatingBalance($playerId, $stateArgs, $updatedTreasuries);
+      Crown::drawCardAndSetClimate();
+    }
+
+    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->resolveAction([], true);
   }
 
   //  .##.....##.########.####.##.......####.########.##....##
@@ -168,6 +190,84 @@ class Chairman extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private function gainPromiseCubesForAllocatingBalance($playerId, $stateArgs, $updatedTreasuries)
+  {
+    $promiseCubesGained = 0;
+    $amountPerPromiseCube = $this->crownBalanceFavor[Crown::getClimate()];
+    $initialTreasuries = $stateArgs['initialTreasuries'];
+
+    $offices = Offices::getAll();
+
+    foreach ($updatedTreasuries as $officeId => $value) {
+      if ($offices[$officeId]->getFamilyId() === CROWN) {
+        $promiseCubesGained += floor(($value - $initialTreasuries[$officeId]) / $amountPerPromiseCube);
+      }
+    }
+
+    $promiseCubesGained = min(Families::get(CROWN)->getCrownPromiseCubes(), $promiseCubesGained);
+
+    Players::get($playerId)->getFamily()->gainPromiseCubes($promiseCubesGained);
+  }
+
+  private function handleDebtVote($debtVote, $stateArgs, $playerId)
+  {
+    $debtOptions = $stateArgs['debtOptions'];
+
+    // value to be voted for needs to be in options and greater than current company debt
+    if ($debtVote <= Company::getDebt() || !in_array($debtVote, $debtOptions['vote'])) {
+      throw new \feException("ERROR_034");
+    }
+
+    $player = Players::get($playerId);
+    Notifications::message(clienttranslate('${player_name} asks for consent to increase Company Debt to ${tkn_boldText_value}'), [
+      'player' => $player,
+      'tkn_boldText_value' => $debtVote,
+    ]);
+
+    $families = Families::getAll();
+
+    $playerIdsWithShare = array_values(array_unique(array_map(function ($familyMember) use ($families) {
+      return $families[$familyMember->getFamilyId()]->getPlayer()->getId();
+    }, Company::getShares())));
+
+    $yay = [$playerId];
+
+    $insertNode = true;
+
+    // TODO: 2p game where it is possible the crown does not need to give consent?
+    if (in_array(CROWN_PLAYER_ID, $playerIdsWithShare)) {
+      $yay[] = CROWN_PLAYER_ID;
+
+      $promiseCubesToPay = $debtOptions['promiseCubeCost'][$debtVote];
+
+      $data = $player->getFamily()->payPromiseCubes($promiseCubesToPay, false);
+      Notifications::payPromiseCubesForConsent($player, $data['amount']);
+
+
+      if ($debtOptions['crownVotes'] >= $debtOptions['requiredShareCount']) {
+        AtomicActions::get(CHAIRMAN_DEBT_CONSENT)->courtOfDirectorsGivesConsent($debtVote);
+        $insertNode = false;
+      }
+    }
+
+    if ($insertNode) {
+      $this->ctx->insertBefore(
+        new LeafNode([
+          'action' => CHAIRMAN_DEBT_CONSENT,
+          'playerId' => 'some',
+          'activePlayerIds' => Utils::filter($playerIdsWithShare, function ($pId) use ($playerId) {
+            return $pId !== $playerId && $pId !== CROWN_PLAYER_ID;
+          }),
+          'yay' => $yay,
+          'nay' => [],
+          'debt' => $debtVote,
+        ])
+      );
+      return true;
+    }
+    return false;
+  }
 
   private function updateDebt($newDebt, $debtOptions)
   {
@@ -222,5 +322,6 @@ class Chairman extends \Bga\Games\JohnCompany\Models\AtomicAction
     if ($debtIncreased || count($updatedTreasuries) > 0) {
       Notifications::companyOperationChairman(Players::get($playerId), $companyDebt, $debtIncreased, $updatedTreasuries, Company::getBalance());
     }
+    return $updatedTreasuries;
   }
 }

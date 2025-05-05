@@ -12,6 +12,7 @@ use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\Company;
+use Bga\Games\JohnCompany\Managers\Crown;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
@@ -44,11 +45,7 @@ class DirectorOfTradeSpecialEnvoySuccess extends \Bga\Games\JohnCompany\Models\A
   // .##.....##.##....##....##.....##..##.....##.##...###
   // .##.....##..######.....##....####..#######..##....##
 
-  public function stDirectorOfTradeSpecialEnvoySuccess()
-  {
-
-
-  }
+  public function stDirectorOfTradeSpecialEnvoySuccess() {}
 
   // ....###....########...######....######.
   // ...##.##...##.....##.##....##..##....##
@@ -116,8 +113,12 @@ class DirectorOfTradeSpecialEnvoySuccess extends \Bga\Games\JohnCompany\Models\A
     if ($order === null) {
       throw new \feException("ERROR_011");
     }
-    
+
     $order->open($player);
+
+    if (Crown::isInGame()) {
+      $this->checkIfPlayerGainsPromiseCubeFromCrown($player, $order);
+    }
 
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
     $this->resolveAction([], true);
@@ -131,4 +132,22 @@ class DirectorOfTradeSpecialEnvoySuccess extends \Bga\Games\JohnCompany\Models\A
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
+  private function checkIfPlayerGainsPromiseCubeFromCrown($player, $order)
+  {
+    $crown = Families::get(CROWN);
+    if ($crown->getCrownPromiseCubes() === 0 || in_array(Crown::getClimate(), [BEAR, PEACOCK])) {
+      return;
+    }
+    $regionId = $order->getRegionId();
+    if (!in_array($regionId, HOME_REGIONS)) {
+      return;
+    }
+    $familyMembers = FamilyMembers::getAll()->toArray();
+    $crownHasWriter = Utils::array_find($familyMembers, function ($familyMember) use ($regionId) {
+      return $familyMember->getLocation() === Locations::writers($regionId);
+    });
+    if ($crownHasWriter) {
+      $player->getFamily()->gainPromiseCubes(1);
+    }
+  }
 }

@@ -92,13 +92,31 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     $this->incTreasury(-$amount);
   }
 
-  public function payPromiseCubes($amount)
+  public function payPromiseCubes($amount, $notify = true)
+  {
+    return $this->gainPromiseCubes(-$amount, $notify);
+  }
+
+  public function gainPromiseCubes($amount, $notify = true)
   {
     $crown = Families::get(CROWN);
-    $this->incCrownPromiseCubes(-$amount);
-    $crown->incCrownPromiseCubes($amount);
-    Notifications::payPromiseCubes($this->getPlayer(), $amount, $this->getCrownPromiseCubes(), $crown->getCrownPromiseCubes());
+    if ($amount > 0 && $crown->getCrownPromiseCubes() === 0) {
+      return;
+    }
+    $this->incCrownPromiseCubes($amount);
+    $crown->incCrownPromiseCubes(-$amount);
+
+    if ($notify && $amount < 0) {
+      Notifications::payPromiseCubes($this->getPlayer(), $amount);
+    } else if ($notify && $amount > 0) {
+      // Player gains Promise cubes
+      Notifications::gainPromiseCubes($this->getPlayer(), $amount);
+    }
+    return [
+      'amount' => $amount,
+    ];
   }
+
 
   public function gainCash($amount)
   {

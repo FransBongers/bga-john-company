@@ -4,6 +4,7 @@ namespace Bga\Games\JohnCompany\Boilerplate\Core;
 
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
+use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Regions;
 
 class Notifications
@@ -556,15 +557,38 @@ class Notifications
     ]);
   }
 
-  public static function payPromiseCubes($player, $amount, $playerCubes, $crownCubes)
+  public static function gainPromiseCubes($player, $amount)
+  {
+    self::notifyAll('transferPromiseCubes', clienttranslate('${player_name} gains ${tkn_boldText_amount} ${tkn_promiseCube} from the ${tkn_boldText_crown}'), [
+      'player' => $player,
+      'tkn_promiseCube' => self::tknPromiseCube(),
+      'amount' => $amount,
+      'tkn_boldText_amount' => $amount,
+      'tkn_boldText_crown' => clienttranslate('Crown'),
+      'i18n' => ['tkn_boldText_crown'],
+    ]);
+  }
+
+  public static function payPromiseCubes($player, $amount)
   {
     self::notifyAll('transferPromiseCubes', clienttranslate('${player_name} pays ${tkn_boldText_amount} ${tkn_promiseCube} to the ${tkn_boldText_crown}'), [
       'player' => $player,
       'tkn_promiseCube' => self::tknPromiseCube(),
       'amount' => $amount,
-      'playerCubes' => $playerCubes,
-      'crownCubes' => $crownCubes,
-      'tkn_boldText_amount' => $amount,
+      'tkn_boldText_amount' => abs($amount),
+      'tkn_boldText_crown' => clienttranslate('Crown'),
+      'i18n' => ['tkn_boldText_crown'],
+    ]);
+  }
+
+  public static function payPromiseCubesForConsent($player, $amount)
+  {
+    self::notifyAll('transferPromiseCubes', clienttranslate('${player_name} pays ${tkn_boldText_amount} ${tkn_promiseCube} to the ${tkn_playerName_crown} to give consent'), [
+      'player' => $player,
+      'tkn_playerName_crown' => Players::get(CROWN_PLAYER_ID)->getName(),
+      'tkn_promiseCube' => self::tknPromiseCube(),
+      'amount' => $amount,
+      'tkn_boldText_amount' => abs($amount),
       'tkn_boldText_crown' => clienttranslate('Crown'),
       'i18n' => ['tkn_boldText_crown'],
     ]);

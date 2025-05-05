@@ -116,19 +116,7 @@ class ChairmanDebtConsent extends \Bga\Games\JohnCompany\Models\AtomicAction
     $game->gamestate->setPlayerNonMultiactive($playerId, 'next');
 
     if ($next === 'consent') {
-      $newCompanyDebt = $info['debt'];
-      Notifications::message(clienttranslate('The Court of Directors gives consent to increase Company Debt to ${value}'), [
-        'tkn_boldText_not' => clienttranslate('not'),
-        'value' => $newCompanyDebt,
-        'i18n' => ['tkn_boldText_not'],
-      ]);
-      
-      $currentDebt = Company::getDebt();
-      $increase = $newCompanyDebt - $currentDebt;
-      Company::setDebt($newCompanyDebt );
-      $companyBalance = Company::incBalance($increase * 5);
-
-      Notifications::increaseCompanyDebt(Offices::get(CHAIRMAN)->getPlayer(), $newCompanyDebt, $companyBalance);
+      $this->courtOfDirectorsGivesConsent($info['debt']);
       $this->resolveAction([], true);
       return;
     } else if ($next === 'noConsent') {
@@ -157,6 +145,22 @@ class ChairmanDebtConsent extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  public function courtOfDirectorsGivesConsent($newCompanyDebt)
+  {
+    Notifications::message(clienttranslate('The Court of Directors gives consent to increase Company Debt to ${value}'), [
+      'tkn_boldText_not' => clienttranslate('not'),
+      'value' => $newCompanyDebt,
+      'i18n' => ['tkn_boldText_not'],
+    ]);
+    
+    $currentDebt = Company::getDebt();
+    $increase = $newCompanyDebt - $currentDebt;
+    Company::setDebt($newCompanyDebt );
+    $companyBalance = Company::incBalance($increase * 5);
+
+    Notifications::increaseCompanyDebt(Offices::get(CHAIRMAN)->getPlayer(), $newCompanyDebt, $companyBalance);
+  }
 
   private function getNextStep($info)
   {

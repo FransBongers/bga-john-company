@@ -141,8 +141,6 @@ interface NotifSetupFamilyMembers extends NotifWithPlayerArgs {
 
 interface NotifTransferPromiseCubes extends NotifWithPlayerArgs {
   amount: number;
-  playerCubes: number;
-  crownCubes: number;
 }
 
 interface NotifUpdateRegion {

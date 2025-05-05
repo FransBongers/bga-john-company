@@ -253,7 +253,7 @@ trait TurnTrait
           'playerId' => 'some',
           'activePlayerIds' => [$playerId],
           'optional' => true,
-        ]
+        ],
       ],
     ];
 

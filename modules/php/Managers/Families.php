@@ -81,13 +81,14 @@ class Families extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   public static function getFamilyIdPlayerIdMap()
   {
     $players = Players::getAll();
+
     $map = [];
     foreach ($players as $playerId => $player) {
-      if ($playerId === CROWN_PLAYER_ID) {
-        $map[CROWN] = $playerId;
-        continue;
-      }
       $map[COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[$player->getColor()]]] = $playerId;
+    }
+    // Add crown as it is not returned by Players::getAll()
+    if (Crown::isInGame()) {
+      $map[CROWN] = CROWN_PLAYER_ID;
     }
     return $map;
   }

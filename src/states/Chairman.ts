@@ -4,6 +4,7 @@ interface OnEnteringChairmanArgs extends CommonStateArgs {
     vote: number[];
     noVote: number[];
     requiredShareCount: number;
+    promiseCubeCost?: Record<number, number>;
   };
   companyBalance: number;
   initialTreasuries: Record<string, number>;
@@ -14,8 +15,11 @@ class Chairman implements State {
   private args: OnEnteringChairmanArgs;
   private companyBalance: number;
   private currentDebt: number;
+  private crownInGame: boolean;
 
-  constructor(private game: GameAlias) {}
+  constructor(private game: GameAlias) {
+    this.crownInGame = this.game.gameOptions.crownEnabled;
+  }
 
   public static create(game: JohnCompany) {
     Chairman.instance = new Chairman(game);
@@ -39,7 +43,7 @@ class Chairman implements State {
   }
 
   setDescription(activePlayerIds: number[], args: OnEnteringChairmanArgs) {
-    console.log('setDescription Chairman')
+    console.log('setDescription Chairman');
     updatePageTitle(
       _(
         '${tkn_playerName} may increase Company Debt and must allocate the Company Balance'
@@ -85,7 +89,12 @@ class Chairman implements State {
       elt.setAttribute('data-vote', 'false');
     });
     this.args.debtOptions.vote.forEach((value) => {
-      if (value <= this.currentDebt) {
+      if (
+        value <= this.currentDebt ||
+        // Player needs to be able to pay crown cost if a value requires a vote
+        // TODO: check two player game
+        (this.crownInGame && !this.args.debtOptions.promiseCubeCost[value])
+      ) {
         return;
       }
       const elt = board.ui.selectBoxes[`companyDebt_${value}`];
@@ -110,14 +119,30 @@ class Chairman implements State {
     clearPossible();
     setSelected(Board.getInstance().ui.selectBoxes[`companyDebt_${value}`]);
 
-    updatePageTitle(
-      _(
-        'Ask Court of Directors for consent to increase Company Debt to ${value}?'
-      ),
-      {
-        value,
-      }
-    );
+    if (this.crownInGame) {
+      updatePageTitle(
+        _(
+          'Ask Court of Directors for consent to increase Company Debt to ${value}? ${you} will need to pay ${number} ${tkn_promiseCube} to ${tkn_playerName_crown}'
+        ),
+        {
+          value,
+          number: this.args.debtOptions.promiseCubeCost[value],
+          tkn_promiseCube: 'Promise Cube',
+          tkn_playerName_crown: PlayerManager.getInstance()
+            .getPlayer(CROWN_PLAYER_ID)
+            .getName(),
+        }
+      );
+    } else {
+      updatePageTitle(
+        _(
+          'Ask Court of Directors for consent to increase Company Debt to ${value}?'
+        ),
+        {
+          value,
+        }
+      );
+    }
 
     addConfirmButton(() => this.performAction(true, value));
     addDangerActionButton({
