@@ -57,6 +57,13 @@ class JohnCompany implements Game {
   private states = {
     Chairman,
     ChairmanDebtConsent,
+    CrownChairmanRequestAllocation,
+    CrownChairmanRequestDebtAdvancement,
+    CrownManagerOfShippingBuyCompanyShips,
+    CrownManagerOfShippingFitShips,
+    CrownManagerOfShippingLeaseExtraShips,
+    CrownManagerOfShippingPlaceShips,
+    // CrownManagerOfShippingUnfittedShipOptions,
     ConfirmPartialTurn,
     ConfirmTurn,
     DirectorOfTradeSpecialEnvoy,
@@ -578,10 +585,6 @@ class JohnCompany implements Game {
   public getPlayerId(): number {
     return Number(this.framework().player_id);
   }
-
-  //  public getCurrentPlayer(): GestPlayer {
-  //  return this.playerManager.getPlayer({ playerId: this.getPlayerId() });
-  //  }
 
   /**
    * Typescript wrapper for framework functions

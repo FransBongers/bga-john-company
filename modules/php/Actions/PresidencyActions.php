@@ -17,6 +17,7 @@ use Bga\Games\JohnCompany\Managers\Ships;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 use Bga\Games\JohnCompany\Models\Office;
+use Bga\Games\JohnCompany\Utils\TradeRoutes;
 
 class PresidencyActions extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
@@ -30,66 +31,16 @@ class PresidencyActions extends \Bga\Games\JohnCompany\Models\AtomicAction
   {
     $shipCount = Ships::countInLocation($office->getSeaZone());
 
-    $orders = Orders::getAll();
-
     $homePortOrderId = $office->getHomePortOrderId();
-    $visited = [
-      $homePortOrderId => 1,
-    ];
-    $queue = [$homePortOrderId];
-    // $homePortOrder = $orders[];
 
-    // Get all orders within range
-    while (count($queue) > 0) {
-      $currentOrderId =  array_shift($queue);
+    $tradeRoute = TradeRoutes::getOrdersForTradeRoute($homePortOrderId, $shipCount, $regionIds);
 
-      if ($visited[$currentOrderId] === $shipCount) {
-        continue;
-      }
-
-      $currentOrder = $orders[$currentOrderId];
-
-      $connectedOrders = $currentOrder->getConnectedOrders();
-
-      foreach($connectedOrders as $connectedOrderId) {
-        if (isset($visited[$connectedOrderId])) {
-          continue;
-        }
-        
-        $connectedOrder = $orders[$connectedOrderId];
-
-        if ($connectedOrder->getStatus() !== OPEN) {
-          continue;
-        }
-        if($regionIds !== null && !in_array($connectedOrder->getRegionId(), $regionIds)) {
-          continue;
-        }
-
-        $queue[] = $connectedOrderId;
-        $visited[$connectedOrderId] = $visited[$currentOrderId] + 1;
-
-      }
-    }
-
-    $regions = Regions::getAll();
-
-    $possibleOrders = [];
-    $possibleRegions = [];
-    foreach(array_keys($visited) as $orderId) {
-      $possibleOrders[$orderId] = $orders[$orderId];
-      $regionId = $orders[$orderId]->getRegionId();
-      if (!isset($possibleRegions[$regionId])) {
-        $possibleRegions[$regionId] = $regions[$regionId];
-      }
-    }
     return [
-      'orders' => $possibleOrders,
-      'regions' => $possibleRegions,
+      'orders' => $tradeRoute['orders'],
+      'regions' => $tradeRoute['regions'],
       'homePortOrderId' => $homePortOrderId,
       'homeRegionId' => $office->getRegionId(),
       'shipCount' => $shipCount,
     ];
-
   }
-
 }

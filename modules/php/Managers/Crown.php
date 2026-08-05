@@ -14,6 +14,10 @@ class Crown
     return Globals::getCrown();
   }
 
+  public static function getPlayer()
+  {
+    return Players::get(CROWN_PLAYER_ID);
+  }
 
   public static function drawCardAndSetClimate()
   {
@@ -52,6 +56,24 @@ class Crown
     });
 
     return $presidencies[0];
+  }
+
+  public static function getPromiseCubesForActivePlayers($stateInfo)
+  {
+    $players = Players::getAll();
+    $playerIds = $stateInfo['activePlayerIds'];
+
+    $promiseCubes = [];
+
+    foreach($playerIds as $playerId) {
+      $promiseCubes[$playerId] = $players[$playerId]->getFamily()->getCrownPromiseCubes();
+    }
+    return $promiseCubes;
+  }
+
+  public static function isCrownPresidency($presidendy) {
+    $office = Offices::get(PRESIDENCY_PRESIDENT_OFFICE_MAP[$presidendy]);
+    return $office->getFamilyId() === CROWN;
   }
 
   public static function isInGame()

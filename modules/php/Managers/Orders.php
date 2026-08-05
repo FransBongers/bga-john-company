@@ -83,4 +83,11 @@ class Orders extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
       return $order->getStatus() === CLOSED;
     });
   }
+
+  public static function getHomePorts()
+  {
+    return Utils::filter(self::getAll()->toArray(), function ($order) {
+      return $order->getHomePort() !== null;
+    });
+  }
 }

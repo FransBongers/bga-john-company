@@ -261,6 +261,13 @@ class Board {
       elt.setAttribute('data-position', position);
       this.ui.containers.selectBoxes.appendChild(elt);
     });
+    OFFICES_WITH_TREASURY.forEach((office) => {
+      const elt = (this.ui.selectBoxes[office] = document.createElement('div'));
+      elt.classList.add('joco-select-box');
+      elt.classList.add('joco-office');
+      elt.setAttribute('data-office', office);
+      this.ui.containers.selectBoxes.appendChild(elt);
+    });
     Array.from(Array(9).keys()).forEach((value) => {
       const elt = (this.ui.selectBoxes[`companyDebt_${value}`] =
         document.createElement('div'));

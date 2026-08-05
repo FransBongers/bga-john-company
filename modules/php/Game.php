@@ -367,6 +367,7 @@ class Game extends \Table
             'regions' => Regions::getAll(),
             'ships' => Ships::getAll(),
             'staticData' => [
+                'offices' => Offices::getStaticUiData(),
                 'orders' => Orders::getStaticUiData(),
                 'regions' => Regions::getStaticUiData(),
                 'setupCards' => SetupCards::getStaticUiData(),

@@ -1,37 +1,48 @@
-interface OnEnteringEnlistWriterArgs extends CommonStateArgs {
-
+interface OnEnteringCrownManagerOfShippingFitShipsArgs extends CommonStateArgs {
+  shipsThatWillBeFitted: JocoShipBase[];
+  shipsThatWillNotBeFitted: JocoShipBase[];
+  playerPromiseCubeCost: Record<number, number>;
 }
 
-class EnlistWriter implements State {
-  private static instance: EnlistWriter;
-  private args: OnEnteringEnlistWriterArgs;
+class CrownManagerOfShippingFitShips implements State {
+  private static instance: CrownManagerOfShippingFitShips;
+  private args: OnEnteringCrownManagerOfShippingFitShipsArgs;
+  private ship: JocoShipBase;
+  private location: string;
 
   constructor(private game: GameAlias) {}
 
   public static create(game: JohnCompany) {
-    EnlistWriter.instance = new EnlistWriter(game);
+    CrownManagerOfShippingFitShips.instance =
+      new CrownManagerOfShippingFitShips(game);
   }
 
   public static getInstance() {
-    return EnlistWriter.instance;
+    return CrownManagerOfShippingFitShips.instance;
   }
 
-  onEnteringState(args: OnEnteringEnlistWriterArgs) {
-    debug('Entering EnlistWriter state');
+  onEnteringState(args: OnEnteringCrownManagerOfShippingFitShipsArgs) {
+    debug('Entering CrownManagerOfShippingFitShips state');
     this.args = args;
+
     this.updateInterfaceInitialStep();
   }
 
   onLeavingState() {
-    debug('Leaving EnlistWriter state');
+    debug('Leaving CrownManagerOfShippingFitShips state');
   }
 
-  setDescription(activePlayerIds: number[], args: OnEnteringEnlistWriterArgs) {
-    updatePageTitle(_('${tkn_playerName} must select a region to place their writer'), {
-      tkn_playerName: PlayerManager.getInstance()
-        .getPlayer(activePlayerIds[0])
-        .getName(),
-    });
+  setDescription(
+    activePlayerIds: number,
+    args: OnEnteringCrownManagerOfShippingFitShipsArgs
+  ) {
+    updatePageTitle(
+      _('${tkn_playerName} may fit ships'),
+      {
+        tkn_playerName: getCrownPlayerName(),
+      },
+      true
+    );
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########
@@ -52,36 +63,39 @@ class EnlistWriter implements State {
 
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
+    console.log('');
 
-    updatePageTitle(_('${you} must select a region to place ${tkn_icon}'), {
-      tkn_icon: WRITER
-    });
+    this.updatePageTitle();
 
-    [BENGAL, BOMBAY, MADRAS].forEach((region) => {
-      const box = Board.getInstance().ui.selectBoxes[`Writers_${region}`];
-      onClick(box, () => this.updateInterfaceConfirm(region))
+    // if (
+    //   this.args.ship.id === this.ship.id &&
+    //   this.args.options.ships.length > 0
+    // ) {
+    //   addPrimaryActionButton({
+    //     id: 'fit_ship_btn',
+    //     text: _('Pay to fit a ship'),
+    //     callback: () => this.updateInterfaceSelectShip(),
+    //   });
+    // }
+
+    addPrimaryActionButton({
+      id: 'continue_btn',
+      text: _('Continue'),
+      callback: () =>
+        performAction('actCrownManagerOfShippingFitShips', {
+          continue: true,
+        }),
     });
   }
 
-  private updateInterfaceConfirm(regionId: string) {
+  private updateInterfaceConfirm() {
     clearPossible();
 
-    setSelected(Board.getInstance().ui.selectBoxes[`Writers_${regionId}`])
+    updatePageTitle(_('Confirm ship placement'));
 
-    updatePageTitle(_('Enlist ${tkn_icon} in ${regionName}?'), {
-      tkn_icon: WRITER,
-      regionName: _(StaticData.get().region(regionId).name),
+    addConfirmButton(() => {
+      performAction('actCrownManagerOfShippingFitShips', {});
     });
-
-    const callback = () => performAction('actEnlistWriter', {
-      regionId,
-    });
-
-    addConfirmButton(callback);
-
-    // callback();
-
-    addCancelButton();
   }
 
   //  .##.....##.########.####.##.......####.########.##....##
@@ -91,6 +105,27 @@ class EnlistWriter implements State {
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private updatePageTitle() {
+    let text = '';
+
+    const currentPlayerId = PlayerManager.getInstance().getCurrentPlayerId();
+
+    text = _('${tkn_playerName_crown} wants to fit ${ships_log}');
+
+    if (this.args.playerPromiseCubeCost[currentPlayerId]) {
+      text = _(
+        '${tkn_playerName_crown} wants to fit ${ships_log}. ${you} must pay ${amount} ${tkn_promiseCube}'
+      );
+    }
+
+    updatePageTitle(text, {
+      tkn_playerName_crown: getCrownPlayerName(),
+      tkn_promiseCube: tknPromiseCubes(),
+      amount: this.args.playerPromiseCubeCost[currentPlayerId] ?? 0,
+      ships_log: getShipsLog(this.args.shipsThatWillBeFitted),
+    });
+  }
 
   //  ..######..##.......####..######..##....##
   //  .##....##.##........##..##....##.##...##.

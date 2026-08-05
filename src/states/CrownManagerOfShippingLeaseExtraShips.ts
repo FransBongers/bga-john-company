@@ -1,37 +1,46 @@
-interface OnEnteringEnlistWriterArgs extends CommonStateArgs {
-
+interface OnEnteringCrownManagerOfShippingLeaseExtraShipsArgs
+  extends CommonStateArgs {
+  numberOfShipsCrownWillLease: number;
+  optionToLeaveTwoUnspent: Record<number, boolean>;
 }
 
-class EnlistWriter implements State {
-  private static instance: EnlistWriter;
-  private args: OnEnteringEnlistWriterArgs;
+class CrownManagerOfShippingLeaseExtraShips implements State {
+  private static instance: CrownManagerOfShippingLeaseExtraShips;
+  private args: OnEnteringCrownManagerOfShippingLeaseExtraShipsArgs;
 
   constructor(private game: GameAlias) {}
 
   public static create(game: JohnCompany) {
-    EnlistWriter.instance = new EnlistWriter(game);
+    CrownManagerOfShippingLeaseExtraShips.instance =
+      new CrownManagerOfShippingLeaseExtraShips(game);
   }
 
   public static getInstance() {
-    return EnlistWriter.instance;
+    return CrownManagerOfShippingLeaseExtraShips.instance;
   }
 
-  onEnteringState(args: OnEnteringEnlistWriterArgs) {
-    debug('Entering EnlistWriter state');
+  onEnteringState(args: OnEnteringCrownManagerOfShippingLeaseExtraShipsArgs) {
+    debug('Entering CrownManagerOfShippingLeaseExtraShips state');
     this.args = args;
+
     this.updateInterfaceInitialStep();
   }
 
   onLeavingState() {
-    debug('Leaving EnlistWriter state');
+    debug('Leaving CrownManagerOfShippingLeaseExtraShips state');
   }
 
-  setDescription(activePlayerIds: number[], args: OnEnteringEnlistWriterArgs) {
-    updatePageTitle(_('${tkn_playerName} must select a region to place their writer'), {
-      tkn_playerName: PlayerManager.getInstance()
-        .getPlayer(activePlayerIds[0])
-        .getName(),
-    });
+  setDescription(
+    activePlayerIds: number,
+    args: OnEnteringCrownManagerOfShippingLeaseExtraShipsArgs
+  ) {
+    updatePageTitle(
+      _('${tkn_playerName} may lease extra ships'),
+      {
+        tkn_playerName: getCrownPlayerName(),
+      },
+      true
+    );
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########
@@ -53,35 +62,61 @@ class EnlistWriter implements State {
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
 
-    updatePageTitle(_('${you} must select a region to place ${tkn_icon}'), {
-      tkn_icon: WRITER
-    });
+    updatePageTitle(
+      _('${tkn_playerName_crown} wants to lease ${count} ${tkn_ship}'),
+      {
+        count: this.args.numberOfShipsCrownWillLease,
+        tkn_playerName_crown: getCrownPlayerName(),
+        tkn_ship: tknShipValue({
+          name: 'Extra Ship',
+          type: EXTRA_SHIP,
+          fatigued: 0,
+        }),
+      }
+    );
 
-    [BENGAL, BOMBAY, MADRAS].forEach((region) => {
-      const box = Board.getInstance().ui.selectBoxes[`Writers_${region}`];
-      onClick(box, () => this.updateInterfaceConfirm(region))
+    const playerId = PlayerManager.getInstance().getCurrentPlayerId();
+    const optionToLeaveTwoUnspent = this.args.optionToLeaveTwoUnspent[playerId];
+
+    if (optionToLeaveTwoUnspent) {
+      addSecondaryActionButton({
+        id: 'buy_ship_btn',
+        text: formatStringRecursive(
+          _(
+            'Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to leave 2 ${tkn_pound} unspent'
+          ),
+          {
+            amount: 1,
+            tkn_playerName_crown: getCrownPlayerName(),
+            tkn_promiseCube: tknPromiseCubes(),
+            tkn_pound: tknPound(),
+          }
+        ),
+        callback: () =>
+          performAction('actCrownManagerOfShippingBuyCompanyShips', {
+            option: BUY_COMPANY_SHIP,
+          }),
+      });
+    }
+
+    addPrimaryActionButton({
+      id: 'continue_btn',
+      text: _('Continue'),
+      callback: () =>
+        performAction('actCrownManagerOfShippingLeaseExtraShips', {
+          continue: true,
+        }),
     });
   }
 
-  private updateInterfaceConfirm(regionId: string) {
+  private updateInterfaceConfirm() {
     clearPossible();
 
-    setSelected(Board.getInstance().ui.selectBoxes[`Writers_${regionId}`])
+    updatePageTitle(_('Confirm ship placement'));
 
-    updatePageTitle(_('Enlist ${tkn_icon} in ${regionName}?'), {
-      tkn_icon: WRITER,
-      regionName: _(StaticData.get().region(regionId).name),
+    addConfirmButton(() => {
+      performAction('actCrownManagerOfShippingLeaseExtraShips', {});
     });
-
-    const callback = () => performAction('actEnlistWriter', {
-      regionId,
-    });
-
-    addConfirmButton(callback);
-
-    // callback();
-
-    addCancelButton();
   }
 
   //  .##.....##.########.####.##.......####.########.##....##

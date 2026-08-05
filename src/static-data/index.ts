@@ -32,6 +32,10 @@ class StaticData {
     return order;
   }
 
+  public office(id: string): JocoOfficeStatic {
+    return this.staticData.offices[id];
+  }
+
   public region(id: string) {
     return this.staticData.regions[id];
   }

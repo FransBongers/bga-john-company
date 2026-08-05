@@ -28,6 +28,7 @@ use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\Elephant;
 use Bga\Games\JohnCompany\Managers\EventTiles;
 use Bga\Games\JohnCompany\Managers\ResolveCrisis;
+use Bga\Games\JohnCompany\Utils\TradeRoutes;
 
 trait DebugTrait
 {
@@ -38,14 +39,11 @@ trait DebugTrait
 
   function debug_test()
   {
-    $this->checkIfPlayerGainsPromiseCubeFromCrown();
-    // Notifications::log('map', Families::getFamilyIdPlayerIdMap());
-    // Notifications::log('defender', ResolveCrisis::getDefenderStrengthInvasion(Regions::getAll(), Regions::get(BENGAL)));
-    // Regions::get(DELHI)->setControl(BENGAL_PRESIDENCY);
-    // EventTiles::insertOnTop('EventTile_18', DECK);
-    // EventTiles::insertOnTop('EventTile_14', DECK);
-  }
+    // Notifications::log('tradeRoute', TradeRoutes::getOrdersForTradeRoute(ORDER_BOMBAY_3, 16));
+    
+    // Notifications::log('homePorts', Orders::getHomePorts());
 
+  }
 
   function debug_engineDisplay()
   {

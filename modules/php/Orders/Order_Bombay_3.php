@@ -16,7 +16,7 @@ class Order_Bombay_3 extends \Bga\Games\JohnCompany\Models\Order
     $this->connectedOrders = [
       ORDER_MYSORE_1,
       ORDER_BOMBAY_1,
-      ORDER_BOMBAY_3,
+      ORDER_BOMBAY_2,
     ];
   }
 

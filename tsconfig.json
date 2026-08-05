@@ -58,6 +58,13 @@
     "src/player-manager/templates.ts",
     "src/states/Chairman.ts",
     "src/states/ChairmanDebtConsent.ts",
+    "src/states/CrownChairmanRequestAllocation.ts",
+    "src/states/CrownChairmanRequestDebtAdvancement.ts",
+    "src/states/CrownManagerOfShippingBuyCompanyShips.ts",
+    "src/states/CrownManagerOfShippingFitShips.ts",
+    "src/states/CrownManagerOfShippingLeaseExtraShips.ts",
+    "src/states/CrownManagerOfShippingPlaceShips.ts",
+    "src/states/CrownManagerOfShippingUnfittedShipOptions.ts",
     "src/states/DirectorOfTradeSpecialEnvoy.ts",
     "src/states/DirectorOfTradeSpecialEnvoySuccess.ts",
     "src/states/DirectorOfTradeTransfers.ts",
@@ -77,6 +84,7 @@
     "src/states/RevenueRoyalPardon.ts",
     "src/states/SeekShare.ts",
     "src/static-data/index.ts",
-    "src/templates.ts"
+    "src/templates.ts",
+    "src/utility.ts"
   ]
 }

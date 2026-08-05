@@ -173,6 +173,15 @@ const GOVERNOR_OF_MARATHA = 'GovernorOfMaratha';
 const GOVERNOR_OF_HYDERABAD = 'GovernorOfHyderabad';
 const GOVERNOR_OF_MYSORE = 'GovernorOfMysore';
 
+const OFFICES_WITH_TREASURY = [
+  DIRECTOR_OF_TRADE,
+  // GOVERNOR_GENERAL,
+  MANAGER_OF_SHIPPING,
+  PRESIDENT_OF_BOMBAY,
+  PRESIDENT_OF_MADRAS,
+  PRESIDENT_OF_BENGAL,
+];
+
 /**
  * Family member positions
  */
@@ -198,7 +207,7 @@ const DELHI_PUNJAB_BORDER = 'Delhi_Punjab_border';
 const HYDERABAD_MADRAS_BORDER = 'Hyderabad_Madras_border';
 const HYDERABAD_MARATHA_BORDER = 'Hyderabad_Maratha_border';
 const HYDERABAD_MYSORE_BORDER = 'Hyderabad_Mysore_border';
-const MADRAS_MYSORE_BORDER = 'Madras_Mysore_border'
+const MADRAS_MYSORE_BORDER = 'Madras_Mysore_border';
 
 /**
  * RegionIds
@@ -219,11 +228,7 @@ const BENGAL_PRESIDENCY = 'BengalPresidency';
 const BOMBAY_PRESIDENCY = 'BombayPresidency';
 const MADRAS_PRESIDENCY = 'MadrasPresidency';
 
-const PRESIDENCIES = [
-  BENGAL_PRESIDENCY,
-  BOMBAY_PRESIDENCY,
-  MADRAS_PRESIDENCY,
-];
+const PRESIDENCIES = [BENGAL_PRESIDENCY, BOMBAY_PRESIDENCY, MADRAS_PRESIDENCY];
 
 const BENGAL_WRITERS = 'Writers_Bengal';
 const BOMBAY_WRITERS = 'Writers_Bombay';
@@ -249,6 +254,7 @@ const ARMY_REGION_MAP = {
 const WEST_INDIAN = 'westIndian';
 const EAST_INDIAN = 'eastIndian';
 const SOUTH_INDIAN = 'southIndian';
+const CHINA = 'china';
 const UNFITTED = 'unfitted';
 
 const SEA_ZONES = [WEST_INDIAN, EAST_INDIAN, SOUTH_INDIAN];
@@ -321,3 +327,7 @@ const BEAR = 'Bear';
 const PEACOCK = 'Peacock';
 
 const CROWN_CLIMATE = [BULL, STAG, LION, BEAR, PEACOCK];
+
+const BUY_COMPANY_SHIP = 'BUY_COMPANY_SHIP';
+const DO_NOT_BUY_COMPANY_SHIP = 'BUY_COMPANY_SHIP';
+const BUY_AS_MANY_SHIPS_AS_YOU_WISH = 'BUY_AS_MANY_SHIPS_AS_YOU_WISH';

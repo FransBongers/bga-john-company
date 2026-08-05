@@ -62,4 +62,12 @@ class PlayerManager {
       this.players[playerId].clearInterface();
     });
   }
+
+  /**
+   * @returns playerId of the player viewing the game
+   * NOTE: this can be a spectator
+   */
+  getCurrentPlayerId() {
+    return this.game.getPlayerId();
+  }
 }

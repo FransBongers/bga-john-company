@@ -43,6 +43,8 @@ const tplLogTokenPlayerName = ({
   color: string;
 }) => `<span class="playername" style="color:#${color};">${name}</span>`;
 
+const tknPound = () => _('Pounds');
+
 const tknShipValue = ({
   name,
   type,
@@ -54,3 +56,5 @@ const tknShipValue = ({
 }): string => {
   return [type, name, fatigued].join(':');
 };
+
+const tknPromiseCubes = () => 'Promise Cube(s)'

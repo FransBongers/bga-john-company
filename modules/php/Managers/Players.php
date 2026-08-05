@@ -274,6 +274,11 @@ class Players extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     });
   }
 
+  public static function getNonCrownPlayerIds()
+  {
+    return Utils::returnIds(self::getAll()->toArray());
+  }
+
   // // Returns array with $familyId => $playerId
   // public static function getFamilyIdPlayerIdMap()
   // {

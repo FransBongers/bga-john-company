@@ -61,6 +61,7 @@ class NotificationManager {
       'log',
       'message',
       // 'draftCard',
+      'allocateBalanceToOffice',
       'changeOrderStatus',
       'companyOperationChairman',
       'draftCardPrivate',
@@ -241,6 +242,17 @@ class NotificationManager {
         );
       })
     );
+  }
+
+  async notif_allocateBalanceToOffice(
+    notif: Notif<NotifAllocateBalanceToOffice>
+  ) {
+    const { companyBalance, officeTreasury, officeId } = notif.args;
+
+    const board = Board.getInstance();
+    board.treasuries[officeId].toValue(officeTreasury);
+
+    await board.movePawn('balance', companyBalance);
   }
 
   async notif_changeOrderStatus(notif: Notif<NotifChangeOrderStatus>) {
@@ -519,8 +531,10 @@ class NotificationManager {
         ? document.getElementById(`joco-promiseCubes-${CROWN_PLAYER_ID}`)
         : document.getElementById(`joco-promiseCubes-${playerId}`);
 
-    const fromPlayer = amount < 0 ? this.getPlayer(playerId) : this.getPlayer(CROWN_PLAYER_ID);
-    const toPlayer = amount < 0 ? this.getPlayer(CROWN_PLAYER_ID) : this.getPlayer(playerId);
+    const fromPlayer =
+      amount < 0 ? this.getPlayer(playerId) : this.getPlayer(CROWN_PLAYER_ID);
+    const toPlayer =
+      amount < 0 ? this.getPlayer(CROWN_PLAYER_ID) : this.getPlayer(playerId);
 
     const promises = Array.from(Array(Math.abs(amount)).keys()).map(
       async (_, index) => {

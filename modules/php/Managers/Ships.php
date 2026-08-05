@@ -83,6 +83,16 @@ class Ships extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   // .##....##..##..........##.......##....##.......##....##..##....##
   // ..######...########....##.......##....########.##.....##..######.
 
+  public static function getOtherShipFromSupply($shipType)
+  {
+    $ship = self::getTopOf(Locations::supplyOtherShips());
+    if ($ship === null) {
+      throw new \feException("ERROR_038");
+    }
+    $ship->setType($shipType);
+    return $ship;
+  }
+
   public static function getShipsInSeaZones()
   {
     return Utils::filter(self::getAll()->toArray(), function ($ship) {

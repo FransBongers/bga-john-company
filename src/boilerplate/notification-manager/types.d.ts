@@ -13,6 +13,12 @@ interface NotifWithPlayerArgs {
   player_name: string;
 }
 
+interface NotifAllocateBalanceToOffice extends NotifWithPlayerArgs {
+  officeId: string;
+  companyBalance: number;
+  officeTreasury: number;
+}
+
 interface NotifChangeOrderStatus extends NotifWithPlayerArgs {
   order: JoCoOrder;
 }

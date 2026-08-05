@@ -77,6 +77,10 @@ class Ship extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implement
     return $this->owner === null ? null : Players::get($this->owner);
   }
 
+  public function getOwnerPlayerId() {
+    return $this->owner;
+  }
+
   public function place($player, $location, $type = null) {
     $this->setLocation($location);
     if ($type !== null) {

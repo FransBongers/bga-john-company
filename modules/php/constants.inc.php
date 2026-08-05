@@ -86,6 +86,18 @@ const ST_FOREIGN_INVASION_END = 75;
 
 const ST_PARLIAMENT_MEETS = 80;
 
+const ST_CROWN_CHAIRMAN_SEEK_DEBT = 110;
+const ST_CROWN_CHAIRMAN_REQUEST_DEBT_ADVANCEMENT = 111;
+const ST_CROWN_CHAIRMAN_REQUEST_ALLOCATION = 112;
+const ST_CROWN_CHAIRMAN_ALLOCATE_COMPANY_BALANCE = 113;
+
+// const ST_CROWN_MANAGER_OF_SHIPPING = 120;
+const ST_CROWN_MANAGER_OF_SHIPPING_FIT_SHIPS = 120;
+const ST_CROWN_MANAGER_OF_SHIPPING_BUY_COMPANY_SHIPS = 121;
+const ST_CROWN_MANAGER_OF_SHIPPING_LEASE_EXTRA_SHIPS = 122;
+const ST_CROWN_MANAGER_OF_SHIPPING_PLACE_SHIPS = 123;
+
+
 const BONUSES = 'Bonuses';
 const DRAFT_CARD = 'DraftCard';
 const DRAFT_CARD_NEXT_STEP = 'DraftCardNextStep';
@@ -119,7 +131,33 @@ const MILITARY_AFFAIRS_ASSIGN = 'MilitaryAffairsAssign';
 const PRESIDENCY_DECIDE_ORDER = 'PresidencyDecideOrder';
 const PRESIDENCY_TRADE = 'PresidencyTrade';
 const PRESIDENCY_TRADE_FILL_ORDERS = 'PresidencyTradeFillOrders';
+// Crown states
+const CROWN_CHAIRMAN_SEEK_DEBT = 'CrownChairmanSeekDebt';
+const CROWN_CHAIRMAN_REQUEST_DEBT_ADVANCEMENT = 'CrownChairmanRequestDebtAdvancement';
+const CROWN_CHAIRMAN_REQUEST_ALLOCATION = 'CrownChairmanRequestAllocation';
+const CROWN_CHAIRMAN_ALLOCATE_COMPANY_BALANCE = 'CrownChairmanAllocateCompanyBalance';
+const CROWN_MANAGER_OF_SHIPPING_FIT_SHIPS = 'CrownManagerOfShippingFitShips';
+const CROWN_MANAGER_OF_SHIPPING_BUY_COMPANY_SHIPS = 'CrownManagerOfShippingBuyCompanyShips';
+const CROWN_MANAGER_OF_SHIPPING_LEASE_EXTRA_SHIPS = 'CrownManagerOfShippingLeaseExtraShips';
+const CROWN_MANAGER_OF_SHIPPING_PLACE_SHIPS = 'CrownManagerOfShippingPlaceShips';
 
+// const CHAIRMAN = 'Chairman';
+// const DIRECTOR_OF_TRADE = 'DirectorOfTrade';
+// const MANAGER_OF_SHIPPING = 'ManagerOfShipping';
+// const MILITARY_AFFAIRS = 'MilitaryAffairs';
+// const PRESIDENT_OF_BOMBAY = 'PresidentOfBombay';
+// const PRESIDENT_OF_MADRAS = 'PresidentOfMadras';
+// const PRESIDENT_OF_BENGAL = 'PresidentOfBengal';
+// const GOVERNOR_GENERAL = 'GovernorGeneral';
+// const SUPERINTENDENT_OF_TRADE_IN_CHINA = 'SuperintendentOfTradeInChina';
+// const GOVERNOR_OF_BOMBAY = 'GovernorOfBombay';
+// const GOVERNOR_OF_MADRAS = 'GovernorOfMadras';
+// const GOVERNOR_OF_BENGAL = 'GovernorOfBengal';
+// const GOVERNOR_OF_PUNJAB = 'GovernorOfPunjab';
+// const GOVERNOR_OF_DELHI = 'GovernorOfDelhi';
+// const GOVERNOR_OF_MARATHA = 'GovernorOfMaratha';
+// const GOVERNOR_OF_HYDERABAD = 'GovernorOfHyderabad';
+// const GOVERNOR_OF_MYSORE = 'GovernorOfMysore';
 
 /**
  * Company
@@ -129,6 +167,7 @@ const DEBT = 'debt';
 const STANDING = 'standing';
 
 const COMPANY_EXPECTATIONS = [0, 4, 6, 8, 10, 12, 14, 16];
+const MAX_DEBT = 8;
 
 /**
  * Crown
@@ -161,12 +200,20 @@ const SPOUSE = 'Spouse';
 const WEST_INDIAN = 'westIndian';
 const EAST_INDIAN = 'eastIndian';
 const SOUTH_INDIAN = 'southIndian';
+const CHINA = 'china';
 const UNFITTED = 'unfitted';
 
 const SEA_ZONES = [
   WEST_INDIAN,
   SOUTH_INDIAN,
   EAST_INDIAN,
+];
+
+const SHIP_LOCATIONS = [
+  WEST_INDIAN,
+  SOUTH_INDIAN,
+  EAST_INDIAN,
+  CHINA,
 ];
 
 /**
@@ -398,6 +445,18 @@ const PRESIDENCY_HOME_REGION_MAP = [
   MADRAS_PRESIDENCY => MADRAS,
 ];
 
+const PRESIDENCY_SEA_ZONE_MAP = [
+  BENGAL_PRESIDENCY => EAST_INDIAN,
+  BOMBAY_PRESIDENCY => WEST_INDIAN,
+  MADRAS_PRESIDENCY => SOUTH_INDIAN,
+];
+
+const PRESIDENCY_PRESIDENT_OFFICE_MAP = [
+  BENGAL_PRESIDENCY => PRESIDENT_OF_BENGAL,
+  BOMBAY_PRESIDENCY => PRESIDENT_OF_BOMBAY,
+  MADRAS_PRESIDENCY => PRESIDENT_OF_MADRAS,
+];
+
 const BENGAL_ARMY = 'Army_Bengal';
 const BOMBAY_ARMY = 'Army_Bombay';
 const MADRAS_ARMY = 'Army_Madras';
@@ -481,6 +540,16 @@ const EXTRA_SHIP = 'ExtraShip';
 const SUPPLY_OTHER_SHIPS = 'supply_otherShips';
 const SUPPLY_PLAYER_SHIPS = 'supply_playerShips';
 const SUPPLY_REGIMENTS = 'supply_regiments';
+
+const SHIPS_TO_BE_PLACED_BY_CROWN = 'shipsToBePlacedByCrown';
+
+const COST_TO_FIT_SHIP = 3;
+const COST_TO_BUY_COMPANY_SHIP = 5;
+const COST_TO_LEASE_EXTRA_SHIP = 2;
+
+const BUY_COMPANY_SHIP = 'BUY_COMPANY_SHIP';
+const DO_NOT_BUY_COMPANY_SHIP = 'DO_NOT_BUY_COMPANY_SHIP';
+const BUY_AS_MANY_SHIPS_AS_YOU_WISH = 'BUY_AS_MANY_SHIPS_AS_YOU_WISH';
 
 /**
  * Player owned ship names

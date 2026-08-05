@@ -55,6 +55,10 @@ class Locations
     return SUPPLY_PLAYER_SHIPS;
   }
 
+  public static function shipsToBePlacedByCrown()
+  {
+    return SHIPS_TO_BE_PLACED_BY_CROWN;
+  }
 
   public static function presidency($regionId)
   {
@@ -70,11 +74,6 @@ class Locations
   {
     return 'Writers_' . $regionId;
   }
-
-
-
-
-
 
 
   public static function londonSeasonPool($type)

@@ -130,7 +130,7 @@ class Notifications
 
   public static function tknPromiseCube()
   {
-    return clienttranslate('Promise Cubes');
+    return clienttranslate('Promise Cube(s)');
   }
 
   public static function tknRegiment()
@@ -146,6 +146,11 @@ class Notifications
     return implode(':', [$familyMember->getFamilyId(), $number]);
   }
 
+  protected static function tknShip($ship)
+  {
+    return implode(':', [$ship->getType(), $ship->getName(), $ship->getFatigued()]);
+  }
+
   //  .##.....##.########.####.##.......####.########.##....##
   //  .##.....##....##.....##..##........##.....##.....##..##.
   //  .##.....##....##.....##..##........##.....##......####..
@@ -153,6 +158,23 @@ class Notifications
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private static function getShipsLog($ships)
+  {
+    $shipsLog = '';
+    $shipsLogArgs = [];
+
+    foreach ($ships as $index => $ship) {
+      $key = 'tkn_ship_' . $index;
+      $shipsLog = $shipsLog . '${' . $key . '}';
+      $shipsLogArgs[$key] = self::tknShip($ship);
+    }
+
+    return [
+      'log' => $shipsLog,
+      'args' => $shipsLogArgs,
+    ];
+  }
 
   private static function getRegionNameForArmy($armyId)
   {
@@ -170,6 +192,7 @@ class Notifications
       EAST_INDIAN => clienttranslate('East Indian'),
       SOUTH_INDIAN => clienttranslate('South Indian'),
       WEST_INDIAN => clienttranslate('West Indian'),
+      CHINA => clienttranslate('China'),
     ];
     return $idNameMap[$seaId];
   }
@@ -227,6 +250,20 @@ class Notifications
   // .##..####.##.....##....##.....##..##.............##
   // .##...###.##.....##....##.....##..##.......##....##
   // .##....##..#######.....##....####.##........######.
+
+  public static function allocateBalanceToOffice($player, $office, $amount, $companyBalance, $officeTreasury)
+  {
+    self::notifyAll('allocateBalanceToOffice', clienttranslate('${player_name} allocates ${amount} ${tkn_pound} to the ${tkn_boldText_office}'), [
+      'player' => $player,
+      'amount' => $amount,
+      'companyBalance' => $companyBalance,
+      'officeTreasury' => $officeTreasury,
+      'tkn_boldText_office' => $office->getTitle(),
+      'tkn_pound' => self::tknPound(),
+      'officeId' => $office->getId(),
+      'i18n' => ['tkn_boldText_office'],
+    ]);
+  }
 
   public static function setCrownClimate($player, $climate)
   {
@@ -594,13 +631,53 @@ class Notifications
     ]);
   }
 
+  public static function payPromiseCubesToBuyCompanyShip($player, $amount, $ships)
+  {
+    self::notifyAll('transferPromiseCubes', clienttranslate('${player_name} pays ${tkn_boldText_amount} ${tkn_promiseCube} to the ${tkn_playerName_crown} to buy ${shipsLog}'), [
+      'player' => $player,
+      'tkn_playerName_crown' => Players::get(CROWN_PLAYER_ID)->getName(),
+      'tkn_promiseCube' => self::tknPromiseCube(),
+      'amount' => -$amount,
+      'tkn_boldText_amount' => abs($amount),
+      'tkn_boldText_crown' => clienttranslate('Crown'),
+      'shipsLog' => self::getShipsLog($ships),
+      'i18n' => ['tkn_boldText_crown'],
+    ]);
+  }
+
+  public static function buyCompanyShips($player, $ships)
+  {
+    self::message(clienttranslate('${player_name} buys ${shipsLog}'), [
+      'player' => $player,
+      'shipsLog' => self::getShipsLog($ships),
+    ]);
+  }
+
+  public static function fitShips($player, $ships)
+  {
+    self::message(clienttranslate('${player_name} fits ${shipsLog}'), [
+      'player' => $player,
+      'shipsLog' => self::getShipsLog($ships),
+    ]);
+  }
+
+  public static function leaseExtraShips($player, $ships)
+  {
+    self::message(clienttranslate('${player_name} leases ${shipsLog}'), [
+      'player' => $player,
+      'shipsLog' => self::getShipsLog($ships),
+    ]);
+  }
+
+
   public static function placeShip($player, $ship)
   {
     // TODO: ship icon?
-    self::notifyAll('placeShip', clienttranslate('${player_name} places a ship in the ${tkn_boldText_sea}'), [
+    self::notifyAll('placeShip', clienttranslate('${player_name} places ${tkn_ship} in the ${tkn_boldText_sea}'), [
       'player' => $player,
       'tkn_boldText_sea' => self::getSeaName($ship->getLocation()),
       'ship' => $ship->jsonSerialize(),
+      'tkn_ship' => self::tknShip($ship)
     ]);
   }
 

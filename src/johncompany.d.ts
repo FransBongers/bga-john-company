@@ -131,6 +131,7 @@ interface JohnCompanyGamedatas extends Gamedatas {
   regions: Record<string, JocoRegionBase>;
   ships: Record<string, JocoShipBase>;
   staticData: {
+    offices: Record<string, JocoOfficeStatic>;
     orders: Record<string, JoCoOrderStatic>;
     regions: Record<string, JocoRegionStatic>;
     setupCards: Record<string, JocoSetupCardStatic>;
@@ -169,6 +170,11 @@ interface JocoFamilyMember {
 interface JoCoOfficeBase extends GamePiece {
   familyMemberId: string | null;
   treasury: number;
+}
+
+interface JocoOfficeStatic {
+  hirePriority: number;
+  title: string;
 }
 
 interface JoCoOrder {

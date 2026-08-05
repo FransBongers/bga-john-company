@@ -324,6 +324,37 @@
   border-radius: 50%;
 }
 
+.joco-select-box.joco-office {
+  width: calc(var(--boardScale) * 114px);
+  height: calc(var(--boardScale) * 50px);
+  border-radius: calc(var(--boardScale) * 6px);
+}
+
+.joco-select-box.joco-office[data-office=DirectorOfTrade] {
+  top: calc(var(--boardScale) * 660px);
+  left: calc(var(--boardScale) * 418px);
+}
+
+.joco-select-box.joco-office[data-office=ManagerOfShipping] {
+  top: calc(var(--boardScale) * 660px);
+  left: calc(var(--boardScale) * 556px);
+}
+
+.joco-select-box.joco-office[data-office=PresidentOfBombay] {
+  top: calc(var(--boardScale) * 660px);
+  left: calc(var(--boardScale) * 829px);
+}
+
+.joco-select-box.joco-office[data-office=PresidentOfMadras] {
+  top: calc(var(--boardScale) * 660px);
+  left: calc(var(--boardScale) * 1019px);
+}
+
+.joco-select-box.joco-office[data-office=PresidentOfBengal] {
+  top: calc(var(--boardScale) * 660px);
+  left: calc(var(--boardScale) * 1208px);
+}
+
 .joco-regiment.selectable,
 .joco-order.selectable,
 .joco-select-box.selectable {

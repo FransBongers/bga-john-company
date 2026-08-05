@@ -332,6 +332,88 @@ $machinestates = [
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
+    ST_CROWN_CHAIRMAN_SEEK_DEBT => [
+        'name' => CROWN_CHAIRMAN_SEEK_DEBT,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_CROWN_CHAIRMAN_REQUEST_DEBT_ADVANCEMENT => [
+        'name' => CROWN_CHAIRMAN_REQUEST_DEBT_ADVANCEMENT,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . CROWN_CHAIRMAN_REQUEST_DEBT_ADVANCEMENT, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_CROWN_CHAIRMAN_REQUEST_ALLOCATION => [
+        'name' => CROWN_CHAIRMAN_REQUEST_ALLOCATION,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . CROWN_CHAIRMAN_REQUEST_ALLOCATION, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_CROWN_CHAIRMAN_ALLOCATE_COMPANY_BALANCE => [
+        'name' => CROWN_CHAIRMAN_ALLOCATE_COMPANY_BALANCE,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_CROWN_MANAGER_OF_SHIPPING_FIT_SHIPS => [
+        'name' => CROWN_MANAGER_OF_SHIPPING_FIT_SHIPS,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . CROWN_MANAGER_OF_SHIPPING_FIT_SHIPS, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_CROWN_MANAGER_OF_SHIPPING_BUY_COMPANY_SHIPS => [
+        'name' => CROWN_MANAGER_OF_SHIPPING_BUY_COMPANY_SHIPS,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . CROWN_MANAGER_OF_SHIPPING_BUY_COMPANY_SHIPS, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_CROWN_MANAGER_OF_SHIPPING_LEASE_EXTRA_SHIPS => [
+        'name' => CROWN_MANAGER_OF_SHIPPING_LEASE_EXTRA_SHIPS,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . CROWN_MANAGER_OF_SHIPPING_LEASE_EXTRA_SHIPS, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_CROWN_MANAGER_OF_SHIPPING_PLACE_SHIPS => [
+        'name' => CROWN_MANAGER_OF_SHIPPING_PLACE_SHIPS,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . CROWN_MANAGER_OF_SHIPPING_PLACE_SHIPS, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
     ST_MILITARY_AFFAIRS_TRANSFERS => [
         'name' => MILITARY_AFFAIRS_TRANSFERS,
         'type' => 'multipleactiveplayer',

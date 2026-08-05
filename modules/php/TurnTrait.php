@@ -206,14 +206,22 @@ trait TurnTrait
     $this->updatePhase(CHAIRMAN);
     $offices = Company::getOfficesWithTreasury();
 
+    $chairman = Offices::get(CHAIRMAN);
+    $family = $chairman->getFamily();
+
+    if ($family->getId() === CROWN) {
+      $this->stSetupCrownChairman();
+      return;
+    }
+
     $initialTreasuries = [];
 
     foreach ($offices as $officeId => $office) {
       $initialTreasuries[$officeId] = $office->getTreasury();
     }
 
-    $chairman = Offices::get(CHAIRMAN);
-    $family = $chairman->getFamily();
+
+
     if (Crown::isInGame() && $family->getId() !== CROWN && $family->getCrownPromiseCubes() > 0) {
       $family->payPromiseCubes(1);
     }
@@ -227,6 +235,31 @@ trait TurnTrait
           'initialTreasuries' => $initialTreasuries,
           'initialDebt' => Company::getDebt(),
         ]
+      ],
+    ];
+
+    // TODO: Governor General or Director of Trade callback
+    Engine::setup($node, ['method' => 'stSetupDirectorOfTrade']);
+    Engine::proceed();
+  }
+
+  function stSetupCrownChairman()
+  {
+
+    $node = [
+      'children' => [
+        [
+          'action' => CROWN_CHAIRMAN_SEEK_DEBT
+        ],
+        [
+          'action' => CROWN_CHAIRMAN_REQUEST_ALLOCATION,
+          'playerId' => 'some',
+          'activePlayerIds' => Players::getNonCrownPlayerIds(),
+        ],
+        [
+          'action' => CROWN_CHAIRMAN_ALLOCATE_COMPANY_BALANCE,
+          'allocationStep' => 1,
+        ],
       ],
     ];
 
@@ -264,17 +297,55 @@ trait TurnTrait
   function stSetupManagerOfShipping()
   {
     $this->updatePhase(MANAGER_OF_SHIPPING);
-    $offices = Offices::getAll();
+    $office = Offices::get(MANAGER_OF_SHIPPING);
 
-    $officesInGame = [MANAGER_OF_SHIPPING];
+    if ($office->getFamilyId() === CROWN) {
+      $this->stSetupCrownManagerOfShipping();
+      return;
+    }
+
     $node = [
-      'children' => array_map(function ($officeId) use ($offices) {
-        return [
-          'action' => $officeId,
+      'children' => [
+        [
+          'action' => MANAGER_OF_SHIPPING,
           'playerId' => 'some',
-          'activePlayerIds' => [$offices[$officeId]->getPlayerId()],
-        ];
-      }, $officesInGame),
+          'activePlayerIds' => [$office->getPlayerId()],
+        ],
+      ],
+    ];
+
+    Engine::setup($node, ['method' => 'stSetupMilitaryAffairs']);
+    Engine::proceed();
+  }
+
+  function stSetupCrownManagerOfShipping()
+  {
+    $node = [
+      'children' => [
+        [
+          'action' => CROWN_MANAGER_OF_SHIPPING_FIT_SHIPS,
+          'playerId' => 'some',
+          'activePlayerIds' => Players::getNonCrownPlayerIds(),
+        ],
+        [
+          'action' => CROWN_MANAGER_OF_SHIPPING_BUY_COMPANY_SHIPS,
+          'playerId' => 'some',
+          'activePlayerIds' => Players::getNonCrownPlayerIds(),
+        ],
+        [
+          'action' => CROWN_MANAGER_OF_SHIPPING_LEASE_EXTRA_SHIPS,
+          'playerId' => 'some',
+          'activePlayerIds' => Players::getNonCrownPlayerIds(),
+        ],
+        [
+          'action' => CROWN_MANAGER_OF_SHIPPING_PLACE_SHIPS,
+          'playerId' => 'some',
+          'activePlayerIds' => Players::getNonCrownPlayerIds(),
+          'fit' => [],
+          'buy' => [],
+          'lease' => [],
+        ],
+      ],
     ];
 
     Engine::setup($node, ['method' => 'stSetupMilitaryAffairs']);
