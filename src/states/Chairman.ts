@@ -1,3 +1,20 @@
+import { Board } from '../board';
+import { DISABLED, Interaction } from '../boilerplate';
+import {
+  addConfirmButton,
+  addDangerActionButton,
+  addPrimaryActionButton,
+  clearPossible,
+  debug,
+  getPlayerName,
+  performAction,
+  setSelected,
+  updatePageTitle,
+} from '../boilerplate/utility';
+import { CROWN_PLAYER_ID, PLUS, MINUS } from '../constants';
+import { PlayerManager } from '../player-manager';
+import { CommonStateArgs, GameAlias, GameState } from '../types';
+
 interface OnEnteringChairmanArgs extends CommonStateArgs {
   debtOptions: {
     currentDebt: number;
@@ -10,7 +27,7 @@ interface OnEnteringChairmanArgs extends CommonStateArgs {
   initialTreasuries: Record<string, number>;
 }
 
-class Chairman implements State {
+export class Chairman implements GameState<OnEnteringChairmanArgs> {
   private static instance: Chairman;
   private args: OnEnteringChairmanArgs;
   private companyBalance: number;
@@ -21,7 +38,7 @@ class Chairman implements State {
     this.crownInGame = this.game.gameOptions.crownEnabled;
   }
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     Chairman.instance = new Chairman(game);
   }
 
@@ -46,12 +63,12 @@ class Chairman implements State {
     console.log('setDescription Chairman');
     updatePageTitle(
       _(
-        '${tkn_playerName} may increase Company Debt and must allocate the Company Balance'
+        '${tkn_playerName} may increase Company Debt and must allocate the Company Balance',
       ),
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true
+      true,
     );
   }
 
@@ -122,7 +139,7 @@ class Chairman implements State {
     if (this.crownInGame) {
       updatePageTitle(
         _(
-          'Ask Court of Directors for consent to increase Company Debt to ${value}? ${you} will need to pay ${number} ${tkn_promiseCube} to ${tkn_playerName_crown}'
+          'Ask Court of Directors for consent to increase Company Debt to ${value}? ${you} will need to pay ${number} ${tkn_promiseCube} to ${tkn_playerName_crown}',
         ),
         {
           value,
@@ -131,16 +148,16 @@ class Chairman implements State {
           tkn_playerName_crown: PlayerManager.getInstance()
             .getPlayer(CROWN_PLAYER_ID)
             .getName(),
-        }
+        },
       );
     } else {
       updatePageTitle(
         _(
-          'Ask Court of Directors for consent to increase Company Debt to ${value}?'
+          'Ask Court of Directors for consent to increase Company Debt to ${value}?',
         ),
         {
           value,
-        }
+        },
       );
     }
 
@@ -167,8 +184,8 @@ class Chairman implements State {
     } else {
       updatePageTitle(
         _(
-          '${you} may increase Company Debt and must allocate the Company Balance'
-        )
+          '${you} may increase Company Debt and must allocate the Company Balance',
+        ),
       );
     }
   }
@@ -178,7 +195,7 @@ class Chairman implements State {
     Object.entries(Board.getInstance().treasuries).forEach(
       ([office, treasury]) => {
         treasuries[office] = treasury.getValue();
-      }
+      },
     );
 
     performAction('actChairman', {
@@ -193,7 +210,7 @@ class Chairman implements State {
     Object.entries(Board.getInstance().treasuries).forEach(
       ([office, treasury]) => {
         treasury.setInactive();
-      }
+      },
     );
   }
 
@@ -206,10 +223,10 @@ class Chairman implements State {
         this.checkMinusDisabled(office);
         [PLUS, MINUS].forEach((type: 'plus' | 'minus') => {
           interaction.onClick(treasury.getButtonElement(type), () =>
-            this.handleClick(type, office)
+            this.handleClick(type, office),
           );
         });
-      }
+      },
     );
   }
 

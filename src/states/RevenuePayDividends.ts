@@ -1,16 +1,31 @@
+import {
+  debug,
+  updatePageTitle,
+  getPlayerName,
+  addSecondaryActionButton,
+  DISABLED,
+  addPrimaryActionButton,
+  formatStringRecursive,
+  addCancelButton,
+  clearPossible,
+  addConfirmButton,
+  performAction,
+} from '../boilerplate';
+import { CommonStateArgs, GameState, GameAlias } from '../types';
+
 interface OnEnteringRevenuePayDividendsArgs extends CommonStateArgs {
   costPerDividend: number;
   maxNumberOfDividends: number;
 }
 
-class RevenuePayDividends implements State {
+export class RevenuePayDividends implements GameState<OnEnteringRevenuePayDividendsArgs> {
   private static instance: RevenuePayDividends;
   private args: OnEnteringRevenuePayDividendsArgs;
   private selectedNumberOfDividends: number;
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     RevenuePayDividends.instance = new RevenuePayDividends(game);
   }
 
@@ -31,14 +46,14 @@ class RevenuePayDividends implements State {
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringRevenuePayDividendsArgs
+    args: OnEnteringRevenuePayDividendsArgs,
   ) {
     updatePageTitle(
       _('${tkn_playerName} may pay dividends'),
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true
+      true,
     );
   }
 
@@ -63,13 +78,13 @@ class RevenuePayDividends implements State {
 
     updatePageTitle(
       _(
-        '${you} may pay up to ${maxNumber} dividends for ${amount} ${tkn_pound} each'
+        '${you} may pay up to ${maxNumber} dividends for ${amount} ${tkn_pound} each',
       ),
       {
         maxNumber: this.args.maxNumberOfDividends,
         amount: this.args.costPerDividend,
         tkn_pound: 'pound',
-      }
+      },
     );
 
     addSecondaryActionButton({
@@ -122,7 +137,7 @@ class RevenuePayDividends implements State {
           number: this.selectedNumberOfDividends,
           amount: this.args.costPerDividend * this.selectedNumberOfDividends,
           tkn_pound: 'pound',
-        }
+        },
       );
     }
 

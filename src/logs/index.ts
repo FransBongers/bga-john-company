@@ -1,3 +1,18 @@
+import { createFamilyMember, createRegiment, createShip } from '../board/utility';
+import { PlayerManager } from '../player-manager';
+import { GameAlias } from '../types';
+import {
+  tlpLogTokenText,
+  tplLogTokenClimate,
+  tplLogTokenIcon,
+  tplLogTokenElephant,
+  tplLogTokenPound,
+  tplLogTokenPromiseCube,
+  tplLogTokenSetupCard,
+  tplLogTokenStormDie,
+  tplLogTokenPlayerName,
+} from './templates';
+
 const LOG_TOKEN_BOLD_TEXT = 'boldText';
 const LOG_TOKEN_BOLD_ITALIC_TEXT = 'boldItalicText';
 const LOG_TOKEN_NEW_LINE = 'newLine';
@@ -7,7 +22,7 @@ const LOG_TOKEN_CLIMATE = 'climate';
 const LOG_TOKEN_POUND = 'pound';
 const LOG_TOKEN_ELEPHANT = 'elephant';
 const LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
-const LOG_TOKEN_FAMILY_MEMBER = 'familyMember'
+const LOG_TOKEN_FAMILY_MEMBER = 'familyMember';
 const LOG_TOKEN_ICON = 'icon';
 const LOG_TOKEN_REGIMENT = 'regiment';
 const LOG_TOKEN_PROMISE_CUBE = 'promiseCube';
@@ -19,7 +34,7 @@ const CLASS_LOG_TOKEN = 'log-token';
 
 let tooltipIdCounter = 0;
 
-const getTokenDiv = ({
+export const getTokenDiv = ({
   key,
   value,
   game,
@@ -44,7 +59,8 @@ const getTokenDiv = ({
       return tplLogTokenElephant();
     case LOG_TOKEN_FAMILY_MEMBER:
       const [familyId, number] = value.split(':');
-      return createFamilyMember(familyId, Number(number), [CLASS_LOG_TOKEN]).outerHTML;
+      return createFamilyMember(familyId, Number(number), [CLASS_LOG_TOKEN])
+        .outerHTML;
     case LOG_TOKEN_POUND:
       return tplLogTokenPound();
     case LOG_TOKEN_PROMISE_CUBE:
@@ -55,7 +71,12 @@ const getTokenDiv = ({
       return tplLogTokenSetupCard(value);
     case LOG_TOKEN_SHIP:
       const [type, name, fatigued] = value.split(':');
-      return createShip({type, name, fatigued: Number(fatigued) as 0 | 1, extraClasses: [CLASS_LOG_TOKEN]}).outerHTML;
+      return createShip({
+        type,
+        name,
+        fatigued: Number(fatigued) as 0 | 1,
+        extraClasses: [CLASS_LOG_TOKEN],
+      }).outerHTML;
     case LOG_TOKEN_STORM_DIE:
       return tplLogTokenStormDie(value);
     case LOG_TOKEN_NEW_LINE:

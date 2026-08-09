@@ -1,18 +1,30 @@
+import {
+  addConfirmButton,
+  addPrimaryActionButton,
+  clearPossible,
+  debug,
+  GameState,
+  performAction,
+  updatePageTitle,
+} from '../boilerplate';
+import { tknPromiseCubes } from '../logs/templates';
+import { PlayerManager } from '../player-manager';
+import { CommonStateArgs, GameAlias, JocoShipBase } from '../types';
+import { getCrownPlayerName, getShipsLog } from '../utility';
+
 interface OnEnteringCrownManagerOfShippingFitShipsArgs extends CommonStateArgs {
   shipsThatWillBeFitted: JocoShipBase[];
   shipsThatWillNotBeFitted: JocoShipBase[];
   playerPromiseCubeCost: Record<number, number>;
 }
 
-class CrownManagerOfShippingFitShips implements State {
+export class CrownManagerOfShippingFitShips implements GameState<OnEnteringCrownManagerOfShippingFitShipsArgs> {
   private static instance: CrownManagerOfShippingFitShips;
   private args: OnEnteringCrownManagerOfShippingFitShipsArgs;
-  private ship: JocoShipBase;
-  private location: string;
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     CrownManagerOfShippingFitShips.instance =
       new CrownManagerOfShippingFitShips(game);
   }
@@ -34,14 +46,14 @@ class CrownManagerOfShippingFitShips implements State {
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringCrownManagerOfShippingFitShipsArgs
+    args: OnEnteringCrownManagerOfShippingFitShipsArgs,
   ) {
     updatePageTitle(
       _('${tkn_playerName} may fit ships'),
       {
         tkn_playerName: getCrownPlayerName(),
       },
-      true
+      true,
     );
   }
 
@@ -115,7 +127,7 @@ class CrownManagerOfShippingFitShips implements State {
 
     if (this.args.playerPromiseCubeCost[currentPlayerId]) {
       text = _(
-        '${tkn_playerName_crown} wants to fit ${ships_log}. ${you} must pay ${amount} ${tkn_promiseCube}'
+        '${tkn_playerName_crown} wants to fit ${ships_log}. ${you} must pay ${amount} ${tkn_promiseCube}',
       );
     }
 

@@ -1,4 +1,6 @@
-const tplBoard = (gamedatas: GamedatasAlias ) => `<div id="joco-board">
+import { GamedatasAlias } from "../types";
+
+export const tplBoard = (gamedatas: GamedatasAlias ) => `<div id="joco-board">
   <div id="joco-family-members"></div>
   <div id="joco-orders"></div>
   <div id="joco-regiments"></div>

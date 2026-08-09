@@ -1,16 +1,27 @@
-interface OnEnteringCrownManagerOfShippingPlaceShipsArgs
-  extends CommonStateArgs {
+import {
+  addConfirmButton,
+  addPrimaryActionButton,
+  clearPossible,
+  debug,
+  GameState,
+  performAction,
+  updatePageTitle,
+} from '../boilerplate';
+import { CommonStateArgs, GameAlias, JocoShipBase } from '../types';
+import { getCrownPlayerName, getSeaName, getShipsLog } from '../utility';
+
+interface OnEnteringCrownManagerOfShippingPlaceShipsArgs extends CommonStateArgs {
   seaZone: string;
   ships: JocoShipBase[];
 }
 
-class CrownManagerOfShippingPlaceShips implements State {
+export class CrownManagerOfShippingPlaceShips implements GameState<OnEnteringCrownManagerOfShippingPlaceShipsArgs> {
   private static instance: CrownManagerOfShippingPlaceShips;
   private args: OnEnteringCrownManagerOfShippingPlaceShipsArgs;
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     CrownManagerOfShippingPlaceShips.instance =
       new CrownManagerOfShippingPlaceShips(game);
   }
@@ -32,14 +43,14 @@ class CrownManagerOfShippingPlaceShips implements State {
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringCrownManagerOfShippingPlaceShipsArgs
+    args: OnEnteringCrownManagerOfShippingPlaceShipsArgs,
   ) {
     updatePageTitle(
       _('${tkn_playerName} must place ships'),
       {
         tkn_playerName: getCrownPlayerName(),
       },
-      true
+      true,
     );
   }
 
@@ -68,7 +79,7 @@ class CrownManagerOfShippingPlaceShips implements State {
         seaZone: getSeaName(this.args.seaZone),
         shipsLog: getShipsLog(this.args.ships),
         tkn_playerName_crown: getCrownPlayerName(),
-      }
+      },
     );
 
     // const playerId = PlayerManager.getInstance().getCurrentPlayerId();

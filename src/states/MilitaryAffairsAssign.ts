@@ -1,9 +1,29 @@
+import { Board } from '../board';
+import {
+  debug,
+  updatePageTitle,
+  getPlayerName,
+  onClick,
+  clearPossible,
+  setSelected,
+  addConfirmButton,
+  performAction,
+  addDangerActionButton,
+} from '../boilerplate';
+import { OFFICER_IN_TRAINING } from '../constants';
+import {
+  CommonStateArgs,
+  JocoFamilyMember,
+  GameState,
+  GameAlias,
+} from '../types';
+
 interface OnEnteringMilitaryAffairsAssignArgs extends CommonStateArgs {
   armies: string[];
   officersInTraining: Record<string, JocoFamilyMember>;
 }
 
-class MilitaryAffairsAssign implements State {
+export class MilitaryAffairsAssign implements GameState<OnEnteringMilitaryAffairsAssignArgs> {
   private static instance: MilitaryAffairsAssign;
   private args: OnEnteringMilitaryAffairsAssignArgs;
   private assignedOfficers: Record<
@@ -16,7 +36,7 @@ class MilitaryAffairsAssign implements State {
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     MilitaryAffairsAssign.instance = new MilitaryAffairsAssign(game);
   }
 
@@ -38,14 +58,14 @@ class MilitaryAffairsAssign implements State {
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringMilitaryAffairsAssignArgs
+    args: OnEnteringMilitaryAffairsAssignArgs,
   ) {
     updatePageTitle(
       _('${tkn_playerName} must assign officers-in-training'),
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true
+      true,
     );
   }
 
@@ -86,9 +106,9 @@ class MilitaryAffairsAssign implements State {
         }
 
         onClick(board.ui.familyMembers[officerId], () =>
-          this.updateInterfaceSelectArmy(officer)
+          this.updateInterfaceSelectArmy(officer),
         );
-      }
+      },
     );
   }
 
@@ -118,7 +138,7 @@ class MilitaryAffairsAssign implements State {
     addConfirmButton(() => {
       performAction('actMilitaryAffairsAssign', {
         assignedOfficers: Object.values(this.assignedOfficers).map(
-          ({ officer, to }) => ({ familyMemberId: officer.id, to })
+          ({ officer, to }) => ({ familyMemberId: officer.id, to }),
         ),
       });
     });
@@ -139,7 +159,7 @@ class MilitaryAffairsAssign implements State {
     for (const { officer, to } of Object.values(this.assignedOfficers)) {
       await board.moveFamilyMemberBetweenLocations(
         officer,
-        OFFICER_IN_TRAINING
+        OFFICER_IN_TRAINING,
       );
     }
   }

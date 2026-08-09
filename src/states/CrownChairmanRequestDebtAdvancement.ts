@@ -1,5 +1,21 @@
-interface OnEnteringCrownChairmanRequestDebtAdvancementArgs
-  extends CommonStateArgs {
+import {
+  addConfirmButton,
+  addPrimaryActionButton,
+  addSecondaryActionButton,
+  clearPossible,
+  debug,
+  DISABLED,
+  formatStringRecursive,
+  GameState,
+  performAction,
+  updatePageTitle,
+} from '../boilerplate';
+import { tknPromiseCubes } from '../logs/templates';
+import { PlayerManager } from '../player-manager';
+import { CommonStateArgs, GameAlias, JocoShipBase } from '../types';
+import { getCrownPlayerName } from '../utility';
+
+interface OnEnteringCrownChairmanRequestDebtAdvancementArgs extends CommonStateArgs {
   additionalAdvancement: {
     cost: number;
     possible: boolean;
@@ -14,15 +30,15 @@ interface OnEnteringCrownChairmanRequestDebtAdvancementArgs
   newDebt: number;
 }
 
-class CrownChairmanRequestDebtAdvancement implements State {
+export class CrownChairmanRequestDebtAdvancement implements GameState<OnEnteringCrownChairmanRequestDebtAdvancementArgs> {
   private static instance: CrownChairmanRequestDebtAdvancement;
   private args: OnEnteringCrownChairmanRequestDebtAdvancementArgs;
-  private ship: JocoShipBase;
-  private location: string;
+  // private ship: JocoShipBase;
+  // private location: string;
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     CrownChairmanRequestDebtAdvancement.instance =
       new CrownChairmanRequestDebtAdvancement(game);
   }
@@ -44,14 +60,14 @@ class CrownChairmanRequestDebtAdvancement implements State {
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringCrownChairmanRequestDebtAdvancementArgs
+    args: OnEnteringCrownChairmanRequestDebtAdvancementArgs,
   ) {
     updatePageTitle(
       _('${tkn_playerName} may fit ships'),
       {
         tkn_playerName: getCrownPlayerName(),
       },
-      true
+      true,
     );
   }
 
@@ -82,13 +98,11 @@ class CrownChairmanRequestDebtAdvancement implements State {
       addSecondaryActionButton({
         id: 'one_less_btn',
         text: formatStringRecursive(
-          _(
-            'Pay ${amount} ${tkn_promiseCube} for -1 Debt'
-          ),
+          _('Pay ${amount} ${tkn_promiseCube} for -1 Debt'),
           {
             amount: this.args.oneLessAdvancement.cost,
             tkn_promiseCube: tknPromiseCubes(),
-          }
+          },
         ),
         extraClasses: !this.args.oneLessAdvancement.playerCanPay[playerId]
           ? DISABLED
@@ -105,13 +119,11 @@ class CrownChairmanRequestDebtAdvancement implements State {
       addSecondaryActionButton({
         id: 'additional_btn',
         text: formatStringRecursive(
-          _(
-            'Pay ${amount} ${tkn_promiseCube} for +1 Debt'
-          ),
+          _('Pay ${amount} ${tkn_promiseCube} for +1 Debt'),
           {
             amount: this.args.additionalAdvancement.cost,
             tkn_promiseCube: tknPromiseCubes(),
-          }
+          },
         ),
         extraClasses: !this.args.additionalAdvancement.playerCanPay[playerId]
           ? DISABLED
@@ -161,15 +173,17 @@ class CrownChairmanRequestDebtAdvancement implements State {
         _('${tkn_playerName} does not want to advance the Debt marker'),
         {
           tkn_playerName: getCrownPlayerName(),
-        }
+        },
       );
     } else {
       updatePageTitle(
-        _('${tkn_playerName} wants to increase Company Debt to ${tkn_boldText_debtValue}'),
+        _(
+          '${tkn_playerName} wants to increase Company Debt to ${tkn_boldText_debtValue}',
+        ),
         {
           tkn_playerName: getCrownPlayerName(),
           tkn_boldText_debtValue: this.args.newDebt,
-        }
+        },
       );
     }
   }

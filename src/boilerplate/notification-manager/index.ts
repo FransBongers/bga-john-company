@@ -6,6 +6,63 @@
 //  .##...###.##.....##....##.....##..##......
 //  .##....##..#######.....##....####.##......
 
+import { Board } from '../../board';
+import {
+  LUXURY,
+  LUXURIES_COUNTER,
+  SHIPYARD,
+  SHIPYARDS_COUNTER,
+  WORKSHOP,
+  WORKSHOPS_COUNTER,
+  CASH_COUNTER,
+  FAMILY_MEMBERS_COUNTER,
+  FILLED,
+  SHIPS_COUNTER,
+  SHARES_COUNTER,
+  EXTRA_SHIP,
+  COMPANY_SHIP,
+  CROWN_PLAYER_ID,
+  PROMISE_CUBES_COUNTER,
+} from '../../constants';
+import { CrownClimate } from '../../crown/climate';
+import { PlayerManager } from '../../player-manager';
+import { JocoPlayer } from '../../player-manager/player';
+import { SetupArea } from '../../setup-area';
+import { GameAlias, OtherShipType } from '../../types';
+import { Interaction } from '../interaction';
+import { debug } from '../utility';
+import {
+  NotifAllocateBalanceToOffice,
+  NotifChangeOrderStatus,
+  NotifCompanyOperationChairman,
+  NotifDraftCardPrivateArgs,
+  NotifDraftNewCardsPrivateArgs,
+  NotifElephantMarch,
+  NotifEnlistFamilyMember,
+  NotifFillOrder,
+  NotifGainCash,
+  NotifGainEnterprise,
+  NotifMakeCheck,
+  NotifMoveCompanyBalance,
+  NotifMoveCompanyDebt,
+  NotifMoveCompanyStanding,
+  NotifMoveFamilyMember,
+  NotifMoveFamilyMembers,
+  NotifMoveRegiment,
+  NotifMoveShipArgs,
+  NotifNewCompanyShare,
+  NotifNextPhase,
+  NotifPayFromTreasury,
+  NotifPlaceShip,
+  NotifPurchaseEnterprise,
+  NotifReturnFamilyMemberToSupply,
+  NotifSeekShare,
+  NotifSetCrownClimate,
+  NotifSetupFamilyMembers,
+  NotifTransferPromiseCubes,
+  NotifUpdateRegion,
+} from './types';
+
 //  .##.....##....###....##....##....###.....######...########.########.
 //  .###...###...##.##...###...##...##.##...##....##..##.......##.....##
 //  .####.####..##...##..####..##..##...##..##........##.......##.....##
@@ -16,24 +73,23 @@
 
 const MIN_NOTIFICATION_MS = 1200;
 
-class NotificationManager {
+export class NotificationManager {
   private static instance: NotificationManager;
   private game: GameAlias;
-  private subscriptions: unknown[];
-  private id: string;
+  // private subscriptions: unknown[];
 
   constructor(game: GameAlias) {
     this.game = game;
-    this.subscriptions = [];
+    // this.subscriptions = [];
   }
 
-  public static create(game: GameAlias) {
-    NotificationManager.instance = new NotificationManager(game);
-  }
+  // public static create(game: GameAlias) {
+  //   NotificationManager.instance = new NotificationManager(game);
+  // }
 
-  public static getInstance() {
-    return NotificationManager.instance;
-  }
+  // public static getInstance() {
+  //   return NotificationManager.instance;
+  // }
 
   // ..######..########.########.##.....##.########.
   // .##....##.##..........##....##.....##.##.....##
@@ -44,108 +100,129 @@ class NotificationManager {
   // ..######..########....##.....#######..##.......
 
   setupNotifications() {
-    console.log('notifications subscriptions setup');
+    this.game.bga.notifications.setupPromiseNotifications({
+      prefix: 'notif_', // default is 'notif_'
+      minDuration: 1200, // for longer animations (500 by default)
+      minDurationNoText: 1,
+      handlers: [this.game.notificationManager], // if you write your notif function in a subclass instead of this (default this)
+      logger: debug, // show notif debug informations on console. Could be console.warn or any custom debug function (default null = no logs)
+      // ignoreNotifications: ['updateAutoPlay'], // the notif_updateAutoPlay function will be ignored by bgaSetupPromiseNotifications. You'll need to subscribe to it manually
+      onStart: (notifName: string, msg: string, args: any) => {
+        if (msg != '') {
+          $('gameaction_status').innerHTML = msg;
+          $('pagemaintitletext').innerHTML = msg;
+          $('generalactions').innerHTML = '';
 
-    dojo.connect(this.game.framework().notifqueue, 'addToLog', () => {
-      this.game.addLogClass();
-    });
-
-    /**
-     * In general:
-     * private is only for owning player
-     * all is for both players and spectators
-     * public / no suffix is for other player and spectators, not owning player
-     */
-    const notifs: string[] = [
-      // Boilerplate
-      'log',
-      'message',
-      // 'draftCard',
-      'allocateBalanceToOffice',
-      'changeOrderStatus',
-      'companyOperationChairman',
-      'draftCardPrivate',
-      'draftNewCardsPrivate',
-      'elephantMarch',
-      'enlistFamilyMember',
-      'fillOrder',
-      'gainCash',
-      'gainEnterprise',
-      'makeCheck',
-      'moveCompanyBalance',
-      'moveCompanyDebt',
-      'moveCompanyStanding',
-      'moveFamilyMember',
-      'moveFamilyMembers',
-      'moveRegiment',
-      'moveShip',
-      'newCompanyShare',
-      'nextPhase',
-      'payFromTreasury',
-      'placeShip',
-      'purchaseEnterprise',
-      'returnFamilyMemberToSupply',
-      'seekShare',
-      'setCrownClimate',
-      'setupDone',
-      'setupFamilyMembers',
-      'transferPromiseCubes',
-      'updateRegion',
-    ];
-
-    // example: https://github.com/thoun/knarr/blob/main/src/knarr.ts
-    notifs.forEach((notifName) => {
-      this.subscriptions.push(
-        dojo.subscribe(notifName, this, (notifDetails: Notif<unknown>) => {
-          debug(`notif_${notifName}`, notifDetails); // log notif params (with Tisaac log method, so only studio side)
-
-          const promise = this[`notif_${notifName}`](notifDetails);
-          const promises = promise ? [promise] : [];
-          let minDuration = 1;
-
-          // Show log messags in page title
-          let msg = this.game.format_string_recursive(
-            notifDetails.log,
-            notifDetails.args as Record<string, unknown>
-          );
-          // TODO: check if this clearPossible causes any issues?
-          // this.game.clearPossible();
-          if (msg != '') {
-            $('gameaction_status').innerHTML = msg;
-            $('pagemaintitletext').innerHTML = msg;
-            $('generalactions').innerHTML = '';
-
-            // If there is some text, we let the message some time, to be read
-            minDuration = MIN_NOTIFICATION_MS;
-          }
-
-          // Promise.all([...promises, sleep(minDuration)]).then(() =>
-          //   this.game.framework().notifqueue.onSynchronousNotificationEnd()
-          // );
-          // tell the UI notification ends, if the function returned a promise.
-          if (this.game.animationManager.animationsActive()) {
-            Promise.all([...promises, sleep(minDuration)]).then(() =>
-              this.game.framework().notifqueue.onSynchronousNotificationEnd()
-            );
-          } else {
-            // TODO: check what this does
-            this.game.framework().notifqueue.setSynchronousDuration(0);
-          }
-        })
-      );
-      this.game.framework().notifqueue.setSynchronous(notifName, undefined);
-
-      ['draftCard'].forEach((notifId) => {
-        this.game
-          .framework()
-          .notifqueue.setIgnoreNotificationCheck(
-            notifId,
-            (notif: Notif<{ playerId: number }>) =>
-              notif.args.playerId == this.game.getPlayerId()
-          );
-      });
+          // If there is some text, we let the message some time, to be read
+        }
+        // this.game.bga.statusBar.setTitle(msg);
+      },
     });
   }
+
+  // setupNotifications() {
+  //   console.log('notifications subscriptions setup');
+
+  //   dojo.connect(this.game.framework().notifqueue, 'addToLog', () => {
+  //     this.game.addLogClass();
+  //   });
+
+  //   /**
+  //    * In general:
+  //    * private is only for owning player
+  //    * all is for both players and spectators
+  //    * public / no suffix is for other player and spectators, not owning player
+  //    */
+  //   const notifs: string[] = [
+  //     // Boilerplate
+  //     'log',
+  //     'message',
+  //     // 'draftCard',
+  //     'allocateBalanceToOffice',
+  //     'changeOrderStatus',
+  //     'companyOperationChairman',
+  //     'draftCardPrivate',
+  //     'draftNewCardsPrivate',
+  //     'elephantMarch',
+  //     'enlistFamilyMember',
+  //     'fillOrder',
+  //     'gainCash',
+  //     'gainEnterprise',
+  //     'makeCheck',
+  //     'moveCompanyBalance',
+  //     'moveCompanyDebt',
+  //     'moveCompanyStanding',
+  //     'moveFamilyMember',
+  //     'moveFamilyMembers',
+  //     'moveRegiment',
+  //     'moveShip',
+  //     'newCompanyShare',
+  //     'nextPhase',
+  //     'payFromTreasury',
+  //     'placeShip',
+  //     'purchaseEnterprise',
+  //     'returnFamilyMemberToSupply',
+  //     'seekShare',
+  //     'setCrownClimate',
+  //     'setupDone',
+  //     'setupFamilyMembers',
+  //     'transferPromiseCubes',
+  //     'updateRegion',
+  //   ];
+
+  //   // example: https://github.com/thoun/knarr/blob/main/src/knarr.ts
+  //   notifs.forEach((notifName) => {
+  //     this.subscriptions.push(
+  //       dojo.subscribe(notifName, this, (notifDetails: Notif<unknown>) => {
+  //         debug(`notif_${notifName}`, notifDetails); // log notif params (with Tisaac log method, so only studio side)
+
+  //         const promise = this[`notif_${notifName}`](notifDetails);
+  //         const promises = promise ? [promise] : [];
+  //         let minDuration = 1;
+
+  //         // Show log messags in page title
+  //         let msg = this.game.format_string_recursive(
+  //           notifDetails.log,
+  //           notifDetails.args as Record<string, unknown>,
+  //         );
+  //         // TODO: check if this clearPossible causes any issues?
+  //         // this.game.clearPossible();
+  //         if (msg != '') {
+  //           $('gameaction_status').innerHTML = msg;
+  //           $('pagemaintitletext').innerHTML = msg;
+  //           $('generalactions').innerHTML = '';
+
+  //           // If there is some text, we let the message some time, to be read
+  //           minDuration = MIN_NOTIFICATION_MS;
+  //         }
+
+  //         // Promise.all([...promises, sleep(minDuration)]).then(() =>
+  //         //   this.game.framework().notifqueue.onSynchronousNotificationEnd()
+  //         // );
+  //         // tell the UI notification ends, if the function returned a promise.
+  //         if (this.game.animationManager.animationsActive()) {
+  //           Promise.all([...promises, sleep(minDuration)]).then(() =>
+  //             this.game.framework().notifqueue.onSynchronousNotificationEnd(),
+  //           );
+  //         } else {
+  //           // TODO: check what this does
+  //           this.game.framework().notifqueue.setSynchronousDuration(0);
+  //         }
+  //       }),
+  //     );
+  //     this.game.framework().notifqueue.setSynchronous(notifName, undefined);
+
+  //     ['draftCard'].forEach((notifId) => {
+  //       this.game
+  //         .framework()
+  //         .notifqueue.setIgnoreNotificationCheck(
+  //           notifId,
+  //           (notif: Notif<{ playerId: number }>) =>
+  //             notif.args.playerId == this.game.getPlayerId(),
+  //         );
+  //     });
+  //   });
+  // }
 
   //  .##.....##.########.####.##.......####.########.##....##
   //  .##.....##....##.....##..##........##.....##.....##..##.
@@ -155,9 +232,10 @@ class NotificationManager {
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  destroy() {
-    dojo.forEach(this.subscriptions, dojo.unsubscribe);
-  }
+  // destroy() {
+  //   // @ts-ignore
+  //   dojo.forEach(this.subscriptions, dojo.unsubscribe);
+  // }
 
   getPlayer(playerId: number): JocoPlayer {
     return PlayerManager.getInstance().getPlayer(playerId);
@@ -177,20 +255,18 @@ class NotificationManager {
   }
 
   async pay(playerId: number, amount: number) {
-    await this.game.framework().wait(1);
+    await Interaction.use().wait(1);
 
     const logPound: HTMLElement = document.querySelector(
-      '#pagemaintitletext .joco_pound'
+      '#pagemaintitletext .joco_pound',
     );
 
-    const fromRect = document
-      .getElementById(`joco-cash-${playerId}`)
-      .getBoundingClientRect();
+    const playerCashElt = document.getElementById(`joco-cash-${playerId}`);
 
     const player = PlayerManager.getInstance().getPlayer(playerId);
 
     const promises = Array.from(Array(amount).keys()).map(async (_, index) => {
-      await this.game.framework().wait(index * 150);
+      await Interaction.use().wait(index * 150);
       player.counters[CASH_COUNTER].incValue(-1);
       const element = document.createElement('div');
       element.classList.add('log_token');
@@ -200,13 +276,8 @@ class NotificationManager {
       //   .getElementById(`joco-cash-${playerId}`)
       //   .insertAdjacentElement('afterbegin', element);
       logPound.insertAdjacentElement('afterbegin', element);
-      await this.game.animationManager.play(
-        new BgaSlideAnimation({
-          element,
-          transitionTimingFunction: 'ease-in-out',
-          fromRect,
-        })
-      );
+      await this.game.animationManager.slideIn(element, playerCashElt);
+
       element.remove();
     });
 
@@ -230,22 +301,23 @@ class NotificationManager {
     // Only here so messages get displayed in title bar
   }
 
+  // TODO: make private notif
   async notif_draftCardPrivate(notif: Notif<NotifDraftCardPrivateArgs>) {
     const { cardIds } = notif.args;
 
     await Promise.all(
       cardIds.map(async (cardId, index) => {
         // await Interaction.use().wait(index * 100);
-        await this.game.animationManager.attachWithAnimation(
-          new BgaSlideAnimation({ element: document.getElementById(cardId) }),
-          document.getElementById('joco_chosen_cards')
+        await this.game.animationManager.slideAndAttach(
+          document.getElementById(cardId),
+          document.getElementById('joco_chosen_cards'),
         );
-      })
+      }),
     );
   }
 
   async notif_allocateBalanceToOffice(
-    notif: Notif<NotifAllocateBalanceToOffice>
+    notif: Notif<NotifAllocateBalanceToOffice>,
   ) {
     const { companyBalance, officeTreasury, officeId } = notif.args;
 
@@ -259,12 +331,12 @@ class NotificationManager {
     const { order } = notif.args;
     Board.getInstance().ui.orders[order.id].setAttribute(
       'data-status',
-      order.status
+      order.status,
     );
   }
 
   async notif_companyOperationChairman(
-    notif: Notif<NotifCompanyOperationChairman>
+    notif: Notif<NotifCompanyOperationChairman>,
   ) {
     const { debtIncreased, companyDebt, treasuries, companyBalance } =
       notif.args;
@@ -280,7 +352,7 @@ class NotificationManager {
   }
 
   async notif_draftNewCardsPrivate(
-    notif: Notif<NotifDraftNewCardsPrivateArgs>
+    notif: Notif<NotifDraftNewCardsPrivateArgs>,
   ) {
     const { cardIds, lastCard } = notif.args;
 
@@ -297,7 +369,7 @@ class NotificationManager {
     const { familyMember, playerId } = notif.args;
     await Board.getInstance().placeFamilyMembers(
       [familyMember],
-      this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER]
+      this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER],
     );
   }
 
@@ -329,20 +401,19 @@ class NotificationManager {
     const { amount, playerId } = notif.args;
 
     // Need to wait, otherwise the token in pagemaintitletext cannot be found
-    await this.game.framework().wait(1);
+    await Interaction.use().wait(1);
     // let msg = this.game.format_string_recursive(
     //   notif.log,
     //   notif.args as unknown as Record<string, unknown>
     // );
     // $('pagemaintitletext').innerHTML = msg;
     const logPound: HTMLElement = document.querySelector(
-      '#pagemaintitletext .joco_pound'
+      '#pagemaintitletext .joco_pound',
     );
 
-    const fromRect = logPound.getBoundingClientRect();
-
     const promises = Array.from(Array(amount).keys()).map(async (_, index) => {
-      await this.game.framework().wait(index * 100);
+      await Interaction.use().wait(index * 100);
+
       const element = document.createElement('div');
       element.classList.add('log_token');
       element.classList.add('joco_pound');
@@ -350,13 +421,8 @@ class NotificationManager {
       document
         .getElementById(`joco-cash-${playerId}`)
         .insertAdjacentElement('afterbegin', element);
-      await this.game.animationManager.play(
-        new BgaSlideAnimation({
-          element,
-          transitionTimingFunction: 'ease-in-out',
-          fromRect,
-        })
-      );
+      await this.game.animationManager.slideIn(element, logPound);
+
       element.remove();
       PlayerManager.getInstance()
         .getPlayer(playerId)
@@ -407,8 +473,8 @@ class NotificationManager {
     const board = Board.getInstance();
     await Promise.all(
       familyMembers.map(async (familyMember, index) =>
-        board.moveFamilyMember({ familyMember, index })
-      )
+        board.moveFamilyMember({ familyMember, index }),
+      ),
     );
     board.updateFamilyMembers(familyMembers);
   }
@@ -477,16 +543,18 @@ class NotificationManager {
   }
 
   async notif_returnFamilyMemberToSupply(
-    notif: Notif<NotifReturnFamilyMemberToSupply>
+    notif: Notif<NotifReturnFamilyMemberToSupply>,
   ) {
     const { familyMember, playerId } = notif.args;
     const element = Board.getInstance().ui.familyMembers[familyMember.id];
-    await moveToAnimation({
-      game: this.game,
-      element,
-      toId: `joco-familyMembers-${playerId}`,
-      remove: true,
-    });
+    const toElement = document.getElementById(`joco-familyMembers-${playerId}`);
+    this.game.animationManager.slideOutAndDestroy(element, toElement);
+    // await moveToAnimation({
+    //   game: this.game,
+    //   element,
+    //   toId: `joco-familyMembers-${playerId}`,
+    //   remove: true,
+    // });
     this.getPlayer(playerId).counters[FAMILY_MEMBERS_COUNTER].incValue(1);
   }
 
@@ -496,7 +564,7 @@ class NotificationManager {
 
     await Board.getInstance().placeFamilyMembers(
       [familyMember],
-      this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER]
+      this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER],
     );
   }
 
@@ -513,7 +581,7 @@ class NotificationManager {
     const { familyMembers, playerId } = notif.args;
     await Board.getInstance().placeFamilyMembers(
       familyMembers,
-      this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER]
+      this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER],
     );
   }
 
@@ -525,7 +593,7 @@ class NotificationManager {
       amount < 0
         ? document.getElementById(`joco-promiseCubes-${playerId}`)
         : document.getElementById(`joco-promiseCubes-${CROWN_PLAYER_ID}`);
-    const fromRect = fromElement.getBoundingClientRect();
+
     const toElement =
       amount < 0
         ? document.getElementById(`joco-promiseCubes-${CROWN_PLAYER_ID}`)
@@ -538,7 +606,7 @@ class NotificationManager {
 
     const promises = Array.from(Array(Math.abs(amount)).keys()).map(
       async (_, index) => {
-        await this.game.framework().wait(index * 250);
+        Interaction.use().wait(index * 250);
         fromPlayer.counters[PROMISE_CUBES_COUNTER].incValue(-1);
         const element = document.createElement('div');
         element.classList.add('log_token');
@@ -546,16 +614,10 @@ class NotificationManager {
         element.classList.add('animation');
         toElement.insertAdjacentElement('afterbegin', element);
 
-        await this.game.animationManager.play(
-          new BgaSlideAnimation({
-            element,
-            transitionTimingFunction: 'ease-in-out',
-            fromRect,
-          })
-        );
+        await this.game.animationManager.slideIn(element, fromElement);
         element.remove();
         toPlayer.counters[PROMISE_CUBES_COUNTER].incValue(1);
-      }
+      },
     );
 
     await Promise.all(promises);

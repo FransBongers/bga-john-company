@@ -1,6 +1,6 @@
 /* ------- DEFAULT LOG TOKENS ------- */
 
-const tlpLogTokenText = ({
+export const tlpLogTokenText = ({
   text,
   tooltipId,
   italic = false,
@@ -17,25 +17,25 @@ const tlpLogTokenText = ({
 
 /* ------- GAME SPECIFIC LOG TOKENS ------- */
 
-const tplLogTokenClimate = (climate: string) =>
+export const tplLogTokenClimate = (climate: string) =>
   `<div class="log_token joco-crown-climate-icon" data-climate="${climate}"></div>`;
 
-const tplLogTokenElephant = () => '<div class="log_token joco_elephant"></div>';
+export const tplLogTokenElephant = () => '<div class="log_token joco_elephant"></div>';
 
-const tplLogTokenPound = () => `<div class="log_token joco_pound"></div>`;
+export const tplLogTokenPound = () => `<div class="log_token joco_pound"></div>`;
 
-const tplLogTokenPromiseCube = () => '<div class="log_token joco-promise-cube"></div>'
+export const tplLogTokenPromiseCube = () => '<div class="log_token joco-promise-cube"></div>'
 
-const tplLogTokenStormDie = (side: string) =>
+export const tplLogTokenStormDie = (side: string) =>
   `<div class="log_token joco-storm-die" data-side="${side}"></div>`;
 
-const tplLogTokenIcon = (type: string) =>
+export const tplLogTokenIcon = (type: string) =>
   `<div class="log-token joco-icon" data-icon="${type}"></div>`;
 
-const tplLogTokenSetupCard = (id: string) =>
+export const tplLogTokenSetupCard = (id: string) =>
   `<div class="log-token joco-setup-card" data-card-id="${id}"></div>`;
 
-const tplLogTokenPlayerName = ({
+export const tplLogTokenPlayerName = ({
   name,
   color,
 }: {
@@ -43,9 +43,9 @@ const tplLogTokenPlayerName = ({
   color: string;
 }) => `<span class="playername" style="color:#${color};">${name}</span>`;
 
-const tknPound = () => _('Pounds');
+export const tknPound = () => _('Pounds');
 
-const tknShipValue = ({
+export const tknShipValue = ({
   name,
   type,
   fatigued,
@@ -57,4 +57,4 @@ const tknShipValue = ({
   return [type, name, fatigued].join(':');
 };
 
-const tknPromiseCubes = () => 'Promise Cube(s)'
+export const tknPromiseCubes = () => 'Promise Cube(s)';

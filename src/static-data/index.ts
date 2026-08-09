@@ -1,4 +1,12 @@
-class StaticData {
+import {
+  GameAlias,
+  JohnCompanyGamedatas,
+  JoCoOrderStatic,
+  JocoOfficeStatic,
+  JocoSetupCardStatic,
+} from '../types';
+
+export class StaticData {
   private static instance: StaticData;
   private game: GameAlias;
   private staticData: JohnCompanyGamedatas['staticData'];

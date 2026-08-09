@@ -1,5 +1,8 @@
+import { AbsolutePosition } from "../boilerplate";
+import { ORDER_PUNJAB_1, ORDER_DELHI_1, ORDER_DELHI_2, ORDER_DELHI_3, ORDER_BENGAL_1, ORDER_BENGAL_2, ORDER_BOMBAY_1, ORDER_BOMBAY_2, ORDER_BOMBAY_3, ORDER_MARATHA_1, ORDER_MARATHA_2, ORDER_MARATHA_3, ORDER_HYDERABAD_1, ORDER_MYSORE_1, ORDER_MYSORE_2, ORDER_MADRAS_1, ORDER_MADRAS_2, SETUP, LONDON_SEASON, FAMILY, FIRMS, HIRING, CHAIRMAN, DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING, MILITARY_AFFAIRS, BOMBAY_PRESIDENCY, MADRAS_PRESIDENCY, BENGAL_PRESIDENCY, SUPERINTENDENT_OF_TRADE_IN_CHINA, BONUSES, REVENUE, EVENTS_IN_INDIA, PARLIAMENT_MEETS, UPKEEP_AND_REFRESH, BOMBAY_ARMY, BENGAL_ARMY, MADRAS_ARMY, BOMBAY_WRITERS, BENGAL_WRITERS, MADRAS_WRITERS, STOCK_EXCHANGE_2, STOCK_EXCHANGE_3_LEFT, STOCK_EXCHANGE_3_RIGHT, STOCK_EXCHANGE_4, STOCK_EXCHANGE_5, WEST_INDIAN, SOUTH_INDIAN, EAST_INDIAN, PRESIDENT_OF_BOMBAY, PRESIDENT_OF_MADRAS, PRESIDENT_OF_BENGAL, GOVERNOR_GENERAL, GOVERNOR_OF_BOMBAY, GOVERNOR_OF_MADRAS, GOVERNOR_OF_BENGAL, GOVERNOR_OF_PUNJAB, GOVERNOR_OF_DELHI, GOVERNOR_OF_MARATHA, GOVERNOR_OF_HYDERABAD, GOVERNOR_OF_MYSORE, BENGAL, BOMBAY, DELHI, HYDERABAD, MADRAS, MARATHA, MYSORE, PUNJAB } from "../constants";
+
 // Array with top, left coords for each order
-const ORDERS_CONFIG: Record<string, AbsolutePosition> = {
+export const ORDERS_CONFIG: Record<string, AbsolutePosition> = {
   [ORDER_PUNJAB_1]: { top: 22.5, left: 933 },
   [ORDER_DELHI_1]: { top: 15, left: 1069 },
   [ORDER_DELHI_2]: { top: 47, left: 1158.5 },
@@ -18,12 +21,12 @@ const ORDERS_CONFIG: Record<string, AbsolutePosition> = {
   [ORDER_MADRAS_1]: { top: 398, left: 1148.5 },
   [ORDER_MADRAS_2]: { top: 447.5, left: 1118.5 },
 };
-const getCompanyBalanceConfig = (balance: number): AbsolutePosition => {
+export const getCompanyBalanceConfig = (balance: number): AbsolutePosition => {
   const left = 24 + 34.5 * (balance % 40);
   return { top: 702, left };
 };
 
-const COMPANY_DEBT_CONFIG: AbsolutePosition[] = [
+export const COMPANY_DEBT_CONFIG: AbsolutePosition[] = [
   { top: 149, left: 370 },
   { top: 149, left: 404.5 },
   { top: 149, left: 439 },
@@ -34,11 +37,11 @@ const COMPANY_DEBT_CONFIG: AbsolutePosition[] = [
   { top: 149, left: 611 },
   { top: 149, left: 644.5 },
 ];
-const getCompanyDebtConfig = (debt: number): AbsolutePosition => {
+export const getCompanyDebtConfig = (debt: number): AbsolutePosition => {
   return COMPANY_DEBT_CONFIG[debt];
 };
 
-const COMPANY_STANDING_CONFIG: Record<string, AbsolutePosition> = {
+export const COMPANY_STANDING_CONFIG: Record<string, AbsolutePosition> = {
   0: { top: 63, left: 370 },
   4: { top: 63, left: 409 },
   6: { top: 63, left: 448 },
@@ -48,10 +51,10 @@ const COMPANY_STANDING_CONFIG: Record<string, AbsolutePosition> = {
   14: { top: 63, left: 604 },
   16: { top: 63, left: 643 },
 };
-const getCompanyStandingConfig = (standing: 'fail' | number) =>
+export const getCompanyStandingConfig = (standing: 'fail' | number) =>
   COMPANY_STANDING_CONFIG[standing];
 
-const PHASE_CONFIG: Record<string, AbsolutePosition> = {
+export const PHASE_CONFIG: Record<string, AbsolutePosition> = {
   [SETUP]: { top: 466, left: 226 },
   [LONDON_SEASON]: { top: 400, left: 226 },
   [FAMILY]: { top: 466, left: 226 },
@@ -72,7 +75,7 @@ const PHASE_CONFIG: Record<string, AbsolutePosition> = {
   [UPKEEP_AND_REFRESH]: { top: 277, left: 1382 },
 };
 
-const TURN_CONFIG: Record<string | number, AbsolutePosition> = {
+export const TURN_CONFIG: Record<string | number, AbsolutePosition> = {
   1: { top: 138, left: 199.5 },
   2: { top: 169, left: 199.5 },
   3: { top: 201, left: 199.5 },
@@ -84,7 +87,7 @@ const TURN_CONFIG: Record<string | number, AbsolutePosition> = {
   endGameScoring: { top: 138, left: 199.5 },
 };
 
-const getGroupPosition = (
+export const getGroupPosition = (
   top: number,
   left: number,
   index: number,
@@ -98,7 +101,7 @@ const getGroupPosition = (
   };
 };
 
-const getRegimentGroupPosition = (
+export const getRegimentGroupPosition = (
   top: number,
   left: number,
   index: number,
@@ -112,7 +115,7 @@ const getRegimentGroupPosition = (
   };
 };
 
-const getOfficerPosition = (army: string, index: number): AbsolutePosition => {
+export const getOfficerPosition = (army: string, index: number): AbsolutePosition => {
   console.log('getOfficerPosition', army, index);
   switch (army) {
     case BOMBAY_ARMY:
@@ -126,7 +129,7 @@ const getOfficerPosition = (army: string, index: number): AbsolutePosition => {
   }
 };
 
-const getRegimentPosition = (
+export const getRegimentPosition = (
   location: string,
   index: number,
   exhausted: boolean
@@ -143,13 +146,13 @@ const getRegimentPosition = (
   }
 };
 
-const getCourtOfDirectorsPosition = (index: number) =>
+export const getCourtOfDirectorsPosition = (index: number) =>
   getGroupPosition(555, 243, index, 4);
 
-const getOfficersInTrainingPosition = (index: number) =>
+export const getOfficersInTrainingPosition = (index: number) =>
   getGroupPosition(602, 692, index, 3);
 
-const getWriterPosition = (
+export const getWriterPosition = (
   location: string,
   index: number
 ): AbsolutePosition => {
@@ -165,7 +168,7 @@ const getWriterPosition = (
   }
 };
 
-const getStockExchangePosition = (position: string): AbsolutePosition => {
+export const getStockExchangePosition = (position: string): AbsolutePosition => {
   switch (position) {
     case STOCK_EXCHANGE_2:
       return { top: 458, left: 249 };
@@ -182,7 +185,7 @@ const getStockExchangePosition = (position: string): AbsolutePosition => {
   }
 };
 
-const WEST_INDIAN_POSITIONS: AbsolutePosition[] = [
+export const WEST_INDIAN_POSITIONS: AbsolutePosition[] = [
   {
     top: 445,
     left: 870,
@@ -193,7 +196,7 @@ const WEST_INDIAN_POSITIONS: AbsolutePosition[] = [
   },
 ];
 
-const SOUTH_INDIAN_POSITIONS: AbsolutePosition[] = [
+export const SOUTH_INDIAN_POSITIONS: AbsolutePosition[] = [
   {
     top: 391,
     left: 1233,
@@ -204,7 +207,7 @@ const SOUTH_INDIAN_POSITIONS: AbsolutePosition[] = [
   },
 ];
 
-const EAST_INDIAN_POSITIONS: AbsolutePosition[] = [
+export const EAST_INDIAN_POSITIONS: AbsolutePosition[] = [
   {
     top: 332,
     left: 1273,
@@ -215,7 +218,7 @@ const EAST_INDIAN_POSITIONS: AbsolutePosition[] = [
   },
 ];
 
-const getShipPosition = (sea: string, index: number): AbsolutePosition => {
+export const getShipPosition = (sea: string, index: number): AbsolutePosition => {
   const numberOfPositions = 2;
   // Item in array, depends on array length of positions
   const positionIndex = index % numberOfPositions;
@@ -241,7 +244,7 @@ const getShipPosition = (sea: string, index: number): AbsolutePosition => {
   return position;
 };
 
-const FAMILY_MEMBER_OFFICE_CONFIG: Record<string, AbsolutePosition> = {
+export const FAMILY_MEMBER_OFFICE_CONFIG: Record<string, AbsolutePosition> = {
   [CHAIRMAN]: { top: 662, left: 246 },
   [DIRECTOR_OF_TRADE]: { top: 662, left: 420 },
   [MANAGER_OF_SHIPPING]: { top: 662, left: 558 },
@@ -264,7 +267,7 @@ const FAMILY_MEMBER_OFFICE_CONFIG: Record<string, AbsolutePosition> = {
   Commander_Madras: { top: 84, left: 695 },
 };
 
-const towerConfig: Record<string, { bottom: number; left: number }> = {
+export const towerConfig: Record<string, { bottom: number; left: number }> = {
   [BENGAL]: { bottom: -149, left: 1339 },
   [BOMBAY]: { bottom: -332, left: 954 },
   [DELHI]: { bottom: -60, left: 1186 },
@@ -275,7 +278,7 @@ const towerConfig: Record<string, { bottom: number; left: number }> = {
   [PUNJAB]: { bottom: -74, left: 851 },
 };
 
-const TREASURY_POSITIONS: Record<string, AbsolutePosition> = {
+export const TREASURY_POSITIONS: Record<string, AbsolutePosition> = {
   [DIRECTOR_OF_TRADE]: { top: 618, left: 416 },
   [MANAGER_OF_SHIPPING]: { top: 618, left: 555 },
   [PRESIDENT_OF_BOMBAY]: { top: 618, left: 806 },
@@ -283,20 +286,20 @@ const TREASURY_POSITIONS: Record<string, AbsolutePosition> = {
   [PRESIDENT_OF_BENGAL]: { top: 618, left: 1185 },
 };
 
-const POWER_TOKEN_POSITIONS: AbsolutePosition[] = [
+export const POWER_TOKEN_POSITIONS: AbsolutePosition[] = [
   { top: 72, left: 276 },
   { top: 115, left: 276 },
   { top: 159, left: 251 },
   { top: 159, left: 301 },
 ];
 
-const ARMY_SELECT_POSITIONS: Record<string, AbsolutePosition> = {
+export const ARMY_SELECT_POSITIONS: Record<string, AbsolutePosition> = {
   [BOMBAY_ARMY]: { top: 21, left: 692 },
   [MADRAS_ARMY]: { top: 214, left: 692 },
   [BENGAL_ARMY]: { top: 407, left: 692 },
 };
 
-const COMPANY_DEBT_SELECT_POSITIONS: AbsolutePosition[] = [
+export const COMPANY_DEBT_SELECT_POSITIONS: AbsolutePosition[] = [
   { top: 157, left: 365.5 },
   { top: 157, left: 400 },
   { top: 157, left: 434 },
@@ -308,7 +311,7 @@ const COMPANY_DEBT_SELECT_POSITIONS: AbsolutePosition[] = [
   { top: 157, left: 640 },
 ];
 
-const SEA_ZONE_SELECT_POSITIONS: Record<string, AbsolutePosition> = {
+export const SEA_ZONE_SELECT_POSITIONS: Record<string, AbsolutePosition> = {
   [WEST_INDIAN]: { top: 377, left: 885 },
   [SOUTH_INDIAN]: { top: 432, left: 1219 },
   [EAST_INDIAN]: { top: 301, left: 1317 },

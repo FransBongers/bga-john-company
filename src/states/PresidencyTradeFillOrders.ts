@@ -1,3 +1,25 @@
+import { Board } from '../board';
+import {
+  addConfirmButton,
+  addDangerActionButton,
+  clearPossible,
+  debug,
+  GameState,
+  getPlayerName,
+  onClick,
+  performAction,
+  setSelected,
+  updatePageTitle,
+} from '../boilerplate';
+import { FILLED, OPEN } from '../constants';
+import { StaticData } from '../static-data';
+import type {
+  CommonStateArgs,
+  JoCoOrder,
+  JocoFamilyMember,
+  GameAlias,
+} from '../types';
+
 interface OnEnteringPresidencyTradeFillOrdersArgs extends CommonStateArgs {
   homePortOrderId: string;
   companyBalance: number;
@@ -6,7 +28,7 @@ interface OnEnteringPresidencyTradeFillOrdersArgs extends CommonStateArgs {
   numberOfOrdersToFill: number;
 }
 
-class PresidencyTradeFillOrders implements State {
+export class PresidencyTradeFillOrders implements GameState<OnEnteringPresidencyTradeFillOrdersArgs> {
   private static instance: PresidencyTradeFillOrders;
   private args: OnEnteringPresidencyTradeFillOrdersArgs;
   private filledOrders: Array<{ orderId: string; filledBy: string }>; // orderId / familyMemberId or 'filled' if not available
@@ -15,7 +37,7 @@ class PresidencyTradeFillOrders implements State {
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     PresidencyTradeFillOrders.instance = new PresidencyTradeFillOrders(game);
   }
 
@@ -38,14 +60,14 @@ class PresidencyTradeFillOrders implements State {
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringPresidencyTradeFillOrdersArgs
+    args: OnEnteringPresidencyTradeFillOrdersArgs,
   ) {
     updatePageTitle(
       _('${tkn_playerName} must fill orders'),
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true
+      true,
     );
   }
 
@@ -84,11 +106,11 @@ class PresidencyTradeFillOrders implements State {
     }
 
     const placedWriters = this.filledOrders.map(
-      (filledOrder) => filledOrder.filledBy
+      (filledOrder) => filledOrder.filledBy,
     );
 
     const availableWriters = this.args.writers.filter(
-      (writer) => !placedWriters.includes(writer.id)
+      (writer) => !placedWriters.includes(writer.id),
     );
 
     if (availableWriters.length === 0) {
@@ -127,7 +149,7 @@ class PresidencyTradeFillOrders implements State {
         this.balance += order.value;
         if (writer) {
           promises.push(
-            this.board.moveFamilyMemberBetweenLocations(writer, orderId)
+            this.board.moveFamilyMemberBetweenLocations(writer, orderId),
           );
         } else {
           this.board.ui.orders[orderId].setAttribute('data-status', FILLED);
@@ -160,7 +182,9 @@ class PresidencyTradeFillOrders implements State {
   //  ..#######.....##....####.########.####....##.......##...
 
   private getAvailableOrderIds() {
-    const filledOrderIds = this.filledOrders.map((filledOrder) => filledOrder.orderId);
+    const filledOrderIds = this.filledOrders.map(
+      (filledOrder) => filledOrder.orderId,
+    );
     if (filledOrderIds.length === 0) {
       // No orders selected yet
       return [this.args.homePortOrderId];
@@ -175,7 +199,7 @@ class PresidencyTradeFillOrders implements State {
       }
       const staticOrder = staticData.order(order.id);
       const connectedOrderHasBeenFilled = filledOrderIds.some((orderId) =>
-        staticOrder.connectedOrders.includes(orderId)
+        staticOrder.connectedOrders.includes(orderId),
       );
       if (connectedOrderHasBeenFilled && !orderIds.includes(order.id)) {
         orderIds.push(order.id);
@@ -185,17 +209,17 @@ class PresidencyTradeFillOrders implements State {
   }
 
   private async returnPieces() {
-    for (let {orderId, filledBy} of this.filledOrders) {
+    for (let { orderId, filledBy } of this.filledOrders) {
       const promises: Promise<void>[] = [];
       if (filledBy === FILLED) {
         this.board.ui.orders[orderId].setAttribute('data-status', OPEN);
       } else {
         const writer = this.args.writers.find(
-          (writer) => writer.id === filledBy
+          (writer) => writer.id === filledBy,
         );
         writer.location = orderId;
         promises.push(
-          this.board.moveFamilyMemberBetweenLocations(writer, 'Writers_Bombay')
+          this.board.moveFamilyMemberBetweenLocations(writer, 'Writers_Bombay'),
         );
       }
       this.balance = this.balance - StaticData.get().order(orderId).value;

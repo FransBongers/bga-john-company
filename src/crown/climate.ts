@@ -1,6 +1,9 @@
-type Climate = 'Bull' | 'Bear' | 'Lion' | 'Stag' | 'Peacock';
+import { CROWN_CLIMATE, CROWN_PLAYER_ID } from '../constants';
+import { GameAlias, GamedatasAlias } from '../types';
 
-class CrownClimate {
+export type Climate = 'Bull' | 'Bear' | 'Lion' | 'Stag' | 'Peacock';
+
+export class CrownClimate {
   private static instance: CrownClimate;
   private climate: Record<string, HTMLElement> = {};
 
@@ -48,14 +51,13 @@ class CrownClimate {
     });
 
     const node = document.querySelector(
-      `#player_board_${CROWN_PLAYER_ID} .player-board-game-specific-content`
+      `#player_board_${CROWN_PLAYER_ID} .player-board-game-specific-content`,
     );
 
     node.insertAdjacentElement('afterbegin', row);
     if (gamedatas.crown.climate) {
       this.updateClimate(gamedatas.crown.climate);
     }
-    
   }
 
   // .##.....##.########..########.....###....########.########....##.....##.####

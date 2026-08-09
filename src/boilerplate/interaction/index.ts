@@ -1,12 +1,14 @@
-class Interaction {
+import { PlayerManager } from '../../player-manager';
+import { GameAlias } from '../../types';
+import { SELECTED } from '../constants';
+import { CommonStateArgs } from '../types';
+
+export class Interaction {
   private static instance: Interaction;
-  private game: GameAlias;
-  private subscriptions: unknown[];
-  private id: string;
+  public game: GameAlias;
 
   constructor(game: GameAlias) {
     this.game = game;
-    this.subscriptions = [];
   }
 
   public static create(game: GameAlias) {
@@ -27,7 +29,7 @@ class Interaction {
     id: string;
     text: string;
     playerId: number;
-    callback: Function | string;
+    callback: Function;
     extraClasses?: string;
   }) {
     this.addSecondaryActionButton({
@@ -41,7 +43,7 @@ class Interaction {
       .getPlayer(playerId)
       .getColor();
     // TODO: use classes so hover effect does not break?
-    elt.style.backgroundColor = '#' + playerColor;
+    elt!.style.backgroundColor = '#' + playerColor;
   }
 
   public addPrimaryActionButton({
@@ -52,18 +54,19 @@ class Interaction {
   }: {
     id: string;
     text: string;
-    callback: Function | string;
-    extraClasses?: string;
+    callback: Function;
+    extraClasses?: string | string[];
   }) {
     if ($(id)) {
       return;
     }
-    this.game
-      .framework()
-      .addActionButton(id, text, callback, 'customActions', false, 'blue');
-    if (extraClasses) {
-      dojo.addClass(id, extraClasses);
-    }
+
+    this.game.bga.statusBar.addActionButton(text, callback, {
+      id,
+      color: 'primary',
+      destination: document.getElementById('customActions')!,
+      classes: extraClasses ?? '',
+    });
   }
 
   addSecondaryActionButton({
@@ -74,18 +77,18 @@ class Interaction {
   }: {
     id: string;
     text: string;
-    callback: Function | string;
+    callback: Function;
     extraClasses?: string;
   }) {
     if ($(id)) {
       return;
     }
-    this.game
-      .framework()
-      .addActionButton(id, text, callback, 'customActions', false, 'gray');
-    if (extraClasses) {
-      dojo.addClass(id, extraClasses);
-    }
+    this.game.bga.statusBar.addActionButton(text, callback, {
+      id,
+      color: 'secondary',
+      destination: document.getElementById('customActions')!,
+      classes: extraClasses ?? '',
+    });
   }
 
   addCancelButton({
@@ -121,18 +124,19 @@ class Interaction {
   }: {
     id: string;
     text: string;
-    callback: Function | string;
+    callback: Function;
     extraClasses?: string;
   }) {
     if ($(id)) {
       return;
     }
-    this.game
-      .framework()
-      .addActionButton(id, text, callback, 'customActions', false, 'red');
-    if (extraClasses) {
-      dojo.addClass(id, extraClasses);
-    }
+
+    this.game.bga.statusBar.addActionButton(text, callback, {
+      id,
+      color: 'alert',
+      destination: document.getElementById('customActions')!,
+      classes: extraClasses ?? '',
+    });
   }
 
   public addPassButton(optionalAction: boolean, text?: string) {
@@ -141,7 +145,7 @@ class Interaction {
         id: 'pass_btn',
         text: text ? _(text) : _('Pass'),
         callback: () =>
-          this.game.framework().bgaPerformAction('actPassOptionalAction'),
+          this.game.bga.actions.performAction('actPassOptionalAction'),
       });
     }
   }
@@ -157,6 +161,9 @@ class Interaction {
         id: 'undo_last_step_btn',
         text: _('Undo last step'),
         callback: () => {
+          this.game.bga.actions.performAction('actUndoToStep', {
+            stepId: lastStep,
+          });
           // this.takeAction({
           //   action: 'actUndoToStep',
           //   args: {
@@ -172,8 +179,9 @@ class Interaction {
     if (previousEngineChoices > 0) {
       this.addDangerActionButton({
         id: 'restart_btn',
-        text: _('Restart turn'),
+        text: _('Undo all'),
         callback: () => {
+          this.game.bga.actions.performAction('actRestart');
           // this.takeAction({ action: 'actRestart', atomicAction: false }),
         },
       });
@@ -187,21 +195,21 @@ class Interaction {
   public clientUpdatePageTitle(
     text: string,
     args: Record<string, string | number | unknown>,
-    nonActivePlayers: boolean = false
+    nonActivePlayers: boolean = false,
   ) {
-    const title = this.game.format_string_recursive(_(text), args);
-    this.game.gamedatas.gamestate.descriptionmyturn = title;
-    if (nonActivePlayers) {
-      this.game.gamedatas.gamestate.description = title;
-    }
-    this.game.framework().updatePageTitle();
+    // const title = this.game.bga.gameui.format_string_recursive(_(text), args);
+    // this.game.gamedatas.gamestate.descriptionmyturn = title;
+    // if (nonActivePlayers) {
+    //   this.game.gamedatas.gamestate.description = title;
+    // }
+    this.game.bga.statusBar.setTitle(text, args);
   }
 
   public formatStringRecursive(
     log: string,
-    args: Record<string, unknown>
+    args: Record<string, unknown>,
   ): string {
-    return this.game.format_string_recursive(log, args);
+    return this.game.bga.gameui.format_string_recursive(log, args);
   }
 
   public onClick(node: HTMLElement, callback: Function, temporary = true) {
@@ -215,18 +223,18 @@ class Interaction {
     node.classList.add(SELECTED);
   }
 
-  public performAction(actionName: string, args: Record<string, unknown>) {
-    this.game.framework().bgaPerformAction(
+  public async performAction(actionName: string, args: Record<string, unknown>) {
+    return await this.game.bga.actions.performAction(
       'actTakeAtomicAction',
       {
         actionName,
         args: JSON.stringify(args),
-      }
+      },
       //  {lock: true, checkAction: false}
     );
   }
 
   public async wait(ms: number) {
-    return await this.game.framework().wait(ms);
+    return await this.game.bga.gameui.wait(ms);
   }
 }

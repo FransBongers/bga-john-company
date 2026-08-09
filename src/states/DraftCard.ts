@@ -1,3 +1,17 @@
+import {
+  addCancelButton,
+  addConfirmButton,
+  clearPossible,
+  debug,
+  GameState,
+  onClick,
+  performAction,
+  SELECTABLE,
+  setSelected,
+  updatePageTitle,
+} from '../boilerplate';
+import { CommonStateArgs, GameAlias, JoCoSetupCard } from '../types';
+
 interface OnEnteringDraftCardArgs extends CommonStateArgs {
   _private?: {
     options: JoCoSetupCard[];
@@ -6,14 +20,14 @@ interface OnEnteringDraftCardArgs extends CommonStateArgs {
   numberToSelect: number;
 }
 
-class DraftCard implements State {
+export class DraftCard implements GameState<OnEnteringDraftCardArgs> {
   private static instance: DraftCard;
   private args: OnEnteringDraftCardArgs;
   private selectedCards: string[];
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     DraftCard.instance = new DraftCard(game);
   }
 
@@ -64,7 +78,7 @@ class DraftCard implements State {
         _('${you} must select a card to draft (${number} remaining)'),
         {
           number: this.args.numberToSelect - this.selectedCards.length,
-        }
+        },
       );
     }
 
@@ -131,7 +145,7 @@ class DraftCard implements State {
     if (this.selectedCards.includes(cardId)) {
       // Unselect if card was already selected
       this.selectedCards = this.selectedCards.filter(
-        (selectedCardId) => selectedCardId !== cardId
+        (selectedCardId) => selectedCardId !== cardId,
       );
     } else {
       // Otherwise add to selected cards

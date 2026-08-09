@@ -1,14 +1,23 @@
-interface OnEnteringRevenueRoyalPardonArgs extends CommonStateArgs {
+import {
+  debug,
+  updatePageTitle,
+  getPlayerName,
+  clearPossible,
+  addConfirmButton,
+  performAction,
+  addCancelButton,
+} from '../boilerplate';
+import { CommonStateArgs, GameState, GameAlias } from '../types';
 
-}
+interface OnEnteringRevenueRoyalPardonArgs extends CommonStateArgs {}
 
-class RevenueRoyalPardon implements State {
+export class RevenueRoyalPardon implements GameState<OnEnteringRevenueRoyalPardonArgs> {
   private static instance: RevenueRoyalPardon;
   private args: OnEnteringRevenueRoyalPardonArgs;
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     RevenueRoyalPardon.instance = new RevenueRoyalPardon(game);
   }
 
@@ -29,14 +38,14 @@ class RevenueRoyalPardon implements State {
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringRevenueRoyalPardonArgs
+    args: OnEnteringRevenueRoyalPardonArgs,
   ) {
     updatePageTitle(
       _('${tkn_playerName} may pay dividends'),
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true
+      true,
     );
   }
 
@@ -60,18 +69,14 @@ class RevenueRoyalPardon implements State {
     this.game.clearPossible();
 
     updatePageTitle(_('${you} may pay dividends'));
-
   }
-
 
   private updateInterfaceConfirm(next: string) {
     clearPossible();
 
-
-
     addConfirmButton(() => {
       performAction('actRevenueRoyalPardon', {
-        next
+        next,
       });
     });
     addCancelButton();
@@ -84,7 +89,6 @@ class RevenueRoyalPardon implements State {
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
-
 
   //  ..######..##.......####..######..##....##
   //  .##....##.##........##..##....##.##...##.
@@ -101,6 +105,4 @@ class RevenueRoyalPardon implements State {
   // .##.....##.#########.##..####.##.....##.##.......##.............##
   // .##.....##.##.....##.##...###.##.....##.##.......##.......##....##
   // .##.....##.##.....##.##....##.########..########.########..######.
-
-
 }

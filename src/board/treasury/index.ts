@@ -1,4 +1,11 @@
-class Treasury {
+import { DISABLED } from '../../boilerplate/constants';
+import { AbsolutePosition } from '../../boilerplate/utility';
+
+import { PLUS } from '../../constants';
+import { GamedatasAlias } from '../../types';
+import { tplTreasury } from './templates';
+
+export class Treasury {
   private counter: Counter;
 
   private element: HTMLElement;
@@ -30,10 +37,10 @@ class Treasury {
 
     this.element = document.getElementById(`joco-treasury-${office}`);
     this.minusButton = document.getElementById(
-      `joco-treasury-${office}-minus-btn`
+      `joco-treasury-${office}-minus-btn`,
     );
     this.plusButton = document.getElementById(
-      `joco-treasury-${office}-plus-btn`
+      `joco-treasury-${office}-plus-btn`,
     );
 
     this.counter = new ebg.counter();
@@ -89,7 +96,6 @@ class Treasury {
   public incValue(value: number) {
     return this.counter.incValue(value);
   }
-
 
   public plus() {
     this.counter.incValue(1);

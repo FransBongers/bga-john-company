@@ -1,16 +1,29 @@
+import { Board } from '../board';
+import {
+  addDangerActionButton,
+  addPrimaryActionButton,
+  debug,
+  getPlayerName,
+  performAction,
+  setSelected,
+  updatePageTitle,
+} from '../boilerplate/utility';
+import { SHARE } from '../constants';
+import { CommonStateArgs, GameAlias, GameState } from '../types';
+
 interface OnEnteringChairmanDebtConsentArgs extends CommonStateArgs {
   chairmanPlayerId: number;
   debt: number;
   remainingVotesRequired: number;
 }
 
-class ChairmanDebtConsent implements State {
+export class ChairmanDebtConsent implements GameState<OnEnteringChairmanDebtConsentArgs> {
   private static instance: ChairmanDebtConsent;
   private args: OnEnteringChairmanDebtConsentArgs;
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     ChairmanDebtConsent.instance = new ChairmanDebtConsent(game);
   }
 
@@ -31,7 +44,7 @@ class ChairmanDebtConsent implements State {
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringChairmanDebtConsentArgs
+    args: OnEnteringChairmanDebtConsentArgs,
   ) {
     this.args = args;
     updatePageTitle(
@@ -64,17 +77,17 @@ class ChairmanDebtConsent implements State {
 
     updatePageTitle(
       _(
-        '${tkn_playerName} asks for your consent to increase Company Debt to ${value} (${required} more ${tkn_icon} required)'
+        '${tkn_playerName} asks for your consent to increase Company Debt to ${value} (${required} more ${tkn_icon} required)',
       ),
       {
         value: this.args.debt,
         tkn_playerName: getPlayerName(this.args.chairmanPlayerId),
         required: this.args.remainingVotesRequired,
         tkn_icon: SHARE,
-      }
+      },
     );
     setSelected(
-      Board.getInstance().ui.selectBoxes[`companyDebt_${this.args.debt}`]
+      Board.getInstance().ui.selectBoxes[`companyDebt_${this.args.debt}`],
     );
     addPrimaryActionButton({
       id: 'yay_btn',

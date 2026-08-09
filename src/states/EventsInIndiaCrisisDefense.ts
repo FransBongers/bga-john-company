@@ -1,12 +1,22 @@
+import { Board } from '../board';
+import {
+  clearPossible,
+  debug,
+  getPlayerName,
+  updatePageTitle,
+} from '../boilerplate/utility';
+import { GameState } from '../types';
+import { CommonStateArgs, GameAlias } from '../types';
+
 interface OnEnteringEventsInIndiaCrisisDefenseArgs extends CommonStateArgs {}
 
-class EventsInIndiaCrisisDefense implements State {
+export class EventsInIndiaCrisisDefense implements GameState<OnEnteringEventsInIndiaCrisisDefenseArgs> {
   private static instance: EventsInIndiaCrisisDefense;
   private args: OnEnteringEventsInIndiaCrisisDefenseArgs;
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     EventsInIndiaCrisisDefense.instance = new EventsInIndiaCrisisDefense(game);
   }
 
@@ -25,13 +35,16 @@ class EventsInIndiaCrisisDefense implements State {
     debug('Leaving EventsInIndiaCrisisDefense state');
   }
 
-  setDescription(activePlayerIds: number, args: OnEnteringEventsInIndiaCrisisDefenseArgs) {
+  setDescription(
+    activePlayerIds: number,
+    args: OnEnteringEventsInIndiaCrisisDefenseArgs,
+  ) {
     updatePageTitle(
       _('${tkn_playerName} may exhaust defenders'),
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true
+      true,
     );
   }
 

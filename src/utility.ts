@@ -1,4 +1,9 @@
-const getSeaName = (seaId: string) => {
+import { EAST_INDIAN, SOUTH_INDIAN, WEST_INDIAN, CHINA, CROWN_PLAYER_ID } from "./constants";
+import { tknShipValue } from "./logs/templates";
+import { PlayerManager } from "./player-manager";
+import { JocoShipBase } from "./types";
+
+export const getSeaName = (seaId: string) => {
   switch (seaId) {
     case EAST_INDIAN:
       return _('East Indian');
@@ -13,10 +18,10 @@ const getSeaName = (seaId: string) => {
   }
 };
 
-const getCrownPlayerName = () =>
+export const getCrownPlayerName = () =>
   PlayerManager.getInstance().getPlayer(CROWN_PLAYER_ID).getName();
 
-const getShipsLog = (ships: JocoShipBase[]) => {
+export const getShipsLog = (ships: JocoShipBase[]) => {
   const shipsLog = {
     log: '',
     args: {},

@@ -1,14 +1,29 @@
+import { Board } from '../board';
+import {
+  debug,
+  updatePageTitle,
+  onClick,
+  clearPossible,
+  setSelected,
+  performAction,
+  addConfirmButton,
+  addCancelButton,
+} from '../boilerplate';
+import { WRITER, SHARE } from '../constants';
+import { PlayerManager } from '../player-manager';
+import { CommonStateArgs, GameAlias, GameState } from '../types';
+
 interface OnEnteringSeekShareArgs extends CommonStateArgs {
   options: Record<string, number>;
 }
 
-class SeekShare implements State {
+export class SeekShare implements GameState<OnEnteringSeekShareArgs> {
   private static instance: SeekShare;
   private args: OnEnteringSeekShareArgs;
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     SeekShare.instance = new SeekShare(game);
   }
 
@@ -29,13 +44,13 @@ class SeekShare implements State {
   setDescription(activePlayerIds: number[], args: OnEnteringSeekShareArgs) {
     updatePageTitle(
       _(
-        '${tkn_playerName} must place a family member on the Stock Exchange track'
+        '${tkn_playerName} must place a family member on the Stock Exchange track',
       ),
       {
         tkn_playerName: PlayerManager.getInstance()
           .getPlayer(activePlayerIds[0])
           .getName(),
-      }
+      },
     );
   }
 
@@ -62,7 +77,7 @@ class SeekShare implements State {
       _('${you} must select a place on the Stock Exchange track'),
       {
         tkn_icon: WRITER,
-      }
+      },
     );
 
     Object.entries(this.args.options).forEach(([position, price]) => {
@@ -79,7 +94,7 @@ class SeekShare implements State {
     updatePageTitle(_('Pay ${amount} ${tkn_pound} to seek a ${tkn_icon}?'), {
       amount: price,
       tkn_pound: _('Pounds'),
-      tkn_icon: SHARE
+      tkn_icon: SHARE,
     });
 
     const callback = () =>

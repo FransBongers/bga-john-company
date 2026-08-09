@@ -1,3 +1,17 @@
+import { Board } from '../board';
+import {
+  debug,
+  updatePageTitle,
+  getPlayerName,
+  addPrimaryActionButton,
+  clearPossible,
+  addConfirmButton,
+  performAction,
+  addCancelButton,
+} from '../boilerplate';
+import { TRADE, DONE } from '../constants';
+import { CommonStateArgs, GameState, GameAlias } from '../types';
+
 interface OnEnteringPresidencyDecideOrderArgs extends CommonStateArgs {
   trade: boolean;
   done: boolean;
@@ -5,13 +19,14 @@ interface OnEnteringPresidencyDecideOrderArgs extends CommonStateArgs {
   governors: Record<string, boolean>;
 }
 
-class PresidencyDecideOrder implements State {
+// TODO: replace with OR STATE
+export class PresidencyDecideOrder implements GameState<OnEnteringPresidencyDecideOrderArgs> {
   private static instance: PresidencyDecideOrder;
   private args: OnEnteringPresidencyDecideOrderArgs;
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     PresidencyDecideOrder.instance = new PresidencyDecideOrder(game);
   }
 
@@ -32,14 +47,14 @@ class PresidencyDecideOrder implements State {
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringPresidencyDecideOrderArgs
+    args: OnEnteringPresidencyDecideOrderArgs,
   ) {
     updatePageTitle(
       _('${tkn_playerName} must choose which is next to act'),
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true
+      true,
     );
   }
 
@@ -65,31 +80,37 @@ class PresidencyDecideOrder implements State {
     updatePageTitle(_('${you} must choose which is next to act'));
     const board = Board.getInstance();
     if (this.args.trade) {
-      addPrimaryActionButton({id: 'trade_btn', text: _('Trade'), callback: () => this.updateInterfaceConfirm(TRADE)})
+      addPrimaryActionButton({
+        id: 'trade_btn',
+        text: _('Trade'),
+        callback: () => this.updateInterfaceConfirm(TRADE),
+      });
     }
     if (this.args.done) {
-      addPrimaryActionButton({id: 'done_btn', text: _('Done'), callback: () => this.updateInterfaceConfirm(DONE)})
+      addPrimaryActionButton({
+        id: 'done_btn',
+        text: _('Done'),
+        callback: () => this.updateInterfaceConfirm(DONE),
+      });
     }
   }
-
 
   private updateInterfaceConfirm(next: string) {
     clearPossible();
 
-    switch(next) {
+    switch (next) {
       case TRADE:
         updatePageTitle(_('Perform the Trade action?'));
         break;
       case DONE:
         updatePageTitle(_('Done?'));
         break;
-      default:    
+      default:
     }
-    
 
     addConfirmButton(() => {
       performAction('actPresidencyDecideOrder', {
-        next
+        next,
       });
     });
     addCancelButton();
@@ -102,7 +123,6 @@ class PresidencyDecideOrder implements State {
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
-
 
   //  ..######..##.......####..######..##....##
   //  .##....##.##........##..##....##.##...##.
@@ -119,6 +139,4 @@ class PresidencyDecideOrder implements State {
   // .##.....##.#########.##..####.##.....##.##.......##.............##
   // .##.....##.##.....##.##...###.##.....##.##.......##.......##....##
   // .##.....##.##.....##.##....##.########..########.########..######.
-
-
 }

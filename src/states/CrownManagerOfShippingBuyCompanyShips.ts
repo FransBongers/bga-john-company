@@ -1,20 +1,43 @@
+import {
+  addConfirmButton,
+  addPrimaryActionButton,
+  addSecondaryActionButton,
+  clearPossible,
+  debug,
+  formatStringRecursive,
+  performAction,
+  updatePageTitle,
+} from '../boilerplate';
+import { BUY_COMPANY_SHIP, COMPANY_SHIP, DO_NOT_BUY_COMPANY_SHIP, BUY_AS_MANY_SHIPS_AS_YOU_WISH } from '../constants';
+import { tknPromiseCubes, tknShipValue } from '../logs/templates';
+import { PlayerManager } from '../player-manager';
+import { GameAlias, GameState } from '../types';
+import { CommonStateArgs, JocoShipBase } from '../types';
+import { getCrownPlayerName } from '../utility';
+
 interface CrownManagerOfShippingBuyCompanyShipsPlayerOption {
-  option: 'BUY_COMPANY_SHIP' | 'DO_NOT_BUY_COMPANY_SHIP' | 'BUY_AS_MANY_SHIPS_AS_YOU_WISH';
+  option:
+    | 'BUY_COMPANY_SHIP'
+    | 'DO_NOT_BUY_COMPANY_SHIP'
+    | 'BUY_AS_MANY_SHIPS_AS_YOU_WISH';
   promiseCubeCost: number;
 }
 
 interface OnEnteringCrownManagerOfShippingBuyCompanyShipsArgs extends CommonStateArgs {
   shipsCrownWillBuy: JocoShipBase[];
-  playerOptions: Record<number, CrownManagerOfShippingBuyCompanyShipsPlayerOption>
+  playerOptions: Record<
+    number,
+    CrownManagerOfShippingBuyCompanyShipsPlayerOption
+  >;
 }
 
-class CrownManagerOfShippingBuyCompanyShips implements State {
+export class CrownManagerOfShippingBuyCompanyShips implements GameState<OnEnteringCrownManagerOfShippingBuyCompanyShipsArgs> {
   private static instance: CrownManagerOfShippingBuyCompanyShips;
   private args: OnEnteringCrownManagerOfShippingBuyCompanyShipsArgs;
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     CrownManagerOfShippingBuyCompanyShips.instance =
       new CrownManagerOfShippingBuyCompanyShips(game);
   }
@@ -36,14 +59,14 @@ class CrownManagerOfShippingBuyCompanyShips implements State {
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringCrownManagerOfShippingBuyCompanyShipsArgs
+    args: OnEnteringCrownManagerOfShippingBuyCompanyShipsArgs,
   ) {
     updatePageTitle(
       _('${tkn_playerName} may buy  Company ships'),
       {
         tkn_playerName: getCrownPlayerName(),
       },
-      true
+      true,
     );
   }
 
@@ -69,18 +92,27 @@ class CrownManagerOfShippingBuyCompanyShips implements State {
     this.updatePageTitle();
 
     const playerId = PlayerManager.getInstance().getCurrentPlayerId();
-    const option = this.args.playerOptions[playerId]
+    const option = this.args.playerOptions[playerId];
     if (option) {
-      switch(option.option) {
+      switch (option.option) {
         case BUY_COMPANY_SHIP:
           addSecondaryActionButton({
             id: 'buy_ship_btn',
-            text: formatStringRecursive(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to buy ${tkn_ship}'), {
-              amount: option.promiseCubeCost,
-              tkn_playerName_crown: getCrownPlayerName(),
-              tkn_promiseCube: tknPromiseCubes(),
-              tkn_ship: tknShipValue({name: _('Company Ship'), type: COMPANY_SHIP, fatigued: 0})
-            }),
+            text: formatStringRecursive(
+              _(
+                'Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to buy ${tkn_ship}',
+              ),
+              {
+                amount: option.promiseCubeCost,
+                tkn_playerName_crown: getCrownPlayerName(),
+                tkn_promiseCube: tknPromiseCubes(),
+                tkn_ship: tknShipValue({
+                  name: _('Company Ship'),
+                  type: COMPANY_SHIP,
+                  fatigued: 0,
+                }),
+              },
+            ),
             callback: () =>
               performAction('actCrownManagerOfShippingBuyCompanyShips', {
                 option: BUY_COMPANY_SHIP,
@@ -90,12 +122,21 @@ class CrownManagerOfShippingBuyCompanyShips implements State {
         case DO_NOT_BUY_COMPANY_SHIP:
           addSecondaryActionButton({
             id: 'do_not_buy_ship_btn',
-            text: formatStringRecursive(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to not buy ${tkn_ship}'), {
-              amount: option.promiseCubeCost,
-              tkn_playerName_crown: getCrownPlayerName(),
-              tkn_promiseCube: tknPromiseCubes(),
-              tkn_ship: tknShipValue({name: _('Company Ship'), type: COMPANY_SHIP, fatigued: 0})
-            }),
+            text: formatStringRecursive(
+              _(
+                'Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to not buy ${tkn_ship}',
+              ),
+              {
+                amount: option.promiseCubeCost,
+                tkn_playerName_crown: getCrownPlayerName(),
+                tkn_promiseCube: tknPromiseCubes(),
+                tkn_ship: tknShipValue({
+                  name: _('Company Ship'),
+                  type: COMPANY_SHIP,
+                  fatigued: 0,
+                }),
+              },
+            ),
             callback: () =>
               performAction('actCrownManagerOfShippingBuyCompanyShips', {
                 option: DO_NOT_BUY_COMPANY_SHIP,
@@ -158,11 +199,8 @@ class CrownManagerOfShippingBuyCompanyShips implements State {
     text = _('${tkn_playerName_crown} wants to buy ${ships_log}');
 
     if (this.args.shipsCrownWillBuy.length === 0) {
-      text = _(
-        '${tkn_playerName_crown} will not buy Company ships'
-      );
+      text = _('${tkn_playerName_crown} will not buy Company ships');
     }
-
 
     // const type = this.args.phase === UNFITTED ? this.args.ship.type : this.args.phase;
     updatePageTitle(text, {

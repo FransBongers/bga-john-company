@@ -1,3 +1,5 @@
+import { createFamilyMember } from "../board/utility";
+
 /**
  * row 1
  * - Family Members
@@ -10,7 +12,7 @@
  * - Shipyards
  * - Workshops
  */
-const tplPlayerCounters = ({
+export const tplPlayerCounters = ({
   crownInGame,
   familyId,
   playerId,

@@ -1,4 +1,7 @@
-class PlayerAreas {
+import { GameAlias, GamedatasAlias } from "../types";
+import { tplPlayerAreas, tplPlayerArea } from "./templates";
+
+export class PlayerAreas {
   private static instance: PlayerAreas;
 
   constructor(private game: GameAlias) {

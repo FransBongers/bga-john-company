@@ -1,4 +1,97 @@
-class Board {
+import { Interaction } from '../boilerplate/interaction';
+import { AbsolutePosition, setAbsolutePosition } from '../boilerplate/utility';
+import {
+  BENGAL_ARMY,
+  BOMBAY_ARMY,
+  MADRAS_ARMY,
+  WEST_INDIAN,
+  SOUTH_INDIAN,
+  EAST_INDIAN,
+  CROWN,
+  COLOR_FAMILY_MAP,
+  HEX_COLOR_COLOR_MAP,
+  CROWN_PLAYER_ID,
+  COURT_OF_DIRECTORS,
+  OFFICER_IN_TRAINING,
+  WRITER_LOCATIONS,
+  ARMIES,
+  POWER_TOKENS,
+  POWER_TOKEN_ICON_MAP,
+  BOARD_SCALE,
+  BENGAL,
+  BOMBAY,
+  MADRAS,
+  SEA_ZONES,
+  STOCK_EXCHANGE_POSITIONS,
+  OFFICES_WITH_TREASURY,
+  BENGAL_WRITERS,
+  BOMBAY_WRITERS,
+  MADRAS_WRITERS,
+  STOCK_EXCHANGE_2,
+  STOCK_EXCHANGE_3_LEFT,
+  STOCK_EXCHANGE_3_RIGHT,
+  STOCK_EXCHANGE_4,
+  STOCK_EXCHANGE_5,
+  ORDER_PUNJAB_1,
+  ORDER_DELHI_1,
+  ORDER_DELHI_2,
+  ORDER_DELHI_3,
+  ORDER_BENGAL_1,
+  ORDER_BENGAL_2,
+  ORDER_BOMBAY_1,
+  ORDER_BOMBAY_2,
+  ORDER_BOMBAY_3,
+  ORDER_MARATHA_1,
+  ORDER_MARATHA_2,
+  ORDER_MARATHA_3,
+  ORDER_HYDERABAD_1,
+  ORDER_MYSORE_1,
+  ORDER_MYSORE_2,
+  ORDER_MADRAS_1,
+  ORDER_MADRAS_2,
+  FAMILY_MEMBERS_COUNTER,
+  CHAIRMAN,
+  SHARES_COUNTER,
+  SHIPYARD,
+  SHIPS_COUNTER,
+} from '../constants';
+import { PlayerManager } from '../player-manager';
+import {
+  GameAlias,
+  JocoFamilyMember,
+  JocoArmyPieceBase,
+  JocoShipBase,
+  GamedatasAlias,
+  JocoRegionBase,
+  OtherShipType,
+} from '../types';
+import {
+  ARMY_SELECT_POSITIONS,
+  SEA_ZONE_SELECT_POSITIONS,
+  COMPANY_DEBT_SELECT_POSITIONS,
+  TREASURY_POSITIONS,
+  getRegimentPosition,
+  getCourtOfDirectorsPosition,
+  getOfficersInTrainingPosition,
+  getWriterPosition,
+  getOfficerPosition,
+  getStockExchangePosition,
+  ORDERS_CONFIG,
+  FAMILY_MEMBER_OFFICE_CONFIG,
+  POWER_TOKEN_POSITIONS,
+  getCompanyBalanceConfig,
+  getCompanyDebtConfig,
+  PHASE_CONFIG,
+  getCompanyStandingConfig,
+  TURN_CONFIG,
+  getShipPosition,
+} from './config';
+import { Region } from './region';
+import { tplBoard } from './templates';
+import { Treasury } from './treasury';
+import { createRegiment, createFamilyMember, createShip } from './utility';
+
+export class Board {
   private static instance: Board;
   private game: GameAlias;
 
@@ -148,7 +241,7 @@ class Board {
               ]
             ]
           : familyId,
-        id
+        id,
       );
       [
         COURT_OF_DIRECTORS,
@@ -206,7 +299,7 @@ class Board {
       elt.classList.add('joco_pawn');
       elt.setAttribute(
         'data-color',
-        pawn === 'turn' ? 'black' : pawn === 'phase' ? 'silver' : 'red'
+        pawn === 'turn' ? 'black' : pawn === 'phase' ? 'silver' : 'red',
       );
       this.ui.containers.board.appendChild(elt);
     });
@@ -276,7 +369,7 @@ class Board {
       setAbsolutePosition(
         elt,
         BOARD_SCALE,
-        COMPANY_DEBT_SELECT_POSITIONS[value]
+        COMPANY_DEBT_SELECT_POSITIONS[value],
       );
       this.ui.containers.selectBoxes.appendChild(elt);
     });
@@ -326,8 +419,8 @@ class Board {
           getRegimentPosition(
             piece.location,
             this.armies.regiments[piece.location].length,
-            piece.exhausted
-          )
+            piece.exhausted,
+          ),
         );
         this.armies.regiments[piece.location].push(piece);
       }
@@ -354,13 +447,13 @@ class Board {
       switch (location) {
         case COURT_OF_DIRECTORS:
           position = getCourtOfDirectorsPosition(
-            this.familyMembers[COURT_OF_DIRECTORS].length
+            this.familyMembers[COURT_OF_DIRECTORS].length,
           );
           this.familyMembers[COURT_OF_DIRECTORS].push(familyMember);
           break;
         case OFFICER_IN_TRAINING:
           position = getOfficersInTrainingPosition(
-            this.familyMembers[OFFICER_IN_TRAINING].length
+            this.familyMembers[OFFICER_IN_TRAINING].length,
           );
           this.familyMembers[OFFICER_IN_TRAINING].push(familyMember);
           break;
@@ -369,7 +462,7 @@ class Board {
         case MADRAS_WRITERS:
           position = getWriterPosition(
             location,
-            this.familyMembers[location].length
+            this.familyMembers[location].length,
           );
           this.familyMembers[location].push(familyMember);
           break;
@@ -378,7 +471,7 @@ class Board {
         case MADRAS_ARMY:
           position = getOfficerPosition(
             location,
-            this.familyMembers[location].length
+            this.familyMembers[location].length,
           );
           this.familyMembers[location].push(familyMember);
           break;
@@ -428,18 +521,24 @@ class Board {
     const fromRect =
       this.ui.familyMembers[familyMember.id].getBoundingClientRect();
     this.updateFamilyMembers([familyMember]);
-    await this.game.animationManager.play(
-      new BgaSlideAnimation({
-        element: this.ui.familyMembers[familyMember.id],
-        transitionTimingFunction: 'ease-in-out',
-        fromRect,
-      })
+
+    await this.game.animationManager.slideIn(
+      this.ui.familyMembers[familyMember.id],
+      this.ui.familyMembers[familyMember.id],
     );
+
+    // await this.game.animationManager.play(
+    //   new BgaSlideAnimation({
+    //     element: this.ui.familyMembers[familyMember.id],
+    //     transitionTimingFunction: 'ease-in-out',
+    //     fromRect,
+    //   })
+    // );
   }
 
   public async moveFamilyMemberBetweenLocations(
     familyMember: JocoFamilyMember,
-    to: string // key of this.familyMember
+    to: string, // key of this.familyMember
   ) {
     const from = familyMember.location;
     familyMember.location = to;
@@ -450,7 +549,7 @@ class Board {
       this.familyMembers[familyMember.location] &&
       this.familyMembers[familyMember.location].some(
         (memberInLocation: JocoFamilyMember) =>
-          memberInLocation.id === familyMember.id
+          memberInLocation.id === familyMember.id,
       )
     ) {
       return;
@@ -459,11 +558,11 @@ class Board {
     let promises = [];
     if (this.familyMembers[from]) {
       const remainingFamilyMembers = this.familyMembers[from].filter(
-        (member: JocoFamilyMember) => member.id !== familyMember.id
+        (member: JocoFamilyMember) => member.id !== familyMember.id,
       );
       this.familyMembers[from] = [];
       promises = remainingFamilyMembers.map((member: JocoFamilyMember) =>
-        this.moveFamilyMember({ familyMember: member })
+        this.moveFamilyMember({ familyMember: member }),
       );
     }
 
@@ -473,24 +572,28 @@ class Board {
 
   async placeFamilyMembers(
     familyMembers: JocoFamilyMember[],
-    fromElement: HTMLElement
+    fromElement: HTMLElement,
   ) {
-    const fromRect = fromElement.getBoundingClientRect();
     const promises = familyMembers.map(async (familyMember, index) => {
       const { id } = familyMember;
       const player = PlayerManager.getInstance().getPlayerForFamily(
-        familyMember.familyId
+        familyMember.familyId,
       );
-      await this.game.framework().wait(index * 200);
+      await Interaction.use().wait(index * 200);
+
       player.counters[FAMILY_MEMBERS_COUNTER].incValue(-1);
       this.updateFamilyMembers([familyMember]);
-      await this.game.animationManager.play(
-        new BgaSlideAnimation({
-          element: this.ui.familyMembers[id],
-          transitionTimingFunction: 'ease-in-out',
-          fromRect,
-        })
+      await this.game.animationManager.slideIn(
+        this.ui.familyMembers[id],
+        fromElement,
       );
+      // await this.game.animationManager.play(
+      //   new BgaSlideAnimation({
+      //     element: this.ui.familyMembers[id],
+      //     transitionTimingFunction: 'ease-in-out',
+      //     fromRect,
+      //   }),
+      // );
       if (
         familyMember.location === COURT_OF_DIRECTORS ||
         familyMember.location === CHAIRMAN
@@ -507,7 +610,7 @@ class Board {
       setAbsolutePosition(
         this.ui.orders[orderId],
         BOARD_SCALE,
-        ORDERS_CONFIG[orderId]
+        ORDERS_CONFIG[orderId],
       );
       // this.orders[orderId].style.top = `calc(var(--boardScale) * ${ORDERS_CONFIG[orderId].top}px)`
       // this.orders[orderId].style.left = `calc(var(--boardScale) * ${ORDERS_CONFIG[orderId].left}px)`
@@ -521,29 +624,30 @@ class Board {
       setAbsolutePosition(
         this.ui.containers.powerTokens[token],
         BOARD_SCALE,
-        POWER_TOKEN_POSITIONS[index]
+        POWER_TOKEN_POSITIONS[index],
       );
     });
   }
 
   async movePawn(
     type: keyof typeof this.ui.containers.pawns,
-    value: string | number
+    value: string | number,
   ) {
     const fromRect = this.ui.containers.pawns[type].getBoundingClientRect();
     this.updatePawn(type, value);
-    await this.game.animationManager.play(
-      new BgaSlideAnimation({
-        element: this.ui.containers.pawns[type],
-        transitionTimingFunction: 'ease-in-out',
-        fromRect,
-      })
-    );
+    await this.game.animationManager.slideIn(this.ui.containers.pawns[type], this.ui.containers.pawns[type]);
+    // await this.game.animationManager.play(
+    //   new BgaSlideAnimation({
+    //     element: this.ui.containers.pawns[type],
+    //     transitionTimingFunction: 'ease-in-out',
+    //     fromRect,
+    //   }),
+    // );
   }
 
   updatePawn(
     type: keyof typeof this.ui.containers.pawns,
-    value: string | number
+    value: string | number,
   ) {
     let position: AbsolutePosition;
     switch (type) {
@@ -581,37 +685,39 @@ class Board {
     const fromRect = this.ui.armyPieces[regiment.id].getBoundingClientRect();
 
     this.updateArmyPieces([regiment]);
-    await this.game.animationManager.play(
-      new BgaSlideAnimation({
-        element: this.ui.armyPieces[regiment.id],
-        transitionTimingFunction: 'ease-in-out',
-        fromRect,
-      })
-    );
+    // Should be slideIn from Delta?
+    this.game.animationManager.slideIn(this.ui.armyPieces[regiment.id],this.ui.armyPieces[regiment.id]);
+    // await this.game.animationManager.play(
+    //   new BgaSlideAnimation({
+    //     element: this.ui.armyPieces[regiment.id],
+    //     transitionTimingFunction: 'ease-in-out',
+    //     fromRect,
+    //   }),
+    // );
   }
 
   public async moveRegimentBetweenArmies(
     regiment: JocoArmyPieceBase,
-    from: string
+    from: string,
   ) {
     // Skip if regiment is already in location, ie player already moved it when performing action
     // and this is triggered by notif.
     if (
       this.armies.regiments[regiment.location].some(
         (regimentInLocation: JocoFamilyMember) =>
-          regimentInLocation.id === regiment.id
+          regimentInLocation.id === regiment.id,
       )
     ) {
       return;
     }
 
     const remainingRegiments = this.armies.regiments[from].filter(
-      (piece: JocoArmyPieceBase) => piece.id !== regiment.id
+      (piece: JocoArmyPieceBase) => piece.id !== regiment.id,
     );
 
     this.armies.regiments[from] = [];
     const promises = remainingRegiments.map((remaining: JocoArmyPieceBase) =>
-      this.moveRegiment(remaining)
+      this.moveRegiment(remaining),
     );
 
     promises.push(this.moveRegiment(regiment));
@@ -630,25 +736,26 @@ class Board {
     await Interaction.use().wait(index * 200);
     const fromRect = this.ui.ships[ship.id].getBoundingClientRect();
     const fromIndex = this.seas[from].findIndex(
-      (shipInOldZone: JocoShipBase | null) => shipInOldZone?.id === ship.id
+      (shipInOldZone: JocoShipBase | null) => shipInOldZone?.id === ship.id,
     );
     this.placeShip(ship);
     if (fromIndex >= 0) {
       this.seas[from][fromIndex] = null;
     }
-    await this.game.animationManager.play(
-      new BgaSlideAnimation({
-        element: this.ui.ships[ship.id],
-        transitionTimingFunction: 'ease-in-out',
-        fromRect,
-      })
-    );
+
+    const toRect = this.ui.ships[ship.id].getBoundingClientRect();
+    const delta = {
+      x: fromRect.left - toRect.left,
+      y: fromRect.top - toRect.top,
+    };
+    await this.game.animationManager.slideInFromDelta(this.ui.ships[ship.id], delta);
+
   }
 
   public async removeShip(shipId: string, seaZone: string) {
     this.ui.ships[shipId].remove();
     const fromIndex = this.seas[seaZone].findIndex(
-      (shipInOldZone: JocoShipBase | null) => shipInOldZone?.id === shipId
+      (shipInOldZone: JocoShipBase | null) => shipInOldZone?.id === shipId,
     );
     if (fromIndex >= 0) {
       this.seas[seaZone][fromIndex] = null;
@@ -657,7 +764,7 @@ class Board {
 
   public updateOtherShip(
     ship: JocoShipBase,
-    type: OtherShipType
+    type: OtherShipType,
   ): JocoShipBase {
     this.ui.ships[ship.id].setAttribute('data-type', type);
     ship.type = type;
@@ -667,7 +774,7 @@ class Board {
 
   public shipAlreadyInZone(shipId: string, location: string) {
     return this.seas[location].some(
-      (shipInLocation: JocoShipBase | null) => shipInLocation?.id === shipId
+      (shipInLocation: JocoShipBase | null) => shipInLocation?.id === shipId,
     );
   }
 
@@ -683,7 +790,7 @@ class Board {
         this.ui.containers.ships.appendChild(this.ui.ships[id]);
       }
       const nullIndex = (this.seas[location] as JocoShipBase[]).findIndex(
-        (pos) => pos === null
+        (pos) => pos === null,
       );
 
       const shipIndex = nullIndex >= 0 ? nullIndex : this.seas[location].length;
@@ -692,20 +799,21 @@ class Board {
       this.seas[location][shipIndex] = ship;
       setAbsolutePosition(this.ui.ships[id], BOARD_SCALE, position);
       if (fromElement) {
-        await this.game.animationManager.play(
-          new BgaSlideAnimation({
-            element: this.ui.ships[id],
-            transitionTimingFunction: 'ease-in-out',
-            fromRect: fromElement.getBoundingClientRect(),
-          })
-        );
+        await this.game.animationManager.slideIn(this.ui.ships[id], fromElement);
+        // await this.game.animationManager.play(
+        //   new BgaSlideAnimation({
+        //     element: this.ui.ships[id],
+        //     transitionTimingFunction: 'ease-in-out',
+        //     fromRect: fromElement.getBoundingClientRect(),
+        //   }),
+        // );
       }
     } else if (location.startsWith(SHIPYARD)) {
       // Unfitted
       // TODO: place on cards in player area
       const enterprise = this.game.gamedatas.enterprises[location];
       const player = PlayerManager.getInstance().getPlayerForFamily(
-        enterprise.location
+        enterprise.location,
       );
       player.counters[SHIPS_COUNTER].incValue(1);
     }

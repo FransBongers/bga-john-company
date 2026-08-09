@@ -1,4 +1,7 @@
-class Bar {
+import { GameAlias, GamedatasAlias } from "../types";
+import { tplTabButton } from "./templates";
+
+export class Bar {
   private static instance: Bar;
   private game: GameAlias;
 

@@ -1,15 +1,28 @@
-interface OnEnteringDirectorOfTradeSpecialEnvoySuccessArgs
-  extends CommonStateArgs {
+import { Board } from '../board';
+import {
+  debug,
+  updatePageTitle,
+  getPlayerName,
+  onClick,
+  clearPossible,
+  setSelected,
+  addConfirmButton,
+  addCancelButton,
+  performAction,
+} from '../boilerplate';
+import { CommonStateArgs, GameAlias, GameState, JoCoOrder } from '../types';
+
+interface OnEnteringDirectorOfTradeSpecialEnvoySuccessArgs extends CommonStateArgs {
   closedOrders: JoCoOrder[];
 }
 
-class DirectorOfTradeSpecialEnvoySuccess implements State {
+export class DirectorOfTradeSpecialEnvoySuccess implements GameState<OnEnteringDirectorOfTradeSpecialEnvoySuccessArgs> {
   private static instance: DirectorOfTradeSpecialEnvoySuccess;
   private args: OnEnteringDirectorOfTradeSpecialEnvoySuccessArgs;
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     DirectorOfTradeSpecialEnvoySuccess.instance =
       new DirectorOfTradeSpecialEnvoySuccess(game);
   }
@@ -30,16 +43,16 @@ class DirectorOfTradeSpecialEnvoySuccess implements State {
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringDirectorOfTradeSpecialEnvoyArgs
+    args: OnEnteringDirectorOfTradeSpecialEnvoySuccessArgs,
   ) {
     updatePageTitle(
       _(
-        '${tkn_playerName} may open trade with China or may open a closed order'
+        '${tkn_playerName} may open trade with China or may open a closed order',
       ),
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true
+      true,
     );
   }
 
@@ -63,13 +76,14 @@ class DirectorOfTradeSpecialEnvoySuccess implements State {
     this.game.clearPossible();
 
     updatePageTitle(
-      _('${you} may open trade with China or may open a closed order')
+      _('${you} may open trade with China or may open a closed order'),
     );
     const board = Board.getInstance();
     this.args.closedOrders.forEach((order) => {
-      onClick(board.ui.orders[order.id], () => this.updateInterfaceConfirm(order))
-      
-    })
+      onClick(board.ui.orders[order.id], () =>
+        this.updateInterfaceConfirm(order),
+      );
+    });
 
     // addCancelButton();
   }

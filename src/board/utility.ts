@@ -1,4 +1,6 @@
-const createFamilyMember = (familyId: string, familyMemberId: number | string, extraClasses?: string[]): HTMLElement => {
+import { familyMemberSvgs } from "../templates";
+
+export const createFamilyMember = (familyId: string, familyMemberId: number | string, extraClasses?: string[]): HTMLElement => {
   const elt = document.createElement('div');
   const familyMemberNumber = typeof familyMemberId === 'number' ? familyMemberId : Number(familyMemberId.split('_')[2]) % 18;
 
@@ -24,7 +26,7 @@ const createFamilyMember = (familyId: string, familyMemberId: number | string, e
 }
 
 // TODO: use id to get name
-const createShip = ({name, type, fatigued, extraClasses }: {name: string; type: string; fatigued: 0 | 1; extraClasses?: string[]}): HTMLElement => {
+export const createShip = ({name, type, fatigued, extraClasses }: {name: string; type: string; fatigued: 0 | 1; extraClasses?: string[]}): HTMLElement => {
   const elt = document.createElement('div');
   
   elt.classList.add('joco-ship');
@@ -36,7 +38,7 @@ const createShip = ({name, type, fatigued, extraClasses }: {name: string; type: 
   return elt;
 }
 
-const createRegiment = (extraClasses: string[] = []): HTMLElement => {
+export const createRegiment = (extraClasses: string[] = []): HTMLElement => {
   const elt = document.createElement('div');
   elt.classList.add('joco-regiment');
   extraClasses.forEach((className) => elt.classList.add(className));

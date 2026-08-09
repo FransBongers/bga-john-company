@@ -13,31 +13,83 @@
  *
  */
 
-declare const define; // TODO: check if we comment here or in bga-animations module?
-declare const ebg;
-declare const $;
-declare const dijit;
-declare const dojo: Dojo;
-declare const _: (stringToTranslate: string) => string;
-declare const g_gamethemeurl;
-declare const playSound;
-declare var noUiSlider;
+import { Bar } from './bar';
+import { Board } from './board';
+import {
+  NotificationManager,
+  debug,
+  Interaction,
+  SELECTABLE,
+  SELECTED,
+} from './boilerplate';
+import { ConfirmPartialTurn } from './boilerplate/states/ConfirmPartialTurn';
+import { ConfirmTurn } from './boilerplate/states/ConfirmTurn';
+import { CROWN_PLAYER_ID, SETUP } from './constants';
+import { CrownClimate } from './crown/climate';
+import { BgaAnimations, BgaAutofit } from './libs';
+import { getTokenDiv } from './logs';
+import { Negotiation } from './negotiation';
+import { PlayerAreas } from './player-areas';
+import { PlayerManager } from './player-manager';
+import { SetupArea } from './setup-area';
+import {
+  Chairman,
+  ChairmanDebtConsent,
+  CrownChairmanRequestAllocation,
+  CrownChairmanRequestDebtAdvancement,
+  CrownManagerOfShippingBuyCompanyShips,
+  CrownManagerOfShippingFitShips,
+  CrownManagerOfShippingLeaseExtraShips,
+  CrownManagerOfShippingPlaceShips,
+  DirectorOfTradeSpecialEnvoy,
+  DirectorOfTradeSpecialEnvoySuccess,
+  DirectorOfTradeTransfers,
+  DraftCard,
+  EnlistWriter,
+  EventsInIndiaCrisisDefense,
+  FamilyAction,
+  ManagerOfShipping,
+  MilitaryAffairsAssign,
+  MilitaryAffairsTransfers,
+  PlayerTurn,
+  PresidencyDecideOrder,
+  PresidencyTrade,
+  PresidencyTradeFillOrders,
+  RevenuePayDividends,
+  RevenueRoyalPardon,
+  SeekShare,
+} from './states';
+import { StaticData } from './static-data';
+import { tplPlayArea, tplCrownPlayerPanel } from './templates';
+import { JohnCompanyGamedatas, GamedatasAlias } from './types';
+
+// declare const define; // TODO: check if we comment here or in bga-animations module?
+// declare const ebg;
+// declare const $;
+// declare const dijit;
+// declare const dojo: Dojo;
+// declare const _: (stringToTranslate: string) => string;
+// declare const g_gamethemeurl;
+// declare const playSound;
+// declare var noUiSlider;
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-class JohnCompany implements Game {
+export class Game {
   public gamedatas: JohnCompanyGamedatas;
 
   // Default
-  public animationManager: AnimationManager;
+  public animationManager!: InstanceType<typeof BgaAnimations.Manager>;
   //  public settings: Settings;
   public gameOptions: GamedatasAlias['gameOptions'];
   public notificationManager: NotificationManager;
   //  public playerManager: PlayerManager;
   public playerOrder: number[];
   //  public tooltipManager: TooltipManager;
+  public gameName: string = '';
+  private isLoadingComplete: boolean = false;
 
   // Boiler plate
   //  private alwaysFixTopActions: boolean;
@@ -84,9 +136,122 @@ class JohnCompany implements Game {
     RevenueRoyalPardon,
     SeekShare,
   };
+  public bga: Bga;
 
-  constructor() {
+  constructor(bga: Bga) {
+    this.bga = bga;
     console.log('johncompany constructor');
+
+    this.gameName = 'hegemony';
+
+    this.bga.gameui.onScreenWidthChange = () => this.onScreenWidthChange();
+    this.overrideOnPlaceLogOnChannel();
+    this.overrideAddToLog();
+    this.overrideSetLoader();
+    this.overrideUpdatePlayerOrdering();
+
+    this.bga.userPreferences.onChange = (prefId, prefValue) =>
+      this.onUserPrefChanged(prefId, prefValue);
+  }
+
+  onScreenWidthChange() {
+    this.updateLayout();
+  }
+
+  /**
+   * Setup undo/cancel log tracking for notifications
+   * Intercepts log placement to map notification UIDs to log IDs
+   * @private
+   */
+  private overrideOnPlaceLogOnChannel(): void {
+    const originalOnPlaceLogOnChannel =
+      // @ts-ignore
+      this.bga.gameui.onPlaceLogOnChannel.bind(this.bga.gameui);
+    // @ts-ignore
+    this.bga.gameui.onPlaceLogOnChannel = (msg: Notif<unknown>) => {
+      // @ts-ignore
+      const currentLogId = this.bga.gameui.notifqueue.next_log_id;
+      // @ts-ignore
+      const currentMobileLogId = this.bga.gameui.next_log_id;
+      const res = originalOnPlaceLogOnChannel(msg);
+
+      this._notif_uid_to_log_id[msg.uid] = currentLogId;
+      this._notif_uid_to_mobile_log_id[msg.uid] = currentMobileLogId;
+      this._last_notif = {
+        logId: currentLogId,
+        mobileLogId: currentMobileLogId,
+        msg,
+      };
+
+      return res;
+    };
+  }
+
+  private overrideAddToLog(): void {
+    const originalAddToLog =
+      // @ts-ignore
+      this.bga.notifications.game.notifqueue.addToLog.bind(
+        // @ts-ignore
+        this.bga.notifications.game.notifqueue,
+      );
+    // @ts-ignore
+    this.bga.notifications.game.notifqueue.addToLog = (input: unknown) => {
+      // @ts-ignore
+
+      const res = originalAddToLog(input);
+      this.addLogClass();
+
+      return res;
+    };
+  }
+
+  private overrideSetLoader() {
+    const originalSetLoader =
+      // @ts-ignore
+      this.bga.gameui.setLoader.bind(
+        // @ts-ignore
+        this.bga.gameui,
+      );
+
+    // @ts-ignore
+    this.bga.gameui.setLoader = (value: any, max: any) => {
+      originalSetLoader(value, max);
+
+      if (!this.isLoadingComplete && value >= 100) {
+        this.isLoadingComplete = true;
+        this.onLoadingComplete();
+      }
+    };
+  }
+
+  onLoadingComplete() {
+    this.updateLayout();
+    BgaAutofit.init({ scaleStep: 0.025, rootElement: document.body });
+  }
+
+  private overrideUpdatePlayerOrdering() {
+    const original =
+      // @ts-ignore
+      this.bga.gameui.updatePlayerOrdering.bind(
+        // @ts-ignore
+        this.bga.gameui,
+      );
+
+    // @ts-ignore
+    this.bga.gameui.updatePlayerOrdering = () => {
+      original();
+      const container = document.getElementById('player_boards');
+      if (!container) {
+        return;
+      }
+
+      this.playerOrder.forEach((playerId) => {
+        const playerBoard = document.getElementById(
+          `overall_player_board_${playerId}`,
+        )!;
+        container.insertAdjacentElement('beforeend', playerBoard);
+      });
+    };
   }
 
   // ..######..########.########.##.....##.########.
@@ -101,11 +266,12 @@ class JohnCompany implements Game {
     this.mobileVersion = body && body.classList.contains('mobile_version');
 
     // Create a new div for buttons to avoid BGA auto clearing it
-    dojo.place(
-      "<div id='customActions' style='display:inline-block'></div>",
-      $('generalactions'),
-      'after'
-    );
+    document
+      .getElementById('generalactions')!
+      .insertAdjacentHTML(
+        'afterend',
+        "<div id='customActions' style='display:inline-block'></div>",
+      );
 
     document
       .getElementById('game_play_area')
@@ -126,8 +292,8 @@ class JohnCompany implements Game {
           'afterbegin',
           tplCrownPlayerPanel(
             _('The Crown'),
-            gamedatas.players[CROWN_PLAYER_ID].color
-          )
+            gamedatas.players[CROWN_PLAYER_ID].color,
+          ),
         );
       // dojo.place(tplWakhanPlayerPanel({ name: _('Wakhan') }), 'player_boards', 0);
     }
@@ -143,11 +309,12 @@ class JohnCompany implements Game {
     //  this.infoPanel.setupAddCardTooltips();
     //  this.informationModal = new InformationModal(this);
 
-    this.animationManager = new AnimationManager(this, {
+    this.animationManager = new BgaAnimations.Manager({
       duration: 500,
-      //  this.settings.get({ id: PREF_SHOW_ANIMATIONS }) === DISABLED
-      // 	 ? 0
-      // 	 : 2100 - (this.settings.get({ id: PREF_ANIMATION_SPEED }) as number),
+      animationsActive: () => {
+        const showAnimations = this.bga.userPreferences.get(100) === 1;
+        return showAnimations && this.bga.gameui.bgaAnimationsActive();
+      },
     });
 
     //  this.cardManager = new GestCardManager(this);
@@ -164,7 +331,7 @@ class JohnCompany implements Game {
     if (this.gameOptions.crownEnabled) {
       CrownClimate.create(this);
     }
-    NotificationManager.create(this);
+    this.notificationManager = new NotificationManager(this);
     Negotiation.create(this);
     PlayerAreas.create(this);
     Board.create(this);
@@ -177,9 +344,10 @@ class JohnCompany implements Game {
       SetupArea.create(this);
     }
 
-    NotificationManager.getInstance().setupNotifications();
+    this.notificationManager.setupNotifications();
 
     //  this.tooltipManager.setupTooltips();
+    // this.setupResizeObserver();
     debug('Ending game setup');
   }
 
@@ -219,7 +387,8 @@ class JohnCompany implements Game {
     console.log('Entering state: ' + stateName, args);
     const activePlayerIds: number[] | undefined = args.args?.activePlayerIds;
     const playerIsActiveAndStateExists =
-      this.framework().isCurrentPlayerActive() && this.states[stateName];
+      this.bga.players.isCurrentPlayerActive() &&
+      this.states[stateName as keyof typeof this.states];
 
     const currentPlayerId = this.getPlayerId();
     // UI changes for active player
@@ -233,7 +402,7 @@ class JohnCompany implements Game {
         .getInstance()
         .setDescription(
           activePlayerIds || Number(args.active_player),
-          args.args
+          args.args,
         );
     }
 
@@ -254,14 +423,14 @@ class JohnCompany implements Game {
     if (args.args && args.args.previousSteps) {
       args.args.previousSteps.forEach((stepId: number) => {
         let logEntry = $('logs').querySelector(
-          `.log.notif_newUndoableStep[data-step="${stepId}"]`
-        );
+          `.log.notif_newUndoableStep[data-step="${stepId}"]`,
+        ) as HTMLElement;
         if (logEntry) {
           this.onClick(logEntry, () => this.undoToStep({ stepId }));
         }
 
         logEntry = document.querySelector(
-          `.chatwindowlogs_zone .log.notif_newUndoableStep[data-step="${stepId}"]`
+          `.chatwindowlogs_zone .log.notif_newUndoableStep[data-step="${stepId}"]`,
         );
         if (logEntry) {
           this.onClick(logEntry, () => this.undoToStep({ stepId }));
@@ -331,13 +500,25 @@ class JohnCompany implements Game {
   // 	 }
   //  }
 
-  destroy(elem: HTMLElement) {
-    if (this.framework().tooltips[elem.id]) {
-      this.framework().tooltips[elem.id].destroy();
-      delete this.framework().tooltips[elem.id];
-    }
+  // .##.....##..######..########.########.
+  // .##.....##.##....##.##.......##.....##
+  // .##.....##.##.......##.......##.....##
+  // .##.....##..######..######...########.
+  // .##.....##.......##.##.......##...##..
+  // .##.....##.##....##.##.......##....##.
+  // ..#######...######..########.##.....##
 
-    elem.remove();
+  // .########..########..########.########..######.
+  // .##.....##.##.....##.##.......##.......##....##
+  // .##.....##.##.....##.##.......##.......##......
+  // .########..########..######...######....######.
+  // .##........##...##...##.......##.............##
+  // .##........##....##..##.......##.......##....##
+  // .##........##.....##.########.##........######.
+
+  private onUserPrefChanged(prefId: number, prefValue: string | number) {
+    switch (prefId) {
+    }
   }
 
   //  .##.....##.########.####.##.......####.########.##....##
@@ -348,221 +529,13 @@ class JohnCompany implements Game {
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  ///////////////////////////////////////////////////
-  //// Utility methods - add in alphabetical order
-
-  /*
-   * Add a blue/grey button if it doesn't already exists
-   */
-  addActionButtonClient({
-    id,
-    text,
-    callback,
-    extraClasses,
-    color = 'none',
-  }: {
-    id: string;
-    text: string;
-    callback: Function | string;
-    extraClasses?: string;
-    color?: 'blue' | 'gray' | 'red' | 'none';
-  }) {
-    if ($(id)) {
-      return;
-    }
-    this.framework().addActionButton(
-      id,
-      text,
-      callback,
-      'customActions',
-      false,
-      color
-    );
-    if (extraClasses) {
-      dojo.addClass(id, extraClasses);
-    }
-  }
-
-  // addCancelButton(callback?: Function) {
-  //   this.addDangerActionButton({
-  //     id: 'cancel_btn',
-  //     text: _('Cancel'),
-  //     callback: () => {
-  //       if (callback) {
-  //         callback();
-  //       }
-  //       this.onCancel();
-  //     },
-  //   });
-  // }
-
-  // addConfirmButton(callback: Function) {
-  //   this.addPrimaryActionButton({
-  //     id: 'confirm_btn',
-  //     text: _('Confirm'),
-  //     callback,
-  //   });
-  // }
-
-  // addPassButton({
-  //   optionalAction,
-  //   text,
-  // }: {
-  //   optionalAction: boolean;
-  //   text?: string;
-  // }) {
-  //   if (optionalAction) {
-  //     this.addSecondaryActionButton({
-  //       id: 'pass_btn',
-  //       text: text ? _(text) : _('Pass'),
-  //       callback: () => {
-  //         // this.takeAction({
-  //         //   action: 'actPassOptionalAction',
-  //         //   atomicAction: false,
-  //         // });
-  //       },
-  //     });
-  //   }
-  // }
-
-  // addPlayerButton({
-  //   player,
-  //   callback,
-  // }: {
-  //   player: BgaPlayer;
-  //   callback: Function | string;
-  // }) {
-  //   const id = `select_${player.id}`;
-
-  //   this.addPrimaryActionButton({
-  //     id,
-  //     text: player.name,
-  //     callback,
-  //   });
-
-  //   const node = document.getElementById(id);
-  //   node.style.backgroundColor = `#${player.color}`;
-  // }
-
-  // addPrimaryActionButton({
-  //   id,
-  //   text,
-  //   callback,
-  //   extraClasses,
-  // }: {
-  //   id: string;
-  //   text: string;
-  //   callback: Function | string;
-  //   extraClasses?: string;
-  // }) {
-  //   if ($(id)) {
-  //     return;
-  //   }
-  //   this.framework().addActionButton(
-  //     id,
-  //     text,
-  //     callback,
-  //     'customActions',
-  //     false,
-  //     'blue'
-  //   );
-  //   if (extraClasses) {
-  //     dojo.addClass(id, extraClasses);
-  //   }
-  // }
-
-  // addSecondaryActionButton({
-  //   id,
-  //   text,
-  //   callback,
-  //   extraClasses,
-  // }: {
-  //   id: string;
-  //   text: string;
-  //   callback: Function | string;
-  //   extraClasses?: string;
-  // }) {
-  //   if ($(id)) {
-  //     return;
-  //   }
-  //   this.framework().addActionButton(
-  //     id,
-  //     text,
-  //     callback,
-  //     'customActions',
-  //     false,
-  //     'gray'
-  //   );
-  //   if (extraClasses) {
-  //     dojo.addClass(id, extraClasses);
-  //   }
-  // }
-
-  // addDangerActionButton({
-  //   id,
-  //   text,
-  //   callback,
-  //   extraClasses,
-  // }: {
-  //   id: string;
-  //   text: string;
-  //   callback: Function | string;
-  //   extraClasses?: string;
-  // }) {
-  //   if ($(id)) {
-  //     return;
-  //   }
-  //   this.framework().addActionButton(
-  //     id,
-  //     text,
-  //     callback,
-  //     'customActions',
-  //     false,
-  //     'red'
-  //   );
-  //   if (extraClasses) {
-  //     dojo.addClass(id, extraClasses);
-  //   }
-  // }
-
-  // addUndoButtons({ previousSteps, previousEngineChoices }: CommonStateArgs) {
-  //   const lastStep = Math.max(0, ...previousSteps);
-  //   if (lastStep > 0) {
-  //     // this.addDangerActionButton('btnUndoLastStep', _('Undo last step'), () => this.undoToStep(lastStep), 'restartAction');
-  //     this.addDangerActionButton({
-  //       id: 'undo_last_step_btn',
-  //       text: _('Undo last step'),
-  //       callback: () => {
-  //         // this.takeAction({
-  //         //   action: 'actUndoToStep',
-  //         //   args: {
-  //         //     stepId: lastStep,
-  //         //   },
-  //         //   checkAction: 'actRestart',
-  //         //   atomicAction: false,
-  //         // });
-  //       },
-  //     });
-  //   }
-
-  //   if (previousEngineChoices > 0) {
-  //     this.addDangerActionButton({
-  //       id: 'restart_btn',
-  //       text: _('Restart turn'),
-  //       callback: () => {
-  //         // this.takeAction({ action: 'actRestart', atomicAction: false }),
-  //       },
-  //     });
-  //   }
-  // }
-
   public clearInterface() {
     //  this.playerManager.clearInterface();
     //  this.gameMap.clearInterface();
   }
 
   clearPossible() {
-    this.framework().removeActionButtons();
+    this.bga.statusBar.removeActionButtons();
     dojo.empty('customActions');
 
     dojo.forEach(this._connections, dojo.disconnect);
@@ -583,19 +556,12 @@ class JohnCompany implements Game {
   }
 
   public getPlayerId(): number {
-    return Number(this.framework().player_id);
-  }
-
-  /**
-   * Typescript wrapper for framework functions
-   */
-  public framework(): Framework {
-    return this as unknown as Framework;
+    return this.bga.players.getCurrentPlayerId();
   }
 
   onCancel() {
     this.clearPossible();
-    this.framework().restoreServerGameState();
+    this.bga.states.restoreServerGameState();
   }
 
   clientUpdatePageTitle({
@@ -607,13 +573,7 @@ class JohnCompany implements Game {
     args: Record<string, string | number>;
     nonActivePlayers?: boolean;
   }) {
-    const title = this.format_string_recursive(_(text), args);
-    if (nonActivePlayers) {
-      this.gamedatas.gamestate.description = title;
-    } else {
-      this.gamedatas.gamestate.descriptionmyturn = title;
-    }
-    this.framework().updatePageTitle();
+    this.bga.statusBar.setTitle(_(text), args);
   }
 
   // .########...#######..####.##.......########.########.
@@ -643,7 +603,8 @@ class JohnCompany implements Game {
   onClick(node: HTMLElement, callback: Function, temporary = true) {
     let safeCallback = (evt) => {
       evt.stopPropagation();
-      if (this.framework().isInterfaceLocked()) {
+      // @ts-expect-error
+      if (this.bga.actions.game.isInterfaceLocked()) {
         return false;
       }
       if (this._helpMode) {
@@ -654,8 +615,7 @@ class JohnCompany implements Game {
 
     if (temporary) {
       this.connect($(node), 'click', safeCallback);
-      // dojo.removeClass(node, 'unselectable'); // replace with pr_selectable / pr_selected
-      dojo.addClass(node, 'selectable');
+      node.classList.add(SELECTABLE);
       this._selectableNodes.push(node);
     } else {
       dojo.connect($(node), 'click', safeCallback);
@@ -759,72 +719,23 @@ class JohnCompany implements Game {
   }) {
     if (!$(`log_${notif.logId}`)) return;
     let stepId = notif.msg.args.stepId;
-    $(`log_${notif.logId}`).dataset.step = stepId;
+    $(`log_${notif.logId}`).dataset.step = stepId as string;
     if ($(`dockedlog_${notif.mobileLogId}`))
-      $(`dockedlog_${notif.mobileLogId}`).dataset.step = stepId;
+      $(`dockedlog_${notif.mobileLogId}`).dataset.step = stepId as string;
 
     if (
       (
-        this.gamedatas.gamestate as ActiveGamestate<{
-          previousSteps?: number[];
-        }>
+        this.gamedatas.gamestate as Gamestate & {
+          args: { previousSteps?: number[] };
+        }
       ).args.previousSteps?.includes(Number(stepId))
     ) {
       this.onClick($(`log_${notif.logId}`), () => this.undoToStep({ stepId }));
       if ($(`dockedlog_${notif.mobileLogId}`))
         this.onClick($(`dockedlog_${notif.mobileLogId}`), () =>
-          this.undoToStep({ stepId })
+          this.undoToStep({ stepId }),
         );
     }
-  }
-
-  /*
-   * Remove non standard zoom property
-   */
-  onScreenWidthChange() {
-    this.updateLayout();
-  }
-
-  /* @Override */
-  format_string_recursive(log: string, args: Record<string, unknown>): string {
-    try {
-      if (log && args && !args.processed) {
-        args.processed = true;
-
-        // replace all keys that start with 'logToken'
-        Object.entries(args).forEach(([key, value]) => {
-          if (key.startsWith('tkn_')) {
-            args[key] = getTokenDiv({
-              key,
-              value: value as string,
-              game: this,
-            });
-          }
-        });
-      }
-    } catch (e) {
-      console.error(log, args, 'Exception thrown', e.stack);
-    }
-    return (this as any).inherited(arguments);
-  }
-
-  /*
-   * [Undocumented] Called by BGA framework on any notification message
-   * Handle cancelling log messages for restart turn
-   */
-  onPlaceLogOnChannel(msg: Notif<unknown>) {
-    const currentLogId = this.framework().notifqueue.next_log_id;
-    const currentMobileLogId = this.framework().next_log_id;
-    const res = this.framework().inherited(arguments);
-    this._notif_uid_to_log_id[msg.uid] = currentLogId;
-    this._notif_uid_to_mobile_log_id[msg.uid] = currentMobileLogId;
-    this._last_notif = {
-      logId: currentLogId,
-      mobileLogId: currentMobileLogId,
-      msg,
-    };
-    // console.log('_notif_uid_to_log_id', this._notif_uid_to_log_id);
-    return res;
   }
 
   /*
@@ -900,145 +811,4 @@ class JohnCompany implements Game {
     // console.log("tooltipsToMap", this.tooltipsToMap);
     // TODO: check how to update this. For now needs refresh
   }
-
-  /*
-   * [Undocumented] Override BGA framework functions to call onLoadingComplete when loading is done
-   */
-  setLoader(value, max) {
-    this.framework().inherited(arguments);
-    if (!this.framework().isLoadingComplete && value >= 100) {
-      this.framework().isLoadingComplete = true;
-      this.onLoadingComplete();
-    }
-  }
-
-  onLoadingComplete() {
-    // debug('Loading complete');
-    //  this.cancelLogs(this.gamedatas.canceledNotifIds);
-    this.updateLayout();
-    // this.inherited(arguments);
-  }
-
-  /* @Override */
-  updatePlayerOrdering() {
-    this.framework().inherited(arguments);
-    // TODO: Update for mobile mode
-    const container = document.getElementById('player_boards');
-    const infoPanel = document.getElementById('info_panel');
-
-    if (!container) {
-      return;
-    }
-    //  container.insertAdjacentElement('afterbegin', infoPanel);
-
-    //  if (this.mobileVersion) {
-    // 	 const travellersInfo = document.getElementById('travellers_info_panel');
-    // 	 console.log('travellersInfo', this.mobileVersion, travellersInfo);
-    // 	 container.insertBefore(travellersInfo, container.childNodes[2]);
-    //  }
-  }
-
-  //  setAlwaysFixTopActions(alwaysFixed = true, maximum = 30) {
-  // 	 this.alwaysFixTopActions = alwaysFixed;
-  // 	 this.alwaysFixTopActionsMaximum = maximum;
-  // 	 this.adaptStatusBar();
-  //  }
-
-  //  adaptStatusBar() {
-  // 	 (this as any).inherited(arguments);
-
-  // 	 if (this.alwaysFixTopActions) {
-  // 		 const afterTitleElem = document.getElementById('after-page-title');
-  // 		 const titleElem = document.getElementById('page-title');
-  // 		 let zoom = (getComputedStyle(titleElem) as any).zoom;
-  // 		 if (!zoom) {
-  // 			 zoom = 1;
-  // 		 }
-
-  // 		 const titleRect = afterTitleElem.getBoundingClientRect();
-  // 		 if (
-  // 			 titleRect.top < 0 &&
-  // 			 titleElem.offsetHeight <
-  // 				 (window.innerHeight * this.alwaysFixTopActionsMaximum) / 100
-  // 		 ) {
-  // 			 const afterTitleRect = afterTitleElem.getBoundingClientRect();
-  // 			 titleElem.classList.add('fixed-page-title');
-  // 			 titleElem.style.width = (afterTitleRect.width - 10) / zoom + 'px';
-  // 			 afterTitleElem.style.height = titleRect.height + 'px';
-  // 		 } else {
-  // 			 titleElem.classList.remove('fixed-page-title');
-  // 			 titleElem.style.width = 'auto';
-  // 			 afterTitleElem.style.height = '0px';
-  // 		 }
-  // 	 }
-  //  }
-
-  // .########..#######......######..##.....##.########..######..##....##
-  // ....##....##.....##....##....##.##.....##.##.......##....##.##...##.
-  // ....##....##.....##....##.......##.....##.##.......##.......##..##..
-  // ....##....##.....##....##.......#########.######...##.......#####...
-  // ....##....##.....##....##.......##.....##.##.......##.......##..##..
-  // ....##....##.....##....##....##.##.....##.##.......##....##.##...##.
-  // ....##.....#######......######..##.....##.########..######..##....##
-
-  //....###..........##....###....##.....##
-  //...##.##.........##...##.##....##...##.
-  //..##...##........##..##...##....##.##..
-  //.##.....##.......##.##.....##....###...
-  //.#########.##....##.#########...##.##..
-  //.##.....##.##....##.##.....##..##...##.
-  //.##.....##..######..##.....##.##.....##
-
-  actionError(actionName: string) {
-    this.framework().showMessage(`cannot take ${actionName} action`, 'error');
-  }
-
-  /*
-   * Make an AJAX call with automatic lock
-   */
-  // takeAction({
-  //   action,
-  //   atomicAction = true,
-  //   args = {},
-  //   checkAction,
-  // }: {
-  //   action: string;
-  //   atomicAction?: boolean;
-  //   args?: Record<string, unknown>;
-  //   checkAction?: string; // Action used in checkAction
-  // }) {
-  //   const actionName = atomicAction ? action : undefined;
-  //   if (!this.framework().checkAction(checkAction || action)) {
-  //     this.actionError(action);
-  //     return;
-  //   }
-  //   const data = {
-  //     lock: true,
-  //     actionName,
-  //     args: JSON.stringify(args),
-  //   };
-  //   // data.
-  //   const gameName = this.framework().game_name;
-  //   this.framework().ajaxcall(
-  //     `/${gameName}/${gameName}/${
-  //       atomicAction ? 'actTakeAtomicAction' : action
-  //     }.html`,
-  //     data,
-  //     this,
-  //     () => {}
-  //   );
-  // }
-
-  // // Generic call for Atomic Action that encode args as a JSON to be decoded by backend
-  // takeAtomicAction(action, args, warning = false) {
-  //   if (!this.framework().checkAction(action)) {
-  //     this.actionError(action);
-  //     return;
-  //   }
-
-  //   this.takeAction({
-  //     action: "actTakeAtomicAction",
-  //     args: { actionName: action, actionArgs: args },
-  //   });
-  // }
 }

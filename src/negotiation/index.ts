@@ -1,4 +1,7 @@
-class Negotiation {
+import { GameAlias, GamedatasAlias } from '../types';
+import { tplNegotiation } from './templates';
+
+export class Negotiation {
   private static instance: Negotiation;
 
   constructor(private game: GameAlias) {
@@ -22,12 +25,10 @@ class Negotiation {
   // .##....##.##..........##....##.....##.##.......
   // ..######..########....##.....#######..##.......
 
-  
   setup(gamedatas: GamedatasAlias) {
     document
       .getElementById('joco')
       .insertAdjacentHTML('afterbegin', tplNegotiation());
-
   }
 
   // .##.....##.########..########.....###....########.########....##.....##.####
@@ -37,5 +38,4 @@ class Negotiation {
   // .##.....##.##........##.....##.#########....##....##..........##.....##..##.
   // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
   // ..#######..##........########..##.....##....##....########.....#######..####
-
 }

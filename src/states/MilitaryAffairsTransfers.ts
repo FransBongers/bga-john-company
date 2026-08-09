@@ -1,3 +1,25 @@
+import { Board } from '../board';
+import {
+  debug,
+  updatePageTitle,
+  getPlayerName,
+  onClick,
+  addPrimaryActionButton,
+  addPassButton,
+  clearPossible,
+  setSelected,
+  addConfirmButton,
+  performAction,
+  addDangerActionButton,
+} from '../boilerplate';
+import {
+  CommonStateArgs,
+  GameAlias,
+  GameState,
+  JocoArmyPieceBase,
+  JocoFamilyMember,
+} from '../types';
+
 interface OnEnteringMilitaryAffairsTransfersArgs extends CommonStateArgs {
   options: {
     officers: Record<
@@ -21,7 +43,7 @@ interface OnEnteringMilitaryAffairsTransfersArgs extends CommonStateArgs {
   } | null;
 }
 
-class MilitaryAffairsTransfers implements State {
+export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAffairsTransfersArgs> {
   private static instance: MilitaryAffairsTransfers;
   private args: OnEnteringMilitaryAffairsTransfersArgs;
   private transfers: {
@@ -37,7 +59,7 @@ class MilitaryAffairsTransfers implements State {
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     MilitaryAffairsTransfers.instance = new MilitaryAffairsTransfers(game);
   }
 
@@ -61,14 +83,14 @@ class MilitaryAffairsTransfers implements State {
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringMilitaryAffairsTransfersArgs
+    args: OnEnteringMilitaryAffairsTransfersArgs,
   ) {
     updatePageTitle(
       _('${tkn_playerName} may make Army transfers'),
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true
+      true,
     );
   }
 
@@ -101,7 +123,7 @@ class MilitaryAffairsTransfers implements State {
       _('${you} may make up to two Army transfers (${number} remaining)'),
       {
         number: 2 - this.getTransferCount(),
-      }
+      },
     );
     const board = Board.getInstance();
     Object.entries(this.args.options.regiments).forEach(([id, data]) => {
@@ -109,7 +131,7 @@ class MilitaryAffairsTransfers implements State {
         return;
       }
       onClick(board.ui.armyPieces[id], () =>
-        this.updateInterfaceSelectArmyForRegiment(data)
+        this.updateInterfaceSelectArmyForRegiment(data),
       );
     });
 
@@ -213,8 +235,6 @@ class MilitaryAffairsTransfers implements State {
       Object.keys(this.transfers.regiments).length
     );
   }
-
-
 
   private async returnPieces() {
     const board = Board.getInstance();

@@ -1,4 +1,8 @@
-class Region {
+import { PRESIDENCIES } from "../constants";
+import { JocoRegionBase, GameAlias } from "../types";
+import { towerConfig } from "./config";
+
+export class Region {
   private tower: HTMLElement;
   private data: JocoRegionBase;
 

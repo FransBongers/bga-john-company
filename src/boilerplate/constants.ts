@@ -1,6 +1,6 @@
 /**
  * Class names
  */
-const DISABLED = 'disabled';
-const SELECTABLE = 'selectable';
-const SELECTED = 'selected';
+export const DISABLED = 'disabled';
+export const SELECTABLE = 'selectable';
+export const SELECTED = 'selected';

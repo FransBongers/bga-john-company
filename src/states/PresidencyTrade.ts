@@ -1,3 +1,23 @@
+import { Board } from '../board';
+import {
+  addCancelButton,
+  addConfirmButton,
+  addDangerActionButton,
+  addPrimaryActionButton,
+  addSecondaryActionButton,
+  clearPossible,
+  CommonStateArgs,
+  debug,
+  DISABLED,
+  formatStringRecursive,
+  GameState,
+  getPlayerName,
+  performAction,
+  updatePageTitle,
+} from '../boilerplate';
+import { StaticData } from '../static-data';
+import { JoCoOrder, JocoRegionBase, GameAlias } from '../types';
+
 interface OnEnteringPresidencyTradeArgs extends CommonStateArgs {
   treasury: number;
   proposal: number | null;
@@ -5,12 +25,12 @@ interface OnEnteringPresidencyTradeArgs extends CommonStateArgs {
   options: {
     homePortOrderId: string;
     homeRegionId: string;
-    orders: Record<string, JoCoOrder>
+    orders: Record<string, JoCoOrder>;
     regions: Record<string, JocoRegionBase>;
-  }
+  };
 }
 
-class PresidencyTrade implements State {
+export class PresidencyTrade implements GameState<OnEnteringPresidencyTradeArgs> {
   private static instance: PresidencyTrade;
   private args: OnEnteringPresidencyTradeArgs;
   private spend: number;
@@ -18,7 +38,7 @@ class PresidencyTrade implements State {
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     PresidencyTrade.instance = new PresidencyTrade(game);
   }
 
@@ -41,14 +61,14 @@ class PresidencyTrade implements State {
   setDescription(activePlayerIds: number, args: OnEnteringPresidencyTradeArgs) {
     updatePageTitle(
       _(
-        '${tkn_playerName} must choose regions to trade with and spend ${tkn_pound} to make a check'
+        '${tkn_playerName} must choose regions to trade with and spend ${tkn_pound} to make a check',
       ),
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
         amount: args.proposal,
         tkn_pound: 'pound',
       },
-      true
+      true,
     );
   }
 
@@ -71,13 +91,20 @@ class PresidencyTrade implements State {
   private updateInterfaceInitialStep() {
     clearPossible();
 
-    if (this.selectedRegionIds.length === Object.keys(this.args.options.regions).length) {
+    if (
+      this.selectedRegionIds.length ===
+      Object.keys(this.args.options.regions).length
+    ) {
       // All regions selected
       this.setMinSpendAmount();
       return;
     }
 
-    updatePageTitle(_('Trade check: ${you} must select the regions in which you wish to trade'));
+    updatePageTitle(
+      _(
+        'Trade check: ${you} must select the regions in which you wish to trade',
+      ),
+    );
 
     const staticData = StaticData.get();
 
@@ -85,13 +112,21 @@ class PresidencyTrade implements State {
       if (this.selectedRegionIds.includes(regionId)) {
         return;
       }
-      addPrimaryActionButton({id: `${regionId}_btn`, text: _(staticData.region(regionId).name), callback: () => {
-        this.selectedRegionIds.push(regionId);
-        this.updateInterfaceInitialStep();
-      }})
-    })
+      addPrimaryActionButton({
+        id: `${regionId}_btn`,
+        text: _(staticData.region(regionId).name),
+        callback: () => {
+          this.selectedRegionIds.push(regionId);
+          this.updateInterfaceInitialStep();
+        },
+      });
+    });
 
-    addPrimaryActionButton({id: 'done_btn', text: _('Done'), callback: () => this.setMinSpendAmount()});
+    addPrimaryActionButton({
+      id: 'done_btn',
+      text: _('Done'),
+      callback: () => this.setMinSpendAmount(),
+    });
     // >1 because home region is already selected.
     if (this.selectedRegionIds.length > 1) {
       addCancelButton();
@@ -100,7 +135,9 @@ class PresidencyTrade implements State {
 
   private setMinSpendAmount() {
     this.spend = this.selectedRegionIds.length;
-    Board.getInstance().treasuries[this.args.officeId].incValue(-this.selectedRegionIds.length);
+    Board.getInstance().treasuries[this.args.officeId].incValue(
+      -this.selectedRegionIds.length,
+    );
     this.updateInterfaceMakeCheck();
   }
 
@@ -163,10 +200,13 @@ class PresidencyTrade implements State {
   private updateInterfaceConfirm() {
     clearPossible();
 
-    updatePageTitle(_('Make a check with ${number} dice to trade in ${tradeLog}?'), {
-      number: this.spend,
-      tradeLog: this.getTradeLog()
-    });
+    updatePageTitle(
+      _('Make a check with ${number} dice to trade in ${tradeLog}?'),
+      {
+        number: this.spend,
+        tradeLog: this.getTradeLog(),
+      },
+    );
 
     addConfirmButton(() => this.performAction(true));
     this.addCancelButton();
@@ -188,14 +228,14 @@ class PresidencyTrade implements State {
 
     this.selectedRegionIds.forEach((regionId, index) => {
       const key = `key_${index}`;
-      log.push(['${',key,'}'].join(''));
+      log.push(['${', key, '}'].join(''));
       args[key] = _(staticData.region(regionId).name);
-    })
+    });
 
     return {
       log: log.join(', '),
       args,
-    }
+    };
   }
 
   private performAction(makeCheck: boolean = false) {
@@ -227,8 +267,10 @@ class PresidencyTrade implements State {
       id: 'cancel_btn',
       text: _('Cancel'),
       callback: async () => {
-        Board.getInstance().treasuries[this.args.officeId].toValue(this.args.treasury),
-        this.game.onCancel();
+        (Board.getInstance().treasuries[this.args.officeId].toValue(
+          this.args.treasury,
+        ),
+          this.game.onCancel());
       },
     });
   }

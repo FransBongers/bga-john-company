@@ -1,10 +1,15 @@
-class PlayerTurn implements State {
+import { debug, updatePageTitle } from '../boilerplate';
+import { GameState, GameAlias, CommonStateArgs } from '../types';
+
+export type OnEnteringPlayerTurnArgs = CommonStateArgs;
+
+export class PlayerTurn implements GameState<OnEnteringPlayerTurnArgs> {
   private static instance: PlayerTurn;
-  private args: OnEnteringConfirmTurnArgs;
+  private args: OnEnteringPlayerTurnArgs;
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     PlayerTurn.instance = new PlayerTurn(game);
   }
 
@@ -12,14 +17,14 @@ class PlayerTurn implements State {
     return PlayerTurn.instance;
   }
 
-  onEnteringState(args: OnEnteringConfirmTurnArgs) {
-    debug('Entering SelectPlotState');
+  onEnteringState(args: OnEnteringPlayerTurnArgs) {
+    debug('Entering PlayerTurn state');
     // this.args = args;
     this.updateInterfaceInitialStep();
   }
 
   onLeavingState() {
-    debug('Leaving SelectPlotState');
+    debug('Leaving PlayerTurn state');
   }
 
   setDescription(activePlayerId: number) {}

@@ -1,12 +1,16 @@
+import { Board } from "../board";
+import { debug, updatePageTitle, getPlayerName, clearPossible } from "../boilerplate";
+import { CommonStateArgs, GameState, GameAlias } from "../types";
+
 interface OnEnteringParliamentMeetsArgs extends CommonStateArgs {}
 
-class ParliamentMeets implements State {
+export class ParliamentMeets implements GameState<OnEnteringParliamentMeetsArgs> {
   private static instance: ParliamentMeets;
   private args: OnEnteringParliamentMeetsArgs;
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     ParliamentMeets.instance = new ParliamentMeets(game);
   }
 

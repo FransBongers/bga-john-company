@@ -1,4 +1,6 @@
 // TODO: split in framework & game specicf
+import { Climate } from './crown/climate';
+import { Game } from './Game';
 
 interface AddButtonProps {
   id: string;
@@ -11,9 +13,10 @@ interface AddActionButtonProps extends AddButtonProps {
   color?: 'blue' | 'gray' | 'red' | 'none';
 }
 
-interface State {
-  onEnteringState: (args: any) => void;
+export interface GameState<T> {
+  onEnteringState: (args: T) => void;
   onLeavingState: () => void;
+  setDescription: (activePlayerIds: number | number[], args: T) => void;
 }
 
 interface CommonStateArgs {
@@ -99,7 +102,7 @@ interface GamePiece {
 
 // Used to define game in all core states
 
-interface JohnCompanyGamedatas extends Gamedatas {
+export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   // Default
   canceledNotifIds: string[];
   gameOptions: {
@@ -107,7 +110,7 @@ interface JohnCompanyGamedatas extends Gamedatas {
   };
   playerOrder: number[];
   players: Record<number, JohnCompanyPlayerData>;
-  armyPieces: Record<string, JocoArmyPieceBase>
+  armyPieces: Record<string, JocoArmyPieceBase>;
   company: {
     debt: number;
     balance: number;
@@ -121,7 +124,7 @@ interface JohnCompanyGamedatas extends Gamedatas {
     location: string;
     facing: string;
   };
-  enterprises: Record<string, JoCoEnterPriseBase>
+  enterprises: Record<string, JoCoEnterPriseBase>;
   families: Record<string, JocoFamily>;
   familyMembers: Record<string, JocoFamilyMember>;
   offices: Record<string, JoCoOfficeBase>;
@@ -239,11 +242,11 @@ interface JoCoEnterPriseBase extends GamePiece {
   used: boolean;
 }
 
-interface JohnCompanyPlayerData extends BgaPlayer {
+interface JohnCompanyPlayerData extends Player {
   draft: JoCoSetupCard[];
   familyId: string;
   setupCards: JoCoSetupCard[];
 }
 
-type GameAlias = JohnCompany;
-type GamedatasAlias = JohnCompanyGamedatas;
+export type GameAlias = Game;
+export type GamedatasAlias = JohnCompanyGamedatas;

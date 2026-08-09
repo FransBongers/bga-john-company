@@ -1,3 +1,25 @@
+import { Board } from '../board';
+import {
+  debug,
+  updatePageTitle,
+  getPlayerName,
+  onClick,
+  addPrimaryActionButton,
+  addPassButton,
+  clearPossible,
+  setSelected,
+  addConfirmButton,
+  performAction,
+  addDangerActionButton,
+} from '../boilerplate';
+import {
+  CommonStateArgs,
+  GameAlias,
+  GameState,
+  JocoFamilyMember,
+  JocoShipBase,
+} from '../types';
+
 interface OnEnteringDirectorOfTradeTransfersArgs extends CommonStateArgs {
   options: {
     ships: Record<
@@ -24,7 +46,7 @@ interface OnEnteringDirectorOfTradeTransfersArgs extends CommonStateArgs {
   } | null;
 }
 
-class DirectorOfTradeTransfers implements State {
+export class DirectorOfTradeTransfers implements GameState<OnEnteringDirectorOfTradeTransfersArgs> {
   private static instance: DirectorOfTradeTransfers;
   private args: OnEnteringDirectorOfTradeTransfersArgs;
   private transfers: {
@@ -37,7 +59,7 @@ class DirectorOfTradeTransfers implements State {
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     DirectorOfTradeTransfers.instance = new DirectorOfTradeTransfers(game);
   }
 
@@ -61,14 +83,14 @@ class DirectorOfTradeTransfers implements State {
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringDirectorOfTradeTransfersArgs
+    args: OnEnteringDirectorOfTradeTransfersArgs,
   ) {
     updatePageTitle(
       _('${tkn_playerName} may move writers or ships'),
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true
+      true,
     );
   }
 
@@ -101,17 +123,19 @@ class DirectorOfTradeTransfers implements State {
       _('${you} may make up to two transfers (${number} remaining)'),
       {
         number: 2 - this.getTransferCount(),
-      }
+      },
     );
     const board = Board.getInstance();
     Object.entries(this.args.options.writers).forEach(([id, data]) =>
       onClick(board.ui.familyMembers[id], () =>
-        this.updateInterfaceSelectPresidency(data)
-      )
+        this.updateInterfaceSelectPresidency(data),
+      ),
     );
 
     Object.entries(this.args.options.ships).forEach(([id, data]) =>
-      onClick(board.ui.ships[id], () => this.updateInterfaceSelectSeaZone(data))
+      onClick(board.ui.ships[id], () =>
+        this.updateInterfaceSelectSeaZone(data),
+      ),
     );
 
     if (this.getTransferCount() > 0) {

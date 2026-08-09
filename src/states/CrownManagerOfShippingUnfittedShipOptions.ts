@@ -1,5 +1,21 @@
-interface OnEnteringCrownManagerOfShippingUnfittedShipOptionsArgs
-  extends CommonStateArgs {
+import { Board } from '../board';
+import {
+  debug,
+  updatePageTitle,
+  getPlayerName,
+  addPrimaryActionButton,
+  addCancelButton,
+  clearPossible,
+  addConfirmButton,
+  performAction,
+} from '../boilerplate';
+import { UNFITTED, COMPANY_SHIP, EXTRA_SHIP } from '../constants';
+import { tknShipValue } from '../logs/templates';
+import { GameState } from '../types';
+import { CommonStateArgs, GameAlias, JocoShipBase } from '../types';
+import { getCrownPlayerName, getSeaName } from '../utility';
+
+interface OnEnteringCrownManagerOfShippingUnfittedShipOptionsArgs extends CommonStateArgs {
   ship: JocoShipBase;
   location: string;
   options: {
@@ -8,10 +24,9 @@ interface OnEnteringCrownManagerOfShippingUnfittedShipOptionsArgs
   };
   phase: 'unfitted' | 'CompanyShip' | 'ExtraShip';
   promiseCubes: Record<number, number>;
-
 }
 
-class CrownManagerOfShippingUnfittedShipOptions implements State {
+export class CrownManagerOfShippingUnfittedShipOptions implements GameState<OnEnteringCrownManagerOfShippingUnfittedShipOptionsArgs> {
   private static instance: CrownManagerOfShippingUnfittedShipOptions;
   private args: OnEnteringCrownManagerOfShippingUnfittedShipOptionsArgs;
   private ship: JocoShipBase;
@@ -19,7 +34,7 @@ class CrownManagerOfShippingUnfittedShipOptions implements State {
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     CrownManagerOfShippingUnfittedShipOptions.instance =
       new CrownManagerOfShippingUnfittedShipOptions(game);
   }
@@ -28,7 +43,9 @@ class CrownManagerOfShippingUnfittedShipOptions implements State {
     return CrownManagerOfShippingUnfittedShipOptions.instance;
   }
 
-  onEnteringState(args: OnEnteringCrownManagerOfShippingUnfittedShipOptionsArgs) {
+  onEnteringState(
+    args: OnEnteringCrownManagerOfShippingUnfittedShipOptionsArgs,
+  ) {
     debug('Entering CrownManagerOfShippingUnfittedShipOptions state');
     this.args = args;
     this.location = args.location;
@@ -43,14 +60,14 @@ class CrownManagerOfShippingUnfittedShipOptions implements State {
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringCrownManagerOfShippingUnfittedShipOptionsArgs
+    args: OnEnteringCrownManagerOfShippingUnfittedShipOptionsArgs,
   ) {
     updatePageTitle(
       _('${tkn_playerName} may fit, buy and lease ships'),
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true
+      true,
     );
   }
 
@@ -75,25 +92,27 @@ class CrownManagerOfShippingUnfittedShipOptions implements State {
 
     this.updatePageTitle();
 
-    if (this.args.ship.id === this.ship.id && this.args.options.ships.length > 0) {
+    if (
+      this.args.ship.id === this.ship.id &&
+      this.args.options.ships.length > 0
+    ) {
       addPrimaryActionButton({
         id: 'fit_ship_btn',
         text: _('Pay to fit a ship'),
         callback: () => this.updateInterfaceSelectShip(),
-      })
+      });
     }
 
-  if (true) {
-    addPrimaryActionButton({
-      id: 'choose_location_btn',
-      text: _('Choose Sea Zone'),
-      callback: () => this.updateInterfaceSelectSeaZone()
-    })
-  }
+    if (true) {
+      addPrimaryActionButton({
+        id: 'choose_location_btn',
+        text: _('Choose Sea Zone'),
+        callback: () => this.updateInterfaceSelectSeaZone(),
+      });
+    }
   }
 
-  private updateInterfaceSelectShip()
-  {
+  private updateInterfaceSelectShip() {
     this.game.clearPossible();
     updatePageTitle(_('${you} must select a ship to fit'));
 
@@ -159,23 +178,24 @@ class CrownManagerOfShippingUnfittedShipOptions implements State {
     switch (this.args.phase) {
       case UNFITTED:
         text = _(
-          '${tkn_playerName_crown} wants to fit ${tkn_ship} and place it in ${location}'
+          '${tkn_playerName_crown} wants to fit ${tkn_ship} and place it in ${location}',
         );
         break;
       case COMPANY_SHIP:
         text = _(
-          '${tkn_playerName_crown} wants to fit ${tkn_ship} and place it in ${location}'
+          '${tkn_playerName_crown} wants to fit ${tkn_ship} and place it in ${location}',
         );
         break;
       case EXTRA_SHIP:
         text = _(
-          '${tkn_playerName_crown} wants to fit ${tkn_ship} and place it in ${location}'
+          '${tkn_playerName_crown} wants to fit ${tkn_ship} and place it in ${location}',
         );
         break;
       default:
         throw new Error('Unknown phase');
     }
-    const type = this.args.phase === UNFITTED ? this.args.ship.type : this.args.phase;
+    const type =
+      this.args.phase === UNFITTED ? this.args.ship.type : this.args.phase;
     updatePageTitle(text, {
       tkn_playerName_crown: getCrownPlayerName(),
       tkn_ship: tknShipValue({
@@ -183,7 +203,7 @@ class CrownManagerOfShippingUnfittedShipOptions implements State {
         name: _(this.args.ship.name),
         fatigued: 0,
       }),
-      location: getSeaName(this.args.location)
+      location: getSeaName(this.args.location),
     });
   }
 

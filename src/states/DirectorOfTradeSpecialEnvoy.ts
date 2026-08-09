@@ -1,18 +1,36 @@
+import {
+  debug,
+  updatePageTitle,
+  getPlayerName,
+  addPrimaryActionButton,
+  addSecondaryActionButton,
+  addCancelButton,
+  addConfirmButton,
+  addPassButton,
+  clearPossible,
+  performAction,
+  formatStringRecursive,
+  DISABLED,
+  CommonStateArgs,
+} from '../boilerplate';
+import { GameState } from '../boilerplate';
+import { GameAlias } from '../types';
+
 interface OnEnteringDirectorOfTradeSpecialEnvoyArgs extends CommonStateArgs {
   treasury: number;
   proposal: number | null;
 }
 
-class DirectorOfTradeSpecialEnvoy implements State {
+export class DirectorOfTradeSpecialEnvoy implements GameState<OnEnteringDirectorOfTradeSpecialEnvoyArgs> {
   private static instance: DirectorOfTradeSpecialEnvoy;
   private args: OnEnteringDirectorOfTradeSpecialEnvoyArgs;
   private spend: number;
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     DirectorOfTradeSpecialEnvoy.instance = new DirectorOfTradeSpecialEnvoy(
-      game
+      game,
     );
   }
 
@@ -33,19 +51,19 @@ class DirectorOfTradeSpecialEnvoy implements State {
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringDirectorOfTradeSpecialEnvoyArgs
+    args: OnEnteringDirectorOfTradeSpecialEnvoyArgs,
   ) {
     if (args.proposal > 0) {
       updatePageTitle(
         _(
-          'Special Envoy: ${tkn_playerName} proposes to spend ${amount} ${tkn_pound} to make a check'
+          'Special Envoy: ${tkn_playerName} proposes to spend ${amount} ${tkn_pound} to make a check',
         ),
         {
           tkn_playerName: getPlayerName(activePlayerIds[0]),
           amount: args.proposal,
           tkn_pound: 'pound',
         },
-        true
+        true,
       );
     } else if (args.proposal === 0) {
       updatePageTitle(
@@ -53,7 +71,7 @@ class DirectorOfTradeSpecialEnvoy implements State {
         {
           tkn_playerName: getPlayerName(activePlayerIds[0]),
         },
-        true
+        true,
       );
     } else {
       updatePageTitle(
@@ -61,7 +79,7 @@ class DirectorOfTradeSpecialEnvoy implements State {
         {
           tkn_playerName: getPlayerName(activePlayerIds[0]),
         },
-        true
+        true,
       );
     }
   }
@@ -92,7 +110,7 @@ class DirectorOfTradeSpecialEnvoy implements State {
       {
         available,
         tkn_pound: 'pound',
-      }
+      },
     );
 
     addSecondaryActionButton({

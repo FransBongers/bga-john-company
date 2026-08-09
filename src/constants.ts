@@ -1,39 +1,39 @@
 /**
  * Var names
  */
-const BOARD_SCALE = 'boardScale';
+export const BOARD_SCALE = 'boardScale';
 
-const PLUS = 'plus';
-const MINUS = 'minus';
+export const PLUS = 'plus';
+export const MINUS = 'minus';
 
-const DONE = 'done';
-const TRADE = 'trade';
+export const DONE = 'done';
+export const TRADE = 'trade';
 
 /**
  * Families
  */
-const BENYON = 'Benyon';
-const HASTINGS = 'Hastings';
-const LARKINS = 'Larkins';
-const PAXTON = 'Paxton';
-const SYKES = 'Sykes';
-const WALSH = 'Walsh';
+export const BENYON = 'Benyon';
+export const HASTINGS = 'Hastings';
+export const LARKINS = 'Larkins';
+export const PAXTON = 'Paxton';
+export const SYKES = 'Sykes';
+export const WALSH = 'Walsh';
 
-const CROWN = 'Crown';
-const CROWN_PLAYER_ID = 1;
+export const CROWN = 'Crown';
+export const CROWN_PLAYER_ID = 1;
 
 /**
  * Colors
  */
-const BLUE = 'blue';
-const GRAY = 'gray';
-const GREEN = 'green';
-const PINK = 'pink';
-const PURPLE = 'purple';
-const YELLOW = 'yellow';
-const RED = 'red'; // The crown
+export const BLUE = 'blue';
+export const GRAY = 'gray';
+export const GREEN = 'green';
+export const PINK = 'pink';
+export const PURPLE = 'purple';
+export const YELLOW = 'yellow';
+export const RED = 'red'; // The crown
 
-const HEX_COLOR_COLOR_MAP = {
+export const HEX_COLOR_COLOR_MAP = {
   '99dae9': BLUE,
   dbd9d6: GRAY,
   addb90: GREEN,
@@ -43,7 +43,7 @@ const HEX_COLOR_COLOR_MAP = {
   // 'bd1f35': RED,
 };
 
-const COLOR_FAMILY_MAP = {
+export const COLOR_FAMILY_MAP = {
   [PINK]: BENYON,
   [BLUE]: HASTINGS,
   [YELLOW]: LARKINS,
@@ -56,45 +56,45 @@ const COLOR_FAMILY_MAP = {
 /**
  * Phases
  */
-const SETUP = 'setup'; // Only used during start of game
-const LONDON_SEASON = 'londonSeason';
-const FAMILY = 'family';
-const FIRMS = 'firms';
-const HIRING = 'hiring';
-const BONUSES = 'Bonuses';
-const REVENUE = 'revenue';
-const EVENTS_IN_INDIA = 'eventsInIndia';
-const PARLIAMENT_MEETS = 'ParliamentMeets';
-const UPKEEP_AND_REFRESH = 'upkeepAndRefresh';
+export const SETUP = 'setup'; // Only used during start of game
+export const LONDON_SEASON = 'londonSeason';
+export const FAMILY = 'family';
+export const FIRMS = 'firms';
+export const HIRING = 'hiring';
+export const BONUSES = 'Bonuses';
+export const REVENUE = 'revenue';
+export const EVENTS_IN_INDIA = 'eventsInIndia';
+export const PARLIAMENT_MEETS = 'ParliamentMeets';
+export const UPKEEP_AND_REFRESH = 'upkeepAndRefresh';
 
 /**
  * Setup
  */
-const OFFICE = 'office';
-const COMPANY_SHARE = 'companyShare';
-const CASH = 'cash';
-const PRIME_MINISTER = 'primeMinister';
-const RANDOM_BLACKMAIL_CARD = 'randomBlackmailCard';
-const SHIP = 'ship';
-const LUXURY = 'Luxury';
-const WORKSHOP = 'Workshop';
+export const OFFICE = 'office';
+export const COMPANY_SHARE = 'companyShare';
+export const CASH = 'cash';
+export const PRIME_MINISTER = 'primeMinister';
+export const RANDOM_BLACKMAIL_CARD = 'randomBlackmailCard';
+export const SHIP = 'ship';
+export const LUXURY = 'Luxury';
+export const WORKSHOP = 'Workshop';
 
-const SHIPYARD = 'Shipyard';
-const SHARE = 'Share';
+export const SHIPYARD = 'Shipyard';
+export const SHARE = 'Share';
 
 /**
  * Counters
  */
-const FAMILY_MEMBERS_COUNTER = 'familyMembers';
-const CASH_COUNTER = 'cash';
-const SHIPS_COUNTER = 'ships';
-const SHARES_COUNTER = 'shares';
-const WORKSHOPS_COUNTER = 'workshops';
-const SHIPYARDS_COUNTER = 'shipyards';
-const LUXURIES_COUNTER = 'luxuries';
-const PROMISE_CUBES_COUNTER = 'promiseCubes';
+export const FAMILY_MEMBERS_COUNTER = 'familyMembers';
+export const CASH_COUNTER = 'cash';
+export const SHIPS_COUNTER = 'ships';
+export const SHARES_COUNTER = 'shares';
+export const WORKSHOPS_COUNTER = 'workshops';
+export const SHIPYARDS_COUNTER = 'shipyards';
+export const LUXURIES_COUNTER = 'luxuries';
+export const PROMISE_CUBES_COUNTER = 'promiseCubes';
 
-const COUNTERS = [
+export const COUNTERS = [
   FAMILY_MEMBERS_COUNTER,
   CASH_COUNTER,
   SHIPS_COUNTER,
@@ -107,32 +107,32 @@ const COUNTERS = [
 /**
  * Order status
  */
-const CLOSED = 'closed';
-const FILLED = 'filled';
-const OPEN = 'open';
+export const CLOSED = 'closed';
+export const FILLED = 'filled';
+export const OPEN = 'open';
 
 /**
  * OrderIds
  */
-const ORDER_PUNJAB_1 = 'Order_Punjab_1';
-const ORDER_DELHI_1 = 'Order_Delhi_1';
-const ORDER_DELHI_2 = 'Order_Delhi_2';
-const ORDER_DELHI_3 = 'Order_Delhi_3';
-const ORDER_BENGAL_1 = 'Order_Bengal_1';
-const ORDER_BENGAL_2 = 'Order_Bengal_2';
-const ORDER_BOMBAY_1 = 'Order_Bombay_1';
-const ORDER_BOMBAY_2 = 'Order_Bombay_2';
-const ORDER_BOMBAY_3 = 'Order_Bombay_3';
-const ORDER_MARATHA_1 = 'Order_Maratha_1';
-const ORDER_MARATHA_2 = 'Order_Maratha_2';
-const ORDER_MARATHA_3 = 'Order_Maratha_3';
-const ORDER_HYDERABAD_1 = 'Order_Hyderabad_1';
-const ORDER_MYSORE_1 = 'Order_Mysore_1';
-const ORDER_MYSORE_2 = 'Order_Mysore_2';
-const ORDER_MADRAS_1 = 'Order_Madras_1';
-const ORDER_MADRAS_2 = 'Order_Madras_2';
+export const ORDER_PUNJAB_1 = 'Order_Punjab_1';
+export const ORDER_DELHI_1 = 'Order_Delhi_1';
+export const ORDER_DELHI_2 = 'Order_Delhi_2';
+export const ORDER_DELHI_3 = 'Order_Delhi_3';
+export const ORDER_BENGAL_1 = 'Order_Bengal_1';
+export const ORDER_BENGAL_2 = 'Order_Bengal_2';
+export const ORDER_BOMBAY_1 = 'Order_Bombay_1';
+export const ORDER_BOMBAY_2 = 'Order_Bombay_2';
+export const ORDER_BOMBAY_3 = 'Order_Bombay_3';
+export const ORDER_MARATHA_1 = 'Order_Maratha_1';
+export const ORDER_MARATHA_2 = 'Order_Maratha_2';
+export const ORDER_MARATHA_3 = 'Order_Maratha_3';
+export const ORDER_HYDERABAD_1 = 'Order_Hyderabad_1';
+export const ORDER_MYSORE_1 = 'Order_Mysore_1';
+export const ORDER_MYSORE_2 = 'Order_Mysore_2';
+export const ORDER_MADRAS_1 = 'Order_Madras_1';
+export const ORDER_MADRAS_2 = 'Order_Madras_2';
 
-const ORDERS = [
+export const ORDERS = [
   ORDER_PUNJAB_1,
   ORDER_DELHI_1,
   ORDER_DELHI_2,
@@ -155,25 +155,25 @@ const ORDERS = [
 /**
  * Offices
  */
-const CHAIRMAN = 'Chairman';
-const DIRECTOR_OF_TRADE = 'DirectorOfTrade';
-const MANAGER_OF_SHIPPING = 'ManagerOfShipping';
-const MILITARY_AFFAIRS = 'MilitaryAffairs';
-const PRESIDENT_OF_BOMBAY = 'PresidentOfBombay';
-const PRESIDENT_OF_MADRAS = 'PresidentOfMadras';
-const PRESIDENT_OF_BENGAL = 'PresidentOfBengal';
-const GOVERNOR_GENERAL = 'GovernorGeneral';
-const SUPERINTENDENT_OF_TRADE_IN_CHINA = 'SuperintendentOfTradeInChina';
-const GOVERNOR_OF_BOMBAY = 'GovernorOfBombay';
-const GOVERNOR_OF_MADRAS = 'GovernorOfMadras';
-const GOVERNOR_OF_BENGAL = 'GovernorOfBengal';
-const GOVERNOR_OF_PUNJAB = 'GovernorOfPunjab';
-const GOVERNOR_OF_DELHI = 'GovernorOfDelhi';
-const GOVERNOR_OF_MARATHA = 'GovernorOfMaratha';
-const GOVERNOR_OF_HYDERABAD = 'GovernorOfHyderabad';
-const GOVERNOR_OF_MYSORE = 'GovernorOfMysore';
+export const CHAIRMAN = 'Chairman';
+export const DIRECTOR_OF_TRADE = 'DirectorOfTrade';
+export const MANAGER_OF_SHIPPING = 'ManagerOfShipping';
+export const MILITARY_AFFAIRS = 'MilitaryAffairs';
+export const PRESIDENT_OF_BOMBAY = 'PresidentOfBombay';
+export const PRESIDENT_OF_MADRAS = 'PresidentOfMadras';
+export const PRESIDENT_OF_BENGAL = 'PresidentOfBengal';
+export const GOVERNOR_GENERAL = 'GovernorGeneral';
+export const SUPERINTENDENT_OF_TRADE_IN_CHINA = 'SuperintendentOfTradeInChina';
+export const GOVERNOR_OF_BOMBAY = 'GovernorOfBombay';
+export const GOVERNOR_OF_MADRAS = 'GovernorOfMadras';
+export const GOVERNOR_OF_BENGAL = 'GovernorOfBengal';
+export const GOVERNOR_OF_PUNJAB = 'GovernorOfPunjab';
+export const GOVERNOR_OF_DELHI = 'GovernorOfDelhi';
+export const GOVERNOR_OF_MARATHA = 'GovernorOfMaratha';
+export const GOVERNOR_OF_HYDERABAD = 'GovernorOfHyderabad';
+export const GOVERNOR_OF_MYSORE = 'GovernorOfMysore';
 
-const OFFICES_WITH_TREASURY = [
+export const OFFICES_WITH_TREASURY = [
   DIRECTOR_OF_TRADE,
   // GOVERNOR_GENERAL,
   MANAGER_OF_SHIPPING,
@@ -185,64 +185,64 @@ const OFFICES_WITH_TREASURY = [
 /**
  * Family member positions
  */
-const COMMANDER = 'Commander';
-const OFFICER = 'Officer';
-const OFFICER_IN_TRAINING = 'OfficerInTraining';
-const WRITER = 'Writer';
+export const COMMANDER = 'Commander';
+export const OFFICER = 'Officer';
+export const OFFICER_IN_TRAINING = 'OfficerInTraining';
+export const WRITER = 'Writer';
 
-const COURT_OF_DIRECTORS = 'CourtOfDirectors';
+export const COURT_OF_DIRECTORS = 'CourtOfDirectors';
 
 /**
  * Borders
  */
-const BENGAL_DELHI_BORDER = 'Bengal_Delhi_border';
-const BENGAL_MARATHA_BORDER = 'Bengal_Maratha_border';
-const BOMBAY_DELHI_BORDER = 'Bombay_Delhi_border';
-const BOMBAY_HYDERABAD_BORDER = 'Bombay_Hyderabad_border';
-const BOMBAY_MARATHA_BORDER = 'Bombay_Maratha_border';
-const BOMBAY_MYSORE_BORDER = 'Bombay_Mysore_border';
-const BOMBAY_PUNJAB_BORDER = 'Bombay_Punjab_border';
-const DELHI_MARATHA_BORDER = 'Delhi_Maratha_border';
-const DELHI_PUNJAB_BORDER = 'Delhi_Punjab_border';
-const HYDERABAD_MADRAS_BORDER = 'Hyderabad_Madras_border';
-const HYDERABAD_MARATHA_BORDER = 'Hyderabad_Maratha_border';
-const HYDERABAD_MYSORE_BORDER = 'Hyderabad_Mysore_border';
-const MADRAS_MYSORE_BORDER = 'Madras_Mysore_border';
+export const BENGAL_DELHI_BORDER = 'Bengal_Delhi_border';
+export const BENGAL_MARATHA_BORDER = 'Bengal_Maratha_border';
+export const BOMBAY_DELHI_BORDER = 'Bombay_Delhi_border';
+export const BOMBAY_HYDERABAD_BORDER = 'Bombay_Hyderabad_border';
+export const BOMBAY_MARATHA_BORDER = 'Bombay_Maratha_border';
+export const BOMBAY_MYSORE_BORDER = 'Bombay_Mysore_border';
+export const BOMBAY_PUNJAB_BORDER = 'Bombay_Punjab_border';
+export const DELHI_MARATHA_BORDER = 'Delhi_Maratha_border';
+export const DELHI_PUNJAB_BORDER = 'Delhi_Punjab_border';
+export const HYDERABAD_MADRAS_BORDER = 'Hyderabad_Madras_border';
+export const HYDERABAD_MARATHA_BORDER = 'Hyderabad_Maratha_border';
+export const HYDERABAD_MYSORE_BORDER = 'Hyderabad_Mysore_border';
+export const MADRAS_MYSORE_BORDER = 'Madras_Mysore_border';
 
 /**
  * RegionIds
  */
-const BENGAL = 'Bengal';
-const BOMBAY = 'Bombay';
-const DELHI = 'Delhi';
-const HYDERABAD = 'Hyderabad';
-const MADRAS = 'Madras';
-const MARATHA = 'Maratha';
-const MYSORE = 'Mysore';
-const PUNJAB = 'Punjab';
+export const BENGAL = 'Bengal';
+export const BOMBAY = 'Bombay';
+export const DELHI = 'Delhi';
+export const HYDERABAD = 'Hyderabad';
+export const MADRAS = 'Madras';
+export const MARATHA = 'Maratha';
+export const MYSORE = 'Mysore';
+export const PUNJAB = 'Punjab';
 
 /**
- * Presidencis
+ * Presidencies
  */
-const BENGAL_PRESIDENCY = 'BengalPresidency';
-const BOMBAY_PRESIDENCY = 'BombayPresidency';
-const MADRAS_PRESIDENCY = 'MadrasPresidency';
+export const BENGAL_PRESIDENCY = 'BengalPresidency';
+export const BOMBAY_PRESIDENCY = 'BombayPresidency';
+export const MADRAS_PRESIDENCY = 'MadrasPresidency';
 
-const PRESIDENCIES = [BENGAL_PRESIDENCY, BOMBAY_PRESIDENCY, MADRAS_PRESIDENCY];
+export const PRESIDENCIES = [BENGAL_PRESIDENCY, BOMBAY_PRESIDENCY, MADRAS_PRESIDENCY];
 
-const BENGAL_WRITERS = 'Writers_Bengal';
-const BOMBAY_WRITERS = 'Writers_Bombay';
-const MADRAS_WRITERS = 'Writers_Madras';
+export const BENGAL_WRITERS = 'Writers_Bengal';
+export const BOMBAY_WRITERS = 'Writers_Bombay';
+export const MADRAS_WRITERS = 'Writers_Madras';
 
-const WRITER_LOCATIONS = [BENGAL_WRITERS, BOMBAY_WRITERS, MADRAS_WRITERS];
+export const WRITER_LOCATIONS = [BENGAL_WRITERS, BOMBAY_WRITERS, MADRAS_WRITERS];
 
-const BENGAL_ARMY = 'Army_Bengal';
-const BOMBAY_ARMY = 'Army_Bombay';
-const MADRAS_ARMY = 'Army_Madras';
+export const BENGAL_ARMY = 'Army_Bengal';
+export const BOMBAY_ARMY = 'Army_Bombay';
+export const MADRAS_ARMY = 'Army_Madras';
 
-const ARMIES = [BENGAL_ARMY, BOMBAY_ARMY, MADRAS_ARMY];
+export const ARMIES = [BENGAL_ARMY, BOMBAY_ARMY, MADRAS_ARMY];
 
-const ARMY_REGION_MAP = {
+export const ARMY_REGION_MAP = {
   [BENGAL_ARMY]: BENGAL,
   [BOMBAY_ARMY]: BOMBAY,
   [MADRAS_ARMY]: MADRAS,
@@ -251,38 +251,38 @@ const ARMY_REGION_MAP = {
 /**
  * Ship locations
  */
-const WEST_INDIAN = 'westIndian';
-const EAST_INDIAN = 'eastIndian';
-const SOUTH_INDIAN = 'southIndian';
-const CHINA = 'china';
-const UNFITTED = 'unfitted';
+export const WEST_INDIAN = 'westIndian';
+export const EAST_INDIAN = 'eastIndian';
+export const SOUTH_INDIAN = 'southIndian';
+export const CHINA = 'china';
+export const UNFITTED = 'unfitted';
 
-const SEA_ZONES = [WEST_INDIAN, EAST_INDIAN, SOUTH_INDIAN];
+export const SEA_ZONES = [WEST_INDIAN, EAST_INDIAN, SOUTH_INDIAN];
 
 /**
  * Ship types
  */
-const COMPANY_SHIP = 'CompanyShip';
-const EXTRA_SHIP = 'ExtraShip';
+export const COMPANY_SHIP = 'CompanyShip';
+export const EXTRA_SHIP = 'ExtraShip';
 
 /**
  * Power tokens
  */
-const POWER_TOKEN_COMPANY_SHARE = 'companyShare';
-const POWER_TOKEN_MANUFACTURING = 'manufacturing';
-const POWER_TOKEN_SHIPPING = 'shipping';
-const POWER_TOKEN_SOCIAL = 'social';
+export const POWER_TOKEN_COMPANY_SHARE = 'companyShare';
+export const POWER_TOKEN_MANUFACTURING = 'manufacturing';
+export const POWER_TOKEN_SHIPPING = 'shipping';
+export const POWER_TOKEN_SOCIAL = 'social';
 
-const SHARE_VICTORY_POINTS_TOKEN = 'shareVictoryPoints';
+export const SHARE_VICTORY_POINTS_TOKEN = 'shareVictoryPoints';
 
-const POWER_TOKENS = [
+export const POWER_TOKENS = [
   POWER_TOKEN_COMPANY_SHARE,
   POWER_TOKEN_MANUFACTURING,
   POWER_TOKEN_SHIPPING,
   POWER_TOKEN_SOCIAL,
 ];
 
-const POWER_TOKEN_ICON_MAP = {
+export const POWER_TOKEN_ICON_MAP = {
   [POWER_TOKEN_COMPANY_SHARE]: SHARE,
   [POWER_TOKEN_MANUFACTURING]: WORKSHOP,
   [POWER_TOKEN_SHIPPING]: SHIPYARD,
@@ -292,24 +292,24 @@ const POWER_TOKEN_ICON_MAP = {
 /**
  * Family Actions
  */
-const ENLIST_WRITER = 'EnlistWriter';
-const ENLIST_OFFICER = 'EnlistOfficer';
-const PURCHASE_LUXURY = 'PurchaseLuxury';
-const PURCHASE_SHIPYARD = 'PurchaseShipyard';
-const PURCHASE_WORKSHOP = 'PurchaseWorkshop';
-const SEEK_SHARE = 'SeekShare';
-const PURCHASE_ENTERPRISE = 'PurchaseEnterprise';
+export const ENLIST_WRITER = 'EnlistWriter';
+export const ENLIST_OFFICER = 'EnlistOfficer';
+export const PURCHASE_LUXURY = 'PurchaseLuxury';
+export const PURCHASE_SHIPYARD = 'PurchaseShipyard';
+export const PURCHASE_WORKSHOP = 'PurchaseWorkshop';
+export const SEEK_SHARE = 'SeekShare';
+export const PURCHASE_ENTERPRISE = 'PurchaseEnterprise';
 
 /**
  * Stock Exchange locations
  */
-const STOCK_EXCHANGE_2 = 'StockExchange_2';
-const STOCK_EXCHANGE_3_LEFT = 'StockExchange_3_Left';
-const STOCK_EXCHANGE_3_RIGHT = 'StockExchange_3_Right';
-const STOCK_EXCHANGE_4 = 'StockExchange_4';
-const STOCK_EXCHANGE_5 = 'StockExchange_5';
+export const STOCK_EXCHANGE_2 = 'StockExchange_2';
+export const STOCK_EXCHANGE_3_LEFT = 'StockExchange_3_Left';
+export const STOCK_EXCHANGE_3_RIGHT = 'StockExchange_3_Right';
+export const STOCK_EXCHANGE_4 = 'StockExchange_4';
+export const STOCK_EXCHANGE_5 = 'StockExchange_5';
 
-const STOCK_EXCHANGE_POSITIONS = [
+export const STOCK_EXCHANGE_POSITIONS = [
   STOCK_EXCHANGE_2,
   STOCK_EXCHANGE_3_LEFT,
   STOCK_EXCHANGE_3_RIGHT,
@@ -320,14 +320,14 @@ const STOCK_EXCHANGE_POSITIONS = [
 /**
  * Crown climates
  */
-const BULL = 'Bull';
-const STAG = 'Stag';
-const LION = 'Lion';
-const BEAR = 'Bear';
-const PEACOCK = 'Peacock';
+export const BULL = 'Bull';
+export const STAG = 'Stag';
+export const LION = 'Lion';
+export const BEAR = 'Bear';
+export const PEACOCK = 'Peacock';
 
-const CROWN_CLIMATE = [BULL, STAG, LION, BEAR, PEACOCK];
+export const CROWN_CLIMATE = [BULL, STAG, LION, BEAR, PEACOCK];
 
-const BUY_COMPANY_SHIP = 'BUY_COMPANY_SHIP';
-const DO_NOT_BUY_COMPANY_SHIP = 'BUY_COMPANY_SHIP';
-const BUY_AS_MANY_SHIPS_AS_YOU_WISH = 'BUY_AS_MANY_SHIPS_AS_YOU_WISH';
+export const BUY_COMPANY_SHIP = 'BUY_COMPANY_SHIP';
+export const DO_NOT_BUY_COMPANY_SHIP = 'BUY_COMPANY_SHIP';
+export const BUY_AS_MANY_SHIPS_AS_YOU_WISH = 'BUY_AS_MANY_SHIPS_AS_YOU_WISH';

@@ -1,10 +1,22 @@
-class ConfirmPartialTurn implements State {
+import { GameAlias } from '../../types';
+import { CommonStateArgs, GameState } from '../types';
+import {
+  debug,
+  addConfirmButton,
+  addUndoButtons,
+  updatePageTitle,
+  performAction,
+} from '../utility';
+
+interface OnEnteringConfirmPartialTurnArgs extends CommonStateArgs {}
+
+export class ConfirmPartialTurn implements GameState<OnEnteringConfirmPartialTurnArgs> {
   private static instance: ConfirmPartialTurn;
-  private args: OnEnteringConfirmTurnArgs;
+  private args!: OnEnteringConfirmPartialTurnArgs;
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     ConfirmPartialTurn.instance = new ConfirmPartialTurn(game);
   }
 
@@ -12,7 +24,7 @@ class ConfirmPartialTurn implements State {
     return ConfirmPartialTurn.instance;
   }
 
-  onEnteringState(args: OnEnteringConfirmTurnArgs) {
+  onEnteringState(args: OnEnteringConfirmPartialTurnArgs) {
     this.args = args;
     this.updateInterfaceInitialStep();
   }
@@ -21,7 +33,10 @@ class ConfirmPartialTurn implements State {
     debug('Leaving ConfirmTurnState');
   }
 
-  setDescription(activePlayerId: number) {
+  setDescription(
+    activePlayerId: number | number[],
+    args: OnEnteringConfirmPartialTurnArgs,
+  ) {
     // this.game.clientUpdatePageTitle({
     //   text: _("${player_name} must confirm the switch of player"),
     //   args: {
@@ -49,17 +64,12 @@ class ConfirmPartialTurn implements State {
 
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
-    this.game.clientUpdatePageTitle({
-      text: _(
-        '${you} must confirm the switch of player. You will not be able to restart your turn'
-      ),
-      args: {
-        you: '${you}',
-      },
-    });
-    addConfirmButton(() =>
-      this.game.framework().bgaPerformAction('actConfirmPartialTurn')
+
+    updatePageTitle(
+      _('${you} must confirm your moves. You will not be able to undo'),
     );
+
+    addConfirmButton(() => this.game.bga.actions.performAction('actConfirmPartialTurn'));
     addUndoButtons(this.args);
   }
 

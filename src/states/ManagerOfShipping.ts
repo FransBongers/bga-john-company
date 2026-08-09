@@ -1,10 +1,32 @@
+import { Board } from '../board';
+import {
+  addConfirmButton,
+  addDangerActionButton,
+  addPlayerButton,
+  addPrimaryActionButton,
+  addSecondaryActionButton,
+  clearPossible,
+  CommonStateArgs,
+  debug,
+  formatStringRecursive,
+  GameState,
+  getPlayerName,
+  onClick,
+  performAction,
+  updatePageTitle,
+} from '../boilerplate';
+import { EXTRA_SHIP, COMPANY_SHIP, SEA_ZONES, SHIPS_COUNTER, MANAGER_OF_SHIPPING } from '../constants';
+import { tknShipValue } from '../logs/templates';
+import { PlayerManager } from '../player-manager';
+import { JocoShipBase, GameAlias } from '../types';
+
 interface OnEnteringManagerOfShippingArgs extends CommonStateArgs {
   playerShips: JocoShipBase[];
   otherShips: JocoShipBase[];
   treasury: number;
 }
 
-class ManagerOfShipping implements State {
+export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingArgs> {
   private static instance: ManagerOfShipping;
   private args: OnEnteringManagerOfShippingArgs;
   private placedCompanyShips: Record<string, string>;
@@ -14,7 +36,7 @@ class ManagerOfShipping implements State {
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     ManagerOfShipping.instance = new ManagerOfShipping(game);
   }
 
@@ -39,14 +61,14 @@ class ManagerOfShipping implements State {
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringManagerOfShippingArgs
+    args: OnEnteringManagerOfShippingArgs,
   ) {
     updatePageTitle(
       _('${tkn_playerName} may fit, buy and lease ships'),
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true
+      true,
     );
   }
 
@@ -76,7 +98,7 @@ class ManagerOfShipping implements State {
 
     updatePageTitle(
       _('${you} may fit, buy and lease ships (£${amount} remaining)'),
-      { amount: this.treasury }
+      { amount: this.treasury },
     );
     const board = Board.getInstance();
 

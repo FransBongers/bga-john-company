@@ -1,16 +1,33 @@
+import { Board } from '../board';
+import {
+  addCancelButton,
+  addConfirmButton,
+  addSecondaryActionButton,
+  clearPossible,
+  debug,
+  formatStringRecursive,
+  onClick,
+  performAction,
+  updatePageTitle,
+} from '../boilerplate/utility';
+import { OFFICES_WITH_TREASURY } from '../constants';
+import { tknPromiseCubes, tknPound } from '../logs/templates';
+import { PlayerManager } from '../player-manager';
+import { StaticData } from '../static-data';
+import { CommonStateArgs, GameAlias, GameState, JocoShipBase } from '../types';
+import { getCrownPlayerName } from '../utility';
+
 interface OnEnteringCrownChairmanRequestAllocationArgs extends CommonStateArgs {
   maxAmount: number;
 }
 
-class CrownChairmanRequestAllocation implements State {
+export class CrownChairmanRequestAllocation implements GameState<OnEnteringCrownChairmanRequestAllocationArgs> {
   private static instance: CrownChairmanRequestAllocation;
   private args: OnEnteringCrownChairmanRequestAllocationArgs;
-  private ship: JocoShipBase;
-  private location: string;
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     CrownChairmanRequestAllocation.instance =
       new CrownChairmanRequestAllocation(game);
   }
@@ -32,14 +49,14 @@ class CrownChairmanRequestAllocation implements State {
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringCrownChairmanRequestAllocationArgs
+    args: OnEnteringCrownChairmanRequestAllocationArgs,
   ) {
     updatePageTitle(
       _('${tkn_playerName} may fit ships'),
       {
         tkn_playerName: getCrownPlayerName(),
       },
-      true
+      true,
     );
   }
 
@@ -66,13 +83,13 @@ class CrownChairmanRequestAllocation implements State {
 
     updatePageTitle(
       _(
-        '${you} may pay 1 ${tkn_promiseCube} to request to allocate up to 3 ${tkn_pound} to a specific office'
+        '${you} may pay 1 ${tkn_promiseCube} to request to allocate up to 3 ${tkn_pound} to a specific office',
       ),
       {
         tkn_playerName: getCrownPlayerName(),
         tkn_promiseCube: tknPromiseCubes(),
         tkn_pound: tknPound(),
-      }
+      },
     );
 
     this.setOfficesSelectable();
@@ -127,14 +144,14 @@ class CrownChairmanRequestAllocation implements State {
 
     updatePageTitle(
       _(
-        'Pay 1 ${tkn_promiseCube} to allocate ${amount} ${tkn_pound} to the ${office}?'
+        'Pay 1 ${tkn_promiseCube} to allocate ${amount} ${tkn_pound} to the ${office}?',
       ),
       {
         tkn_promiseCube: tknPromiseCubes(),
         tkn_pound: tknPound(),
         amount,
         office: _(StaticData.get().office(officeId).title),
-      }
+      },
     );
 
     addConfirmButton(() => {

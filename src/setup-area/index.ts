@@ -1,4 +1,7 @@
-class SetupArea {
+import { StaticData } from '../static-data';
+import { GameAlias, GamedatasAlias } from '../types';
+
+export class SetupArea {
   private static instance: SetupArea;
   private game: GameAlias;
   private ui: {
@@ -62,7 +65,6 @@ class SetupArea {
     gamedatas.players[this.playerId].setupCards.forEach(({ id }) => {
       this.ui.chosenCards.appendChild(this.cards[id]);
     });
-
   }
 
   public newCards(cardIds: string[], lastCard: boolean) {

@@ -1,4 +1,6 @@
-const tplTreasury = (office: string, { top, left }: AbsolutePosition) => `
+import type { AbsolutePosition } from '../../boilerplate';
+
+export const tplTreasury = (office: string, { top, left }: AbsolutePosition) => `
 <div id="joco-treasury-${office}" class="joco-treasury" style="top: calc(var(--boardScale) * ${top}px); left: calc(var(--boardScale) * ${left}px);">
   <div id="joco-treasury-${office}-minus-btn" class="joco-button" data-type="minus"><i class="fa6 fa6-minus"></i></div>
   <div class="joco-container">

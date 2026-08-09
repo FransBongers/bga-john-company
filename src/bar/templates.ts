@@ -1,4 +1,4 @@
-const tplTabButton = (text: string, index: number) => `
+export const tplTabButton = (text: string, index: number) => `
 <div id="joco-bar-item-${index}" class="joco-bar-item">${text}</div>
 `;
 

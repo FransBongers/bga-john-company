@@ -1,16 +1,32 @@
-interface OnEnteringCrownManagerOfShippingLeaseExtraShipsArgs
-  extends CommonStateArgs {
+import {
+  addConfirmButton,
+  addPrimaryActionButton,
+  addSecondaryActionButton,
+  clearPossible,
+  debug,
+  formatStringRecursive,
+  GameState,
+  performAction,
+  updatePageTitle,
+} from '../boilerplate';
+import { EXTRA_SHIP, BUY_COMPANY_SHIP } from '../constants';
+import { tknShipValue, tknPromiseCubes, tknPound } from '../logs/templates';
+import { PlayerManager } from '../player-manager';
+import { CommonStateArgs, GameAlias } from '../types';
+import { getCrownPlayerName } from '../utility';
+
+interface OnEnteringCrownManagerOfShippingLeaseExtraShipsArgs extends CommonStateArgs {
   numberOfShipsCrownWillLease: number;
   optionToLeaveTwoUnspent: Record<number, boolean>;
 }
 
-class CrownManagerOfShippingLeaseExtraShips implements State {
+export class CrownManagerOfShippingLeaseExtraShips implements GameState<OnEnteringCrownManagerOfShippingLeaseExtraShipsArgs> {
   private static instance: CrownManagerOfShippingLeaseExtraShips;
   private args: OnEnteringCrownManagerOfShippingLeaseExtraShipsArgs;
 
   constructor(private game: GameAlias) {}
 
-  public static create(game: JohnCompany) {
+  public static create(game: GameAlias) {
     CrownManagerOfShippingLeaseExtraShips.instance =
       new CrownManagerOfShippingLeaseExtraShips(game);
   }
@@ -32,14 +48,14 @@ class CrownManagerOfShippingLeaseExtraShips implements State {
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringCrownManagerOfShippingLeaseExtraShipsArgs
+    args: OnEnteringCrownManagerOfShippingLeaseExtraShipsArgs,
   ) {
     updatePageTitle(
       _('${tkn_playerName} may lease extra ships'),
       {
         tkn_playerName: getCrownPlayerName(),
       },
-      true
+      true,
     );
   }
 
@@ -72,7 +88,7 @@ class CrownManagerOfShippingLeaseExtraShips implements State {
           type: EXTRA_SHIP,
           fatigued: 0,
         }),
-      }
+      },
     );
 
     const playerId = PlayerManager.getInstance().getCurrentPlayerId();
@@ -83,14 +99,14 @@ class CrownManagerOfShippingLeaseExtraShips implements State {
         id: 'buy_ship_btn',
         text: formatStringRecursive(
           _(
-            'Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to leave 2 ${tkn_pound} unspent'
+            'Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to leave 2 ${tkn_pound} unspent',
           ),
           {
             amount: 1,
             tkn_playerName_crown: getCrownPlayerName(),
             tkn_promiseCube: tknPromiseCubes(),
             tkn_pound: tknPound(),
-          }
+          },
         ),
         callback: () =>
           performAction('actCrownManagerOfShippingBuyCompanyShips', {
