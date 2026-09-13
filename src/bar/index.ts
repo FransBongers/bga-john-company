@@ -1,5 +1,5 @@
-import { GameAlias, GamedatasAlias } from "../types";
-import { tplTabButton } from "./templates";
+import { GameAlias, GamedatasAlias } from '../types';
+import { tplTabButton } from './templates';
 
 export class Bar {
   private static instance: Bar;
@@ -15,6 +15,19 @@ export class Bar {
   private active: number = 0;
 
   private config = [
+    {
+      id: 'joco-london',
+      text: _('London'),
+    },
+    {
+      id: 'joco-company',
+      text: _('Company'),
+    },
+
+    {
+      id: 'joco-india',
+      text: _('India'),
+    },
     {
       id: 'joco-board',
       text: _('Board'),
@@ -55,7 +68,9 @@ export class Bar {
     const bar = document.getElementById('joco-bar');
     this.config.forEach(({ id, text }, index) => {
       bar.insertAdjacentHTML('beforeend', tplTabButton(text, index));
-      this.ui.barButtons.push(document.getElementById(`joco-bar-item-${index}`));
+      this.ui.barButtons.push(
+        document.getElementById(`joco-bar-item-${index}`),
+      );
       this.ui.tabs[id] = document.getElementById(id);
 
       if (index === this.active) {
@@ -66,7 +81,9 @@ export class Bar {
       }
     });
 
-    bar.addEventListener('click', (event: PointerEvent) => this.onIconClick(event))
+    bar.addEventListener('click', (event: PointerEvent) =>
+      this.onIconClick(event),
+    );
   }
 
   // .##.....##.########..########.....###....########.########....##.....##.####

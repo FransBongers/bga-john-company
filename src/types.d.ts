@@ -1,4 +1,5 @@
 // TODO: split in framework & game specicf
+import { Log } from './boilerplate/notification-manager/types';
 import { Climate } from './crown/climate';
 import { Game } from './Game';
 
@@ -127,6 +128,7 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   enterprises: Record<string, JoCoEnterPriseBase>;
   families: Record<string, JocoFamily>;
   familyMembers: Record<string, JocoFamilyMember>;
+  londonSeasonDisplay: JocoLondonSeasonCardBase[];
   offices: Record<string, JoCoOfficeBase>;
   orders: Record<string, JoCoOrder>;
   phase: string;
@@ -134,6 +136,7 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   regions: Record<string, JocoRegionBase>;
   ships: Record<string, JocoShipBase>;
   staticData: {
+    londonSeasonCards: Record<string, JocoLondonSeasonCardStatic>;
     offices: Record<string, JocoOfficeStatic>;
     orders: Record<string, JoCoOrderStatic>;
     regions: Record<string, JocoRegionStatic>;
@@ -161,6 +164,26 @@ type BengalPresidency = 'BengalPresidency';
 type BombayPresidency = 'BombayPresidency';
 type MadrasPresidency = 'MadrasPresidency';
 type JoCoPresidency = BengalPresidency | BombayPresidency | MadrasPresidency;
+
+export type JocoLondonSeasonCardType = 'Blackmail' | 'Prestige';
+
+export interface JocoLondonSeasonCardBase extends GamePiece {
+  type: JocoLondonSeasonCardType;
+}
+
+export interface JocoLondonSeasonCardStatic {
+  title: string;
+  background: string;
+  subtype: 'Enterprise' | 'Spouse';
+  text: Array<string | Log>;
+  textNote: string | null;
+  enterpriseType: string | null;
+  power: number | null;
+  victoryPoints: number | null;
+  discount: number | null;
+}
+
+export type JocoLondonSeasonCard = JocoLondonSeasonCardBase & JocoLondonSeasonCardStatic;
 
 interface JocoFamilyMember {
   id: string;

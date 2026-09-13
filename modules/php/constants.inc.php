@@ -45,6 +45,8 @@ const DECK = 'deck';
 const DISCARD = 'discard';
 const EXTRA_SETUP = 'extraSetup';
 
+const LONDON_SEASON_DISPLAY = 'LondonSeasonDisplay';
+
 const ST_SETUP_DRAFT = 19;
 const ST_DRAFT_CARD = 20;
 const ST_DRAFT_CARD_NEXT_STEP = 21;
@@ -185,6 +187,12 @@ const RANDOM_BLACKMAIL_CARD = 'randomBlackmailCard';
 const SHIP = 'ship';
 const LUXURY = 'Luxury';
 const WORKSHOP = 'Workshop';
+
+const VOTE = 'Vote';
+const SOCIAL_POLICY = 'Social';
+const COMPANY_SHARES_POLICY = 'CompanyShares';
+const SHIPPING_POLICY = 'Shipping';
+const MANUFACTURING_POLICY = 'Manufacturing';
 
 const SHIPYARD = 'Shipyard';
 const SHARE = 'Share';

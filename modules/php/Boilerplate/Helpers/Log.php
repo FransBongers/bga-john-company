@@ -2,6 +2,7 @@
 
 namespace Bga\Games\JohnCompany\Boilerplate\Helpers;
 
+use Bga\GameFramework\Table;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
@@ -20,7 +21,7 @@ use Bga\Games\JohnCompany\Managers\Players;
  *  `affected` JSON,
  */
 
-class Log extends \APP_DbObject
+class Log
 {
   public static function enable()
   {
@@ -47,7 +48,7 @@ class Log extends \APP_DbObject
       $entry['primary'] = '';
     }
 
-    $entry['move_id'] = self::getUniqueValueFromDB('SELECT global_value FROM global WHERE global_id = 3');
+    $entry['move_id'] = Table::getUniqueValueFromDB('SELECT global_value FROM global WHERE global_id = 3');
     $query = new QueryBuilder('log', null, 'id');
     return $query->insert($entry);
   }

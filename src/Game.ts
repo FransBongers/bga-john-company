@@ -24,10 +24,14 @@ import {
 } from './boilerplate';
 import { ConfirmPartialTurn } from './boilerplate/states/ConfirmPartialTurn';
 import { ConfirmTurn } from './boilerplate/states/ConfirmTurn';
+import { LondonSeasonCardsManager } from './cards/london-season-cards';
+import { Company } from './company';
 import { CROWN_PLAYER_ID, SETUP } from './constants';
 import { CrownClimate } from './crown/climate';
+import { India } from './india';
 import { BgaAnimations, BgaAutofit } from './libs';
 import { getTokenDiv } from './logs';
+import { London } from './london';
 import { Negotiation } from './negotiation';
 import { PlayerAreas } from './player-areas';
 import { PlayerManager } from './player-manager';
@@ -158,6 +162,22 @@ export class Game {
     this.updateLayout();
   }
 
+  // .########.########.....###....##.....##.########.##......##..#######..########..##....##
+  // .##.......##.....##...##.##...###...###.##.......##..##..##.##.....##.##.....##.##...##.
+  // .##.......##.....##..##...##..####.####.##.......##..##..##.##.....##.##.....##.##..##..
+  // .######...########..##.....##.##.###.##.######...##..##..##.##.....##.########..#####...
+  // .##.......##...##...#########.##.....##.##.......##..##..##.##.....##.##...##...##..##..
+  // .##.......##....##..##.....##.##.....##.##.......##..##..##.##.....##.##....##..##...##.
+  // .##.......##.....##.##.....##.##.....##.########..###..###...#######..##.....##.##....##
+
+  // ..#######..##.....##.########.########..########..####.########..########..######.
+  // .##.....##.##.....##.##.......##.....##.##.....##..##..##.....##.##.......##....##
+  // .##.....##.##.....##.##.......##.....##.##.....##..##..##.....##.##.......##......
+  // .##.....##.##.....##.######...########..########...##..##.....##.######....######.
+  // .##.....##..##...##..##.......##...##...##...##....##..##.....##.##.............##
+  // .##.....##...##.##...##.......##....##..##....##...##..##.....##.##.......##....##
+  // ..#######.....###....########.##.....##.##.....##.####.########..########..######.
+
   /**
    * Setup undo/cancel log tracking for notifications
    * Intercepts log placement to map notification UIDs to log IDs
@@ -254,6 +274,31 @@ export class Game {
     };
   }
 
+  public bgaFormatText(
+    log: string,
+    args: Record<string, unknown>,
+  ): { log: string; args: any } {
+    try {
+      if (log && args && !args.processed) {
+        args.processed = true;
+
+        // replace all keys that start with 'logToken'
+        Object.entries(args).forEach(([key, value]) => {
+          if (key.startsWith('tkn_')) {
+            args[key] = getTokenDiv({
+              key,
+              value: value as string,
+              game: this,
+            });
+          }
+        });
+      }
+    } catch (e) {
+      console.error(log, args, 'Exception thrown', (e as Error).stack);
+    }
+    return { log, args };
+  }
+
   // ..######..########.########.##.....##.########.
   // .##....##.##..........##....##.....##.##.....##
   // .##.......##..........##....##.....##.##.....##
@@ -261,6 +306,7 @@ export class Game {
   // .......##.##..........##....##.....##.##.......
   // .##....##.##..........##....##.....##.##.......
   // ..######..########....##.....#######..##.......
+
   public setup(gamedatas: JohnCompanyGamedatas) {
     const body = document.getElementById('ebd-body');
     this.mobileVersion = body && body.classList.contains('mobile_version');
@@ -316,12 +362,7 @@ export class Game {
         return showAnimations && this.bga.gameui.bgaAnimationsActive();
       },
     });
-
-    //  this.cardManager = new GestCardManager(this);
-    //  this.forceManager = new ForceManager(this);
-    //  this.markerManager = new MarkerManager(this);
-    //  this.travellerManager = new TravellerManager(this);
-    //  this.travellersInfoPanel = new TravellersInfoPanel(this);
+    LondonSeasonCardsManager.create(this);
 
     //  this.gameMap = new GameMap(this);
     //  this.cardArea = new CardArea(this);
@@ -335,6 +376,10 @@ export class Game {
     Negotiation.create(this);
     PlayerAreas.create(this);
     Board.create(this);
+    Company.create(this);
+
+    London.create(this);
+    India.create(this);
     Bar.create(this);
 
     if (

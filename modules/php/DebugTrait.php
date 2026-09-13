@@ -39,6 +39,7 @@ trait DebugTrait
 
   function debug_test()
   {
+    LondonSeasonCards::setupLoadBlackmailCards();
     // Notifications::log('tradeRoute', TradeRoutes::getOrdersForTradeRoute(ORDER_BOMBAY_3, 16));
     
     // Notifications::log('homePorts', Orders::getHomePorts());

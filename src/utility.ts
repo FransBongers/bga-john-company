@@ -1,7 +1,18 @@
-import { EAST_INDIAN, SOUTH_INDIAN, WEST_INDIAN, CHINA, CROWN_PLAYER_ID } from "./constants";
-import { tknShipValue } from "./logs/templates";
-import { PlayerManager } from "./player-manager";
-import { JocoShipBase } from "./types";
+import {
+  EAST_INDIAN,
+  SOUTH_INDIAN,
+  WEST_INDIAN,
+  CHINA,
+  CROWN_PLAYER_ID,
+} from './constants';
+import { tknShipValue } from './logs/templates';
+import { PlayerManager } from './player-manager';
+import { StaticData } from './static-data';
+import {
+  JocoLondonSeasonCard,
+  JocoLondonSeasonCardBase,
+  JocoShipBase,
+} from './types';
 
 export const getSeaName = (seaId: string) => {
   switch (seaId) {
@@ -34,4 +45,15 @@ export const getShipsLog = (ships: JocoShipBase[]) => {
   });
 
   return shipsLog;
+};
+
+export const getLondonSeasonCard = (
+  card: JocoLondonSeasonCardBase,
+): JocoLondonSeasonCard => {
+  const staticData = StaticData.get();
+  const cardStatic = staticData.londonSeasonCard(card.id);
+  return {
+    ...card,
+    ...cardStatic,
+  };
 };

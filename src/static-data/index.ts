@@ -4,6 +4,7 @@ import {
   JoCoOrderStatic,
   JocoOfficeStatic,
   JocoSetupCardStatic,
+  JocoLondonSeasonCardStatic,
 } from '../types';
 
 export class StaticData {
@@ -32,24 +33,44 @@ export class StaticData {
   // .##....##.##..........##....##.....##.##.......
   // ..######..########....##.....#######..##.......
 
+  public londonSeasonCard(id: string): JocoLondonSeasonCardStatic {
+    const card = this.staticData.londonSeasonCards[id] ?? {} as JocoLondonSeasonCardStatic;
+    if (!card) {
+      throw new Error('STATIC_DATA_ERROR_001');
+    }
+    return card;
+  }
+
   public order(id: string): JoCoOrderStatic {
     const order = this.staticData.orders[id];
     if (!order) {
-      throw new Error('FE_ERROR_001');
+      throw new Error('STATIC_DATA_ERROR_002');
     }
     return order;
   }
 
   public office(id: string): JocoOfficeStatic {
-    return this.staticData.offices[id];
+    const office = this.staticData.offices[id];
+    if (!office) {
+      throw new Error('STATIC_DATA_ERROR_003');
+    }
+    return office;
   }
 
   public region(id: string) {
-    return this.staticData.regions[id];
+    const region = this.staticData.regions[id];
+    if (!region) {
+      throw new Error('STATIC_DATA_ERROR_004');
+    }
+    return region;
   }
 
   public setupCard(id: string): JocoSetupCardStatic {
-    return this.staticData.setupCards[id];
+    const setupCard = this.staticData.setupCards[id];
+    if (!setupCard) {
+      throw new Error('STATIC_DATA_ERROR_005');
+    }
+    return setupCard;
   }
 
   public setupCards(): JocoSetupCardStatic[] {

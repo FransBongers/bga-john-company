@@ -14,6 +14,7 @@
 @use './board/elephant';
 @use './board/treasury/treasury';
 @use './boilerplate/default';
+@use './cards/bridgeCards';
 @use './cards/setupCards';
 @use './crown/crown';
 @use './dice';
@@ -25,6 +26,7 @@
 @use './setup-area/setup-area';
 @use './logs/logs';
 @use './tokens';
+@use './india/india';
 
 html {
   background-image: url('img/background.jpg');

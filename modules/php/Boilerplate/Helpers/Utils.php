@@ -2,7 +2,7 @@
 
 namespace Bga\Games\JohnCompany\Boilerplate\Helpers;
 
-abstract class Utils extends \APP_DbObject
+abstract class Utils
 {
 
 

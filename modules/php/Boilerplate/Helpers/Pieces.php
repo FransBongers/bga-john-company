@@ -180,6 +180,7 @@ class Pieces extends DB_Manager
     }
 
     $extra = $like ? '%' : '';
+    
     if (preg_match("/^[A-Za-z_0-9${extra}]+$/", $id) == 0) {
       throw new \BgaVisibleSystemException("Class Pieces: id must be alphanum and underscore non empty string '$id'");
     }

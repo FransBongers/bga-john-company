@@ -80,4 +80,9 @@ class Locations
   {
     return 'pool_' . $type;
   }
+
+  public static function londonSeasonDisplay()
+  {
+    return LONDON_SEASON_DISPLAY;
+  }
 }

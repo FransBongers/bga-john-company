@@ -110,6 +110,8 @@ CREATE TABLE IF NOT EXISTS `london_season_cards` (
   `card_location` varchar(32) NOT NULL,
   `card_state` int(10) DEFAULT 0,
   `used` tinyint(1) DEFAULT 0,
+  `public_id` varchar(32) NULL,
+  `extra_data` JSON NULL,
   PRIMARY KEY (`card_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 CREATE TABLE IF NOT EXISTS `offices` (

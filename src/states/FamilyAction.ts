@@ -7,8 +7,20 @@ import {
   addSecondaryActionButton,
   formatStringRecursive,
 } from '../boilerplate';
-import { ENLIST_WRITER, WRITER, ENLIST_OFFICER, OFFICER_IN_TRAINING, PURCHASE_LUXURY, LUXURY, PURCHASE_SHIPYARD, SHIPYARD, PURCHASE_WORKSHOP, WORKSHOP, SEEK_SHARE, SHARE } from '../constants';
-import { PlayerManager } from '../player-manager';
+import {
+  ENLIST_WRITER,
+  WRITER,
+  ENLIST_OFFICER,
+  OFFICER_IN_TRAINING,
+  PURCHASE_LUXURY,
+  LUXURY,
+  PURCHASE_SHIPYARD,
+  SHIPYARD,
+  PURCHASE_WORKSHOP,
+  WORKSHOP,
+  SEEK_SHARE,
+  SHARE,
+} from '../constants';
 import { CommonStateArgs, GameState, GameAlias } from '../types';
 
 interface OnEnteringFamilyActionArgs extends CommonStateArgs {

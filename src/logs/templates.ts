@@ -29,8 +29,8 @@ export const tplLogTokenPromiseCube = () => '<div class="log_token joco-promise-
 export const tplLogTokenStormDie = (side: string) =>
   `<div class="log_token joco-storm-die" data-side="${side}"></div>`;
 
-export const tplLogTokenIcon = (type: string) =>
-  `<div class="log-token joco-icon" data-icon="${type}"></div>`;
+// export const tplLogTokenIcon = (type: string) =>
+//   `<div class="log-token joco-icon" data-icon="${type}"></div>`;
 
 export const tplLogTokenSetupCard = (id: string) =>
   `<div class="log-token joco-setup-card" data-card-id="${id}"></div>`;

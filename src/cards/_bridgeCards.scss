@@ -1,0 +1,213 @@
+@use 'sass:math';
+@use 'sass:map';
+
+.joco-card {
+  width: 225px;
+  aspect-ratio: 150 / 234;
+  background-image: url('img/bridge_cards.jpg');
+  background-size: 500% 500%;
+}
+
+$bridgeCards: (
+  1: 'Blackmail',
+  2: 'MrRochester',
+  3: 'EstherSummerson',
+  4: 'JohnThorpe',
+  5: 'VioletEffingham',
+  6: 'JosephSedley',
+  7: 'BeckySharp',
+  8: 'WilliamCollins',
+  9: 'LadyGlencora',
+  10: 'LordHighgate',
+  11: 'LadyNewcome',
+  12: 'Shipbuilders',
+  13: 'TaxCollectors',
+  14: 'LabourNewspaper',
+  15: 'Foundry',
+  16: 'StockBroker',
+  17: 'SocialMagazine',
+  18: 'ScottishCastle',
+  19: 'RottenBorough',
+  20: 'Law1',
+  21: 'Law2',
+  22: 'Law3',
+  23: 'BlackmailBack',
+  24: 'LawBack',
+  25: 'PrestigeBack',
+);
+
+$cols: 5;
+$rows: 5;
+
+@for $i from 1 through 25 {
+  $index: $i - 1;
+  $col: $index % $cols;
+  $row: math.floor(math.div($index, $cols));
+
+  .joco-card[data-background='#{map.get($bridgeCards,$i)}'] {
+    // For a sprite sheet with $cols columns and $rows rows where
+    // background-size is ($cols * 100%) by ($rows * 100%),
+    // positions run from 0% to 100% inclusive so the step is 100% / ($cols - 1) or ($rows - 1).
+    background-position-x: math.div($col * 100%, $cols - 1);
+    background-position-y: math.div($row * 100%, $rows - 1);
+  }
+}
+
+.joco-card-container {
+  .joco-enterprise-icon,
+  .fb-card-text-note,
+  .fb-card-text,
+  .joco-card-title,
+  .joco-card-subtitle,
+  .joco-card-name {
+    position: absolute;
+    text-align: center;
+  }
+
+  &[data-subtype='Enterprise'] {
+    .joco-card-name {
+      left: 2px;
+      top: 18px;
+      // background-color: yellow;
+      width: 161px;
+      height: 20px;
+      // letter-spacing: 0.5px;
+    }
+
+    .fb-card-text {
+      left: 5%;
+      width: 90%;
+      top: 225px;
+      height: 115px;
+      // background-color: yellow;
+    }
+
+    .joco-enterprise-icon {
+      left: 169px;
+      top: 22px;
+
+      .joco-icon {
+        height: 40px;
+        // background-color: yellow;
+      }
+    }
+
+    .joco-card {
+      &[data-background='LabourNewspaper'],
+      &[data-background='SocialMagazine'],
+      &[data-background='RottenBorough'] {
+        .fb-card-text {
+          .joco-policy-icon,
+          .joco-icon {
+            height: 40px;
+          }
+        }
+      }
+
+      &[data-background='ScottishCastle'] {
+        .joco-icon {
+          position: absolute;
+          height: 40px;
+
+          &[data-icon='Power3'] {
+            top: 262px;
+            left: 40px;
+          }
+        }
+
+        .joco-window-1 {
+          top: 235px;
+          left: 100px;
+        }
+
+        .joco-window-2 {
+          top: 280px;
+          left: 150px;
+        }
+      }
+    }
+  }
+
+  &[data-subtype='Spouse'] {
+    .joco-card-title {
+      left: 5%;
+      width: 90%;
+      top: 4px;
+      height: 20px;
+      // background-color: yellow;
+    }
+
+    .joco-card-subtitle {
+      left: 5%;
+      width: 90%;
+      top: 20px;
+      height: 16px;
+      // background-color: yellow;
+    }
+
+    .joco-card-name {
+      left: 5%;
+      width: 90%;
+      top: 215px;
+      height: 34px;
+
+      .bga-autofit__inner {
+        overflow: visible !important;
+      }
+    }
+
+    .fb-card-text {
+      left: 5%;
+      width: 90%;
+      top: 250px;
+      height: 90px;
+    }
+
+    .joco-icon[data-icon^='Discount'] {
+      position: absolute;
+      height: 40px;
+      left: 166px;
+      top: 95px;
+    }
+    .joco-icon[data-icon^='Power'] {
+      position: absolute;
+      height: 40px;
+      left: 166px;
+      top: 50px;
+    }
+    .joco-icon[data-icon^='VictoryPoints'] {
+      position: absolute;
+      height: 40px;
+      left: 166px;
+      top: 50px;
+    }
+
+    &[data-has-text-note='true'] {
+      .fb-card-text {
+        height: 60px;
+        // background-color: grey;
+      }
+
+      .fb-card-text-note {
+        left: 5%;
+        width: 90%;
+        top: 310px;
+        height: 35px;
+        // background-color: yellow;
+      }
+    }
+  }
+}
+
+#game-card-PrestigeCard_25 {
+  .game-card-front {
+    .joco-card-name {
+      left: 24px;
+      top: 18px;
+      // background-color: yellow;
+      width: 140px;
+      height: 20px;
+      // letter-spacing: 0.5px;
+    }
+  }
+}

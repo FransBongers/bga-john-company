@@ -20,7 +20,8 @@ declare(strict_types=1);
 
 namespace Bga\Games\JohnCompany;
 
-require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
+require_once("Boilerplate/constants.inc.php");
+require_once("constants.inc.php");
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
@@ -36,6 +37,7 @@ use Bga\Games\JohnCompany\Managers\EventTiles;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\LawCards;
+use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Orders;
 use Bga\Games\JohnCompany\Managers\Players;
@@ -46,7 +48,7 @@ use Bga\Games\JohnCompany\Managers\SetupCards;
 use Bga\Games\JohnCompany\Managers\Ships;
 use Bga\Games\JohnCompany\Models\Enterprise;
 
-class Game extends \Table
+class Game extends \Bga\GameFramework\Table
 {
     use \Bga\Games\JohnCompany\DebugTrait;
     use \Bga\Games\JohnCompany\EngineTrait;
@@ -110,7 +112,7 @@ class Game extends \Table
     // Exposing protected method translation
     public static function translate($text)
     {
-        return self::_($text);
+        return clienttranslate($text);
     }
 
     ///////////////////////////////////////////////
@@ -359,6 +361,7 @@ class Game extends \Table
             'enterprises' => Enterprises::getAll(),
             'families' => Families::getAll(),
             'familyMembers' => FamilyMembers::getAll(),
+            'londonSeasonDisplay' => LondonSeasonCards::getInLocationOrdered(LONDON_SEASON_DISPLAY)->toArray(),
             'offices' => Offices::getAll(),
             'orders' => Orders::getAll(),
             'playerOrder' => Players::getTurnOrder($playerId),
@@ -367,6 +370,7 @@ class Game extends \Table
             'regions' => Regions::getAll(),
             'ships' => Ships::getAll(),
             'staticData' => [
+                'londonSeasonCards' => LondonSeasonCards::getStaticUiData(),
                 'offices' => Offices::getStaticUiData(),
                 'orders' => Orders::getStaticUiData(),
                 'regions' => Regions::getStaticUiData(),
@@ -379,16 +383,6 @@ class Game extends \Table
         }
 
         return $data;
-    }
-
-    /**
-     * Returns the game name.
-     *
-     * IMPORTANT: Please do not modify.
-     */
-    protected function getGameName()
-    {
-        return "johncompany";
     }
 
     /**
@@ -414,6 +408,7 @@ class Game extends \Table
         Offices::setupNewGame();
         Orders::setupNewGame();
         LawCards::setupNewGame();
+        LondonSeasonCards::setupNewGame();
         PrimeMinister::setupNewGame();
         Regions::setupNewGame();
         SetupCards::setupNewGame();
@@ -439,6 +434,7 @@ class Game extends \Table
 
         // Activate first player once everything has been initialized and ready.
         $this->activeNextPlayer();
+        return ST_SETUP_DRAFT;
     }
 
     /**

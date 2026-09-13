@@ -9,6 +9,10 @@ class PrestigeCard_19 extends \Bga\Games\JohnCompany\Models\PrestigeCard
     parent::__construct($row);
     $this->id = 'PrestigeCard_19';
     $this->title = clienttranslate('Lord Highgate');
-    $this->type = SPOUSE;
+    $this->subtype = SPOUSE;
+    $this->background = 'LordHighgate';
+    $this->text = [clienttranslate('You may only retire to the 8 or 12 victory point prizes.')];
+    $this->victoryPoints = 3;
+    $this->discount = 2;
   }
 }

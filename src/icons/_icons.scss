@@ -1,37 +1,113 @@
+@use 'sass:math';
+@use 'sass:map';
+
 .joco-icon {
   background-image: url('img/icons.png');
-  background-size: 600% 100%;
-  width: calc(var(--iconScale) * 48px);
-  height: calc(var(--iconScale) * 48px);
+  background-size: 400% 400%;
+  height: 24px;
+  aspect-ratio: 1 / 1;
 }
 
-.joco-icon[data-icon='Luxury'] {
-  background-position-x: 0%;
-}
+// .joco-icon[data-icon='Luxury'] {
+//   background-position-x: 0%;
+// }
 
-.joco-icon[data-icon='Share'] {
-  background-position-x: 80%;
-}
+// .joco-icon[data-icon='Share'] {
+//   background-position-x: 80%;
+// }
 
-.joco-icon[data-icon='Shipyard'] {
-  background-position-x: 40%;
-}
+// .joco-icon[data-icon='Shipyard'] {
+//   background-position-x: 40%;
+// }
 
-.joco-icon[data-icon='Workshop'] {
-  background-position-x: 20%;
-}
+// .joco-icon[data-icon='Workshop'] {
+//   background-position-x: 20%;
+// }
 
-.joco-icon[data-icon='Writer'] {
-  background-position-x: 100%;
-}
+// .joco-icon[data-icon='Writer'] {
+//   background-position-x: 100%;
+// }
 
-.joco-icon[data-icon='OfficerInTraining'] {
-  background-position-x: 60%;
-}
+// .joco-icon[data-icon='OfficerInTraining'] {
+//   background-position-x: 60%;
+// }
 
 .joco-promise-cube {
   background-image: url('img/cubes.png');
   background-size: 200% 100%;
   width: calc(var(--iconScale) * 41px);
   height: calc(var(--iconScale) * 48px);
+}
+
+$icons: (
+  1: 'Luxury',
+  2: 'Workshop',
+  3: 'Shipyard',
+  4: 'OfficerInTraining',
+  5: 'Share',
+  6: 'Writer',
+  7: 'Regiment',
+  8: 'Vote',
+  9: 'Window',
+  10: 'Power1',
+  11: 'Power2',
+  12: 'Power3',
+  13: 'Discount1',
+  14: 'Discount2',
+  15: 'VictoryPoints2',
+  16: 'VictoryPoints3',
+);
+
+$cols: 4;
+$rows: 4;
+
+@for $i from 1 through 16 {
+  $index: $i - 1;
+  $col: $index % $cols;
+  $row: math.floor(math.div($index, $cols));
+
+  .joco-icon[data-icon='#{map.get($icons,$i)}'] {
+    // For a sprite sheet with $cols columns and $rows rows where
+    // background-size is ($cols * 100%) by ($rows * 100%),
+    // positions run from 0% to 100% inclusive so the step is 100% / ($cols - 1) or ($rows - 1).
+    background-position-x: math.div($col * 100%, $cols - 1);
+    background-position-y: math.div($row * 100%, $rows - 1);
+  }
+}
+
+.joco-icon[data-icon='Power'] {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.joco-policy-icon {
+  background-image: url('img/policies.png');
+  background-size: 400% 100%;
+  height: 24px;
+  aspect-ratio: 300 / 163;
+}
+
+$policies: (
+  1: 'Manufacturing',
+  2: 'CompanyShare',
+  3: 'Shipping',
+  4: 'Social',
+);
+
+$cols: 4;
+$rows: 1;
+
+@for $i from 1 through 4 {
+  $index: $i - 1;
+  $col: $index % $cols;
+  $row: math.floor(math.div($index, $cols));
+
+  .joco-policy-icon[data-policy-icon='#{map.get($policies,$i)}'] {
+    // For a sprite sheet with $cols columns and $rows rows where
+    // background-size is ($cols * 100%) by ($rows * 100%),
+    // positions run from 0% to 100% inclusive so the step is 100% / ($cols - 1) or ($rows - 1).
+    background-position-x: math.div($col * 100%, $cols - 1);
+    // background-position-y: math.div($row * 100%, $rows - 1);
+  }
 }

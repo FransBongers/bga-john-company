@@ -8,5 +8,6 @@ class BlackmailCard extends \Bga\Games\JohnCompany\Models\LondonSeasonCard
   {
     parent::__construct($row);
     $this->type = BLACKMAIL;
+    $this->background = 'Blackmail';
   }
 }

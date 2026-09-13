@@ -1,3 +1,4 @@
+@use './fonts';
 
 /* make space between buttons on touch devices */
 @media (hover: none) {
@@ -51,8 +52,15 @@ a[style*='color: #addb90'],
 a[style*='color:#addb90'],
 span[style*='color: #addb90'],
 span[style*='color:#addb90'] {
-  text-shadow: 1px 0 0 black, 0 1px 0 black, -1px 0 0 black, 0 -1px 0 black,
-    1px 1px 0 black, -1px 1px 0 black, 1px -1px 0 black, -1px -1px 0 black !important;
+  text-shadow:
+    1px 0 0 black,
+    0 1px 0 black,
+    -1px 0 0 black,
+    0 -1px 0 black,
+    1px 1px 0 black,
+    -1px 1px 0 black,
+    1px -1px 0 black,
+    -1px -1px 0 black !important;
 }
 
 #page-title {

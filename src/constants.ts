@@ -22,6 +22,11 @@ export const WALSH = 'Walsh';
 export const CROWN = 'Crown';
 export const CROWN_PLAYER_ID = 1;
 
+export const BLACKMAIL = 'Blackmail';
+export const PRESTIGE = 'Prestige';
+export const ENTERPRISE = 'Enterprise';
+export const SPOUSE = 'Spouse';
+
 /**
  * Colors
  */
@@ -78,6 +83,12 @@ export const RANDOM_BLACKMAIL_CARD = 'randomBlackmailCard';
 export const SHIP = 'ship';
 export const LUXURY = 'Luxury';
 export const WORKSHOP = 'Workshop';
+export const WINDOW = 'Window';
+
+export const CIRCLE = 'Circle';
+export const POWER = 'Power';
+export const VICTORY_POINTS = 'VictoryPoints';
+export const DISCOUNT = 'Discount';
 
 export const SHIPYARD = 'Shipyard';
 export const SHARE = 'Share';
@@ -228,13 +239,21 @@ export const BENGAL_PRESIDENCY = 'BengalPresidency';
 export const BOMBAY_PRESIDENCY = 'BombayPresidency';
 export const MADRAS_PRESIDENCY = 'MadrasPresidency';
 
-export const PRESIDENCIES = [BENGAL_PRESIDENCY, BOMBAY_PRESIDENCY, MADRAS_PRESIDENCY];
+export const PRESIDENCIES = [
+  BENGAL_PRESIDENCY,
+  BOMBAY_PRESIDENCY,
+  MADRAS_PRESIDENCY,
+];
 
 export const BENGAL_WRITERS = 'Writers_Bengal';
 export const BOMBAY_WRITERS = 'Writers_Bombay';
 export const MADRAS_WRITERS = 'Writers_Madras';
 
-export const WRITER_LOCATIONS = [BENGAL_WRITERS, BOMBAY_WRITERS, MADRAS_WRITERS];
+export const WRITER_LOCATIONS = [
+  BENGAL_WRITERS,
+  BOMBAY_WRITERS,
+  MADRAS_WRITERS,
+];
 
 export const BENGAL_ARMY = 'Army_Bengal';
 export const BOMBAY_ARMY = 'Army_Bombay';

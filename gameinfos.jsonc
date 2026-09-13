@@ -1,0 +1,27 @@
+{
+  "game_name": "John Company: 2nd Edition",
+  "publisher": "Wehrlegig Games",
+  "publisher_website": "https:\/\/wehrlegig.com\/",
+  "publisher_bgg_id": 39814,
+  "bgg_id": 332686,
+  "players": [1, 2, 3, 4, 5, 6],
+  "suggest_player_number": null,
+  "not_recommend_player_number": null,
+  "estimated_duration": 30,
+  "fast_additional_time": 30,
+  "medium_additional_time": 40,
+  "slow_additional_time": 50,
+  "tie_breaker_description": "",
+  "losers_not_ranked": false,
+  "solo_mode_ranked": false,
+  "is_coop": 0,
+  "language_dependency": false,
+  "player_colors": ["c7b4e1", "99dae9", "ffb1b9", "dbd9d6", "f9e08d", "addb90"],
+  "favorite_colors_support": true,
+  "disable_player_order_swap_on_rematch": false,
+  "game_interface_width": {
+    "min": 800,
+    "autoscale": true,
+  },
+  "exception_on_warning": true
+}

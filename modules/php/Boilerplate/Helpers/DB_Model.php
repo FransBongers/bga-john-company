@@ -4,7 +4,7 @@ namespace Bga\Games\JohnCompany\Boilerplate\Helpers;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Game;
 
-abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
+abstract class DB_Model implements \JsonSerializable
 {
   protected $table = null;
   protected $primary = null;

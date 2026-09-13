@@ -8,7 +8,10 @@ class PrestigeCard_27 extends \Bga\Games\JohnCompany\Models\PrestigeCard
   {
     parent::__construct($row);
     $this->id = 'PrestigeCard_27';
-    $this->title = clienttranslate('SCOTTISH CASTLE');
-    $this->type = ENTERPRISE;
+    $this->title = clienttranslate('Scottish Castle');
+    $this->subtype = ENTERPRISE;
+    $this->background = 'ScottishCastle';
+    $this->enterpriseType = LUXURY;
+    $this->power = 3;
   }
 }

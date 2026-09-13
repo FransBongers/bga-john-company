@@ -1,10 +1,15 @@
-import { createFamilyMember, createRegiment, createShip } from '../board/utility';
+import {
+  createFamilyMember,
+  createRegiment,
+  createShip,
+} from '../board/utility';
+import { tplIcon, tplPolicyIcon } from '../icons/templates';
 import { PlayerManager } from '../player-manager';
 import { GameAlias } from '../types';
 import {
   tlpLogTokenText,
   tplLogTokenClimate,
-  tplLogTokenIcon,
+  // tplLogTokenIcon,
   tplLogTokenElephant,
   tplLogTokenPound,
   tplLogTokenPromiseCube,
@@ -24,6 +29,7 @@ const LOG_TOKEN_ELEPHANT = 'elephant';
 const LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
 const LOG_TOKEN_FAMILY_MEMBER = 'familyMember';
 const LOG_TOKEN_ICON = 'icon';
+const LOG_TOKEN_POLICY_ICON = 'policyIcon';
 const LOG_TOKEN_REGIMENT = 'regiment';
 const LOG_TOKEN_PROMISE_CUBE = 'promiseCube';
 const LOG_TOKEN_SETUP_CARD = 'setupCard';
@@ -54,7 +60,9 @@ export const getTokenDiv = ({
       return tplLogTokenClimate(value);
     case LOG_TOKEN_ICON:
     case LOG_TOKEN_ENTERPRISE_ICON:
-      return tplLogTokenIcon(value);
+      return tplIcon(value, 'log-token');
+    case LOG_TOKEN_POLICY_ICON:
+      return tplPolicyIcon(value, 'log-token');
     case LOG_TOKEN_ELEPHANT:
       return tplLogTokenElephant();
     case LOG_TOKEN_FAMILY_MEMBER:
