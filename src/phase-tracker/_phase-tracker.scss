@@ -1,0 +1,64 @@
+#joco-trackers {
+  // display: grid;
+  // grid-template-columns: repeat(auto-fill, 200px);
+  // gap: 4px;
+  border: 2px solid black;
+  border-radius: 4px;
+  padding: 4px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 16px;
+
+  // background: rgb(205, 111, 98);
+  // background: linear-gradient(135deg, #c98d7b 0%, #dfb39d 35%, #f1d8c1 60%, #b77d6d 100%);
+
+  .joco-phase-tracker {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    // padding: 4px;
+    // border: 1px solid black;
+    // border-radius: 4px;
+    .joco-current-phase {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 24px;
+      padding: 0 8px;
+      border: 2px solid black;
+      border-radius: 4px;
+    }
+  }
+
+  .joco-turn-tracker {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    // padding: 4px;
+    // border: 1px solid black;
+    // border-radius: 4px;
+
+    .joco-turn-numbers {
+      display: flex;
+      flex-direction: row;
+      gap: 4px;
+
+      .joco-turn-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border: 2px solid black;
+        border-radius: 4px;
+
+        &:not([data-active='true']) {
+          opacity: 0.5;
+        }
+      }
+    }
+  }
+}

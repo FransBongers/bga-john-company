@@ -13,7 +13,7 @@ export const isDebug =
 export const debug = isDebug ? console.info.bind(window.console) : () => {};
 
 export const addCancelButton = (
-  props: { callback?: Function; extraClasses?: string } = {}
+  props: { callback?: Function; extraClasses?: string } = {},
 ) => {
   Interaction.use().addCancelButton(props);
 };
@@ -67,12 +67,12 @@ export const clearPossible = () => {
 export const updatePageTitle = (
   text: string,
   args: Record<string, string | number | unknown> = {},
-  nonActivePlayers: boolean = false
+  nonActivePlayers: boolean = false,
 ) => Interaction.use().clientUpdatePageTitle(text, args, nonActivePlayers);
 
 export const formatStringRecursive = (
   log: string,
-  args: Record<string, unknown>
+  args: Record<string, unknown>,
 ): string => {
   return Interaction.use().formatStringRecursive(log, args);
 };
@@ -80,7 +80,7 @@ export const formatStringRecursive = (
 export const setAbsolutePosition = (
   elt: HTMLElement,
   scaleVarName: string,
-  { top, left }: AbsolutePosition
+  { top, left }: AbsolutePosition,
 ) => {
   // console.log('setAbsolutePosition', elt, top, left);
   if (!elt) {
@@ -93,7 +93,7 @@ export const setAbsolutePosition = (
 export const onClick = (
   node: HTMLElement | string,
   callback: Function,
-  temporary = true
+  temporary = true,
 ) => {
   let element = typeof node === 'string' ? document.getElementById(node) : node;
   Interaction.use().onClick(element, callback, temporary);
@@ -104,11 +104,20 @@ export const setSelected = (node: HTMLElement | string) => {
   Interaction.use().setSelected(element);
 };
 
-export const performAction = (actionName: string, args: Record<string, unknown>) => {
+export const performAction = (
+  actionName: string,
+  args: Record<string, unknown>,
+) => {
   Interaction.use().clearPossible();
   Interaction.use().performAction(actionName, args);
 };
 
 export const getPlayerName = (playerId: number) => {
   return PlayerManager.getInstance().getPlayer(playerId).getName();
+};
+
+export const createHtmlElement = (html: string): HTMLElement => {
+  const template = document.createElement('template');
+  template.innerHTML = html.trim();
+  return template.content.firstChild as HTMLElement;
 };

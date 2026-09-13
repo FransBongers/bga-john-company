@@ -33,6 +33,7 @@ import { BgaAnimations, BgaAutofit } from './libs';
 import { getTokenDiv } from './logs';
 import { London } from './london';
 import { Negotiation } from './negotiation';
+import { PhaseTracker } from './phase-tracker';
 import { PlayerAreas } from './player-areas';
 import { PlayerManager } from './player-manager';
 import { SetupArea } from './setup-area';
@@ -368,6 +369,8 @@ export class Game {
     //  this.cardArea = new CardArea(this);
     StaticData.create(this);
     Interaction.create(this);
+    PhaseTracker.create(this);
+
     PlayerManager.create(this);
     if (this.gameOptions.crownEnabled) {
       CrownClimate.create(this);

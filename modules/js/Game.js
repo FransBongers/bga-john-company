@@ -784,7 +784,7 @@ const clearPossible = () => {
     Interaction.use().clearPossible();
 };
 const updatePageTitle = (text, args = {}, nonActivePlayers = false) => Interaction.use().clientUpdatePageTitle(text, args, nonActivePlayers);
-const formatStringRecursive$1 = (log, args) => {
+const formatStringRecursive = (log, args) => {
     return Interaction.use().formatStringRecursive(log, args);
 };
 const setAbsolutePosition = (elt, scaleVarName, { top, left }) => {
@@ -808,6 +808,11 @@ const performAction = (actionName, args) => {
 };
 const getPlayerName = (playerId) => {
     return PlayerManager.getInstance().getPlayer(playerId).getName();
+};
+const createHtmlElement = (html) => {
+    const template = document.createElement('template');
+    template.innerHTML = html.trim();
+    return template.content.firstChild;
 };
 
 const ORDERS_CONFIG = {
@@ -2171,7 +2176,7 @@ const tplCardText = (text, { containerClass = 'fb-card-text', textClass = 'fb-fo
             return `<span class="${textClass}">${item}</span>`;
         }
         else {
-            return `<span class="${textClass}">${formatStringRecursive$1(_(item.log), item.args)}</span>`;
+            return `<span class="${textClass}">${formatStringRecursive(_(item.log), item.args)}</span>`;
         }
     })
         .join('')}
@@ -2530,6 +2535,118 @@ class Negotiation {
     }
 }
 
+const tplDivider = (style = 'horizontal', extraClasses = '') => `<div class="fb-divider ${extraClasses}" data-style="${style}"></div>`;
+
+const getPhaseName = (phase) => {
+    switch (phase) {
+        case LONDON_SEASON:
+            return _('London Season');
+        case FAMILY:
+            return _('Family');
+        case HIRING:
+            return _('Hiring');
+        case CHAIRMAN:
+            return _('Chairman');
+        case DIRECTOR_OF_TRADE:
+            return _('Director of Trade');
+        case MANAGER_OF_SHIPPING:
+            return _('Manager of Shipping');
+        case MILITARY_AFFAIRS:
+            return _('Military Affairs');
+        case BOMBAY_PRESIDENCY:
+            return _('Bombay Presidency');
+        case MADRAS_PRESIDENCY:
+            return _('Madras Presidency');
+        case BENGAL_PRESIDENCY:
+            return _('Bengal Presidency');
+        case SUPERINTENDENT_OF_TRADE_IN_CHINA:
+            return _('Superintendent of Trade in China');
+        case BONUSES:
+            return _('Bonuses');
+        case REVENUE:
+            return _('Revenue');
+        case EVENTS_IN_INDIA:
+            return _('Events in India');
+        case PARLIAMENT_MEETS:
+            return _('Parliament Meets');
+        case UPKEEP_AND_REFRESH:
+            return _('Upkeep & Refresh');
+        default:
+            return phase;
+    }
+};
+
+const PHASES = [
+    LONDON_SEASON,
+    FAMILY,
+    HIRING,
+    CHAIRMAN,
+    DIRECTOR_OF_TRADE,
+    MANAGER_OF_SHIPPING,
+    MILITARY_AFFAIRS,
+    BOMBAY_PRESIDENCY,
+    MADRAS_PRESIDENCY,
+    BENGAL_PRESIDENCY,
+    BONUSES,
+    REVENUE,
+    EVENTS_IN_INDIA,
+    PARLIAMENT_MEETS,
+    UPKEEP_AND_REFRESH,
+];
+const tplPhaseTracker = (phases) => `
+  <div id="joco-trackers">
+
+  </div>
+`;
+const tplCurrentPhase = (phase) => `
+  <div class="joco-phase-tracker" id="joco-current-phase">
+    <div class="joco-label">
+      <span class="fb-font-baskerville fb-font-bold fb-font-16">${_('PHASE')}</span>
+    </div>
+    <div class="joco-current-phase">
+      <span class="fb-font-baskerville fb-font-bold fb-font-16">${getPhaseName(phase).toLocaleUpperCase()}</span>
+    </div>
+  </div>
+`;
+const tplCurrentTurn = (turn) => `
+  <div class="joco-turn-tracker" id="joco-phase-turn">
+    <div class="joco-label">
+      <span class="fb-font-baskerville fb-font-bold fb-font-16">${_('TURN')}</span>
+    </div>
+    <div class="joco-turn-numbers">
+      ${[1, 2, 3, 4, 5, 6, 7, 8].map((t) => `<span class="joco-turn-number fb-font-baskerville fb-font-bold fb-font-16" data-active="${t === turn}">${t}</span>`).join('')}
+    </div>
+  </div>
+`;
+class PhaseTracker {
+    constructor(game) {
+        this.game = game;
+        this.game = game;
+        this.setup(game.gamedatas);
+    }
+    static create(game) {
+        PhaseTracker.instance = new PhaseTracker(game);
+    }
+    static getInstance() {
+        return PhaseTracker.instance;
+    }
+    setupPhases(gamedatas) {
+        this.ui.container.insertAdjacentHTML('beforeend', tplCurrentTurn(gamedatas.turn));
+        this.ui.container.insertAdjacentHTML('beforeend', tplDivider('vertical'));
+        this.ui.container.insertAdjacentHTML('beforeend', tplCurrentPhase(gamedatas.phase));
+    }
+    setup(gamedatas) {
+        document
+            .getElementById('game_play_area')
+            .insertAdjacentHTML('afterbegin', tplPhaseTracker(PHASES));
+        this.ui = {
+            container: document.getElementById('joco-trackers'),
+            phases: {},
+        };
+        this.setupPhases(gamedatas);
+    }
+}
+
 const tplPlayerAreas = () => `<div id="joco-player-areas">
 </div>`;
 const tplPlayerArea = (player) => `
@@ -2841,7 +2958,7 @@ class CrownChairmanRequestAllocation {
         this.setOfficesSelectable();
         addSecondaryActionButton({
             id: 'pay_btn',
-            text: formatStringRecursive$1(_('Pay 1 ${tkn_promiseCube}'), {
+            text: formatStringRecursive(_('Pay 1 ${tkn_promiseCube}'), {
                 tkn_promiseCube: tknPromiseCubes(),
             }),
             callback: () => this.updateInterfaceSelectOffice(),
@@ -2866,7 +2983,7 @@ class CrownChairmanRequestAllocation {
         for (let i = 1; i <= this.args.maxAmount; i++) {
             addSecondaryActionButton({
                 id: `amount_${i}_btn`,
-                text: formatStringRecursive$1(_('${amount} ${tkn_pound}'), {
+                text: formatStringRecursive(_('${amount} ${tkn_pound}'), {
                     amount: i,
                     tkn_pound: tknPound(),
                 }),
@@ -2931,7 +3048,7 @@ class CrownChairmanRequestDebtAdvancement {
         if (this.args.oneLessAdvancement.possible) {
             addSecondaryActionButton({
                 id: 'one_less_btn',
-                text: formatStringRecursive$1(_('Pay ${amount} ${tkn_promiseCube} for -1 Debt'), {
+                text: formatStringRecursive(_('Pay ${amount} ${tkn_promiseCube} for -1 Debt'), {
                     amount: this.args.oneLessAdvancement.cost,
                     tkn_promiseCube: tknPromiseCubes(),
                 }),
@@ -2948,7 +3065,7 @@ class CrownChairmanRequestDebtAdvancement {
         if (this.args.additionalAdvancement.possible) {
             addSecondaryActionButton({
                 id: 'additional_btn',
-                text: formatStringRecursive$1(_('Pay ${amount} ${tkn_promiseCube} for +1 Debt'), {
+                text: formatStringRecursive(_('Pay ${amount} ${tkn_promiseCube} for +1 Debt'), {
                     amount: this.args.additionalAdvancement.cost,
                     tkn_promiseCube: tknPromiseCubes(),
                 }),
@@ -3028,7 +3145,7 @@ class CrownManagerOfShippingBuyCompanyShips {
                 case BUY_COMPANY_SHIP:
                     addSecondaryActionButton({
                         id: 'buy_ship_btn',
-                        text: formatStringRecursive$1(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to buy ${tkn_ship}'), {
+                        text: formatStringRecursive(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to buy ${tkn_ship}'), {
                             amount: option.promiseCubeCost,
                             tkn_playerName_crown: getCrownPlayerName(),
                             tkn_promiseCube: tknPromiseCubes(),
@@ -3046,7 +3163,7 @@ class CrownManagerOfShippingBuyCompanyShips {
                 case DO_NOT_BUY_COMPANY_SHIP:
                     addSecondaryActionButton({
                         id: 'do_not_buy_ship_btn',
-                        text: formatStringRecursive$1(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to not buy ${tkn_ship}'), {
+                        text: formatStringRecursive(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to not buy ${tkn_ship}'), {
                             amount: option.promiseCubeCost,
                             tkn_playerName_crown: getCrownPlayerName(),
                             tkn_promiseCube: tknPromiseCubes(),
@@ -3203,7 +3320,7 @@ class CrownManagerOfShippingLeaseExtraShips {
         if (optionToLeaveTwoUnspent) {
             addSecondaryActionButton({
                 id: 'buy_ship_btn',
-                text: formatStringRecursive$1(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to leave 2 ${tkn_pound} unspent'), {
+                text: formatStringRecursive(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to leave 2 ${tkn_pound} unspent'), {
                     amount: 1,
                     tkn_playerName_crown: getCrownPlayerName(),
                     tkn_promiseCube: tknPromiseCubes(),
@@ -3425,7 +3542,7 @@ class DirectorOfTradeSpecialEnvoy {
         });
         addPrimaryActionButton({
             id: 'make_check_btn',
-            text: formatStringRecursive$1(_('Roll ${number} dice'), {
+            text: formatStringRecursive(_('Roll ${number} dice'), {
                 number: this.spend,
             }),
             callback: () => this.updateInterfaceConfirm(),
@@ -3843,7 +3960,7 @@ class FamilyAction {
         if (this.args.options[action]) {
             addSecondaryActionButton({
                 id: `${action}_btn`,
-                text: formatStringRecursive$1(text, {
+                text: formatStringRecursive(text, {
                     tkn_icon: icon,
                 }),
                 callback: () => this.updateInterfaceConfirm(action),
@@ -3896,7 +4013,7 @@ class ManagerOfShipping {
             playerShipsAvailable = true;
             addPlayerButton({
                 id: `${ship.id}_btn`,
-                text: formatStringRecursive$1(_('Fit ${tkn_ship}'), {
+                text: formatStringRecursive(_('Fit ${tkn_ship}'), {
                     tkn_ship: tknShipValue({ type, name, fatigued }),
                 }),
                 playerId,
@@ -3908,7 +4025,7 @@ class ManagerOfShipping {
         if (this.treasury >= 2) {
             addSecondaryActionButton({
                 id: 'extraShip_btn',
-                text: formatStringRecursive$1(_('Lease ${tkn_ship}'), {
+                text: formatStringRecursive(_('Lease ${tkn_ship}'), {
                     tkn_ship: tknShipValue({
                         type: EXTRA_SHIP,
                         name: _('Extra Ship'),
@@ -3925,7 +4042,7 @@ class ManagerOfShipping {
         if (!playerShipsAvailable && this.treasury >= 5) {
             addSecondaryActionButton({
                 id: 'companyShip_btn',
-                text: formatStringRecursive$1(_('Buy ${tkn_ship}'), {
+                text: formatStringRecursive(_('Buy ${tkn_ship}'), {
                     tkn_ship: tknShipValue({
                         type: COMPANY_SHIP,
                         name: _('Company Ship'),
@@ -4420,7 +4537,7 @@ class PresidencyTrade {
         });
         addPrimaryActionButton({
             id: 'make_check_btn',
-            text: formatStringRecursive$1(_('Roll ${number} dice'), {
+            text: formatStringRecursive(_('Roll ${number} dice'), {
                 number: Math.max(this.spend - penalty, 0),
             }),
             callback: () => this.updateInterfaceConfirm(),
@@ -4666,7 +4783,7 @@ class RevenuePayDividends {
         });
         addPrimaryActionButton({
             id: 'make_check_btn',
-            text: formatStringRecursive$1(_('Pay ${number} dividend(s)'), {
+            text: formatStringRecursive(_('Pay ${number} dividend(s)'), {
                 number: this.selectedNumberOfDividends,
             }),
             callback: () => this.updateInterfaceConfirm(),
@@ -4945,6 +5062,7 @@ class Game {
         LondonSeasonCardsManager.create(this);
         StaticData.create(this);
         Interaction.create(this);
+        PhaseTracker.create(this);
         PlayerManager.create(this);
         if (this.gameOptions.crownEnabled) {
             CrownClimate.create(this);
