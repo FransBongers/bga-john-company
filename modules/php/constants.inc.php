@@ -46,6 +46,7 @@ const DISCARD = 'discard';
 const EXTRA_SETUP = 'extraSetup';
 
 const LONDON_SEASON_DISPLAY = 'LondonSeasonDisplay';
+const PASSED_LAWS = 'PassedLaws';
 
 const ST_SETUP_DRAFT = 19;
 const ST_DRAFT_CARD = 20;
@@ -714,9 +715,9 @@ const STORM_DIE = [FOUR, TWO_EAST, ONE_ALL, THREE_SOUTH, TWO_WEST, FOUR];
  * Prime Minister
  */
 const DIAL = 'dial';
-const BONUS = 'bonus';
-const POWER = 'power';
-const TAX = 'tax';
+const BONUS = 'Bonus';
+const POWER = 'Power';
+const TAX = 'Tax';
 const START_SCENARIO = 'startScenario';
 const TYPE = 'type';
 const TARGET = 'target';

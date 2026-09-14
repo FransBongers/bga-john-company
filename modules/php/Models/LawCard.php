@@ -10,8 +10,15 @@ class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   protected $location;
   protected $state;
 
-
+  protected $background;
+  protected $header = 'default';
   protected $title;
+  protected $text = [];
+  protected $extraActionText = null;
+  protected $extraAction = null;
+  protected $initialSupport = null;
+  protected $policyTarget = null;
+  protected $policyConsequence = null;
   // protected $type;
 
   protected $attributes = [
@@ -21,7 +28,15 @@ class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   ];
 
   protected $staticAttributes = [
+    'background',
+    'header',
     'title',
+    'text',
+    'extraActionText',
+    'extraAction',
+    'initialSupport',
+    'policyTarget',
+    'policyConsequence',
     // 'type',
   ];
 
@@ -36,5 +51,4 @@ class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     // Notifications::log('getUiData card model', []);
     return $this->jsonSerialize(); // Static datas are already in js file
   }
-
 }

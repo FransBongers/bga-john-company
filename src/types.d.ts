@@ -131,11 +131,13 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   londonSeasonDisplay: JocoLondonSeasonCardBase[];
   offices: Record<string, JoCoOfficeBase>;
   orders: Record<string, JoCoOrder>;
+  passedLaws: JocoLawCardBase[];
   phase: string;
   powerTokens: string[];
   regions: Record<string, JocoRegionBase>;
   ships: Record<string, JocoShipBase>;
   staticData: {
+    lawCards: Record<string, JocoLawCardStatic>;
     londonSeasonCards: Record<string, JocoLondonSeasonCardStatic>;
     offices: Record<string, JocoOfficeStatic>;
     orders: Record<string, JoCoOrderStatic>;
@@ -164,26 +166,6 @@ type BengalPresidency = 'BengalPresidency';
 type BombayPresidency = 'BombayPresidency';
 type MadrasPresidency = 'MadrasPresidency';
 type JoCoPresidency = BengalPresidency | BombayPresidency | MadrasPresidency;
-
-export type JocoLondonSeasonCardType = 'Blackmail' | 'Prestige';
-
-export interface JocoLondonSeasonCardBase extends GamePiece {
-  type: JocoLondonSeasonCardType;
-}
-
-export interface JocoLondonSeasonCardStatic {
-  title: string;
-  background: string;
-  subtype: 'Enterprise' | 'Spouse';
-  text: Array<string | Log>;
-  textNote: string | null;
-  enterpriseType: string | null;
-  power: number | null;
-  victoryPoints: number | null;
-  discount: number | null;
-}
-
-export type JocoLondonSeasonCard = JocoLondonSeasonCardBase & JocoLondonSeasonCardStatic;
 
 interface JocoFamilyMember {
   id: string;
@@ -271,5 +253,46 @@ interface JohnCompanyPlayerData extends Player {
   setupCards: JoCoSetupCard[];
 }
 
+/**
+ * NEW AFTER UPDATE
+ */
+
 export type GameAlias = Game;
 export type GamedatasAlias = JohnCompanyGamedatas;
+
+export type JocoLondonSeasonCardType = 'Blackmail' | 'Prestige';
+
+export interface JocoLondonSeasonCardBase extends GamePiece {
+  type: JocoLondonSeasonCardType;
+}
+
+export interface JocoLondonSeasonCardStatic {
+  title: string;
+  background: string;
+  subtype: 'Enterprise' | 'Spouse';
+  text: Array<string | Log>;
+  textNote: string | null;
+  enterpriseType: string | null;
+  power: number | null;
+  victoryPoints: number | null;
+  discount: number | null;
+}
+
+export type JocoLondonSeasonCard = JocoLondonSeasonCardBase &
+  JocoLondonSeasonCardStatic;
+
+export interface JocoLawCardBase extends GamePiece {}
+
+export interface JocoLawCardStatic {
+  background: string;
+  title: string;
+  header: string;
+  text: Array<string | Log>;
+  extraAction: string | null;
+  extraActionText: Array<string | Log> | null;
+  policyConsequence: string | null;
+  policyTarget: string | null;
+  initialSupport: number | null;
+}
+
+export type JocoLawCard = JocoLawCardBase & JocoLawCardStatic;

@@ -87,6 +87,8 @@ export const WINDOW = 'Window';
 
 export const CIRCLE = 'Circle';
 export const POWER = 'Power';
+export const BONUS = 'Bonus';
+export const TAX = 'Tax';
 export const VICTORY_POINTS = 'VictoryPoints';
 export const DISCOUNT = 'Discount';
 

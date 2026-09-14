@@ -5,6 +5,7 @@ import {
   JocoOfficeStatic,
   JocoSetupCardStatic,
   JocoLondonSeasonCardStatic,
+  JocoLawCardStatic,
 } from '../types';
 
 export class StaticData {
@@ -33,10 +34,20 @@ export class StaticData {
   // .##....##.##..........##....##.....##.##.......
   // ..######..########....##.....#######..##.......
 
-  public londonSeasonCard(id: string): JocoLondonSeasonCardStatic {
-    const card = this.staticData.londonSeasonCards[id] ?? {} as JocoLondonSeasonCardStatic;
+  public lawCard(id: string): JocoLawCardStatic {
+    const card = this.staticData.lawCards[id] ?? ({} as JocoLawCardStatic);
     if (!card) {
       throw new Error('STATIC_DATA_ERROR_001');
+    }
+    return card;
+  }
+
+  public londonSeasonCard(id: string): JocoLondonSeasonCardStatic {
+    const card =
+      this.staticData.londonSeasonCards[id] ??
+      ({} as JocoLondonSeasonCardStatic);
+    if (!card) {
+      throw new Error('STATIC_DATA_ERROR_002');
     }
     return card;
   }
@@ -44,7 +55,7 @@ export class StaticData {
   public order(id: string): JoCoOrderStatic {
     const order = this.staticData.orders[id];
     if (!order) {
-      throw new Error('STATIC_DATA_ERROR_002');
+      throw new Error('STATIC_DATA_ERROR_003');
     }
     return order;
   }
@@ -52,7 +63,7 @@ export class StaticData {
   public office(id: string): JocoOfficeStatic {
     const office = this.staticData.offices[id];
     if (!office) {
-      throw new Error('STATIC_DATA_ERROR_003');
+      throw new Error('STATIC_DATA_ERROR_004');
     }
     return office;
   }
@@ -60,7 +71,7 @@ export class StaticData {
   public region(id: string) {
     const region = this.staticData.regions[id];
     if (!region) {
-      throw new Error('STATIC_DATA_ERROR_004');
+      throw new Error('STATIC_DATA_ERROR_005');
     }
     return region;
   }
@@ -68,7 +79,7 @@ export class StaticData {
   public setupCard(id: string): JocoSetupCardStatic {
     const setupCard = this.staticData.setupCards[id];
     if (!setupCard) {
-      throw new Error('STATIC_DATA_ERROR_005');
+      throw new Error('STATIC_DATA_ERROR_006');
     }
     return setupCard;
   }

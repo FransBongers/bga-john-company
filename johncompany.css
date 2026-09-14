@@ -10,6 +10,7 @@
  */
 @import url("https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Parisienne&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap");
 #joco-bar {
   background-color: transparent;
   height: 52px;
@@ -641,6 +642,10 @@
   font-family: "Parisienne", cursive;
 }
 
+.fb-font-bebas-neue {
+  font-family: "Bebas Neue", sans-serif;
+}
+
 .fb-font-8 {
   font-size: 8px;
 }
@@ -1018,6 +1023,134 @@ span[style*="color:#addb90"] {
   height: 20px;
 }
 
+.joco-law-card {
+  width: 225px;
+  aspect-ratio: 150/234;
+  background-image: url("img/law_cards.jpg");
+  background-size: 600% 100%;
+}
+.joco-law-card .joco-header {
+  position: absolute;
+  top: 17px;
+  left: 5%;
+  width: 90%;
+  height: 24px;
+}
+.joco-law-card .joco-title {
+  left: 5%;
+  width: 90%;
+  position: absolute;
+  top: 50px;
+  text-align: center;
+  line-height: 34px;
+  height: 68px;
+}
+.joco-law-card .fb-card-text {
+  position: absolute;
+  left: 5%;
+  width: 90%;
+  top: 120px;
+  height: 155px;
+  text-align: center;
+}
+.joco-law-card .joco-icon[data-icon=VoteClear] {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 54px;
+  top: 287px;
+  left: 159px;
+}
+.joco-law-card .joco-icon[data-icon=VoteClear] .joco-initial-support-icon {
+  height: 30px;
+}
+.joco-law-card .joco-extra-action-icon {
+  position: absolute;
+  height: 60px;
+  top: 106px;
+  left: 8px;
+}
+.joco-law-card .joco-extra-action-header {
+  position: absolute;
+  height: 20px;
+  width: 142px;
+  text-align: center;
+  top: 105px;
+  left: 80px;
+}
+.joco-law-card .joco-extra-action-text {
+  position: absolute;
+  text-align: center;
+  height: 44px;
+  width: 134px;
+  top: 125px;
+  left: 84px;
+}
+.joco-law-card .joco-policy-icon {
+  position: absolute;
+  height: 60px;
+  top: 285px;
+  left: 20px;
+}
+.joco-law-card[data-background=Law1] .joco-title {
+  top: 46px;
+  height: 54px;
+}
+.joco-law-card[data-background=Law1] .fb-card-text {
+  top: 173px;
+  height: 103px;
+}
+
+.joco-law-card[data-background=Dilemma1] {
+  background-position-x: 0%;
+}
+
+.joco-law-card[data-background=Dilemma2] {
+  background-position-x: 20%;
+}
+
+.joco-law-card[data-background=Law1] {
+  background-position-x: 40%;
+}
+
+.joco-law-card[data-background=Law2] {
+  background-position-x: 60%;
+}
+
+.joco-law-card[data-background=Law3] {
+  background-position-x: 80%;
+}
+
+.joco-law-card[data-background=LawBack] {
+  background-position-x: 100%;
+}
+
+#law-card-LawCard_56-front .joco-title {
+  top: 48px;
+  height: 34px;
+}
+#law-card-LawCard_56-front .fb-card-text {
+  top: 196px;
+  height: 152px;
+}
+#law-card-LawCard_56-front .joco-deregulation-1 {
+  position: absolute;
+  height: 55px;
+  width: 90%;
+  top: 77px;
+  left: 5%;
+  text-align: center;
+}
+#law-card-LawCard_56-front .joco-deregulation-2 {
+  position: absolute;
+  height: 60px;
+  width: 90px;
+  top: 135px;
+  left: 5%;
+  text-align: center;
+}
+
 .joco-crown-climate-row {
   --iconScale: 1;
   width: 100%;
@@ -1109,7 +1242,7 @@ span[style*="color:#addb90"] {
 
 .joco-icon {
   background-image: url("img/icons.png");
-  background-size: 400% 400%;
+  background-size: 600% 300%;
   height: 24px;
   aspect-ratio: 1/1;
 }
@@ -1127,58 +1260,58 @@ span[style*="color:#addb90"] {
 }
 
 .joco-icon[data-icon=Workshop] {
-  background-position-x: 33.3333333333%;
+  background-position-x: 20%;
   background-position-y: 0%;
 }
 
 .joco-icon[data-icon=Shipyard] {
-  background-position-x: 66.6666666667%;
+  background-position-x: 40%;
   background-position-y: 0%;
 }
 
 .joco-icon[data-icon=OfficerInTraining] {
-  background-position-x: 100%;
+  background-position-x: 60%;
   background-position-y: 0%;
 }
 
 .joco-icon[data-icon=Share] {
-  background-position-x: 0%;
-  background-position-y: 33.3333333333%;
+  background-position-x: 80%;
+  background-position-y: 0%;
 }
 
 .joco-icon[data-icon=Writer] {
-  background-position-x: 33.3333333333%;
-  background-position-y: 33.3333333333%;
+  background-position-x: 100%;
+  background-position-y: 0%;
 }
 
 .joco-icon[data-icon=Regiment] {
-  background-position-x: 66.6666666667%;
-  background-position-y: 33.3333333333%;
+  background-position-x: 0%;
+  background-position-y: 50%;
 }
 
 .joco-icon[data-icon=Vote] {
-  background-position-x: 100%;
-  background-position-y: 33.3333333333%;
+  background-position-x: 20%;
+  background-position-y: 50%;
 }
 
 .joco-icon[data-icon=Window] {
-  background-position-x: 0%;
-  background-position-y: 66.6666666667%;
+  background-position-x: 40%;
+  background-position-y: 50%;
 }
 
 .joco-icon[data-icon=Power1] {
-  background-position-x: 33.3333333333%;
-  background-position-y: 66.6666666667%;
+  background-position-x: 60%;
+  background-position-y: 50%;
 }
 
 .joco-icon[data-icon=Power2] {
-  background-position-x: 66.6666666667%;
-  background-position-y: 66.6666666667%;
+  background-position-x: 80%;
+  background-position-y: 50%;
 }
 
 .joco-icon[data-icon=Power3] {
   background-position-x: 100%;
-  background-position-y: 66.6666666667%;
+  background-position-y: 50%;
 }
 
 .joco-icon[data-icon=Discount1] {
@@ -1187,17 +1320,22 @@ span[style*="color:#addb90"] {
 }
 
 .joco-icon[data-icon=Discount2] {
-  background-position-x: 33.3333333333%;
+  background-position-x: 20%;
   background-position-y: 100%;
 }
 
 .joco-icon[data-icon=VictoryPoints2] {
-  background-position-x: 66.6666666667%;
+  background-position-x: 40%;
   background-position-y: 100%;
 }
 
 .joco-icon[data-icon=VictoryPoints3] {
-  background-position-x: 100%;
+  background-position-x: 60%;
+  background-position-y: 100%;
+}
+
+.joco-icon[data-icon=VoteClear] {
+  background-position-x: 80%;
   background-position-y: 100%;
 }
 
@@ -1208,26 +1346,92 @@ span[style*="color:#addb90"] {
 }
 
 .joco-policy-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background-image: url("img/policies.png");
-  background-size: 400% 100%;
+  background-size: 700% 100%;
   height: 24px;
   aspect-ratio: 300/163;
 }
+.joco-policy-icon div.bga-autofit {
+  width: 90%;
+  height: 60%;
+}
 
-.joco-policy-icon[data-policy-icon=Manufacturing] {
+.joco-policy-icon[data-policy-icon=Bonus] {
   background-position-x: 0%;
 }
 
-.joco-policy-icon[data-policy-icon=CompanyShare] {
+.joco-policy-icon[data-policy-icon=Power] {
+  background-position-x: 16.6666666667%;
+}
+
+.joco-policy-icon[data-policy-icon=Tax] {
   background-position-x: 33.3333333333%;
 }
 
-.joco-policy-icon[data-policy-icon=Shipping] {
+.joco-policy-icon[data-policy-icon=Manufacturing] {
+  background-position-x: 50%;
+}
+
+.joco-policy-icon[data-policy-icon=CompanyShare] {
   background-position-x: 66.6666666667%;
+}
+
+.joco-policy-icon[data-policy-icon=Shipping] {
+  background-position-x: 83.3333333333%;
 }
 
 .joco-policy-icon[data-policy-icon=Social] {
   background-position-x: 100%;
+}
+
+.joco-initial-support-icon {
+  background-image: url("img/starting_votes.png");
+  background-size: 400% 200%;
+  height: 24px;
+  aspect-ratio: 249/202;
+}
+
+.joco-initial-support-icon[data-initial-support="-1"] {
+  background-position-x: 0%;
+  background-position-y: 0%;
+}
+
+.joco-initial-support-icon[data-initial-support="-2"] {
+  background-position-x: 33.3333333333%;
+  background-position-y: 0%;
+}
+
+.joco-initial-support-icon[data-initial-support="-3"] {
+  background-position-x: 66.6666666667%;
+  background-position-y: 0%;
+}
+
+.joco-initial-support-icon[data-initial-support="-4"] {
+  background-position-x: 100%;
+  background-position-y: 0%;
+}
+
+.joco-initial-support-icon[data-initial-support="-5"] {
+  background-position-x: 0%;
+  background-position-y: 100%;
+}
+
+.joco-initial-support-icon[data-initial-support="0"] {
+  background-position-x: 33.3333333333%;
+  background-position-y: 100%;
+}
+
+.joco-initial-support-icon[data-initial-support="1"] {
+  background-position-x: 66.6666666667%;
+  background-position-y: 100%;
+}
+
+.joco-initial-support-icon[data-initial-support="5"] {
+  background-position-x: 100%;
+  background-position-y: 100%;
 }
 
 #joco-trackers {

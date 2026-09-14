@@ -369,7 +369,9 @@ class Game extends \Bga\GameFramework\Table
             'powerTokens' => Globals::getPowerTokens(),
             'regions' => Regions::getAll(),
             'ships' => Ships::getAll(),
+            'passedLaws' => LawCards::getInLocationOrdered(PASSED_LAWS)->toArray(),
             'staticData' => [
+                'lawCards' => LawCards::getStaticUiData(),
                 'londonSeasonCards' => LondonSeasonCards::getStaticUiData(),
                 'offices' => Offices::getStaticUiData(),
                 'orders' => Orders::getStaticUiData(),

@@ -14,8 +14,7 @@ class LawCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 {
   protected static $table = 'law_cards';
   protected static $prefix = 'card_';
-  protected static $customFields = [
-  ];
+  protected static $customFields = [];
   protected static $autoremovePrefix = false;
   protected static $autoreshuffle = false;
   protected static $autoIncrement = false;
@@ -77,10 +76,17 @@ class LawCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     self::shuffle(DECK);
   }
 
+  private static function setupPassedLaws()
+  {
+    $passedLaws = Scenarios::get()->getPassedLaws();
+    self::move($passedLaws, PASSED_LAWS);
+    self::shuffle(DECK);
+  }
 
   /* Creation of the cards */
   public static function setupNewGame($players = null, $options = null)
   {
     self::setupLoadCards();
+    self::setupPassedLaws();
   }
 }

@@ -1,11 +1,7 @@
-import { BLACKMAIL, ENTERPRISE, PRESTIGE, SPOUSE } from '../../constants';
+import { BLACKMAIL, PRESTIGE } from '../../constants';
 import { BgaCards } from '../../libs';
 import { GameAlias, JocoLondonSeasonCard } from '../../types';
-import { tplEnterprise, tplLondonSeasonCardContent, tplSpouse } from './templates';
-
-export const tplLondonSeasonCardHtml = (card: JocoLondonSeasonCard) => `
-  <div class="joco-card-title fb-font-bold fb-font-16 bga-autofit">${_(card.title)}</div>
-`;
+import { tplLondonSeasonCardContent } from './templates';
 
 export class LondonSeasonCardsManager extends BgaCards.Manager<JocoLondonSeasonCard> {
   private static instance: LondonSeasonCardsManager;
@@ -45,7 +41,6 @@ export class LondonSeasonCardsManager extends BgaCards.Manager<JocoLondonSeasonC
   setupFrontDiv(card: JocoLondonSeasonCard, div: HTMLElement) {
     div.classList.add('joco-card');
     div.setAttribute('data-background', card.background);
-    
 
     if (div.children.length) {
       console.log('Front div already has children, skipping setup.');

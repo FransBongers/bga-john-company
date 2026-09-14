@@ -8,6 +8,12 @@ class LawCard_36 extends \Bga\Games\JohnCompany\Models\LawCard
   {
     parent::__construct($row);
     $this->id = 'LawCard_36';
-    $this->title = clienttranslate('Inclosure ACTS');
+    $this->title = clienttranslate('Inclosure Acts');
+    $this->background = 'Law2';
+    $this->policyConsequence = BONUS;
+    $this->initialSupport = -4;
+    $this->text = [
+      clienttranslate('Each family member on a prize now earns their family £1 during the Bonuses phase.'),
+    ];
   }
 }

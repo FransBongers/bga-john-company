@@ -80,4 +80,9 @@ class Scenario implements \JsonSerializable
   {
     return $this->startTurn;
   }
+
+  public function getPassedLaws()
+  {
+    return $this->passedLaws;
+  }
 }

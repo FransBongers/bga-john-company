@@ -20,6 +20,7 @@ import {
 
 const LOG_TOKEN_BOLD_TEXT = 'boldText';
 const LOG_TOKEN_BOLD_ITALIC_TEXT = 'boldItalicText';
+const LOG_TOKEN_ITALIC_TEXT = 'italicText';
 const LOG_TOKEN_NEW_LINE = 'newLine';
 const LOG_TOKEN_PLAYER_NAME = 'playerName';
 // Game specific
@@ -56,6 +57,8 @@ export const getTokenDiv = ({
       return tlpLogTokenText({ text: value });
     case LOG_TOKEN_BOLD_ITALIC_TEXT:
       return tlpLogTokenText({ text: value, italic: true });
+    case LOG_TOKEN_ITALIC_TEXT:
+      return tlpLogTokenText({ text: value, italic: true, bold: false });
     case LOG_TOKEN_CLIMATE:
       return tplLogTokenClimate(value);
     case LOG_TOKEN_ICON:

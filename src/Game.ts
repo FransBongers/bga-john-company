@@ -24,6 +24,7 @@ import {
 } from './boilerplate';
 import { ConfirmPartialTurn } from './boilerplate/states/ConfirmPartialTurn';
 import { ConfirmTurn } from './boilerplate/states/ConfirmTurn';
+import { LawCardsManager } from './cards/law-cards';
 import { LondonSeasonCardsManager } from './cards/london-season-cards';
 import { Company } from './company';
 import { CROWN_PLAYER_ID, SETUP } from './constants';
@@ -363,6 +364,7 @@ export class Game {
         return showAnimations && this.bga.gameui.bgaAnimationsActive();
       },
     });
+    LawCardsManager.create(this);
     LondonSeasonCardsManager.create(this);
 
     //  this.gameMap = new GameMap(this);

@@ -1,0 +1,178 @@
+@use 'sass:math';
+@use 'sass:map';
+
+.joco-law-card {
+  width: 225px;
+  aspect-ratio: 150 / 234;
+  background-image: url('img/law_cards.jpg');
+  background-size: 600% 100%;
+
+  .joco-header {
+    position: absolute;
+    top: 17px;
+    left: 5%;
+    width: 90%;
+    height: 24px;
+  }
+
+  .joco-title {
+    left: 5%;
+    width: 90%;
+    position: absolute;
+    top: 50px;
+    text-align: center;
+    line-height: 34px;
+    height: 68px;
+
+    // background-color: rgba(yellow, 0.5);
+  }
+
+  .fb-card-text {
+    position: absolute;
+    left: 5%;
+    width: 90%;
+    top: 120px;
+    height: 155px;
+    // background-color: lightblue;
+    text-align: center;
+  }
+
+  .joco-icon[data-icon='VoteClear'] {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 54px;
+    top: 287px;
+    left: 159px;
+
+    .joco-initial-support-icon {
+      height: 30px;
+    }
+  }
+
+  .joco-extra-action-icon {
+    position: absolute;
+    height: 60px;
+    top: 106px;
+    left: 8px;
+  }
+
+  .joco-extra-action-header {
+    position: absolute;
+    // background-color: yellow;
+    height: 20px;
+    width: 142px;
+    text-align: center;
+    top: 105px;
+    left: 80px;
+  }
+
+  .joco-extra-action-text {
+    position: absolute;
+    text-align: center;
+    // background-color: lightblue;
+    height: 44px;
+    width: 134px;
+    top: 125px;
+    left: 84px;
+  }
+
+  .joco-policy-icon {
+    position: absolute;
+    height: 60px;
+    top: 285px;
+    left: 20px;
+  }
+
+  &[data-background='Law1'] {
+    .joco-title {
+      top: 46px;
+      height: 54px;
+    }
+
+    .fb-card-text {
+      top: 173px;
+      height: 103px;
+    }
+  }
+}
+
+$bridgeCards: (
+  1: 'Dilemma1',
+  2: 'Dilemma2',
+  3: 'Law1',
+  4: 'Law2',
+  5: 'Law3',
+  6: 'LawBack',
+);
+
+$cols: 6;
+$rows: 1;
+
+@for $i from 1 through 6 {
+  $index: $i - 1;
+  $col: $index % $cols;
+  $row: math.floor(math.div($index, $cols));
+
+  .joco-law-card[data-background='#{map.get($bridgeCards,$i)}'] {
+    // For a sprite sheet with $cols columns and $rows rows where
+    // background-size is ($cols * 100%) by ($rows * 100%),
+    // positions run from 0% to 100% inclusive so the step is 100% / ($cols - 1) or ($rows - 1).
+    background-position-x: math.div($col * 100%, $cols - 1);
+    // background-position-y: math.div($row * 100%, $rows - 1);
+  }
+}
+
+// #law-card-LawCard_41-front,
+// #law-card-LawCard_43-front,
+// #law-card-LawCard_44-front,
+// #law-card-LawCard_45-front,
+// #law-card-LawCard_47-front,
+// #law-card-LawCard_51-front,
+// #law-card-LawCard_52-front,
+// #law-card-LawCard_55-front,
+// #law-card-LawCard_50-front {
+//   .joco-title {
+//     top: 50px;
+//     height: 68px;
+//     line-height: 34px;
+//   }
+
+//   .fb-card-text {
+//     top: 140px;
+//     height: 135px;
+//   }
+// }
+
+#law-card-LawCard_56-front {
+  .joco-title {
+    top: 48px;
+    height: 34px;
+  }
+
+  .fb-card-text {
+    top: 196px;
+    height: 152px;
+    // background-color: rgba(yellow, 0.5);
+  }
+
+  .joco-deregulation-1 {
+    position: absolute;
+    // background-color: rgba(yellow, 0.5);
+    height: 55px;
+    width: 90%;
+    top: 77px;
+    left: 5%;
+    text-align: center;
+  }
+  .joco-deregulation-2 {
+    position: absolute;
+    // background-color: rgba(lightblue, 0.5);
+    height: 60px;
+    width: 90px;
+    top: 135px;
+    left: 5%;
+    text-align: center;
+  }
+}
