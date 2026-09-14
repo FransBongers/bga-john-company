@@ -7,6 +7,7 @@
 //  .##....##..#######.....##....####.##......
 
 import { Board } from '../../board';
+import { createFamilyMember } from '../../board/utility';
 import {
   LUXURY,
   LUXURIES_COUNTER,
@@ -23,6 +24,9 @@ import {
   COMPANY_SHIP,
   CROWN_PLAYER_ID,
   PROMISE_CUBES_COUNTER,
+  COLOR_FAMILY_MAP,
+  CROWN,
+  HEX_COLOR_COLOR_MAP,
 } from '../../constants';
 import { CrownClimate } from '../../crown/climate';
 import { PlayerManager } from '../../player-manager';
@@ -558,14 +562,31 @@ export class NotificationManager {
     this.getPlayer(playerId).counters[FAMILY_MEMBERS_COUNTER].incValue(1);
   }
 
-  async notif_seekShare(notif: Notif<NotifSeekShare>) {
-    const { playerId, familyMember, amount } = notif.args;
+  async notif_seekShare(notif: NotifSeekShare) {
+    const { playerId, familyMember, amount } = notif;
+    const { familyId, location, id } = familyMember;
     await this.pay(playerId, amount);
 
-    await Board.getInstance().placeFamilyMembers(
-      [familyMember],
-      this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER],
+    // await Board.getInstance().placeFamilyMembers(
+    //   [familyMember],
+    //   this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER],
+    // );
+    const fromElement = this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER];
+    const toElement = document.getElementById(location)!;
+
+    const familyMemberElement = createFamilyMember(
+      familyId === CROWN
+        ? COLOR_FAMILY_MAP[
+            HEX_COLOR_COLOR_MAP[
+              PlayerManager.getInstance().getPlayer(CROWN_PLAYER_ID).getColor()
+            ]
+          ]
+        : familyId,
+      id,
     );
+    toElement.insertAdjacentElement('beforeend', familyMemberElement);
+
+    await this.game.animationManager.slideIn(familyMemberElement, fromElement);
   }
 
   async notif_setCrownClimate(notif: Notif<NotifSetCrownClimate>) {

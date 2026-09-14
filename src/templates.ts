@@ -7,6 +7,12 @@ export const tplPlayArea = () => `
   </div>
 `;
 
+export const tplFamilyMemberSpot = (id: string, backgroundElt?: string) => `
+  <div class="joco-family-member-spot" id="${id}">
+    ${backgroundElt ? `<div class="joco-family-member-spot-background-elt">${backgroundElt}</div>` : ''}
+  </div>
+`;
+
 export const tplCrownPlayerPanel = (name: string, color: string) => {
   return `<div id="overall_player_board_1" class="player-board">
             <div class="player_board_inner" id="player_board_inner_${color}">

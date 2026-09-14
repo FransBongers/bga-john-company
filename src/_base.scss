@@ -2,16 +2,30 @@ $selectable-color: yellow;
 $selected-color: blue;
 
 $player-purple: #c7b4e1;
+$player-purple-highlight: hsl(265, 43%, 89%);
+$player-purple-shadow: hsl(265, 43%, 69%);
 $player-purple-dark: #880064; 
 $player-blue: #99dae9;
+$player-blue-highlight: hsl(191, 65%, 86%);
+$player-blue-shadow: hsl(191, 65%, 66%);
 $player-blue-dark: #006480;
 $player-pink: #ffb1b9;
+$player-pink-highlight: hsl(354, 100%, 95%);
+$player-pink-shadow: hsl(354, 100%, 75%);
 $player-pink-dark: #cd3263;
 $player-gray: #dbd9d6;
+$player-gray-highlight: hsl(36, 6%, 95%);
+$player-gray-shadow: hsl(36, 6%, 75%);
 $player-gray-dark: #101820;
 $player-yellow: #f9e08d;
+$player-yellow-highlight: hsl(46, 90%, 86%);
+$player-yellow-shadow: hsl(46, 90%, 66%);
 $player-yellow-dark: #9d5e16;
+
 $player-green: #addb90;
+// 10 point
+$player-green-highlight: hsl(97, 51%, 81%);
+$player-green-shadow: hsl(97, 51%, 61%);
 $player-green-dark: #2b5135;
 
 $crown-red: #bd1f35;

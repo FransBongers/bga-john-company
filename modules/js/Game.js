@@ -11,12 +11,12 @@ class Bar {
         this.active = 0;
         this.config = [
             {
-                id: 'joco-london',
-                text: _('London'),
-            },
-            {
                 id: 'joco-company',
                 text: _('Company'),
+            },
+            {
+                id: 'joco-london',
+                text: _('London'),
             },
             {
                 id: 'joco-india',
@@ -229,7 +229,7 @@ const COMMANDER = 'Commander';
 const OFFICER = 'Officer';
 const OFFICER_IN_TRAINING = 'OfficerInTraining';
 const WRITER = 'Writer';
-const COURT_OF_DIRECTORS = 'CourtOfDirectors';
+const COURT_OF_DIRECTORS$1 = 'CourtOfDirectors';
 const BENGAL_DELHI_BORDER = 'Bengal_Delhi_border';
 const BENGAL_MARATHA_BORDER = 'Bengal_Maratha_border';
 const BOMBAY_DELHI_BORDER = 'Bombay_Delhi_border';
@@ -313,7 +313,7 @@ const STOCK_EXCHANGE_3_LEFT = 'StockExchange_3_Left';
 const STOCK_EXCHANGE_3_RIGHT = 'StockExchange_3_Right';
 const STOCK_EXCHANGE_4 = 'StockExchange_4';
 const STOCK_EXCHANGE_5 = 'StockExchange_5';
-const STOCK_EXCHANGE_POSITIONS = [
+const STOCK_EXCHANGE_POSITIONS$1 = [
     STOCK_EXCHANGE_2,
     STOCK_EXCHANGE_3_LEFT,
     STOCK_EXCHANGE_3_RIGHT,
@@ -336,6 +336,11 @@ const tplPlayArea = () => `
     <div id="joco-overlay">
       <div id="joco-bar"></div>
     </div>
+  </div>
+`;
+const tplFamilyMemberSpot = (id, backgroundElt) => `
+  <div class="joco-family-member-spot" id="${id}">
+    ${backgroundElt ? `<div class="joco-family-member-spot-background-elt">${backgroundElt}</div>` : ''}
   </div>
 `;
 const tplCrownPlayerPanel = (name, color) => {
@@ -456,16 +461,23 @@ const familyMemberSvgs = {
 };
 
 const createFamilyMember = (familyId, familyMemberId, extraClasses) => {
+    familyId =
+        familyId === CROWN
+            ? COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[PlayerManager.getInstance().getPlayer(CROWN_PLAYER_ID).getColor()]]
+            : familyId;
     const elt = document.createElement('div');
-    const familyMemberNumber = typeof familyMemberId === 'number' ? familyMemberId : Number(familyMemberId.split('_')[2]) % 18;
+    const familyMemberNumber = typeof familyMemberId === 'number'
+        ? familyMemberId
+        : Number(familyMemberId.split('_')[2]) % 18;
     elt.classList.add('joco-family-member');
+    elt.id = familyMemberId.toString();
     elt.insertAdjacentHTML('afterbegin', familyMemberSvgs[familyMemberNumber] ?? familyMemberSvgs[1]);
     (extraClasses || []).forEach((className) => elt.classList.add(className));
     elt.setAttribute('data-family', familyId);
     elt.setAttribute('data-number', `${familyMemberNumber}`);
     return elt;
 };
-const createShip = ({ name, type, fatigued, extraClasses }) => {
+const createShip = ({ name, type, fatigued, extraClasses, }) => {
     const elt = document.createElement('div');
     elt.classList.add('joco-ship');
     (extraClasses || []).forEach((className) => elt.classList.add(className));
@@ -561,7 +573,7 @@ class JocoPlayer {
         this.counters[CASH_COUNTER].setValue(gamedatas.families[this.familyId].treasury);
         this.counters[FAMILY_MEMBERS_COUNTER].setValue(Object.values(gamedatas.familyMembers).filter(({ familyId, location }) => familyId === this.familyId && location.startsWith('supply')).length);
         this.counters[SHARES_COUNTER].setValue(Object.values(gamedatas.familyMembers).filter(({ familyId, location }) => familyId === this.familyId &&
-            (location === COURT_OF_DIRECTORS || location === CHAIRMAN)).length);
+            (location === COURT_OF_DIRECTORS$1 || location === CHAIRMAN)).length);
         this.counters[SHIPYARDS_COUNTER].setValue(Object.values(gamedatas.enterprises).filter(({ type, location }) => type === SHIPYARD && location === this.familyId).length);
         this.counters[LUXURIES_COUNTER].setValue(Object.values(gamedatas.enterprises).filter(({ type, location }) => type === LUXURY && location === this.familyId).length);
         this.counters[WORKSHOPS_COUNTER].setValue(Object.values(gamedatas.enterprises).filter(({ type, location }) => type === WORKSHOP && location === this.familyId).length);
@@ -1305,7 +1317,6 @@ class Board {
         this.setupRegions(gamedatas);
         this.setupPawns(gamedatas);
         this.setupPowerTokens(gamedatas);
-        this.setupFamilyMembers(gamedatas);
         this.setupSelectBoxes();
         this.setupShips(gamedatas);
         this.setupTreasuries(gamedatas);
@@ -1326,7 +1337,7 @@ class Board {
                     .getColor()]]
                 : familyId, id);
             [
-                COURT_OF_DIRECTORS,
+                COURT_OF_DIRECTORS$1,
                 OFFICER_IN_TRAINING,
                 ...WRITER_LOCATIONS,
                 ...ARMIES,
@@ -1398,7 +1409,7 @@ class Board {
             setAbsolutePosition(elt, BOARD_SCALE, SEA_ZONE_SELECT_POSITIONS[seaZone]);
             this.ui.containers.selectBoxes.appendChild(elt);
         });
-        STOCK_EXCHANGE_POSITIONS.forEach((position) => {
+        STOCK_EXCHANGE_POSITIONS$1.forEach((position) => {
             const elt = (this.ui.selectBoxes[position] =
                 document.createElement('div'));
             elt.classList.add('joco-select-box');
@@ -1468,9 +1479,9 @@ class Board {
             }
             let position = { top: 0, left: 0 };
             switch (location) {
-                case COURT_OF_DIRECTORS:
-                    position = getCourtOfDirectorsPosition(this.familyMembers[COURT_OF_DIRECTORS].length);
-                    this.familyMembers[COURT_OF_DIRECTORS].push(familyMember);
+                case COURT_OF_DIRECTORS$1:
+                    position = getCourtOfDirectorsPosition(this.familyMembers[COURT_OF_DIRECTORS$1].length);
+                    this.familyMembers[COURT_OF_DIRECTORS$1].push(familyMember);
                     break;
                 case OFFICER_IN_TRAINING:
                     position = getOfficersInTrainingPosition(this.familyMembers[OFFICER_IN_TRAINING].length);
@@ -1551,7 +1562,7 @@ class Board {
             player.counters[FAMILY_MEMBERS_COUNTER].incValue(-1);
             this.updateFamilyMembers([familyMember]);
             await this.game.animationManager.slideIn(this.ui.familyMembers[id], fromElement);
-            if (familyMember.location === COURT_OF_DIRECTORS ||
+            if (familyMember.location === COURT_OF_DIRECTORS$1 ||
                 familyMember.location === CHAIRMAN) {
                 player.counters[SHARES_COUNTER].incValue(1);
             }
@@ -2068,9 +2079,16 @@ class NotificationManager {
         this.getPlayer(playerId).counters[FAMILY_MEMBERS_COUNTER].incValue(1);
     }
     async notif_seekShare(notif) {
-        const { playerId, familyMember, amount } = notif.args;
+        const { playerId, familyMember, amount } = notif;
+        const { familyId, location, id } = familyMember;
         await this.pay(playerId, amount);
-        await Board.getInstance().placeFamilyMembers([familyMember], this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER]);
+        const fromElement = this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER];
+        const toElement = document.getElementById(location);
+        const familyMemberElement = createFamilyMember(familyId === CROWN
+            ? COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[PlayerManager.getInstance().getPlayer(CROWN_PLAYER_ID).getColor()]]
+            : familyId, id);
+        toElement.insertAdjacentElement('beforeend', familyMemberElement);
+        await this.game.animationManager.slideIn(familyMemberElement, fromElement);
     }
     async notif_setCrownClimate(notif) {
         const { climate } = notif.args;
@@ -2389,16 +2407,37 @@ class LondonSeasonCardsManager extends BgaCards.Manager {
     }
 }
 
+const STOCK_EXCHANGE_CONFIG = [
+    { id: STOCK_EXCHANGE_2, value: 2 },
+    { id: STOCK_EXCHANGE_3_LEFT, value: 3 },
+    { id: STOCK_EXCHANGE_3_RIGHT, value: 3 },
+    { id: STOCK_EXCHANGE_4, value: 4 },
+    { id: STOCK_EXCHANGE_5, value: 5 },
+];
+const tplCourtOfDirectors = () => `
+  <div class="joco-court-of-directors-container joco-container">
+    <div id="joco-stock-exchange">
+      <div class="joco-header"><span>${'Stock Exchange'}</span></div>
+      <div class="stock-exchange-track">
+        ${STOCK_EXCHANGE_CONFIG.map((item) => `${tplFamilyMemberSpot(item.id, `<span>£${item.value}</span>`)}`).join('')}
+      </div>
+    </div>
+    <div id="joco-court-of-directors">
+      <div class="joco-header"><span>${'Court of Directors'}</span></div>
+      <div id="CourtOfDirectors" class="joco-court-of-directors-family-members"></div>
+    </div>
+  </div>
+`;
+
 const tplCompany = () => `
   <div id="joco-company" class="joco-tab">
+
+
     <div id="joco-company-standing">
       Company Standing
     </div>
     <div id="joco-company-debt">
       Company Debt
-    </div>
-    <div id="joco-court-of-directors">
-      Court of Directors
     </div>
     <div id="joco-offices">
       Offices
@@ -2411,6 +2450,9 @@ const tplCompany = () => `
 class Company {
     constructor(game) {
         this.game = game;
+        this.ui = {
+            stockExchange: {},
+        };
         this.game = game;
         this.setup(game.gamedatas);
     }
@@ -2420,10 +2462,35 @@ class Company {
     static getInstance() {
         return Company.instance;
     }
+    setupCourtOfDirectors(gamedatas) {
+        document
+            .getElementById('joco-company')
+            .insertAdjacentHTML('afterbegin', tplCourtOfDirectors());
+        this.ui.courtOfDirectors = document.getElementById('CourtOfDirectors');
+        STOCK_EXCHANGE_CONFIG.forEach((item) => {
+            this.ui.stockExchange[item.id] = document.getElementById(item.id);
+        });
+        this.updateCourtOfDirectors(gamedatas);
+    }
     setup(gamedatas) {
         document
             .getElementById('joco')
             .insertAdjacentHTML('afterbegin', tplCompany());
+        this.setupCourtOfDirectors(gamedatas);
+    }
+    updateCourtOfDirectors(gamedatas) {
+        Object.values(gamedatas.familyMembers).forEach((familyMember) => {
+            const { id, familyId, location } = familyMember;
+            if (STOCK_EXCHANGE_POSITIONS$1.includes(location)) {
+                const familyMemberElement = createFamilyMember(familyId, id);
+                this.ui.stockExchange[location].appendChild(familyMemberElement);
+            }
+            else if (location === COURT_OF_DIRECTORS$1) {
+                console.log(`Placing family member ${id} in Court of Directors`);
+                const familyMemberElement = createFamilyMember(familyId, id);
+                this.ui.courtOfDirectors?.appendChild(familyMemberElement);
+            }
+        });
     }
 }
 
@@ -5020,13 +5087,12 @@ class SeekShare {
             tkn_icon: WRITER,
         });
         Object.entries(this.args.options).forEach(([position, price]) => {
-            const box = Board.getInstance().ui.selectBoxes[position];
-            onClick(box, () => this.updateInterfaceConfirm(position, price));
+            onClick(position, () => this.updateInterfaceConfirm(position, price));
         });
     }
     updateInterfaceConfirm(position, price) {
         clearPossible();
-        setSelected(Board.getInstance().ui.selectBoxes[position]);
+        setSelected(position);
         updatePageTitle(_('Pay ${amount} ${tkn_pound} to seek a ${tkn_icon}?'), {
             amount: price,
             tkn_pound: _('Pounds'),

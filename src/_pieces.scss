@@ -1,21 +1,56 @@
 @use './base';
 
+.joco-family-member-spot {
+  position: relative;
+  border-radius: 50%;
+  height: 46px;
+  width: 39px;
+  // outline: 3px double black;
+  border: 3px double black;
+
+  .joco-family-member-spot-background-elt {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    // pointer-events: none !important;
+  }
+
+  // TODO: replace with images for border
+  &.selectable {
+    cursor: pointer;
+    outline: 4px solid base.$selectable-color;
+  }
+
+  &.selectable:hover,
+  &.selected {
+    cursor: pointer;
+    outline: 4px solid base.$selected-color;
+  }
+}
+
 .joco-family-member {
+  box-sizing: border-box;
   display: flex;
   justify-content: center;
   align-items: center;
-  position: absolute;
+  // position: absolute;
   border-radius: 50%;
-  height: calc(var(--tokenScale) * 46px);
-  width: calc(var(--tokenScale) * 39px);
-  outline: calc(var(--tokenScale) * 1px) solid black;
+  height: 46px;
+  width: 39px;
+  border: 2px solid black;
+
+  outline: 1px solid black;
   // transition-property: top, left;
   // transition-duration: 700ms;
   // transition-timing-function: ease;
 
   svg {
-    height: calc(var(--tokenScale) * 42px);
-    width: calc(var(--tokenScale) * 35px);
+    height: 42px;
+    width: 35px;
     pointer-events: none;
   }
 }
@@ -23,13 +58,20 @@
 .joco-family-member[data-family='Benyon'] {
   background-color: base.$player-pink;
   outline-color: base.$player-pink-dark;
+  border-color: base.$player-pink-highlight base.$player-pink-shadow
+    base.$player-pink-shadow base.$player-pink-highlight;
+
   svg {
     fill: base.$player-pink-dark;
   }
 }
+
 .joco-family-member[data-family='Hastings'] {
   background-color: base.$player-blue;
   outline-color: base.$player-blue-dark;
+  border-color: base.$player-blue-highlight base.$player-blue-shadow
+    base.$player-blue-shadow base.$player-blue-highlight;
+
   svg {
     fill: base.$player-blue-dark;
   }
@@ -37,13 +79,20 @@
 .joco-family-member[data-family='Larkins'] {
   background-color: base.$player-yellow;
   outline-color: base.$player-yellow-dark;
+  border-color: base.$player-yellow-highlight base.$player-yellow-shadow
+    base.$player-yellow-shadow base.$player-yellow-highlight;
+
   svg {
     fill: base.$player-yellow-dark;
   }
 }
+
 .joco-family-member[data-family='Paxton'] {
   background-color: base.$player-gray;
   outline-color: base.$player-gray-dark;
+  border-color: base.$player-gray-highlight base.$player-gray-shadow
+    base.$player-gray-shadow base.$player-gray-highlight;
+
   svg {
     fill: base.$player-gray-dark;
   }
@@ -51,16 +100,24 @@
 .joco-family-member[data-family='Sykes'] {
   background-color: base.$player-purple;
   outline-color: base.$player-purple-dark;
+  border-color: base.$player-purple-highlight base.$player-purple-shadow
+    base.$player-purple-shadow base.$player-purple-highlight;
+
   svg {
     fill: base.$player-purple-dark;
   }
 }
+
 .joco-family-member[data-family='Walsh'] {
   background-color: base.$player-green;
   outline-color: base.$player-green-dark;
   svg {
     fill: base.$player-green-dark;
   }
+
+  border-color: base.$player-green-highlight base.$player-green-shadow
+    base.$player-green-shadow base.$player-green-highlight;
+  // box-shadow: 0 0 0 1px #790000, 0px 1px 4px #0008;
 }
 
 // .joco-family-member[data-family='Crown'] {
@@ -73,28 +130,27 @@
 
 .joco-ship {
   position: absolute;
-  
+
   width: calc(var(--tokenScale) * 40px);
   height: calc(var(--tokenScale) * 36px);
   background-size: 100% 100%;
 }
 
-.joco-ship[data-type="CompanyShip"] {
+.joco-ship[data-type='CompanyShip'] {
   background-image: url('img/ship_company.png');
 }
 
-.joco-ship[data-type="ExtraShip"] {
+.joco-ship[data-type='ExtraShip'] {
   background-image: url('img/ship_extra.png');
 }
 
-.joco-ship[data-type="playerOwnedShip"] {
+.joco-ship[data-type='playerOwnedShip'] {
   background-image: url('img/ship_player.png');
 }
 
-.joco-ship[data-type="playerOwnedShip"][data-fatigued="1"] {
+.joco-ship[data-type='playerOwnedShip'][data-fatigued='1'] {
   background-image: url('img/ship_player_fatigued.png');
 }
-
 
 .joco-family-member.selectable {
   cursor: pointer;

@@ -21,8 +21,15 @@ a[style*='color: #c0c0c0'],
 a[style*='color:#c0c0c0'],
 span[style*='color: #c0c0c0'],
 span[style*='color:#c0c0c0'] {
-  text-shadow: 1px 0 0 black, 0 1px 0 black, -1px 0 0 black, 0 -1px 0 black,
-    1px 1px 0 black, -1px 1px 0 black, 1px -1px 0 black, -1px -1px 0 black !important;
+  text-shadow:
+    1px 0 0 black,
+    0 1px 0 black,
+    -1px 0 0 black,
+    0 -1px 0 black,
+    1px 1px 0 black,
+    -1px 1px 0 black,
+    1px -1px 0 black,
+    -1px -1px 0 black !important;
 }
 
 #logs .log.notif_newUndoableStep {
@@ -122,6 +129,10 @@ span[style*='color:#c0c0c0'] {
   --tokenScale: 0.6;
   --iconScale: 0.7;
   --cardScale: 0;
+
+  .joco-icon {
+    height: 34px;
+  }
 
   .joco-setup-card,
   .joco-new-line {

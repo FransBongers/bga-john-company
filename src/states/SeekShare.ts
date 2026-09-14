@@ -81,15 +81,14 @@ export class SeekShare implements GameState<OnEnteringSeekShareArgs> {
     );
 
     Object.entries(this.args.options).forEach(([position, price]) => {
-      const box = Board.getInstance().ui.selectBoxes[position];
-      onClick(box, () => this.updateInterfaceConfirm(position, price));
+      onClick(position, () => this.updateInterfaceConfirm(position, price));
     });
   }
 
   private updateInterfaceConfirm(position: string, price: number) {
     clearPossible();
 
-    setSelected(Board.getInstance().ui.selectBoxes[position]);
+    setSelected(position);
 
     updatePageTitle(_('Pay ${amount} ${tkn_pound} to seek a ${tkn_icon}?'), {
       amount: price,

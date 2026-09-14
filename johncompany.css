@@ -1151,6 +1151,41 @@ span[style*="color:#addb90"] {
   text-align: center;
 }
 
+.joco-container {
+  border: 3px double #000;
+  width: fit-content;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+#joco-company .joco-court-of-directors-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#joco-company .joco-court-of-directors-container #joco-stock-exchange {
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 4px;
+}
+#joco-company .joco-court-of-directors-container #joco-stock-exchange .stock-exchange-track {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  margin-top: 4px;
+}
+#joco-company .joco-court-of-directors-container #joco-court-of-directors {
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 4px;
+}
+#joco-company .joco-court-of-directors-container #joco-court-of-directors .joco-court-of-directors-family-members {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  min-height: 100px;
+}
+
 .joco-crown-climate-row {
   --iconScale: 1;
   width: 100%;
@@ -1482,25 +1517,52 @@ span[style*="color:#addb90"] {
   opacity: 0.5;
 }
 
-.joco-family-member {
+.joco-family-member-spot {
+  position: relative;
+  border-radius: 50%;
+  height: 46px;
+  width: 39px;
+  border: 3px double black;
+}
+.joco-family-member-spot .joco-family-member-spot-background-elt {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  position: absolute;
+}
+.joco-family-member-spot.selectable {
+  cursor: pointer;
+  outline: 4px solid yellow;
+}
+.joco-family-member-spot.selectable:hover, .joco-family-member-spot.selected {
+  cursor: pointer;
+  outline: 4px solid blue;
+}
+
+.joco-family-member {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   border-radius: 50%;
-  height: calc(var(--tokenScale) * 46px);
-  width: calc(var(--tokenScale) * 39px);
-  outline: calc(var(--tokenScale) * 1px) solid black;
+  height: 46px;
+  width: 39px;
+  border: 2px solid black;
+  outline: 1px solid black;
 }
 .joco-family-member svg {
-  height: calc(var(--tokenScale) * 42px);
-  width: calc(var(--tokenScale) * 35px);
+  height: 42px;
+  width: 35px;
   pointer-events: none;
 }
 
 .joco-family-member[data-family=Benyon] {
   background-color: #ffb1b9;
   outline-color: #cd3263;
+  border-color: hsl(354, 100%, 95%) hsl(354, 100%, 75%) hsl(354, 100%, 75%) hsl(354, 100%, 95%);
 }
 .joco-family-member[data-family=Benyon] svg {
   fill: #cd3263;
@@ -1509,6 +1571,7 @@ span[style*="color:#addb90"] {
 .joco-family-member[data-family=Hastings] {
   background-color: #99dae9;
   outline-color: #006480;
+  border-color: hsl(191, 65%, 86%) hsl(191, 65%, 66%) hsl(191, 65%, 66%) hsl(191, 65%, 86%);
 }
 .joco-family-member[data-family=Hastings] svg {
   fill: #006480;
@@ -1517,6 +1580,7 @@ span[style*="color:#addb90"] {
 .joco-family-member[data-family=Larkins] {
   background-color: #f9e08d;
   outline-color: #9d5e16;
+  border-color: hsl(46, 90%, 86%) hsl(46, 90%, 66%) hsl(46, 90%, 66%) hsl(46, 90%, 86%);
 }
 .joco-family-member[data-family=Larkins] svg {
   fill: #9d5e16;
@@ -1525,6 +1589,7 @@ span[style*="color:#addb90"] {
 .joco-family-member[data-family=Paxton] {
   background-color: #dbd9d6;
   outline-color: #101820;
+  border-color: hsl(36, 6%, 95%) hsl(36, 6%, 75%) hsl(36, 6%, 75%) hsl(36, 6%, 95%);
 }
 .joco-family-member[data-family=Paxton] svg {
   fill: #101820;
@@ -1533,6 +1598,7 @@ span[style*="color:#addb90"] {
 .joco-family-member[data-family=Sykes] {
   background-color: #c7b4e1;
   outline-color: #880064;
+  border-color: hsl(265, 43%, 89%) hsl(265, 43%, 69%) hsl(265, 43%, 69%) hsl(265, 43%, 89%);
 }
 .joco-family-member[data-family=Sykes] svg {
   fill: #880064;
@@ -1541,6 +1607,7 @@ span[style*="color:#addb90"] {
 .joco-family-member[data-family=Walsh] {
   background-color: #addb90;
   outline-color: #2b5135;
+  border-color: hsl(97, 51%, 81%) hsl(97, 51%, 61%) hsl(97, 51%, 61%) hsl(97, 51%, 81%);
 }
 .joco-family-member[data-family=Walsh] svg {
   fill: #2b5135;
@@ -1923,6 +1990,10 @@ span[style*="color:#c0c0c0"] {
   --tokenScale: 0.6;
   --iconScale: 0.7;
   --cardScale: 0;
+}
+#pagemaintitletext .joco-icon,
+#gameaction_status .joco-icon {
+  height: 34px;
 }
 #pagemaintitletext .joco-setup-card,
 #pagemaintitletext .joco-new-line,

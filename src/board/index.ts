@@ -214,7 +214,7 @@ export class Board {
     this.setupRegions(gamedatas);
     this.setupPawns(gamedatas);
     this.setupPowerTokens(gamedatas);
-    this.setupFamilyMembers(gamedatas);
+    // this.setupFamilyMembers(gamedatas);
     this.setupSelectBoxes();
     this.setupShips(gamedatas);
     this.setupTreasuries(gamedatas);
