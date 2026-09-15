@@ -16,6 +16,10 @@ export class Bar {
 
   private config = [
     {
+      id: 'joco-player-areas',
+      text: _('Player Areas'),
+    },
+    {
       id: 'joco-company',
       text: _('Company'),
     },
@@ -30,10 +34,6 @@ export class Bar {
     {
       id: 'joco-board',
       text: _('Board'),
-    },
-    {
-      id: 'joco-player-areas',
-      text: _('Player Areas'),
     },
     {
       id: 'joco-negotiation',

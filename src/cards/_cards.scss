@@ -1,3 +1,44 @@
+@use 'sass:math';
+@use 'sass:map';
+
+@use './enterprise-cards/enterpriseCards';
 @use './london-season-cards/londonSeasonCards';
 @use './law-cards/lawCards';
 @use './setup-cards/setupCards';
+
+.joco-small-card-horizontal {
+  height: 150px;
+  aspect-ratio: 610 / 400;
+  background-image: url('img/small_cards_horizontal.jpg');
+  background-size: 500% 200%;
+}
+
+$horizontalCards: (
+  1: 'Luxury',
+  2: 'Shipyard',
+  3: 'Workshop',
+  4: 'WorkshopInvested',
+  5: 'PromiseCardHastings',
+  6: 'PromiseCardWalsh',
+  7: 'PromiseCardBenyon',
+  8: 'PromiseCardSykes',
+  9: 'PromiseCardPaxton',
+  10: 'PromiseCardLarkins',
+);
+
+$cols: 5;
+$rows: 2;
+
+@for $i from 1 through 25 {
+  $index: $i - 1;
+  $col: $index % $cols;
+  $row: math.floor(math.div($index, $cols));
+
+  .joco-small-card-horizontal[data-background='#{map.get($horizontalCards,$i)}'] {
+    // For a sprite sheet with $cols columns and $rows rows where
+    // background-size is ($cols * 100%) by ($rows * 100%),
+    // positions run from 0% to 100% inclusive so the step is 100% / ($cols - 1) or ($rows - 1).
+    background-position-x: math.div($col * 100%, $cols - 1);
+    background-position-y: math.div($row * 100%, $rows - 1);
+  }
+}

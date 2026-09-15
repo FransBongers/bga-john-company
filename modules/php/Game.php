@@ -371,6 +371,7 @@ class Game extends \Bga\GameFramework\Table
             'ships' => Ships::getAll(),
             'passedLaws' => LawCards::getInLocationOrdered(PASSED_LAWS)->toArray(),
             'staticData' => [
+                'enterpriseCards' => Enterprises::getStaticUiData(),
                 'lawCards' => LawCards::getStaticUiData(),
                 'londonSeasonCards' => LondonSeasonCards::getStaticUiData(),
                 'offices' => Offices::getStaticUiData(),

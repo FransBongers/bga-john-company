@@ -9,6 +9,8 @@ import { tknShipValue } from './logs/templates';
 import { PlayerManager } from './player-manager';
 import { StaticData } from './static-data';
 import {
+  JocoEnterpriseCard,
+  JocoEnterpriseCardBase,
   JocoLawCard,
   JocoLawCardBase,
   JocoLondonSeasonCard,
@@ -49,11 +51,11 @@ export const getShipsLog = (ships: JocoShipBase[]) => {
   return shipsLog;
 };
 
-export const getLondonSeasonCard = (
-  card: JocoLondonSeasonCardBase,
-): JocoLondonSeasonCard => {
+export const getEnterpriseCard = (
+  card: JocoEnterpriseCardBase,
+): JocoEnterpriseCard => {
   const staticData = StaticData.get();
-  const cardStatic = staticData.londonSeasonCard(card.id);
+  const cardStatic = staticData.enterpriseCard(card.id);
   return {
     ...card,
     ...cardStatic,
@@ -63,6 +65,17 @@ export const getLondonSeasonCard = (
 export const getLawCard = (card: JocoLawCardBase): JocoLawCard => {
   const staticData = StaticData.get();
   const cardStatic = staticData.lawCard(card.id);
+  return {
+    ...card,
+    ...cardStatic,
+  };
+};
+
+export const getLondonSeasonCard = (
+  card: JocoLondonSeasonCardBase,
+): JocoLondonSeasonCard => {
+  const staticData = StaticData.get();
+  const cardStatic = staticData.londonSeasonCard(card.id);
   return {
     ...card,
     ...cardStatic,

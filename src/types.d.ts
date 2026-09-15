@@ -125,7 +125,7 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
     location: string;
     facing: string;
   };
-  enterprises: Record<string, JoCoEnterPriseBase>;
+  enterprises: Record<string, JocoEnterpriseCardBase>;
   families: Record<string, JocoFamily>;
   familyMembers: Record<string, JocoFamilyMember>;
   londonSeasonDisplay: JocoLondonSeasonCardBase[];
@@ -137,6 +137,7 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   regions: Record<string, JocoRegionBase>;
   ships: Record<string, JocoShipBase>;
   staticData: {
+    enterpriseCards: Record<string, JocoEnterpriseCardStatic>;
     lawCards: Record<string, JocoLawCardStatic>;
     londonSeasonCards: Record<string, JocoLondonSeasonCardStatic>;
     offices: Record<string, JocoOfficeStatic>;
@@ -240,13 +241,6 @@ type JocoSetupCardStatic = {
   items: Array<{ type: string; value?: string }>;
 };
 
-interface JoCoEnterPriseBase extends GamePiece {
-  invested: boolean;
-  shipId: string | null;
-  type: string;
-  used: boolean;
-}
-
 interface JohnCompanyPlayerData extends Player {
   draft: JoCoSetupCard[];
   familyId: string;
@@ -259,7 +253,11 @@ interface JohnCompanyPlayerData extends Player {
 
 export type GameAlias = Game;
 export type GamedatasAlias = JohnCompanyGamedatas;
+export type PlayerAlias = JohnCompanyPlayerData;
 
+/*
+ * London Season Cards
+ */
 export type JocoLondonSeasonCardType = 'Blackmail' | 'Prestige';
 
 export interface JocoLondonSeasonCardBase extends GamePiece {
@@ -281,6 +279,9 @@ export interface JocoLondonSeasonCardStatic {
 export type JocoLondonSeasonCard = JocoLondonSeasonCardBase &
   JocoLondonSeasonCardStatic;
 
+/*
+ * Law Cards
+ */
 export interface JocoLawCardBase extends GamePiece {}
 
 export interface JocoLawCardStatic {
@@ -296,3 +297,22 @@ export interface JocoLawCardStatic {
 }
 
 export type JocoLawCard = JocoLawCardBase & JocoLawCardStatic;
+
+/*
+ * Enterprises
+ */
+export interface JocoEnterpriseCardBase extends GamePiece {
+  invested: boolean;
+  shipId: string | null;
+  type: string;
+  used: boolean;
+}
+
+export interface JocoEnterpriseCardStatic {
+  name: string;
+  cost: number;
+  votes: number;
+}
+
+export type JocoEnterpriseCard = JocoEnterpriseCardBase &
+  JocoEnterpriseCardStatic;

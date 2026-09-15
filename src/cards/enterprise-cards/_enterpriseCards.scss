@@ -1,0 +1,31 @@
+.joco-enterprise-card {
+  .joco-title {
+    position: absolute;
+    // background-color: yellow;
+    top: 16px;
+    left: 42px;
+    height: 16px;
+    width: 135px;
+    text-align: center;
+  }
+
+  .joco-ship-first-letter {
+    position: absolute;
+    // background-color: yellow;
+    top: 48px;
+    left: 10px;
+    height: 30px;
+    width: 30px;
+    text-align: center;
+  }
+
+  .joco-ship-name {
+    position: absolute;
+    // background-color: yellow;
+    top: 110px;
+    left: 25px;
+    height: 28px;
+    width: 76px;
+    text-align: center;
+  }
+}

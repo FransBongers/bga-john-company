@@ -24,6 +24,7 @@ import {
 } from './boilerplate';
 import { ConfirmPartialTurn } from './boilerplate/states/ConfirmPartialTurn';
 import { ConfirmTurn } from './boilerplate/states/ConfirmTurn';
+import { EnterpriseCardsManager } from './cards/enterprise-cards';
 import { LawCardsManager } from './cards/law-cards';
 import { LondonSeasonCardsManager } from './cards/london-season-cards';
 import { Company } from './company';
@@ -364,12 +365,14 @@ export class Game {
         return showAnimations && this.bga.gameui.bgaAnimationsActive();
       },
     });
+    StaticData.create(this);
+    EnterpriseCardsManager.create(this);
     LawCardsManager.create(this);
     LondonSeasonCardsManager.create(this);
 
     //  this.gameMap = new GameMap(this);
     //  this.cardArea = new CardArea(this);
-    StaticData.create(this);
+    
     Interaction.create(this);
     PhaseTracker.create(this);
 

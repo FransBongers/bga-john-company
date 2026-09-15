@@ -36,6 +36,19 @@ class Enterprises extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     return new $className($data);
   }
 
+  /**
+   * getStaticUiData : return static data
+   */
+  public static function getStaticUiData()
+  {
+    $pieces = self::getAll()->toArray();
+
+    $data = [];
+    foreach ($pieces as $index => $piece) {
+      $data[$piece->getId()] = $piece->getStaticData();
+    }
+    return $data;
+  }
 
   // ..######..########.########.##.....##.########.
   // .##....##.##..........##....##.....##.##.....##

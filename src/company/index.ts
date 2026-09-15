@@ -88,7 +88,7 @@ export class Company {
         const familyMemberElement = createFamilyMember(familyId, id);
         this.ui.stockExchange[location].appendChild(familyMemberElement);
       } else if (location === COURT_OF_DIRECTORS) {
-        console.log(`Placing family member ${id} in Court of Directors`);
+
         const familyMemberElement = createFamilyMember(familyId, id);
         this.ui.courtOfDirectors?.appendChild(familyMemberElement);
       }

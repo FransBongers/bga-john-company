@@ -779,6 +779,31 @@ span[style*="color:#addb90"] {
   min-height: 100%;
 }
 
+.joco-enterprise-card .joco-title {
+  position: absolute;
+  top: 16px;
+  left: 42px;
+  height: 16px;
+  width: 135px;
+  text-align: center;
+}
+.joco-enterprise-card .joco-ship-first-letter {
+  position: absolute;
+  top: 48px;
+  left: 10px;
+  height: 30px;
+  width: 30px;
+  text-align: center;
+}
+.joco-enterprise-card .joco-ship-name {
+  position: absolute;
+  top: 110px;
+  left: 25px;
+  height: 28px;
+  width: 76px;
+  text-align: center;
+}
+
 .joco-card {
   width: 225px;
   aspect-ratio: 150/234;
@@ -1149,6 +1174,138 @@ span[style*="color:#addb90"] {
   top: 135px;
   left: 5%;
   text-align: center;
+}
+
+.joco-small-card-horizontal {
+  height: 150px;
+  aspect-ratio: 610/400;
+  background-image: url("img/small_cards_horizontal.jpg");
+  background-size: 500% 200%;
+}
+
+.joco-small-card-horizontal[data-background=Luxury] {
+  background-position-x: 0%;
+  background-position-y: 0%;
+}
+
+.joco-small-card-horizontal[data-background=Shipyard] {
+  background-position-x: 25%;
+  background-position-y: 0%;
+}
+
+.joco-small-card-horizontal[data-background=Workshop] {
+  background-position-x: 50%;
+  background-position-y: 0%;
+}
+
+.joco-small-card-horizontal[data-background=WorkshopInvested] {
+  background-position-x: 75%;
+  background-position-y: 0%;
+}
+
+.joco-small-card-horizontal[data-background=PromiseCardHastings] {
+  background-position-x: 100%;
+  background-position-y: 0%;
+}
+
+.joco-small-card-horizontal[data-background=PromiseCardWalsh] {
+  background-position-x: 0%;
+  background-position-y: 100%;
+}
+
+.joco-small-card-horizontal[data-background=PromiseCardBenyon] {
+  background-position-x: 25%;
+  background-position-y: 100%;
+}
+
+.joco-small-card-horizontal[data-background=PromiseCardSykes] {
+  background-position-x: 50%;
+  background-position-y: 100%;
+}
+
+.joco-small-card-horizontal[data-background=PromiseCardPaxton] {
+  background-position-x: 75%;
+  background-position-y: 100%;
+}
+
+.joco-small-card-horizontal[data-background=PromiseCardLarkins] {
+  background-position-x: 100%;
+  background-position-y: 100%;
+}
+
+.joco-small-card-horizontal[data-background=""] {
+  background-position-x: 0%;
+  background-position-y: 200%;
+}
+
+.joco-small-card-horizontal[data-background=""] {
+  background-position-x: 25%;
+  background-position-y: 200%;
+}
+
+.joco-small-card-horizontal[data-background=""] {
+  background-position-x: 50%;
+  background-position-y: 200%;
+}
+
+.joco-small-card-horizontal[data-background=""] {
+  background-position-x: 75%;
+  background-position-y: 200%;
+}
+
+.joco-small-card-horizontal[data-background=""] {
+  background-position-x: 100%;
+  background-position-y: 200%;
+}
+
+.joco-small-card-horizontal[data-background=""] {
+  background-position-x: 0%;
+  background-position-y: 300%;
+}
+
+.joco-small-card-horizontal[data-background=""] {
+  background-position-x: 25%;
+  background-position-y: 300%;
+}
+
+.joco-small-card-horizontal[data-background=""] {
+  background-position-x: 50%;
+  background-position-y: 300%;
+}
+
+.joco-small-card-horizontal[data-background=""] {
+  background-position-x: 75%;
+  background-position-y: 300%;
+}
+
+.joco-small-card-horizontal[data-background=""] {
+  background-position-x: 100%;
+  background-position-y: 300%;
+}
+
+.joco-small-card-horizontal[data-background=""] {
+  background-position-x: 0%;
+  background-position-y: 400%;
+}
+
+.joco-small-card-horizontal[data-background=""] {
+  background-position-x: 25%;
+  background-position-y: 400%;
+}
+
+.joco-small-card-horizontal[data-background=""] {
+  background-position-x: 50%;
+  background-position-y: 400%;
+}
+
+.joco-small-card-horizontal[data-background=""] {
+  background-position-x: 75%;
+  background-position-y: 400%;
+}
+
+.joco-small-card-horizontal[data-background=""] {
+  background-position-x: 100%;
+  background-position-y: 400%;
 }
 
 .joco-container {

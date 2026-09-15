@@ -6,6 +6,8 @@ import {
   JocoSetupCardStatic,
   JocoLondonSeasonCardStatic,
   JocoLawCardStatic,
+  JocoEnterpriseCardStatic,
+  JocoShipBase,
 } from '../types';
 
 export class StaticData {
@@ -33,6 +35,15 @@ export class StaticData {
   // .......##.##..........##....##.....##.##.......
   // .##....##.##..........##....##.....##.##.......
   // ..######..########....##.....#######..##.......
+
+  public enterpriseCard(id: string): JocoEnterpriseCardStatic {
+    const card =
+      this.staticData.enterpriseCards[id] ?? ({} as JocoEnterpriseCardStatic);
+    if (!card) {
+      throw new Error('STATIC_DATA_ERROR_001');
+    }
+    return card;
+  }
 
   public lawCard(id: string): JocoLawCardStatic {
     const card = this.staticData.lawCards[id] ?? ({} as JocoLawCardStatic);
@@ -86,5 +97,10 @@ export class StaticData {
 
   public setupCards(): JocoSetupCardStatic[] {
     return Object.values(this.staticData.setupCards);
+  }
+
+  public ship(id: string): JocoShipBase {
+    console.log('getting ship data for id:', id);
+    return this.game.gamedatas.ships[id];
   }
 }
