@@ -11,6 +11,29 @@
   width: calc(var(--leftColumnScale) * 1500px);
   // width: 100%;
   // aspect-ratio: 30 / 15;
+
+  .joco-order {
+    position: absolute;
+    border-radius: 50%;
+    height: calc(var(--leftColumnScale) * 46px);
+    width: calc(var(--leftColumnScale) * 39.5px);
+    // background-color: yellow;
+    // opacity: 0.5;
+    // box-shadow: 0px 0px 0px 4px base.$selectable-color !important;
+  }
+
+  .joco-order[data-status='closed'] {
+    background-color: black;
+  }
+
+  .joco-order[data-status='filled'] {
+    background-color: lightgray;
+  }
+
+  .joco-order.selected {
+    cursor: pointer;
+    outline: calc(var(--boardScale) * 4px) solid base.$selected-color;
+  }
 }
 
 #joco-select-boxes,
@@ -24,29 +47,6 @@
   position: absolute;
   top: 0;
   left: 0;
-}
-
-.joco-order {
-  position: absolute;
-  border-radius: 50%;
-  height: calc(var(--leftColumnScale) * 46px);
-  width: calc(var(--leftColumnScale) * 39.5px);
-  // background-color: yellow;
-  // opacity: 0.5;
-  // box-shadow: 0px 0px 0px 4px base.$selectable-color !important;
-}
-
-.joco-order[data-status='closed'] {
-  background-color: black;
-}
-
-.joco-order[data-status='filled'] {
-  background-color: lightgray;
-}
-
-.joco-order.selected {
-  cursor: pointer;
-  outline: calc(var(--boardScale) * 4px) solid base.$selected-color;
 }
 
 .joco_pawn {
@@ -315,27 +315,27 @@
   border-radius: calc(var(--boardScale) * 6px);
 }
 
-.joco-select-box.joco-office[data-office="DirectorOfTrade"] {
+.joco-select-box.joco-office[data-office='DirectorOfTrade'] {
   top: calc(var(--boardScale) * 660px);
   left: calc(var(--boardScale) * 418px);
 }
 
-.joco-select-box.joco-office[data-office="ManagerOfShipping"] {
+.joco-select-box.joco-office[data-office='ManagerOfShipping'] {
   top: calc(var(--boardScale) * 660px);
   left: calc(var(--boardScale) * 556px);
 }
 
-.joco-select-box.joco-office[data-office="PresidentOfBombay"] {
+.joco-select-box.joco-office[data-office='PresidentOfBombay'] {
   top: calc(var(--boardScale) * 660px);
   left: calc(var(--boardScale) * 829px);
 }
 
-.joco-select-box.joco-office[data-office="PresidentOfMadras"] {
+.joco-select-box.joco-office[data-office='PresidentOfMadras'] {
   top: calc(var(--boardScale) * 660px);
   left: calc(var(--boardScale) * 1019px);
 }
 
-.joco-select-box.joco-office[data-office="PresidentOfBengal"] {
+.joco-select-box.joco-office[data-office='PresidentOfBengal'] {
   top: calc(var(--boardScale) * 660px);
   left: calc(var(--boardScale) * 1208px);
 }

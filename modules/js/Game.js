@@ -11,6 +11,10 @@ class Bar {
         this.active = 0;
         this.config = [
             {
+                id: 'joco-india',
+                text: _('India'),
+            },
+            {
                 id: 'joco-player-areas',
                 text: _('Player Areas'),
             },
@@ -21,10 +25,6 @@ class Bar {
             {
                 id: 'joco-london',
                 text: _('London'),
-            },
-            {
-                id: 'joco-india',
-                text: _('India'),
             },
             {
                 id: 'joco-board',
@@ -336,6 +336,11 @@ const tplPlayArea = () => `
     <div id="joco-overlay">
       <div id="joco-bar"></div>
     </div>
+  </div>
+`;
+const tplAmount = (value, small = false) => `
+  <div class="fb-font-baskerville">
+    <span class="${small ? 'fb-font-8' : 'fb-font-16'} ">£</span><span class="${small ? 'fb-font-12' : 'fb-font-24'}">${value}</span>
   </div>
 `;
 const tplFamilyMemberSpot = (id, backgroundElt) => `
@@ -829,7 +834,7 @@ const createHtmlElement = (html) => {
     return template.content.firstChild;
 };
 
-const ORDERS_CONFIG = {
+const ORDERS_CONFIG$1 = {
     [ORDER_PUNJAB_1]: { top: 22.5, left: 933 },
     [ORDER_DELHI_1]: { top: 15, left: 1069 },
     [ORDER_DELHI_2]: { top: 47, left: 1158.5 },
@@ -1523,7 +1528,7 @@ class Board {
                 case ORDER_MYSORE_2:
                 case ORDER_MADRAS_1:
                 case ORDER_MADRAS_2:
-                    position = ORDERS_CONFIG[location];
+                    position = ORDERS_CONFIG$1[location];
                     break;
                 default:
                     position = FAMILY_MEMBER_OFFICE_CONFIG[location];
@@ -1572,7 +1577,7 @@ class Board {
     updateOrders(gamedatas) {
         this.ui.containers.orders.replaceChildren();
         Object.entries(gamedatas.orders).forEach(([orderId, order]) => {
-            setAbsolutePosition(this.ui.orders[orderId], BOARD_SCALE, ORDERS_CONFIG[orderId]);
+            setAbsolutePosition(this.ui.orders[orderId], BOARD_SCALE, ORDERS_CONFIG$1[orderId]);
             this.ui.orders[orderId].setAttribute('data-status', order.status);
             this.ui.containers.orders.appendChild(this.ui.orders[orderId]);
         });
@@ -1804,7 +1809,6 @@ class StaticData {
         return Object.values(this.staticData.setupCards);
     }
     ship(id) {
-        console.log('getting ship data for id:', id);
         return this.game.gamedatas.ships[id];
     }
 }
@@ -2457,7 +2461,7 @@ class LondonSeasonCardsManager extends BgaCards.Manager {
         div.classList.add('joco-card');
         div.setAttribute('data-background', card.background);
         if (div.children.length) {
-            console.log('Front div already has children, skipping setup.');
+            console.log('Front div already has children, skipping setup.', card.id);
             return;
         }
         const cardContent = tplLondonSeasonCardContent(card);
@@ -2560,21 +2564,109 @@ class Company {
     }
 }
 
+const ORDERS_CONFIG = {
+    [ORDER_PUNJAB_1]: { top: 40, left: 212 },
+    [ORDER_DELHI_1]: { top: 28, left: 425 },
+    [ORDER_DELHI_2]: { top: 79, left: 565 },
+    [ORDER_DELHI_3]: { top: 102, left: 377 },
+    [ORDER_BENGAL_1]: { top: 182, left: 749 },
+    [ORDER_BENGAL_2]: { top: 273, left: 902 },
+    [ORDER_BOMBAY_1]: { top: 145, left: 246 },
+    [ORDER_BOMBAY_2]: { top: 275, left: 312 },
+    [ORDER_BOMBAY_3]: { top: 370, left: 225 },
+    [ORDER_MARATHA_1]: { top: 176, left: 584 },
+    [ORDER_MARATHA_2]: { top: 281, left: 431 },
+    [ORDER_MARATHA_3]: { top: 348, left: 665 },
+    [ORDER_HYDERABAD_1]: { top: 476, left: 526 },
+    [ORDER_MYSORE_1]: { top: 544, left: 345 },
+    [ORDER_MYSORE_2]: { top: 632, left: 403 },
+    [ORDER_MADRAS_1]: { top: 629, left: 550 },
+    [ORDER_MADRAS_2]: { top: 706, left: 502 },
+};
+
+class Presidency {
+    constructor(config) {
+        this.id = config.id;
+        this.setup(config);
+    }
+    setup(config) {
+        const parentElement = typeof config.parentElement === 'string'
+            ? document.getElementById(config.parentElement)
+            : config.parentElement;
+        if (!parentElement) {
+            throw new Error('FE_PRESIDENCY_01');
+        }
+        parentElement.insertAdjacentHTML('beforeend', this.tplPresidency());
+        this.ui = {
+            parent: parentElement,
+            writers: document.getElementById(`${this.id}-writers`),
+        };
+    }
+    tplPresidency() {
+        return `
+      <div id="${this.id}" class="joco-presidency joco-container">
+        <div><span class="fb-font-baskerville fb-font-12">${this.getName()}</span></div>
+        <div>
+          <div>
+            <span class="fb-font-baskerville fb-font-12">${_('Writers').toLocaleUpperCase()}</span>
+          </div>
+          <div id="${this.id}-writers">
+          </div>
+        </div>
+      </div>
+    `;
+    }
+    addWriters(writers) {
+        writers.forEach((writer) => {
+            const writerElement = createFamilyMember(writer.familyId, writer.id);
+            this.ui.writers.appendChild(writerElement);
+        });
+    }
+    getName() {
+        switch (this.id) {
+            case BENGAL:
+                return 'Presidency of Bengal';
+            case BOMBAY:
+                return 'Presidency of Bombay';
+            case MADRAS:
+                return 'Presidency of Madras';
+            default:
+                return '';
+        }
+    }
+}
+
+const tplOrder = (orderId, { top, left }) => {
+    const staticData = StaticData.get().order(orderId);
+    return `<div id="${orderId}" class="joco-order" style="top: ${top}px; left: ${left}px;" data-is-home-port="${staticData.homePort !== null}">
+          <div class="joco-order-value">${tplAmount(staticData.value)}</div>
+          <div class="joco-filled-order-value">${tplAmount(staticData.filledValue, true)}</div>
+        </div>`;
+};
+const tplOrderToken = (type) => `
+  <div class="joco-order-token" data-type="${type}">
+    <div class="joco-text fb-font-parisienne fb-font-12 bga-autofit"><span>${type === 'filled' ? _('Filled') : _('Closed')}</span></div>
+  </div>
+`;
+
 const tplIndia = () => `
   <div id="joco-india" class="joco-tab">
     <div id="joco-india-map">
     </div>
+    <div id="joco-presidencies-and-armies">
+      
+      
+    </div>
     <div id="joco-armies">
       Armies
     </div>
-    <div id="joco-presidencies">
-      Presidencies
-    </div>
+
   </div>
 `;
 class India {
     constructor(game) {
         this.game = game;
+        this.presidencies = {};
         this.game = game;
         this.setup(game.gamedatas);
     }
@@ -2588,6 +2680,36 @@ class India {
         document
             .getElementById('joco')
             .insertAdjacentHTML('afterbegin', tplIndia());
+        this.ui = {
+            map: document.getElementById('joco-india-map'),
+            orders: {},
+        };
+        this.setupOrders(gamedatas);
+        const presidencyContainer = document.getElementById('joco-presidencies-and-armies');
+        [BOMBAY, MADRAS, BENGAL].forEach((presidency) => {
+            const presidencyInstance = new Presidency({
+                parentElement: presidencyContainer,
+                id: presidency,
+            });
+            this.presidencies[presidency] = presidencyInstance;
+            presidencyInstance.addWriters(Object.values(gamedatas.familyMembers).filter((member) => member.location === `Writers_${presidency}`));
+        });
+    }
+    setupOrders(gamedatas) {
+        Object.entries(ORDERS_CONFIG).forEach(([orderId, position]) => {
+            const elt = createHtmlElement(tplOrder(orderId, position));
+            this.ui.orders[orderId] = elt;
+            this.ui.map.appendChild(elt);
+        });
+        this.updateOrders(gamedatas);
+    }
+    updateOrders(gamedatas) {
+        Object.entries(gamedatas.orders).forEach(([orderId, order]) => {
+            if (order.status === 'open') {
+                return;
+            }
+            this.ui.orders[orderId].insertAdjacentHTML('beforeend', tplOrderToken(order.status));
+        });
     }
 }
 
@@ -2692,6 +2814,28 @@ const getSeaName = (seaId) => {
             return _('West Indian');
         case CHINA:
             return _('China');
+        default:
+            return '';
+    }
+};
+const getRegionName = (regionId) => {
+    switch (regionId) {
+        case 'BENGAL':
+            return _('Bengal');
+        case 'BOMBAY':
+            return _('Bombay');
+        case 'DELHI':
+            return _('Delhi');
+        case 'HYDERABAD':
+            return _('Hyderabad');
+        case 'MADRAS':
+            return _('Madras');
+        case 'MARATHA':
+            return _('Maratha');
+        case 'MYSORE':
+            return _('Mysore');
+        case 'PUNJAB':
+            return _('Punjab');
         default:
             return '';
     }

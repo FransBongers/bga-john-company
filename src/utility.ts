@@ -33,6 +33,29 @@ export const getSeaName = (seaId: string) => {
   }
 };
 
+export const getRegionName = (regionId: string) => {
+  switch (regionId) {
+    case 'BENGAL':
+      return _('Bengal');
+    case 'BOMBAY':
+      return _('Bombay');
+    case 'DELHI':
+      return _('Delhi');
+    case 'HYDERABAD':
+      return _('Hyderabad');
+    case 'MADRAS':
+      return _('Madras');
+    case 'MARATHA':
+      return _('Maratha');
+    case 'MYSORE':
+      return _('Mysore');
+    case 'PUNJAB':
+      return _('Punjab');
+    default:
+      return '';
+  }
+};
+
 export const getCrownPlayerName = () =>
   PlayerManager.getInstance().getPlayer(CROWN_PLAYER_ID).getName();
 

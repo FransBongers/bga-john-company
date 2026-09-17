@@ -7,6 +7,12 @@ export const tplPlayArea = () => `
   </div>
 `;
 
+export const tplAmount = (value: number | string, small = false) => `
+  <div class="fb-font-baskerville">
+    <span class="${small ? 'fb-font-8' : 'fb-font-16' } ">£</span><span class="${small ? 'fb-font-12' : 'fb-font-24'}">${value}</span>
+  </div>
+`
+
 export const tplFamilyMemberSpot = (id: string, backgroundElt?: string) => `
   <div class="joco-family-member-spot" id="${id}">
     ${backgroundElt ? `<div class="joco-family-member-spot-background-elt">${backgroundElt}</div>` : ''}

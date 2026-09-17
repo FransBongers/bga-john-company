@@ -4,7 +4,7 @@
  */
 
 import { Climate } from "../../crown/climate";
-import { JocoArmyPieceBase, JocoFamilyMember, JoCoOrder, JocoRegionBase, JocoShipBase } from "../../types";
+import { JocoArmyPieceBase, JocoFamilyMember, JoCoOrderBase, JocoRegionBase, JocoShipBase } from "../../types";
 
 export interface Log {
   log: string;
@@ -23,7 +23,7 @@ export interface NotifAllocateBalanceToOffice extends NotifWithPlayerArgs {
 }
 
 export interface NotifChangeOrderStatus extends NotifWithPlayerArgs {
-  order: JoCoOrder;
+  order: JoCoOrderBase;
 }
 
 export interface NotifCompanyOperationChairman extends NotifWithPlayerArgs {
@@ -53,7 +53,7 @@ export interface NotifEnlistFamilyMember extends NotifWithPlayerArgs {
 
 export interface NotifFillOrder extends NotifWithPlayerArgs {
   amount: number;
-  order: JoCoOrder;
+  order: JoCoOrderBase;
   from: string | null;
   familyMember: JocoFamilyMember | null;
 }

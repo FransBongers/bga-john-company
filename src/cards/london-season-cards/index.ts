@@ -43,7 +43,7 @@ export class LondonSeasonCardsManager extends BgaCards.Manager<JocoLondonSeasonC
     div.setAttribute('data-background', card.background);
 
     if (div.children.length) {
-      console.log('Front div already has children, skipping setup.');
+      console.log('Front div already has children, skipping setup.', card.id);
       return;
     }
     const cardContent = tplLondonSeasonCardContent(card);

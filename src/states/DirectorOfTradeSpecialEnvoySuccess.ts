@@ -10,10 +10,10 @@ import {
   addCancelButton,
   performAction,
 } from '../boilerplate';
-import { CommonStateArgs, GameAlias, GameState, JoCoOrder } from '../types';
+import { CommonStateArgs, GameAlias, GameState, JoCoOrderBase } from '../types';
 
 interface OnEnteringDirectorOfTradeSpecialEnvoySuccessArgs extends CommonStateArgs {
-  closedOrders: JoCoOrder[];
+  closedOrders: JoCoOrderBase[];
 }
 
 export class DirectorOfTradeSpecialEnvoySuccess implements GameState<OnEnteringDirectorOfTradeSpecialEnvoySuccessArgs> {
@@ -88,7 +88,7 @@ export class DirectorOfTradeSpecialEnvoySuccess implements GameState<OnEnteringD
     // addCancelButton();
   }
 
-  private updateInterfaceConfirm(order: JoCoOrder) {
+  private updateInterfaceConfirm(order: JoCoOrderBase) {
     clearPossible();
 
     updatePageTitle(_('Open closed order in ${region}?'), {
@@ -108,7 +108,7 @@ export class DirectorOfTradeSpecialEnvoySuccess implements GameState<OnEnteringD
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  private performAction(order: JoCoOrder, perform: boolean = false) {
+  private performAction(order: JoCoOrderBase, perform: boolean = false) {
     performAction('actDirectorOfTradeSpecialEnvoySuccess', {
       orderId: order.id,
       perform,

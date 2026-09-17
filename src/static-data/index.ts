@@ -100,7 +100,6 @@ export class StaticData {
   }
 
   public ship(id: string): JocoShipBase {
-    console.log('getting ship data for id:', id);
     return this.game.gamedatas.ships[id];
   }
 }

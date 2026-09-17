@@ -130,7 +130,7 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   familyMembers: Record<string, JocoFamilyMember>;
   londonSeasonDisplay: JocoLondonSeasonCardBase[];
   offices: Record<string, JoCoOfficeBase>;
-  orders: Record<string, JoCoOrder>;
+  orders: Record<string, JoCoOrderBase>;
   passedLaws: JocoLawCardBase[];
   phase: string;
   powerTokens: string[];
@@ -184,21 +184,6 @@ interface JoCoOfficeBase extends GamePiece {
 interface JocoOfficeStatic {
   hirePriority: number;
   title: string;
-}
-
-interface JoCoOrder {
-  id: string;
-  location: string;
-  status: 'open' | 'closed' | 'filled' | 'string';
-}
-
-interface JoCoOrderStatic {
-  connectedOrders: string[];
-  filledValue: number;
-  homePort: string | null;
-  northenPriority: number;
-  regionId: string;
-  value: number;
 }
 
 interface JocoArmyPieceBase extends GamePiece {
@@ -316,3 +301,21 @@ export interface JocoEnterpriseCardStatic {
 
 export type JocoEnterpriseCard = JocoEnterpriseCardBase &
   JocoEnterpriseCardStatic;
+
+/**
+ * Orders
+ */
+interface JoCoOrderBase {
+  id: string;
+  location: string;
+  status: 'open' | 'closed' | 'filled';// | 'string';
+}
+
+interface JoCoOrderStatic {
+  connectedOrders: string[];
+  filledValue: number;
+  homePort: string | null;
+  northenPriority: number;
+  regionId: string;
+  value: number;
+}

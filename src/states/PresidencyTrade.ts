@@ -16,7 +16,7 @@ import {
   updatePageTitle,
 } from '../boilerplate';
 import { StaticData } from '../static-data';
-import { JoCoOrder, JocoRegionBase, GameAlias } from '../types';
+import { JoCoOrderBase, JocoRegionBase, GameAlias } from '../types';
 
 interface OnEnteringPresidencyTradeArgs extends CommonStateArgs {
   treasury: number;
@@ -25,7 +25,7 @@ interface OnEnteringPresidencyTradeArgs extends CommonStateArgs {
   options: {
     homePortOrderId: string;
     homeRegionId: string;
-    orders: Record<string, JoCoOrder>;
+    orders: Record<string, JoCoOrderBase>;
     regions: Record<string, JocoRegionBase>;
   };
 }

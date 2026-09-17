@@ -15,7 +15,7 @@ import { FILLED, OPEN } from '../constants';
 import { StaticData } from '../static-data';
 import type {
   CommonStateArgs,
-  JoCoOrder,
+  JoCoOrderBase,
   JocoFamilyMember,
   GameAlias,
 } from '../types';
@@ -23,7 +23,7 @@ import type {
 interface OnEnteringPresidencyTradeFillOrdersArgs extends CommonStateArgs {
   homePortOrderId: string;
   companyBalance: number;
-  orders: Record<string, JoCoOrder>;
+  orders: Record<string, JoCoOrderBase>;
   writers: JocoFamilyMember[];
   numberOfOrdersToFill: number;
 }
