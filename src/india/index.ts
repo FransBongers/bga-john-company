@@ -9,14 +9,16 @@ import {
 } from '../constants';
 import { StaticData } from '../static-data';
 import { tplAmount } from '../templates';
-import { GameAlias, GamedatasAlias } from '../types';
+import { GameAlias, GamedatasAlias, JocoRegionBase } from '../types';
 import { ORDERS_CONFIG } from './config';
 import { Presidency } from './presidency';
+import { Region } from './region';
 import { tplOrder, tplOrderToken } from './templates';
 
 const tplIndia = () => `
   <div id="joco-india" class="joco-tab">
     <div id="joco-india-map">
+      <div id="joco-elephant"></div>
     </div>
     <div id="joco-presidencies-and-armies">
       
@@ -32,9 +34,12 @@ const tplIndia = () => `
 export class India {
   private static instance: India;
   private presidencies: Record<string, Presidency> = {};
+  private regions: Record<string, Region> = {};
+
   private ui: {
     map: HTMLElement;
     orders: Record<string, HTMLElement>;
+    elephant: HTMLElement;
   };
   constructor(private game: GameAlias) {
     this.game = game;
@@ -65,9 +70,11 @@ export class India {
     this.ui = {
       map: document.getElementById('joco-india-map')!,
       orders: {},
+      elephant: document.getElementById('joco-elephant')!,
     };
 
     this.setupOrders(gamedatas);
+    this.setupRegions(gamedatas);
 
     const presidencyContainer = document.getElementById(
       'joco-presidencies-and-armies',
@@ -85,6 +92,8 @@ export class India {
         ),
       );
     });
+
+    this.updateElephant(gamedatas.elephant);
   }
 
   private setupOrders(gamedatas: GamedatasAlias) {
@@ -97,6 +106,12 @@ export class India {
     this.updateOrders(gamedatas);
   }
 
+  private setupRegions(gamedatas: GamedatasAlias) {
+    Object.values(gamedatas.regions).forEach((region: JocoRegionBase) => {
+      this.regions[region.id] = new Region(region.id, this.game, region);
+    });
+  }
+
   // .##.....##.########..########.....###....########.########....##.....##.####
   // .##.....##.##.....##.##.....##...##.##......##....##..........##.....##..##.
   // .##.....##.##.....##.##.....##..##...##.....##....##..........##.....##..##.
@@ -104,6 +119,11 @@ export class India {
   // .##.....##.##........##.....##.#########....##....##..........##.....##..##.
   // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
   // ..#######..##........########..##.....##....##....########.....#######..####
+
+  updateElephant({ location, facing }: { location: string; facing: string }) {
+    this.ui.elephant.setAttribute('data-location', location);
+    this.ui.elephant.setAttribute('data-facing', facing);
+  }
 
   private updateOrders(gamedatas: GamedatasAlias) {
     // this.ui.orders[ORDER_MADRAS_2].appendChild(

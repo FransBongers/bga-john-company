@@ -9,5 +9,5 @@ export const tplBoard = (gamedatas: GamedatasAlias ) => `<div id="joco-board">
   <div id="joco_towers"></div>
   <div id="joco_treasuries"></div>
   <div id="joco-select-boxes"></div>
-  <div id="joco-elephant"></div>
+  <div id="joco-elephant-old"></div>
 </div>`

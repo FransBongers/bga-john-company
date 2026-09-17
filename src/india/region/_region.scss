@@ -1,0 +1,118 @@
+@use '../../base';
+
+.joco-tower {
+  // --towerScale: 1;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  width: fit-content;
+  align-items: center;
+
+  &:has(> :only-child) {
+    padding-bottom: 7px;
+  }
+}
+
+.joco-tower-level {
+  background-image: url('img/tower_level.png');
+  width: 62px;
+  // height: 41px;
+  aspect-ratio: 45 / 41;
+  background-size: 100% 100%;
+  margin-top: -37px;
+
+  @for $i from 2 through 6 {
+    &:nth-child(#{$i}) {
+      z-index: 7 - $i;
+    }
+  }
+
+  &.hidden {
+    display: none;
+  }
+}
+
+.joco-tower-top {
+  background-image: url('img/tower_top.png');
+  width: 85px;
+  // height: 40px;
+  aspect-ratio: 59 / 40;
+  background-size: 100% 100%;
+  z-index: 6;
+}
+
+.joco-tower-flag {
+  position: absolute;
+  box-sizing: border-box;
+  border: 2px solid black;
+  width: 15px;
+  height: 20px;
+  top: -10px;
+  left: 35px;
+  background-color: whitesmoke;
+  display: flex;
+  justify-content: center;
+}
+
+.joco-tower-top[data-empire='false'] {
+  .joco-tower-flag {
+    display: none;
+  }
+}
+
+.joco-tower-top[data-capital='false'] {
+  .joco-tower-flag {
+    span {
+      display: none;
+    }
+  }
+}
+
+.joco-tower-top[data-empire-id='Bengal'] {
+  .joco-tower-flag {
+    background-color: base.$bengal-color;
+  }
+}
+
+.joco-tower-top[data-empire-id='Bombay'] {
+  .joco-tower-flag {
+    background-color: base.$bombay-color;
+  }
+}
+
+.joco-tower-top[data-empire-id='Delhi'] {
+  .joco-tower-flag {
+    background-color: base.$delhi-color;
+  }
+}
+
+.joco-tower-top[data-empire-id='Hyderabad'] {
+  .joco-tower-flag {
+    background-color: base.$hyderabad-color;
+  }
+}
+
+.joco-tower-top[data-empire-id='Madras'] {
+  .joco-tower-flag {
+    background-color: base.$madras-color;
+  }
+}
+
+.joco-tower-top[data-empire-id='Maratha'] {
+  .joco-tower-flag {
+    background-color: base.$maratha-color;
+  }
+}
+
+.joco-tower-top[data-empire-id='Mysore'] {
+  .joco-tower-flag {
+    background-color: base.$mysore-color;
+  }
+}
+
+.joco-tower-top[data-empire-id='Punjab'] {
+  .joco-tower-flag {
+    background-color: base.$punjab-color;
+  }
+}

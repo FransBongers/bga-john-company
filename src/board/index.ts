@@ -114,7 +114,7 @@ export class Board {
       treasuries: HTMLElement;
     };
     armyPieces: Record<string, HTMLElement>;
-    elephant: HTMLElement;
+    // elephant: HTMLElement;
     familyMembers: Record<string, HTMLElement>;
     orders: Record<string, HTMLElement>;
     ships: Record<string, HTMLElement>;
@@ -200,7 +200,7 @@ export class Board {
         treasuries: document.getElementById('joco_treasuries'),
       },
       armyPieces: {},
-      elephant: document.getElementById('joco-elephant'),
+      // elephant: document.getElementById('joco-elephant'),
       familyMembers: {},
       orders: {},
       selectBoxes: {},
@@ -209,9 +209,9 @@ export class Board {
 
     // this.ui.containers.board.insertAdjacentHTML('afterbegin', familyMember);
     this.setupArmyPieces(gamedatas);
-    this.updateElephant(gamedatas.elephant);
-    this.setupOrders(gamedatas);
-    this.setupRegions(gamedatas);
+    // this.updateElephant(gamedatas.elephant);
+    // this.setupOrders(gamedatas);
+    // this.setupRegions(gamedatas);
     this.setupPawns(gamedatas);
     this.setupPowerTokens(gamedatas);
     // this.setupFamilyMembers(gamedatas);
@@ -275,21 +275,21 @@ export class Board {
     this.updateFamilyMembers(Object.values(gamedatas.familyMembers));
   }
 
-  private setupOrders(gamedatas: GamedatasAlias) {
-    Object.keys(gamedatas.orders).forEach((orderId) => {
-      const elt = (this.ui.orders[orderId] = document.createElement('div'));
-      // elt.id = orderId;
-      elt.classList.add('joco-order');
-      elt.id = orderId;
-    });
-    this.updateOrders(gamedatas);
-  }
+  // private setupOrders(gamedatas: GamedatasAlias) {
+  //   Object.keys(gamedatas.orders).forEach((orderId) => {
+  //     const elt = (this.ui.orders[orderId] = document.createElement('div'));
+  //     // elt.id = orderId;
+  //     elt.classList.add('joco-order');
+  //     elt.id = orderId;
+  //   });
+  //   this.updateOrders(gamedatas);
+  // }
 
-  private setupRegions(gamedatas: GamedatasAlias) {
-    Object.values(gamedatas.regions).forEach((region: JocoRegionBase) => {
-      this.regions[region.id] = new Region(region.id, this.game, region);
-    });
-  }
+  // private setupRegions(gamedatas: GamedatasAlias) {
+  //   Object.values(gamedatas.regions).forEach((region: JocoRegionBase) => {
+  //     this.regions[region.id] = new Region(region.id, this.game, region);
+  //   });
+  // }
 
   private setupPawns(gamedatas: GamedatasAlias) {
     ['balance', 'standing', 'debt', 'turn', 'phase'].forEach((pawn) => {
@@ -427,10 +427,10 @@ export class Board {
     });
   }
 
-  updateElephant({ location, facing }: { location: string; facing: string }) {
-    this.ui.elephant.setAttribute('data-location', location);
-    this.ui.elephant.setAttribute('data-facing', facing);
-  }
+  // updateElephant({ location, facing }: { location: string; facing: string }) {
+  //   this.ui.elephant.setAttribute('data-location', location);
+  //   this.ui.elephant.setAttribute('data-facing', facing);
+  // }
 
   updateFamilyMembers(familyMembers: JocoFamilyMember[]) {
     familyMembers.forEach((familyMember) => {

@@ -1,0 +1,224 @@
+.joco_elephant,
+#joco-elephant {
+  position: absolute;
+  background-image: url('img/elephant.svg');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  // height: 51px;
+  width: 70px;
+  aspect-ratio: 60/51;
+  z-index: 1;
+  // transition:
+  //   transform 500ms ease-in-out,
+  //   top 500ms ease-in-out,
+  //   left 500ms ease-in-out;
+}
+
+#joco-elephant[data-location='Bengal'] {
+  top: 105px;
+  left: 791px;
+  transform: scaleX(-1);
+}
+
+#joco-elephant[data-location='Bombay'] {
+  top: 242px;
+  left: 156px;
+}
+
+#joco-elephant[data-location='Delhi'] {
+  top: 58px;
+  left: 314px;
+}
+
+#joco-elephant[data-location='Hyderabad'] {
+  top: 412px;
+  left: 461px;
+  transform: scaleX(-1);
+}
+
+#joco-elephant[data-location='Madras'] {
+  top: 283px;
+  left: 479px;
+}
+
+#joco-elephant[data-location='Maratha'] {
+  top: 276px;
+  left: 567px;
+  transform: scaleX(-1);
+}
+
+#joco-elephant[data-location='Mysore'] {
+  top: 721px;
+  left: 386px;
+}
+
+#joco-elephant[data-location='Punjab'] {
+  top: 4px;
+  left: 142px;
+}
+
+#joco-elephant[data-location='Bengal_Delhi_border'] {
+  top: 79px;
+  left: 696px;
+
+  &[data-facing='Bengal'] {
+    transform: rotate(7deg);
+  }
+
+  &[data-facing='Delhi'] {
+    transform: scaleX(-1) rotate(-38deg);
+  }
+}
+
+#joco-elephant[data-location='Bengal_Maratha_border'] {
+  top: 237px;
+  left: 682px;
+
+  &[data-facing='Bengal'] {
+    transform: rotate(-56deg);
+  }
+
+  &[data-facing='Maratha'] {
+    transform: scaleX(-1) rotate(31deg);
+  }
+}
+
+#joco-elephant[data-location='Bombay_Delhi_border'] {
+  top: 90px;
+  left: 276px;
+
+  &[data-facing='Bombay'] {
+    transform: scaleX(-1) rotate(34deg);
+  }
+
+  &[data-facing='Delhi'] {
+    transform: rotate(-56deg);
+  }
+}
+
+#joco-elephant[data-location='Bombay_Hyderabad_border'] {
+  top: 349px;
+  left: 316px;
+
+  &[data-facing='Bombay'] {
+    transform: scaleX(-1) rotate(-24deg);
+  }
+
+  &[data-facing='Hyderabad'] {
+    transform: rotate(4deg);
+  }
+}
+
+#joco-elephant[data-location='Bombay_Maratha_border'] {
+  top: 208px;
+  left: 332px;
+
+  &[data-facing='Bombay'] {
+    transform: scaleX(-1) rotate(-4deg);
+  }
+
+  &[data-facing='Maratha'] {
+    transform: rotate(-4deg);
+  }
+}
+
+#joco-elephant[data-location='Bombay_Mysore_border'] {
+  top: 528px;
+  left: 278px;
+
+  &[data-facing='Bombay'] {
+    transform: scaleX(-1) rotate(-77deg);
+  }
+
+  &[data-facing='Mysore'] {
+    transform: rotate(40deg);
+  }
+}
+
+#joco-elephant[data-location='Bombay_Punjab_border'] {
+  top: 134px;
+  left: 174px;
+
+  &[data-facing='Bombay'] {
+    transform: rotate(45deg);
+  }
+
+  &[data-facing='Punjab'] {
+    transform: scaleX(-1) rotate(-77deg);
+  }
+}
+
+#joco-elephant[data-location='Delhi_Maratha_border'] {
+  top: 125px;
+  left: 528px;
+
+  &[data-facing='Delhi'] {
+    transform: scaleX(-1) rotate(-75deg);
+  }
+
+  &[data-facing='Maratha'] {
+    transform: rotate(41deg);
+  }
+}
+
+#joco-elephant[data-location='Delhi_Punjab_border'] {
+  top: 5px;
+  left: 282px;
+
+  &[data-facing='Delhi'] {
+    transform: rotate(9deg);
+  }
+
+  &[data-facing='Punjab'] {
+    transform: scaleX(-1) rotate(-26deg);
+  }
+}
+
+#joco-elephant[data-location='Hyderabad_Madras_border'] {
+  top: 546px;
+  left: 482px;
+
+  &[data-facing='Hyderabad'] {
+    transform: rotate(-78deg);
+  }
+
+  &[data-facing='Madras'] {
+    transform: scaleX(-1) rotate(52deg);
+  }
+}
+
+#joco-elephant[data-location='Hyderabad_Maratha_border'] {
+  top: 364px;
+  left: 506px;
+
+  &[data-facing='Hyderabad'] {
+    transform: scaleX(-1) rotate(23deg);
+  }
+
+  &[data-facing='Maratha'] {
+    transform: rotate(-56deg);
+  }
+}
+
+#joco-elephant[data-location='Hyderabad_Mysore_border'] {
+  top: 510px;
+  left: 404px;
+  z-index: 10;
+
+  &[data-facing='Hyderabad'] {
+    transform: rotate(-44deg);
+  }
+
+  &[data-facing='Mysore'] {
+    transform: scaleX(-1) rotate(32deg);
+  }
+}
+
+#joco-elephant[data-location='Madras_Mysore_border'] {
+  top: 736px;
+  left: 420px;
+
+  &[data-facing='Mysore'] {
+    transform: scaleX(-1);
+  }
+}

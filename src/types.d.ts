@@ -190,19 +190,6 @@ interface JocoArmyPieceBase extends GamePiece {
   exhausted: boolean;
 }
 
-interface JocoRegionBase {
-  id: string;
-  control: string | null;
-  looted: boolean;
-  strength: number;
-  unrest: number;
-  isCapital: boolean;
-}
-
-interface JocoRegionStatic {
-  name: string;
-}
-
 type OtherShipType = 'ExtraShip' | 'CompanyShip';
 
 interface JocoShipBase extends GamePiece {
@@ -308,7 +295,7 @@ export type JocoEnterpriseCard = JocoEnterpriseCardBase &
 interface JoCoOrderBase {
   id: string;
   location: string;
-  status: 'open' | 'closed' | 'filled';// | 'string';
+  status: 'open' | 'closed' | 'filled'; // | 'string';
 }
 
 interface JoCoOrderStatic {
@@ -318,4 +305,20 @@ interface JoCoOrderStatic {
   northenPriority: number;
   regionId: string;
   value: number;
+}
+
+/**
+ * Regions
+ */
+interface JocoRegionBase {
+  id: string;
+  control: string | null;
+  looted: boolean;
+  strength: number;
+  unrest: number;
+  isCapital: boolean;
+}
+
+interface JocoRegionStatic {
+  name: string;
 }

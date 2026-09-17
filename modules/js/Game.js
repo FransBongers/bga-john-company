@@ -1101,81 +1101,6 @@ const SEA_ZONE_SELECT_POSITIONS = {
     [EAST_INDIAN]: { top: 301, left: 1317 },
 };
 
-class Region {
-    constructor(id, game, data) {
-        this.id = id;
-        this.game = game;
-        this.data = data;
-        this.setup(data);
-    }
-    setup(data) {
-        const elt = (this.tower = document.createElement('div'));
-        elt.classList.add('joco_tower');
-        elt.style.bottom = `calc(var(--boardScale) * ${towerConfig[data.id].bottom}px)`;
-        elt.style.left = `calc(var(--boardScale) * ${towerConfig[data.id].left}px)`;
-        const towerTop = document.createElement('div');
-        towerTop.classList.add('joco-tower-top');
-        elt.appendChild(towerTop);
-        const flagElt = document.createElement('div');
-        flagElt.classList.add('joco-tower-flag');
-        towerTop.appendChild(flagElt);
-        const spanWithStar = document.createElement('span');
-        flagElt.appendChild(spanWithStar);
-        spanWithStar.innerText = '*';
-        for (let i = 0; i < 6; i++) {
-            const towerLevel = document.createElement('div');
-            towerLevel.classList.add('joco_tower_level');
-            elt.appendChild(towerLevel);
-        }
-        document.getElementById('joco_towers').appendChild(elt);
-        this.updateStrength(data.strength);
-        this.updateCapital(data.isCapital);
-        this.updateEmpire(data.isCapital, data.control);
-    }
-    update(region) {
-        if (this.data.strength !== region.strength) {
-            this.updateStrength(region.strength);
-        }
-        if (this.data.isCapital !== region.isCapital) {
-            this.updateCapital(region.isCapital);
-        }
-        if (this.data.control !== region.control) {
-            this.updateEmpire(region.isCapital, region.control);
-        }
-    }
-    updateCapital(isCapital) {
-        this.data.isCapital = isCapital;
-        this.tower.children[0].setAttribute('data-capital', isCapital ? 'true' : 'false');
-        if (isCapital) {
-            this.updateEmpire(isCapital, null);
-        }
-    }
-    updateEmpire(isCapital, control) {
-        this.data.control = control;
-        const isPartOfEmpire = isCapital || (control !== null && !PRESIDENCIES.includes(control));
-        this.tower.children[0].setAttribute('data-empire', isPartOfEmpire ? 'true' : 'false');
-        if (isPartOfEmpire) {
-            this.tower.children[0].setAttribute('data-empire-id', isCapital ? this.id : control);
-        }
-    }
-    updateStrength(value) {
-        this.data.strength = value;
-        const children = this.tower.children;
-        for (let i = 0; i < children.length; i++) {
-            const child = children[i];
-            if (i > value) {
-                child.classList.add('hidden');
-            }
-            else {
-                child.classList.remove('hidden');
-            }
-        }
-    }
-    updateUnrest(value) {
-        this.data.unrest = value;
-    }
-}
-
 const tplBoard = (gamedatas) => `<div id="joco-board">
   <div id="joco-family-members"></div>
   <div id="joco-orders"></div>
@@ -1185,7 +1110,7 @@ const tplBoard = (gamedatas) => `<div id="joco-board">
   <div id="joco_towers"></div>
   <div id="joco_treasuries"></div>
   <div id="joco-select-boxes"></div>
-  <div id="joco-elephant"></div>
+  <div id="joco-elephant-old"></div>
 </div>`;
 
 const tplTreasury = (office, { top, left }) => `
@@ -1310,16 +1235,12 @@ class Board {
                 treasuries: document.getElementById('joco_treasuries'),
             },
             armyPieces: {},
-            elephant: document.getElementById('joco-elephant'),
             familyMembers: {},
             orders: {},
             selectBoxes: {},
             ships: {},
         };
         this.setupArmyPieces(gamedatas);
-        this.updateElephant(gamedatas.elephant);
-        this.setupOrders(gamedatas);
-        this.setupRegions(gamedatas);
         this.setupPawns(gamedatas);
         this.setupPowerTokens(gamedatas);
         this.setupSelectBoxes();
@@ -1351,19 +1272,6 @@ class Board {
             });
         });
         this.updateFamilyMembers(Object.values(gamedatas.familyMembers));
-    }
-    setupOrders(gamedatas) {
-        Object.keys(gamedatas.orders).forEach((orderId) => {
-            const elt = (this.ui.orders[orderId] = document.createElement('div'));
-            elt.classList.add('joco-order');
-            elt.id = orderId;
-        });
-        this.updateOrders(gamedatas);
-    }
-    setupRegions(gamedatas) {
-        Object.values(gamedatas.regions).forEach((region) => {
-            this.regions[region.id] = new Region(region.id, this.game, region);
-        });
     }
     setupPawns(gamedatas) {
         ['balance', 'standing', 'debt', 'turn', 'phase'].forEach((pawn) => {
@@ -1468,10 +1376,6 @@ class Board {
                 this.armies.regiments[piece.location].push(piece);
             }
         });
-    }
-    updateElephant({ location, facing }) {
-        this.ui.elephant.setAttribute('data-location', location);
-        this.ui.elephant.setAttribute('data-facing', facing);
     }
     updateFamilyMembers(familyMembers) {
         familyMembers.forEach((familyMember) => {
@@ -2636,6 +2540,86 @@ class Presidency {
     }
 }
 
+const TOWER_CONFIG = {
+    [BENGAL]: { bottom: 697, left: 849 },
+    [BOMBAY]: { bottom: 409, left: 245 },
+    [DELHI]: { bottom: 838, left: 609 },
+    [HYDERABAD]: { bottom: 396, left: 378 },
+    [MADRAS]: { bottom: 82, left: 489 },
+    [MARATHA]: { bottom: 697, left: 466 },
+    [MYSORE]: { bottom: 207, left: 290 },
+    [PUNJAB]: { bottom: 815, left: 84 },
+};
+
+const tplTowerLevel = () => `
+<div class="joco-tower-level"></div>`;
+const tplTowerTop = () => `
+<div class="joco-tower-top">
+  <div class="joco-tower-flag">
+    <span>*</span>
+  </div>
+</div>`;
+
+class Region {
+    constructor(id, game, data) {
+        this.id = id;
+        this.game = game;
+        this.data = data;
+        this.setup(data);
+    }
+    setup(data) {
+        const elt = (this.tower = document.createElement('div'));
+        elt.id = `joco-tower-${data.id}`;
+        elt.classList.add('joco-tower');
+        elt.style.bottom = `${TOWER_CONFIG[data.id].bottom}px`;
+        elt.style.left = `${TOWER_CONFIG[data.id].left}px`;
+        this.towerTop = createHtmlElement(tplTowerTop());
+        elt.appendChild(this.towerTop);
+        document.getElementById('joco-india-map').appendChild(elt);
+        this.updateStrength(data.strength);
+        this.updateCapital(data.isCapital);
+        this.updateEmpire(data.isCapital, data.control);
+    }
+    update(region) {
+        if (this.data.strength !== region.strength) {
+            this.updateStrength(region.strength);
+        }
+        if (this.data.isCapital !== region.isCapital) {
+            this.updateCapital(region.isCapital);
+        }
+        if (this.data.control !== region.control) {
+            this.updateEmpire(region.isCapital, region.control);
+        }
+    }
+    updateCapital(isCapital) {
+        this.data.isCapital = isCapital;
+        this.tower.children[0].setAttribute('data-capital', isCapital ? 'true' : 'false');
+        if (isCapital) {
+            this.updateEmpire(isCapital, null);
+        }
+    }
+    updateEmpire(isCapital, control) {
+        this.data.control = control;
+        const isPartOfEmpire = isCapital || (control !== null && !PRESIDENCIES.includes(control));
+        this.tower.children[0].setAttribute('data-empire', isPartOfEmpire ? 'true' : 'false');
+        if (isPartOfEmpire) {
+            this.tower.children[0].setAttribute('data-empire-id', isCapital ? this.id : control);
+        }
+    }
+    updateStrength(value) {
+        this.data.strength = value;
+        this.tower.querySelectorAll('.joco-tower-level').forEach((level) => {
+            level.remove();
+        });
+        for (let i = 0; i < value; i++) {
+            this.tower.insertAdjacentHTML('beforeend', tplTowerLevel());
+        }
+    }
+    updateUnrest(value) {
+        this.data.unrest = value;
+    }
+}
+
 const tplOrder = (orderId, { top, left }) => {
     const staticData = StaticData.get().order(orderId);
     return `<div id="${orderId}" class="joco-order" style="top: ${top}px; left: ${left}px;" data-is-home-port="${staticData.homePort !== null}">
@@ -2652,6 +2636,7 @@ const tplOrderToken = (type) => `
 const tplIndia = () => `
   <div id="joco-india" class="joco-tab">
     <div id="joco-india-map">
+      <div id="joco-elephant"></div>
     </div>
     <div id="joco-presidencies-and-armies">
       
@@ -2667,6 +2652,7 @@ class India {
     constructor(game) {
         this.game = game;
         this.presidencies = {};
+        this.regions = {};
         this.game = game;
         this.setup(game.gamedatas);
     }
@@ -2683,8 +2669,10 @@ class India {
         this.ui = {
             map: document.getElementById('joco-india-map'),
             orders: {},
+            elephant: document.getElementById('joco-elephant'),
         };
         this.setupOrders(gamedatas);
+        this.setupRegions(gamedatas);
         const presidencyContainer = document.getElementById('joco-presidencies-and-armies');
         [BOMBAY, MADRAS, BENGAL].forEach((presidency) => {
             const presidencyInstance = new Presidency({
@@ -2694,6 +2682,7 @@ class India {
             this.presidencies[presidency] = presidencyInstance;
             presidencyInstance.addWriters(Object.values(gamedatas.familyMembers).filter((member) => member.location === `Writers_${presidency}`));
         });
+        this.updateElephant(gamedatas.elephant);
     }
     setupOrders(gamedatas) {
         Object.entries(ORDERS_CONFIG).forEach(([orderId, position]) => {
@@ -2702,6 +2691,15 @@ class India {
             this.ui.map.appendChild(elt);
         });
         this.updateOrders(gamedatas);
+    }
+    setupRegions(gamedatas) {
+        Object.values(gamedatas.regions).forEach((region) => {
+            this.regions[region.id] = new Region(region.id, this.game, region);
+        });
+    }
+    updateElephant({ location, facing }) {
+        this.ui.elephant.setAttribute('data-location', location);
+        this.ui.elephant.setAttribute('data-facing', facing);
     }
     updateOrders(gamedatas) {
         Object.entries(gamedatas.orders).forEach(([orderId, order]) => {
