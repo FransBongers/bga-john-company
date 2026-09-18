@@ -11,6 +11,18 @@
 @import url("https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Parisienne&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap");
+.joco-background-bombay {
+  background-color: #a1b4ab;
+}
+
+.joco-background-madras {
+  background-color: #e9ca92;
+}
+
+.joco-background-bengal {
+  background-color: #b47860;
+}
+
 #joco-bar {
   background-color: transparent;
   height: 52px;
@@ -45,6 +57,15 @@
   outline: 2px solid black;
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
 #joco-board {
   --boardScale: var(--leftColumnScale);
   --tokenScale: var(--leftColumnScale);
@@ -104,17 +125,6 @@
 
 .joco_pawn[data-color=silver] {
   background-image: url("img/pawn_silver.svg");
-}
-
-.joco-regiment {
-  box-sizing: border-box;
-  position: absolute;
-  background-image: url("img/regiment.jpg");
-  background-size: 100% 100%;
-  width: calc(var(--tokenScale) * 35px);
-  height: calc(var(--tokenScale) * 35px);
-  border: calc(var(--tokenScale) * 1px) solid black;
-  border-radius: 12%;
 }
 
 .joco-power-token {
@@ -258,7 +268,6 @@
   left: calc(var(--boardScale) * 1208px);
 }
 
-.joco-regiment.selectable,
 .joco-order.selectable,
 .joco-select-box.selectable {
   cursor: pointer;
@@ -266,8 +275,6 @@
   outline: calc(var(--boardScale) * 4px) solid yellow !important;
 }
 
-.joco-regiment.selected,
-.joco-regiment.selectable:hover,
 .joco-order.selected,
 .joco-order.selectable:hover,
 .joco-select-box.selected,
@@ -493,6 +500,9 @@ span[style*="color:#addb90"] {
   height: 28px;
   width: 76px;
   text-align: center;
+}
+.joco-enterprise-card .joco-ship {
+  width: 103px;
 }
 
 .joco-card {
@@ -1365,6 +1375,15 @@ span[style*="color:#addb90"] {
   opacity: 0.5;
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
 .joco-family-member-spot {
   position: relative;
   border-radius: 50%;
@@ -1412,7 +1431,7 @@ span[style*="color:#addb90"] {
 .joco-family-member[data-family=Benyon] {
   background-color: #ffb1b9;
   outline-color: #cd3263;
-  border-color: hsl(354, 100%, 95%) hsl(354, 100%, 75%) hsl(354, 100%, 75%) hsl(354, 100%, 95%);
+  border-color: hsl(354, 100%, 95%) hsl(354, 100%, 95%) hsl(354, 100%, 75%) hsl(354, 100%, 75%);
 }
 .joco-family-member[data-family=Benyon] svg {
   fill: #cd3263;
@@ -1421,7 +1440,7 @@ span[style*="color:#addb90"] {
 .joco-family-member[data-family=Hastings] {
   background-color: #99dae9;
   outline-color: #006480;
-  border-color: hsl(191, 65%, 86%) hsl(191, 65%, 66%) hsl(191, 65%, 66%) hsl(191, 65%, 86%);
+  border-color: hsl(191, 65%, 86%) hsl(191, 65%, 86%) hsl(191, 65%, 66%) hsl(191, 65%, 66%);
 }
 .joco-family-member[data-family=Hastings] svg {
   fill: #006480;
@@ -1430,7 +1449,7 @@ span[style*="color:#addb90"] {
 .joco-family-member[data-family=Larkins] {
   background-color: #f9e08d;
   outline-color: #9d5e16;
-  border-color: hsl(46, 90%, 86%) hsl(46, 90%, 66%) hsl(46, 90%, 66%) hsl(46, 90%, 86%);
+  border-color: hsl(46, 90%, 86%) hsl(46, 90%, 86%) hsl(46, 90%, 66%) hsl(46, 90%, 66%);
 }
 .joco-family-member[data-family=Larkins] svg {
   fill: #9d5e16;
@@ -1439,7 +1458,7 @@ span[style*="color:#addb90"] {
 .joco-family-member[data-family=Paxton] {
   background-color: #dbd9d6;
   outline-color: #101820;
-  border-color: hsl(36, 6%, 95%) hsl(36, 6%, 75%) hsl(36, 6%, 75%) hsl(36, 6%, 95%);
+  border-color: hsl(36, 6%, 95%) hsl(36, 6%, 95%) hsl(36, 6%, 75%) hsl(36, 6%, 75%);
 }
 .joco-family-member[data-family=Paxton] svg {
   fill: #101820;
@@ -1448,7 +1467,7 @@ span[style*="color:#addb90"] {
 .joco-family-member[data-family=Sykes] {
   background-color: #c7b4e1;
   outline-color: #880064;
-  border-color: hsl(265, 43%, 89%) hsl(265, 43%, 69%) hsl(265, 43%, 69%) hsl(265, 43%, 89%);
+  border-color: hsl(265, 43%, 89%) hsl(265, 43%, 89%) hsl(265, 43%, 69%) hsl(265, 43%, 69%);
 }
 .joco-family-member[data-family=Sykes] svg {
   fill: #880064;
@@ -1457,33 +1476,10 @@ span[style*="color:#addb90"] {
 .joco-family-member[data-family=Walsh] {
   background-color: #addb90;
   outline-color: #2b5135;
-  border-color: hsl(97, 51%, 81%) hsl(97, 51%, 61%) hsl(97, 51%, 61%) hsl(97, 51%, 81%);
+  border-color: hsl(97, 51%, 81%) hsl(97, 51%, 81%) hsl(97, 51%, 61%) hsl(97, 51%, 61%);
 }
 .joco-family-member[data-family=Walsh] svg {
   fill: #2b5135;
-}
-
-.joco-ship {
-  position: absolute;
-  width: calc(var(--tokenScale) * 40px);
-  height: calc(var(--tokenScale) * 36px);
-  background-size: 100% 100%;
-}
-
-.joco-ship[data-type=CompanyShip] {
-  background-image: url("img/ship_company.png");
-}
-
-.joco-ship[data-type=ExtraShip] {
-  background-image: url("img/ship_extra.png");
-}
-
-.joco-ship[data-type=playerOwnedShip] {
-  background-image: url("img/ship_player.png");
-}
-
-.joco-ship[data-type=playerOwnedShip][data-fatigued="1"] {
-  background-image: url("img/ship_player_fatigued.png");
 }
 
 .joco-family-member.selectable {
@@ -1510,6 +1506,35 @@ span[style*="color:#addb90"] {
   cursor: pointer;
   filter: drop-shadow(calc(var(--tokenScale) * 4px) 0px 0px blue) drop-shadow(calc(var(--tokenScale) * -4px) 0px 0px blue) drop-shadow(0px calc(var(--tokenScale) * 4px) 0px blue) drop-shadow(0px calc(var(--tokenScale) * -4px) 0px blue);
   z-index: 1;
+}
+
+.joco-regiment {
+  box-sizing: border-box;
+  position: absolute;
+  background-image: url("img/regiment.jpg");
+  background-size: 100% 100%;
+  width: 40px;
+  aspect-ratio: 1/1;
+  border-radius: 12%;
+  outline: 1px solid black;
+  border: 2px solid black;
+  border-color: #e6d3d1 #e6d3d1 #c2938f #c2938f;
+}
+
+.joco-regiment.selectable,
+.joco-order.selectable {
+  cursor: pointer;
+  display: block;
+  outline: 4px solid yellow !important;
+}
+
+.joco-regiment.selected,
+.joco-regiment.selectable:hover,
+.joco-order.selected,
+.joco-order.selectable:hover {
+  cursor: pointer;
+  display: block;
+  outline: 4px solid blue !important;
 }
 
 .joco-player-area {
@@ -1561,6 +1586,15 @@ span[style*="color:#addb90"] {
   gap: 4px;
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
 .joco-setup-card {
   height: calc(var(--cardScale) * 228px);
   width: calc(var(--cardScale) * 150px);
@@ -1731,6 +1765,49 @@ span[style*="color:#addb90"] {
   background-position-x: 33.3333333333%;
   background-position-y: 100%;
   background-size: 400% 300%;
+}
+
+.joco-ship {
+  width: 50px;
+  aspect-ratio: 40/36;
+  background-size: 100% 100%;
+  box-shadow: none !important;
+}
+.joco-ship .joco-ship-name {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 70%;
+  height: 30%;
+  left: 5%;
+  width: 90%;
+  text-align: center;
+  font-size: 50%;
+}
+.joco-ship .joco-ship-fatigued {
+  position: absolute;
+  font-size: 23%;
+  top: 60%;
+  height: 10%;
+  width: 10%;
+  left: 21%;
+}
+
+.joco-ship[data-type=CompanyShip] {
+  background-image: url("img/ship_company.png");
+}
+
+.joco-ship[data-type=ExtraShip] {
+  background-image: url("img/ship_extra.png");
+}
+
+.joco-ship[data-type=playerOwnedShip] {
+  background-image: url("img/ship_player.png");
+}
+
+.joco-ship[data-type=playerOwnedShip][data-fatigued="1"] {
+  background-image: url("img/ship_player_fatigued.png");
 }
 
 /* ------- UNDO TURN ------- */
@@ -1910,6 +1987,29 @@ span[style*="color:#c0c0c0"] {
   background-size: 100% 100%;
   height: calc(var(--tokenScale) * 50px);
   width: calc(var(--tokenScale) * 50px);
+}
+
+.joco-army {
+  box-sizing: border-box;
+  width: 100%;
+}
+.joco-army.joco-container {
+  padding: 0;
+}
+.joco-army .joco-army-banner {
+  padding: 4px 8px;
+}
+.joco-army .joco-army-stock {
+  min-height: 84px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.joco-army .joco-inner-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
 }
 
 .joco_elephant,
@@ -2107,6 +2207,15 @@ span[style*="color:#c0c0c0"] {
   transform: scaleX(-1);
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
 .joco-tower {
   position: absolute;
   display: flex;
@@ -2206,10 +2315,37 @@ span[style*="color:#c0c0c0"] {
   background-color: #8a8e99;
 }
 
-#joco-india {
+.joco-sea-zone {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 4px;
+  position: absolute;
+  width: 200px;
+}
+.joco-sea-zone .joco-ship-stock {
+  min-height: 45px;
+}
+.joco-sea-zone[data-zone=westIndian] {
+  top: 750px;
+  left: 125px;
+}
+.joco-sea-zone[data-zone=southIndian] {
+  top: 775px;
+  left: 665px;
+}
+.joco-sea-zone[data-zone=eastIndian] {
+  top: 565px;
+  left: 780px;
+}
+
+#joco-india {
+  width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 #joco-india #joco-india-map {
   position: relative;
@@ -2244,9 +2380,39 @@ span[style*="color:#c0c0c0"] {
   left: 58px;
 }
 #joco-india #joco-presidencies-and-armies {
+  box-sizing: border-box;
+  align-self: stretch;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 12px;
+}
+#joco-india #joco-presidencies-and-armies .joco-presidency {
+  box-sizing: border-box;
+  width: 100%;
+}
+#joco-india #joco-presidencies-and-armies .joco-presidency.joco-container {
+  padding: 0;
+}
+#joco-india #joco-presidencies-and-armies .joco-presidency .joco-header {
+  padding: 8px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+#joco-india #joco-presidencies-and-armies .joco-presidency .joco-treasury-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+}
+#joco-india #joco-presidencies-and-armies .joco-presidency .joco-inner-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+}
+#joco-india #joco-presidencies-and-armies .joco-presidency .joco-writers-stock {
+  min-height: 50px;
 }
 
 .joco-order-token {

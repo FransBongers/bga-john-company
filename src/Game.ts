@@ -68,6 +68,7 @@ import {
 } from './states';
 import { StaticData } from './static-data';
 import { tplPlayArea, tplCrownPlayerPanel } from './templates';
+import { ShipsManager } from './token-managers/ship-tokens';
 import { JohnCompanyGamedatas, GamedatasAlias } from './types';
 
 // declare const define; // TODO: check if we comment here or in bga-animations module?
@@ -369,6 +370,7 @@ export class Game {
     EnterpriseCardsManager.create(this);
     LawCardsManager.create(this);
     LondonSeasonCardsManager.create(this);
+    ShipsManager.create(this);
 
     //  this.gameMap = new GameMap(this);
     //  this.cardArea = new CardArea(this);

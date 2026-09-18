@@ -6,13 +6,17 @@ import {
   BENGAL,
   ORDER_MADRAS_2,
   ORDER_HYDERABAD_1,
+  WEST_INDIAN,
+  SEA_ZONES,
 } from '../constants';
 import { StaticData } from '../static-data';
 import { tplAmount } from '../templates';
 import { GameAlias, GamedatasAlias, JocoRegionBase } from '../types';
+import { Army } from './army';
 import { ORDERS_CONFIG } from './config';
 import { Presidency } from './presidency';
 import { Region } from './region';
+import { ShipZone } from './ship-zone';
 import { tplOrder, tplOrderToken } from './templates';
 
 const tplIndia = () => `
@@ -33,6 +37,7 @@ const tplIndia = () => `
 
 export class India {
   private static instance: India;
+  private armies: Record<string, Army> = {};
   private presidencies: Record<string, Presidency> = {};
   private regions: Record<string, Region> = {};
 
@@ -73,14 +78,37 @@ export class India {
       elephant: document.getElementById('joco-elephant')!,
     };
 
+    this.setupPresidencies(gamedatas);
+    this.setupArmies(gamedatas);
+
     this.setupOrders(gamedatas);
     this.setupRegions(gamedatas);
+    this.setupShipZones(gamedatas);
 
+    this.updateElephant(gamedatas.elephant);
+  }
+
+  private setupArmies(gamedatas: GamedatasAlias) {
+    const presidencyContainer = document.getElementById(
+      'joco-presidencies-and-armies',
+    );
+    [BOMBAY, MADRAS, BENGAL].forEach((army) => {
+      const armyInstance = new Army({
+        parentElement: presidencyContainer!,
+        id: army,
+        gamedatas,
+      });
+      this.armies[army] = armyInstance;
+    });
+  }
+
+  private setupPresidencies(gamedatas: GamedatasAlias) {
     const presidencyContainer = document.getElementById(
       'joco-presidencies-and-armies',
     );
     [BOMBAY, MADRAS, BENGAL].forEach((presidency) => {
       const presidencyInstance = new Presidency({
+        gamedatas,
         parentElement: presidencyContainer!,
         id: presidency,
       });
@@ -92,8 +120,6 @@ export class India {
         ),
       );
     });
-
-    this.updateElephant(gamedatas.elephant);
   }
 
   private setupOrders(gamedatas: GamedatasAlias) {
@@ -109,6 +135,12 @@ export class India {
   private setupRegions(gamedatas: GamedatasAlias) {
     Object.values(gamedatas.regions).forEach((region: JocoRegionBase) => {
       this.regions[region.id] = new Region(region.id, this.game, region);
+    });
+  }
+
+  private setupShipZones(gamedatas: GamedatasAlias) {
+    SEA_ZONES.forEach((seaZone) => {
+      new ShipZone(seaZone, gamedatas);
     });
   }
 

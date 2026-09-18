@@ -63,8 +63,8 @@
 .joco-family-member[data-family='Benyon'] {
   background-color: base.$player-pink;
   outline-color: base.$player-pink-dark;
-  border-color: base.$player-pink-highlight base.$player-pink-shadow
-    base.$player-pink-shadow base.$player-pink-highlight;
+  border-color: base.$player-pink-highlight base.$player-pink-highlight
+    base.$player-pink-shadow base.$player-pink-shadow;
 
   svg {
     fill: base.$player-pink-dark;
@@ -74,8 +74,8 @@
 .joco-family-member[data-family='Hastings'] {
   background-color: base.$player-blue;
   outline-color: base.$player-blue-dark;
-  border-color: base.$player-blue-highlight base.$player-blue-shadow
-    base.$player-blue-shadow base.$player-blue-highlight;
+  border-color: base.$player-blue-highlight base.$player-blue-highlight
+    base.$player-blue-shadow base.$player-blue-shadow;
 
   svg {
     fill: base.$player-blue-dark;
@@ -84,8 +84,8 @@
 .joco-family-member[data-family='Larkins'] {
   background-color: base.$player-yellow;
   outline-color: base.$player-yellow-dark;
-  border-color: base.$player-yellow-highlight base.$player-yellow-shadow
-    base.$player-yellow-shadow base.$player-yellow-highlight;
+  border-color: base.$player-yellow-highlight base.$player-yellow-highlight
+    base.$player-yellow-shadow base.$player-yellow-shadow;
 
   svg {
     fill: base.$player-yellow-dark;
@@ -95,8 +95,8 @@
 .joco-family-member[data-family='Paxton'] {
   background-color: base.$player-gray;
   outline-color: base.$player-gray-dark;
-  border-color: base.$player-gray-highlight base.$player-gray-shadow
-    base.$player-gray-shadow base.$player-gray-highlight;
+  border-color: base.$player-gray-highlight base.$player-gray-highlight
+    base.$player-gray-shadow base.$player-gray-shadow;
 
   svg {
     fill: base.$player-gray-dark;
@@ -105,8 +105,8 @@
 .joco-family-member[data-family='Sykes'] {
   background-color: base.$player-purple;
   outline-color: base.$player-purple-dark;
-  border-color: base.$player-purple-highlight base.$player-purple-shadow
-    base.$player-purple-shadow base.$player-purple-highlight;
+  border-color: base.$player-purple-highlight base.$player-purple-highlight
+    base.$player-purple-shadow base.$player-purple-shadow;
 
   svg {
     fill: base.$player-purple-dark;
@@ -120,8 +120,8 @@
     fill: base.$player-green-dark;
   }
 
-  border-color: base.$player-green-highlight base.$player-green-shadow
-    base.$player-green-shadow base.$player-green-highlight;
+  border-color: base.$player-green-highlight base.$player-green-highlight
+    base.$player-green-shadow base.$player-green-shadow;
   // box-shadow: 0 0 0 1px #790000, 0px 1px 4px #0008;
 }
 
@@ -132,30 +132,6 @@
 // .joco-family-member[data-family='Crown'] svg {
 //   fill: black;
 // }
-
-.joco-ship {
-  position: absolute;
-
-  width: calc(var(--tokenScale) * 40px);
-  height: calc(var(--tokenScale) * 36px);
-  background-size: 100% 100%;
-}
-
-.joco-ship[data-type='CompanyShip'] {
-  background-image: url('img/ship_company.png');
-}
-
-.joco-ship[data-type='ExtraShip'] {
-  background-image: url('img/ship_extra.png');
-}
-
-.joco-ship[data-type='playerOwnedShip'] {
-  background-image: url('img/ship_player.png');
-}
-
-.joco-ship[data-type='playerOwnedShip'][data-fatigued='1'] {
-  background-image: url('img/ship_player_fatigued.png');
-}
 
 .joco-family-member.selectable {
   cursor: pointer;
@@ -192,4 +168,38 @@
     drop-shadow(0px calc(var(--tokenScale) * 4px) 0px base.$selected-color)
     drop-shadow(0px calc(var(--tokenScale) * -4px) 0px base.$selected-color);
   z-index: 1;
+}
+
+.joco-regiment {
+  box-sizing: border-box;
+  position: absolute;
+  background-image: url('img/regiment.jpg');
+  background-size: 100% 100%;
+  width: 40px;
+  aspect-ratio: 1 / 1;
+  // height: 35px;
+  // top: 22px;
+  // left: 694px;
+  // border: 1px solid black;
+  border-radius: 12%;
+  outline: 1px solid black;
+
+  border: 2px solid black;
+  border-color: #e6d3d1 #e6d3d1 #c2938f #c2938f;
+}
+
+.joco-regiment.selectable,
+.joco-order.selectable {
+  cursor: pointer;
+  display: block;
+  outline: 4px solid base.$selectable-color !important;
+}
+
+.joco-regiment.selected,
+.joco-regiment.selectable:hover,
+.joco-order.selected,
+.joco-order.selectable:hover {
+  cursor: pointer;
+  display: block;
+  outline: 4px solid base.$selected-color !important;
 }

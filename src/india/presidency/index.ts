@@ -1,9 +1,10 @@
 import { createFamilyMember } from '../../board/utility';
 import { BENGAL, BOMBAY, MADRAS } from '../../constants';
-import { JocoFamilyMember } from '../../types';
+import { GamedatasAlias, JocoFamilyMember } from '../../types';
 import { getRegionName } from '../../utility';
 
 export interface PresidencyProps {
+  gamedatas: GamedatasAlias;
   parentElement: HTMLElement | string;
   id: string;
 }
@@ -14,6 +15,7 @@ export class Presidency {
     writers: HTMLElement;
   };
   private id: string;
+  private treasury: Counter;
 
   constructor(config: PresidencyProps) {
     this.id = config.id;
@@ -44,17 +46,29 @@ export class Presidency {
       parent: parentElement,
       writers: document.getElementById(`${this.id}-writers`) as HTMLElement,
     };
+
+    this.treasury = new ebg.counter();
+    this.treasury.create(`joco-treasury-${this.id.toLocaleLowerCase()}`);
+    this.treasury.setValue(
+      config.gamedatas.offices[`PresidentOf${this.id}`].treasury,
+    );
   }
 
   private tplPresidency() {
     return `
       <div id="${this.id}" class="joco-presidency joco-container">
-        <div><span class="fb-font-baskerville fb-font-12">${this.getName()}</span></div>
-        <div>
-          <div>
-            <span class="fb-font-baskerville fb-font-12">${_('Writers').toLocaleUpperCase()}</span>
+        <div class="joco-header joco-background-${this.id.toLocaleLowerCase()}"><span class="fb-font-baskerville fb-font-16">${this.getName().toLocaleUpperCase()}</span></div>
+        <div class="joco-treasury-container">
+          <div><span class="fb-font-baskerville fb-font-12">${_('Treasury').toLocaleUpperCase()}</span></div>
+          <div class="joco-treasury-counter-container">
+            <span class="fb-font-baskerville fb-font-12">£</span><span id="joco-treasury-${this.id.toLocaleLowerCase()}" class="fb-font-baskerville fb-font-20"></span>
           </div>
-          <div id="${this.id}-writers">
+        </div>
+        <div class="joco-inner-container">
+          <div id="${this.id}-writers" class="joco-writers-stock">
+          </div>
+          <div>
+            <span class="fb-font-baskerville fb-font-8">${_('Writers').toLocaleUpperCase()}</span>
           </div>
         </div>
       </div>

@@ -283,8 +283,13 @@ export const SEA_ZONES = [WEST_INDIAN, EAST_INDIAN, SOUTH_INDIAN];
 /**
  * Ship types
  */
+export const PLAYER_OWNED_SHIP = 'playerOwnedShip';
 export const COMPANY_SHIP = 'CompanyShip';
 export const EXTRA_SHIP = 'ExtraShip';
+
+
+export const FATIGUED = 'fatigued';
+export const FULL = 'full';
 
 /**
  * Power tokens

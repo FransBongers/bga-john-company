@@ -1,0 +1,46 @@
+.joco-ship {
+  width: 50px;
+  // height: 36px;
+  aspect-ratio: 40/36;
+  background-size: 100% 100%;
+  box-shadow: none !important;
+
+  .joco-ship-name {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    // background-color: rgba(yellow, 0.5);
+    top: 70%;
+    height: 30%;
+    left: 5%;
+    width: 90%;
+    text-align: center;
+    font-size: 50%;
+  }
+
+  .joco-ship-fatigued {
+    position: absolute;
+    font-size: 23%;
+    top: 60%;
+    height: 10%;
+    width: 10%;
+    left: 21%;
+  }
+}
+
+.joco-ship[data-type='CompanyShip'] {
+  background-image: url('img/ship_company.png');
+}
+
+.joco-ship[data-type='ExtraShip'] {
+  background-image: url('img/ship_extra.png');
+}
+
+.joco-ship[data-type='playerOwnedShip'] {
+  background-image: url('img/ship_player.png');
+}
+
+.joco-ship[data-type='playerOwnedShip'][data-fatigued='1'] {
+  background-image: url('img/ship_player_fatigued.png');
+}

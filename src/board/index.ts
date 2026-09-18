@@ -216,7 +216,7 @@ export class Board {
     this.setupPowerTokens(gamedatas);
     // this.setupFamilyMembers(gamedatas);
     this.setupSelectBoxes();
-    this.setupShips(gamedatas);
+    // this.setupShips(gamedatas);
     this.setupTreasuries(gamedatas);
   }
 
@@ -229,51 +229,51 @@ export class Board {
     this.updateArmyPieces(Object.values(gamedatas.armyPieces));
   }
 
-  private setupFamilyMembers(gamedatas: GamedatasAlias) {
-    Object.values(gamedatas.familyMembers).forEach(({ id, familyId }) => {
-      this.ui.familyMembers[id] = createFamilyMember(
-        familyId === CROWN
-          ? COLOR_FAMILY_MAP[
-              HEX_COLOR_COLOR_MAP[
-                PlayerManager.getInstance()
-                  .getPlayer(CROWN_PLAYER_ID)
-                  .getColor()
-              ]
-            ]
-          : familyId,
-        id,
-      );
-      [
-        COURT_OF_DIRECTORS,
-        OFFICER_IN_TRAINING,
-        ...WRITER_LOCATIONS,
-        ...ARMIES,
-      ].forEach((location) => {
-        this.familyMembers[location] = [];
-      });
+  // private setupFamilyMembers(gamedatas: GamedatasAlias) {
+  //   Object.values(gamedatas.familyMembers).forEach(({ id, familyId }) => {
+  //     this.ui.familyMembers[id] = createFamilyMember(
+  //       familyId === CROWN
+  //         ? COLOR_FAMILY_MAP[
+  //             HEX_COLOR_COLOR_MAP[
+  //               PlayerManager.getInstance()
+  //                 .getPlayer(CROWN_PLAYER_ID)
+  //                 .getColor()
+  //             ]
+  //           ]
+  //         : familyId,
+  //       id,
+  //     );
+  //     [
+  //       COURT_OF_DIRECTORS,
+  //       OFFICER_IN_TRAINING,
+  //       ...WRITER_LOCATIONS,
+  //       ...ARMIES,
+  //     ].forEach((location) => {
+  //       this.familyMembers[location] = [];
+  //     });
 
-      // const elt = (this.familyMembers[familyMember.id] =
-      //   document.createElement('div'));
-      // const familyMemberNumber = `${
-      //   Number(familyMember.id.split('_')[2]) % 18
-      // }`;
-      // elt.classList.add('joco-family-member');
-      // elt.insertAdjacentHTML(
-      //   'afterbegin',
-      //   familyMemberSvgs[familyMemberNumber] ?? familyMemberSvgs[1]
-      // );
-      // let familyId = familyMember.familyId;
-      // if (familyId === CROWN) {
-      //   const crownColor = PlayerManager.getInstance()
-      //     .getPlayer(CROWN_PLAYER_ID)
-      //     .getColor();
-      //   familyId = COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[crownColor]];
-      // }
-      // elt.setAttribute('data-family', familyId);
-      // elt.setAttribute('data-number', familyMemberNumber);
-    });
-    this.updateFamilyMembers(Object.values(gamedatas.familyMembers));
-  }
+  //     // const elt = (this.familyMembers[familyMember.id] =
+  //     //   document.createElement('div'));
+  //     // const familyMemberNumber = `${
+  //     //   Number(familyMember.id.split('_')[2]) % 18
+  //     // }`;
+  //     // elt.classList.add('joco-family-member');
+  //     // elt.insertAdjacentHTML(
+  //     //   'afterbegin',
+  //     //   familyMemberSvgs[familyMemberNumber] ?? familyMemberSvgs[1]
+  //     // );
+  //     // let familyId = familyMember.familyId;
+  //     // if (familyId === CROWN) {
+  //     //   const crownColor = PlayerManager.getInstance()
+  //     //     .getPlayer(CROWN_PLAYER_ID)
+  //     //     .getColor();
+  //     //   familyId = COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[crownColor]];
+  //     // }
+  //     // elt.setAttribute('data-family', familyId);
+  //     // elt.setAttribute('data-number', familyMemberNumber);
+  //   });
+  //   this.updateFamilyMembers(Object.values(gamedatas.familyMembers));
+  // }
 
   // private setupOrders(gamedatas: GamedatasAlias) {
   //   Object.keys(gamedatas.orders).forEach((orderId) => {
@@ -375,12 +375,12 @@ export class Board {
     });
   }
 
-  private setupShips(gamedatas: GamedatasAlias) {
-    Object.values(gamedatas.ships).forEach(({ id, name, type, fatigued }) => {
-      this.ui.ships[id] = createShip({ name, type, fatigued });
-    });
-    this.updateShips(Object.values(gamedatas.ships));
-  }
+  // private setupShips(gamedatas: GamedatasAlias) {
+  //   Object.values(gamedatas.ships).forEach(({ id, name, type, fatigued }) => {
+  //     this.ui.ships[id] = createShip({ name, type, fatigued });
+  //   });
+  //   this.updateShips(Object.values(gamedatas.ships));
+  // }
 
   private setupTreasuries(gamedatas: GamedatasAlias) {
     Object.entries(TREASURY_POSITIONS).forEach(([office, position]) => {
@@ -819,11 +819,11 @@ export class Board {
     }
   }
 
-  private updateShips(ships: JocoShipBase[]) {
-    ships.forEach((ship) => {
-      this.placeShip(ship);
-    });
-  }
+  // private updateShips(ships: JocoShipBase[]) {
+  //   ships.forEach((ship) => {
+  //     this.placeShip(ship);
+  //   });
+  // }
 
   //  .##.....##.########.####.##.......####.########.##....##
   //  .##.....##....##.....##..##........##.....##.....##..##.

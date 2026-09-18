@@ -1,0 +1,28 @@
+.joco-sea-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  position: absolute;
+  width: 200px;
+  // background-color: rgba(yellow, 0.5);
+
+  .joco-ship-stock {
+    min-height: 45px;
+  }
+
+  &[data-zone='westIndian'] {
+    top: 750px;
+    left: 125px;
+  }
+
+  &[data-zone='southIndian'] {
+    top: 775px;
+    left: 665px;
+  }
+
+  &[data-zone='eastIndian'] {
+    top: 565px;
+    left: 780px;
+  }
+}

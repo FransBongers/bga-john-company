@@ -543,8 +543,12 @@ const OPEN = 'open';
  */
 const PLAYER_OWNED_SHIP = 'playerOwnedShip';
 // Capitalized because these are used to derive class names
+const OTHER_SHIP = 'OtherShip';
 const COMPANY_SHIP = 'CompanyShip';
 const EXTRA_SHIP = 'ExtraShip';
+
+const FATIGUED = 'fatigued';
+const FULL = 'full';
 
 const SUPPLY_OTHER_SHIPS = 'supply_otherShips';
 const SUPPLY_PLAYER_SHIPS = 'supply_playerShips';

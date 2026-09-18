@@ -2,7 +2,7 @@
 
 namespace Bga\Games\JohnCompany\Ships;
 
-class ExtraShip extends \Bga\Games\JohnCompany\Models\Ship
+class ExtraShip extends \Bga\Games\JohnCompany\Ships\OtherShip
 {
   public function __construct($row)
   {

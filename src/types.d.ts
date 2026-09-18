@@ -190,14 +190,7 @@ interface JocoArmyPieceBase extends GamePiece {
   exhausted: boolean;
 }
 
-type OtherShipType = 'ExtraShip' | 'CompanyShip';
 
-interface JocoShipBase extends GamePiece {
-  type: string;
-  fatigued: 0 | 1;
-  name: string;
-  owner: number | null;
-}
 
 type JoCoSetupCard = JoCoSetupCardBase & JocoSetupCardStatic;
 
@@ -321,4 +314,16 @@ interface JocoRegionBase {
 
 interface JocoRegionStatic {
   name: string;
+}
+
+/**
+ * Ships
+ */
+type OtherShipType = 'ExtraShip' | 'CompanyShip';
+
+interface JocoShipBase extends GamePiece {
+  type: string;
+  side: string;
+  name: string;
+  owner: number | null;
 }

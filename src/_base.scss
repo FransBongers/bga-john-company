@@ -30,6 +30,9 @@ $player-green-dark: #2b5135;
 
 $crown-red: #bd1f35;
 
+
+$regiment-color: rgb(212, 179, 176);
+
 $bengal-color: #b47860;
 $bombay-color: #a1b4ab;
 $madras-color: #e9ca92;
@@ -38,3 +41,15 @@ $delhi-color: #8e867c;
 $maratha-color: #cd9f6b;
 $hyderabad-color: #a4a576;
 $mysore-color: #c9bda5;
+
+.joco-background-bombay {
+  background-color: $bombay-color;
+}
+
+.joco-background-madras {
+  background-color: $madras-color;
+}
+
+.joco-background-bengal {
+  background-color: $bengal-color;
+}

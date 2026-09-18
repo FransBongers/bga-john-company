@@ -75,18 +75,18 @@
   background-image: url('img/pawn_silver.svg');
 }
 
-.joco-regiment {
-  box-sizing: border-box;
-  position: absolute;
-  background-image: url('img/regiment.jpg');
-  background-size: 100% 100%;
-  width: calc(var(--tokenScale) * 35px);
-  height: calc(var(--tokenScale) * 35px);
-  // top: calc(var(--tokenScale) * 22px);
-  // left: calc(var(--tokenScale) * 694px);
-  border: calc(var(--tokenScale) * 1px) solid black;
-  border-radius: 12%;
-}
+// .joco-regiment {
+//   box-sizing: border-box;
+//   position: absolute;
+//   background-image: url('img/regiment.jpg');
+//   background-size: 100% 100%;
+//   width: calc(var(--tokenScale) * 35px);
+//   height: calc(var(--tokenScale) * 35px);
+//   // top: calc(var(--tokenScale) * 22px);
+//   // left: calc(var(--tokenScale) * 694px);
+//   border: calc(var(--tokenScale) * 1px) solid black;
+//   border-radius: 12%;
+// }
 
 // .joco_tower {
 //   // --towerScale: 1;
@@ -340,7 +340,7 @@
   left: calc(var(--boardScale) * 1208px);
 }
 
-.joco-regiment.selectable,
+// .joco-regiment.selectable,
 .joco-order.selectable,
 .joco-select-box.selectable {
   cursor: pointer;
@@ -348,8 +348,8 @@
   outline: calc(var(--boardScale) * 4px) solid base.$selectable-color !important;
 }
 
-.joco-regiment.selected,
-.joco-regiment.selectable:hover,
+// .joco-regiment.selected,
+// .joco-regiment.selectable:hover,
 .joco-order.selected,
 .joco-order.selectable:hover,
 .joco-select-box.selected,

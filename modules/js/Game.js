@@ -229,7 +229,7 @@ const COMMANDER = 'Commander';
 const OFFICER = 'Officer';
 const OFFICER_IN_TRAINING = 'OfficerInTraining';
 const WRITER = 'Writer';
-const COURT_OF_DIRECTORS$1 = 'CourtOfDirectors';
+const COURT_OF_DIRECTORS = 'CourtOfDirectors';
 const BENGAL_DELHI_BORDER = 'Bengal_Delhi_border';
 const BENGAL_MARATHA_BORDER = 'Bengal_Maratha_border';
 const BOMBAY_DELHI_BORDER = 'Bombay_Delhi_border';
@@ -282,8 +282,11 @@ const SOUTH_INDIAN = 'southIndian';
 const CHINA = 'china';
 const UNFITTED = 'unfitted';
 const SEA_ZONES = [WEST_INDIAN, EAST_INDIAN, SOUTH_INDIAN];
+const PLAYER_OWNED_SHIP = 'playerOwnedShip';
 const COMPANY_SHIP = 'CompanyShip';
 const EXTRA_SHIP = 'ExtraShip';
+const FATIGUED = 'fatigued';
+const FULL = 'full';
 const POWER_TOKEN_COMPANY_SHARE = 'companyShare';
 const POWER_TOKEN_MANUFACTURING = 'manufacturing';
 const POWER_TOKEN_SHIPPING = 'shipping';
@@ -313,7 +316,7 @@ const STOCK_EXCHANGE_3_LEFT = 'StockExchange_3_Left';
 const STOCK_EXCHANGE_3_RIGHT = 'StockExchange_3_Right';
 const STOCK_EXCHANGE_4 = 'StockExchange_4';
 const STOCK_EXCHANGE_5 = 'StockExchange_5';
-const STOCK_EXCHANGE_POSITIONS$1 = [
+const STOCK_EXCHANGE_POSITIONS = [
     STOCK_EXCHANGE_2,
     STOCK_EXCHANGE_3_LEFT,
     STOCK_EXCHANGE_3_RIGHT,
@@ -578,7 +581,7 @@ class JocoPlayer {
         this.counters[CASH_COUNTER].setValue(gamedatas.families[this.familyId].treasury);
         this.counters[FAMILY_MEMBERS_COUNTER].setValue(Object.values(gamedatas.familyMembers).filter(({ familyId, location }) => familyId === this.familyId && location.startsWith('supply')).length);
         this.counters[SHARES_COUNTER].setValue(Object.values(gamedatas.familyMembers).filter(({ familyId, location }) => familyId === this.familyId &&
-            (location === COURT_OF_DIRECTORS$1 || location === CHAIRMAN)).length);
+            (location === COURT_OF_DIRECTORS || location === CHAIRMAN)).length);
         this.counters[SHIPYARDS_COUNTER].setValue(Object.values(gamedatas.enterprises).filter(({ type, location }) => type === SHIPYARD && location === this.familyId).length);
         this.counters[LUXURIES_COUNTER].setValue(Object.values(gamedatas.enterprises).filter(({ type, location }) => type === LUXURY && location === this.familyId).length);
         this.counters[WORKSHOPS_COUNTER].setValue(Object.values(gamedatas.enterprises).filter(({ type, location }) => type === WORKSHOP && location === this.familyId).length);
@@ -1244,7 +1247,6 @@ class Board {
         this.setupPawns(gamedatas);
         this.setupPowerTokens(gamedatas);
         this.setupSelectBoxes();
-        this.setupShips(gamedatas);
         this.setupTreasuries(gamedatas);
     }
     setupArmyPieces(gamedatas) {
@@ -1254,24 +1256,6 @@ class Board {
             }
         });
         this.updateArmyPieces(Object.values(gamedatas.armyPieces));
-    }
-    setupFamilyMembers(gamedatas) {
-        Object.values(gamedatas.familyMembers).forEach(({ id, familyId }) => {
-            this.ui.familyMembers[id] = createFamilyMember(familyId === CROWN
-                ? COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[PlayerManager.getInstance()
-                    .getPlayer(CROWN_PLAYER_ID)
-                    .getColor()]]
-                : familyId, id);
-            [
-                COURT_OF_DIRECTORS$1,
-                OFFICER_IN_TRAINING,
-                ...WRITER_LOCATIONS,
-                ...ARMIES,
-            ].forEach((location) => {
-                this.familyMembers[location] = [];
-            });
-        });
-        this.updateFamilyMembers(Object.values(gamedatas.familyMembers));
     }
     setupPawns(gamedatas) {
         ['balance', 'standing', 'debt', 'turn', 'phase'].forEach((pawn) => {
@@ -1322,7 +1306,7 @@ class Board {
             setAbsolutePosition(elt, BOARD_SCALE, SEA_ZONE_SELECT_POSITIONS[seaZone]);
             this.ui.containers.selectBoxes.appendChild(elt);
         });
-        STOCK_EXCHANGE_POSITIONS$1.forEach((position) => {
+        STOCK_EXCHANGE_POSITIONS.forEach((position) => {
             const elt = (this.ui.selectBoxes[position] =
                 document.createElement('div'));
             elt.classList.add('joco-select-box');
@@ -1345,12 +1329,6 @@ class Board {
             setAbsolutePosition(elt, BOARD_SCALE, COMPANY_DEBT_SELECT_POSITIONS[value]);
             this.ui.containers.selectBoxes.appendChild(elt);
         });
-    }
-    setupShips(gamedatas) {
-        Object.values(gamedatas.ships).forEach(({ id, name, type, fatigued }) => {
-            this.ui.ships[id] = createShip({ name, type, fatigued });
-        });
-        this.updateShips(Object.values(gamedatas.ships));
     }
     setupTreasuries(gamedatas) {
         Object.entries(TREASURY_POSITIONS).forEach(([office, position]) => {
@@ -1388,9 +1366,9 @@ class Board {
             }
             let position = { top: 0, left: 0 };
             switch (location) {
-                case COURT_OF_DIRECTORS$1:
-                    position = getCourtOfDirectorsPosition(this.familyMembers[COURT_OF_DIRECTORS$1].length);
-                    this.familyMembers[COURT_OF_DIRECTORS$1].push(familyMember);
+                case COURT_OF_DIRECTORS:
+                    position = getCourtOfDirectorsPosition(this.familyMembers[COURT_OF_DIRECTORS].length);
+                    this.familyMembers[COURT_OF_DIRECTORS].push(familyMember);
                     break;
                 case OFFICER_IN_TRAINING:
                     position = getOfficersInTrainingPosition(this.familyMembers[OFFICER_IN_TRAINING].length);
@@ -1471,7 +1449,7 @@ class Board {
             player.counters[FAMILY_MEMBERS_COUNTER].incValue(-1);
             this.updateFamilyMembers([familyMember]);
             await this.game.animationManager.slideIn(this.ui.familyMembers[id], fromElement);
-            if (familyMember.location === COURT_OF_DIRECTORS$1 ||
+            if (familyMember.location === COURT_OF_DIRECTORS ||
                 familyMember.location === CHAIRMAN) {
                 player.counters[SHARES_COUNTER].incValue(1);
             }
@@ -1595,11 +1573,6 @@ class Board {
             const player = PlayerManager.getInstance().getPlayerForFamily(enterprise.location);
             player.counters[SHIPS_COUNTER].incValue(1);
         }
-    }
-    updateShips(ships) {
-        ships.forEach((ship) => {
-            this.placeShip(ship);
-        });
     }
 }
 
@@ -2116,6 +2089,7 @@ const tplEnterpriseCardContent = (card) => {
     return `
   <div class="joco-title fb-font-baskerville  fb-font-12 bga-autofit">${card.type === WORKSHOP && card.invested ? _('Invested Workshop').toLocaleUpperCase() : _(card.name).toLocaleUpperCase()}</div>
   ${shipName !== null ? `<div class="joco-ship-first-letter fb-font-baskerville fb-font-24 fb-font-italic bga-autofit">${_(shipName).charAt(0)}</div><div class="joco-ship-name fb-font-baskerville fb-font-8 bga-autofit">${_(shipName)}</div>` : ''}  
+  
 `;
 };
 
@@ -2456,15 +2430,83 @@ class Company {
     updateCourtOfDirectors(gamedatas) {
         Object.values(gamedatas.familyMembers).forEach((familyMember) => {
             const { id, familyId, location } = familyMember;
-            if (STOCK_EXCHANGE_POSITIONS$1.includes(location)) {
+            if (STOCK_EXCHANGE_POSITIONS.includes(location)) {
                 const familyMemberElement = createFamilyMember(familyId, id);
                 this.ui.stockExchange[location].appendChild(familyMemberElement);
             }
-            else if (location === COURT_OF_DIRECTORS$1) {
+            else if (location === COURT_OF_DIRECTORS) {
                 const familyMemberElement = createFamilyMember(familyId, id);
                 this.ui.courtOfDirectors?.appendChild(familyMemberElement);
             }
         });
+    }
+}
+
+const tplRegiment = ({ id, extraClasses = '', }) => {
+    return `
+    <div id="${id ?? ''}" class="joco-regiment ${extraClasses}"></div>
+  `;
+};
+
+class Army {
+    constructor(config) {
+        this.id = config.id;
+        this.setup(config);
+    }
+    setup(config) {
+        const parentElement = typeof config.parentElement === 'string'
+            ? document.getElementById(config.parentElement)
+            : config.parentElement;
+        if (!parentElement) {
+            throw new Error('FE_ARMY_01');
+        }
+        parentElement.insertAdjacentHTML('beforeend', this.tplArmy());
+        this.ui = {
+            parent: parentElement,
+            army: {
+                ready: document.getElementById(`joco-army-${this.id.toLocaleLowerCase()}-ready`),
+                exhausted: document.getElementById(`joco-army-${this.id.toLocaleLowerCase()}-exhausted`),
+            },
+        };
+        this.addPieces(config.gamedatas);
+    }
+    tplArmy() {
+        return `
+      <div id="${this.id}" class="joco-army joco-container">
+        <div class="joco-inner-container">
+          <div><span class="fb-font-baskerville fb-font-8">${_('Ready pieces').toLocaleUpperCase()}</span></div>
+          <div id="joco-army-${this.id.toLocaleLowerCase()}-ready" class="joco-army-stock"></div>
+        </div>
+        <div class="joco-army-banner joco-background-${this.id.toLocaleLowerCase()}"><span class="fb-font-baskerville fb-font-16">${this.getName().toLocaleUpperCase()}</span></div>
+        <div class="joco-inner-container">
+          <div id="joco-army-${this.id.toLocaleLowerCase()}-exhausted" class="joco-army-stock"></div>
+          <div><span class="fb-font-baskerville fb-font-8">${_('Exhausted pieces').toLocaleUpperCase()}</span></div>
+        </div>
+      </div>
+    `;
+    }
+    addPieces(gamedatas) {
+        Object.values(gamedatas.armyPieces).forEach((piece) => {
+            if (piece.location !== `Army_${this.id}`) {
+                return;
+            }
+            const parent = piece.exhausted
+                ? this.ui.army.exhausted
+                : this.ui.army.ready;
+            parent.insertAdjacentHTML('beforeend', tplRegiment({ id: piece.id }));
+        });
+    }
+    getName() {
+        switch (this.id) {
+            case BENGAL:
+                return 'Army of Bengal';
+            case BOMBAY:
+                return 'Army of Bombay';
+            case MADRAS:
+                return 'Army of Madras';
+            default:
+                return '';
+        }
     }
 }
 
@@ -2505,16 +2547,25 @@ class Presidency {
             parent: parentElement,
             writers: document.getElementById(`${this.id}-writers`),
         };
+        this.treasury = new ebg.counter();
+        this.treasury.create(`joco-treasury-${this.id.toLocaleLowerCase()}`);
+        this.treasury.setValue(config.gamedatas.offices[`PresidentOf${this.id}`].treasury);
     }
     tplPresidency() {
         return `
       <div id="${this.id}" class="joco-presidency joco-container">
-        <div><span class="fb-font-baskerville fb-font-12">${this.getName()}</span></div>
-        <div>
-          <div>
-            <span class="fb-font-baskerville fb-font-12">${_('Writers').toLocaleUpperCase()}</span>
+        <div class="joco-header joco-background-${this.id.toLocaleLowerCase()}"><span class="fb-font-baskerville fb-font-16">${this.getName().toLocaleUpperCase()}</span></div>
+        <div class="joco-treasury-container">
+          <div><span class="fb-font-baskerville fb-font-12">${_('Treasury').toLocaleUpperCase()}</span></div>
+          <div class="joco-treasury-counter-container">
+            <span class="fb-font-baskerville fb-font-12">£</span><span id="joco-treasury-${this.id.toLocaleLowerCase()}" class="fb-font-baskerville fb-font-20"></span>
           </div>
-          <div id="${this.id}-writers">
+        </div>
+        <div class="joco-inner-container">
+          <div id="${this.id}-writers" class="joco-writers-stock">
+          </div>
+          <div>
+            <span class="fb-font-baskerville fb-font-8">${_('Writers').toLocaleUpperCase()}</span>
           </div>
         </div>
       </div>
@@ -2620,6 +2671,94 @@ class Region {
     }
 }
 
+const tplShipContent = (ship, fatiguedSide = false) => `
+  <div class="joco-ship-name bga-autofit"><span class="fb-font-baskerville">${_(ship.name)}</span></div>
+  ${fatiguedSide ? `<div class="joco-ship-fatigued fb-font-baskerville bga-autofit">${_('F')}</div>` : ''}
+`;
+
+class ShipsManager extends BgaCards.Manager {
+    static create(game) {
+        ShipsManager.instance = new ShipsManager(game);
+    }
+    static getInstance() {
+        return ShipsManager.instance;
+    }
+    constructor(game) {
+        super({
+            getId: (card) => card.id,
+            setupDiv: (card, div) => this.setupDiv(card, div),
+            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
+            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
+            isCardVisible: (card) => this.isCardVisible(card),
+            animationManager: game.animationManager,
+            cardHeight: 45,
+            cardWidth: 50,
+            type: 'law-card',
+        });
+        this.game = game;
+    }
+    clearInterface() { }
+    setupDiv(card, div) {
+        div.classList.add('joco-ship');
+    }
+    setupFrontDiv(card, div) {
+        div.classList.add('joco-ship');
+        div.setAttribute('data-type', card.type);
+        if (div.children.length) {
+            return;
+        }
+        div.insertAdjacentHTML('beforeend', tplShipContent(card));
+    }
+    setupBackDiv(card, div) {
+        div.classList.add('joco-ship');
+        div.setAttribute('data-type', card.type);
+        if (card.type === PLAYER_OWNED_SHIP) {
+            div.setAttribute('data-fatigued', '1');
+        }
+        if (div.children.length) {
+            return;
+        }
+        div.insertAdjacentHTML('beforeend', tplShipContent(card, true));
+    }
+    isCardVisible(card) {
+        return card.side === FULL || card.side === COMPANY_SHIP;
+    }
+}
+
+const tplSeaZone = (id) => `
+  <div class="joco-sea-zone" data-zone="${id}">
+    <div id="joco-ship-stock-${id}" class="joco-ship-stock"></div>  
+    <div class="joco-ship-count">
+      <span id="joco-ship-count-${id}" class="fb-font-baskerville fb-font-bold fb-font-12"></span>
+    </div>
+  </div>
+`;
+
+class ShipZone {
+    constructor(id, gamedatas) {
+        this.id = id;
+        this.gamedatas = gamedatas;
+        this.setup(gamedatas);
+    }
+    setup(gamedatas) {
+        document
+            .getElementById('joco-india-map')
+            ?.insertAdjacentHTML('beforeend', tplSeaZone(this.id));
+        this.ui = {
+            stock: document.getElementById(`joco-ship-stock-${this.id}`),
+            count: document.getElementById(`joco-ship-count-${this.id}`),
+        };
+        this.stock = new BgaCards.LineStock(ShipsManager.getInstance(), this.ui.stock);
+        this.updateShips(Object.values(gamedatas.ships).filter((ship) => ship.location === this.id));
+    }
+    updateShips(ships) {
+        this.stock.addCards(ships);
+        this.ui.count.textContent = formatStringRecursive(ships.length === 1 ? '${count} Ship' : '${count} Ships', {
+            count: ships.length,
+        });
+    }
+}
+
 const tplOrder = (orderId, { top, left }) => {
     const staticData = StaticData.get().order(orderId);
     return `<div id="${orderId}" class="joco-order" style="top: ${top}px; left: ${left}px;" data-is-home-port="${staticData.homePort !== null}">
@@ -2651,6 +2790,7 @@ const tplIndia = () => `
 class India {
     constructor(game) {
         this.game = game;
+        this.armies = {};
         this.presidencies = {};
         this.regions = {};
         this.game = game;
@@ -2671,18 +2811,35 @@ class India {
             orders: {},
             elephant: document.getElementById('joco-elephant'),
         };
+        this.setupPresidencies(gamedatas);
+        this.setupArmies(gamedatas);
         this.setupOrders(gamedatas);
         this.setupRegions(gamedatas);
+        this.setupShipZones(gamedatas);
+        this.updateElephant(gamedatas.elephant);
+    }
+    setupArmies(gamedatas) {
+        const presidencyContainer = document.getElementById('joco-presidencies-and-armies');
+        [BOMBAY, MADRAS, BENGAL].forEach((army) => {
+            const armyInstance = new Army({
+                parentElement: presidencyContainer,
+                id: army,
+                gamedatas,
+            });
+            this.armies[army] = armyInstance;
+        });
+    }
+    setupPresidencies(gamedatas) {
         const presidencyContainer = document.getElementById('joco-presidencies-and-armies');
         [BOMBAY, MADRAS, BENGAL].forEach((presidency) => {
             const presidencyInstance = new Presidency({
+                gamedatas,
                 parentElement: presidencyContainer,
                 id: presidency,
             });
             this.presidencies[presidency] = presidencyInstance;
             presidencyInstance.addWriters(Object.values(gamedatas.familyMembers).filter((member) => member.location === `Writers_${presidency}`));
         });
-        this.updateElephant(gamedatas.elephant);
     }
     setupOrders(gamedatas) {
         Object.entries(ORDERS_CONFIG).forEach(([orderId, position]) => {
@@ -2695,6 +2852,11 @@ class India {
     setupRegions(gamedatas) {
         Object.values(gamedatas.regions).forEach((region) => {
             this.regions[region.id] = new Region(region.id, this.game, region);
+        });
+    }
+    setupShipZones(gamedatas) {
+        SEA_ZONES.forEach((seaZone) => {
+            new ShipZone(seaZone, gamedatas);
         });
     }
     updateElephant({ location, facing }) {
@@ -5498,6 +5660,7 @@ class Game {
         EnterpriseCardsManager.create(this);
         LawCardsManager.create(this);
         LondonSeasonCardsManager.create(this);
+        ShipsManager.create(this);
         Interaction.create(this);
         PhaseTracker.create(this);
         PlayerManager.create(this);

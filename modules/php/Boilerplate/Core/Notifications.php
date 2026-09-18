@@ -148,7 +148,7 @@ class Notifications
 
   protected static function tknShip($ship)
   {
-    return implode(':', [$ship->getType(), $ship->getName(), $ship->getFatigued()]);
+    return implode(':', [$ship->getType(), $ship->getName(), $ship->isFatigued()]);
   }
 
   //  .##.....##.########.####.##.......####.########.##....##

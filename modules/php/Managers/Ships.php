@@ -14,7 +14,7 @@ class Ships extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   protected static $table = 'ships';
   protected static $prefix = 'ship_';
   protected static $customFields = [
-    'fatigued',
+    'side',
     'type',
     'owner',
   ];
@@ -56,7 +56,7 @@ class Ships extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
         'id' => $shipId,
         'location' => SUPPLY_PLAYER_SHIPS,
         'type' => PLAYER_OWNED_SHIP,
-        'fatigued' => 0,
+        'side' => FULL,
       ];
     }
 
@@ -67,8 +67,8 @@ class Ships extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
         "nbr" => 14,
         "nbrStart" => 1,
         'location' => SUPPLY_OTHER_SHIPS,
-        'type' => COMPANY_SHIP,
-        'fatigued' => 0,
+        'type' => OTHER_SHIP,
+        'side' => COMPANY_SHIP,
       ]
     ]);
     self::shuffle(SUPPLY_OTHER_SHIPS);

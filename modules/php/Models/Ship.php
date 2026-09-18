@@ -14,7 +14,7 @@ class Ship extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implement
   protected $primary = 'ship_id';
   protected $location;
   protected $state;
-  protected $fatigued;
+  protected $side;
   protected $name;
   protected $owner = null;
 
@@ -29,7 +29,7 @@ class Ship extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implement
     'id' => ['ship_id', 'str'],
     'location' => 'ship_location',
     'state' => ['ship_state', 'int'],
-    'fatigued' => ['fatigued', 'int'],
+    'side' => ['side', 'str'],
     'type' => ['type', 'str'],
     'owner' => ['owner', 'int'],
   ];
@@ -65,7 +65,7 @@ class Ship extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implement
 
   public function isOtherShip()
   {
-    return Utils::startsWith($this->getId(), 'ship');
+    return $this->getType() === OTHER_SHIP;
   }
 
   public function isInSupply()
@@ -87,5 +87,10 @@ class Ship extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implement
       $this->setType($type);
     }
     Notifications::placeShip($player, $this);
+  }
+
+  public function isFatigued()
+  {
+    return $this->getType() === PLAYER_OWNED_SHIP && $this->getSide() === FATIGUED;
   }
 }
