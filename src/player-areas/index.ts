@@ -1,4 +1,5 @@
 import { EnterpriseCardsManager } from '../cards/enterprise-cards';
+import { SHIPYARD } from '../constants';
 import { BgaCards } from '../libs';
 import { GameAlias, GamedatasAlias, JocoEnterpriseCard } from '../types';
 import { getEnterpriseCard } from '../utility';
@@ -63,11 +64,30 @@ export class PlayerAreas {
   // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
   // ..#######..##........########..##.....##....##....########.....#######..####
 
+  public async addEnterprise(enterprise: JocoEnterpriseCard) {
+    const stock = this.enterprises[enterprise.location];
+    if (stock) {
+      await stock.addCard(getEnterpriseCard(enterprise));
+    }
+  }
+
   private updateEnterprises(gamedatas: GamedatasAlias) {
+    const ships = Object.values(gamedatas.ships);
     Object.values(gamedatas.enterprises).forEach((enterprise) => {
       const stock = this.enterprises[enterprise.location];
-      if (stock) {
-        stock.addCard(getEnterpriseCard(enterprise));
+      if (!stock) {
+        return;
+      }
+      stock.addCard(getEnterpriseCard(enterprise));
+      if (enterprise.type === SHIPYARD) {
+        const ship = ships.find((s) => s.location === enterprise.id);
+        if (ship) {
+          const shipStock =
+            EnterpriseCardsManager.getInstance().shipStocks[enterprise.id];
+          if (shipStock) {
+            shipStock.addCard(ship);
+          }
+        }
       }
     });
   }

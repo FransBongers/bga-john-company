@@ -688,6 +688,7 @@ class Notifications
       'tkn_boldText_enterprise' => $enterprise->getName(),
       'tkn_enterpriseIcon' => $enterprise->getType(),
       'amount' => $amount,
+      'enterprise' => $enterprise,
       'type' => $enterprise->getType(),
       'tkn_pound' => clienttranslate('Pounds'),
       'i18n' => ['tkn_boldText_enterprise'],

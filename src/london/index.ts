@@ -11,13 +11,18 @@ import { getLawCard, getLondonSeasonCard } from '../utility';
 
 const tplLondon = () => `
   <div id="joco-london" class="joco-tab">
-    <div>London Season Display</div>
-    <div id="joco-london-season-display">
-      
+    
+    <div class="joco-container">
+      <div class="joco-header"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('London Season Display').toLocaleUpperCase()}</span></div>
+      <div id="joco-london-season-display">
+        
+      </div>
     </div>
-    <div>Passed Laws</div>
-    <div id="joco-london-laws">
-      
+    <div class="joco-container">
+      <div class="joco-header"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Passed Laws').toLocaleUpperCase()}</span></div>
+      <div id="joco-london-laws">
+        
+      </div>
     </div>
     <div id="joco-pensioners">
       Pensioners

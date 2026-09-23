@@ -168,14 +168,6 @@ type BombayPresidency = 'BombayPresidency';
 type MadrasPresidency = 'MadrasPresidency';
 type JoCoPresidency = BengalPresidency | BombayPresidency | MadrasPresidency;
 
-interface JocoFamilyMember {
-  id: string;
-  location: string;
-  state: number;
-  familyId: string;
-  presidency: JoCoPresidency | null;
-}
-
 interface JoCoOfficeBase extends GamePiece {
   familyMemberId: string | null;
   treasury: number;
@@ -189,8 +181,6 @@ interface JocoOfficeStatic {
 interface JocoArmyPieceBase extends GamePiece {
   exhausted: boolean;
 }
-
-
 
 type JoCoSetupCard = JoCoSetupCardBase & JocoSetupCardStatic;
 
@@ -219,6 +209,14 @@ interface JohnCompanyPlayerData extends Player {
 export type GameAlias = Game;
 export type GamedatasAlias = JohnCompanyGamedatas;
 export type PlayerAlias = JohnCompanyPlayerData;
+
+interface JocoFamilyMember {
+  id: string;
+  location: string;
+  state: number;
+  familyId: string;
+  presidency: JoCoPresidency | null;
+}
 
 /*
  * London Season Cards

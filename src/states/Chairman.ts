@@ -60,7 +60,6 @@ export class Chairman implements GameState<OnEnteringChairmanArgs> {
   }
 
   setDescription(activePlayerIds: number[], args: OnEnteringChairmanArgs) {
-    console.log('setDescription Chairman');
     updatePageTitle(
       _(
         '${tkn_playerName} may increase Company Debt and must allocate the Company Balance',

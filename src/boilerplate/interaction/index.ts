@@ -60,7 +60,6 @@ export class Interaction {
     if ($(id)) {
       return;
     }
-
     this.game.bga.statusBar.addActionButton(text, callback, {
       id,
       color: 'primary',

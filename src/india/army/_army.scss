@@ -1,3 +1,5 @@
+@use '../../base';
+
 .joco-army {
   box-sizing: border-box;
   // min-width: 0;
@@ -8,7 +10,17 @@
   }
 
   .joco-army-banner {
+    position: relative;
     padding: 4px 8px;
+    padding-left: 52px;
+
+    .joco-family-member-spot {
+      position: absolute;
+      left: 4px;
+      top: -10px;
+      outline: 1px solid white;
+      border: 2px solid;
+    }
   }
 
   .joco-army-stock {
@@ -23,5 +35,23 @@
     flex-direction: column;
     gap: 4px;
     padding: 8px;
+  }
+}
+
+#ArmyOfBengal {
+  .joco-family-member-spot {
+    border-color: base.$bengal-color;
+  }
+}
+
+#ArmyOfBombay {
+  .joco-family-member-spot {
+    border-color: base.$bombay-color;
+  }
+}
+
+#ArmyOfMadras {
+  .joco-family-member-spot {
+    border-color: base.$madras-color;
   }
 }

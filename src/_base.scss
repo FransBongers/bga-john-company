@@ -29,7 +29,7 @@ $player-green-shadow: hsl(97, 51%, 61%);
 $player-green-dark: #2b5135;
 
 $crown-red: #bd1f35;
-
+$joco-red: rgb(183, 98, 85);
 
 $regiment-color: rgb(212, 179, 176);
 
@@ -52,4 +52,14 @@ $mysore-color: #c9bda5;
 
 .joco-background-bengal {
   background-color: $bengal-color;
+}
+
+.joco-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.joco-column {
+  display: flex;
+  flex-direction: column;
 }

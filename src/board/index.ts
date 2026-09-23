@@ -89,7 +89,7 @@ import {
 import { Region } from './region';
 import { tplBoard } from './templates';
 import { Treasury } from './treasury';
-import { createRegiment, createFamilyMember, createShip } from './utility';
+
 
 export class Board {
   private static instance: Board;
@@ -208,7 +208,7 @@ export class Board {
     };
 
     // this.ui.containers.board.insertAdjacentHTML('afterbegin', familyMember);
-    this.setupArmyPieces(gamedatas);
+    // this.setupArmyPieces(gamedatas);
     // this.updateElephant(gamedatas.elephant);
     // this.setupOrders(gamedatas);
     // this.setupRegions(gamedatas);
@@ -220,14 +220,14 @@ export class Board {
     this.setupTreasuries(gamedatas);
   }
 
-  private setupArmyPieces(gamedatas: GamedatasAlias) {
-    Object.entries(gamedatas.armyPieces).forEach(([id, piece]) => {
-      if (id.startsWith('Regiment')) {
-        this.ui.armyPieces[id] = createRegiment();
-      }
-    });
-    this.updateArmyPieces(Object.values(gamedatas.armyPieces));
-  }
+  // private setupArmyPieces(gamedatas: GamedatasAlias) {
+  //   Object.entries(gamedatas.armyPieces).forEach(([id, piece]) => {
+  //     if (id.startsWith('Regiment')) {
+  //       this.ui.armyPieces[id] = createRegiment();
+  //     }
+  //   });
+  //   this.updateArmyPieces(Object.values(gamedatas.armyPieces));
+  // }
 
   // private setupFamilyMembers(gamedatas: GamedatasAlias) {
   //   Object.values(gamedatas.familyMembers).forEach(({ id, familyId }) => {
@@ -401,31 +401,31 @@ export class Board {
   // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
   // ..#######..##........########..##.....##....##....########.....#######..####
 
-  updateArmyPieces(pieces: JocoArmyPieceBase[]) {
-    // this.ui.containers.regiments.replaceChildren();
-    pieces.forEach((piece) => {
-      if (piece.location.startsWith('supply')) {
-        return;
-      }
-      if (piece.id.startsWith('Regiment')) {
-        const elt = this.ui.armyPieces[piece.id];
-        if (!this.ui.armyPieces[piece.id].parentElement) {
-          this.ui.containers.regiments.appendChild(elt);
-        }
+  // updateArmyPieces(pieces: JocoArmyPieceBase[]) {
+  //   // this.ui.containers.regiments.replaceChildren();
+  //   pieces.forEach((piece) => {
+  //     if (piece.location.startsWith('supply')) {
+  //       return;
+  //     }
+  //     if (piece.id.startsWith('Regiment')) {
+  //       const elt = this.ui.armyPieces[piece.id];
+  //       if (!this.ui.armyPieces[piece.id].parentElement) {
+  //         this.ui.containers.regiments.appendChild(elt);
+  //       }
 
-        setAbsolutePosition(
-          elt,
-          BOARD_SCALE,
-          getRegimentPosition(
-            piece.location,
-            this.armies.regiments[piece.location].length,
-            piece.exhausted,
-          ),
-        );
-        this.armies.regiments[piece.location].push(piece);
-      }
-    });
-  }
+  //       setAbsolutePosition(
+  //         elt,
+  //         BOARD_SCALE,
+  //         getRegimentPosition(
+  //           piece.location,
+  //           this.armies.regiments[piece.location].length,
+  //           piece.exhausted,
+  //         ),
+  //       );
+  //       this.armies.regiments[piece.location].push(piece);
+  //     }
+  //   });
+  // }
 
   // updateElephant({ location, facing }: { location: string; facing: string }) {
   //   this.ui.elephant.setAttribute('data-location', location);
@@ -684,7 +684,7 @@ export class Board {
 
     const fromRect = this.ui.armyPieces[regiment.id].getBoundingClientRect();
 
-    this.updateArmyPieces([regiment]);
+    // this.updateArmyPieces([regiment]);
     // Should be slideIn from Delta?
     this.game.animationManager.slideIn(this.ui.armyPieces[regiment.id],this.ui.armyPieces[regiment.id]);
     // await this.game.animationManager.play(

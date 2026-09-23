@@ -1,3 +1,4 @@
+import { Bar } from '../bar';
 import { Board } from '../board';
 import {
   debug,
@@ -72,6 +73,7 @@ export class SeekShare implements GameState<OnEnteringSeekShareArgs> {
 
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
+    Bar.getInstance().goTo('joco-company');
 
     updatePageTitle(
       _('${you} must select a place on the Stock Exchange track'),

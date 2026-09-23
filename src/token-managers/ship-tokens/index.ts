@@ -24,7 +24,7 @@ export class ShipsManager extends BgaCards.Manager<JocoShipBase> {
       animationManager: game.animationManager,
       cardHeight: 45,
       cardWidth: 50,
-      type: 'law-card',
+      type: 'ship',
     });
   }
 

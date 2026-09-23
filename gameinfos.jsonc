@@ -20,7 +20,7 @@
   "favorite_colors_support": true,
   "disable_player_order_swap_on_rematch": false,
   "game_interface_width": {
-    "min": 800,
+    "min": 1016,
     "autoscale": true,
   },
   "exception_on_warning": true

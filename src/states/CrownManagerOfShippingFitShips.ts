@@ -75,7 +75,6 @@ export class CrownManagerOfShippingFitShips implements GameState<OnEnteringCrown
 
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
-    console.log('');
 
     this.updatePageTitle();
 

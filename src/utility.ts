@@ -4,6 +4,15 @@ import {
   WEST_INDIAN,
   CHINA,
   CROWN_PLAYER_ID,
+  BENGAL,
+  BOMBAY,
+  DELHI,
+  HYDERABAD,
+  MADRAS,
+  MARATHA,
+  MYSORE,
+  PUNJAB,
+  FATIGUED,
 } from './constants';
 import { tknShipValue } from './logs/templates';
 import { PlayerManager } from './player-manager';
@@ -35,21 +44,21 @@ export const getSeaName = (seaId: string) => {
 
 export const getRegionName = (regionId: string) => {
   switch (regionId) {
-    case 'BENGAL':
+    case BENGAL:
       return _('Bengal');
-    case 'BOMBAY':
+    case BOMBAY:
       return _('Bombay');
-    case 'DELHI':
+    case DELHI:
       return _('Delhi');
-    case 'HYDERABAD':
+    case HYDERABAD:
       return _('Hyderabad');
-    case 'MADRAS':
+    case MADRAS:
       return _('Madras');
-    case 'MARATHA':
+    case MARATHA:
       return _('Maratha');
-    case 'MYSORE':
+    case MYSORE:
       return _('Mysore');
-    case 'PUNJAB':
+    case PUNJAB:
       return _('Punjab');
     default:
       return '';
@@ -68,7 +77,11 @@ export const getShipsLog = (ships: JocoShipBase[]) => {
   ships.forEach((ship, index) => {
     const key = `tkn_ship_${index}`;
     shipsLog.log += `\${${key}}`;
-    shipsLog.args[key] = tknShipValue(ship);
+    shipsLog.args[key] = tknShipValue({
+      name: ship.name,
+      type: ship.type,
+      fatigued: ship.side === FATIGUED ? 1 : 0,
+    });
   });
 
   return shipsLog;

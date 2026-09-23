@@ -62,7 +62,7 @@ export const tplDeregulation = () => `
 `
 
 export const tplLawCardContent = (card: JocoLawCard) => `
-  <div class="joco-header fb-font-baskerville  fb-font-16 fb-font-italic bga-autofit">${lawCardHeaderText(card.header)}</div>
+  <div class="joco-card-header fb-font-baskerville  fb-font-16 fb-font-italic bga-autofit">${lawCardHeaderText(card.header)}</div>
   <div class="joco-title fb-font-bebas-neue fb-font-40 bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
   ${tplCardText(card.text, { textClass: 'fb-font-16 fb-font-baskerville' })}
   ${card.initialSupport !== null ? tplInitialSupport(card.initialSupport) : ''}

@@ -23,6 +23,16 @@
   background-color: #b47860;
 }
 
+.joco-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.joco-column {
+  display: flex;
+  flex-direction: column;
+}
+
 #joco-bar {
   background-color: transparent;
   height: 52px;
@@ -501,8 +511,25 @@ span[style*="color:#addb90"] {
   width: 76px;
   text-align: center;
 }
+.joco-enterprise-card .joco-shipyard-ship {
+  position: relative;
+  position: absolute;
+  width: 100px;
+  aspect-ratio: 40/36;
+  top: 50px;
+  left: 11px;
+}
+.joco-enterprise-card .bga-cards_card-sides,
 .joco-enterprise-card .joco-ship {
-  width: 103px;
+  width: 100px !important;
+  height: 90px !important;
+}
+.joco-enterprise-card .bga-cards_card-sides {
+  left: 0 !important;
+  top: 0 !important;
+}
+.joco-enterprise-card .joco-ship {
+  z-index: 1;
 }
 
 .joco-card {
@@ -755,7 +782,7 @@ span[style*="color:#addb90"] {
   background-image: url("img/law_cards.jpg");
   background-size: 600% 100%;
 }
-.joco-law-card .joco-header {
+.joco-law-card .joco-card-header {
   position: absolute;
   top: 17px;
   left: 5%;
@@ -1009,22 +1036,83 @@ span[style*="color:#addb90"] {
   background-position-y: 400%;
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
 .joco-container {
+  position: relative;
   border: 3px double #000;
   width: fit-content;
   border-radius: 8px;
-  padding: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-image: url("img/background_paper.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.joco-container .joco-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
-#joco-company .joco-court-of-directors-container {
+#joco-company {
+  width: 1000px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
+#joco-company .joco-row {
+  gap: 8px;
+}
+#joco-company .joco-column {
+  gap: 8px;
+}
+#joco-company .joco-column #joco-company-standing,
+#joco-company .joco-column #joco-company-debt {
+  flex-grow: 1;
+  width: 500px;
+}
+#joco-company .joco-court-of-directors-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  margin-bottom: 8px;
+}
+#joco-company .joco-court-of-directors-container .joco-header {
+  position: relative;
+  padding: 8px;
+  padding-left: 52px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  justify-content: flex-start;
+  background-color: rgb(183, 98, 85);
+}
+#joco-company .joco-court-of-directors-container .joco-header .joco-family-member-spot {
+  position: absolute;
+  left: 4px;
+  top: -7px;
+  outline: 1px solid white;
+  border: 2px solid;
+  border-color: rgb(183, 98, 85);
+}
+#joco-company .joco-court-of-directors-container .joco-header span {
+  color: white;
+}
 #joco-company .joco-court-of-directors-container #joco-stock-exchange {
-  border: 1px solid black;
-  border-radius: 4px;
-  padding: 4px;
+  padding: 8px;
 }
 #joco-company .joco-court-of-directors-container #joco-stock-exchange .stock-exchange-track {
   display: flex;
@@ -1033,15 +1121,145 @@ span[style*="color:#addb90"] {
   margin-top: 4px;
 }
 #joco-company .joco-court-of-directors-container #joco-court-of-directors {
-  border: 1px solid black;
-  border-radius: 4px;
-  padding: 4px;
+  padding: 8px;
+}
+#joco-company .joco-court-of-directors-container #joco-court-of-directors .joco-header {
+  padding: 8px 4px;
+  border-radius: 0px;
+  background-color: transparent;
+}
+#joco-company .joco-court-of-directors-container #joco-court-of-directors .joco-header span {
+  color: black;
 }
 #joco-company .joco-court-of-directors-container #joco-court-of-directors .joco-court-of-directors-family-members {
   display: flex;
   flex-direction: row;
   gap: 4px;
   min-height: 100px;
+}
+#joco-company .joco-company-spots {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+#joco-company .joco-company-spots .joco-column {
+  align-items: center;
+}
+#joco-company .joco-company-spot {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+#joco-company .joco-company-spot.active {
+  outline: 4px solid rgb(183, 98, 85);
+}
+#joco-company .joco-company-spot[data-style=empty] svg {
+  fill: none;
+  stroke: #231f20;
+  stroke-miterlimit: 10;
+  stroke-width: 0.85px;
+}
+#joco-company .joco-company-spot[data-style=star] .cls-1,
+#joco-company .joco-company-spot[data-style=star] .cls-2 {
+  fill: none;
+}
+#joco-company .joco-company-spot[data-style=star] .cls-3 {
+  fill: #231f20;
+  fill-rule: evenodd;
+}
+#joco-company .joco-company-spot[data-style=star] .cls-2 {
+  stroke: #231f20;
+  stroke-miterlimit: 10;
+  stroke-width: 0.85px;
+}
+#joco-company .joco-company-spot[data-style=star] .cls-4 {
+  clip-path: url(#clippath);
+}
+#joco-company .joco-company-spot[data-style=striped] .cls-1,
+#joco-company .joco-company-spot[data-style=striped] .cls-2,
+#joco-company .joco-company-spot[data-style=striped] .cls-3 {
+  fill: none;
+}
+#joco-company .joco-company-spot[data-style=striped] .cls-2 {
+  stroke-miterlimit: 10;
+}
+#joco-company .joco-company-spot[data-style=striped] .cls-2,
+#joco-company .joco-company-spot[data-style=striped] .cls-3 {
+  stroke: #231f20;
+  stroke-width: 0.85px;
+}
+#joco-company .joco-company-spot[data-style=striped] .cls-3 {
+  stroke-linecap: square;
+  stroke-miterlimit: 1.5;
+}
+#joco-company .joco-company-spot[data-style=striped] .cls-4 {
+  clip-path: url(#clippath);
+}
+#joco-company .joco-company-spot[data-style=failed] .cls-1 {
+  fill: #231f20;
+  fill-rule: evenodd;
+}
+#joco-company .joco-company-spot[data-style=failed] .cls-2 {
+  stroke: #231f20;
+}
+#joco-company .joco-company-spot[data-style=failed] .cls-2,
+#joco-company .joco-company-spot[data-style=failed] .cls-3 {
+  fill: none;
+  stroke-miterlimit: 10;
+  stroke-width: 0.85px;
+}
+#joco-company .joco-company-spot[data-style=failed] .cls-3 {
+  stroke: #ebe5d9;
+}
+#joco-company .joco-company-spot[data-style=failed] .cls-4 {
+  fill: #f6f0e3;
+}
+#joco-company #joco-company-balance {
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+#joco-company #joco-offices {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.joco-office {
+  box-sizing: border-box;
+  width: 100%;
+}
+.joco-office.joco-container {
+  padding: 0;
+}
+.joco-office .joco-header {
+  padding: 8px;
+  padding-left: 52px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  justify-content: flex-start;
+  background-color: rgb(183, 98, 85);
+}
+.joco-office .joco-header .joco-family-member-spot {
+  position: absolute;
+  left: 4px;
+  top: -7px;
+  outline: 1px solid white;
+  border: 2px solid;
+  border-color: rgb(183, 98, 85);
+}
+.joco-office .joco-header span {
+  color: white;
+}
+.joco-office .joco-treasury-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
 }
 
 .joco-crown-climate-row {
@@ -1327,6 +1545,14 @@ span[style*="color:#addb90"] {
   background-position-y: 100%;
 }
 
+#joco-london {
+  width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 #joco-trackers {
   border: 2px solid black;
   border-radius: 4px;
@@ -1390,6 +1616,7 @@ span[style*="color:#addb90"] {
   height: 46px;
   width: 39px;
   border: 3px double black;
+  background-color: white;
 }
 .joco-family-member-spot .joco-family-member-spot-background-elt {
   position: absolute;
@@ -1399,7 +1626,6 @@ span[style*="color:#addb90"] {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: -1;
 }
 .joco-family-member-spot.selectable {
   cursor: pointer;
@@ -1989,6 +2215,15 @@ span[style*="color:#c0c0c0"] {
   width: calc(var(--tokenScale) * 50px);
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
 .joco-army {
   box-sizing: border-box;
   width: 100%;
@@ -1997,7 +2232,16 @@ span[style*="color:#c0c0c0"] {
   padding: 0;
 }
 .joco-army .joco-army-banner {
+  position: relative;
   padding: 4px 8px;
+  padding-left: 52px;
+}
+.joco-army .joco-army-banner .joco-family-member-spot {
+  position: absolute;
+  left: 4px;
+  top: -10px;
+  outline: 1px solid white;
+  border: 2px solid;
 }
 .joco-army .joco-army-stock {
   min-height: 84px;
@@ -2010,6 +2254,18 @@ span[style*="color:#c0c0c0"] {
   flex-direction: column;
   gap: 4px;
   padding: 8px;
+}
+
+#ArmyOfBengal .joco-family-member-spot {
+  border-color: #b47860;
+}
+
+#ArmyOfBombay .joco-family-member-spot {
+  border-color: #a1b4ab;
+}
+
+#ArmyOfMadras .joco-family-member-spot {
+  border-color: #e9ca92;
 }
 
 .joco_elephant,
@@ -2216,6 +2472,50 @@ span[style*="color:#c0c0c0"] {
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  * -----
  */
+.joco-presidency {
+  box-sizing: border-box;
+  width: 100%;
+}
+.joco-presidency.joco-container {
+  padding: 0;
+}
+.joco-presidency .joco-inner-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+}
+.joco-presidency .joco-header span {
+  color: black;
+}
+.joco-presidency#PresidencyOfBengal .joco-header {
+  background-color: #b47860;
+}
+.joco-presidency#PresidencyOfBengal .joco-family-member-spot {
+  border-color: #b47860;
+}
+.joco-presidency#PresidencyOfBombay .joco-header {
+  background-color: #a1b4ab;
+}
+.joco-presidency#PresidencyOfBombay .joco-family-member-spot {
+  border-color: #a1b4ab;
+}
+.joco-presidency#PresidencyOfMadras .joco-header {
+  background-color: #e9ca92;
+}
+.joco-presidency#PresidencyOfMadras .joco-family-member-spot {
+  border-color: #e9ca92;
+}
+
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
 .joco-tower {
   position: absolute;
   display: flex;
@@ -2353,6 +2653,8 @@ span[style*="color:#c0c0c0"] {
   background-size: 100% 100%;
   width: 1000px;
   aspect-ratio: 1700/1590;
+  outline: 3px double black;
+  border-radius: 5px;
 }
 #joco-india #joco-india-map .joco-order {
   position: absolute;
@@ -2386,34 +2688,6 @@ span[style*="color:#c0c0c0"] {
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
-#joco-india #joco-presidencies-and-armies .joco-presidency {
-  box-sizing: border-box;
-  width: 100%;
-}
-#joco-india #joco-presidencies-and-armies .joco-presidency.joco-container {
-  padding: 0;
-}
-#joco-india #joco-presidencies-and-armies .joco-presidency .joco-header {
-  padding: 8px;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-}
-#joco-india #joco-presidencies-and-armies .joco-presidency .joco-treasury-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 8px;
-}
-#joco-india #joco-presidencies-and-armies .joco-presidency .joco-inner-container {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 8px;
-}
-#joco-india #joco-presidencies-and-armies .joco-presidency .joco-writers-stock {
-  min-height: 50px;
-}
 
 .joco-order-token {
   box-sizing: border-box;
@@ -2446,6 +2720,13 @@ span[style*="color:#c0c0c0"] {
   top: 40%;
   height: 24%;
   line-height: 16px;
+}
+
+#MilitaryAffairsOffice .joco-inner-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
 }
 
 html {
@@ -2507,6 +2788,14 @@ html {
   opacity: 1;
   transition: visibility 0s ease-out, opacity 0.6s linear;
   visibility: visible;
+}
+
+.joco-family-members-stock {
+  min-height: 50px;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 /*# sourceMappingURL=johncompany.css.map */

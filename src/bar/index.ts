@@ -16,12 +16,12 @@ export class Bar {
 
   private config = [
     {
-      id: 'joco-india',
-      text: _('India'),
-    },
-    {
       id: 'joco-player-areas',
       text: _('Player Areas'),
+    },
+    {
+      id: 'joco-india',
+      text: _('India'),
     },
     {
       id: 'joco-company',
@@ -110,5 +110,12 @@ export class Bar {
     tab.classList.toggle('joco-tab-visible');
     tab.classList.toggle('joco-tab-hidden');
     this.ui.barButtons[this.active].classList.toggle('joco-bar-item-active');
+  }
+
+  public goTo(id: string) {
+    const index = this.config.findIndex((tab) => tab.id === id);
+    this.updateActive();
+    this.active = index;
+    this.updateActive();
   }
 }

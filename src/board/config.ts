@@ -116,7 +116,6 @@ export const getRegimentGroupPosition = (
 };
 
 export const getOfficerPosition = (army: string, index: number): AbsolutePosition => {
-  console.log('getOfficerPosition', army, index);
   switch (army) {
     case BOMBAY_ARMY:
       return getGroupPosition(22, 760, index, 3);

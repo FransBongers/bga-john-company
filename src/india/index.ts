@@ -1,4 +1,3 @@
-import { createFamilyMember } from '../board/utility';
 import { createHtmlElement } from '../boilerplate';
 import {
   BOMBAY,
@@ -8,30 +7,28 @@ import {
   ORDER_HYDERABAD_1,
   WEST_INDIAN,
   SEA_ZONES,
+  MILITARY_AFFAIRS,
+  OFFICER_IN_TRAINING,
 } from '../constants';
-import { StaticData } from '../static-data';
-import { tplAmount } from '../templates';
+import { createFamilyMember } from '../templates';
 import { GameAlias, GamedatasAlias, JocoRegionBase } from '../types';
 import { Army } from './army';
 import { ORDERS_CONFIG } from './config';
 import { Presidency } from './presidency';
 import { Region } from './region';
 import { ShipZone } from './ship-zone';
-import { tplOrder, tplOrderToken } from './templates';
+import { tplMilitaryAffairs, tplOrder, tplOrderToken } from './templates';
 
 const tplIndia = () => `
   <div id="joco-india" class="joco-tab">
     <div id="joco-india-map">
       <div id="joco-elephant"></div>
     </div>
+    ${tplMilitaryAffairs()}
     <div id="joco-presidencies-and-armies">
       
       
     </div>
-    <div id="joco-armies">
-      Armies
-    </div>
-
   </div>
 `;
 
@@ -45,6 +42,8 @@ export class India {
     map: HTMLElement;
     orders: Record<string, HTMLElement>;
     elephant: HTMLElement;
+    militaryAffairsOffice: HTMLElement;
+    officersInTraining: HTMLElement;
   };
   constructor(private game: GameAlias) {
     this.game = game;
@@ -76,6 +75,8 @@ export class India {
       map: document.getElementById('joco-india-map')!,
       orders: {},
       elephant: document.getElementById('joco-elephant')!,
+      militaryAffairsOffice: document.getElementById(MILITARY_AFFAIRS)!,
+      officersInTraining: document.getElementById(OFFICER_IN_TRAINING)!,
     };
 
     this.setupPresidencies(gamedatas);
@@ -86,6 +87,7 @@ export class India {
     this.setupShipZones(gamedatas);
 
     this.updateElephant(gamedatas.elephant);
+    this.updateMilitaryAffairsOffice(gamedatas);
   }
 
   private setupArmies(gamedatas: GamedatasAlias) {
@@ -113,12 +115,6 @@ export class India {
         id: presidency,
       });
       this.presidencies[presidency] = presidencyInstance;
-
-      presidencyInstance.addWriters(
-        Object.values(gamedatas.familyMembers).filter(
-          (member) => member.location === `Writers_${presidency}`,
-        ),
-      );
     });
   }
 
@@ -151,6 +147,19 @@ export class India {
   // .##.....##.##........##.....##.#########....##....##..........##.....##..##.
   // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
   // ..#######..##........########..##.....##....##....########.....#######..####
+
+  updateMilitaryAffairsOffice(gamedatas: GamedatasAlias) {
+    Object.values(gamedatas.familyMembers).forEach((member) => {
+      if (member.location === OFFICER_IN_TRAINING) {
+        const officer = createFamilyMember(member.familyId, member.id);
+        this.ui.officersInTraining.appendChild(officer);
+      } else if (member.location === MILITARY_AFFAIRS) {
+        // President
+        const presidentElement = createFamilyMember(member.familyId, member.id);
+        this.ui.militaryAffairsOffice.appendChild(presidentElement);
+      }
+    });
+  }
 
   updateElephant({ location, facing }: { location: string; facing: string }) {
     this.ui.elephant.setAttribute('data-location', location);

@@ -1,20 +1,94 @@
+@use '../base';
+
 .joco-container {
+  position: relative;
   border: 3px double #000;
   width: fit-content;
   border-radius: 8px;
-  padding: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-image: url('img/background_paper.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  .joco-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
+// .joco-container::before {
+//     content: '';
+//     position: absolute;
+//     top: 0;
+//     left: 0;
+//     width: 100%;
+//     height: 100%;
+//     background-color: rgba(0, 0, 0, 0.05); // Adjust the opacity as needed
+//     // z-index: -1; // Ensure it stays behind all other content
+//   }
+
 #joco-company {
+  width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .joco-row {
+    gap: 8px;
+  }
+
+  .joco-column {
+    gap: 8px;
+    // flex-grow: 1;
+
+    #joco-company-standing,
+    #joco-company-debt {
+      flex-grow: 1;
+      width: 500px;
+    }
+  }
+
   .joco-court-of-directors-container {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    padding: 0;
+    margin-bottom: 8px;
+
+    .joco-header {
+      position: relative;
+      padding: 8px;
+      padding-left: 52px;
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 5px;
+      justify-content: flex-start;
+      background-color: base.$joco-red;
+
+      .joco-family-member-spot {
+        position: absolute;
+        left: 4px;
+        top: -7px;
+        outline: 1px solid white;
+        border: 2px solid;
+        border-color: rgb(183, 98, 85);
+      }
+
+      span {
+        color: white;
+      }
+    }
 
     #joco-stock-exchange {
-      border: 1px solid black;
-      border-radius: 4px;
-      padding: 4px;
+      // border: 1px solid black;
+      // border-radius: 4px;
+      padding: 8px;
 
       .stock-exchange-track {
         display: flex;
@@ -25,9 +99,19 @@
     }
 
     #joco-court-of-directors {
-      border: 1px solid black;
-      border-radius: 4px;
-      padding: 4px;
+      // border: 1px solid black;
+      // border-radius: 4px;
+      padding: 8px;
+
+      .joco-header {
+        padding: 8px 4px;
+        border-radius: 0px;
+        background-color: transparent;
+
+        span {
+          color: black;
+        }
+      }
 
       .joco-court-of-directors-family-members {
         display: flex;
@@ -36,5 +120,172 @@
         min-height: 100px;
       }
     }
+  }
+
+  .joco-company-spots {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    .joco-column {
+      align-items: center;
+    }
+  }
+
+  .joco-company-spot {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+
+    &.active {
+      outline: 4px solid base.$joco-red;
+    }
+
+    &[data-style='empty'] {
+      svg {
+        fill: none;
+        stroke: #231f20;
+        stroke-miterlimit: 10;
+        stroke-width: 0.85px;
+      }
+    }
+
+    &[data-style='star'] {
+      .cls-1,
+      .cls-2 {
+        fill: none;
+      }
+
+      .cls-3 {
+        fill: #231f20;
+        fill-rule: evenodd;
+      }
+
+      .cls-2 {
+        stroke: #231f20;
+        stroke-miterlimit: 10;
+        stroke-width: 0.85px;
+      }
+
+      .cls-4 {
+        clip-path: url(#clippath);
+      }
+    }
+
+    &[data-style='striped'] {
+      .cls-1,
+      .cls-2,
+      .cls-3 {
+        fill: none;
+      }
+
+      .cls-2 {
+        stroke-miterlimit: 10;
+      }
+
+      .cls-2,
+      .cls-3 {
+        stroke: #231f20;
+        stroke-width: 0.85px;
+      }
+
+      .cls-3 {
+        stroke-linecap: square;
+        stroke-miterlimit: 1.5;
+      }
+
+      .cls-4 {
+        clip-path: url(#clippath);
+      }
+    }
+
+    &[data-style='failed'] {
+      .cls-1 {
+        fill: #231f20;
+        fill-rule: evenodd;
+      }
+
+      .cls-2 {
+        stroke: #231f20;
+      }
+
+      .cls-2,
+      .cls-3 {
+        fill: none;
+        stroke-miterlimit: 10;
+        stroke-width: 0.85px;
+      }
+
+      .cls-3 {
+        stroke: #ebe5d9;
+      }
+
+      .cls-4 {
+        fill: #f6f0e3;
+      }
+    }
+    // svg {
+    //   fill: none;
+    //   stroke: #231f20;
+    //   stroke-miterlimit: 10;
+    //   stroke-width: 0.85px;
+    // }
+  }
+
+  #joco-company-balance {
+    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  #joco-offices {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+}
+
+.joco-office {
+  box-sizing: border-box;
+  // min-width: 0;
+  width: 100%;
+
+  &.joco-container {
+    padding: 0;
+  }
+
+  .joco-header {
+    padding: 8px;
+    padding-left: 52px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    justify-content: flex-start;
+    background-color: base.$joco-red;
+    // color: white;
+    // border-color: base.$joco-red;
+
+    .joco-family-member-spot {
+      position: absolute;
+      left: 4px;
+      top: -7px;
+      outline: 1px solid white;
+      border: 2px solid;
+      border-color: base.$joco-red;
+    }
+
+    span {
+      color: white;
+    }
+  }
+
+  .joco-treasury-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 8px;
   }
 }

@@ -1,0 +1,86 @@
+@use '../../base';
+
+.joco-presidency {
+  box-sizing: border-box;
+  // min-width: 0;
+  width: 100%;
+
+  &.joco-container {
+    padding: 0;
+  }
+
+  // .joco-header {
+  //   padding: 8px;
+  //   padding-left: 52px;
+  //   border-top-left-radius: 5px;
+  //   border-top-right-radius: 5px;
+  //   justify-content: flex-start;
+
+  //   .joco-family-member-spot {
+  //     position: absolute;
+  //     left: 4px;
+  //     top: -7px;
+  //     outline: 1px solid white;
+  //     border: 2px solid;
+  //   }
+  // }
+
+  // .joco-treasury-container {
+  //   display: flex;
+  //   flex-direction: row;
+  //   align-items: center;
+  //   justify-content: space-between;
+  //   padding: 4px 8px;
+  // }
+
+  .joco-inner-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+  }
+
+  // .joco-writers-stock {
+  //   min-height: 50px;
+  //   display: flex;
+  //   flex-direction: row;
+  //   gap: 8px;
+  //   flex-wrap: wrap;
+  // }
+
+  .joco-header {
+    span {
+      color: black;
+    }
+  }
+
+  &#PresidencyOfBengal {
+    .joco-header {
+      background-color: base.$bengal-color;
+    }
+
+    .joco-family-member-spot {
+      border-color: base.$bengal-color;
+    }
+  }
+
+  &#PresidencyOfBombay {
+    .joco-header {
+      background-color: base.$bombay-color;
+    }
+
+    .joco-family-member-spot {
+      border-color: base.$bombay-color;
+    }
+  }
+
+  &#PresidencyOfMadras {
+    .joco-header {
+      background-color: base.$madras-color;
+    }
+
+    .joco-family-member-spot {
+      border-color: base.$madras-color;
+    }
+  }
+}

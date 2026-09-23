@@ -4,7 +4,7 @@
  */
 
 import { Climate } from "../../crown/climate";
-import { JocoArmyPieceBase, JocoFamilyMember, JoCoOrderBase, JocoRegionBase, JocoShipBase } from "../../types";
+import { JocoArmyPieceBase, JocoEnterpriseCard, JocoEnterpriseCardBase, JocoFamilyMember, JoCoOrderBase, JocoRegionBase, JocoShipBase } from "../../types";
 
 export interface Log {
   log: string;
@@ -129,6 +129,7 @@ export interface NotifPlaceShip extends NotifWithPlayerArgs {
 export interface NotifPurchaseEnterprise extends NotifWithPlayerArgs {
   amount: number;
   type: string;
+  enterprise: JocoEnterpriseCardBase;
 }
 
 export interface NotifReturnFamilyMemberToSupply extends NotifWithPlayerArgs {

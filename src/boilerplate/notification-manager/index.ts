@@ -7,7 +7,7 @@
 //  .##....##..#######.....##....####.##......
 
 import { Board } from '../../board';
-import { createFamilyMember } from '../../board/utility';
+
 import {
   LUXURY,
   LUXURIES_COUNTER,
@@ -27,12 +27,18 @@ import {
   COLOR_FAMILY_MAP,
   CROWN,
   HEX_COLOR_COLOR_MAP,
+  COURT_OF_DIRECTORS,
+  CHAIRMAN,
 } from '../../constants';
 import { CrownClimate } from '../../crown/climate';
+import { India } from '../../india';
+import { PlayerAreas } from '../../player-areas';
 import { PlayerManager } from '../../player-manager';
 import { JocoPlayer } from '../../player-manager/player';
 import { SetupArea } from '../../setup-area';
-import { GameAlias, OtherShipType } from '../../types';
+import { createFamilyMember } from '../../templates';
+import { GameAlias, JocoFamilyMember, OtherShipType } from '../../types';
+import { getEnterpriseCard } from '../../utility';
 import { Interaction } from '../interaction';
 import { debug } from '../utility';
 import {
@@ -288,6 +294,34 @@ export class NotificationManager {
     await Promise.all(promises);
   }
 
+  async placeFamilyMembers(
+    familyMembers: JocoFamilyMember[],
+    fromElement: HTMLElement,
+  ) {
+    const promises = familyMembers.map(async (familyMember, index) => {
+      const { id, familyId, location } = familyMember;
+      const player = PlayerManager.getInstance().getPlayerForFamily(familyId);
+      await Interaction.use().wait(index * 200);
+
+      const elt = createFamilyMember(familyId, id);
+      document.getElementById(location)?.appendChild(elt);
+      player.counters[FAMILY_MEMBERS_COUNTER].incValue(-1);
+
+      await this.game.animationManager.slideIn(elt, fromElement);
+      // await this.game.animationManager.play(
+      //   new BgaSlideAnimation({
+      //     element: this.ui.familyMembers[id],
+      //     transitionTimingFunction: 'ease-in-out',
+      //     fromRect,
+      //   }),
+      // );
+      if (location === COURT_OF_DIRECTORS || location === CHAIRMAN) {
+        player.counters[SHARES_COUNTER].incValue(1);
+      }
+    });
+    await Promise.all(promises);
+  }
+
   // .##....##..#######..########.####.########..######.
   // .###...##.##.....##....##.....##..##.......##....##
   // .####..##.##.....##....##.....##..##.......##......
@@ -363,15 +397,15 @@ export class NotificationManager {
     SetupArea.getInstance().newCards(cardIds, lastCard);
   }
 
-  async notif_elephantMarch(notif: Notif<NotifElephantMarch>) {
-    const board = Board.getInstance();
-    board.updateElephant(notif.args);
+  async notif_elephantMarch(notif: NotifElephantMarch) {
+    India.getInstance().updateElephant(notif);
     await Interaction.use().wait(500);
   }
 
-  async notif_enlistFamilyMember(notif: Notif<NotifEnlistFamilyMember>) {
-    const { familyMember, playerId } = notif.args;
-    await Board.getInstance().placeFamilyMembers(
+  async notif_enlistFamilyMember(notif: NotifEnlistFamilyMember) {
+    const { familyMember, playerId } = notif;
+
+    await this.placeFamilyMembers(
       [familyMember],
       this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER],
     );
@@ -507,8 +541,8 @@ export class NotificationManager {
     player.counters[SHARES_COUNTER].incValue(1);
   }
 
-  async notif_nextPhase(notif: Notif<NotifNextPhase>) {
-    const { phase } = notif.args;
+  async notif_nextPhase(notif: NotifNextPhase) {
+    const { phase } = notif;
     await Board.getInstance().movePawn('phase', phase);
   }
 
@@ -534,8 +568,8 @@ export class NotificationManager {
     await board.placeShip(placedShip, player.ui[SHIPS_COUNTER]);
   }
 
-  async notif_purchaseEnterprise(notif: Notif<NotifPurchaseEnterprise>) {
-    const { playerId, type, amount } = notif.args;
+  async notif_purchaseEnterprise(notif: NotifPurchaseEnterprise) {
+    const { playerId, enterprise, type, amount } = notif;
 
     await this.pay(playerId, amount);
 
@@ -544,6 +578,9 @@ export class NotificationManager {
     if (type === SHIPYARD) {
       player.counters[SHIPS_COUNTER].incValue(1);
     }
+    await PlayerAreas.getInstance().addEnterprise(
+      getEnterpriseCard(enterprise),
+    );
   }
 
   async notif_returnFamilyMemberToSupply(

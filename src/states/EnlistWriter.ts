@@ -1,7 +1,9 @@
+import { Bar } from '../bar';
 import { Board } from '../board';
 import {
   addCancelButton,
   addConfirmButton,
+  addPrimaryActionButton,
   clearPossible,
   debug,
   GameState,
@@ -14,6 +16,7 @@ import { WRITER, BENGAL, BOMBAY, MADRAS } from '../constants';
 import { PlayerManager } from '../player-manager';
 import { StaticData } from '../static-data';
 import { CommonStateArgs, GameAlias } from '../types';
+import { getRegionName } from '../utility';
 
 interface OnEnteringEnlistWriterArgs extends CommonStateArgs {}
 
@@ -70,14 +73,20 @@ export class EnlistWriter implements GameState<OnEnteringEnlistWriterArgs> {
 
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
+    Bar.getInstance().goTo('joco-india');
 
     updatePageTitle(_('${you} must select a region to place ${tkn_icon}'), {
       tkn_icon: WRITER,
     });
 
-    [BENGAL, BOMBAY, MADRAS].forEach((region) => {
-      const box = Board.getInstance().ui.selectBoxes[`Writers_${region}`];
-      onClick(box, () => this.updateInterfaceConfirm(region));
+    [BOMBAY, MADRAS, BENGAL].forEach((region) => {
+      // const box = Board.getInstance().ui.selectBoxes[`Writers_${region}`];
+      // onClick(box, () => this.updateInterfaceConfirm(region));
+      addPrimaryActionButton({
+        id: `writers-${region}-btn`,
+        text: getRegionName(region),
+        callback: () => this.updateInterfaceConfirm(region),
+      });
     });
   }
 

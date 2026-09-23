@@ -1,10 +1,15 @@
-import { WORKSHOP } from '../../constants';
+import { SHIPYARD, WORKSHOP } from '../../constants';
 import { BgaCards } from '../../libs';
-import { GameAlias, JocoEnterpriseCard } from '../../types';
+import { ShipsManager } from '../../token-managers/ship-tokens';
+import { GameAlias, JocoEnterpriseCard, JocoShipBase } from '../../types';
 import { tplEnterpriseCardContent } from './templates';
 
 export class EnterpriseCardsManager extends BgaCards.Manager<JocoEnterpriseCard> {
   private static instance: EnterpriseCardsManager;
+  public shipStocks: Record<
+    string,
+    InstanceType<typeof BgaCards.LineStock<JocoShipBase>>
+  > = {};
 
   public static create(game: GameAlias) {
     EnterpriseCardsManager.instance = new EnterpriseCardsManager(game);
@@ -41,6 +46,12 @@ export class EnterpriseCardsManager extends BgaCards.Manager<JocoEnterpriseCard>
       return;
     }
     div.insertAdjacentHTML('beforeend', tplEnterpriseCardContent(card));
+    if (card.type === SHIPYARD) {
+      this.shipStocks[card.id] = new BgaCards.LineStock<JocoShipBase>(
+        ShipsManager.getInstance(),
+        document.getElementById(`${card.id}-ship`)!,
+      );
+    }
   }
 
   setupBackDiv(card: JocoEnterpriseCard, div: HTMLElement) {

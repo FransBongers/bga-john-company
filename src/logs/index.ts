@@ -1,10 +1,10 @@
 import {
-  createFamilyMember,
   createRegiment,
   createShip,
 } from '../board/utility';
 import { tplIcon, tplPolicyIcon } from '../icons/templates';
 import { PlayerManager } from '../player-manager';
+import { createFamilyMember } from '../templates';
 import { GameAlias } from '../types';
 import {
   tlpLogTokenText,

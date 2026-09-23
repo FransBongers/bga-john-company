@@ -1,4 +1,4 @@
-import { createFamilyMember } from "../board/utility";
+import { createFamilyMember } from "../templates";
 
 /**
  * row 1

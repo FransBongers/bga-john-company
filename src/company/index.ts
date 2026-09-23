@@ -1,20 +1,42 @@
-import { createFamilyMember } from '../board/utility';
-import { COURT_OF_DIRECTORS, STOCK_EXCHANGE_POSITIONS } from '../constants';
+import { createFamilyMember } from '../templates';
+import {
+  CHAIRMAN,
+  COURT_OF_DIRECTORS,
+  DIRECTOR_OF_TRADE,
+  MANAGER_OF_SHIPPING,
+  STOCK_EXCHANGE_POSITIONS,
+} from '../constants';
 import { GameAlias, GamedatasAlias } from '../types';
-import { STOCK_EXCHANGE_CONFIG, tplCourtOfDirectors } from './templates';
+import {
+  COMPANY_STANDING_CONFIG,
+  STOCK_EXCHANGE_CONFIG,
+  tplCompanyStanding,
+  tplCourtOfDirectors,
+  tplCompanyDebt,
+  COMPANY_DEBT_CONFIG,
+  tplCompanyBalance,
+  tplOffice,
+} from './templates';
+import { getPhaseName } from '../phase-tracker/translations';
 
 const tplCompany = () => `
   <div id="joco-company" class="joco-tab">
+    <div class="joco-row">
+      <div class="joco-column">
+        ${tplCourtOfDirectors()}
+        ${tplOffice(DIRECTOR_OF_TRADE, DIRECTOR_OF_TRADE, getPhaseName(DIRECTOR_OF_TRADE))}
+        ${tplOffice(MANAGER_OF_SHIPPING, MANAGER_OF_SHIPPING, getPhaseName(MANAGER_OF_SHIPPING))}
+      </div>
+      <div class="joco-column">
+        ${tplCompanyBalance()}
+        ${tplCompanyStanding()}
+        ${tplCompanyDebt()}    
+      </div>
+      
+    </div>
 
 
-    <div id="joco-company-standing">
-      Company Standing
-    </div>
-    <div id="joco-company-debt">
-      Company Debt
-    </div>
     <div id="joco-offices">
-      Offices
     </div>
     <div id="joco-vacant-offices">
       Vacant Offices
@@ -27,9 +49,17 @@ export class Company {
   private ui: {
     courtOfDirectors?: HTMLElement;
     stockExchange: Record<string, HTMLElement>;
+    standing: Record<string, HTMLElement>;
+    debt: Record<string, HTMLElement>;
+    offices: Record<string, HTMLElement>;
   } = {
     stockExchange: {},
+    standing: {},
+    debt: {},
+    offices: {},
   };
+  private balance: Counter;
+  private treasuries: Record<string, Counter> = {};
 
   constructor(private game: GameAlias) {
     this.game = game;
@@ -53,9 +83,9 @@ export class Company {
   // ..######..########....##.....#######..##.......
 
   setupCourtOfDirectors(gamedatas: GamedatasAlias) {
-    document
-      .getElementById('joco-company')
-      .insertAdjacentHTML('afterbegin', tplCourtOfDirectors());
+    // document
+    //   .getElementById('joco-company')
+    //   .insertAdjacentHTML('afterbegin', tplCourtOfDirectors());
 
     this.ui.courtOfDirectors = document.getElementById('CourtOfDirectors')!;
     STOCK_EXCHANGE_CONFIG.forEach((item) => {
@@ -65,12 +95,48 @@ export class Company {
     this.updateCourtOfDirectors(gamedatas);
   }
 
+  setupCompanyBalance(gamedatas: GamedatasAlias) {
+    this.balance = new ebg.counter();
+    this.balance.create(`joco-balance`);
+    this.balance.setValue(gamedatas.company.balance);
+  }
+
+  setupCompanyStanding(gamedatas: GamedatasAlias) {
+    COMPANY_STANDING_CONFIG.forEach((item) => {
+      this.ui.standing[item.id] = document.getElementById(item.id)!;
+    });
+    this.updateCompanyStanding(gamedatas.company.standing);
+  }
+
+  setupCompanyDebt(gamedatas: GamedatasAlias) {
+    COMPANY_DEBT_CONFIG.forEach((item) => {
+      this.ui.debt[item.id] = document.getElementById(item.id)!;
+    });
+    this.updateCompanyDebt(gamedatas.company.debt);
+  }
+
+  private setupTreasury(gamedatas: GamedatasAlias, id: string) {
+    this.treasuries[id] = new ebg.counter();
+    this.treasuries[id].create(`${id}-treasury`);
+    this.treasuries[id].setValue(gamedatas.offices[id].treasury);
+  }
+
   setup(gamedatas: GamedatasAlias) {
     document
       .getElementById('joco')
       .insertAdjacentHTML('afterbegin', tplCompany());
 
+    [CHAIRMAN, DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING].forEach((officeId) => {
+      this.ui.offices[officeId] = document.getElementById(officeId)!;
+    });
+
     this.setupCourtOfDirectors(gamedatas);
+    this.setupCompanyBalance(gamedatas);
+    this.setupCompanyStanding(gamedatas);
+    this.setupCompanyDebt(gamedatas);
+    this.setupTreasury(gamedatas, DIRECTOR_OF_TRADE);
+    this.setupTreasury(gamedatas, MANAGER_OF_SHIPPING);
+    this.updateFamilyMembers(gamedatas);
   }
 
   // .##.....##.########..########.....###....########.########....##.....##.####
@@ -81,6 +147,46 @@ export class Company {
   // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
   // ..#######..##........########..##.....##....##....########.....#######..####
 
+  public updateFamilyMembers(gamedatas: GamedatasAlias) {
+    const offices = [CHAIRMAN, DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING];
+    Object.values(gamedatas.familyMembers).forEach((member) => {
+      if (offices.includes(member.location)) {
+        const officeId = member.location;
+        const familyMemberElement = createFamilyMember(
+          member.familyId,
+          member.id,
+        );
+        this.ui.offices[officeId].appendChild(familyMemberElement);
+      }
+    });
+  }
+
+  public updateCompanyStanding(standing: number | 'fail') {
+    Object.values(this.ui.standing).forEach((element) => {
+      element.classList.remove('active');
+    });
+
+    const activeId = `company-standing-${standing}`;
+    const activeElement = this.ui.standing[activeId];
+
+    if (activeElement) {
+      activeElement.classList.add('active');
+    }
+  }
+
+  public updateCompanyDebt(debt: number) {
+    Object.values(this.ui.debt).forEach((element) => {
+      element.classList.remove('active');
+    });
+
+    const activeId = `company-debt-${debt}`;
+    const activeElement = this.ui.debt[activeId];
+
+    if (activeElement) {
+      activeElement.classList.add('active');
+    }
+  }
+
   private updateCourtOfDirectors(gamedatas: GamedatasAlias) {
     Object.values(gamedatas.familyMembers).forEach((familyMember) => {
       const { id, familyId, location } = familyMember;
@@ -88,7 +194,6 @@ export class Company {
         const familyMemberElement = createFamilyMember(familyId, id);
         this.ui.stockExchange[location].appendChild(familyMemberElement);
       } else if (location === COURT_OF_DIRECTORS) {
-
         const familyMemberElement = createFamilyMember(familyId, id);
         this.ui.courtOfDirectors?.appendChild(familyMemberElement);
       }

@@ -29,7 +29,28 @@
     text-align: center;
   }
 
+  .joco-shipyard-ship {
+    position: relative;
+    // background-color: rgba(yellow, 0.5);
+    position: absolute;
+    width: 100px;
+    aspect-ratio: 40/36;
+    top: 50px;
+    left: 11px;
+  }
+
+  .bga-cards_card-sides,
   .joco-ship {
-    width: 103px;
+    width: 100px !important;
+    height: 90px !important;
+  }
+
+  .bga-cards_card-sides {
+    left: 0 !important;
+    top: 0 !important;
+  }
+
+  .joco-ship {
+    z-index: 1;
   }
 }
