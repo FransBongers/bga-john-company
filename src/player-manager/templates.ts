@@ -27,7 +27,7 @@ export const tplPlayerCounters = ({
   return `
 <div id="joco-counters-${playerId}-row-1" class="joco-counters-row">
   ${elt.outerHTML}
-  <div id="joco-cash-${playerId}" class="log_token joco_pound"></div>
+  <div id="joco-cash-${playerId}" class="log-token joco_pound"></div>
   <div id="joco-ships-${playerId}" class="joco-ship" data-type="playerOwnedShip"></div>
   ${
     crownInGame

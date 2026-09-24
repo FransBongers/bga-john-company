@@ -7,6 +7,7 @@
 //  .##....##..#######.....##....####.##......
 
 import { Board } from '../../board';
+import { Company } from '../../company';
 
 import {
   LUXURY,
@@ -40,7 +41,7 @@ import { createFamilyMember } from '../../templates';
 import { GameAlias, JocoFamilyMember, OtherShipType } from '../../types';
 import { getEnterpriseCard } from '../../utility';
 import { Interaction } from '../interaction';
-import { debug } from '../utility';
+import { debug, parentHasChildWithId } from '../utility';
 import {
   NotifAllocateBalanceToOffice,
   NotifChangeOrderStatus,
@@ -322,6 +323,20 @@ export class NotificationManager {
     await Promise.all(promises);
   }
 
+  async moveFamilyMember(familyMember: JocoFamilyMember) {
+    const { id, location } = familyMember;
+
+    const elt = document.getElementById(id);
+
+    if (location.startsWith('Army')) {
+      const regionId = location.split('_')[1];
+      India.getInstance().getArmy(regionId).addPiece(elt);
+    } else {
+      const locationElt = document.getElementById(location);
+      await this.game.animationManager.slideAndAttach(elt, locationElt);
+    }
+  }
+
   // .##....##..#######..########.####.########..######.
   // .###...##.##.....##....##.....##..##.......##....##
   // .####..##.##.....##....##.....##..##.......##......
@@ -330,18 +345,18 @@ export class NotificationManager {
   // .##...###.##.....##....##.....##..##.......##....##
   // .##....##..#######.....##....####.##........######.
 
-  async notif_log(notif: Notif<unknown>) {
+  async notif_log(notif: unknown) {
     // this is for debugging php side
-    debug('notif_log', notif.args);
+    debug('notif_log', notif);
   }
 
-  async notif_message(notif: Notif<unknown>) {
+  async notif_message(notif: unknown) {
     // Only here so messages get displayed in title bar
   }
 
   // TODO: make private notif
-  async notif_draftCardPrivate(notif: Notif<NotifDraftCardPrivateArgs>) {
-    const { cardIds } = notif.args;
+  async notif_draftCardPrivate(notif: NotifDraftCardPrivateArgs) {
+    const { cardIds } = notif;
 
     await Promise.all(
       cardIds.map(async (cardId, index) => {
@@ -354,10 +369,8 @@ export class NotificationManager {
     );
   }
 
-  async notif_allocateBalanceToOffice(
-    notif: Notif<NotifAllocateBalanceToOffice>,
-  ) {
-    const { companyBalance, officeTreasury, officeId } = notif.args;
+  async notif_allocateBalanceToOffice(notif: NotifAllocateBalanceToOffice) {
+    const { companyBalance, officeTreasury, officeId } = notif;
 
     const board = Board.getInstance();
     board.treasuries[officeId].toValue(officeTreasury);
@@ -365,34 +378,28 @@ export class NotificationManager {
     await board.movePawn('balance', companyBalance);
   }
 
-  async notif_changeOrderStatus(notif: Notif<NotifChangeOrderStatus>) {
-    const { order } = notif.args;
-    Board.getInstance().ui.orders[order.id].setAttribute(
+  async notif_changeOrderStatus(notif: NotifChangeOrderStatus) {
+    const { order } = notif;
+    India.getInstance().ui.orders[order.id].setAttribute(
       'data-status',
       order.status,
     );
   }
 
-  async notif_companyOperationChairman(
-    notif: Notif<NotifCompanyOperationChairman>,
-  ) {
-    const { debtIncreased, companyDebt, treasuries, companyBalance } =
-      notif.args;
-    const board = Board.getInstance();
+  async notif_companyOperationChairman(notif: NotifCompanyOperationChairman) {
+    const { debtIncreased, companyDebt, treasuries, companyBalance } = notif;
+    const company = Company.getInstance();
+    const companyTreasuries = Company.getInstance().treasuries;
     Object.entries(treasuries).forEach(([officeId, value]) => {
-      board.treasuries[officeId].toValue(value);
+      companyTreasuries[officeId].toValue(value);
     });
 
-    await Promise.all([
-      board.movePawn('debt', companyDebt),
-      board.movePawn('balance', companyBalance),
-    ]);
+    company.balance.toValue(companyBalance);
+    company.updateCompanyDebt(companyDebt);
   }
 
-  async notif_draftNewCardsPrivate(
-    notif: Notif<NotifDraftNewCardsPrivateArgs>,
-  ) {
-    const { cardIds, lastCard } = notif.args;
+  async notif_draftNewCardsPrivate(notif: NotifDraftNewCardsPrivateArgs) {
+    const { cardIds, lastCard } = notif;
 
     SetupArea.getInstance().newCards(cardIds, lastCard);
   }
@@ -411,8 +418,8 @@ export class NotificationManager {
     );
   }
 
-  async notif_fillOrder(notif: Notif<NotifFillOrder>) {
-    const { familyMember, order, from } = notif.args;
+  async notif_fillOrder(notif: NotifFillOrder) {
+    const { familyMember, order, from } = notif;
     const promises: Promise<void>[] = [];
     const board = Board.getInstance();
     if (familyMember) {
@@ -425,8 +432,8 @@ export class NotificationManager {
     await Promise.all(promises);
   }
 
-  async notif_gainEnterprise(notif: Notif<NotifGainEnterprise>) {
-    const { playerId, type } = notif.args;
+  async notif_gainEnterprise(notif: NotifGainEnterprise) {
+    const { playerId, type } = notif;
 
     const player = this.getPlayer(playerId);
     player.counters[this.getEnterpriseCounter(type)].incValue(1);
@@ -435,8 +442,8 @@ export class NotificationManager {
     }
   }
 
-  async notif_gainCash(notif: Notif<NotifGainCash>) {
-    const { amount, playerId } = notif.args;
+  async notif_gainCash(notif: NotifGainCash) {
+    const { amount, playerId } = notif;
 
     // Need to wait, otherwise the token in pagemaintitletext cannot be found
     await Interaction.use().wait(1);
@@ -470,19 +477,19 @@ export class NotificationManager {
     await Promise.all(promises);
   }
 
-  async notif_makeCheck(notif: Notif<NotifMakeCheck>) {
+  async notif_makeCheck(notif: NotifMakeCheck) {
     // TODO: animation
   }
 
-  async notif_moveCompanyBalance(notif: Notif<NotifMoveCompanyBalance>) {
-    const { companyBalance } = notif.args;
+  async notif_moveCompanyBalance(notif: NotifMoveCompanyBalance) {
+    const { companyBalance } = notif;
     const board = Board.getInstance();
 
     await board.movePawn('balance', companyBalance);
   }
 
-  async notif_moveCompanyDebt(notif: Notif<NotifMoveCompanyDebt>) {
-    const { companyBalance, companyDebt } = notif.args;
+  async notif_moveCompanyDebt(notif: NotifMoveCompanyDebt) {
+    const { companyBalance, companyDebt } = notif;
     const board = Board.getInstance();
     const promises = [board.movePawn('debt', companyDebt)];
     if (companyBalance) {
@@ -492,52 +499,59 @@ export class NotificationManager {
     await Promise.all(promises);
   }
 
-  async notif_moveCompanyStanding(notif: Notif<NotifMoveCompanyStanding>) {
-    const { companyStanding } = notif.args;
+  async notif_moveCompanyStanding(notif: NotifMoveCompanyStanding) {
+    const { companyStanding } = notif;
     const board = Board.getInstance();
 
     await board.movePawn('standing', companyStanding);
   }
 
-  async notif_moveFamilyMember(notif: Notif<NotifMoveFamilyMember>) {
-    const { familyMember, to } = notif.args;
-    const board = Board.getInstance();
+  async notif_moveFamilyMember(notif: NotifMoveFamilyMember) {
+    const { familyMember } = notif;
 
-    await board.moveFamilyMemberBetweenLocations(familyMember, to);
+    if (parentHasChildWithId(familyMember.location, familyMember.id)) {
+      return;
+    }
+
+    await this.moveFamilyMember(familyMember);
   }
 
-  async notif_moveFamilyMembers(notif: Notif<NotifMoveFamilyMembers>) {
-    const { familyMembers } = notif.args;
-    const board = Board.getInstance();
+  async notif_moveFamilyMembers(notif: NotifMoveFamilyMembers) {
+    const { familyMembers } = notif;
+    // const board = Board.getInstance();
     await Promise.all(
-      familyMembers.map(async (familyMember, index) =>
-        board.moveFamilyMember({ familyMember, index }),
-      ),
+      familyMembers.map(async (familyMember, index) => {
+        await Interaction.use().wait(index * 200);
+        await this.moveFamilyMember(familyMember);
+      }),
     );
-    board.updateFamilyMembers(familyMembers);
+    // board.updateFamilyMembers(familyMembers);
   }
 
-  async notif_moveRegiment(notif: Notif<NotifMoveRegiment>) {
-    const { from, regiment } = notif.args;
-    await Board.getInstance().moveRegimentBetweenArmies(regiment, from);
+  async notif_moveRegiment(notif: NotifMoveRegiment) {
+    const { from, regiment } = notif;
+    const regionId = regiment.location.split('_')[1];
+
+    const army = India.getInstance().getArmy(regionId);
+    await army.addPiece(regiment.id);
   }
 
-  async notif_moveShip(notif: Notif<NotifMoveShipArgs>) {
-    const { from, ship } = notif.args;
-    await Board.getInstance().moveShip({ ship, from });
+  async notif_moveShip(notif: NotifMoveShipArgs) {
+    const { from, ship } = notif;
+    const seaZone = India.getInstance().getSeaZone(ship.location);
+    if (!seaZone.hasShip(ship.id)) {
+      await seaZone.addShip(ship, from);
+    }
   }
 
-  async notif_newCompanyShare(notif: Notif<NotifNewCompanyShare>) {
-    const { playerId, familyMember, debt } = notif.args;
+  async notif_newCompanyShare(notif: NotifNewCompanyShare) {
+    const { playerId, familyMember, debt } = notif;
 
     const player = this.getPlayer(playerId);
 
-    const board = Board.getInstance();
+    await this.moveFamilyMember(familyMember);
 
-    await Promise.all([
-      board.moveFamilyMember({ familyMember }),
-      board.movePawn('debt', debt),
-    ]);
+    Company.getInstance().updateCompanyDebt(debt);
     player.counters[SHARES_COUNTER].incValue(1);
   }
 
@@ -546,26 +560,24 @@ export class NotificationManager {
     await Board.getInstance().movePawn('phase', phase);
   }
 
-  async notif_payFromTreasury(notif: Notif<NotifPayFromTreasury>) {
-    const { treasury, officeId } = notif.args;
-    Board.getInstance().treasuries[officeId].toValue(treasury);
+  async notif_payFromTreasury(notif: NotifPayFromTreasury) {
+    const { treasury, officeId } = notif;
+    Company.getInstance().treasuries[officeId].toValue(treasury);
   }
 
-  async notif_placeShip(notif: Notif<NotifPlaceShip>) {
-    const { playerId, ship } = notif.args;
+  async notif_placeShip(notif: NotifPlaceShip) {
+    const { playerId, ship } = notif;
     let placedShip = ship;
 
-    const isOtherShip = [EXTRA_SHIP, COMPANY_SHIP].includes(ship.type);
+    // const isOtherShip = [EXTRA_SHIP, COMPANY_SHIP].includes(ship.type);
 
-    const player = this.getPlayer(playerId);
+    // const player = this.getPlayer(playerId);
+    const india = India.getInstance();
 
-    const board = Board.getInstance();
-    if (isOtherShip) {
-      placedShip = board.updateOtherShip(ship, ship.type as OtherShipType);
-    } else if (!board.shipAlreadyInZone(ship.id, ship.location)) {
-      player.counters[SHIPS_COUNTER].incValue(-1);
+    const seaZone = india.getSeaZone(ship.location);
+    if (!seaZone.hasShip(ship.id)) {
+      await seaZone.addShip(placedShip);
     }
-    await board.placeShip(placedShip, player.ui[SHIPS_COUNTER]);
   }
 
   async notif_purchaseEnterprise(notif: NotifPurchaseEnterprise) {
@@ -584,9 +596,9 @@ export class NotificationManager {
   }
 
   async notif_returnFamilyMemberToSupply(
-    notif: Notif<NotifReturnFamilyMemberToSupply>,
+    notif: NotifReturnFamilyMemberToSupply,
   ) {
-    const { familyMember, playerId } = notif.args;
+    const { familyMember, playerId } = notif;
     const element = Board.getInstance().ui.familyMembers[familyMember.id];
     const toElement = document.getElementById(`joco-familyMembers-${playerId}`);
     this.game.animationManager.slideOutAndDestroy(element, toElement);
@@ -626,25 +638,25 @@ export class NotificationManager {
     await this.game.animationManager.slideIn(familyMemberElement, fromElement);
   }
 
-  async notif_setCrownClimate(notif: Notif<NotifSetCrownClimate>) {
-    const { climate } = notif.args;
+  async notif_setCrownClimate(notif: NotifSetCrownClimate) {
+    const { climate } = notif;
     CrownClimate.getInstance().updateClimate(climate);
   }
 
-  async notif_setupDone(notif: Notif<unknown>) {
+  async notif_setupDone(notif: unknown) {
     SetupArea.getInstance().hide();
   }
 
-  async notif_setupFamilyMembers(notif: Notif<NotifSetupFamilyMembers>) {
-    const { familyMembers, playerId } = notif.args;
+  async notif_setupFamilyMembers(notif: NotifSetupFamilyMembers) {
+    const { familyMembers, playerId } = notif;
     await Board.getInstance().placeFamilyMembers(
       familyMembers,
       this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER],
     );
   }
 
-  async notif_transferPromiseCubes(notif: Notif<NotifTransferPromiseCubes>) {
-    const { playerId, amount } = notif.args;
+  async notif_transferPromiseCubes(notif: NotifTransferPromiseCubes) {
+    const { playerId, amount } = notif;
     // Player pays to crown
 
     const fromElement =
@@ -681,8 +693,8 @@ export class NotificationManager {
     await Promise.all(promises);
   }
 
-  async notif_updateRegion(notif: Notif<NotifUpdateRegion>) {
-    const { region } = notif.args;
+  async notif_updateRegion(notif: NotifUpdateRegion) {
+    const { region } = notif;
     Board.getInstance().regions[region.id].update(region);
   }
 }

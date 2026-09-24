@@ -1,5 +1,5 @@
-import { Board } from '../board';
-import { DISABLED, Interaction } from '../boilerplate';
+import { Bar } from '../bar';
+import { DISABLED } from '../boilerplate';
 import {
   addConfirmButton,
   addDangerActionButton,
@@ -7,10 +7,12 @@ import {
   clearPossible,
   debug,
   getPlayerName,
+  onClick,
   performAction,
   setSelected,
   updatePageTitle,
 } from '../boilerplate/utility';
+import { Company } from '../company';
 import { CROWN_PLAYER_ID, PLUS, MINUS } from '../constants';
 import { PlayerManager } from '../player-manager';
 import { CommonStateArgs, GameAlias, GameState } from '../types';
@@ -52,6 +54,7 @@ export class Chairman implements GameState<OnEnteringChairmanArgs> {
     this.companyBalance = args.companyBalance;
     this.currentDebt = args.debtOptions.currentDebt;
     this.updateInterfaceInitialStep();
+    Bar.getInstance().goTo('joco-company');
   }
 
   onLeavingState() {
@@ -93,15 +96,14 @@ export class Chairman implements GameState<OnEnteringChairmanArgs> {
     this.updatePageTitle();
     this.setupTreasuries();
 
-    const board = Board.getInstance();
-    const interaction = Interaction.use();
+    const company = Company.getInstance();
 
     this.args.debtOptions.noVote.forEach((value) => {
       if (value <= this.currentDebt) {
         return;
       }
-      const elt = board.ui.selectBoxes[`companyDebt_${value}`];
-      interaction.onClick(elt, () => this.handleDebtClick(value, false));
+      const elt = company.getDebtElt(value);
+      onClick(elt, () => this.handleDebtClick(value, false));
       elt.setAttribute('data-vote', 'false');
     });
     this.args.debtOptions.vote.forEach((value) => {
@@ -113,8 +115,8 @@ export class Chairman implements GameState<OnEnteringChairmanArgs> {
       ) {
         return;
       }
-      const elt = board.ui.selectBoxes[`companyDebt_${value}`];
-      interaction.onClick(elt, () => this.handleDebtClick(value, true));
+      const elt = company.getDebtElt(value);
+      onClick(elt, () => this.handleDebtClick(value, true));
       elt.setAttribute('data-vote', 'true');
     });
     addPrimaryActionButton({
@@ -133,7 +135,7 @@ export class Chairman implements GameState<OnEnteringChairmanArgs> {
   private udpateInterfaceConfirmVote(value: number) {
     this.deactivateTreasuries();
     clearPossible();
-    setSelected(Board.getInstance().ui.selectBoxes[`companyDebt_${value}`]);
+    setSelected(`company-debt-${value}`);
 
     if (this.crownInGame) {
       updatePageTitle(
@@ -183,19 +185,20 @@ export class Chairman implements GameState<OnEnteringChairmanArgs> {
     } else {
       updatePageTitle(
         _(
-          '${you} may increase Company Debt and must allocate the Company Balance',
+          '${you} may increase Company Debt and must allocate the Company Balance (£${balance} remaining)',
         ),
+        {
+          balance: this.companyBalance,
+        },
       );
     }
   }
 
   private performAction(propose: boolean, debtVote?: number) {
     const treasuries = {};
-    Object.entries(Board.getInstance().treasuries).forEach(
-      ([office, treasury]) => {
-        treasuries[office] = treasury.getValue();
-      },
-    );
+    Object.entries(this.getTreasuries()).forEach(([office, treasury]) => {
+      treasuries[office] = treasury.getValue();
+    });
 
     performAction('actChairman', {
       companyDebt: this.currentDebt,
@@ -206,39 +209,38 @@ export class Chairman implements GameState<OnEnteringChairmanArgs> {
   }
 
   private deactivateTreasuries() {
-    Object.entries(Board.getInstance().treasuries).forEach(
-      ([office, treasury]) => {
-        treasury.setInactive();
-      },
-    );
+    Object.entries(this.getTreasuries()).forEach(([office, treasury]) => {
+      treasury.setInactive();
+    });
   }
 
   private setupTreasuries() {
-    const interaction = Interaction.use();
+    // const interaction = Interaction.use();
     this.checkPlusDisabled();
-    Object.entries(Board.getInstance().treasuries).forEach(
-      ([office, treasury]) => {
-        treasury.setActive();
-        this.checkMinusDisabled(office);
-        [PLUS, MINUS].forEach((type: 'plus' | 'minus') => {
-          interaction.onClick(treasury.getButtonElement(type), () =>
-            this.handleClick(type, office),
-          );
-        });
-      },
-    );
+
+    Object.entries(this.getTreasuries()).forEach(([office, treasury]) => {
+      treasury.setActive();
+      this.checkMinusDisabled(office);
+      [PLUS, MINUS].forEach((type: 'plus' | 'minus') => {
+        onClick(treasury.getButtonElement(type), () =>
+          this.handleClick(type, office),
+        );
+      });
+    });
   }
 
   private checkMinusDisabled(office: string) {
-    const treasury = Board.getInstance().treasuries[office];
+    const treasury = this.getTreasuries()[office];
     if (treasury.getValue() === this.args.initialTreasuries[office]) {
       treasury.disableButton('minus');
     }
   }
 
   private checkPlusDisabled() {
-    const treasuries = Object.values(Board.getInstance().treasuries);
-    if (this.companyBalance > 0) {
+    const companyHasBalance = this.companyBalance > 0;
+    const treasuries = Object.values(this.getTreasuries());
+
+    if (companyHasBalance) {
       treasuries.forEach((treasury) => {
         treasury.enableButton(PLUS);
       });
@@ -267,15 +269,13 @@ export class Chairman implements GameState<OnEnteringChairmanArgs> {
   // .##.....##.##.....##.##....##.########..########.########..######.
 
   private async updateCompanyBalance(value: number) {
-    const board = Board.getInstance();
+    const company = Company.getInstance();
     const increase = value - this.currentDebt;
     clearPossible();
     this.currentDebt = value;
     this.companyBalance += increase * 5;
-    await Promise.all([
-      board.movePawn('debt', value),
-      board.movePawn('balance', this.companyBalance),
-    ]);
+    company.updateCompanyDebt(this.currentDebt);
+    company.balance.toValue(this.companyBalance);
   }
 
   private async handleDebtClick(value: number, requiresVote: boolean) {
@@ -297,14 +297,14 @@ export class Chairman implements GameState<OnEnteringChairmanArgs> {
   }
 
   private async handleClick(type: 'plus' | 'minus', office: string) {
-    const board = Board.getInstance();
-    const treasury = board.treasuries[office];
+    const treasury = this.getTreasuries()[office];
     if (type === 'plus' && this.companyBalance > 0) {
       this.companyBalance--;
       treasury.plus();
       treasury.enableButton('minus');
       this.checkPlusDisabled();
-      board.movePawn('balance', this.companyBalance);
+      Company.getInstance().incBalance(-1);
+      // board.movePawn('balance', this.companyBalance);
     } else if (
       type === 'minus' &&
       treasury.getValue() > this.args.initialTreasuries[office]
@@ -314,8 +314,13 @@ export class Chairman implements GameState<OnEnteringChairmanArgs> {
       this.companyBalance++;
 
       this.checkPlusDisabled();
-      board.movePawn('balance', this.companyBalance);
+      Company.getInstance().incBalance(1);
     }
     this.updateInterfaceInitialStep();
+  }
+
+  private getTreasuries() {
+    const company = Company.getInstance();
+    return company.treasuries;
   }
 }

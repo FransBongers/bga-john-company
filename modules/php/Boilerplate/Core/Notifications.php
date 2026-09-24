@@ -148,7 +148,7 @@ class Notifications
 
   protected static function tknShip($ship)
   {
-    return implode(':', [$ship->getType(), $ship->getName(), $ship->isFatigued()]);
+    return implode(':', [$ship->getSide(), $ship->getName()]);
   }
 
   //  .##.....##.########.####.##.......####.########.##....##
@@ -752,15 +752,14 @@ class Notifications
     ]);
   }
 
-  public static function moveFamilyMember($player, $familyMember, $to)
+  public static function moveFamilyMember($player, $familyMember, $from)
   {
     self::notifyAll('moveFamilyMember', clienttranslate('${player_name} moves ${tkn_familyMember} from ${tkn_boldText_from} to ${tkn_boldText_to}'), [
       'player' => $player,
       'familyMember' => $familyMember->jsonSerialize(),
-      'to' => $to,
       'tkn_familyMember' => self::tknFamilyMember($familyMember),
-      'tkn_boldText_from' => self::getLocationNameForFamilyMember($familyMember->getLocation()),
-      'tkn_boldText_to' => self::getLocationNameForFamilyMember($to),
+      'tkn_boldText_from' => self::getLocationNameForFamilyMember($from),
+      'tkn_boldText_to' => self::getLocationNameForFamilyMember($familyMember->getLocation()),
       'i18n' => ['tkn_boldText_from', 'tkn_boldText_to'],
     ]);
   }

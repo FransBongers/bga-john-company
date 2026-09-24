@@ -10,8 +10,7 @@
 
 @use './base';
 @use './bar/bar';
-@use './board/board';
-@use './board/treasury/treasury';
+// @use './board/board';
 @use './boilerplate/default';
 @use './cards/cards';
 @use './company/company';
@@ -26,6 +25,7 @@
 @use './player-manager/playerPanel';
 @use './setup-area/setup-area';
 @use './token-managers/tokensManaged';
+@use './ui-components/ui-components';
 @use './logs/logs';
 @use './tokens';
 @use './india/india';
@@ -111,4 +111,8 @@ html {
   flex-direction: row;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.player-button {
+  background: none;
 }

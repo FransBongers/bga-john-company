@@ -1,0 +1,55 @@
+.joco-treasury-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+
+  .joco-row {
+    align-items: center;
+    gap: 8px;
+  }
+
+  .joco-button {
+    background-color: white;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    border: 1px solid #060606;
+    box-shadow: 0 0 0 #000;
+    color: #060606;
+    text-shadow: none;
+    border-radius: 6px;
+    padding: 4px;
+    cursor: pointer;
+
+    i {
+      pointer-events: none;
+    }
+  }
+
+  .joco-button:hover {
+    background-color: #f0f0f0;
+  }
+
+  .joco-button.disabled {
+    background: #787878;
+    pointer-events: none;
+  }
+
+  .joco-treasury-counter-container {
+    min-width: 36px;
+    text-align: center;
+  }
+
+  &[data-active='false'] {
+    .joco-button {
+      cursor: auto;
+      visibility: hidden;
+      pointer-events: none;
+      display: none;
+    }
+  }
+}

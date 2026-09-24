@@ -8,7 +8,7 @@ import {
   performAction,
   updatePageTitle,
 } from '../boilerplate';
-import { BUY_COMPANY_SHIP, COMPANY_SHIP, DO_NOT_BUY_COMPANY_SHIP, BUY_AS_MANY_SHIPS_AS_YOU_WISH } from '../constants';
+import { BUY_COMPANY_SHIP, COMPANY_SHIP, DO_NOT_BUY_COMPANY_SHIP, BUY_AS_MANY_SHIPS_AS_YOU_WISH, OTHER_SHIP } from '../constants';
 import { tknPromiseCubes, tknShipValue } from '../logs/templates';
 import { PlayerManager } from '../player-manager';
 import { GameAlias, GameState } from '../types';
@@ -108,8 +108,7 @@ export class CrownManagerOfShippingBuyCompanyShips implements GameState<OnEnteri
                 tkn_promiseCube: tknPromiseCubes(),
                 tkn_ship: tknShipValue({
                   name: _('Company Ship'),
-                  type: COMPANY_SHIP,
-                  fatigued: 0,
+                  side: COMPANY_SHIP,
                 }),
               },
             ),
@@ -132,8 +131,7 @@ export class CrownManagerOfShippingBuyCompanyShips implements GameState<OnEnteri
                 tkn_promiseCube: tknPromiseCubes(),
                 tkn_ship: tknShipValue({
                   name: _('Company Ship'),
-                  type: COMPANY_SHIP,
-                  fatigued: 0,
+                  side: COMPANY_SHIP,
                 }),
               },
             ),
@@ -191,7 +189,8 @@ export class CrownManagerOfShippingBuyCompanyShips implements GameState<OnEnteri
 
     this.args.shipsCrownWillBuy.forEach((ship, index) => {
       const key = `tkn_ship_${index}`;
-      ship.type = COMPANY_SHIP;
+      ship.type = OTHER_SHIP;
+      ship.side = COMPANY_SHIP;
       shipsLog.log += `\${${key}}`;
       shipsLog.args[key] = tknShipValue(ship);
     });

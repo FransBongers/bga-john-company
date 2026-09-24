@@ -1,9 +1,14 @@
 import { DISABLED } from '../../boilerplate/constants';
-import { AbsolutePosition } from '../../boilerplate/utility';
 
 import { PLUS } from '../../constants';
 import { GamedatasAlias } from '../../types';
 import { tplTreasury } from './templates';
+
+export interface TreasuryProps {
+  parent: HTMLElement;
+  gamedatas: GamedatasAlias;
+  office: string;
+}
 
 export class Treasury {
   private counter: Counter;
@@ -13,27 +18,12 @@ export class Treasury {
   private plusButton: HTMLElement;
   private active: boolean;
 
-  constructor(props: {
-    container: HTMLElement;
-    gamedatas: GamedatasAlias;
-    office: string;
-    position: AbsolutePosition;
-  }) {
+  constructor(props: TreasuryProps) {
     this.setup(props);
   }
 
-  private setup({
-    container,
-    gamedatas,
-    office,
-    position,
-  }: {
-    container: HTMLElement;
-    gamedatas: GamedatasAlias;
-    office: string;
-    position: AbsolutePosition;
-  }) {
-    container.insertAdjacentHTML('afterbegin', tplTreasury(office, position));
+  private setup({ parent, gamedatas, office }: TreasuryProps) {
+    parent.insertAdjacentHTML('beforeend', tplTreasury(office));
 
     this.element = document.getElementById(`joco-treasury-${office}`);
     this.minusButton = document.getElementById(
@@ -44,12 +34,12 @@ export class Treasury {
     );
 
     this.counter = new ebg.counter();
-    this.counter.create(`joco_${office}_treasury`);
+    this.counter.create(`joco-treasury-${office}-counter`);
     this.counter.setValue(gamedatas.offices[office].treasury);
 
-    // this.element.addEventListener('click', (event: PointerEvent) => this.handleClick(event));
-    this.setInactive();
-    // this.element.removeEventListener('click', (event: PointerEvent) => this.handleClick(event));
+    // // this.element.addEventListener('click', (event: PointerEvent) => this.handleClick(event));
+    // this.setInactive();
+    // // this.element.removeEventListener('click', (event: PointerEvent) => this.handleClick(event));
   }
 
   public getButtonElement(type: 'plus' | 'minus'): HTMLElement {
@@ -65,25 +55,25 @@ export class Treasury {
     this.active = false;
   }
 
-  private handleClick(event: PointerEvent) {
-    event.stopPropagation();
-    event.preventDefault();
-    if (!this.active) {
-      return;
-    }
+  // private handleClick(event: PointerEvent) {
+  //   event.stopPropagation();
+  //   event.preventDefault();
+  //   if (!this.active) {
+  //     return;
+  //   }
 
-    const target = event.target as HTMLElement;
-    if (!target.classList.contains('joco-button')) {
-      return;
-    }
+  //   const target = event.target as HTMLElement;
+  //   if (!target.classList.contains('joco-button')) {
+  //     return;
+  //   }
 
-    const action = target.getAttribute('data-type');
-    if (action === 'plus') {
-      this.plus();
-    } else if (action === 'minus') {
-      this.minus();
-    }
-  }
+  //   const action = target.getAttribute('data-type');
+  //   if (action === 'plus') {
+  //     this.plus();
+  //   } else if (action === 'minus') {
+  //     this.minus();
+  //   }
+  // }
 
   public getValue() {
     return this.counter.getValue();

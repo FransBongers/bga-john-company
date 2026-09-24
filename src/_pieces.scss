@@ -173,7 +173,7 @@
 
 .joco-regiment {
   box-sizing: border-box;
-  position: absolute;
+  // position: absolute;
   background-image: url('img/regiment.jpg');
   background-size: 100% 100%;
   width: 40px;
@@ -189,18 +189,30 @@
   border-color: #e6d3d1 #e6d3d1 #c2938f #c2938f;
 }
 
+.joco-family-member.selectable,
 .joco-regiment.selectable,
+.joco-company-spot.selectable,
 .joco-order.selectable {
   cursor: pointer;
-  display: block;
+  // display: block;
   outline: 4px solid base.$selectable-color !important;
 }
 
+.joco-family-member.selected,
+.joco-family-member.selectable:hover,
 .joco-regiment.selected,
 .joco-regiment.selectable:hover,
+.joco-company-spot.selected,
+.joco-company-spot.selectable:hover,
 .joco-order.selected,
 .joco-order.selectable:hover {
   cursor: pointer;
-  display: block;
+  // display: block;
   outline: 4px solid base.$selected-color !important;
+}
+
+.joco-company-spot.selected[data-vote='true'],
+.joco-company-spot.selectable:hover[data-vote='true'],
+.joco-company-spot[data-vote='true'] {
+  outline-style: dashed !important;
 }

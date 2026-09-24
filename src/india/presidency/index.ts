@@ -2,6 +2,8 @@ import { createFamilyMember, tplFamilyMemberSpot } from '../../templates';
 import { BENGAL, BOMBAY, MADRAS } from '../../constants';
 import { GamedatasAlias, JocoFamilyMember } from '../../types';
 import { tplOfficeHeader } from '../../company/templates';
+import { Treasury } from '../../ui-components';
+import { Company } from '../../company';
 
 export interface PresidencyProps {
   gamedatas: GamedatasAlias;
@@ -16,7 +18,6 @@ export class Presidency {
     president: HTMLElement;
   };
   private id: string;
-  private treasury: Counter;
 
   constructor(config: PresidencyProps) {
     this.id = config.id;
@@ -42,6 +43,21 @@ export class Presidency {
     }
 
     parentElement.insertAdjacentHTML('beforeend', this.tplPresidency());
+    const presidencyContainer = document.getElementById(
+      `PresidencyOf${this.id}`,
+    ) as HTMLElement;
+    const company = Company.getInstance();
+
+    company.treasuries[`PresidentOf${this.id}`] = new Treasury({
+      parent: presidencyContainer,
+      gamedatas: config.gamedatas,
+      office: `PresidentOf${this.id}`,
+    });
+
+    presidencyContainer.insertAdjacentHTML(
+      'beforeend',
+      this.tplInnerContainer(),
+    );
 
     this.ui = {
       parent: parentElement,
@@ -51,11 +67,11 @@ export class Presidency {
       ) as HTMLElement,
     };
 
-    this.treasury = new ebg.counter();
-    this.treasury.create(`joco-treasury-${this.id.toLocaleLowerCase()}`);
-    this.treasury.setValue(
-      config.gamedatas.offices[`PresidentOf${this.id}`].treasury,
-    );
+    // this.treasury = new ebg.counter();
+    // this.treasury.create(`joco-treasury-${this.id.toLocaleLowerCase()}`);
+    // this.treasury.setValue(
+    //   config.gamedatas.offices[`PresidentOf${this.id}`].treasury,
+    // );
 
     this.updateFamilyMembers(config.gamedatas);
   }
@@ -64,22 +80,26 @@ export class Presidency {
     return `
       <div id="PresidencyOf${this.id}" class="joco-office joco-presidency joco-container">
         ${tplOfficeHeader(`PresidentOf${this.id}`, this.getName())}
-        <div class="joco-treasury-container">
+       <!-- <div class="joco-treasury-container">
           <div><span class="fb-font-baskerville fb-font-12">${_('Treasury').toLocaleUpperCase()}</span></div>
           <div class="joco-treasury-counter-container">
             <span class="fb-font-baskerville fb-font-12">£</span><span id="joco-treasury-${this.id.toLocaleLowerCase()}" class="fb-font-baskerville fb-font-20"></span>
           </div>
-        </div>
-        <div class="joco-inner-container">
-          <div id="Writers_${this.id}" class="joco-family-members-stock">
-          </div>
-          <div>
-            <span class="fb-font-baskerville fb-font-12">${_('Writers').toLocaleUpperCase()}</span>
-          </div>
-        </div>
+        </div> -->
+
       </div>
     `;
   }
+
+  private tplInnerContainer = () => {
+    return `
+    <div class="joco-inner-container">
+      <div id="Writers_${this.id}" class="joco-family-members-stock"></div>
+      <div>
+        <span class="fb-font-baskerville fb-font-12">${_('Writers').toLocaleUpperCase()}</span>
+      </div>
+    </div>`;
+  };
 
   // .##.....##.########..########.....###....########.########....##.....##.####
   // .##.....##.##.....##.##.....##...##.##......##....##..........##.....##..##.
@@ -111,6 +131,11 @@ export class Presidency {
   // .##.....##....##.....##..##........##.....##.......##...
   // .##.....##....##.....##..##........##.....##.......##...
   // ..#######.....##....####.########.####....##.......##...
+
+  public getTreasury() {
+    const company = Company.getInstance();
+    return company.treasuries[`PresidentOf${this.id}`];
+  }
 
   public getName() {
     switch (this.id) {

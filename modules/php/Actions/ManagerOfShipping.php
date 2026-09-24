@@ -158,7 +158,7 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
       return $shipId === $otherShip->getId();
     });
     if ($ship === null) {
-      throw new \feException("ERROR_017");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_017");
     }
     $ship->place($player, $seaZone, $type);
   }

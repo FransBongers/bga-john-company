@@ -1,4 +1,5 @@
-import { Board } from '../board';
+// import { Board } from '../board';
+import { Bar } from '../bar';
 import {
   debug,
   updatePageTitle,
@@ -10,6 +11,7 @@ import {
   addCancelButton,
   performAction,
 } from '../boilerplate';
+import { India } from '../india';
 import { CommonStateArgs, GameAlias, GameState, JoCoOrderBase } from '../types';
 
 interface OnEnteringDirectorOfTradeSpecialEnvoySuccessArgs extends CommonStateArgs {
@@ -74,13 +76,14 @@ export class DirectorOfTradeSpecialEnvoySuccess implements GameState<OnEnteringD
 
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
+    Bar.getInstance().goTo('joco-india');
 
     updatePageTitle(
       _('${you} may open trade with China or may open a closed order'),
     );
-    const board = Board.getInstance();
+    const india = India.getInstance();
     this.args.closedOrders.forEach((order) => {
-      onClick(board.ui.orders[order.id], () =>
+      onClick(india.ui.orders[order.id], () =>
         this.updateInterfaceConfirm(order),
       );
     });
@@ -94,7 +97,7 @@ export class DirectorOfTradeSpecialEnvoySuccess implements GameState<OnEnteringD
     updatePageTitle(_('Open closed order in ${region}?'), {
       region: _(order.location),
     });
-    setSelected(Board.getInstance().ui.orders[order.id]);
+    setSelected(India.getInstance().ui.orders[order.id]);
 
     addConfirmButton(() => this.performAction(order, true));
     addCancelButton();

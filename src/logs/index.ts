@@ -1,6 +1,6 @@
 import {
   createRegiment,
-  createShip,
+  // createShip,
 } from '../board/utility';
 import { tplIcon, tplPolicyIcon } from '../icons/templates';
 import { PlayerManager } from '../player-manager';
@@ -16,6 +16,7 @@ import {
   tplLogTokenSetupCard,
   tplLogTokenStormDie,
   tplLogTokenPlayerName,
+  tplLogTokenShip,
 } from './templates';
 
 const LOG_TOKEN_BOLD_TEXT = 'boldText';
@@ -81,13 +82,11 @@ export const getTokenDiv = ({
     case LOG_TOKEN_SETUP_CARD:
       return tplLogTokenSetupCard(value);
     case LOG_TOKEN_SHIP:
-      const [type, name, fatigued] = value.split(':');
-      return createShip({
-        type,
+      const [side, name] = value.split(':');
+      return tplLogTokenShip({
         name,
-        fatigued: Number(fatigued) as 0 | 1,
-        extraClasses: [CLASS_LOG_TOKEN],
-      }).outerHTML;
+        side,
+      });
     case LOG_TOKEN_STORM_DIE:
       return tplLogTokenStormDie(value);
     case LOG_TOKEN_NEW_LINE:

@@ -1,4 +1,3 @@
-import { Board } from '../board';
 import {
   debug,
   updatePageTitle,
@@ -11,6 +10,7 @@ import {
   addDangerActionButton,
 } from '../boilerplate';
 import { OFFICER_IN_TRAINING } from '../constants';
+import { India } from '../india';
 import {
   CommonStateArgs,
   JocoFamilyMember,
@@ -97,31 +97,35 @@ export class MilitaryAffairsAssign implements GameState<OnEnteringMilitaryAffair
     }
 
     updatePageTitle(_('${you} must assign all officers-in-training'));
-    const board = Board.getInstance();
-
+    
     Object.entries(this.args.officersInTraining).forEach(
       ([officerId, officer]) => {
         if (this.assignedOfficers[officerId]) {
           return;
         }
 
-        onClick(board.ui.familyMembers[officerId], () =>
+        onClick(officerId, () =>
           this.updateInterfaceSelectArmy(officer),
         );
       },
     );
+
+    if (Object.keys(this.assignedOfficers).length > 0) {
+      this.addCancelButton();
+    }
   }
 
   private updateInterfaceSelectArmy(officer: JocoFamilyMember) {
     clearPossible();
-    const board = Board.getInstance();
 
-    setSelected(board.ui.familyMembers[officer.id]);
+    setSelected(officer.id);
 
     this.args.armies.forEach((to) => {
-      onClick(board.ui.selectBoxes[to], async () => {
+      const regionId = to.split('_')[1];
+      onClick(`ArmyOf${regionId}`, async () => {
+        
         clearPossible();
-        await board.moveFamilyMemberBetweenLocations(officer, to);
+        await India.getInstance().getArmy(regionId).addPiece(officer.id);
         this.assignedOfficers[officer.id] = { officer, to };
         this.updateInterfaceInitialStep();
       });
@@ -154,12 +158,11 @@ export class MilitaryAffairsAssign implements GameState<OnEnteringMilitaryAffair
   //  ..#######.....##....####.########.####....##.......##...
 
   private async returnPieces() {
-    const board = Board.getInstance();
 
     for (const { officer, to } of Object.values(this.assignedOfficers)) {
-      await board.moveFamilyMemberBetweenLocations(
-        officer,
-        OFFICER_IN_TRAINING,
+      await this.game.animationManager.slideAndAttach(
+        document.getElementById(officer.id)!,
+        document.getElementById(OFFICER_IN_TRAINING)!,
       );
     }
   }

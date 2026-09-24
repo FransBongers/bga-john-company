@@ -1,5 +1,9 @@
 /* ------- DEFAULT LOG TOKENS ------- */
 
+import { EXTRA_SHIP, FATIGUED } from '../constants';
+import { tplShipContent } from '../token-managers/ship-tokens/templates';
+import { JocoShipBase } from '../types';
+
 export const tlpLogTokenText = ({
   text,
   tooltipId,
@@ -14,22 +18,25 @@ export const tlpLogTokenText = ({
   `<span ${
     tooltipId ? `id="${tooltipId}" class="log_tooltip"` : ''
   } style="font-weight: ${bold ? '700' : '400'};${italic ? ' font-style: italic;' : ''}">${_(
-    text
+    text,
   )}</span>`;
 
 /* ------- GAME SPECIFIC LOG TOKENS ------- */
 
 export const tplLogTokenClimate = (climate: string) =>
-  `<div class="log_token joco-crown-climate-icon" data-climate="${climate}"></div>`;
+  `<div class="log-token joco-crown-climate-icon" data-climate="${climate}"></div>`;
 
-export const tplLogTokenElephant = () => '<div class="log_token joco_elephant"></div>';
+export const tplLogTokenElephant = () =>
+  '<div class="log-token joco_elephant"></div>';
 
-export const tplLogTokenPound = () => `<div class="log_token joco_pound"></div>`;
+export const tplLogTokenPound = () =>
+  `<div class="log-token joco_pound"></div>`;
 
-export const tplLogTokenPromiseCube = () => '<div class="log_token joco-promise-cube"></div>'
+export const tplLogTokenPromiseCube = () =>
+  '<div class="log-token joco-promise-cube"></div>';
 
 export const tplLogTokenStormDie = (side: string) =>
-  `<div class="log_token joco-storm-die" data-side="${side}"></div>`;
+  `<div class="log-token joco-storm-die" data-side="${side}"></div>`;
 
 // export const tplLogTokenIcon = (type: string) =>
 //   `<div class="log-token joco-icon" data-icon="${type}"></div>`;
@@ -45,18 +52,26 @@ export const tplLogTokenPlayerName = ({
   color: string;
 }) => `<span class="playername" style="color:#${color};">${name}</span>`;
 
+export const tplLogTokenShip = ({
+  name,
+  side,
+}: {
+  name: string;
+  side: string;
+}) => `<div class="log-token joco-ship" data-side="${side}">
+  ${tplShipContent({ name, side } as JocoShipBase, side === FATIGUED || side === EXTRA_SHIP)}
+</div>`;
+
 export const tknPound = () => _('Pounds');
 
 export const tknShipValue = ({
   name,
-  type,
-  fatigued,
+  side,
 }: {
   name: string;
-  type: string;
-  fatigued: 0 | 1;
+  side: string;
 }): string => {
-  return [type, name, fatigued].join(':');
+  return [side, name].join(':');
 };
 
 export const tknPromiseCubes = () => 'Promise Cube(s)';

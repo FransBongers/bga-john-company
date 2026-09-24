@@ -37,8 +37,9 @@ export class India {
   private armies: Record<string, Army> = {};
   private presidencies: Record<string, Presidency> = {};
   private regions: Record<string, Region> = {};
+  private seaZones: Record<string, ShipZone> = {};
 
-  private ui: {
+  public ui: {
     map: HTMLElement;
     orders: Record<string, HTMLElement>;
     elephant: HTMLElement;
@@ -99,6 +100,7 @@ export class India {
         parentElement: presidencyContainer!,
         id: army,
         gamedatas,
+        game: this.game,
       });
       this.armies[army] = armyInstance;
     });
@@ -123,6 +125,9 @@ export class India {
       const elt = createHtmlElement(tplOrder(orderId, position));
       this.ui.orders[orderId] = elt;
       this.ui.map.appendChild(elt);
+
+      elt.insertAdjacentHTML('beforeend', tplOrderToken('closed'));
+      elt.insertAdjacentHTML('beforeend', tplOrderToken('filled'));
     });
 
     this.updateOrders(gamedatas);
@@ -136,7 +141,7 @@ export class India {
 
   private setupShipZones(gamedatas: GamedatasAlias) {
     SEA_ZONES.forEach((seaZone) => {
-      new ShipZone(seaZone, gamedatas);
+      this.seaZones[seaZone] = new ShipZone(seaZone, gamedatas);
     });
   }
 
@@ -172,13 +177,22 @@ export class India {
     // );
     // this.ui.orders[ORDER_HYDERABAD_1].insertAdjacentHTML('beforeend', tplOrderToken('filled'));
     Object.entries(gamedatas.orders).forEach(([orderId, order]) => {
-      if (order.status === 'open') {
-        return;
-      }
-      this.ui.orders[orderId].insertAdjacentHTML(
-        'beforeend',
-        tplOrderToken(order.status),
-      );
+      this.ui.orders[orderId].setAttribute('data-status', order.status);
+      // if (order.status === 'open') {
+      //   return;
+      // }
+      // this.ui.orders[orderId].insertAdjacentHTML(
+      //   'beforeend',
+      //   tplOrderToken(order.status),
+      // );
     });
+  }
+
+  public getArmy(regionId: string): Army {
+    return this.armies[regionId];
+  }
+
+  public getSeaZone(seaZone: string): ShipZone {
+    return this.seaZones[seaZone];
   }
 }

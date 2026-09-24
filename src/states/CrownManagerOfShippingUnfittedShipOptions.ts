@@ -199,10 +199,10 @@ export class CrownManagerOfShippingUnfittedShipOptions implements GameState<OnEn
     updatePageTitle(text, {
       tkn_playerName_crown: getCrownPlayerName(),
       tkn_ship: tknShipValue({
-        type,
+        // TODO: check
+        side: type,
         name: _(this.args.ship.name),
-        fatigued: 0,
-      }),
+        }),
       location: getSeaName(this.args.location),
     });
   }

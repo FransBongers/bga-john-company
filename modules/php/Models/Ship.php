@@ -81,10 +81,10 @@ class Ship extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implement
     return $this->owner;
   }
 
-  public function place($player, $location, $type = null) {
+  public function place($player, $location, $side = null) {
     $this->setLocation($location);
-    if ($type !== null) {
-      $this->setType($type);
+    if ($side !== null) {
+      $this->setSide($side);
     }
     Notifications::placeShip($player, $this);
   }

@@ -1,4 +1,4 @@
-import { COMPANY_SHIP, FULL, PLAYER_OWNED_SHIP } from '../../constants';
+import { COMPANY_SHIP, EXTRA_SHIP, FATIGUED, FULL, PLAYER_OWNED_SHIP } from '../../constants';
 import { BgaCards } from '../../libs';
 import { GameAlias, JocoShipBase } from '../../types';
 import { tplShipContent } from './templates';
@@ -22,8 +22,8 @@ export class ShipsManager extends BgaCards.Manager<JocoShipBase> {
       setupBackDiv: (card, div: HTMLElement) => this.setupBackDiv(card, div),
       isCardVisible: (card) => this.isCardVisible(card),
       animationManager: game.animationManager,
-      cardHeight: 45,
-      cardWidth: 50,
+      cardWidth: 75,
+      cardHeight: 68,
       type: 'ship',
     });
   }
@@ -31,13 +31,13 @@ export class ShipsManager extends BgaCards.Manager<JocoShipBase> {
   clearInterface() {}
 
   setupDiv(card: JocoShipBase, div: HTMLElement) {
-    div.classList.add('joco-ship');
+    div.classList.add('joco-ship-container');
   }
 
   setupFrontDiv(card: JocoShipBase, div: HTMLElement) {
     div.classList.add('joco-ship');
     // div.setAttribute('data-background', card.background);
-    div.setAttribute('data-type', card.type);
+    div.setAttribute('data-side', card.type === PLAYER_OWNED_SHIP ? FULL : COMPANY_SHIP);
 
     if (div.children.length) {
       return;
@@ -47,10 +47,7 @@ export class ShipsManager extends BgaCards.Manager<JocoShipBase> {
 
   setupBackDiv(card: JocoShipBase, div: HTMLElement) {
     div.classList.add('joco-ship');
-    div.setAttribute('data-type', card.type);
-    if (card.type === PLAYER_OWNED_SHIP) {
-      div.setAttribute('data-fatigued', '1');
-    }
+    div.setAttribute('data-side', card.type === PLAYER_OWNED_SHIP ? FATIGUED : EXTRA_SHIP);
 
     if (div.children.length) {
       return;

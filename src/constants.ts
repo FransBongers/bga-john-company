@@ -278,15 +278,15 @@ export const SOUTH_INDIAN = 'southIndian';
 export const CHINA = 'china';
 export const UNFITTED = 'unfitted';
 
-export const SEA_ZONES = [WEST_INDIAN, EAST_INDIAN, SOUTH_INDIAN];
+export const SEA_ZONES = [WEST_INDIAN, SOUTH_INDIAN, EAST_INDIAN];
 
 /**
  * Ship types
  */
 export const PLAYER_OWNED_SHIP = 'playerOwnedShip';
+export const OTHER_SHIP = 'OtherShip';
 export const COMPANY_SHIP = 'CompanyShip';
 export const EXTRA_SHIP = 'ExtraShip';
-
 
 export const FATIGUED = 'fatigued';
 export const FULL = 'full';

@@ -1,4 +1,4 @@
-import { Board } from '../board';
+import { Bar } from '../bar';
 import {
   debug,
   updatePageTitle,
@@ -12,6 +12,7 @@ import {
   performAction,
   addDangerActionButton,
 } from '../boilerplate';
+import { India } from '../india';
 import {
   CommonStateArgs,
   GameAlias,
@@ -74,6 +75,7 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
       officers: {},
       regiments: {},
     };
+    Bar.getInstance().goTo('joco-india');
     this.updateInterfaceInitialStep();
   }
 
@@ -125,12 +127,12 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
         number: 2 - this.getTransferCount(),
       },
     );
-    const board = Board.getInstance();
+
     Object.entries(this.args.options.regiments).forEach(([id, data]) => {
       if (this.transfers.regiments[id]) {
         return;
       }
-      onClick(board.ui.armyPieces[id], () =>
+      onClick(id, () =>
         this.updateInterfaceSelectArmyForRegiment(data),
       );
     });
@@ -159,12 +161,13 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
     locations: string[];
   }) {
     clearPossible();
-    const board = Board.getInstance();
 
-    setSelected(board.ui.armyPieces[regiment.id]);
+
+    setSelected(regiment.id);
 
     locations.forEach((to) => {
-      onClick(board.ui.selectBoxes[to], async () => {
+      const regionId = to.split('_')[1];
+      onClick(`ArmyOf${regionId}`, async () => {
         const from = regiment.location;
         this.transfers.regiments[regiment.id] = {
           regiment,
@@ -173,7 +176,7 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
         };
         regiment.location = to;
         clearPossible();
-        await board.moveRegimentBetweenArmies(regiment, from);
+        await India.getInstance().getArmy(regionId).addPiece(regiment.id);
         this.updateInterfaceInitialStep();
       });
     });
@@ -237,11 +240,10 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
   }
 
   private async returnPieces() {
-    const board = Board.getInstance();
-
+    const india = India.getInstance();
     for (let data of Object.values(this.transfers.regiments)) {
       data.regiment.location = data.from;
-      await board.moveRegimentBetweenArmies(data.regiment, data.to);
+      await india.getArmy(data.from).addPiece(data.regiment.id);
     }
     // for (let data of Object.values(this.transfers.writers)) {
     //   data.writer.location = data.from;

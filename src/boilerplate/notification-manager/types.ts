@@ -85,7 +85,7 @@ export interface NotifMoveCompanyStanding {
 
 export interface NotifMoveFamilyMember {
   familyMember: JocoFamilyMember;
-  to: string;
+  from: string;
 }
 
 export interface NotifMoveFamilyMembers {

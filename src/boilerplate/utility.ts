@@ -121,3 +121,15 @@ export const createHtmlElement = (html: string): HTMLElement => {
   template.innerHTML = html.trim();
   return template.content.firstChild as HTMLElement;
 };
+
+export const parentHasChildWithId = (parentId: string, childId: string) => {
+  const locationElement = document.getElementById(parentId);
+  if (
+    Array.from(locationElement?.children ?? []).some(
+      (child) => child.id === childId,
+    )
+  ) {
+    return true;
+  }
+  return false;
+};

@@ -83,7 +83,7 @@ export class PlayerAreas {
         const ship = ships.find((s) => s.location === enterprise.id);
         if (ship) {
           const shipStock =
-            EnterpriseCardsManager.getInstance().shipStocks[enterprise.id];
+            EnterpriseCardsManager.getInstance().shipStocks[enterprise.shipId];
           if (shipStock) {
             shipStock.addCard(ship);
           }

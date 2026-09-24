@@ -1,5 +1,7 @@
+@use '../../base';
+
 .joco-ship {
-  width: 50px;
+  width: 75px;
   // height: 36px;
   aspect-ratio: 40/36;
   background-size: 100% 100%;
@@ -17,6 +19,7 @@
     width: 90%;
     text-align: center;
     font-size: 50%;
+    color: black;
   }
 
   .joco-ship-fatigued {
@@ -29,18 +32,40 @@
   }
 }
 
-.joco-ship[data-type='CompanyShip'] {
-  background-image: url('img/ship_company.png');
+.joco-ship {
+  &[data-side='full'] {
+    background-image: url('img/ship_player.png');
+  }
+
+  &[data-side='fatigued'] {
+    background-image: url('img/ship_player_fatigued.png');
+  }
+
+  &[data-side='ExtraShip'] {
+    background-image: url('img/ship_extra.png');
+    .joco-ship-name {
+      color: white;
+    }
+  }
+
+  &[data-side='CompanyShip'] {
+    background-image: url('img/ship_company.png');
+  }
 }
 
-.joco-ship[data-type='ExtraShip'] {
-  background-image: url('img/ship_extra.png');
+.joco-ship-container.selectable {
+  .joco-ship {
+    cursor: pointer;
+    z-index: 1;
+    outline: 4px solid base.$selectable-color !important;
+  }
 }
 
-.joco-ship[data-type='playerOwnedShip'] {
-  background-image: url('img/ship_player.png');
-}
-
-.joco-ship[data-type='playerOwnedShip'][data-fatigued='1'] {
-  background-image: url('img/ship_player_fatigued.png');
+.joco-ship-container.selectable:hover,
+.joco-ship-container.selected {
+  .joco-ship {
+    cursor: pointer;
+    z-index: 1;
+    outline: 4px solid base.$selected-color !important;
+  }
 }

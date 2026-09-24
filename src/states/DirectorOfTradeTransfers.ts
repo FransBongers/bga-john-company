@@ -1,4 +1,5 @@
-import { Board } from '../board';
+// import { Board } from '../board';
+import { Bar } from '../bar';
 import {
   debug,
   updatePageTitle,
@@ -12,6 +13,7 @@ import {
   performAction,
   addDangerActionButton,
 } from '../boilerplate';
+import { India } from '../india';
 import {
   CommonStateArgs,
   GameAlias,
@@ -19,6 +21,7 @@ import {
   JocoFamilyMember,
   JocoShipBase,
 } from '../types';
+import { getSeaName } from '../utility';
 
 interface OnEnteringDirectorOfTradeTransfersArgs extends CommonStateArgs {
   options: {
@@ -112,6 +115,7 @@ export class DirectorOfTradeTransfers implements GameState<OnEnteringDirectorOfT
 
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
+    Bar.getInstance().goTo('joco-india');
 
     const transferCount = this.getTransferCount();
     if (transferCount === 2) {
@@ -125,17 +129,13 @@ export class DirectorOfTradeTransfers implements GameState<OnEnteringDirectorOfT
         number: 2 - this.getTransferCount(),
       },
     );
-    const board = Board.getInstance();
+    // const board = Board.getInstance();
     Object.entries(this.args.options.writers).forEach(([id, data]) =>
-      onClick(board.ui.familyMembers[id], () =>
-        this.updateInterfaceSelectPresidency(data),
-      ),
+      onClick(id, () => this.updateInterfaceSelectPresidency(data)),
     );
 
     Object.entries(this.args.options.ships).forEach(([id, data]) =>
-      onClick(board.ui.ships[id], () =>
-        this.updateInterfaceSelectSeaZone(data),
-      ),
+      onClick(`ship-${id}`, () => this.updateInterfaceSelectSeaZone(data)),
     );
 
     if (this.getTransferCount() > 0) {
@@ -158,17 +158,25 @@ export class DirectorOfTradeTransfers implements GameState<OnEnteringDirectorOfT
     locations: string[];
   }) {
     clearPossible();
-    const board = Board.getInstance();
-    setSelected(board.ui.familyMembers[writer.id]);
+    // const board = Board.getInstance();
+    const writerElt = document.getElementById(writer.id)!;
+    setSelected(writerElt);
+
+    updatePageTitle(_('${you} must select a Presidency'));
 
     locations.forEach((newLocation) => {
-      onClick(board.ui.selectBoxes[newLocation], async () => {
+      const regionId = newLocation.split('_')[1];
+      onClick(`PresidencyOf${regionId}`, async () => {
+        clearPossible();
         this.transfers.writers[writer.id] = {
           writer,
           from: writer.location,
           to: newLocation,
         };
-        await board.moveFamilyMemberBetweenLocations(writer, newLocation);
+        await this.game.animationManager.slideAndAttach(
+          writerElt,
+          document.getElementById(newLocation),
+        );
         this.updateInterfaceInitialStep();
       });
     });
@@ -184,22 +192,40 @@ export class DirectorOfTradeTransfers implements GameState<OnEnteringDirectorOfT
     locations: string[];
   }) {
     clearPossible();
-    const board = Board.getInstance();
-    setSelected(board.ui.ships[ship.id]);
+
+    updatePageTitle(_('${you} must select a sea zone'));
+    setSelected(`ship-${ship.id}`);
+    const india = India.getInstance();
 
     locations.forEach((seaZone) => {
-      onClick(board.ui.selectBoxes[seaZone], async () => {
-        clearPossible();
-        const from = ship.location;
-        ship.location = seaZone;
-        this.transfers.ships[ship.id] = {
-          from,
-          to: seaZone,
-          ship,
-        };
-        await board.moveShip({ ship, from });
-        this.updateInterfaceInitialStep();
+      addPrimaryActionButton({
+        id: `${seaZone}-btn`,
+        text: getSeaName(seaZone),
+        callback: async () => {
+          clearPossible();
+          const from = ship.location;
+          ship.location = seaZone;
+          this.transfers.ships[ship.id] = {
+            from,
+            to: seaZone,
+            ship,
+          };
+          await india.getSeaZone(seaZone).addShip(ship, from);
+          this.updateInterfaceInitialStep();
+        },
       });
+      // onClick(seaZone, async () => {
+      //   clearPossible();
+      //   const from = ship.location;
+      //   ship.location = seaZone;
+      //   this.transfers.ships[ship.id] = {
+      //     from,
+      //     to: seaZone,
+      //     ship,
+      //   };
+      //   await india.getSeaZone(seaZone).addShip(ship);
+      //   this.updateInterfaceInitialStep();
+      // });
     });
     this.addCancelButton();
   }
@@ -232,14 +258,17 @@ export class DirectorOfTradeTransfers implements GameState<OnEnteringDirectorOfT
   }
 
   private async returnPieces() {
-    const board = Board.getInstance();
-
+    // const board = Board.getInstance();
+    const india = India.getInstance();
     for (let data of Object.values(this.transfers.ships)) {
       data.ship.location = data.from;
-      await board.moveShip({ ship: data.ship, from: data.to });
+      await india.getSeaZone(data.from).addShip(data.ship, data.to);
     }
     for (let data of Object.values(this.transfers.writers)) {
-      await board.moveFamilyMemberBetweenLocations(data.writer, data.from);
+      await this.game.animationManager.slideAndAttach(
+        document.getElementById(data.writer.id),
+        document.getElementById(data.from),
+      );
     }
   }
 

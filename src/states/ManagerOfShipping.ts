@@ -1,4 +1,4 @@
-import { Board } from '../board';
+import { Bar } from '../bar';
 import {
   addConfirmButton,
   addDangerActionButton,
@@ -15,10 +15,21 @@ import {
   performAction,
   updatePageTitle,
 } from '../boilerplate';
-import { EXTRA_SHIP, COMPANY_SHIP, SEA_ZONES, SHIPS_COUNTER, MANAGER_OF_SHIPPING } from '../constants';
+import { EnterpriseCardsManager } from '../cards/enterprise-cards';
+import { Company } from '../company';
+import {
+  EXTRA_SHIP,
+  COMPANY_SHIP,
+  SEA_ZONES,
+  SHIPS_COUNTER,
+  MANAGER_OF_SHIPPING,
+  FULL,
+} from '../constants';
+import { India } from '../india';
 import { tknShipValue } from '../logs/templates';
 import { PlayerManager } from '../player-manager';
 import { JocoShipBase, GameAlias } from '../types';
+import { getSeaName } from '../utility';
 
 interface OnEnteringManagerOfShippingArgs extends CommonStateArgs {
   playerShips: JocoShipBase[];
@@ -29,9 +40,27 @@ interface OnEnteringManagerOfShippingArgs extends CommonStateArgs {
 export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingArgs> {
   private static instance: ManagerOfShipping;
   private args: OnEnteringManagerOfShippingArgs;
-  private placedCompanyShips: Record<string, string>;
-  private placedExtraShips: Record<string, string>;
-  private placedPlayerShips: Record<string, string>;
+  private placedCompanyShips: Record<
+    string,
+    {
+      ship: JocoShipBase;
+      seaZone: string;
+    }
+  >;
+  private placedExtraShips: Record<
+    string,
+    {
+      ship: JocoShipBase;
+      seaZone: string;
+    }
+  >;
+  private placedPlayerShips: Record<
+    string,
+    {
+      ship: JocoShipBase;
+      seaZone: string;
+    }
+  >;
   private treasury: number;
 
   constructor(private game: GameAlias) {}
@@ -51,7 +80,7 @@ export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingA
     this.placedExtraShips = {};
     this.placedPlayerShips = {};
     this.treasury = this.args.treasury;
-
+    Bar.getInstance().goTo('joco-india');
     this.updateInterfaceInitialStep();
   }
 
@@ -100,12 +129,11 @@ export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingA
       _('${you} may fit, buy and lease ships (£${amount} remaining)'),
       { amount: this.treasury },
     );
-    const board = Board.getInstance();
 
     let playerShipsAvailable = false;
 
     this.args.playerShips.forEach((ship) => {
-      const { id, type, name, fatigued, owner: playerId } = ship;
+      const { id, type, name, owner: playerId } = ship;
       if (this.placedPlayerShips[ship.id] || this.treasury < 3) {
         return;
       }
@@ -113,7 +141,7 @@ export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingA
       addPlayerButton({
         id: `${ship.id}_btn`,
         text: formatStringRecursive(_('Fit ${tkn_ship}'), {
-          tkn_ship: tknShipValue({ type, name, fatigued }),
+          tkn_ship: tknShipValue({ side: FULL, name }),
         }),
         playerId,
         callback: () => {
@@ -126,9 +154,8 @@ export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingA
         id: 'extraShip_btn',
         text: formatStringRecursive(_('Lease ${tkn_ship}'), {
           tkn_ship: tknShipValue({
-            type: EXTRA_SHIP,
+            side: EXTRA_SHIP,
             name: _('Extra Ship'),
-            fatigued: 0,
           }),
         }),
         callback: () => {
@@ -143,9 +170,8 @@ export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingA
         id: 'companyShip_btn',
         text: formatStringRecursive(_('Buy ${tkn_ship}'), {
           tkn_ship: tknShipValue({
-            type: COMPANY_SHIP,
+            side: COMPANY_SHIP,
             name: _('Company Ship'),
-            fatigued: 0,
           }),
         }),
         callback: () => {
@@ -175,39 +201,74 @@ export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingA
   private updateInterfaceSelectSeaZone(ship: JocoShipBase, playerId?: number) {
     clearPossible();
 
-    const board = Board.getInstance();
-
     updatePageTitle(_('${you} must select a sea zone'));
 
     SEA_ZONES.forEach((seaZone) => {
-      onClick(board.ui.selectBoxes[seaZone], async () => {
-        ship.location = seaZone;
-        let fromElt = undefined;
-        clearPossible();
-        if (playerId) {
-          // Player Ship
-          this.placedPlayerShips[ship.id] = seaZone;
-          const player = PlayerManager.getInstance().getPlayer(playerId);
-          player.counters[SHIPS_COUNTER].incValue(-1);
-          fromElt = player.ui[SHIPS_COUNTER];
-          this.pay(3);
-        } else if (ship.type === EXTRA_SHIP) {
-          ship = board.updateOtherShip(ship, EXTRA_SHIP);
-          this.placedExtraShips[ship.id] = seaZone;
-          this.pay(2);
-        } else {
-          // Company ship
-          ship = board.updateOtherShip(ship, COMPANY_SHIP);
-          this.placedCompanyShips[ship.id] = seaZone;
-          this.pay(5);
-        }
-
-        await board.placeShip(ship, fromElt);
-        this.updateInterfaceInitialStep();
+      addPrimaryActionButton({
+        id: `select_${seaZone}_btn`,
+        text: getSeaName(seaZone),
+        callback: () => this.onSeaZoneClick(seaZone, ship, playerId),
       });
+      // onClick(board.ui.selectBoxes[seaZone], async () => {
+      //   ship.location = seaZone;
+      //   let fromElt = undefined;
+      //   clearPossible();
+      //   if (playerId) {
+      //     // Player Ship
+      //     this.placedPlayerShips[ship.id] = seaZone;
+      //     const player = PlayerManager.getInstance().getPlayer(playerId);
+      //     player.counters[SHIPS_COUNTER].incValue(-1);
+      //     fromElt = player.ui[SHIPS_COUNTER];
+      //     this.pay(3);
+      //   } else if (ship.type === EXTRA_SHIP) {
+      //     ship = board.updateOtherShip(ship, EXTRA_SHIP);
+      //     this.placedExtraShips[ship.id] = seaZone;
+      //     this.pay(2);
+      //   } else {
+      //     // Company ship
+      //     ship = board.updateOtherShip(ship, COMPANY_SHIP);
+      //     this.placedCompanyShips[ship.id] = seaZone;
+      //     this.pay(5);
+      //   }
+
+      //   await board.placeShip(ship, fromElt);
+      //   this.updateInterfaceInitialStep();
+      // });
     });
 
     this.addCancelButton();
+  }
+
+  private async onSeaZoneClick(
+    seaZone: string,
+    ship: JocoShipBase,
+    playerId?: number,
+  ) {
+    ship.location = seaZone;
+    let fromElt = undefined;
+    clearPossible();
+    if (playerId) {
+      // Player Ship
+      this.placedPlayerShips[ship.id] = { ship, seaZone };
+      // const player = PlayerManager.getInstance().getPlayer(playerId);
+      // player.counters[SHIPS_COUNTER].incValue(-1);
+      // fromElt = player.ui[SHIPS_COUNTER];
+      this.pay(3);
+    } else if (ship.type === EXTRA_SHIP) {
+      // ship = board.updateOtherShip(ship, EXTRA_SHIP);
+      ship.side = EXTRA_SHIP;
+      this.placedExtraShips[ship.id] = { ship, seaZone };
+      this.pay(2);
+    } else {
+      // Company ship
+      // ship = board.updateOtherShip(ship, COMPANY_SHIP);
+      ship.side = COMPANY_SHIP;
+      this.placedCompanyShips[ship.id] = { ship, seaZone };
+      this.pay(5);
+    }
+
+    await India.getInstance().getSeaZone(seaZone).addShip(ship);
+    this.updateInterfaceInitialStep();
   }
 
   private updateInterfaceConfirm() {
@@ -217,12 +278,22 @@ export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingA
 
     addConfirmButton(() => {
       performAction('actManagerOfShipping', {
-        playerShips: this.placedPlayerShips,
-        extraShips: this.placedExtraShips,
-        companyShips: this.placedCompanyShips,
+        playerShips: this.getActionData(this.placedPlayerShips),
+        extraShips: this.getActionData(this.placedExtraShips),
+        companyShips: this.getActionData(this.placedCompanyShips),
       });
     });
     this.addCancelButton();
+  }
+
+  private getActionData(
+    input: Record<string, { ship: JocoShipBase; seaZone: string }>,
+  ) {
+    const result = {};
+    Object.entries(input).forEach(([shipId, { ship, seaZone }]) => {
+      result[shipId] = seaZone;
+    });
+    return result;
   }
 
   //  .##.....##.########.####.##.......####.########.##....##
@@ -234,22 +305,30 @@ export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingA
   //  ..#######.....##....####.########.####....##.......##...
 
   private async returnPieces() {
-    const board = Board.getInstance();
+    // const board = Board.getInstance();
+    Company.getInstance().treasuries[MANAGER_OF_SHIPPING].toValue(
+      this.args.treasury,
+    );
+    const india = India.getInstance();
+    const enterpriseCardsManager = EnterpriseCardsManager.getInstance();
 
-    [
-      this.placedCompanyShips,
-      this.placedExtraShips,
-      this.placedPlayerShips,
-    ].forEach((category) => {
-      Object.entries(category).forEach(([shipId, seaZone]) => {
-        board.removeShip(shipId, seaZone);
+    [this.placedCompanyShips, this.placedExtraShips].forEach((category) => {
+      Object.entries(category).forEach(([shipId, { ship, seaZone }]) => {
+        india.getSeaZone(seaZone).removeShip(ship);
+        // board.removeShip(shipId, seaZone);
       });
     });
+    for (const shipId in this.placedPlayerShips) {
+      const { ship, seaZone } = this.placedPlayerShips[shipId];
+      const stock = enterpriseCardsManager.shipStocks[ship.id];
+      await stock.addCard(ship);
+      india.getSeaZone(seaZone).updateCount();
+    }
   }
 
   private async pay(amount: number) {
     this.treasury -= amount;
-    Board.getInstance().treasuries[MANAGER_OF_SHIPPING].toValue(this.treasury);
+    Company.getInstance().treasuries[MANAGER_OF_SHIPPING].incValue(-amount);
   }
 
   //  ..######..##.......####..######..##....##

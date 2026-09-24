@@ -85,8 +85,7 @@ export class CrownManagerOfShippingLeaseExtraShips implements GameState<OnEnteri
         tkn_playerName_crown: getCrownPlayerName(),
         tkn_ship: tknShipValue({
           name: 'Extra Ship',
-          type: EXTRA_SHIP,
-          fatigued: 0,
+          side: EXTRA_SHIP,
         }),
       },
     );

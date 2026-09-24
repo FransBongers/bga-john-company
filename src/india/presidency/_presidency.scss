@@ -83,4 +83,15 @@
       border-color: base.$madras-color;
     }
   }
+
+  &.selectable {
+    cursor: pointer;
+    outline: 4px solid base.$selectable-color !important;
+  }
+
+  &.selectable:hover,
+  &.selected {
+    cursor: pointer;
+    outline: 4px solid base.$selected-color !important;
+  }
 }

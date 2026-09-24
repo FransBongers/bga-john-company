@@ -1,3 +1,4 @@
+import { India } from '..';
 import { formatStringRecursive } from '../../boilerplate/utility';
 import { BgaCards } from '../../libs';
 import { ShipsManager } from '../../token-managers/ship-tokens';
@@ -43,8 +44,35 @@ export class ShipZone {
   public updateShips(ships: JocoShipBase[]) {
     this.stock.addCards(ships);
 
-    this.ui.count.textContent = formatStringRecursive(ships.length === 1 ? '${count} Ship' : '${count} Ships', {
-      count: ships.length,
-    });
+    this.updateCount();
+  }
+
+  public updateCount(modifier = 0) {
+    this.ui.count.replaceChildren();
+    const count = this.stock.getCards().length + modifier;
+    this.ui.count.textContent = formatStringRecursive(
+      count === 1 ? '${count} Ship' : '${count} Ships',
+      {
+        count,
+      },
+    );
+  }
+
+  public async addShip(ship: JocoShipBase, fromSea = null) {
+    if (fromSea) {
+      India.getInstance().getSeaZone(fromSea).updateCount(-1);
+    }
+    await this.stock.addCard(ship);
+
+    this.updateCount();
+  }
+
+  public hasShip(shipId: string) {
+    return this.stock.getCards().some((ship) => ship.id === shipId);
+  }
+
+  public async removeShip(ship: JocoShipBase) {
+    await this.stock.removeCard(ship);
+    this.updateCount();
   }
 }

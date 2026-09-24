@@ -18,6 +18,7 @@ import {
   tplOffice,
 } from './templates';
 import { getPhaseName } from '../phase-tracker/translations';
+import { Treasury } from '../ui-components';
 
 const tplCompany = () => `
   <div id="joco-company" class="joco-tab">
@@ -50,7 +51,7 @@ export class Company {
     courtOfDirectors?: HTMLElement;
     stockExchange: Record<string, HTMLElement>;
     standing: Record<string, HTMLElement>;
-    debt: Record<string, HTMLElement>;
+    debt: Record<number, HTMLElement>;
     offices: Record<string, HTMLElement>;
   } = {
     stockExchange: {},
@@ -58,8 +59,8 @@ export class Company {
     debt: {},
     offices: {},
   };
-  private balance: Counter;
-  private treasuries: Record<string, Counter> = {};
+  public balance: Counter;
+  public treasuries: Record<string, Treasury> = {};
 
   constructor(private game: GameAlias) {
     this.game = game;
@@ -109,16 +110,23 @@ export class Company {
   }
 
   setupCompanyDebt(gamedatas: GamedatasAlias) {
-    COMPANY_DEBT_CONFIG.forEach((item) => {
-      this.ui.debt[item.id] = document.getElementById(item.id)!;
+    COMPANY_DEBT_CONFIG.forEach((item, index) => {
+      this.ui.debt[index] = document.getElementById(item.id)!;
     });
     this.updateCompanyDebt(gamedatas.company.debt);
   }
 
   private setupTreasury(gamedatas: GamedatasAlias, id: string) {
-    this.treasuries[id] = new ebg.counter();
-    this.treasuries[id].create(`${id}-treasury`);
-    this.treasuries[id].setValue(gamedatas.offices[id].treasury);
+    const parent = document.getElementById(`${id}Office`)!;
+    this.treasuries[id] = new Treasury({
+      parent,
+      gamedatas,
+      office: id,
+    });
+
+    // this.treasuries[id] = new ebg.counter();
+    // this.treasuries[id].create(`${id}-treasury`);
+    // this.treasuries[id].setValue(gamedatas.offices[id].treasury);
   }
 
   setup(gamedatas: GamedatasAlias) {
@@ -146,6 +154,10 @@ export class Company {
   // .##.....##.##........##.....##.#########....##....##..........##.....##..##.
   // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
   // ..#######..##........########..##.....##....##....########.....#######..####
+
+  public getDebtElt(debt: number): HTMLElement {
+    return this.ui.debt[debt];
+  }
 
   public updateFamilyMembers(gamedatas: GamedatasAlias) {
     const offices = [CHAIRMAN, DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING];
@@ -179,8 +191,7 @@ export class Company {
       element.classList.remove('active');
     });
 
-    const activeId = `company-debt-${debt}`;
-    const activeElement = this.ui.debt[activeId];
+    const activeElement = this.ui.debt[debt];
 
     if (activeElement) {
       activeElement.classList.add('active');
@@ -198,5 +209,9 @@ export class Company {
         this.ui.courtOfDirectors?.appendChild(familyMemberElement);
       }
     });
+  }
+
+  public incBalance(change: number) {
+    this.balance.incValue(change);
   }
 }

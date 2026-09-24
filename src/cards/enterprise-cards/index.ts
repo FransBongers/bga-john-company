@@ -47,7 +47,7 @@ export class EnterpriseCardsManager extends BgaCards.Manager<JocoEnterpriseCard>
     }
     div.insertAdjacentHTML('beforeend', tplEnterpriseCardContent(card));
     if (card.type === SHIPYARD) {
-      this.shipStocks[card.id] = new BgaCards.LineStock<JocoShipBase>(
+      this.shipStocks[card.shipId] = new BgaCards.LineStock<JocoShipBase>(
         ShipsManager.getInstance(),
         document.getElementById(`${card.id}-ship`)!,
       );

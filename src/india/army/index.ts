@@ -1,12 +1,15 @@
+import { parentHasChildWithId } from '../../boilerplate';
 import { BENGAL, BOMBAY, MADRAS } from '../../constants';
 import { createFamilyMember, tplFamilyMemberSpot } from '../../templates';
-import { GamedatasAlias } from '../../types';
+import { GameAlias, GamedatasAlias } from '../../types';
+
 import { tplRegiment } from './templates';
 
 export interface ArmyProps {
   parentElement: HTMLElement | string;
   id: string;
   gamedatas: GamedatasAlias;
+  game: GameAlias;
 }
 
 export class Army {
@@ -19,9 +22,11 @@ export class Army {
     commander: HTMLElement;
   };
   private id: string;
+  private game: GameAlias;
 
   constructor(config: ArmyProps) {
     this.id = config.id;
+    this.game = config.game;
     this.setup(config);
   }
 
@@ -132,5 +137,16 @@ export class Army {
       default:
         return '';
     }
+  }
+
+  public async addPiece(piece: HTMLElement | string) {
+    const element = typeof piece === 'string' ? document.getElementById(piece) : piece;
+    if (parentHasChildWithId(this.ui.army.ready.id, element.id)) {
+      return;
+    }
+    await this.game.animationManager.slideAndAttach(
+      element,
+      this.ui.army.ready,
+    );
   }
 }

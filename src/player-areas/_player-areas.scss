@@ -2,14 +2,47 @@
   // min-height: 300px;
   // background-color: yellow;
   // z-index: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .joco-player-area {
-  display: flex;
-  flex-direction: column;
   min-height: 200px;
+  width: 1000px;
+  margin: 0 auto;
+  padding: 0;
 
-  .playername {
-    font-size: larger;
+  .joco-player-name {
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+
+  .joco-player-area-content {
+    padding: 12px;
+
+    .joco-inner-container {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+  }
+
+  .joco-player-area-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .joco-enterprises {
+      min-height: 150px;
+    }
+
+    .joco-prestige-blackmail {
+      min-height: 351px;
+    }
   }
 }

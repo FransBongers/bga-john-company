@@ -37,18 +37,19 @@
     aspect-ratio: 40/36;
     top: 50px;
     left: 11px;
+    z-index: 1;
   }
 
-  .bga-cards_card-sides,
-  .joco-ship {
-    width: 100px !important;
-    height: 90px !important;
-  }
+  // .bga-cards_card-sides,
+  // .joco-ship {
+  //   width: 100px !important;
+  //   height: 90px !important;
+  // }
 
-  .bga-cards_card-sides {
-    left: 0 !important;
-    top: 0 !important;
-  }
+  // .bga-cards_card-sides {
+  //   left: 0 !important;
+  //   top: 0 !important;
+  // }
 
   .joco-ship {
     z-index: 1;

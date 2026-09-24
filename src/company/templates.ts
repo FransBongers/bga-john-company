@@ -29,15 +29,17 @@ export const tplOffice = (
   return `
       <div id="${id}Office" class="joco-office joco-container">
         ${tplOfficeHeader(familyMemberLocation, name)}
-        <div class="joco-treasury-container">
-          <div><span class="fb-font-baskerville fb-font-12">${_('Treasury').toLocaleUpperCase()}</span></div>
-          <div class="joco-treasury-counter-container">
-            <span class="fb-font-baskerville fb-font-12">£</span><span id="${id}-treasury" class="fb-font-baskerville fb-font-20"></span>
-          </div>
-        </div>
+
       </div>
     `;
 };
+
+        // <div class="joco-treasury-container">
+        //   <div><span class="fb-font-baskerville fb-font-12">${_('Treasury').toLocaleUpperCase()}</span></div>
+        //   <div class="joco-treasury-counter-container">
+        //     <span class="fb-font-baskerville fb-font-12">£</span><span id="${id}-treasury" class="fb-font-baskerville fb-font-20"></span>
+        //   </div>
+        // </div>
 
 export const tplCourtOfDirectors = () => `
   <div class="joco-court-of-directors-container joco-container">

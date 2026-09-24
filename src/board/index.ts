@@ -88,7 +88,7 @@ import {
 } from './config';
 import { Region } from './region';
 import { tplBoard } from './templates';
-import { Treasury } from './treasury';
+import { Treasury } from '../ui-components/treasury';
 
 
 export class Board {
@@ -217,7 +217,7 @@ export class Board {
     // this.setupFamilyMembers(gamedatas);
     this.setupSelectBoxes();
     // this.setupShips(gamedatas);
-    this.setupTreasuries(gamedatas);
+    // this.setupTreasuries(gamedatas);
   }
 
   // private setupArmyPieces(gamedatas: GamedatasAlias) {
@@ -382,16 +382,16 @@ export class Board {
   //   this.updateShips(Object.values(gamedatas.ships));
   // }
 
-  private setupTreasuries(gamedatas: GamedatasAlias) {
-    Object.entries(TREASURY_POSITIONS).forEach(([office, position]) => {
-      this.treasuries[office] = new Treasury({
-        gamedatas,
-        office,
-        position,
-        container: this.ui.containers.treasuries,
-      });
-    });
-  }
+  // private setupTreasuries(gamedatas: GamedatasAlias) {
+  //   Object.entries(TREASURY_POSITIONS).forEach(([office, position]) => {
+  //     this.treasuries[office] = new Treasury({
+  //       gamedatas,
+  //       office,
+  //       position,
+  //       container: this.ui.containers.treasuries,
+  //     });
+  //   });
+  // }
 
   // .##.....##.########..########.....###....########.########....##.....##.####
   // .##.....##.##.....##.##.....##...##.##......##....##..........##.....##..##.
