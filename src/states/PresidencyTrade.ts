@@ -1,4 +1,4 @@
-import { Board } from '../board';
+import { Bar } from '../bar';
 import {
   addCancelButton,
   addConfirmButton,
@@ -15,6 +15,7 @@ import {
   performAction,
   updatePageTitle,
 } from '../boilerplate';
+import { Company } from '../company';
 import { StaticData } from '../static-data';
 import { JoCoOrderBase, JocoRegionBase, GameAlias } from '../types';
 
@@ -52,6 +53,7 @@ export class PresidencyTrade implements GameState<OnEnteringPresidencyTradeArgs>
     this.spend = args.proposal || 0;
     this.selectedRegionIds = [this.args.options.homeRegionId];
     this.updateInterfaceInitialStep();
+    Bar.getInstance().goTo('joco-india');
   }
 
   onLeavingState() {
@@ -135,7 +137,7 @@ export class PresidencyTrade implements GameState<OnEnteringPresidencyTradeArgs>
 
   private setMinSpendAmount() {
     this.spend = this.selectedRegionIds.length;
-    Board.getInstance().treasuries[this.args.officeId].incValue(
+    Company.getInstance().treasuries[this.args.officeId].incValue(
       -this.selectedRegionIds.length,
     );
     this.updateInterfaceMakeCheck();
@@ -155,14 +157,14 @@ export class PresidencyTrade implements GameState<OnEnteringPresidencyTradeArgs>
       tkn_pound: 'pound',
     });
 
-    const treasuryCounter = Board.getInstance().treasuries[this.args.officeId];
+    const treasury = Company.getInstance().treasuries[this.args.officeId];
 
     addSecondaryActionButton({
       id: 'minus_btn',
       text: '-',
       callback: () => {
         this.spend--;
-        treasuryCounter.incValue(1);
+        treasury.incValue(1);
         this.updateInterfaceMakeCheck();
       },
       extraClasses: this.spend <= minSpend ? DISABLED : '',
@@ -182,7 +184,7 @@ export class PresidencyTrade implements GameState<OnEnteringPresidencyTradeArgs>
       text: '+',
       callback: () => {
         this.spend++;
-        treasuryCounter.incValue(-1);
+        treasury.incValue(-1);
         this.updateInterfaceMakeCheck();
       },
       extraClasses: available === 0 ? DISABLED : '',
@@ -267,7 +269,7 @@ export class PresidencyTrade implements GameState<OnEnteringPresidencyTradeArgs>
       id: 'cancel_btn',
       text: _('Cancel'),
       callback: async () => {
-        (Board.getInstance().treasuries[this.args.officeId].toValue(
+        (Company.getInstance().treasuries[this.args.officeId].toValue(
           this.args.treasury,
         ),
           this.game.onCancel());

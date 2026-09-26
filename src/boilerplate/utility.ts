@@ -122,12 +122,15 @@ export const createHtmlElement = (html: string): HTMLElement => {
   return template.content.firstChild as HTMLElement;
 };
 
-export const parentHasChildWithId = (parentId: string, childId: string) => {
-  const locationElement = document.getElementById(parentId);
+export const parentHasChildWithId = (
+  parent: string | HTMLElement,
+  child: string | HTMLElement,
+) => {
+  const locationElement =
+    typeof parent === 'string' ? document.getElementById(parent) : parent;
+  const childId = typeof child === 'string' ? child : child.id;
   if (
-    Array.from(locationElement?.children ?? []).some(
-      (child) => child.id === childId,
-    )
+    Array.from(locationElement?.children ?? []).some((c) => c.id === childId)
   ) {
     return true;
   }

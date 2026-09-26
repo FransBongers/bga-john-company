@@ -10,6 +10,7 @@ class AtomicActions
 {
   // Mapping of actionId and corresponding class
   static $classes = [
+    RESOLVE_CHOICE => RESOLVE_CHOICE,
     BONUSES => BONUSES,
     CHAIRMAN => CHAIRMAN,
     CHAIRMAN_DEBT_CONSENT => CHAIRMAN_DEBT_CONSENT,
@@ -40,6 +41,7 @@ class AtomicActions
     NEW_COMPANY_SHARES => NEW_COMPANY_SHARES,
     PARLIAMENT_MEETS => PARLIAMENT_MEETS,
     PERFORM_SETUP => PERFORM_SETUP,
+    PRESIDENCY_COMMANDER => PRESIDENCY_COMMANDER,
     PRESIDENCY_DECIDE_ORDER => PRESIDENCY_DECIDE_ORDER,
     PRESIDENCY_TRADE => PRESIDENCY_TRADE,
     PRESIDENCY_TRADE_FILL_ORDERS => PRESIDENCY_TRADE_FILL_ORDERS,
@@ -54,12 +56,14 @@ class AtomicActions
     SEEK_SHARE => SEEK_SHARE,
   ];
 
+
   public static function get($actionId, $ctx = null)
   {
     if (!\array_key_exists($actionId, self::$classes)) {
+      // $actionId = STRIKE;
       // throw new \feException(print_r(debug_print_backtrace()));
       // throw new \feException(print_r(Globals::getEngine()));
-      throw new \BgaVisibleSystemException('Trying to get an atomic action not defined in Actions.php : ' . $actionId);
+      throw new \Bga\GameFramework\VisibleSystemException('Trying to get an atomic action not defined in Actions.php : ' . $actionId);
     }
     $name = '\Bga\Games\JohnCompany\Actions\\' . self::$classes[$actionId];
     // $name = '\Bga\Games\JohnCompany\Actions\\' . $actionId;
@@ -75,7 +79,7 @@ class AtomicActions
     }
 
     if ($throwErrorIfNone) {
-      throw new \BgaVisibleSystemException('Trying to fetch args of a non-declared atomic action in state ' . $stateId);
+      throw new \Bga\GameFramework\VisibleSystemException('Trying to fetch args of a non-declared atomic action in state ' . $stateId);
     } else {
       return null;
     }
@@ -115,13 +119,20 @@ class AtomicActions
   public static function takeAction($actionId, $actionName, $args, $ctx)
   {
     $player = Players::getActive();
-    if (!self::isDoable($actionId, $ctx, $player)) {
-      throw new \BgaUserException(self::getErrorMessage($actionId));
-    }
+    // No need to check before performing an action. This was already checked
+    // if (!self::isDoable($actionId, $ctx, $player)) {
+    //   throw new \BgaUserException(self::getErrorMessage($actionId));
+    // }
 
     $action = self::get($actionId, $ctx);
     $methodName = $actionName; //'act' . self::$classes[$actionId];
     $action->$methodName($args);
+  }
+
+  public static function zombie($playerId, $actionId, $ctx)
+  {
+    $action = self::get($actionId, $ctx);
+    $action->zombie($playerId);
   }
 
   /**
@@ -158,8 +169,7 @@ class AtomicActions
   public static function pass($actionId, $ctx)
   {
     if (!$ctx->isOptional()) {
-      self::error($ctx->toArray());
-      throw new \BgaVisibleSystemException('This action is not optional');
+      throw new \Bga\GameFramework\VisibleSystemException('This action is not optional');
     }
 
     $action = self::get($actionId, $ctx);

@@ -130,6 +130,7 @@ export interface NotifPurchaseEnterprise extends NotifWithPlayerArgs {
   amount: number;
   type: string;
   enterprise: JocoEnterpriseCardBase;
+  ship: JocoShipBase | null;
 }
 
 export interface NotifReturnFamilyMemberToSupply extends NotifWithPlayerArgs {

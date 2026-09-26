@@ -1,4 +1,4 @@
-import { Board } from '../board';
+import { Bar } from '../bar';
 import {
   addConfirmButton,
   addDangerActionButton,
@@ -11,6 +11,7 @@ import {
   setSelected,
   updatePageTitle,
 } from '../boilerplate';
+import { Company } from '../company';
 import { FILLED, OPEN } from '../constants';
 import { StaticData } from '../static-data';
 import type {
@@ -32,7 +33,6 @@ export class PresidencyTradeFillOrders implements GameState<OnEnteringPresidency
   private static instance: PresidencyTradeFillOrders;
   private args: OnEnteringPresidencyTradeFillOrdersArgs;
   private filledOrders: Array<{ orderId: string; filledBy: string }>; // orderId / familyMemberId or 'filled' if not available
-  private board: Board;
   private balance: number;
 
   constructor(private game: GameAlias) {}
@@ -49,9 +49,9 @@ export class PresidencyTradeFillOrders implements GameState<OnEnteringPresidency
     debug('Entering PresidencyTradeFillOrders state');
     this.args = args;
     this.filledOrders = [];
-    this.board = Board.getInstance();
     this.balance = this.args.companyBalance;
     this.updateInterfaceInitialStep();
+    Bar.getInstance().goTo('joco-india');
   }
 
   onLeavingState() {
@@ -121,7 +121,7 @@ export class PresidencyTradeFillOrders implements GameState<OnEnteringPresidency
     updatePageTitle(_('Fill orders: ${you} must select a writer'));
 
     availableWriters.forEach((writer) => {
-      onClick(this.board.ui.familyMembers[writer.id], () => {
+      onClick(writer.id, () => {
         this.updateInterfaceSelectOrder(writer);
       });
     });
@@ -135,13 +135,13 @@ export class PresidencyTradeFillOrders implements GameState<OnEnteringPresidency
     clearPossible();
 
     if (writer) {
-      setSelected(this.board.ui.familyMembers[writer.id]);
+      setSelected(writer.id);
     }
 
     updatePageTitle(_('Fill orders: ${you} must select an order'));
 
     this.getAvailableOrderIds().forEach((orderId) => {
-      onClick(this.board.ui.orders[orderId], async () => {
+      onClick(orderId, async () => {
         this.filledOrders.push({ orderId, filledBy: writer?.id || FILLED });
         const promises: Promise<void>[] = [];
         const order = StaticData.get().order(orderId);
@@ -149,12 +149,16 @@ export class PresidencyTradeFillOrders implements GameState<OnEnteringPresidency
         this.balance += order.value;
         if (writer) {
           promises.push(
-            this.board.moveFamilyMemberBetweenLocations(writer, orderId),
+            this.game.animationManager.slideAndAttach(
+              document.getElementById(writer.id),
+              document.getElementById(orderId),
+            ),
+            // this.board.moveFamilyMemberBetweenLocations(writer, orderId),
           );
         } else {
-          this.board.ui.orders[orderId].setAttribute('data-status', FILLED);
+          document.getElementById(orderId).setAttribute('data-status', FILLED);
         }
-        promises.push(this.board.movePawn('balance', this.balance));
+        Company.getInstance().balance.toValue(this.balance);
         clearPossible();
         await Promise.all(promises);
         this.updateInterfaceInitialStep();
@@ -209,23 +213,23 @@ export class PresidencyTradeFillOrders implements GameState<OnEnteringPresidency
   }
 
   private async returnPieces() {
-    for (let { orderId, filledBy } of this.filledOrders) {
-      const promises: Promise<void>[] = [];
-      if (filledBy === FILLED) {
-        this.board.ui.orders[orderId].setAttribute('data-status', OPEN);
-      } else {
-        const writer = this.args.writers.find(
-          (writer) => writer.id === filledBy,
-        );
-        writer.location = orderId;
-        promises.push(
-          this.board.moveFamilyMemberBetweenLocations(writer, 'Writers_Bombay'),
-        );
-      }
-      this.balance = this.balance - StaticData.get().order(orderId).value;
-      promises.push(this.board.movePawn('balance', this.balance));
-      await Promise.all(promises);
-    }
+    // for (let { orderId, filledBy } of this.filledOrders) {
+    //   const promises: Promise<void>[] = [];
+    //   if (filledBy === FILLED) {
+    //     this.board.ui.orders[orderId].setAttribute('data-status', OPEN);
+    //   } else {
+    //     const writer = this.args.writers.find(
+    //       (writer) => writer.id === filledBy,
+    //     );
+    //     writer.location = orderId;
+    //     promises.push(
+    //       this.board.moveFamilyMemberBetweenLocations(writer, 'Writers_Bombay'),
+    //     );
+    //   }
+    //   this.balance = this.balance - StaticData.get().order(orderId).value;
+    //   promises.push(this.board.movePawn('balance', this.balance));
+    //   await Promise.all(promises);
+    // }
   }
 
   private performAction(makeCheck: boolean = false) {

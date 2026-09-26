@@ -19,6 +19,7 @@ export * from './MilitaryAffairsAssign';
 export * from './MilitaryAffairsTransfers';
 export * from './ParliamentMeets';
 export * from './PlayerTurn';
+export * from './PresidencyCommander';
 export * from './PresidencyDecideOrder';
 export * from './PresidencyTrade';
 export * from './PresidencyTradeFillOrders';

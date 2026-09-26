@@ -73,6 +73,7 @@ const ST_MILITARY_AFFAIRS_ASSIGN = 47;
 const ST_PRESIDENCY_DECIDE_ORDER = 49;
 const ST_PRESIDENCY_TRADE = 50;
 const ST_PRESIDENCY_TRADE_FILL_ORDERS = 51;
+const ST_PRESIDENCY_COMMANDER = 124;
 
 const ST_BONUSES = 60;
 const ST_REVENUE_EXPENSES = 61;
@@ -134,6 +135,7 @@ const MILITARY_AFFAIRS_ASSIGN = 'MilitaryAffairsAssign';
 const PRESIDENCY_DECIDE_ORDER = 'PresidencyDecideOrder';
 const PRESIDENCY_TRADE = 'PresidencyTrade';
 const PRESIDENCY_TRADE_FILL_ORDERS = 'PresidencyTradeFillOrders';
+const PRESIDENCY_COMMANDER = 'PresidencyCommander';
 // Crown states
 const CROWN_CHAIRMAN_SEEK_DEBT = 'CrownChairmanSeekDebt';
 const CROWN_CHAIRMAN_REQUEST_DEBT_ADVANCEMENT = 'CrownChairmanRequestDebtAdvancement';

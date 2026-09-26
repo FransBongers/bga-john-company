@@ -50,6 +50,9 @@
 
   &[data-side='CompanyShip'] {
     background-image: url('img/ship_company.png');
+    .joco-ship-name {
+      color: white;
+    }
   }
 }
 

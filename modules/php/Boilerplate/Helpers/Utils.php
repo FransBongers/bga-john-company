@@ -124,10 +124,23 @@ abstract class Utils
     }, $itemsWithId);
   }
 
-  public static function itemsInLocation($itemsWithLocation, $location) {
+  public static function itemsInLocation($itemsWithLocation, $location)
+  {
     return self::filter($itemsWithLocation, function ($item) use ($location) {
       return $item->getLocation() === $location;
     });
+  }
+
+  public static function randomItemFromArray($array)
+  {
+    $length = count($array);
+    $item = bga_rand(0, $length - 1);
+    return $array[$item];
+  }
+
+  public static function arrayToObject($array)
+  {
+    return (object) $array;
   }
 
   // .##.....##.########.##.......########..########.########...######.

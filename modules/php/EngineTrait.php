@@ -60,7 +60,7 @@ trait EngineTrait
     if ($auto) {
       $this->gamestate->checkPossibleAction('actPassOptionalAction');
     } else {
-      self::checkAction('actPassOptionalAction');
+      $this->checkAction('actPassOptionalAction');
     }
 
     $action = $this->getCurrentAtomicAction();
@@ -78,9 +78,7 @@ trait EngineTrait
   }
 
 
-  public function stResolveStack()
-  {
-  }
+  public function stResolveStack() {}
 
 
   /*******************************
@@ -113,7 +111,7 @@ trait EngineTrait
   public function actConfirmTurn($auto = false)
   {
     if (!$auto) {
-      self::checkAction('actConfirmTurn');
+      $this->checkAction('actConfirmTurn');
     }
     Engine::confirm();
   }
@@ -121,14 +119,14 @@ trait EngineTrait
   public function actConfirmPartialTurn($auto = false)
   {
     if (!$auto) {
-      self::checkAction('actConfirmPartialTurn');
+      $this->checkAction('actConfirmPartialTurn');
     }
     Engine::confirmPartialTurn();
   }
 
   public function actRestart()
   {
-    self::checkAction('actRestart');
+    $this->checkAction('actRestart');
     if (Globals::getEngineChoices() < 1) {
       throw new \BgaVisibleSystemException('No choice to undo');
     }
@@ -137,7 +135,13 @@ trait EngineTrait
 
   public function actUndoToStep($stepId)
   {
-    self::checkAction('actRestart');
+    $this->checkAction('actRestart');
     Engine::undoToStep($stepId);
+  }
+
+  function actChooseAction(int $choiceId)
+  {
+    $player = Players::getActive();
+    Engine::chooseNode($player, $choiceId);
   }
 }

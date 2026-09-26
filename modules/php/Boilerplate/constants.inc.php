@@ -28,3 +28,12 @@ const ST_END_GAME = 99;
 const ST_END_GAME_NAME = 'gameEnd';
 
 const ST_CLEANUP = 88; // TODO: replace
+
+const LOG_PHASE = 'LogPhase';
+const RESOLVE_STACK = 'resolveStack';
+const RESOLVE_CHOICE = 'ResolveChoice';
+const START_GAME_ENGINE = 'StartGameEngine';
+const CONFIRM_TURN = 'ConfirmTurn';
+const CONFIRM_PARTIAL_TURN = 'ConfirmPartialTurn';
+const GENERIC_NEXT_PLAYER = 'genericNextPlayer';
+const PRE_END_GAME = 'preEndGame';

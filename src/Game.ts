@@ -24,6 +24,7 @@ import {
 } from './boilerplate';
 import { ConfirmPartialTurn } from './boilerplate/states/ConfirmPartialTurn';
 import { ConfirmTurn } from './boilerplate/states/ConfirmTurn';
+import { ResolveChoice } from './boilerplate/states/ResolveChoice';
 import { EnterpriseCardsManager } from './cards/enterprise-cards';
 import { LawCardsManager } from './cards/law-cards';
 import { LondonSeasonCardsManager } from './cards/london-season-cards';
@@ -59,6 +60,7 @@ import {
   MilitaryAffairsAssign,
   MilitaryAffairsTransfers,
   PlayerTurn,
+  PresidencyCommander,
   PresidencyDecideOrder,
   PresidencyTrade,
   PresidencyTradeFillOrders,
@@ -115,6 +117,11 @@ export class Game {
   public mobileVersion: boolean = false;
 
   private states = {
+    // Boilerplate
+    ConfirmPartialTurn,
+    ConfirmTurn,
+    ResolveChoice,
+    // Game
     Chairman,
     ChairmanDebtConsent,
     CrownChairmanRequestAllocation,
@@ -124,8 +131,6 @@ export class Game {
     CrownManagerOfShippingLeaseExtraShips,
     CrownManagerOfShippingPlaceShips,
     // CrownManagerOfShippingUnfittedShipOptions,
-    ConfirmPartialTurn,
-    ConfirmTurn,
     DirectorOfTradeSpecialEnvoy,
     DirectorOfTradeSpecialEnvoySuccess,
     DirectorOfTradeTransfers,
@@ -137,6 +142,7 @@ export class Game {
     MilitaryAffairsAssign,
     MilitaryAffairsTransfers,
     PlayerTurn,
+    PresidencyCommander,
     PresidencyDecideOrder,
     PresidencyTrade,
     PresidencyTradeFillOrders,
@@ -374,7 +380,7 @@ export class Game {
 
     //  this.gameMap = new GameMap(this);
     //  this.cardArea = new CardArea(this);
-    
+
     Interaction.create(this);
     PhaseTracker.create(this);
 

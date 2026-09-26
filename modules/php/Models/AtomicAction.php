@@ -22,7 +22,7 @@ class AtomicAction
     $this->ctx = $ctx;
   }
 
-  public function isDoable($player)
+  public function isDoable(Player $player): bool
   {
     return true;
   }
@@ -30,6 +30,11 @@ class AtomicAction
   public function isOptional()
   {
     return false;
+  }
+
+  public function getDescription(): string|array
+  {
+    return $this->description ?? "";
   }
 
   public function getPlayer()
@@ -45,7 +50,7 @@ class AtomicAction
 
   public function resolveAction($args = [], $checkpoint = false)
   {
-    // $checkpoint = $checkpoint || Globals::getCheckpoint(); // Note: custom function right now
+    // $checkpoint = $checkpoint || Globals::getCheckpoint(); // Note: custom right now
     // Globals::setCheckpoint(false);
     Engine::resolveAction($args, $checkpoint, $this->ctx);
     Engine::proceed();
@@ -69,6 +74,7 @@ class AtomicAction
     //   'action' => $action,
     //   'byPassActiveCheck' => $byPassActiveCheck
     // ]);
+    // Game::get()->debug( 'action: '. $action . ' - byPassActiveCheck: ' . ($byPassActiveCheck ? 'true' : 'false') );
     if ($byPassActiveCheck) {
       Game::get()->gamestate->checkPossibleAction($action);
     } else {
@@ -81,10 +87,10 @@ class AtomicAction
   public function checkPlayer()
   {
     $currentPlayerId = Players::getCurrentId();
-    
+
     $activePlayerIds = $this->ctx->getInfo()['activePlayerIds'];
-    if(!in_array($currentPlayerId, $activePlayerIds)) {
-      throw new \feException("ERROR_002");
+    if (!in_array($currentPlayerId, $activePlayerIds)) {
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_999");
     }
     return $currentPlayerId;
   }
@@ -96,5 +102,12 @@ class AtomicAction
       return substr($classname, $pos + 1);
     }
     return $classname;
+  }
+
+  public function zombie($playerId)
+  {
+    Notifications::message("Zombie Turn not implemented for: " . $this->ctx->getAction() . ". Please create a bug report! ", []);
+
+    $this->resolveAction(['automatic' => true], true);
   }
 }

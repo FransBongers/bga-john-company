@@ -122,7 +122,6 @@ class Engine
     // Multi active node with some players active
     if ($playerId == 'some') {
       Game::get()->gamestate->jumpToState(ST_RESOLVE_STACK);
-      // TODO: handle crown
       $activePlayerIds = $node->getInfo()['activePlayerIds'];
       Game::get()->gamestate->setPlayersMultiactive($activePlayerIds, 'next', false);
 
@@ -152,6 +151,7 @@ class Engine
     if ($playerId != null && $oldPlayerId != $playerId) {
       Game::get()->gamestate->jumpToState(ST_RESOLVE_STACK);
       Game::get()->gamestate->changeActivePlayer($playerId);
+      Game::get()->giveExtraTime($playerId);
     }
 
     if ($confirmedPartial) {
@@ -160,7 +160,27 @@ class Engine
       Globals::setEngineChoices(0);
     }
 
-    self::proceedToState($node, $isUndo);
+    // If node with choice, switch to choice state
+    $choices = $node->getChoices($player);
+    $allChoices = $node->getChoices($player, true);
+    if (!empty($allChoices) && $node->getType() != NODE_LEAF) {
+      // Only one choice : auto choose
+      $id = array_keys($choices)[0] ?? null;
+      if (
+        count($choices) == 1 &&
+        count($allChoices) == 1 &&
+        array_keys($allChoices) == array_keys($choices) &&
+        !($choices[$id]['irreversibleAction'] ?? false)
+      ) {
+        self::chooseNode($player, $id, true);
+      } else {
+        // Otherwise, go in the RESOLVE_CHOICE state
+        Game::get()->gamestate->jumpToState(ST_RESOLVE_CHOICE);
+      }
+    } else {
+      // No choice => proceed to do the action
+      self::proceedToState($node, $isUndo);
+    }
   }
 
   public static function proceedToState($node, $isUndo = false)
@@ -176,6 +196,46 @@ class Engine
     }
     Game::get()->gamestate->jumpToState($state);
   }
+
+
+  /**
+   * Get the list of choices of current node
+   */
+  public static function getNextChoice($player = null, $displayAllChoices = false)
+  {
+    return self::$tree->getNextUnresolved()->getChoices($player, $displayAllChoices);
+  }
+
+  /**
+   * Choose one option
+   */
+  public static function chooseNode($player, $nodeId, $auto = false)
+  {
+    $node = self::$tree->getNextUnresolved();
+    $args = $node->getChoices($player);
+    if (!isset($args[$nodeId])) {
+      throw new \Bga\GameFramework\VisibleSystemException('This choice is not possible');
+    }
+
+    if (!$auto) {
+      Globals::incEngineChoices();
+      Log::step();
+    }
+
+    if ($nodeId == PASS) {
+      self::resolve(PASS);
+      self::proceed();
+      return;
+    }
+
+    if ($node->getChildren()[$nodeId]->isResolved()) {
+      throw new \Bga\GameFramework\VisibleSystemException('Node is already resolved');
+    }
+    $node->choose($nodeId, $auto);
+    self::save();
+    self::proceed();
+  }
+
 
   /**
    * Resolve the current unresolved node
@@ -199,9 +259,11 @@ class Engine
       $node = self::$tree->getNextUnresolved();
     }
 
-    $node->resolveAction($args);
-    if ($node->isResolvingParent()) {
-      $node->getParent()->resolve([]);
+    if (!$node->isReUsable()) {
+      $node->resolveAction($args);
+      if ($node->isResolvingParent()) {
+        $node->getParent()->resolve([]);
+      }
     }
 
 

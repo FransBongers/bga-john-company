@@ -9,6 +9,7 @@ import {
   SEA_ZONES,
   MILITARY_AFFAIRS,
   OFFICER_IN_TRAINING,
+  FILLED_BY_WRITER,
 } from '../constants';
 import { createFamilyMember } from '../templates';
 import { GameAlias, GamedatasAlias, JocoRegionBase } from '../types';
@@ -172,19 +173,23 @@ export class India {
   }
 
   private updateOrders(gamedatas: GamedatasAlias) {
-    // this.ui.orders[ORDER_MADRAS_2].appendChild(
-    //   createFamilyMember('Sykes', 'familyMember_Sykes_18'),
-    // );
-    // this.ui.orders[ORDER_HYDERABAD_1].insertAdjacentHTML('beforeend', tplOrderToken('filled'));
     Object.entries(gamedatas.orders).forEach(([orderId, order]) => {
       this.ui.orders[orderId].setAttribute('data-status', order.status);
-      // if (order.status === 'open') {
-      //   return;
-      // }
-      // this.ui.orders[orderId].insertAdjacentHTML(
-      //   'beforeend',
-      //   tplOrderToken(order.status),
-      // );
+      if (order.status === FILLED_BY_WRITER) {
+        const familyMember = Object.values(gamedatas.familyMembers).find(
+          (m) => {
+            return m.location === orderId;
+          },
+        );
+
+        if (familyMember) {
+          const writer = createFamilyMember(
+            familyMember.familyId,
+            familyMember.id,
+          );
+          this.ui.orders[orderId].appendChild(writer);
+        }
+      }
     });
   }
 

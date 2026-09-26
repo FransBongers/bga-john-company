@@ -4,6 +4,7 @@ namespace Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 
 use  Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use  Bga\Games\JohnCompany\Managers\AtomicActions;
+use Bga\Games\JohnCompany\Models\Player;
 
 /*
  * Leaf: a class that represent a Leaf
@@ -26,17 +27,13 @@ class LeafNode extends AbstractNode
 
   public function getArgs()
   {
-    $action = $this->getAction();
-    $data = AtomicActions::getArgs($action,$this);
-    $data['action'] = $action;
-    return $data;
-    // return $this->info['args'] ?? null;
+    return $this->info['args'] ?? null;
   }
 
   /**
    * A Leaf is doable if the corresponding action is doable by the player
    */
-  public function isDoable($player)
+  public function isDoable(Player $player)
   {
     if (isset($this->info['action'])) {
       return $player->canTakeAction($this->info['action'], $this);
@@ -57,7 +54,18 @@ class LeafNode extends AbstractNode
       return AtomicActions::getState($this->info['action'], $this);
     }
 
-    var_dump(\Bga\Games\JohnCompany\Boilerplate\Core\Engine::$tree->toArray());
-    throw new \BgaVisibleSystemException('Trying to get state on a leaf without state nor action');
+    var_dump(\Bga\Games\Hegemony\Boilerplate\Core\Engine::$tree->toArray());
+    throw new \Bga\GameFramework\VisibleSystemException('Trying to get state on a leaf without state nor action');
+  }
+
+  /**
+   * The description is given by the corresponding action
+   */
+  public function getDescription(): string|array
+  {
+    if (isset($this->info['action'])) {
+      return AtomicActions::get($this->info['action'], $this)->getDescription();
+    }
+    return parent::getDescription();
   }
 }

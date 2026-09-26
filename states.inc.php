@@ -52,35 +52,56 @@ $machinestates = [
     // .##.......##...###.##....##...##..##...###.##......
     // .########.##....##..######...####.##....##.########
 
-    ST_RESOLVE_STACK => [
-        'name' => 'resolveStack',
-        'type' => 'game',
-        'action' => 'stResolveStack',
-        'transitions' => ['next' => ST_RESOLVE_STACK],
-    ],
+    ST_RESOLVE_STACK => GameStateBuilder::create()
+        ->name(RESOLVE_STACK)
+        ->description('')
+        ->type(StateType::GAME)
+        ->action('stResolveStack')
+        ->build(),
 
-    ST_CONFIRM_TURN => [
-        'name' => 'confirmTurn',
-        'description' => clienttranslate('${actplayer} must confirm or restart their turn'),
-        'descriptionmyturn' => clienttranslate('${you} must confirm or restart your turn'),
-        'type' => 'activeplayer',
-        'args' => 'argsConfirmTurn',
-        'action' => 'stConfirmTurn',
-        'possibleactions' => ['actConfirmTurn', 'actRestart'],
-        'transitions' => [
-            // 'breakStart' => ST_BREAK_MULTIACTIVE
-        ],
-    ],
+    ST_CONFIRM_TURN => GameStateBuilder::create()
+        ->name(CONFIRM_TURN)
+        ->description(clienttranslate('${actplayer} must confirm or restart their turn'))
+        ->descriptionmyturn(clienttranslate('${you} must confirm or restart your turn'))
+        ->type(StateType::ACTIVE_PLAYER)
+        ->args('argsConfirmTurn')
+        ->action('stConfirmTurn')
+        ->possibleactions([
+            'actConfirmTurn',
+            // these actions are called from the front with bgaPerformAction, and matched to the function on the game.php file
+            'act' . CONFIRM_TURN,
+            'actRestart',
+            'actUndoToStep',
+        ])
+        ->build(),
 
-    ST_CONFIRM_PARTIAL_TURN => [
-        'name' => 'confirmPartialTurn',
-        'description' => clienttranslate('${actplayer} must confirm the switch of player'),
-        'descriptionmyturn' => clienttranslate('${you} must confirm the switch of player. You will not be able to restart turn'),
-        'type' => 'activeplayer',
-        'args' => 'argsConfirmTurn',
-        // 'action' => 'stConfirmPartialTurn',
-        'possibleactions' => ['actConfirmPartialTurn', 'actRestart'],
-    ],
+    ST_CONFIRM_PARTIAL_TURN => GameStateBuilder::create()
+        ->name(CONFIRM_PARTIAL_TURN)
+        ->description(clienttranslate('${actplayer} must confirm their moves'))
+        ->descriptionmyturn(clienttranslate('${you} must confirm your moves. You will not be able to undo'))
+        ->type(StateType::ACTIVE_PLAYER)
+        ->args('argsConfirmTurn')
+        ->action('stConfirmTurn')
+        ->possibleactions([
+            // these actions are called from the front with bgaPerformAction, and matched to the function on the game.php file
+            'act' . CONFIRM_PARTIAL_TURN,
+            'actRestart',
+            'actUndoToStep',
+        ])
+        ->build(),
+
+    ST_RESOLVE_CHOICE => GameStateBuilder::create()
+        ->name(RESOLVE_CHOICE)
+        ->description(clienttranslate('${actplayer} must choose which effect to resolve'))
+        ->descriptionmyturn(clienttranslate('${you} must choose which effect to resolve'))
+        // ->descriptionxor(clienttranslate('${actplayer} must choose exactly one effect'))
+        // ->descriptionmyturnxor(clienttranslate('${you} must choose exactly one effect'))
+        ->type(StateType::ACTIVE_PLAYER)
+        ->args('argsAtomicAction')
+        ->action('stAtomicAction')
+        ->possibleactions(['actChooseAction', 'actRestart', 'actUndoToStep',])
+        ->transitions([])
+        ->build(),
 
     // .########.##....##.########......#######..########
     // .##.......###...##.##.....##....##.....##.##......
@@ -419,6 +440,17 @@ $machinestates = [
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
         'possibleactions' => ['act' . PRESIDENCY_TRADE_FILL_ORDERS, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_PRESIDENCY_COMMANDER => [
+        'name' => PRESIDENCY_COMMANDER,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . PRESIDENCY_COMMANDER, 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 

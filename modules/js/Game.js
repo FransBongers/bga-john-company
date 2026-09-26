@@ -171,6 +171,7 @@ const COUNTERS = [
 const CLOSED = 'closed';
 const FILLED = 'filled';
 const OPEN = 'open';
+const FILLED_BY_WRITER = 'filledByWriter';
 const ORDER_PUNJAB_1 = 'Order_Punjab_1';
 const ORDER_DELHI_1 = 'Order_Delhi_1';
 const ORDER_DELHI_2 = 'Order_Delhi_2';
@@ -637,6 +638,8 @@ class PlayerManager {
 const DISABLED = 'disabled';
 const SELECTABLE = 'selectable';
 const SELECTED = 'selected';
+const PRIMARY = 'primary';
+const SECONDARY = 'secondary';
 
 class Interaction {
     constructor(game) {
@@ -828,9 +831,10 @@ const createHtmlElement = (html) => {
     template.innerHTML = html.trim();
     return template.content.firstChild;
 };
-const parentHasChildWithId = (parentId, childId) => {
-    const locationElement = document.getElementById(parentId);
-    if (Array.from(locationElement?.children ?? []).some((child) => child.id === childId)) {
+const parentHasChildWithId = (parent, child) => {
+    const locationElement = typeof parent === 'string' ? document.getElementById(parent) : parent;
+    const childId = typeof child === 'string' ? child : child.id;
+    if (Array.from(locationElement?.children ?? []).some((c) => c.id === childId)) {
         return true;
     }
     return false;
@@ -1460,6 +1464,195 @@ let Board$1 = class Board {
     }
 };
 
+const BgaAnimations = await globalThis.importEsmLib('bga-animations', '1.x');
+const BgaCards = await globalThis.importEsmLib('bga-cards', '1.x');
+const BgaAutofit = await globalThis.importEsmLib('bga-autofit', '1.x');
+
+const tplShipContent = (ship, back = false) => `
+  <div class="joco-ship-name bga-autofit"><span class="fb-font-baskerville">${back && ship.type !== PLAYER_OWNED_SHIP ? _('Extra Ship') : _(ship.name)}</span></div>
+  ${back ? `<div class="joco-ship-fatigued fb-font-baskerville bga-autofit">${_('F')}</div>` : ''}
+`;
+
+class ShipsManager extends BgaCards.Manager {
+    static create(game) {
+        ShipsManager.instance = new ShipsManager(game);
+    }
+    static getInstance() {
+        return ShipsManager.instance;
+    }
+    constructor(game) {
+        super({
+            getId: (card) => card.id,
+            setupDiv: (card, div) => this.setupDiv(card, div),
+            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
+            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
+            isCardVisible: (card) => this.isCardVisible(card),
+            animationManager: game.animationManager,
+            cardWidth: 75,
+            cardHeight: 68,
+            type: 'ship',
+        });
+        this.game = game;
+    }
+    clearInterface() { }
+    setupDiv(card, div) {
+        div.classList.add('joco-ship-container');
+    }
+    setupFrontDiv(card, div) {
+        div.classList.add('joco-ship');
+        div.setAttribute('data-side', card.type === PLAYER_OWNED_SHIP ? FULL : COMPANY_SHIP);
+        if (div.children.length) {
+            return;
+        }
+        div.insertAdjacentHTML('beforeend', tplShipContent(card));
+    }
+    setupBackDiv(card, div) {
+        div.classList.add('joco-ship');
+        div.setAttribute('data-side', card.type === PLAYER_OWNED_SHIP ? FATIGUED : EXTRA_SHIP);
+        if (div.children.length) {
+            return;
+        }
+        div.insertAdjacentHTML('beforeend', tplShipContent(card, true));
+    }
+    isCardVisible(card) {
+        return card.side === FULL || card.side === COMPANY_SHIP;
+    }
+}
+
+class StaticData {
+    constructor(game) {
+        this.game = game;
+        this.staticData = game.gamedatas.staticData;
+    }
+    static create(game) {
+        StaticData.instance = new StaticData(game);
+    }
+    static get() {
+        return StaticData.instance;
+    }
+    enterpriseCard(id) {
+        const card = this.staticData.enterpriseCards[id] ?? {};
+        if (!card) {
+            throw new Error('STATIC_DATA_ERROR_001');
+        }
+        return card;
+    }
+    lawCard(id) {
+        const card = this.staticData.lawCards[id] ?? {};
+        if (!card) {
+            throw new Error('STATIC_DATA_ERROR_001');
+        }
+        return card;
+    }
+    londonSeasonCard(id) {
+        const card = this.staticData.londonSeasonCards[id] ??
+            {};
+        if (!card) {
+            throw new Error('STATIC_DATA_ERROR_002');
+        }
+        return card;
+    }
+    order(id) {
+        const order = this.staticData.orders[id];
+        if (!order) {
+            throw new Error('STATIC_DATA_ERROR_003');
+        }
+        return order;
+    }
+    office(id) {
+        const office = this.staticData.offices[id];
+        if (!office) {
+            throw new Error('STATIC_DATA_ERROR_004');
+        }
+        return office;
+    }
+    region(id) {
+        const region = this.staticData.regions[id];
+        if (!region) {
+            throw new Error('STATIC_DATA_ERROR_005');
+        }
+        return region;
+    }
+    setupCard(id) {
+        const setupCard = this.staticData.setupCards[id];
+        if (!setupCard) {
+            throw new Error('STATIC_DATA_ERROR_006');
+        }
+        return setupCard;
+    }
+    setupCards() {
+        return Object.values(this.staticData.setupCards);
+    }
+    ship(id) {
+        return this.game.gamedatas.ships[id];
+    }
+}
+
+const tplEnterpriseCardContent = (card) => {
+    let shipName = null;
+    if (card.type === SHIPYARD) {
+        shipName = StaticData.get().ship(card.shipId).name;
+    }
+    return `
+  <div class="joco-title fb-font-baskerville  fb-font-12 bga-autofit">${card.type === WORKSHOP && card.invested ? _('Invested Workshop').toLocaleUpperCase() : _(card.name).toLocaleUpperCase()}</div>
+  ${shipName !== null ? `
+    <div id="${card.id}-ship" class="joco-shipyard-ship"></div>
+    <div class="joco-ship-first-letter fb-font-baskerville fb-font-24 fb-font-italic bga-autofit">${_(shipName).charAt(0)}</div>
+    <div class="joco-ship-name fb-font-baskerville fb-font-8 bga-autofit">${_(shipName)}</div>
+    ` : ''}  
+  
+`;
+};
+
+class EnterpriseCardsManager extends BgaCards.Manager {
+    static create(game) {
+        EnterpriseCardsManager.instance = new EnterpriseCardsManager(game);
+    }
+    static getInstance() {
+        return EnterpriseCardsManager.instance;
+    }
+    constructor(game) {
+        super({
+            getId: (card) => card.id,
+            setupDiv: (card, div) => this.setupDiv(card, div),
+            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
+            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
+            isCardVisible: (card) => this.isCardVisible(card),
+            animationManager: game.animationManager,
+            cardHeight: 150,
+            cardWidth: 228.75,
+            type: 'enterprise-card',
+        });
+        this.game = game;
+        this.shipStocks = {};
+    }
+    clearInterface() { }
+    setupDiv(card, div) { }
+    setupFrontDiv(card, div) {
+        div.classList.add('joco-enterprise-card');
+        div.classList.add('joco-small-card-horizontal');
+        div.setAttribute('data-background', card.type);
+        if (div.children.length) {
+            return;
+        }
+        div.insertAdjacentHTML('beforeend', tplEnterpriseCardContent(card));
+        if (card.type === SHIPYARD) {
+            this.shipStocks[card.shipId] = new BgaCards.LineStock(ShipsManager.getInstance(), document.getElementById(`${card.id}-ship`));
+        }
+    }
+    setupBackDiv(card, div) {
+        div.classList.add('joco-enterprise-card');
+        div.classList.add('joco-small-card-horizontal');
+        div.setAttribute('data-background', card.type === WORKSHOP ? `${WORKSHOP}Invested` : card.type);
+    }
+    isCardVisible(card) {
+        if (card.type === WORKSHOP && card.invested) {
+            return false;
+        }
+        return true;
+    }
+}
+
 const getPhaseName = (phase) => {
     switch (phase) {
         case LONDON_SEASON:
@@ -2048,7 +2241,9 @@ class Army {
     }
     updateFamilyMembers(gamedatas) {
         Object.values(gamedatas.familyMembers).forEach((member) => {
-            if (member.location === `Writers_${this.id}`) {
+            if (member.location === `Army_${this.id}`) {
+                const officerElement = createFamilyMember(member.familyId, member.id);
+                this.ui.army.ready.appendChild(officerElement);
             }
             else if (member.location === `Commander_${this.id}`) {
                 const commanderElement = createFamilyMember(member.familyId, member.id);
@@ -2258,61 +2453,6 @@ class Region {
     }
 }
 
-const BgaAnimations = await globalThis.importEsmLib('bga-animations', '1.x');
-const BgaCards = await globalThis.importEsmLib('bga-cards', '1.x');
-const BgaAutofit = await globalThis.importEsmLib('bga-autofit', '1.x');
-
-const tplShipContent = (ship, back = false) => `
-  <div class="joco-ship-name bga-autofit"><span class="fb-font-baskerville">${back && ship.type !== PLAYER_OWNED_SHIP ? _('Extra Ship') : _(ship.name)}</span></div>
-  ${back ? `<div class="joco-ship-fatigued fb-font-baskerville bga-autofit">${_('F')}</div>` : ''}
-`;
-
-class ShipsManager extends BgaCards.Manager {
-    static create(game) {
-        ShipsManager.instance = new ShipsManager(game);
-    }
-    static getInstance() {
-        return ShipsManager.instance;
-    }
-    constructor(game) {
-        super({
-            getId: (card) => card.id,
-            setupDiv: (card, div) => this.setupDiv(card, div),
-            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
-            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
-            isCardVisible: (card) => this.isCardVisible(card),
-            animationManager: game.animationManager,
-            cardWidth: 75,
-            cardHeight: 68,
-            type: 'ship',
-        });
-        this.game = game;
-    }
-    clearInterface() { }
-    setupDiv(card, div) {
-        div.classList.add('joco-ship-container');
-    }
-    setupFrontDiv(card, div) {
-        div.classList.add('joco-ship');
-        div.setAttribute('data-side', card.type === PLAYER_OWNED_SHIP ? FULL : COMPANY_SHIP);
-        if (div.children.length) {
-            return;
-        }
-        div.insertAdjacentHTML('beforeend', tplShipContent(card));
-    }
-    setupBackDiv(card, div) {
-        div.classList.add('joco-ship');
-        div.setAttribute('data-side', card.type === PLAYER_OWNED_SHIP ? FATIGUED : EXTRA_SHIP);
-        if (div.children.length) {
-            return;
-        }
-        div.insertAdjacentHTML('beforeend', tplShipContent(card, true));
-    }
-    isCardVisible(card) {
-        return card.side === FULL || card.side === COMPANY_SHIP;
-    }
-}
-
 const tplSeaZone = (id) => `
   <div class="joco-sea-zone" data-zone="${id}">
     <div id="joco-ship-stock-${id}" class="joco-ship-stock"></div>  
@@ -2363,75 +2503,6 @@ class ShipZone {
     async removeShip(ship) {
         await this.stock.removeCard(ship);
         this.updateCount();
-    }
-}
-
-class StaticData {
-    constructor(game) {
-        this.game = game;
-        this.staticData = game.gamedatas.staticData;
-    }
-    static create(game) {
-        StaticData.instance = new StaticData(game);
-    }
-    static get() {
-        return StaticData.instance;
-    }
-    enterpriseCard(id) {
-        const card = this.staticData.enterpriseCards[id] ?? {};
-        if (!card) {
-            throw new Error('STATIC_DATA_ERROR_001');
-        }
-        return card;
-    }
-    lawCard(id) {
-        const card = this.staticData.lawCards[id] ?? {};
-        if (!card) {
-            throw new Error('STATIC_DATA_ERROR_001');
-        }
-        return card;
-    }
-    londonSeasonCard(id) {
-        const card = this.staticData.londonSeasonCards[id] ??
-            {};
-        if (!card) {
-            throw new Error('STATIC_DATA_ERROR_002');
-        }
-        return card;
-    }
-    order(id) {
-        const order = this.staticData.orders[id];
-        if (!order) {
-            throw new Error('STATIC_DATA_ERROR_003');
-        }
-        return order;
-    }
-    office(id) {
-        const office = this.staticData.offices[id];
-        if (!office) {
-            throw new Error('STATIC_DATA_ERROR_004');
-        }
-        return office;
-    }
-    region(id) {
-        const region = this.staticData.regions[id];
-        if (!region) {
-            throw new Error('STATIC_DATA_ERROR_005');
-        }
-        return region;
-    }
-    setupCard(id) {
-        const setupCard = this.staticData.setupCards[id];
-        if (!setupCard) {
-            throw new Error('STATIC_DATA_ERROR_006');
-        }
-        return setupCard;
-    }
-    setupCards() {
-        return Object.values(this.staticData.setupCards);
-    }
-    ship(id) {
-        return this.game.gamedatas.ships[id];
     }
 }
 
@@ -2569,6 +2640,15 @@ class India {
     updateOrders(gamedatas) {
         Object.entries(gamedatas.orders).forEach(([orderId, order]) => {
             this.ui.orders[orderId].setAttribute('data-status', order.status);
+            if (order.status === FILLED_BY_WRITER) {
+                const familyMember = Object.values(gamedatas.familyMembers).find((m) => {
+                    return m.location === orderId;
+                });
+                if (familyMember) {
+                    const writer = createFamilyMember(familyMember.familyId, familyMember.id);
+                    this.ui.orders[orderId].appendChild(writer);
+                }
+            }
         });
     }
     getArmy(regionId) {
@@ -2576,71 +2656,6 @@ class India {
     }
     getSeaZone(seaZone) {
         return this.seaZones[seaZone];
-    }
-}
-
-const tplEnterpriseCardContent = (card) => {
-    let shipName = null;
-    if (card.type === SHIPYARD) {
-        shipName = StaticData.get().ship(card.shipId).name;
-    }
-    return `
-  <div class="joco-title fb-font-baskerville  fb-font-12 bga-autofit">${card.type === WORKSHOP && card.invested ? _('Invested Workshop').toLocaleUpperCase() : _(card.name).toLocaleUpperCase()}</div>
-  ${shipName !== null ? `
-    <div id="${card.id}-ship" class="joco-shipyard-ship"></div>
-    <div class="joco-ship-first-letter fb-font-baskerville fb-font-24 fb-font-italic bga-autofit">${_(shipName).charAt(0)}</div>
-    <div class="joco-ship-name fb-font-baskerville fb-font-8 bga-autofit">${_(shipName)}</div>
-    ` : ''}  
-  
-`;
-};
-
-class EnterpriseCardsManager extends BgaCards.Manager {
-    static create(game) {
-        EnterpriseCardsManager.instance = new EnterpriseCardsManager(game);
-    }
-    static getInstance() {
-        return EnterpriseCardsManager.instance;
-    }
-    constructor(game) {
-        super({
-            getId: (card) => card.id,
-            setupDiv: (card, div) => this.setupDiv(card, div),
-            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
-            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
-            isCardVisible: (card) => this.isCardVisible(card),
-            animationManager: game.animationManager,
-            cardHeight: 150,
-            cardWidth: 228.75,
-            type: 'enterprise-card',
-        });
-        this.game = game;
-        this.shipStocks = {};
-    }
-    clearInterface() { }
-    setupDiv(card, div) { }
-    setupFrontDiv(card, div) {
-        div.classList.add('joco-enterprise-card');
-        div.classList.add('joco-small-card-horizontal');
-        div.setAttribute('data-background', card.type);
-        if (div.children.length) {
-            return;
-        }
-        div.insertAdjacentHTML('beforeend', tplEnterpriseCardContent(card));
-        if (card.type === SHIPYARD) {
-            this.shipStocks[card.shipId] = new BgaCards.LineStock(ShipsManager.getInstance(), document.getElementById(`${card.id}-ship`));
-        }
-    }
-    setupBackDiv(card, div) {
-        div.classList.add('joco-enterprise-card');
-        div.classList.add('joco-small-card-horizontal');
-        div.setAttribute('data-background', card.type === WORKSHOP ? `${WORKSHOP}Invested` : card.type);
-    }
-    isCardVisible(card) {
-        if (card.type === WORKSHOP && card.invested) {
-            return false;
-        }
-        return true;
     }
 }
 
@@ -2934,12 +2949,14 @@ class NotificationManager {
         const elt = document.getElementById(id);
         if (location.startsWith('Army')) {
             const regionId = location.split('_')[1];
-            India.getInstance().getArmy(regionId).addPiece(elt);
+            await India.getInstance().getArmy(regionId).addPiece(elt);
+            return;
         }
-        else {
-            const locationElt = document.getElementById(location);
-            await this.game.animationManager.slideAndAttach(elt, locationElt);
+        const locationElt = document.getElementById(location);
+        if (parentHasChildWithId(locationElt, id)) {
+            return;
         }
+        await this.game.animationManager.slideAndAttach(elt, locationElt);
     }
     async notif_log(notif) {
         debug('notif_log', notif);
@@ -2987,14 +3004,11 @@ class NotificationManager {
     async notif_fillOrder(notif) {
         const { familyMember, order, from } = notif;
         const promises = [];
-        const board = Board$1.getInstance();
         if (familyMember) {
-            const to = familyMember.location;
-            familyMember.location = from;
-            promises.push(board.moveFamilyMemberBetweenLocations(familyMember, to));
+            promises.push(this.moveFamilyMember(familyMember));
         }
         else {
-            board.ui.orders[order.id].setAttribute('data-status', FILLED);
+            document.getElementById(order.id).setAttribute('data-status', FILLED);
         }
         await Promise.all(promises);
     }
@@ -3100,14 +3114,15 @@ class NotificationManager {
         }
     }
     async notif_purchaseEnterprise(notif) {
-        const { playerId, enterprise, type, amount } = notif;
+        const { playerId, enterprise, type, amount, ship } = notif;
         await this.pay(playerId, amount);
         const player = this.getPlayer(playerId);
         player.counters[this.getEnterpriseCounter(type)].incValue(1);
-        if (type === SHIPYARD) {
-            player.counters[SHIPS_COUNTER].incValue(1);
-        }
         await PlayerAreas.getInstance().addEnterprise(getEnterpriseCard(enterprise));
+        if (type === SHIPYARD && ship) {
+            player.counters[SHIPS_COUNTER].incValue(1);
+            EnterpriseCardsManager.getInstance().shipStocks[ship.id].addCard(ship);
+        }
     }
     async notif_returnFamilyMemberToSupply(notif) {
         const { familyMember, playerId } = notif;
@@ -3220,6 +3235,79 @@ class ConfirmTurn {
         updatePageTitle(_('${you} must confirm or restart your turn'));
         addConfirmButton(() => this.game.bga.actions.performAction('actConfirmTurn'));
         addUndoButtons(this.args);
+    }
+}
+
+class ResolveChoice {
+    constructor(game) {
+        this.game = game;
+    }
+    static create(game) {
+        ResolveChoice.instance = new ResolveChoice(game);
+    }
+    static getInstance() {
+        return ResolveChoice.instance;
+    }
+    onEnteringState(args) {
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    }
+    onLeavingState() {
+        debug('Leaving ResolveChoiceState');
+    }
+    setDescription(activePlayerId, args) {
+        this.args = args;
+        if (this.args.description && typeof this.args.description === 'string') {
+            updatePageTitle(_(this.args.description));
+        }
+        else if (this.args.description &&
+            typeof this.args.description === 'object') {
+            updatePageTitle(_(this.args.description.log), this.args.description.args);
+        }
+    }
+    updateInterfaceInitialStep() {
+        this.game.clearPossible();
+        if (this.args.description && typeof this.args.description === 'string') {
+            updatePageTitle(_(this.args.description));
+        }
+        else if (this.args.description &&
+            typeof this.args.description === 'object') {
+            updatePageTitle(_(this.args.description.log), this.args.description.args);
+        }
+        else {
+            updatePageTitle(this.args.optionalAction
+                ? _('${you} may choose')
+                : _('${you} must choose'));
+        }
+        Object.values(this.args.choices).forEach((choice) => {
+            this.addChoiceActionButton(choice);
+        });
+        Object.values(this.args.allChoices).forEach((choice) => {
+            this.addChoiceActionButton(choice, true);
+        });
+        addUndoButtons(this.args);
+    }
+    addChoiceActionButton(choice, disabled = false) {
+        const eltId = `choice_btn_${choice.id}`;
+        if (document.getElementById(eltId)) {
+            return;
+        }
+        const button = this.args.buttonType === SECONDARY || choice.id === 99
+            ? addSecondaryActionButton
+            : addPrimaryActionButton;
+        button({
+            id: eltId,
+            text: typeof choice.description === 'string'
+                ? _(choice.description)
+                : Interaction.use().formatStringRecursive(_(choice.description.log), choice.description.args),
+            extraClasses: disabled ? 'disabled' : '',
+            callback: () => {
+                const choiceId = choice.id;
+                this.game.bga.actions.performAction('actChooseAction', {
+                    choiceId: choice.id,
+                });
+            },
+        });
     }
 }
 
@@ -4854,12 +4942,13 @@ class EnlistWriter {
         debug('Entering EnlistWriter state');
         this.args = args;
         this.updateInterfaceInitialStep();
+        Bar$1.getInstance().goTo('joco-india');
     }
     onLeavingState() {
         debug('Leaving EnlistWriter state');
     }
     setDescription(activePlayerIds, args) {
-        updatePageTitle(_('${tkn_playerName} must select a region to place their writer'), {
+        updatePageTitle(_('${tkn_playerName} must select a Presidency to place their writer'), {
             tkn_playerName: PlayerManager.getInstance()
                 .getPlayer(activePlayerIds[0])
                 .getName(),
@@ -4867,16 +4956,11 @@ class EnlistWriter {
     }
     updateInterfaceInitialStep() {
         this.game.clearPossible();
-        Bar$1.getInstance().goTo('joco-india');
-        updatePageTitle(_('${you} must select a region to place ${tkn_icon}'), {
+        updatePageTitle(_('${you} must select a Presidency to place your ${tkn_icon}'), {
             tkn_icon: WRITER,
         });
         [BOMBAY, MADRAS, BENGAL].forEach((region) => {
-            addPrimaryActionButton({
-                id: `writers-${region}-btn`,
-                text: getRegionName(region),
-                callback: () => this.updateInterfaceConfirm(region),
-            });
+            onClick(`PresidencyOf${region}`, () => this.updateInterfaceConfirm(region));
         });
     }
     updateInterfaceConfirm(regionId) {
@@ -5412,6 +5496,34 @@ class PlayerTurn {
     }
 }
 
+class PresidencyCommander {
+    constructor(game) {
+        this.game = game;
+    }
+    static create(game) {
+        PresidencyCommander.instance = new PresidencyCommander(game);
+    }
+    static getInstance() {
+        return PresidencyCommander.instance;
+    }
+    onEnteringState(args) {
+        debug('Entering PresidencyCommander state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    }
+    onLeavingState() {
+        debug('Leaving PresidencyCommander state');
+    }
+    setDescription(activePlayerIds, args) { }
+    updateInterfaceInitialStep() {
+        clearPossible();
+        updatePageTitle(_('${you} may perform an action'), {});
+        addConfirmButton(() => {
+            performAction('actPresidencyCommander', {});
+        });
+    }
+}
+
 class PresidencyDecideOrder {
     constructor(game) {
         this.game = game;
@@ -5490,6 +5602,7 @@ class PresidencyTrade {
         this.spend = args.proposal || 0;
         this.selectedRegionIds = [this.args.options.homeRegionId];
         this.updateInterfaceInitialStep();
+        Bar$1.getInstance().goTo('joco-india');
     }
     onLeavingState() {
         debug('Leaving PresidencyTrade state');
@@ -5534,7 +5647,7 @@ class PresidencyTrade {
     }
     setMinSpendAmount() {
         this.spend = this.selectedRegionIds.length;
-        Board$1.getInstance().treasuries[this.args.officeId].incValue(-this.selectedRegionIds.length);
+        Company.getInstance().treasuries[this.args.officeId].incValue(-this.selectedRegionIds.length);
         this.updateInterfaceMakeCheck();
     }
     updateInterfaceMakeCheck() {
@@ -5546,13 +5659,13 @@ class PresidencyTrade {
             available,
             tkn_pound: 'pound',
         });
-        const treasuryCounter = Board$1.getInstance().treasuries[this.args.officeId];
+        const treasury = Company.getInstance().treasuries[this.args.officeId];
         addSecondaryActionButton({
             id: 'minus_btn',
             text: '-',
             callback: () => {
                 this.spend--;
-                treasuryCounter.incValue(1);
+                treasury.incValue(1);
                 this.updateInterfaceMakeCheck();
             },
             extraClasses: this.spend <= minSpend ? DISABLED : '',
@@ -5570,7 +5683,7 @@ class PresidencyTrade {
             text: '+',
             callback: () => {
                 this.spend++;
-                treasuryCounter.incValue(-1);
+                treasury.incValue(-1);
                 this.updateInterfaceMakeCheck();
             },
             extraClasses: available === 0 ? DISABLED : '',
@@ -5612,7 +5725,7 @@ class PresidencyTrade {
             id: 'cancel_btn',
             text: _('Cancel'),
             callback: async () => {
-                (Board$1.getInstance().treasuries[this.args.officeId].toValue(this.args.treasury),
+                (Company.getInstance().treasuries[this.args.officeId].toValue(this.args.treasury),
                     this.game.onCancel());
             },
         });
@@ -5633,9 +5746,9 @@ class PresidencyTradeFillOrders {
         debug('Entering PresidencyTradeFillOrders state');
         this.args = args;
         this.filledOrders = [];
-        this.board = Board$1.getInstance();
         this.balance = this.args.companyBalance;
         this.updateInterfaceInitialStep();
+        Bar$1.getInstance().goTo('joco-india');
     }
     onLeavingState() {
         debug('Leaving PresidencyTradeFillOrders state');
@@ -5660,7 +5773,7 @@ class PresidencyTradeFillOrders {
         }
         updatePageTitle(_('Fill orders: ${you} must select a writer'));
         availableWriters.forEach((writer) => {
-            onClick(this.board.ui.familyMembers[writer.id], () => {
+            onClick(writer.id, () => {
                 this.updateInterfaceSelectOrder(writer);
             });
         });
@@ -5671,22 +5784,22 @@ class PresidencyTradeFillOrders {
     updateInterfaceSelectOrder(writer) {
         clearPossible();
         if (writer) {
-            setSelected(this.board.ui.familyMembers[writer.id]);
+            setSelected(writer.id);
         }
         updatePageTitle(_('Fill orders: ${you} must select an order'));
         this.getAvailableOrderIds().forEach((orderId) => {
-            onClick(this.board.ui.orders[orderId], async () => {
+            onClick(orderId, async () => {
                 this.filledOrders.push({ orderId, filledBy: writer?.id || FILLED });
                 const promises = [];
                 const order = StaticData.get().order(orderId);
                 this.balance += order.value;
                 if (writer) {
-                    promises.push(this.board.moveFamilyMemberBetweenLocations(writer, orderId));
+                    promises.push(this.game.animationManager.slideAndAttach(document.getElementById(writer.id), document.getElementById(orderId)));
                 }
                 else {
-                    this.board.ui.orders[orderId].setAttribute('data-status', FILLED);
+                    document.getElementById(orderId).setAttribute('data-status', FILLED);
                 }
-                promises.push(this.board.movePawn('balance', this.balance));
+                Company.getInstance().balance.toValue(this.balance);
                 clearPossible();
                 await Promise.all(promises);
                 this.updateInterfaceInitialStep();
@@ -5720,20 +5833,6 @@ class PresidencyTradeFillOrders {
         return orderIds;
     }
     async returnPieces() {
-        for (let { orderId, filledBy } of this.filledOrders) {
-            const promises = [];
-            if (filledBy === FILLED) {
-                this.board.ui.orders[orderId].setAttribute('data-status', OPEN);
-            }
-            else {
-                const writer = this.args.writers.find((writer) => writer.id === filledBy);
-                writer.location = orderId;
-                promises.push(this.board.moveFamilyMemberBetweenLocations(writer, 'Writers_Bombay'));
-            }
-            this.balance = this.balance - StaticData.get().order(orderId).value;
-            promises.push(this.board.movePawn('balance', this.balance));
-            await Promise.all(promises);
-        }
     }
     performAction(makeCheck = false) {
         performAction('actPresidencyTradeFillOrders', {
@@ -5940,6 +6039,9 @@ class Game {
         this._selectableNodes = [];
         this.mobileVersion = false;
         this.states = {
+            ConfirmPartialTurn,
+            ConfirmTurn,
+            ResolveChoice,
             Chairman,
             ChairmanDebtConsent,
             CrownChairmanRequestAllocation,
@@ -5948,8 +6050,6 @@ class Game {
             CrownManagerOfShippingFitShips,
             CrownManagerOfShippingLeaseExtraShips,
             CrownManagerOfShippingPlaceShips,
-            ConfirmPartialTurn,
-            ConfirmTurn,
             DirectorOfTradeSpecialEnvoy,
             DirectorOfTradeSpecialEnvoySuccess,
             DirectorOfTradeTransfers,
@@ -5961,6 +6061,7 @@ class Game {
             MilitaryAffairsAssign,
             MilitaryAffairsTransfers,
             PlayerTurn,
+            PresidencyCommander,
             PresidencyDecideOrder,
             PresidencyTrade,
             PresidencyTradeFillOrders,

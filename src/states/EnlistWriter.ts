@@ -38,6 +38,7 @@ export class EnlistWriter implements GameState<OnEnteringEnlistWriterArgs> {
     debug('Entering EnlistWriter state');
     this.args = args;
     this.updateInterfaceInitialStep();
+    Bar.getInstance().goTo('joco-india');
   }
 
   onLeavingState() {
@@ -46,7 +47,7 @@ export class EnlistWriter implements GameState<OnEnteringEnlistWriterArgs> {
 
   setDescription(activePlayerIds: number[], args: OnEnteringEnlistWriterArgs) {
     updatePageTitle(
-      _('${tkn_playerName} must select a region to place their writer'),
+      _('${tkn_playerName} must select a Presidency to place their writer'),
       {
         tkn_playerName: PlayerManager.getInstance()
           .getPlayer(activePlayerIds[0])
@@ -73,20 +74,20 @@ export class EnlistWriter implements GameState<OnEnteringEnlistWriterArgs> {
 
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
-    Bar.getInstance().goTo('joco-india');
 
-    updatePageTitle(_('${you} must select a region to place ${tkn_icon}'), {
-      tkn_icon: WRITER,
-    });
+    updatePageTitle(
+      _('${you} must select a Presidency to place your ${tkn_icon}'),
+      {
+        tkn_icon: WRITER,
+      },
+    );
 
     [BOMBAY, MADRAS, BENGAL].forEach((region) => {
       // const box = Board.getInstance().ui.selectBoxes[`Writers_${region}`];
       // onClick(box, () => this.updateInterfaceConfirm(region));
-      addPrimaryActionButton({
-        id: `writers-${region}-btn`,
-        text: getRegionName(region),
-        callback: () => this.updateInterfaceConfirm(region),
-      });
+      onClick(`PresidencyOf${region}`, () =>
+        this.updateInterfaceConfirm(region),
+      );
     });
   }
 

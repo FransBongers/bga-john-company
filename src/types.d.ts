@@ -286,7 +286,7 @@ export type JocoEnterpriseCard = JocoEnterpriseCardBase &
 interface JoCoOrderBase {
   id: string;
   location: string;
-  status: 'open' | 'closed' | 'filled'; // | 'string';
+  status: 'open' | 'closed' | 'filled' | 'filledByWriter';
 }
 
 interface JoCoOrderStatic {

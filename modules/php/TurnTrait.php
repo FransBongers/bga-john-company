@@ -5,6 +5,7 @@ namespace Bga\Games\JohnCompany;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Managers\AICards;
 use Bga\Games\JohnCompany\Managers\Company;
@@ -576,7 +577,7 @@ trait TurnTrait
   function stTurnAction()
   {
     $player = Players::getActive();
-    self::giveExtraTime($player->getId());
+    $this->giveExtraTime($player->getId());
 
     $node = [
       'children' => [],
@@ -628,16 +629,56 @@ trait TurnTrait
       BENGAL_PRESIDENCY => PRESIDENT_OF_BENGAL,
     ];
 
-    $office = Offices::get($presidencyOfficeMap[$presidency]);
+    $offices = Offices::getAll();
+
+    // return [
+    //   'children' => [
+    //     [
+    //       'action' => PRESIDENCY_DECIDE_ORDER,
+    //       'playerId' => 'some',
+    //       'activePlayerIds' => [$office->getPlayerId()],
+    //       'officeId' => $office->getId(),
+    //     ]
+    //   ],
+    // ];
+    $presidentOffice = $offices[$presidencyOfficeMap[$presidency]];
+    $commander = $presidentOffice->getCommander();
+
+    // TODO: check if there is a president?:
+    $children = [
+      [
+        'action' => PRESIDENCY_TRADE,
+        'playerId' => 'some',
+        'activePlayerIds' => [$presidentOffice->getPlayerId()],
+        'officeId' => $presidentOffice->getId(),
+      ],
+
+    ];
+
+    if ($commander !== null) {
+      $children[] = [
+        'action' => PRESIDENCY_COMMANDER,
+        'playerId' => 'some',
+        'activePlayerIds' => [$commander->getPlayerId()],
+      ];
+    }
+
+    // TODO: if governor, push option
 
     return [
       'children' => [
         [
-          'action' => PRESIDENCY_DECIDE_ORDER,
-          'playerId' => 'some',
-          'activePlayerIds' => [$office->getPlayerId()],
-          'officeId' => $office->getId(),
-        ]
+          'type' => NODE_OR,
+          'children' => $children,
+          'playerId' => $presidentOffice->getPlayerId(),
+          'stateDescription' => [
+            'descriptionmyturn' => clienttranslate('${you} must choose who will act next'),
+            'description' => clienttranslate('${actplayer} must choose who will act next'),
+            'args' => []
+          ]
+          // 'activePlayerIds' => [$presidentOffice->getPlayerId()],
+          // 'officeId' => $presidentOffice->getId(),
+        ],
       ],
     ];
   }

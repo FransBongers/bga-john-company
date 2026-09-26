@@ -2,6 +2,9 @@
 
 namespace Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 
+use Bga\Games\JohnCompany\Managers\Players;
+use Bga\Games\JohnCompany\Models\Player;
+
 /*
  * AbstractNode: a class that represent an abstract Node
  */
@@ -56,7 +59,7 @@ class AbstractNode
         return $i;
       }
     }
-    throw new \BgaVisibleSystemException("Can't find index of a child");
+    throw new \Bga\GameFramework\VisibleSystemException("Can't find index of a child");
   }
 
   /**
@@ -67,7 +70,7 @@ class AbstractNode
   {
     $index = $this->getIndex();
     if (is_null($index)) {
-      throw new \BgaVisibleSystemException('Trying to replace the root');
+      throw new \Bga\GameFramework\VisibleSystemException('Trying to replace the root');
     }
     return $this->parent->replaceAtPos($newNode, $index);
   }
@@ -86,7 +89,7 @@ class AbstractNode
   {
     $index = $this->getIndex();
     if (is_null($index)) {
-      throw new \BgaVisibleSystemException('Trying to insert a brother of the root');
+      throw new \Bga\GameFramework\VisibleSystemException('Trying to insert a brother of the root');
     }
     // Ensure parent is a seq node
     if (!$this->parent instanceof \Bga\Games\JohnCompany\Boilerplate\Core\Engine\SeqNode) {
@@ -105,7 +108,7 @@ class AbstractNode
   {
     $index = $this->getIndex();
     if (is_null($index)) {
-      throw new \BgaVisibleSystemException('Trying to insert a brother of the root');
+      throw new \Bga\GameFramework\VisibleSystemException('Trying to insert a brother of the root');
     }
     // Ensure parent is a seq node
     if (!$this->parent instanceof \Bga\Games\JohnCompany\Boilerplate\Core\Engine\SeqNode) {
@@ -178,6 +181,56 @@ class AbstractNode
     );
   }
 
+  /**
+   * The description of the node is the sequence of description of its children, separated by a separator
+   */
+  public function getDescription(): string|array
+  {
+    $i = 0;
+    $desc = [];
+    $args = [];
+
+    if (isset($this->info['customDescription'])) {
+      return $this->info['customDescription'];
+    }
+
+    foreach ($this->children as $child) {
+      $name = 'action' . $i++;
+      $tmp = $child->getDescription();
+      if ($tmp != '') {
+        $args[$name] = $tmp;
+        $args['i18n'][] = $name;
+
+        if ($child->forceConfirmation()) {
+          $tmp = [
+            'log' => clienttranslate('Allow ${player_name} to take a triggered action'),
+            'args' => [
+              'player_name' => Players::get($child->getPlayerId())->getName(),
+            ],
+          ];
+        }
+        $args[$name] = $tmp;
+        $args['i18n'][] = $name;
+        $desc[] = '${' . $name . '}';
+      }
+    }
+
+    return [
+      'log' => \implode($this->getDescriptionSeparator(), $desc),
+      'args' => $args,
+    ];
+  }
+
+  public function getDescriptionSeparator()
+  {
+    return '';
+  }
+
+  public function getStateDescription(): string|array
+  {
+    return $this->info['stateDescription'] ?? "";
+  }
+
   /***********************
    *** Getters (sugar) ***
    ***********************/
@@ -206,6 +259,16 @@ class AbstractNode
     return $this->info['cardId'] ?? null;
   }
 
+  public function getSource()
+  {
+    return $this->infos['source'] ?? null;
+  }
+
+  public function getSourceId()
+  {
+    return $this->infos['sourceId'] ?? null;
+  }
+
   public function getInfo()
   {
     return $this->info;
@@ -216,9 +279,19 @@ class AbstractNode
     $this->info[$key] = $value;
   }
 
-  public function isDoable($player)
+  public function doNotDisplayIfNotDoable(): bool
+  {
+    return false;
+  }
+
+  public function isDoable(Player $player)
   {
     return true;
+  }
+
+  public function isReUsable()
+  {
+    return $this->info['reusable'] ?? false;
   }
 
   public function isResolvingParent()
@@ -245,7 +318,12 @@ class AbstractNode
     if ($this->isResolved()) {
       return null;
     }
-    return $this;
+
+    if (!isset($this->info['choice']) || $this->children[$this->info['choice']]->isResolved()) {
+      return $this;
+    } else {
+      return $this->children[$this->info['choice']]->getNextUnresolved();
+    }
   }
 
   public function resolve($args)
@@ -279,6 +357,70 @@ class AbstractNode
     return $this->info['optional'] ?? $this->parent != null && $this->parent->areChildrenOptional();
   }
 
+  public function isAutomatic(?Player $player = null): bool
+  {
+    $choices = $this->getChoices($player);
+    return count($choices) < 2;
+  }
+
+
+  public function getChoices($player = null, $displayAllChoices = false)
+  {
+    $choice = null;
+    $choices = [];
+    $children = $this->getType() == NODE_SEQ && !empty($this->children) ? [0 => $this->children[0]] : $this->children;
+
+    foreach ($children as $id => $child) {
+      $isDisplayed = true;
+      $isDoable = $child->isDoable($player);
+      if (!$isDoable) {
+        $isDisplayed = $displayAllChoices && !$child->doNotDisplayIfNotDoable();
+      }
+
+      if (!$child->isResolved() && $isDisplayed) {
+        $choice = [
+          'id' => $id,
+          'description' => $this->getType() == NODE_SEQ ? $this->getDescription() : $child->getDescription(),
+          'args' => $child->getArgs(),
+          'optionalAction' => $child->isOptional(),
+          'automaticAction' => $child->isAutomatic($player),
+          // 'independentAction' => $child->isIndependent($player),
+          // 'irreversibleAction' => $child->isIrreversible($player),
+          'source' => $child->getSource(),
+          'sourceId' => $child->getSourceId(),
+        ];
+        $choices[$id] = $choice;
+      }
+    }
+
+    if ($this->isOptional()) {
+      if (count($choices) != 1 || !$choice['optionalAction'] || $choice['automaticAction']) {
+        $choices[PASS] = [
+          'id' => PASS,
+          'description' => clienttranslate('Pass'),
+          'irreversibleAction' => false,
+          'args' => [],
+        ];
+      }
+    }
+
+    return $choices;
+  }
+
+  public function choose($childIndex, $auto = false)
+  {
+    $this->info['choice'] = $childIndex;
+    $child = $this->children[$this->info['choice']];
+    if (!$auto && !($child instanceof LeafNode)) {
+      $child->enforceMandatory();
+    }
+  }
+
+  public function unchoose()
+  {
+    unset($this->info['choice']);
+  }
+
 
   /************************
    *** Action resolution ***
@@ -293,6 +435,14 @@ class AbstractNode
   public function isActionResolved()
   {
     return $this->info['actionResolved'] ?? false;
+  }
+
+  public function incChoiceCount($change = 1)
+  {
+    if (!isset($this->info['choiceCount'])) {
+      $this->info['choiceCount'] = 0;
+    }
+    $this->info['choiceCount'] += $change;
   }
 
   public function getActionResolutionArgs()

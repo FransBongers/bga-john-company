@@ -123,6 +123,7 @@ export const COUNTERS = [
 export const CLOSED = 'closed';
 export const FILLED = 'filled';
 export const OPEN = 'open';
+export const FILLED_BY_WRITER = 'filledByWriter';
 
 /**
  * OrderIds

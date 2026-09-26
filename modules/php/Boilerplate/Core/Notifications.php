@@ -6,6 +6,7 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Regions;
+use Bga\Games\JohnCompany\Managers\Ships;
 
 class Notifications
 {
@@ -689,6 +690,7 @@ class Notifications
       'tkn_enterpriseIcon' => $enterprise->getType(),
       'amount' => $amount,
       'enterprise' => $enterprise,
+      'ship' => $enterprise->getType() === SHIPYARD ? Ships::get($enterprise->getShipId()) : null,
       'type' => $enterprise->getType(),
       'tkn_pound' => clienttranslate('Pounds'),
       'i18n' => ['tkn_boldText_enterprise'],

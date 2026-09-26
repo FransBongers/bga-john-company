@@ -7,6 +7,7 @@
 //  .##....##..#######.....##....####.##......
 
 import { Board } from '../../board';
+import { EnterpriseCardsManager } from '../../cards/enterprise-cards';
 import { Company } from '../../company';
 
 import {
@@ -330,11 +331,14 @@ export class NotificationManager {
 
     if (location.startsWith('Army')) {
       const regionId = location.split('_')[1];
-      India.getInstance().getArmy(regionId).addPiece(elt);
-    } else {
-      const locationElt = document.getElementById(location);
-      await this.game.animationManager.slideAndAttach(elt, locationElt);
+      await India.getInstance().getArmy(regionId).addPiece(elt);
+      return;
     }
+    const locationElt = document.getElementById(location);
+    if (parentHasChildWithId(locationElt, id)) {
+      return;
+    }
+    await this.game.animationManager.slideAndAttach(elt, locationElt);
   }
 
   // .##....##..#######..########.####.########..######.
@@ -421,13 +425,13 @@ export class NotificationManager {
   async notif_fillOrder(notif: NotifFillOrder) {
     const { familyMember, order, from } = notif;
     const promises: Promise<void>[] = [];
-    const board = Board.getInstance();
+
     if (familyMember) {
-      const to = familyMember.location;
-      familyMember.location = from;
-      promises.push(board.moveFamilyMemberBetweenLocations(familyMember, to));
+      // const to = familyMember.location;
+      // familyMember.location = from;
+      promises.push(this.moveFamilyMember(familyMember));
     } else {
-      board.ui.orders[order.id].setAttribute('data-status', FILLED);
+      document.getElementById(order.id).setAttribute('data-status', FILLED);
     }
     await Promise.all(promises);
   }
@@ -581,18 +585,19 @@ export class NotificationManager {
   }
 
   async notif_purchaseEnterprise(notif: NotifPurchaseEnterprise) {
-    const { playerId, enterprise, type, amount } = notif;
+    const { playerId, enterprise, type, amount, ship } = notif;
 
     await this.pay(playerId, amount);
 
     const player = this.getPlayer(playerId);
     player.counters[this.getEnterpriseCounter(type)].incValue(1);
-    if (type === SHIPYARD) {
-      player.counters[SHIPS_COUNTER].incValue(1);
-    }
     await PlayerAreas.getInstance().addEnterprise(
       getEnterpriseCard(enterprise),
     );
+    if (type === SHIPYARD && ship) {
+      player.counters[SHIPS_COUNTER].incValue(1);
+      EnterpriseCardsManager.getInstance().shipStocks[ship.id].addCard(ship);
+    }
   }
 
   async notif_returnFamilyMemberToSupply(

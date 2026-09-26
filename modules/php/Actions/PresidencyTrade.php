@@ -19,6 +19,7 @@ use Bga\Games\JohnCompany\Managers\Ships;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 use Bga\Games\JohnCompany\Models\Office;
+use Bga\Games\JohnCompany\Models\Player;
 
 class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
 {
@@ -173,6 +174,25 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
       return false;
     }
 
+    return true;
+  }
+
+    // .########.##....##..######...####.##....##.########
+  // .##.......###...##.##....##...##..###...##.##......
+  // .##.......####..##.##.........##..####..##.##......
+  // .######...##.##.##.##...####..##..##.##.##.######..
+  // .##.......##..####.##....##...##..##..####.##......
+  // .##.......##...###.##....##...##..##...###.##......
+  // .########.##....##..######...####.##....##.########
+
+
+  public function getDescription(): string|array
+  {
+    return clienttranslate('President (trade)');
+  }
+
+  public function isDoable(Player $player): bool
+  {
     return true;
   }
 

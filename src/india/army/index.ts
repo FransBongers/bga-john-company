@@ -106,10 +106,10 @@ export class Army {
   public updateFamilyMembers(gamedatas: GamedatasAlias) {
     // Writers
     Object.values(gamedatas.familyMembers).forEach((member) => {
-      if (member.location === `Writers_${this.id}`) {
+      if (member.location === `Army_${this.id}`) {
         // Officers
-        // const writerElement = createFamilyMember(member.familyId, member.id);
-        // this.ui.writers.appendChild(writerElement);
+        const officerElement = createFamilyMember(member.familyId, member.id);
+        this.ui.army.ready.appendChild(officerElement);
       } else if (member.location === `Commander_${this.id}`) {
         // Commander
         const commanderElement = createFamilyMember(member.familyId, member.id);
@@ -140,7 +140,8 @@ export class Army {
   }
 
   public async addPiece(piece: HTMLElement | string) {
-    const element = typeof piece === 'string' ? document.getElementById(piece) : piece;
+    const element =
+      typeof piece === 'string' ? document.getElementById(piece) : piece;
     if (parentHasChildWithId(this.ui.army.ready.id, element.id)) {
       return;
     }

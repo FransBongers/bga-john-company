@@ -2,8 +2,10 @@
 
 namespace Bga\Games\JohnCompany\Models;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine\AbstractNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Preferences;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 
@@ -55,6 +57,11 @@ class Player extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   public function getId()
   {
     return (int) parent::getId();
+  }
+
+  public function canTakeAction(string $action, null|array|AbstractNode $ctx): bool
+  {
+    return AtomicActions::isDoable($action, $ctx, $this);
   }
 
   public function getFamily()

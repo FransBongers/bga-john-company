@@ -2,7 +2,10 @@
 
 namespace Bga\Games\JohnCompany\Offices;
 
-class PresidentOfBombay extends \Bga\Games\JohnCompany\Models\Office
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Managers\FamilyMembers;
+
+class PresidentOfBombay extends \Bga\Games\JohnCompany\Offices\President
 {
   public function __construct($row)
   {
@@ -10,25 +13,9 @@ class PresidentOfBombay extends \Bga\Games\JohnCompany\Models\Office
     $this->id = PRESIDENT_OF_BOMBAY;
     $this->title = clienttranslate('President of Bombay');
     $this->hirePriority = 5;
-  }
-
-  public function getPresidencyId()
-  {
-    return BOMBAY_PRESIDENCY;
-  }
-
-  public function getRegionId()
-  {
-    return BOMBAY;
-  }
-
-  public function getSeaZone()
-  {
-    return WEST_INDIAN;
-  }
-
-  public function getHomePortOrderId()
-  {
-    return ORDER_BOMBAY_3;
+    $this->presidencyId = BOMBAY_PRESIDENCY;
+    $this->regionId = BOMBAY;
+    $this->seaZone = WEST_INDIAN;
+    $this->homePortOrderId = ORDER_BOMBAY_3;
   }
 }

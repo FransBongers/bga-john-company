@@ -771,7 +771,7 @@ span[style*="color:#addb90"] {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background-image: url("img/background_paper.jpg");
+  background-color: rgb(245, 237, 224);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -1795,6 +1795,9 @@ span[style*="color:#addb90"] {
 .joco-ship[data-side=CompanyShip] {
   background-image: url("img/ship_company.png");
 }
+.joco-ship[data-side=CompanyShip] .joco-ship-name {
+  color: white;
+}
 
 .joco-ship-container.selectable .joco-ship {
   cursor: pointer;
@@ -2508,7 +2511,7 @@ span[style*="color:#c0c0c0"] {
   pointer-events: none;
   opacity: 0;
   position: absolute;
-  transition: visibility 0s ease-out, opacity 5s linear;
+  transition: visibility 0s ease-out, opacity 0.3s linear;
 }
 #joco-india #joco-india-map .joco-order .joco-family-member {
   height: 65px;
