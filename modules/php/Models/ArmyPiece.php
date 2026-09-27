@@ -12,7 +12,6 @@ class ArmyPiece extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impl
   protected $name;
   protected $cost = 0;
   protected $type;
-  protected $exhausted;
   protected $strength = 1;
   protected $region = null;
 
@@ -27,20 +26,19 @@ class ArmyPiece extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impl
     'id' => ['army_piece_id', 'str'],
     'location' => 'army_piece_location',
     'state' => ['army_piece_state', 'int'],
-    'exhausted' => ['exhausted', 'int'],
   ];
 
   protected $staticAttributes = [
     'name',
     'cost',
     'region',
-    'strength'
+    'strength',
+    'type'
   ];
 
   public function jsonSerialize(): array
   {
     $data = parent::jsonSerialize();
-    $data['exhausted'] = $this->exhausted === 1;
     return $data;
   }
 

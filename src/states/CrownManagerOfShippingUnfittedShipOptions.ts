@@ -62,13 +62,9 @@ export class CrownManagerOfShippingUnfittedShipOptions implements GameState<OnEn
     activePlayerIds: number,
     args: OnEnteringCrownManagerOfShippingUnfittedShipOptionsArgs,
   ) {
-    updatePageTitle(
-      _('${tkn_playerName} may fit, buy and lease ships'),
-      {
-        tkn_playerName: getPlayerName(activePlayerIds[0]),
-      },
-      true,
-    );
+    updatePageTitle(_('${tkn_playerName} may fit, buy and lease ships'), {
+      tkn_playerName: getPlayerName(activePlayerIds[0]),
+    });
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########
@@ -202,7 +198,7 @@ export class CrownManagerOfShippingUnfittedShipOptions implements GameState<OnEn
         // TODO: check
         side: type,
         name: _(this.args.ship.name),
-        }),
+      }),
       location: getSeaName(this.args.location),
     });
   }

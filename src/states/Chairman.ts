@@ -70,7 +70,6 @@ export class Chairman implements GameState<OnEnteringChairmanArgs> {
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true,
     );
   }
 

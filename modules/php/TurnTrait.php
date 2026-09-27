@@ -644,11 +644,14 @@ trait TurnTrait
     $presidentOffice = $offices[$presidencyOfficeMap[$presidency]];
     $commander = $presidentOffice->getCommander();
 
+
     // TODO: check if there is a president?:
+    $requiredChoiceCount = 1;
     $children = [
       [
         'action' => PRESIDENCY_TRADE,
         'playerId' => 'some',
+        'optional' => true,
         'activePlayerIds' => [$presidentOffice->getPlayerId()],
         'officeId' => $presidentOffice->getId(),
       ],
@@ -656,10 +659,14 @@ trait TurnTrait
     ];
 
     if ($commander !== null) {
+      $requiredChoiceCount++;
       $children[] = [
         'action' => PRESIDENCY_COMMANDER,
         'playerId' => 'some',
         'activePlayerIds' => [$commander->getPlayerId()],
+        'args' => [
+          'officeId' => $presidentOffice->getId(),
+        ],
       ];
     }
 
@@ -671,6 +678,7 @@ trait TurnTrait
           'type' => NODE_OR,
           'children' => $children,
           'playerId' => $presidentOffice->getPlayerId(),
+          'requiredChoiceCount' => $requiredChoiceCount,
           'stateDescription' => [
             'descriptionmyturn' => clienttranslate('${you} must choose who will act next'),
             'description' => clienttranslate('${actplayer} must choose who will act next'),

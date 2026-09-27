@@ -67,7 +67,6 @@ export class CrownChairmanRequestDebtAdvancement implements GameState<OnEntering
       {
         tkn_playerName: getCrownPlayerName(),
       },
-      true,
     );
   }
 

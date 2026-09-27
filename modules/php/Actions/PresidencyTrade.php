@@ -74,9 +74,10 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
 
   public function actPassPresidencyTrade()
   {
-    $player = self::getPlayer();
+    $playerId = $this->checkPlayer();
     // Stats::incPassActionCount($player->getId(), 1);
     // Engine::resolve(PASS);
+    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
     $this->resolveAction(PASS, true);
   }
 
@@ -141,6 +142,7 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
       $this->ctx->insertAsBrother(Engine::buildTree($action));
     }
 
+    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
     $this->resolveAction([], true);
   }
 

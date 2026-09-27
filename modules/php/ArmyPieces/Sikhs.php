@@ -2,9 +2,7 @@
 
 namespace Bga\Games\JohnCompany\ArmyPieces;
 
-use Bga\Games\JohnCompany\Managers\Ships;
-
-class Sikhs extends \Bga\Games\JohnCompany\Models\ArmyPiece
+class Sikhs extends \Bga\Games\JohnCompany\ArmyPieces\LocalAlliance
 {
   public function __construct($row)
   {
@@ -14,6 +12,5 @@ class Sikhs extends \Bga\Games\JohnCompany\Models\ArmyPiece
     $this->region = BOMBAY;
     $this->cost = 3;
     $this->strength = 2;
-    $this->type = LOCAL_ALLIANCE;
   }
 }

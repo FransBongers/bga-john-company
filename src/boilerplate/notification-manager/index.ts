@@ -60,7 +60,7 @@ import {
   NotifMoveCompanyStanding,
   NotifMoveFamilyMember,
   NotifMoveFamilyMembers,
-  NotifMoveRegiment,
+  NotifMoveArmyPiece,
   NotifMoveShipArgs,
   NotifNewCompanyShare,
   NotifNextPhase,
@@ -532,12 +532,17 @@ export class NotificationManager {
     // board.updateFamilyMembers(familyMembers);
   }
 
-  async notif_moveRegiment(notif: NotifMoveRegiment) {
-    const { from, regiment } = notif;
-    const regionId = regiment.location.split('_')[1];
+  async notif_moveArmyPiece(notif: NotifMoveArmyPiece) {
+    const { armyPiece } = notif;
 
-    const army = India.getInstance().getArmy(regionId);
-    await army.addPiece(regiment.id);
+    if (parentHasChildWithId(armyPiece.location, armyPiece.id)) {
+      return;
+    }
+    const element = document.getElementById(armyPiece.id);
+    await this.game.animationManager.slideAndAttach(
+      element,
+      document.getElementById(armyPiece.location),
+    );
   }
 
   async notif_moveShip(notif: NotifMoveShipArgs) {
@@ -561,7 +566,7 @@ export class NotificationManager {
 
   async notif_nextPhase(notif: NotifNextPhase) {
     const { phase } = notif;
-    await Board.getInstance().movePawn('phase', phase);
+    
   }
 
   async notif_payFromTreasury(notif: NotifPayFromTreasury) {

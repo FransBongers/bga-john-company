@@ -2,6 +2,9 @@
 
 namespace Bga\Games\JohnCompany\Actions;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Models\Player;
 
 class PresidencyCommander extends \Bga\Games\JohnCompany\Models\AtomicAction
@@ -11,30 +14,13 @@ class PresidencyCommander extends \Bga\Games\JohnCompany\Models\AtomicAction
     return ST_PRESIDENCY_COMMANDER;
   }
 
-  // ....###....########...######....######.
-  // ...##.##...##.....##.##....##..##....##
-  // ..##...##..##.....##.##........##......
-  // .##.....##.########..##...####..######.
-  // .#########.##...##...##....##........##
-  // .##.....##.##....##..##....##..##....##
-  // .##.....##.##.....##..######....######.
-
-  public function argsPresidencyCommander()
-  {
-    $args = $this->ctx->getArgs();
-
-    $data = [];
-
-    return $data;
-  }
-
-  //  .########..##..........###....##....##.########.########.
-  //  .##.....##.##.........##.##....##..##..##.......##.....##
-  //  .##.....##.##........##...##....####...##.......##.....##
-  //  .########..##.......##.....##....##....######...########.
-  //  .##........##.......#########....##....##.......##...##..
-  //  .##........##.......##.....##....##....##.......##....##.
-  //  .##........########.##.....##....##....########.##.....##
+  // ..######..########....###....########.########
+  // .##....##....##......##.##......##....##......
+  // .##..........##.....##...##.....##....##......
+  // ..######.....##....##.....##....##....######..
+  // .......##....##....#########....##....##......
+  // .##....##....##....##.....##....##....##......
+  // ..######.....##....##.....##....##....########
 
   // ....###.....######..########.####..#######..##....##
   // ...##.##...##....##....##.....##..##.....##.###...##
@@ -44,25 +30,60 @@ class PresidencyCommander extends \Bga\Games\JohnCompany\Models\AtomicAction
   // .##.....##.##....##....##.....##..##.....##.##...###
   // .##.....##..######.....##....####..#######..##....##
 
-  public function actPassPresidencyCommander()
+  public function stPresidencyCommander()
   {
-    $player = self::getPlayer();
-    $this->resolveAction(PASS);
-  }
+    $args = $this->ctx->getArgs();
+    $officeId = $args['officeId']; // president office
 
-  public function actPresidencyCommander($args)
-  {
-    self::checkAction('actPresidencyCommander');
-    $this->resolveAction([]);
-  }
 
-  //  .##.....##.########.####.##.......####.########.##....##
-  //  .##.....##....##.....##..##........##.....##.....##..##.
-  //  .##.....##....##.....##..##........##.....##......####..
-  //  .##.....##....##.....##..##........##.....##.......##...
-  //  .##.....##....##.....##..##........##.....##.......##...
-  //  .##.....##....##.....##..##........##.....##.......##...
-  //  ..#######.....##....####.########.####....##.......##...
+    $presidentOffice = Offices::get($officeId);
+    // Family Member
+    $commander = $presidentOffice->getCommander();
+
+    Notifications::nextPhase(clienttranslate('Commander'));
+
+    $this->ctx->insertAsBrother(
+      Engine::buildTree(
+        [
+          'children' => [
+            [
+              'action' => COMMANDER_PURCHASE_LOCAL_ALLIANCE,
+              'playerId' => 'some',
+              'activePlayerIds' => [$commander->getPlayerId()],
+              'optional' => true,
+              'args' => [
+                'commanderPlayerId' => $commander->getPlayerId(),
+                'regionId' => $presidentOffice->getRegionId(),
+                'presidentOfficeId' => $presidentOffice->getId(),
+                'first' => true,
+              ]
+            ],
+            [
+              'action' => COMMANDER_DEPLOY,
+              'playerId' => 'some',
+              'activePlayerIds' => [$commander->getPlayerId()],
+              'optional' => true,
+              'args' => [
+                'commanderPlayerId' => $commander->getPlayerId(),
+                'presidentOfficeId' => $presidentOffice->getId(),
+                'first' => true,
+              ]
+            ]
+          ],
+          // 'stateDescription' => [
+          //   'descriptionmyturn' => clienttranslate('${you} must choose who will act next'),
+          //   'description' => clienttranslate('${actplayer} must choose who will act next'),
+          //   'args' => []
+          // ]
+          // 'activePlayerIds' => [$presidentOffice->getPlayerId()],
+          // 'officeId' => $presidentOffice->getId(),
+        ]
+      )
+    );
+
+
+    $this->resolveAction(['automatic' => true]);
+  }
 
   // .########.##....##..######...####.##....##.########
   // .##.......###...##.##....##...##..###...##.##......
@@ -72,15 +93,20 @@ class PresidencyCommander extends \Bga\Games\JohnCompany\Models\AtomicAction
   // .##.......##...###.##....##...##..##...###.##......
   // .########.##....##..######...####.##....##.########
 
-
   public function getDescription(): string|array
   {
+
     return clienttranslate('Commander');
   }
 
   public function isDoable(Player $player): bool
   {
+
     return true;
   }
 
+  public function isAutomatic(?Player $player = null): bool
+  {
+    return true;
+  }
 }

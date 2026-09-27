@@ -43,6 +43,9 @@ import { SetupArea } from './setup-area';
 import {
   Chairman,
   ChairmanDebtConsent,
+  CommanderApproveLocalAlliance,
+  CommanderDeploy,
+  CommanderPurchaseLocalAlliance,
   CrownChairmanRequestAllocation,
   CrownChairmanRequestDebtAdvancement,
   CrownManagerOfShippingBuyCompanyShips,
@@ -60,7 +63,6 @@ import {
   MilitaryAffairsAssign,
   MilitaryAffairsTransfers,
   PlayerTurn,
-  PresidencyCommander,
   PresidencyDecideOrder,
   PresidencyTrade,
   PresidencyTradeFillOrders,
@@ -70,6 +72,7 @@ import {
 } from './states';
 import { StaticData } from './static-data';
 import { tplPlayArea, tplCrownPlayerPanel } from './templates';
+import { ControlTokensManager } from './token-managers/control-tokens';
 import { ShipsManager } from './token-managers/ship-tokens';
 import { JohnCompanyGamedatas, GamedatasAlias } from './types';
 
@@ -124,6 +127,9 @@ export class Game {
     // Game
     Chairman,
     ChairmanDebtConsent,
+    CommanderApproveLocalAlliance,
+    CommanderDeploy,
+    CommanderPurchaseLocalAlliance,
     CrownChairmanRequestAllocation,
     CrownChairmanRequestDebtAdvancement,
     CrownManagerOfShippingBuyCompanyShips,
@@ -142,7 +148,6 @@ export class Game {
     MilitaryAffairsAssign,
     MilitaryAffairsTransfers,
     PlayerTurn,
-    PresidencyCommander,
     PresidencyDecideOrder,
     PresidencyTrade,
     PresidencyTradeFillOrders,
@@ -377,6 +382,7 @@ export class Game {
     LawCardsManager.create(this);
     LondonSeasonCardsManager.create(this);
     ShipsManager.create(this);
+    ControlTokensManager.create(this);
 
     //  this.gameMap = new GameMap(this);
     //  this.cardArea = new CardArea(this);
@@ -455,10 +461,11 @@ export class Game {
     // UI changes for active player
     if (
       playerIsActiveAndStateExists &&
-      (!activePlayerIds || activePlayerIds.includes(currentPlayerId))
+      (!activePlayerIds || activePlayerIds.includes(currentPlayerId)) &&
+      !args.args.skipOnEnteringState
     ) {
       this.states[stateName].getInstance().onEnteringState(args.args);
-    } else if (this.states[stateName]) {
+    } else if (this.states[stateName] && !args.args.skipOnEnteringState) {
       this.states[stateName]
         .getInstance()
         .setDescription(

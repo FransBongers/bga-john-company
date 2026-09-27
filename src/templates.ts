@@ -17,7 +17,7 @@ export const tplPlayArea = () => `
 
 export const tplAmount = (value: number | string, small = false) => `
   <div class="fb-font-baskerville joco-amount">
-    <span class="${small ? 'fb-font-8' : 'fb-font-16'} ">£</span><span class="${small ? 'fb-font-12' : 'fb-font-24'}">${value}</span>
+    <span class="${small ? 'fb-font-8' : 'fb-font-16'} joco-amount-pound">£</span><span class="${small ? 'fb-font-12' : 'fb-font-24'} joco-amount-value">${value}</span>
   </div>
 `;
 

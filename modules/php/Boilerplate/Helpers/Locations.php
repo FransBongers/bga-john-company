@@ -4,9 +4,14 @@ namespace Bga\Games\JohnCompany\Boilerplate\Helpers;
 
 class Locations
 {
-  public static function armyOf($regionId)
+  public static function armyOfReady($regionId)
   {
-    return 'Army_' . $regionId;
+    return 'army_' . $regionId . '_ready';
+  }
+
+  public static function armyOfExhausted($regionId)
+  {
+    return 'army_' . $regionId . '_exhausted';
   }
 
   public static function commander($presidencyId)

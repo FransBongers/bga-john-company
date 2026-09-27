@@ -92,9 +92,8 @@ export interface NotifMoveFamilyMembers {
   familyMembers: JocoFamilyMember[];
 }
 
-export interface NotifMoveRegiment extends NotifWithPlayerArgs {
-  regiment: JocoArmyPieceBase;
-  from: string;
+export interface NotifMoveArmyPiece extends NotifWithPlayerArgs {
+  armyPiece: JocoArmyPieceBase;
 }
 
 export interface NotifMoveShipArgs extends NotifWithPlayerArgs {

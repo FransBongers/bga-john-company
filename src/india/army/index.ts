@@ -3,7 +3,7 @@ import { BENGAL, BOMBAY, MADRAS } from '../../constants';
 import { createFamilyMember, tplFamilyMemberSpot } from '../../templates';
 import { GameAlias, GamedatasAlias } from '../../types';
 
-import { tplRegiment } from './templates';
+import { tplArmyPiece, tplRegiment } from './templates';
 
 export interface ArmyProps {
   parentElement: HTMLElement | string;
@@ -15,10 +15,7 @@ export interface ArmyProps {
 export class Army {
   protected ui: {
     parent: HTMLElement;
-    army: {
-      ready: HTMLElement;
-      exhausted: HTMLElement;
-    };
+    army: Record<string, HTMLElement>;
     commander: HTMLElement;
   };
   private id: string;
@@ -53,11 +50,11 @@ export class Army {
     this.ui = {
       parent: parentElement,
       army: {
-        ready: document.getElementById(
-          `joco-army-${this.id.toLocaleLowerCase()}-ready`,
+        [`army_${this.id}_ready`]: document.getElementById(
+          `army_${this.id}_ready`,
         ) as HTMLElement,
-        exhausted: document.getElementById(
-          `joco-army-${this.id.toLocaleLowerCase()}-exhausted`,
+        [`army_${this.id}_exhausted`]: document.getElementById(
+          `army_${this.id}_exhausted`,
         ) as HTMLElement,
       },
       commander: document.getElementById(`Commander_${this.id}`) as HTMLElement,
@@ -72,12 +69,12 @@ export class Army {
       <div id="ArmyOf${this.id}" class="joco-army joco-container">
         <div class="joco-inner-container">
           <div><span class="fb-font-baskerville fb-font-12">${_('Ready pieces').toLocaleUpperCase()}</span></div>
-          <div id="joco-army-${this.id.toLocaleLowerCase()}-ready" class="joco-army-stock"></div>
+          <div id="army_${this.id}_ready" class="joco-army-stock"></div>
         </div>
         <div class="joco-army-banner joco-background-${this.id.toLocaleLowerCase()}">${tplFamilyMemberSpot(`Commander_${this.id}`)}<span class="fb-font-baskerville fb-font-16">${this.getName().toLocaleUpperCase()}</span></div>
         <div class="joco-inner-container">
-          <div id="joco-army-${this.id.toLocaleLowerCase()}-exhausted" class="joco-army-stock"></div>
-          <div><span class="fb-font-baskerville fb-font-12">${_('Exhausted pieces').toLocaleUpperCase()}</span></div>
+          <div id="army_${this.id}_exhausted" class="joco-army-stock joco-exhausted"></div>
+          <div><span class="fb-font-baskerville fb-font-12">${_('Exhausted pieces & Local Alliances').toLocaleUpperCase()}</span></div>
         </div>
       </div>
     `;
@@ -93,23 +90,21 @@ export class Army {
 
   public addPieces(gamedatas: GamedatasAlias) {
     Object.values(gamedatas.armyPieces).forEach((piece) => {
-      if (piece.location !== `Army_${this.id}`) {
+      if (!piece.location.startsWith(`army_${this.id}`)) {
         return;
       }
-      const parent = piece.exhausted
-        ? this.ui.army.exhausted
-        : this.ui.army.ready;
-      parent.insertAdjacentHTML('beforeend', tplRegiment({ id: piece.id }));
+      const parent = document.getElementById(piece.location) as HTMLElement;
+      parent.insertAdjacentHTML('beforeend', tplArmyPiece(piece));
     });
   }
 
   public updateFamilyMembers(gamedatas: GamedatasAlias) {
     // Writers
     Object.values(gamedatas.familyMembers).forEach((member) => {
-      if (member.location === `Army_${this.id}`) {
+      if (member.location.startsWith(`army_${this.id}`)) {
         // Officers
         const officerElement = createFamilyMember(member.familyId, member.id);
-        this.ui.army.ready.appendChild(officerElement);
+        this.ui.army[member.location].appendChild(officerElement);
       } else if (member.location === `Commander_${this.id}`) {
         // Commander
         const commanderElement = createFamilyMember(member.familyId, member.id);

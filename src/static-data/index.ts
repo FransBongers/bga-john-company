@@ -8,6 +8,8 @@ import {
   JocoLawCardStatic,
   JocoEnterpriseCardStatic,
   JocoShipBase,
+  JocoRegionStatic,
+  JocoArmyPieceStatic,
 } from '../types';
 
 export class StaticData {
@@ -35,6 +37,14 @@ export class StaticData {
   // .......##.##..........##....##.....##.##.......
   // .##....##.##..........##....##.....##.##.......
   // ..######..########....##.....#######..##.......
+
+  public armyPiece(id: string): JocoArmyPieceStatic {
+    const card = this.staticData.armyPieces[id] ?? ({} as JocoArmyPieceStatic);
+    if (!card) {
+      throw new Error('STATIC_DATA_ERROR_001');
+    }
+    return card;
+  }
 
   public enterpriseCard(id: string): JocoEnterpriseCardStatic {
     const card =
@@ -79,7 +89,7 @@ export class StaticData {
     return office;
   }
 
-  public region(id: string) {
+  public region(id: string): JocoRegionStatic {
     const region = this.staticData.regions[id];
     if (!region) {
       throw new Error('STATIC_DATA_ERROR_005');

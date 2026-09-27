@@ -46,7 +46,7 @@ class MilitaryAffairsTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
     ];
 
     $armyLocations = array_map(function ($regionId) {
-      return Locations::armyOf($regionId);
+      return Locations::armyOfReady($regionId);
     }, HOME_REGIONS);
 
     $officers = FamilyMembers::getOfficers();
@@ -121,10 +121,9 @@ class MilitaryAffairsTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
     $player = Players::get($playerId);
 
     foreach ($regimentTransfers as $regimentId => $data) {
-      Notifications::log('regimentTransfer', $regimentId);
       $to = $data->to;
       if (!(isset($stateArgs['options']['regiments'][$regimentId]) && in_array($to, $stateArgs['options']['regiments'][$regimentId]['locations']))) {
-        throw new \feException("ERROR_018");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_018");
       }
       $regiment = $stateArgs['options']['regiments'][$regimentId]['regiment'];
       $regiment->moveTo($player, $to);

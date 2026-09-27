@@ -74,6 +74,9 @@ const ST_PRESIDENCY_DECIDE_ORDER = 49;
 const ST_PRESIDENCY_TRADE = 50;
 const ST_PRESIDENCY_TRADE_FILL_ORDERS = 51;
 const ST_PRESIDENCY_COMMANDER = 124;
+const ST_COMMANDER_PURCHASE_LOCAL_ALLIANCE = 125;
+const ST_COMMANDER_DEPLOY = 126;
+const ST_COMMANDER_APPROVE_LOCAL_ALLIANCE = 127;
 
 const ST_BONUSES = 60;
 const ST_REVENUE_EXPENSES = 61;
@@ -136,6 +139,9 @@ const PRESIDENCY_DECIDE_ORDER = 'PresidencyDecideOrder';
 const PRESIDENCY_TRADE = 'PresidencyTrade';
 const PRESIDENCY_TRADE_FILL_ORDERS = 'PresidencyTradeFillOrders';
 const PRESIDENCY_COMMANDER = 'PresidencyCommander';
+const COMMANDER_PURCHASE_LOCAL_ALLIANCE = 'CommanderPurchaseLocalAlliance';
+const COMMANDER_DEPLOY = 'CommanderDeploy';
+const COMMANDER_APPROVE_LOCAL_ALLIANCE = 'CommanderApproveLocalAlliance';
 // Crown states
 const CROWN_CHAIRMAN_SEEK_DEBT = 'CrownChairmanSeekDebt';
 const CROWN_CHAIRMAN_REQUEST_DEBT_ADVANCEMENT = 'CrownChairmanRequestDebtAdvancement';

@@ -18,12 +18,15 @@ import { tknShipValue } from './logs/templates';
 import { PlayerManager } from './player-manager';
 import { StaticData } from './static-data';
 import {
+  JocoArmyPieceBase,
+  JocoControlToken,
   JocoEnterpriseCard,
   JocoEnterpriseCardBase,
   JocoLawCard,
   JocoLawCardBase,
   JocoLondonSeasonCard,
   JocoLondonSeasonCardBase,
+  JocoRegionBase,
   JocoShipBase,
 } from './types';
 
@@ -87,6 +90,15 @@ export const getShipsLog = (ships: JocoShipBase[]) => {
   return shipsLog;
 };
 
+export const getArmyPiece = (piece: JocoArmyPieceBase) => {
+  const staticData = StaticData.get();
+  const cardStatic = staticData.armyPiece(piece.id);
+  return {
+    ...piece,
+    ...cardStatic,
+  };
+};
+
 export const getEnterpriseCard = (
   card: JocoEnterpriseCardBase,
 ): JocoEnterpriseCard => {
@@ -115,5 +127,15 @@ export const getLondonSeasonCard = (
   return {
     ...card,
     ...cardStatic,
+  };
+};
+
+export const createControlToken = (data: JocoRegionBase): JocoControlToken => {
+  const staticData = StaticData.get().region(data.id);
+  return {
+    id: 'control-token-' + data.id,
+    side: data.looted ? 'control' : 'loot',
+    regionId: data.id,
+    loot: staticData.loot,
   };
 };

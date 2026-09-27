@@ -30,6 +30,12 @@
     justify-content: flex-start;
     align-items: flex-start;
     gap: 8px;
+
+    &.joco-exhausted {
+      .joco-local-alliance {
+        margin: -4px;
+      }
+    }
   }
 
   .joco-inner-container {

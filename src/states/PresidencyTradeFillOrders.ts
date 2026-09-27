@@ -67,7 +67,6 @@ export class PresidencyTradeFillOrders implements GameState<OnEnteringPresidency
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true,
     );
   }
 

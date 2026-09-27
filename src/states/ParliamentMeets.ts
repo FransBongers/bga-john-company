@@ -35,7 +35,6 @@ export class ParliamentMeets implements GameState<OnEnteringParliamentMeetsArgs>
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true
     );
   }
 

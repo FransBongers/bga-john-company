@@ -2,7 +2,7 @@
 
 namespace Bga\Games\JohnCompany\ArmyPieces;
 
-class RajputPrince extends \Bga\Games\JohnCompany\Models\ArmyPiece
+class RajputPrince extends \Bga\Games\JohnCompany\ArmyPieces\LocalAlliance
 {
   public function __construct($row)
   {
@@ -12,6 +12,5 @@ class RajputPrince extends \Bga\Games\JohnCompany\Models\ArmyPiece
     $this->region = BOMBAY;
     $this->cost = 5;
     $this->strength = 3;
-    $this->type = LOCAL_ALLIANCE;
   }
 }

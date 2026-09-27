@@ -445,12 +445,42 @@ $machinestates = [
 
     ST_PRESIDENCY_COMMANDER => [
         'name' => PRESIDENCY_COMMANDER,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_COMMANDER_PURCHASE_LOCAL_ALLIANCE => [
+        'name' => COMMANDER_PURCHASE_LOCAL_ALLIANCE,
         'type' => 'multipleactiveplayer',
         'description' => clienttranslate('${actplayer}'),
         'descriptionmyturn' => clienttranslate('${you}'),
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
-        'possibleactions' => ['act' . PRESIDENCY_COMMANDER, 'actTakeAtomicAction'],
+        'possibleactions' => ['act' . COMMANDER_PURCHASE_LOCAL_ALLIANCE, 'actPassOptionalAction', 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_COMMANDER_APPROVE_LOCAL_ALLIANCE => [
+        'name' => COMMANDER_APPROVE_LOCAL_ALLIANCE,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . COMMANDER_APPROVE_LOCAL_ALLIANCE, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_COMMANDER_DEPLOY => [
+        'name' => COMMANDER_DEPLOY,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . COMMANDER_DEPLOY, 'actPassOptionalAction', 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 

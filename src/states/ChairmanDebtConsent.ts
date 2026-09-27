@@ -52,7 +52,6 @@ export class ChairmanDebtConsent implements GameState<OnEnteringChairmanDebtCons
       {
         value: this.args.debt,
       },
-      true,
     );
   }
 

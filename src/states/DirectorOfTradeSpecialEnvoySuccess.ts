@@ -54,7 +54,6 @@ export class DirectorOfTradeSpecialEnvoySuccess implements GameState<OnEnteringD
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true,
     );
   }
 

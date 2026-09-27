@@ -45,13 +45,9 @@ export class CrownManagerOfShippingPlaceShips implements GameState<OnEnteringCro
     activePlayerIds: number,
     args: OnEnteringCrownManagerOfShippingPlaceShipsArgs,
   ) {
-    updatePageTitle(
-      _('${tkn_playerName} must place ships'),
-      {
-        tkn_playerName: getCrownPlayerName(),
-      },
-      true,
-    );
+    updatePageTitle(_('${tkn_playerName} must place ships'), {
+      tkn_playerName: getCrownPlayerName(),
+    });
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########

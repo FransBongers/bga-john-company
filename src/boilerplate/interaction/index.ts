@@ -194,7 +194,6 @@ export class Interaction {
   public clientUpdatePageTitle(
     text: string,
     args: Record<string, string | number | unknown>,
-    nonActivePlayers: boolean = false,
   ) {
     // const title = this.game.bga.gameui.format_string_recursive(_(text), args);
     // this.game.gamedatas.gamestate.descriptionmyturn = title;
@@ -222,7 +221,10 @@ export class Interaction {
     node.classList.add(SELECTED);
   }
 
-  public async performAction(actionName: string, args: Record<string, unknown>) {
+  public async performAction(
+    actionName: string,
+    args: Record<string, unknown>,
+  ) {
     return await this.game.bga.actions.performAction(
       'actTakeAtomicAction',
       {

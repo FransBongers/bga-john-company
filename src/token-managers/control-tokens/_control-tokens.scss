@@ -1,0 +1,126 @@
+@use '../../base';
+@use 'sass:math';
+@use 'sass:map';
+
+.joco-control-token {
+  width: 30px;
+  aspect-ratio: 250 / 413;
+  background-image: url('img/control_tokens.jpg');
+  background-size: 800% 100%;
+  border: 2px solid black;
+  box-sizing: border-box;
+  outline: 1px solid black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+
+  &[data-region='Bengal'] {
+    border-color: base.$bengal-color-highlight base.$bengal-color-highlight
+      base.$bengal-color-shadow base.$bengal-color-shadow;
+  }
+  &[data-region='Bombay'] {
+    border-color: base.$bombay-color-highlight base.$bombay-color-highlight
+      base.$bombay-color-shadow base.$bombay-color-shadow;
+  }
+  &[data-region='Delhi'] {
+    border-color: base.$delhi-color-highlight base.$delhi-color-highlight
+      base.$delhi-color-shadow base.$delhi-color-shadow;
+  }
+  &[data-region='Hyderabad'] {
+    border-color: base.$hyderabad-color-highlight
+      base.$hyderabad-color-highlight base.$hyderabad-color-shadow
+      base.$hyderabad-color-shadow;
+  }
+  &[data-region='Madras'] {
+    border-color: base.$madras-color-highlight base.$madras-color-highlight
+      base.$madras-color-shadow base.$madras-color-shadow;
+  }
+  &[data-region='Maratha'] {
+    border-color: base.$maratha-color-highlight base.$maratha-color-highlight
+      base.$maratha-color-shadow base.$maratha-color-shadow;
+  }
+  &[data-region='Mysore'] {
+    border-color: base.$mysore-color-highlight base.$mysore-color-highlight
+      base.$mysore-color-shadow base.$mysore-color-shadow;
+  }
+  &[data-region='Punjab'] {
+    border-color: base.$punjab-color-highlight base.$punjab-color-highlight
+      base.$punjab-color-shadow base.$punjab-color-shadow;
+  }
+}
+
+$controlTokens: (
+  1: 'Bengal',
+  2: 'Bombay',
+  3: 'Delhi',
+  4: 'Hyderabad',
+  5: 'Madras',
+  6: 'Maratha',
+  7: 'Mysore',
+  8: 'Punjab',
+);
+
+$cols: 8;
+$rows: 1;
+
+@for $i from 1 through 8 {
+  $index: $i - 1;
+  $col: $index % $cols;
+  // $row: math.floor(math.div($index, $cols));
+
+  .joco-control-token[data-region='#{map.get($controlTokens,$i)}'] {
+    // For a sprite sheet with $cols columns and $rows rows where
+    // background-size is ($cols * 100%) by ($rows * 100%),
+    // positions run from 0% to 100% inclusive so the step is 100% / ($cols - 1) or ($rows - 1).
+    background-position-x: math.div($col * 100%, $cols - 1);
+    // background-position-y: math.div($row * 100%, $rows - 1);
+  }
+}
+
+.joco-region-icon {
+  width: 18px;
+  aspect-ratio: 200 / 202;
+  background-image: url('img/region_icons.png');
+  background-size: 800% 100%;
+}
+
+$regionIcons: (
+  1: 'Mysore',
+  2: 'Hyderabad',
+  3: 'Maratha',
+  4: 'Delhi',
+  5: 'Punjab',
+  6: 'Bengal',
+  7: 'Madras',
+  8: 'Bombay',
+);
+
+$cols: 8;
+$rows: 1;
+
+@for $i from 1 through 8 {
+  $index: $i - 1;
+  $col: $index % $cols;
+  // $row: math.floor(math.div($index, $cols));
+
+  .joco-region-icon[data-region='#{map.get($regionIcons,$i)}'] {
+    // For a sprite sheet with $cols columns and $rows rows where
+    // background-size is ($cols * 100%) by ($rows * 100%),
+    // positions run from 0% to 100% inclusive so the step is 100% / ($cols - 1) or ($rows - 1).
+    background-position-x: math.div($col * 100%, $cols - 1);
+    // background-position-y: math.div($row * 100%, $rows - 1);
+  }
+}
+
+.joco-presidency-icon {
+  width: 20px;
+  aspect-ratio: 200 / 92;
+  background-image: url('img/presidency.png');
+  background-size: 100% 100%;
+
+  &.joco-inverted {
+    transform: scaleY(-1);
+  }
+}

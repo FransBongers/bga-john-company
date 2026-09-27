@@ -67,8 +67,7 @@ export const clearPossible = () => {
 export const updatePageTitle = (
   text: string,
   args: Record<string, string | number | unknown> = {},
-  nonActivePlayers: boolean = false,
-) => Interaction.use().clientUpdatePageTitle(text, args, nonActivePlayers);
+) => Interaction.use().clientUpdatePageTitle(text, args);
 
 export const formatStringRecursive = (
   log: string,

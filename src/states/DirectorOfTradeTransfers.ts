@@ -88,13 +88,9 @@ export class DirectorOfTradeTransfers implements GameState<OnEnteringDirectorOfT
     activePlayerIds: number,
     args: OnEnteringDirectorOfTradeTransfersArgs,
   ) {
-    updatePageTitle(
-      _('${tkn_playerName} may move writers or ships'),
-      {
-        tkn_playerName: getPlayerName(activePlayerIds[0]),
-      },
-      true,
-    );
+    updatePageTitle(_('${tkn_playerName} may move writers or ships'), {
+      tkn_playerName: getPlayerName(activePlayerIds[0]),
+    });
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########

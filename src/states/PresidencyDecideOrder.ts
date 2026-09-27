@@ -54,7 +54,6 @@ export class PresidencyDecideOrder implements GameState<OnEnteringPresidencyDeci
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true,
     );
   }
 

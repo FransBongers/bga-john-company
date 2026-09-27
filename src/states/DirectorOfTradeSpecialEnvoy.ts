@@ -63,7 +63,6 @@ export class DirectorOfTradeSpecialEnvoy implements GameState<OnEnteringDirector
           amount: args.proposal,
           tkn_pound: 'pound',
         },
-        true,
       );
     } else if (args.proposal === 0) {
       updatePageTitle(
@@ -71,16 +70,11 @@ export class DirectorOfTradeSpecialEnvoy implements GameState<OnEnteringDirector
         {
           tkn_playerName: getPlayerName(activePlayerIds[0]),
         },
-        true,
       );
     } else {
-      updatePageTitle(
-        _('Special Envoy: ${tkn_playerName} may make a check'),
-        {
-          tkn_playerName: getPlayerName(activePlayerIds[0]),
-        },
-        true,
-      );
+      updatePageTitle(_('Special Envoy: ${tkn_playerName} may make a check'), {
+        tkn_playerName: getPlayerName(activePlayerIds[0]),
+      });
     }
   }
 

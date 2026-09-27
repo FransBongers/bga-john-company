@@ -44,7 +44,6 @@ export class EventsInIndiaCrisisDefense implements GameState<OnEnteringEventsInI
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true,
     );
   }
 

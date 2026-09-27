@@ -66,7 +66,6 @@ export class CrownManagerOfShippingBuyCompanyShips implements GameState<OnEnteri
       {
         tkn_playerName: getCrownPlayerName(),
       },
-      true,
     );
   }
 

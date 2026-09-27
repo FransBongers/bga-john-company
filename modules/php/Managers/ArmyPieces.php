@@ -13,9 +13,7 @@ class ArmyPieces extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 {
   protected static $table = 'army_pieces';
   protected static $prefix = 'army_piece_';
-  protected static $customFields = [
-    'exhausted',
-  ];
+  protected static $customFields = [];
   protected static $autoremovePrefix = false;
   protected static $autoreshuffle = false;
   protected static $autoIncrement = false;
@@ -34,6 +32,19 @@ class ArmyPieces extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     return new $className($data);
   }
 
+  /**
+   * getStaticUiData : return static data
+   */
+  public static function getStaticUiData()
+  {
+    $pieces = self::getAll()->toArray();
+
+    $data = [];
+    foreach ($pieces as $index => $piece) {
+      $data[$piece->getId()] = $piece->getStaticData();
+    }
+    return $data;
+  }
 
   // ..######..########.########.##.....##.########.
   // .##....##.##..........##....##.....##.##.....##
@@ -54,14 +65,13 @@ class ArmyPieces extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
         "nbr" => 20,
         "nbrStart" => 1,
         'location' => Locations::supplyRegiments(),
-        'exhausted' => 0,
       ],
     ]);
 
     self::shuffle(Locations::supplyRegiments());
 
     foreach (HOME_REGIONS as $regionId) {
-      self::pickForLocation($startingRegiments, Locations::supplyRegiments(), Locations::armyOf($regionId));
+      self::pickForLocation($startingRegiments, Locations::supplyRegiments(), Locations::armyOfReady($regionId));
     }
 
     $localAlliances = [];
@@ -71,8 +81,7 @@ class ArmyPieces extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 
       $localAlliances[$pieceId] = [
         'id' => $pieceId,
-        'location' => $piece->getRegion(),
-        'exhausted' => 1,
+        'location' => Locations::armyOfExhausted($piece->getRegion()),
       ];
     }
 
@@ -99,7 +108,7 @@ class ArmyPieces extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     $regiments = self::getRegiments()->toArray();
 
     $armyLocations = array_map(function ($regionId) {
-      return Locations::armyOf($regionId);
+      return Locations::armyOfReady($regionId);
     }, HOME_REGIONS);
 
     return Utils::filter($regiments, function ($regiment) use ($armyLocations) {

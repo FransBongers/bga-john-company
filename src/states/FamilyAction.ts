@@ -59,7 +59,6 @@ export class FamilyAction implements GameState<OnEnteringFamilyActionArgs> {
         //   .getPlayer(activePlayerIds[0])
         //   .getName(),
       },
-      true,
     );
   }
 

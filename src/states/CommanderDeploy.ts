@@ -9,37 +9,35 @@ import {
 } from '../boilerplate';
 import { GameAlias } from '../types';
 
-interface OnEnteringPresidencyCommanderArgs extends CommonStateArgs {}
+interface OnEnteringCommanderDeployArgs extends CommonStateArgs {}
 
-export class PresidencyCommander
-  implements GameState<OnEnteringPresidencyCommanderArgs>
-{
-  private static instance: PresidencyCommander;
-  private args: OnEnteringPresidencyCommanderArgs;
+export class CommanderDeploy implements GameState<OnEnteringCommanderDeployArgs> {
+  private static instance: CommanderDeploy;
+  private args: OnEnteringCommanderDeployArgs;
 
   constructor(private game: GameAlias) {}
 
   public static create(game: GameAlias) {
-    PresidencyCommander.instance = new PresidencyCommander(game);
+    CommanderDeploy.instance = new CommanderDeploy(game);
   }
 
   public static getInstance() {
-    return PresidencyCommander.instance;
+    return CommanderDeploy.instance;
   }
 
-  onEnteringState(args: OnEnteringPresidencyCommanderArgs) {
-    debug('Entering PresidencyCommander state');
+  onEnteringState(args: OnEnteringCommanderDeployArgs) {
+    debug('Entering CommanderDeploy state');
     this.args = args;
     this.updateInterfaceInitialStep();
   }
 
   onLeavingState() {
-    debug('Leaving PresidencyCommander state');
+    debug('Leaving CommanderDeploy state');
   }
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringPresidencyCommanderArgs,
+    args: OnEnteringCommanderDeployArgs,
   ) {}
 
   //  .####.##....##.########.########.########..########....###.....######..########
@@ -63,7 +61,7 @@ export class PresidencyCommander
     updatePageTitle(_('${you} may perform an action'), {});
 
     addConfirmButton(() => {
-      performAction('actPresidencyCommander', {});
+      performAction('actCommanderDeploy', {});
     });
   }
 

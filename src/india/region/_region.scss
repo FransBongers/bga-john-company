@@ -1,5 +1,12 @@
 @use '../../base';
 
+.joco-control-token-stock {
+  position: absolute !important;
+  width: 30px;
+  aspect-ratio: 250 / 413;
+  // background-color: rgba(yellow, 0.5);
+}
+
 .joco-tower {
   // --towerScale: 1;
   position: absolute;

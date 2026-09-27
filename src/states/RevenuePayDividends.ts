@@ -53,7 +53,6 @@ export class RevenuePayDividends implements GameState<OnEnteringRevenuePayDivide
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true,
     );
   }
 

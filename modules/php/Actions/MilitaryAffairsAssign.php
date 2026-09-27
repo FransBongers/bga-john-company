@@ -44,7 +44,9 @@ class MilitaryAffairsAssign extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $data = [
       'activePlayerIds' => [$activePlayerId],
-      'armies' => ARMIES,
+      'armies' => array_map(function ($region) {
+        return Locations::armyOfReady($region);
+      }, [BOMBAY, MADRAS, BENGAL]),
       'officersInTraining' => $officersInTraining,
     ];
 
@@ -81,12 +83,12 @@ class MilitaryAffairsAssign extends \Bga\Games\JohnCompany\Models\AtomicAction
     $playerId = $this->checkPlayer();
 
     $assignedOfficers = $args->assignedOfficers;
-    
+
     $stateArgs = $this->argsMilitaryAffairsAssign();
 
     $player = Players::get($playerId);
 
-    foreach($assignedOfficers as $data) {
+    foreach ($assignedOfficers as $data) {
       $id = $data->familyMemberId;
       $to = $data->to;
 

@@ -137,6 +137,7 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   regions: Record<string, JocoRegionBase>;
   ships: Record<string, JocoShipBase>;
   staticData: {
+    armyPieces: Record<string, JocoArmyPieceStatic>;
     enterpriseCards: Record<string, JocoEnterpriseCardStatic>;
     lawCards: Record<string, JocoLawCardStatic>;
     londonSeasonCards: Record<string, JocoLondonSeasonCardStatic>;
@@ -178,10 +179,6 @@ interface JocoOfficeStatic {
   title: string;
 }
 
-interface JocoArmyPieceBase extends GamePiece {
-  exhausted: boolean;
-}
-
 type JoCoSetupCard = JoCoSetupCardBase & JocoSetupCardStatic;
 
 interface JoCoSetupCardBase {
@@ -209,6 +206,19 @@ interface JohnCompanyPlayerData extends Player {
 export type GameAlias = Game;
 export type GamedatasAlias = JohnCompanyGamedatas;
 export type PlayerAlias = JohnCompanyPlayerData;
+
+
+export interface JocoArmyPieceBase extends GamePiece {
+}
+
+export interface JocoArmyPieceStatic {
+  strength: number;
+  name: string;
+  region: string;
+  cost: number
+}
+
+export type JocoArmyPiece = JocoArmyPieceBase & JocoArmyPieceStatic;
 
 interface JocoFamilyMember {
   id: string;
@@ -312,6 +322,7 @@ interface JocoRegionBase {
 
 interface JocoRegionStatic {
   name: string;
+  loot: number;
 }
 
 /**
@@ -324,4 +335,11 @@ interface JocoShipBase extends GamePiece {
   side: string;
   name: string;
   owner: number | null;
+}
+
+interface JocoControlToken {
+  id: string;
+  side: 'loot' | 'control';
+  loot: number;
+  regionId: string;
 }

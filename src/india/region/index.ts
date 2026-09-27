@@ -1,13 +1,19 @@
 import { createHtmlElement } from '../../boilerplate';
 import { PRESIDENCIES } from '../../constants';
-import { JocoRegionBase, GameAlias } from '../../types';
-import { TOWER_CONFIG } from './config';
-import { tplTowerLevel, tplTowerTop } from './templates';
+import { BgaCards } from '../../libs copy';
+import { ControlTokensManager } from '../../token-managers/control-tokens';
+import { JocoRegionBase, GameAlias, JocoControlToken } from '../../types';
+import { createControlToken } from '../../utility';
+import { CONTROL_TOKEN_STOCK_CONFIG, TOWER_CONFIG } from './config';
+import { tplControlTokenStock, tplTowerLevel, tplTowerTop } from './templates';
 
 export class Region {
   private tower: HTMLElement;
   private towerTop: HTMLElement;
   private data: JocoRegionBase;
+  private controlTokenStock: InstanceType<
+    typeof BgaCards.LineStock<JocoControlToken>
+  >;
 
   constructor(
     private id: string,
@@ -19,35 +25,31 @@ export class Region {
   }
 
   private setup(data: JocoRegionBase) {
-    // Container
+    const map = document.getElementById('joco-india-map');
+    // Tower
     const elt = (this.tower = document.createElement('div'));
     elt.id = `joco-tower-${data.id}`;
     elt.classList.add('joco-tower');
     elt.style.bottom = `${TOWER_CONFIG[data.id].bottom}px`;
     elt.style.left = `${TOWER_CONFIG[data.id].left}px`;
-
-    // Top
-
     this.towerTop = createHtmlElement(tplTowerTop());
     elt.appendChild(this.towerTop);
 
-    // towerTop;
-    // towerTop.classList.add('joco-tower-top');
-    // elt.appendChild(towerTop);
-    // const flagElt = document.createElement('div');
-    // flagElt.classList.add('joco-tower-flag');
-    // towerTop.appendChild(flagElt);
-    // const spanWithStar = document.createElement('span');
-    // flagElt.appendChild(spanWithStar);
-    // spanWithStar.innerText = '*';
+    map.appendChild(elt);
 
-    // for (let i = 0; i < 6; i++) {
-    //   const towerLevel = document.createElement('div');
-    //   towerLevel.classList.add('joco-tower-level');
-    //   elt.appendChild(towerLevel);
-    // }
+    // Control token stock
 
-    document.getElementById('joco-india-map').appendChild(elt);
+    map.insertAdjacentHTML(
+      'beforeend',
+      tplControlTokenStock(data.id, CONTROL_TOKEN_STOCK_CONFIG[data.id]),
+    );
+
+    this.controlTokenStock = new BgaCards.LineStock<JocoControlToken>(
+      ControlTokensManager.getInstance(),
+      document.getElementById(`joco-control-token-stock-${data.id}`),
+    );
+
+    this.updateControlToken(data);
     this.updateStrength(data.strength);
     this.updateCapital(data.isCapital);
     this.updateEmpire(data.isCapital, data.control);
@@ -76,6 +78,11 @@ export class Region {
     if (isCapital) {
       this.updateEmpire(isCapital, null);
     }
+  }
+
+  public updateControlToken(data: JocoRegionBase) {
+
+    this.controlTokenStock.addCard(createControlToken(data));
   }
 
   public updateEmpire(isCapital: boolean, control: string | null) {

@@ -2,11 +2,14 @@
 
 namespace Bga\Games\JohnCompany\Boilerplate\Core;
 
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Managers\Ships;
+use Bga\Games\JohnCompany\Models\ArmyPiece;
+use Bga\Games\JohnCompany\Models\Player;
 
 class Notifications
 {
@@ -139,6 +142,10 @@ class Notifications
     return clienttranslate('Regiment');
   }
 
+  public static function tknArmyPiece($armyPiece)
+  {
+    return clienttranslate('Army Piece');
+  }
 
   protected static function tknFamilyMember($familyMember)
   {
@@ -177,14 +184,16 @@ class Notifications
     ];
   }
 
-  private static function getRegionNameForArmy($armyId)
+  private static function getRegionNameForArmy($armyLocation)
   {
+    $regionId = explode('_', $armyLocation)[1];
+
     $idNameMap = [
-      BENGAL_ARMY => clienttranslate('Bengal'),
-      BOMBAY_ARMY => clienttranslate('Bombay'),
-      MADRAS_ARMY => clienttranslate('Madras'),
+      BENGAL => clienttranslate('Bengal'),
+      BOMBAY => clienttranslate('Bombay'),
+      MADRAS => clienttranslate('Madras'),
     ];
-    return $idNameMap[$armyId];
+    return $idNameMap[$regionId];
   }
 
   private static function getSeaName($seaId)
@@ -221,17 +230,21 @@ class Notifications
 
   private static function getLocationNameForFamilyMember($location)
   {
+    // TODO: this needs to be used for more than just the current locations, potentially all locations for family members?
     $locationNameMap = [
       BENGAL_WRITERS  => clienttranslate('Bengal'),
       BOMBAY_WRITERS => clienttranslate('Bombay'),
       MADRAS_WRITERS => clienttranslate('Madras'),
-      BENGAL_ARMY => clienttranslate('army of Bengal'),
-      BOMBAY_ARMY => clienttranslate('army of Bombay'),
-      MADRAS_ARMY => clienttranslate('army of Madras'),
+      Locations::armyOfReady(BENGAL) => clienttranslate('army of Bengal'),
+      Locations::armyOfReady(BOMBAY) => clienttranslate('army of Bombay'),
+      Locations::armyOfReady(MADRAS) => clienttranslate('army of Madras'),
+      Locations::armyOfExhausted(BENGAL) => clienttranslate('army of Bengal'),
+      Locations::armyOfExhausted(BOMBAY) => clienttranslate('army of Bombay'),
+      Locations::armyOfExhausted(MADRAS) => clienttranslate('army of Madras'),
       OFFICER_IN_TRAINING => clienttranslate('officers-in-training')
     ];
     if (!isset($locationNameMap[$location])) {
-      throw new \feException("ERROR_021");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_021");
     }
     return $locationNameMap[$location];
   }
@@ -766,15 +779,14 @@ class Notifications
     ]);
   }
 
-  public static function moveRegiment($player, $regiment, $from)
+  public static function moveRegiment($player, $armyPiece, $from)
   {
-    self::notifyAll('moveRegiment', clienttranslate('${player_name} moves ${tkn_regiment} from the army of ${tkn_boldText_from} to the army of ${tkn_boldText_to}'), [
+    self::notifyAll('moveArmyPiece', clienttranslate('${player_name} moves ${tkn_regiment} from the army of ${tkn_boldText_from} to the army of ${tkn_boldText_to}'), [
       'player' => $player,
-      'regiment' => $regiment->jsonSerialize(),
-      'from' => $from,
+      'armyPiece' => $armyPiece->jsonSerialize(),
       'tkn_regiment' => self::tknRegiment(),
       'tkn_boldText_from' => self::getRegionNameForArmy($from),
-      'tkn_boldText_to' => self::getRegionNameForArmy($regiment->getLocation()),
+      'tkn_boldText_to' => self::getRegionNameForArmy($armyPiece->getLocation()),
       'i18n' => ['tkn_boldText_from', 'tkn_boldText_to'],
     ]);
   }
@@ -798,6 +810,16 @@ class Notifications
       'tkn_boldText_amount' => $companyBalance,
       'companyBalance' => $companyBalance,
       'tkn_pound' => clienttranslate('Pounds'),
+    ]);
+  }
+
+  public static function purchaseLocalAlliance(Player $player, ArmyPiece $armyPiece)
+  {
+    self::notifyAll('moveArmyPiece', clienttranslate('${player_name} purchases a local alliance with ${tkn_localAlliance}'), [
+      'player' => $player,
+      'armyPiece' => $armyPiece->jsonSerialize(),
+      'tkn_localAlliance' => $armyPiece->getId(),
+      'i18n' => [],
     ]);
   }
 

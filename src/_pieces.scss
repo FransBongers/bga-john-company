@@ -189,6 +189,76 @@
   border-color: #e6d3d1 #e6d3d1 #c2938f #c2938f;
 }
 
+.joco-local-alliance {
+  background-image: url('img/hexagons.png');
+  background-size: 300% 500%;
+  width: 54px;
+  aspect-ratio: 240 / 225;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .joco-local-alliance-name {
+    width: 44px;
+    height: 8px;
+    font-size: 6px;
+    // background-color: rgba(yellow, 0.5);
+  }
+
+  .joco-local-alliance-strength {
+    line-height: 12px;
+    font-size: 12px;
+    margin-bottom: -2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    gap: 1px;
+  }
+
+  .joco-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 16px;
+
+    .joco-amount-pound {
+      font-size: 6px;
+    }
+    .joco-amount-value {
+      font-size: 8px;
+    }
+
+    span {
+      color: white;
+    }
+  }
+
+  &[data-region='Bengal'] {
+    background-position-y: 0%;
+  }
+
+  &[data-region='Bombay'] {
+    background-position-y: 25%;
+  }
+
+  &[data-region='Madras'] {
+    background-position-y: 50%;
+  }
+
+  &.selectable {
+    cursor: pointer;
+    background-position-x: 50%;
+  }
+
+  &.selectable:hover,
+  &.selected {
+    cursor: pointer;
+    background-position-x: 100%;
+  }
+}
+
 .joco-family-member.selectable,
 .joco-regiment.selectable,
 .joco-company-spot.selectable,
@@ -215,4 +285,15 @@
 .joco-company-spot.selectable:hover[data-vote='true'],
 .joco-company-spot[data-vote='true'] {
   outline-style: dashed !important;
+}
+
+.joco-strength-icon {
+  height: 4px;
+  aspect-ratio: 200 / 123;
+  background-image: url('img/strength.png');
+  background-size: 100% 100%;
+
+  &.joco-inverted {
+    transform: scaleX(-1);
+  }
 }

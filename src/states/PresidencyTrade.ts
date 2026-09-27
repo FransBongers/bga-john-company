@@ -70,7 +70,6 @@ export class PresidencyTrade implements GameState<OnEnteringPresidencyTradeArgs>
         amount: args.proposal,
         tkn_pound: 'pound',
       },
-      true,
     );
   }
 

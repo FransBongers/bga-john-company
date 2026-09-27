@@ -97,7 +97,6 @@ export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingA
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true,
     );
   }
 

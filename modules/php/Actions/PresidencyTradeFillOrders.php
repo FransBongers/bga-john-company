@@ -160,7 +160,7 @@ class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidenc
       $families[$familyId]->gainCash($amount);
     }
 
-
+    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
     $this->resolveAction([], true);
   }
 

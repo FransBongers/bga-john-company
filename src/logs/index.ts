@@ -17,6 +17,7 @@ import {
   tplLogTokenStormDie,
   tplLogTokenPlayerName,
   tplLogTokenShip,
+  tplLogTokenLocalAlliance,
 } from './templates';
 
 const LOG_TOKEN_BOLD_TEXT = 'boldText';
@@ -31,6 +32,7 @@ const LOG_TOKEN_ELEPHANT = 'elephant';
 const LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
 const LOG_TOKEN_FAMILY_MEMBER = 'familyMember';
 const LOG_TOKEN_ICON = 'icon';
+const LOG_TOKEN_LOCAL_ALLIANCE = 'localAlliance';
 const LOG_TOKEN_POLICY_ICON = 'policyIcon';
 const LOG_TOKEN_REGIMENT = 'regiment';
 const LOG_TOKEN_PROMISE_CUBE = 'promiseCube';
@@ -73,6 +75,8 @@ export const getTokenDiv = ({
       const [familyId, number] = value.split(':');
       return createFamilyMember(familyId, Number(number), [CLASS_LOG_TOKEN])
         .outerHTML;
+    case LOG_TOKEN_LOCAL_ALLIANCE:
+      return tplLogTokenLocalAlliance(value);
     case LOG_TOKEN_POUND:
       return tplLogTokenPound();
     case LOG_TOKEN_PROMISE_CUBE:

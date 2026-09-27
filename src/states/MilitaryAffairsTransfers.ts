@@ -92,7 +92,6 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true,
     );
   }
 

@@ -45,7 +45,6 @@ export class RevenueRoyalPardon implements GameState<OnEnteringRevenueRoyalPardo
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
-      true,
     );
   }
 

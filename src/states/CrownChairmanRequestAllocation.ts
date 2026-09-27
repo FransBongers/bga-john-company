@@ -51,13 +51,9 @@ export class CrownChairmanRequestAllocation implements GameState<OnEnteringCrown
     activePlayerIds: number,
     args: OnEnteringCrownChairmanRequestAllocationArgs,
   ) {
-    updatePageTitle(
-      _('${tkn_playerName} may fit ships'),
-      {
-        tkn_playerName: getCrownPlayerName(),
-      },
-      true,
-    );
+    updatePageTitle(_('${tkn_playerName} may fit ships'), {
+      tkn_playerName: getCrownPlayerName(),
+    });
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########

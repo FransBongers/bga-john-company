@@ -1,6 +1,8 @@
 /* ------- DEFAULT LOG TOKENS ------- */
 
 import { EXTRA_SHIP, FATIGUED } from '../constants';
+import { tplLocalAlliance } from '../india/army/templates';
+import { StaticData } from '../static-data';
 import { tplShipContent } from '../token-managers/ship-tokens/templates';
 import { JocoShipBase } from '../types';
 
@@ -28,6 +30,17 @@ export const tplLogTokenClimate = (climate: string) =>
 
 export const tplLogTokenElephant = () =>
   '<div class="log-token joco_elephant"></div>';
+
+export const tplLogTokenLocalAlliance = (id: string) => {
+  const staticData = StaticData.get().armyPiece(id);
+  return tplLocalAlliance({
+    extraClasses: 'log-token',
+    region: staticData.region,
+    name: staticData.name,
+    strength: staticData.strength,
+    cost: staticData.cost,
+  });
+};
 
 export const tplLogTokenPound = () =>
   `<div class="log-token joco_pound"></div>`;

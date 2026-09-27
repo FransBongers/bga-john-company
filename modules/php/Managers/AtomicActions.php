@@ -14,6 +14,9 @@ class AtomicActions
     BONUSES => BONUSES,
     CHAIRMAN => CHAIRMAN,
     CHAIRMAN_DEBT_CONSENT => CHAIRMAN_DEBT_CONSENT,
+    COMMANDER_APPROVE_LOCAL_ALLIANCE => COMMANDER_APPROVE_LOCAL_ALLIANCE,
+    COMMANDER_DEPLOY => COMMANDER_DEPLOY,
+    COMMANDER_PURCHASE_LOCAL_ALLIANCE => COMMANDER_PURCHASE_LOCAL_ALLIANCE,
     CROWN_CHAIRMAN_ALLOCATE_COMPANY_BALANCE => CROWN_CHAIRMAN_ALLOCATE_COMPANY_BALANCE,
     CROWN_CHAIRMAN_REQUEST_ALLOCATION => CROWN_CHAIRMAN_REQUEST_ALLOCATION,
     CROWN_CHAIRMAN_REQUEST_DEBT_ADVANCEMENT => CROWN_CHAIRMAN_REQUEST_DEBT_ADVANCEMENT,
@@ -113,7 +116,10 @@ class AtomicActions
     $action = self::get($actionId, $ctx);
     $methodName = 'args' . $action->getClassName();
     $args = \method_exists($action, $methodName) ? $action->$methodName() : [];
-    return array_merge($args, ['optionalAction' => $ctx->isOptional()]);
+    return array_merge($args, [
+      'optionalAction' => $ctx->isOptional(),
+      'activePlayerIds' => $ctx->getInfo()['activePlayerIds']
+    ]);
   }
 
   public static function takeAction($actionId, $actionName, $args, $ctx)
