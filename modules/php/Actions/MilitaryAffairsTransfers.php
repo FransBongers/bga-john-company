@@ -77,7 +77,6 @@ class MilitaryAffairsTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
     }
 
     $data = [
-      'activePlayerIds' => [$activePlayerId],
       'options' => $options,
     ];
 

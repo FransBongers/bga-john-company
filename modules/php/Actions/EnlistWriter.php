@@ -36,7 +36,6 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
     $playerId = $info['activePlayerIds'][0];
 
     $data = [
-      'activePlayerIds' => [$playerId],
       'options' => $this->getOptions($playerId),
     ];
 
@@ -77,7 +76,7 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
     $stateArgs = $this->argsEnlistWriter();
 
     if (!in_array($regionId, $stateArgs['options'])) {
-      throw new \feException("ERROR_004");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_004");
     }
 
     $this->performAction($playerId, $regionId);

@@ -210,7 +210,7 @@ class CrownChairmanAllocateCompanyBalance extends \Bga\Games\JohnCompany\Models\
       case PEACOCK:
         return $this->allocatePeacockClimate($step);
       default:
-        throw new \feException("ERROR_047");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_047");
     }
   }
 }

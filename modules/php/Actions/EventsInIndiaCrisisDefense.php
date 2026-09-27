@@ -66,7 +66,6 @@ class EventsInIndiaCrisisDefense extends \Bga\Games\JohnCompany\Actions\Presiden
     $activePlayerId = $info['activePlayerIds'][0];
 
     $data = [
-      'activePlayerIds' => [$activePlayerId],
       'attackerStrength' => $info['attackerStrength'],
       'attackerId' => $info['attackerId'],
       'defenderId' => $info['defenderId'],

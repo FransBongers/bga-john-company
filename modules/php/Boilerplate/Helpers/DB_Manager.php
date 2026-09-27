@@ -16,7 +16,7 @@ class DB_Manager
   {
     if (is_null($table)) {
       if (is_null(static::$table)) {
-        throw new \feException('You must specify the table you want to do the query on');
+        throw new \Bga\GameFramework\VisibleSystemException('You must specify the table you want to do the query on');
       }
       $table = static::$table;
     }

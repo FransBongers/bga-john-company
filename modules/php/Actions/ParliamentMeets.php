@@ -37,12 +37,9 @@ class ParliamentMeets extends \Bga\Games\JohnCompany\Models\AtomicAction
   public function argsParliamentMeets()
   {
     $info = $this->ctx->getInfo();
-    // $player = self::getPlayer();
-    $activePlayerId = $info['activePlayerIds'][0];
 
-    $data = [
-      'activePlayerIds' => [$activePlayerId],
-    ];
+
+    $data = [];
 
     return $data;
   }

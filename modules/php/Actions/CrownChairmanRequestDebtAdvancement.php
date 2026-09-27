@@ -108,20 +108,20 @@ class CrownChairmanRequestDebtAdvancement extends \Bga\Games\JohnCompany\Models\
     if ($oneLessAdvancement) {
 
       if (!$stateArgs['oneLessAdvancement']['possible']) {
-        throw new \feException("ERROR_041");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_041");
       }
       if (!$stateArgs['oneLessAdvancement']['playerCanPay'][$playerId]) {
-        throw new \feException("ERROR_042");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_042");
       }
       $newDebt -= 1;
       Notifications::message(clienttranslate('${player_name} requests one less Company Debt advancement'), ['player' => $player]);
       $family->payPromiseCubes($stateArgs['oneLessAdvancement']['cost']);
     } else if ($additionalAdvancement) {
       if (!$stateArgs['additionalAdvancement']['possible']) {
-        throw new \feException("ERROR_043");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_043");
       }
       if (!$stateArgs['additionalAdvancement']['playerCanPay'][$playerId]) {
-        throw new \feException("ERROR_044");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_044");
       }
       $newDebt += 1;
       Notifications::message(clienttranslate('${player_name} requests an additional Company Debt advancement'), ['player' => $player]);
@@ -182,7 +182,7 @@ class CrownChairmanRequestDebtAdvancement extends \Bga\Games\JohnCompany\Models\
         $addtional = 3;
         $oneLess = 100; // Not possible because debt marker did not advance
       default:
-        throw new \feException("ERROR_040");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_040");
     }
 
     return [

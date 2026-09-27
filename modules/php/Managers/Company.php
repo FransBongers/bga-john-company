@@ -132,7 +132,7 @@ class Company
   public static function makeCheck($numberOfDice)
   {
     if ($numberOfDice === 0) {
-      throw new \feException("ERROR_009");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_009");
     }
 
     $dieResults = [];

@@ -101,7 +101,6 @@ class Chairman extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $data = [
       'companyBalance' => Company::getBalance(),
-      'activePlayerIds' => [$playerId],
       'initialDebt' => $initialDebt,
       'initialTreasuries' => $initialTreasuries,
       'debtOptions' => $debtOptions,
@@ -153,7 +152,7 @@ class Chairman extends \Bga\Games\JohnCompany\Models\AtomicAction
     $updatedTreasuries = $this->updateGame($stateArgs, $playerId, $companyDebt, $treasuries);
 
     if (!$propose && Company::getBalance() > 0) {
-      throw new \feException("ERROR_008");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_008");
     }
 
     $saveAndProceed = false;
@@ -216,7 +215,7 @@ class Chairman extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     // value to be voted for needs to be in options and greater than current company debt
     if ($debtVote <= Company::getDebt() || !in_array($debtVote, $debtOptions['vote'])) {
-      throw new \feException("ERROR_034");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_034");
     }
 
     $player = Players::get($playerId);
@@ -274,7 +273,7 @@ class Chairman extends \Bga\Games\JohnCompany\Models\AtomicAction
     $currentDebt = $debtOptions['currentDebt'];
     // Debt is set to a value that is not allowed without a vote
     if ($newDebt !== $currentDebt && !in_array($newDebt, $debtOptions['noVote'])) {
-      throw new \feException("ERROR_006");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_006");
     }
     // Update data
     if ($newDebt > $currentDebt) {
@@ -296,7 +295,7 @@ class Chairman extends \Bga\Games\JohnCompany\Models\AtomicAction
 
       // Not allowed to decrease treasuty to below starting value
       if ($newTreasury < $initialTreasuries[$officeId]) {
-        throw new \feException("ERROR_007");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_007");
       }
 
       if ($office->getTreasury() !== $newTreasury) {

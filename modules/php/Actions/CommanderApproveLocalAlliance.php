@@ -36,7 +36,6 @@ class CommanderApproveLocalAlliance extends \Bga\Games\JohnCompany\Models\Atomic
       'commanderPlayerId' => $args['commanderPlayerId'],
       'localAlliance' => ArmyPieces::get($localAllianceId),
       'presidentOfficeId' => $args['presidentOfficeId'],
-      'activePlayerIds' => $info['activePlayerIds'],
     ];
 
     return $data;

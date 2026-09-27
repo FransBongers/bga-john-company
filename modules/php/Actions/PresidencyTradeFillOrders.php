@@ -40,7 +40,6 @@ class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidenc
   {
     $info = $this->ctx->getInfo();
     // $player = self::getPlayer();
-    $activePlayerId = $info['activePlayerIds'][0];
 
     $office = Offices::get($info['officeId']);
     $regionIds = $info['regionIds'];
@@ -48,7 +47,6 @@ class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidenc
     $options = $this->getOrderOptions($office, $regionIds);
 
     $data = [
-      'activePlayerIds' => [$activePlayerId],
       'companyBalance' => Company::getBalance(),
       'orders' => $options['orders'],
       'homePortOrderId' => $options['homePortOrderId'],
@@ -96,7 +94,7 @@ class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidenc
 
     Notifications::log('args', $args);
     if (count($filledOrders) !== $stateArgs['numberOfOrdersToFill']) {
-      throw new \feException("ERROR_028");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_028");
     }
 
     $ordersThatCanBeFilled = [$stateArgs['homePortOrderId']];
@@ -113,7 +111,7 @@ class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidenc
       $filledBy = $data->filledBy;
 
       if (!in_array($orderId, $ordersThatCanBeFilled)) {
-        throw new \feException("ERROR_029");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_029");
       }
       $order = $orders[$orderId];
 
@@ -121,7 +119,7 @@ class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidenc
 
       // There are still writers to place but according to input a filled token was placed
       if (count($writers) > 0 && $filledBy === FILLED) {
-        throw new \feException("ERROR_030");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_030");
       }
       $familyMember = null;
 
@@ -131,7 +129,7 @@ class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidenc
           return $writer->getId() === $filledBy;
         });
         if ($familyMember === null) {
-          throw new \feException("ERROR_031");
+          throw new \Bga\GameFramework\VisibleSystemException("ERROR_031");
         }
 
         $familyId = $familyMember->getFamilyId();

@@ -87,7 +87,7 @@ class Ships extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   {
     $ship = self::getTopOf(Locations::supplyOtherShips());
     if ($ship === null) {
-      throw new \feException("ERROR_038");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_038");
     }
     $ship->setType($shipType);
     return $ship;

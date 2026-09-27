@@ -62,7 +62,6 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
     $options = $this->getOptions();
 
     return [
-      'activePlayerIds' => $info['activePlayerIds'],
       'options' => $options,
       'skipOnEnteringState' => count($options) === 0,
     ];
@@ -96,6 +95,8 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
     self::checkAction('actCommanderDeploy');
     $playerId = $this->checkPlayer();
 
+    $this->insertState();
+
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
     $this->resolveAction([]);
   }
@@ -127,6 +128,7 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
       'activePlayerIds' => [$commanderPlayerId],
       'optional' => true,
       'args' => [
+        'commanderPlayerId' => $commanderPlayerId,
         'presidentOfficeId' => $presidentOfficeId,
       ]
     ]));

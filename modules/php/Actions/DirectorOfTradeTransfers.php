@@ -108,7 +108,6 @@ class DirectorOfTradeTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
     }
 
     $data = [
-      'activePlayerIds' => [$playerId],
       'options' => $options,
       'transfers' => $transfers,
     ];
@@ -155,7 +154,7 @@ class DirectorOfTradeTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
     foreach ($shipTransfers as $shipId => $data) {
       $to = $data->to;
       if (!(isset($stateArgs['options']['ships'][$shipId]) && in_array($to, $stateArgs['options']['ships'][$shipId]['locations']))) {
-        throw new \feException("ERROR_012");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_012");
       }
       $ship = $stateArgs['options']['ships'][$shipId]['ship'];
       $ship->moveTo($player, $to);
@@ -164,7 +163,7 @@ class DirectorOfTradeTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
     foreach ($writerTransfers as $writerId => $data) {
       $to = $data->to;
       if (!(isset($stateArgs['options']['writers'][$writerId]) && in_array($to, $stateArgs['options']['writers'][$writerId]['locations']))) {
-        throw new \feException("ERROR_013");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_013");
       }
       $familyMember = $stateArgs['options']['writers'][$writerId]['familyMember'];
       // $familyMember->setLocation($to);

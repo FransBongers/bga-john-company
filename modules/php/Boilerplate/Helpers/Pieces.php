@@ -269,8 +269,8 @@ class Pieces extends DB_Manager
       ->whereIn(static::$prefix . 'id', $ids)
       ->get(false);
     if (count($result) != count($ids) && $raiseExceptionIfNotEnough) {
-      // throw new \feException(print_r(\debug_print_backtrace()));
-      throw new \feException('Class Pieces: getMany, some pieces have not been found !' . json_encode($ids));
+      // throw new \Bga\GameFramework\VisibleSystemException(print_r(\debug_print_backtrace()));
+      throw new \Bga\GameFramework\VisibleSystemException('Class Pieces: getMany, some pieces have not been found !' . json_encode($ids));
     }
 
     return $result;

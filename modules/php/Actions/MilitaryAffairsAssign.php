@@ -43,7 +43,6 @@ class MilitaryAffairsAssign extends \Bga\Games\JohnCompany\Models\AtomicAction
     $officersInTraining = FamilyMembers::getInLocation(Locations::officerInTraining());
 
     $data = [
-      'activePlayerIds' => [$activePlayerId],
       'armies' => array_map(function ($region) {
         return Locations::armyOfReady($region);
       }, [BOMBAY, MADRAS, BENGAL]),
@@ -93,10 +92,10 @@ class MilitaryAffairsAssign extends \Bga\Games\JohnCompany\Models\AtomicAction
       $to = $data->to;
 
       if (!in_array($to, $stateArgs['armies'])) {
-        throw new \feException("ERROR_019");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_019");
       }
       if (!isset($stateArgs['officersInTraining'][$id])) {
-        throw new \feException("ERROR_020");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_020");
       }
       $familyMember = $stateArgs['officersInTraining'][$id];
       $familyMember->moveTo($player, $to);

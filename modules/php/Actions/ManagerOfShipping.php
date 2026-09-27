@@ -56,7 +56,6 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
 
 
     $data = [
-      'activePlayerIds' => [$activePlayerId],
       'playerShips' => $playerShips,
       'otherShips' => $otherShips,
       'treasury' => Offices::get(MANAGER_OF_SHIPPING)->getTreasury(),
@@ -111,7 +110,7 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
         return $shipId === $playerShip->getId();
       });
       if ($ship === null) {
-        throw new \feException("ERROR_014");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_014");
       }
       $playerShipCount++;
       $ship->place($ship->getOwner(), $seaZone);
@@ -121,7 +120,7 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
     // Place company ships
     foreach($companyShips as $shipId => $seaZone) {
       if ($playerShipCount < count($stateArgs['playerShips'])) {
-        throw new \feException("ERROR_015");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_015");
       }
       $this->placeOtherShip($stateArgs, $player, $shipId, $seaZone, COMPANY_SHIP);
       $totalPayment += 5;
@@ -136,7 +135,7 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
     $treasury = $office->getTreasury();
     
     if ($treasury < 0 || $treasury > 2) {
-      throw new \feException("ERROR_016");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_016");
     }
 
     Notifications::payFromTreasury($player, $office, $totalPayment, $treasury);

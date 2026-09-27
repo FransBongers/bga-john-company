@@ -110,7 +110,7 @@ class CrownChairmanSeekDebt extends \Bga\Games\JohnCompany\Models\AtomicAction
       case PEACOCK:
         return 0;
       default:
-        throw new \feException("ERROR_039");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_039");
     }
   }
 

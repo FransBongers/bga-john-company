@@ -75,7 +75,6 @@ class FamilyAction extends \Bga\Games\JohnCompany\Models\AtomicAction
     $playerId = $info['activePlayerIds'][0];
 
     $data = [
-      'activePlayerIds' => [$playerId],
       'options' => $this->getOptions($playerId),
     ];
 
@@ -117,7 +116,7 @@ class FamilyAction extends \Bga\Games\JohnCompany\Models\AtomicAction
     $stateArgs = $this->argsFamilyAction();
 
     if (!in_array($familyAction, $stateArgs['options'])) {
-      throw new \feException("ERROR_003");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_003");
     }
 
     Players::get($playerId)->getFamily()->setOpportunityMarker($familyAction);

@@ -134,7 +134,7 @@ abstract class DB_Model implements \JsonSerializable
         return $this->$setter($this->$getter() + (empty($args) ? 1 : $args[0]));
       }
     } else {
-      throw new \feException('Undefined method ' . $method);
+      throw new \Bga\GameFramework\VisibleSystemException('Undefined method ' . $method);
       return null;
     }
   }
@@ -172,7 +172,7 @@ abstract class DB_Model implements \JsonSerializable
   private function DB()
   {
     if (is_null($this->table)) {
-      throw new \feException('You must specify the table you want to do the query on');
+      throw new \Bga\GameFramework\VisibleSystemException('You must specify the table you want to do the query on');
     }
 
     $log = null;

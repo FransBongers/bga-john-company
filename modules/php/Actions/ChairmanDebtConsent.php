@@ -32,25 +32,14 @@ class ChairmanDebtConsent extends \Bga\Games\JohnCompany\Models\AtomicAction
   // .##.....##.##....##..##....##..##....##
   // .##.....##.##.....##..######....######.
 
-  // 'action' => CHAIRMAN_DEBT_CONSENT,
-  //         'playerId' => 'all',
-  //         'activePlayerIds' => Utils::filter($playerIdsWithShare, function ($pId) use ($playerId) {
-  //           return $pId !== $playerId;
-  //         }),
-  //         'yay' => [$playerId],
-  //         'nay' => [],
-  //         'debt' => $debtVote,
   public function argsChairmanDebtConsent()
   {
     $info = $this->ctx->getInfo();
-    // $player = self::getPlayer();
-    $playerIds = $info['activePlayerIds'];
 
     $votes = $this->getCurrentVoteCount($info);
     $remainingVotesRequired = Company::getRequiredNumberForShareMajority() - $votes['yay'];
 
     $data = [
-      'activePlayerIds' => $playerIds,
       'debt' => $info['debt'],
       'chairmanPlayerId' => Offices::get(CHAIRMAN)->getPlayerId(),
       'remainingVotesRequired' => $remainingVotesRequired,

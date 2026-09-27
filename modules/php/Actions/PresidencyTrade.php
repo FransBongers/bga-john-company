@@ -39,15 +39,12 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
   public function argsPresidencyTrade()
   {
     $info = $this->ctx->getInfo();
-    // $player = self::getPlayer();
-    $activePlayerId = $info['activePlayerIds'][0];
 
     $office = Offices::get($info['officeId']);
 
     $treasury = $office->getTreasury();
 
     $data = [
-      'activePlayerIds' => [$activePlayerId],
       'treasury' => $treasury,
       'options' => $this->getOrderOptions($office),
       'officeId' => $info['officeId'],
@@ -95,7 +92,7 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
     $officeId = $stageArgs['officeId'];
 
     if (!$this->canBePerformed($officeId)) {
-      throw new \feException("ERROR_023");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_023");
     }
 
     // All regions need to be withing range
@@ -104,18 +101,18 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
         return $region->getId() === $regionId;
       });
       if ($region === null) {
-        throw new \feException("ERROR_024");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_024");
       }
     }
 
     // Home region needs to be selected
     if (!in_array($options['homeRegionId'], $selectedRegionIds)) {
-      throw new \feException("ERROR_025");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_025");
     }
 
     // Treasury needs to have required cash
     if ($stageArgs['treasury'] < $spend) {
-      throw new \feException("ERROR_026");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_026");
     }
 
     $office = Offices::get($officeId);
@@ -124,7 +121,7 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
     $penalty = count($selectedRegionIds) - 1;
     $numberOfDice = $spend - $penalty;
     if ($numberOfDice < 1) {
-      throw new \feException("ERROR_027");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_027");
     }
 
     $office->pay($player, $spend);

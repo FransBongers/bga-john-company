@@ -62,7 +62,6 @@ class DirectorOfTradeSpecialEnvoySuccess extends \Bga\Games\JohnCompany\Models\A
     $playerId = $info['activePlayerIds'][0];
 
     $data = [
-      'activePlayerIds' => [$playerId],
       'closedOrders' => Orders::getClosedOrders(),
     ];
 
@@ -111,7 +110,7 @@ class DirectorOfTradeSpecialEnvoySuccess extends \Bga\Games\JohnCompany\Models\A
     });
 
     if ($order === null) {
-      throw new \feException("ERROR_011");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_011");
     }
 
     $order->open($player);

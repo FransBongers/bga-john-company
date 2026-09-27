@@ -28,11 +28,9 @@ class EnlistOfficer extends \Bga\Games\JohnCompany\Models\AtomicAction
   public function argsEnlistOfficer()
   {
     $info = $this->ctx->getInfo();
-    $playerId = $info['activePlayerIds'][0];
 
-    $data = [
-      'activePlayerIds' => $info['activePlayerIds'],
-    ];
+
+    $data = [];
 
     return $data;
   }

@@ -148,13 +148,13 @@ class CrownManagerOfShippingBuyCompanyShips extends \Bga\Games\JohnCompany\Model
       $this->resolveAction([], true);
     }
     if ($option === null || !isset($stateArgs['playerOptions'][$playerId])) {
-      throw new \feException("ERROR_035");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_035");
     }
 
     $playerOption = $stateArgs['playerOptions'][$playerId];
 
     if ($playerOption['option'] !== $option) {
-      throw new \feException("ERROR_036");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_036");
     }
 
 
@@ -178,7 +178,7 @@ class CrownManagerOfShippingBuyCompanyShips extends \Bga\Games\JohnCompany\Model
       case BUY_AS_MANY_SHIPS_AS_YOU_WISH:
         break;
       default:
-        throw new \feException("ERROR_037");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_037");
     }
 
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');

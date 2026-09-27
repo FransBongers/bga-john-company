@@ -233,7 +233,7 @@ class QueryBuilder
     $this->assembleQueryClauses();
 
     if ($debug) {
-      throw new \feException($this->sql);
+      throw new \Bga\GameFramework\VisibleSystemException($this->sql);
     }
     $res = Table::getObjectListFromDB($this->sql);
     $oRes = [];

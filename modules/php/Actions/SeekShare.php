@@ -35,7 +35,6 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
     $family = Families::get($familyId);
 
     $data = [
-      'activePlayerIds' => [$playerId],
       'options' => $this->getOptions($family),
     ];
 
@@ -76,7 +75,7 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
     $stateArgs = $this->argsSeekShare();
 
     if (!isset($position, $stateArgs['options'])) {
-      throw new \feException("ERROR_005");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_005");
     }
 
     $price = $stateArgs['options'][$position];

@@ -69,8 +69,6 @@ class RevenuePayDividends extends \Bga\Games\JohnCompany\Actions\PresidencyActio
   public function argsRevenuePayDividends()
   {
     $info = $this->ctx->getInfo();
-    // $player = self::getPlayer();
-    $activePlayerId = $info['activePlayerIds'][0];
 
     $shares = Company::getShares();
     $balance = Company::getBalance();
@@ -79,7 +77,6 @@ class RevenuePayDividends extends \Bga\Games\JohnCompany\Actions\PresidencyActio
     $maxNumberOfDividends = floor($balance / $costPerDividend);
 
     $data = [
-      'activePlayerIds' => [$activePlayerId],
       'costPerDividend' => $costPerDividend,
       'maxNumberOfDividends' => $maxNumberOfDividends,
     ];
@@ -130,11 +127,11 @@ class RevenuePayDividends extends \Bga\Games\JohnCompany\Actions\PresidencyActio
     $shares = Company::getShares();
 
     if ($numberOfDividends < 0) {
-      throw new \feException("ERROR_032");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_032");
     }
 
     if ($numberOfDividends > $stateArgs['maxNumberOfDividends']) {
-      throw new \feException("ERROR_033");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_033");
     }
 
     $totalCost = count($shares) * $numberOfDividends;

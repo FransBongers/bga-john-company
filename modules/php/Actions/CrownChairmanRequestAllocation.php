@@ -85,11 +85,11 @@ class CrownChairmanRequestAllocation extends \Bga\Games\JohnCompany\Models\Atomi
     }
 
     if ($officeId === null || $amount === null) {
-      throw new \feException("ERROR_045");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_045");
     }
 
     if ($amount > $stateArgs['maxAmount']) {
-      throw new \feException("ERROR_046");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_046");
     }
 
     $player = Players::get($playerId);

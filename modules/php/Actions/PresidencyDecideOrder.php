@@ -36,14 +36,11 @@ class PresidencyDecideOrder extends \Bga\Games\JohnCompany\Models\AtomicAction
   public function argsPresidencyDecideOrder()
   {
     $info = $this->ctx->getInfo();
-    // $player = self::getPlayer();
-    $activePlayerId = $info['activePlayerIds'][0];
 
     $canTrade = AtomicActions::get(PRESIDENCY_TRADE)->canBePerformed($info['officeId']);
     $commanderTurn = false;
 
     $data = [
-      'activePlayerIds' => [$activePlayerId],
       'trade' => $canTrade,
       'done' => !($canTrade || $commanderTurn),
     ];
@@ -85,7 +82,7 @@ class PresidencyDecideOrder extends \Bga\Games\JohnCompany\Models\AtomicAction
     $stateArgs = $this->argsPresidencyDecideOrder();
 
     if (!$stateArgs[$next]) {
-      throw new \feException("ERROR_022");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_022");
     }
 
     $ctx = $this->ctx;
@@ -105,7 +102,7 @@ class PresidencyDecideOrder extends \Bga\Games\JohnCompany\Models\AtomicAction
       case DONE:
         break;
       default:
-        throw new \feException("ERROR_023");
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_023");
     }
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
 

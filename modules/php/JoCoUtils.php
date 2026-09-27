@@ -14,7 +14,7 @@ class JoCoUtils
   public static function makeCheck($player, $office, $numberOfDice)
   {
     if ($numberOfDice === 0) {
-      throw new \feException("ERROR_010");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_010");
     }
 
     $dieResults = [];

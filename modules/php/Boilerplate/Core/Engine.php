@@ -335,7 +335,7 @@ class Engine
     $node = self::$tree->getNextUnresolved();
     // Are we done ?
     if ($node != null) {
-      throw new \feException("You can't confirm an ongoing turn");
+      throw new \Bga\GameFramework\VisibleSystemException("You can't confirm an ongoing turn");
     }
 
     // Callback
@@ -356,14 +356,14 @@ class Engine
 
     // Are we done ?
     if ($node == null) {
-      throw new \feException("You can't partial confirm an ended turn");
+      throw new \Bga\GameFramework\VisibleSystemException("You can't partial confirm an ended turn");
     }
 
     $oldPlayerId = Game::get()->getActivePlayerId();
     $playerId = $node->getPlayerId();
 
     if ($oldPlayerId == $playerId) {
-      throw new \feException("You can't partial confirm for the same player");
+      throw new \Bga\GameFramework\VisibleSystemException("You can't partial confirm for the same player");
     }
 
     // Clear log

@@ -64,8 +64,8 @@ class AtomicActions
   {
     if (!\array_key_exists($actionId, self::$classes)) {
       // $actionId = STRIKE;
-      // throw new \feException(print_r(debug_print_backtrace()));
-      // throw new \feException(print_r(Globals::getEngine()));
+      // throw new \Bga\GameFramework\VisibleSystemException(print_r(debug_print_backtrace()));
+      // throw new \Bga\GameFramework\VisibleSystemException(print_r(Globals::getEngine()));
       throw new \Bga\GameFramework\VisibleSystemException('Trying to get an atomic action not defined in Actions.php : ' . $actionId);
     }
     $name = '\Bga\Games\JohnCompany\Actions\\' . self::$classes[$actionId];

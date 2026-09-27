@@ -69,7 +69,6 @@ class DirectorOfTradeSpecialEnvoy extends \Bga\Games\JohnCompany\Models\AtomicAc
     $proposal = isset($info['proposal']) ? $info['proposal'] : null;
 
     $data = [
-      'activePlayerIds' => [$playerId],
       'treasury' => Offices::get(DIRECTOR_OF_TRADE)->getTreasury(),
       'proposal' => $proposal,
     ];

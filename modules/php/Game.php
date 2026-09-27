@@ -478,6 +478,6 @@ class Game extends \Bga\GameFramework\Table
             return;
         }
 
-        throw new \feException("Zombie mode not supported at this game state: \"{$state_name}\".");
+        throw new \Bga\GameFramework\VisibleSystemException("Zombie mode not supported at this game state: \"{$state_name}\".");
     }
 }

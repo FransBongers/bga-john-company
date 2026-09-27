@@ -39,13 +39,9 @@ class RevenueRoyalPardon extends \Bga\Games\JohnCompany\Actions\PresidencyAction
   public function argsRevenueRoyalPardon()
   {
     $info = $this->ctx->getInfo();
-    // $player = self::getPlayer();
-    $activePlayerId = $info['activePlayerIds'][0];
 
 
-    $data = [
-      'activePlayerIds' => [$activePlayerId],
-    ];
+    $data = [];
     return $data;
   }
 
