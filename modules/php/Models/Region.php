@@ -31,6 +31,7 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   protected $adjacentRegionBorderMap = [];
   protected $shapeAdjacentRegionMap = [];
   protected $adjacentRegionsInClockwiseOrder = [];
+  protected string $governorOfficeId;
 
   public function __construct($row)
   {
@@ -55,6 +56,7 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     'orderIds',
     'exportIcons',
     'name',
+    'governorOfficeId',
   ];
 
   public function jsonSerialize(): array
@@ -63,7 +65,7 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     unset($data['state']);
     unset($data['location']);
     $data['looted'] = $this->looted === 1;
-    $data['isCapital'] = in_array($this->id, Globals::getEmpires());
+    $data['isCapital'] = $this->isCapital();
     return $data;
   }
 
@@ -98,7 +100,8 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     return $this->shapeAdjacentRegionMap[$shape];
   }
 
-  public function getNextAdjacentRegionIdInClockwiseOrder($regionId) {
+  public function getNextAdjacentRegionIdInClockwiseOrder($regionId)
+  {
     $index = Utils::array_find_index($this->adjacentRegionsInClockwiseOrder, function ($adjacentRegionId) use ($regionId) {
       return $adjacentRegionId === $regionId;
     });
@@ -169,9 +172,9 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
 
     $orders = Orders::getAll();
 
-    foreach($this->orderIds as $orderId) {
+    foreach ($this->orderIds as $orderId) {
       $connectedOrders = $orders[$orderId]->getConnectedOrders();
-      foreach($connectedOrders as $connectedOrderId) {
+      foreach ($connectedOrders as $connectedOrderId) {
         if (in_array($connectedOrderId, $this->orderIds)) {
           // Order is connected order in the same region;
           continue;
@@ -188,12 +191,23 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     }
   }
 
+  public function openAllOrders()
+  {
+    $orders = Orders::getMany($this->orderIds);
+    foreach ($orders as $orderId => $order) {
+      if (!$order->isClosed()) {
+        continue;
+      }
+      $order->open();
+    }
+  }
+
   public function closeAllOrders()
   {
     $orders = Orders::getMany($this->orderIds);
 
     $orderClosed = false;
-    foreach($orders as $orderId => $order) {
+    foreach ($orders as $orderId => $order) {
       if ($order->isClosed()) {
         continue;
       }
@@ -212,7 +226,7 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     $orders = Orders::getMany($this->orderIds);
 
     $orderClosed = false;
-    foreach($orders as $orderId => $order) {
+    foreach ($orders as $orderId => $order) {
       if ($order->isClosed()) {
         continue;
       }
@@ -230,7 +244,7 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   {
     $empires = Globals::getEmpires();
     $empireCreated = false;
-    for($i = 0; $i < count($empires); $i++) {
+    for ($i = 0; $i < count($empires); $i++) {
       if ($empires[$i] !== null) {
         continue;
       }
@@ -279,10 +293,33 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     Globals::setEmpires($empires);
 
     $regions = Regions::getAll();
-    foreach($regions as $region) {
+    foreach ($regions as $region) {
       if ($region->getControl() === $this->getId()) {
         $region->becomeSovereign();
       }
     }
+  }
+
+  public function companyGainsControl(Player $player, string $presidencyId)
+  {
+    $previousControl = $this->getControl();
+    // Remove tower and check empire
+    $this->setStrength(0);
+    $this->setControl($presidencyId);
+    if ($this->isCapital()) {
+      $this->shatterEmpire();
+    } else if ($previousControl !== $presidencyId) {
+      Notifications::removeTower($player, $this);
+    }
+
+    // Open all orders and remove any unrest
+    $this->openAllOrders();
+    $this->removeUnrest();
+
+    // Form Governorship
+    if ($previousControl !== $presidencyId) {
+      Offices::get($this->getGovernorOfficeId())->moveToVacantOffices($player);
+    }
+    
   }
 }

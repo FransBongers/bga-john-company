@@ -4,6 +4,8 @@ namespace Bga\Games\JohnCompany\Models;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\JoCoUtils;
+use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
 
 class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
@@ -16,6 +18,7 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
   protected $familyId;
   protected $fatigue;
   protected $presidency = null;
+  protected $type = FAMILY_MEMBER;
 
   public function __construct($row)
   {
@@ -34,6 +37,10 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
   ];
 
 
+  protected $staticAttributes = [
+    'type',
+  ];
+
   public function jsonSerialize(): array
   {
     $data = parent::jsonSerialize();
@@ -48,21 +55,54 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
 
   public function returnToSupply()
   {
+    $office = $this->getOffice();
+    if ($office !== null) {
+      $office->setFamilyMemberId(null);
+    }
     $this->setLocation(Locations::familyMemberSupply($this->familyId));
     Notifications::returnFamilyMemberToSupply(Players::getPlayerForFamily($this->familyId), $this);
   }
 
-  public function moveTo($player, $to) {
+  public function moveTo($player, $to)
+  {
     $from = $this->getLocation();
     $this->setLocation($to);
     Notifications::moveFamilyMember($player, $this, $from);
   }
 
-  public function getPlayer() {
+  public function getPlayer()
+  {
     return Players::getPlayerForFamily($this->familyId);
   }
 
-  public function getPlayerId() {
+  public function getPlayerId()
+  {
     return $this->getPlayer()->getId();
+  }
+
+  public function getOffice()
+  {
+    if (in_array($this->getLocation(), OFFICES)) {
+      return Offices::get($this->getLocation());
+    }
+    return null;
+  }
+
+  public function checkForLosses()
+  {
+    $dieResult = JoCoUtils::rollDie();
+    // $dieResult = 6;
+    $player = $this->getPlayer();
+    Notifications::message(clienttranslate('Check for losses: ${player_name} rolls ${tkn_boldText_dieResult} for ${tkn_familyMember}'), [
+      'player' => $player,
+      'tkn_boldText_dieResult' => $dieResult,
+      'tkn_familyMember' => Notifications::tknFamilyMember($this),
+    ]);
+    
+    if ($dieResult === 6) {
+      $this->returnToSupply();
+      return true;
+    }
+    return false;
   }
 }

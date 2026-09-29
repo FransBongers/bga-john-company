@@ -3,8 +3,16 @@
  * it to add player colors to the log messages.
  */
 
-import { Climate } from "../../crown/climate";
-import { JocoArmyPieceBase, JocoEnterpriseCard, JocoEnterpriseCardBase, JocoFamilyMember, JoCoOrderBase, JocoRegionBase, JocoShipBase } from "../../types";
+import { Climate } from '../../crown/climate';
+import {
+  JocoArmyPieceBase,
+  JocoEnterpriseCardBase,
+  JocoFamilyMember,
+  JocoOfficeBase,
+  JoCoOrderBase,
+  JocoRegionBase,
+  JocoShipBase,
+} from '../../types';
 
 export interface Log {
   log: string;
@@ -14,6 +22,10 @@ export interface Log {
 export interface NotifWithPlayerArgs {
   playerId: number;
   player_name: string;
+}
+
+export interface NotifUpdateCountersMultipleTargets extends NotifWithPlayerArgs {
+  counterChanges: Record<string, Record<string, number>>;
 }
 
 export interface NotifAllocateBalanceToOffice extends NotifWithPlayerArgs {
@@ -96,6 +108,14 @@ export interface NotifMoveArmyPiece extends NotifWithPlayerArgs {
   armyPiece: JocoArmyPieceBase;
 }
 
+export interface NotifMoveOfficeCard extends NotifWithPlayerArgs {
+  office: JocoOfficeBase;
+}
+
+export interface NotifMovePieces extends NotifWithPlayerArgs {
+  pieces: Array<JocoArmyPieceBase | JocoFamilyMember>;
+}
+
 export interface NotifMoveShipArgs extends NotifWithPlayerArgs {
   ship: JocoShipBase;
   from: string;
@@ -130,6 +150,7 @@ export interface NotifPurchaseEnterprise extends NotifWithPlayerArgs {
   type: string;
   enterprise: JocoEnterpriseCardBase;
   ship: JocoShipBase | null;
+  familyId: string;
 }
 
 export interface NotifReturnFamilyMemberToSupply extends NotifWithPlayerArgs {

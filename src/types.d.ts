@@ -129,7 +129,7 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   families: Record<string, JocoFamily>;
   familyMembers: Record<string, JocoFamilyMember>;
   londonSeasonDisplay: JocoLondonSeasonCardBase[];
-  offices: Record<string, JoCoOfficeBase>;
+  offices: Record<string, JocoOfficeBase>;
   orders: Record<string, JoCoOrderBase>;
   passedLaws: JocoLawCardBase[];
   phase: string;
@@ -149,35 +149,10 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   turn: number;
 }
 
-interface JocoFamily {
-  id: string;
-  crownPromiseCubes: number;
-  hasChairmanMarker: number;
-  isLeaderOfOpposition: number;
-  lawPieces: number;
-  location: string;
-  opportunityMarker: number;
-  spentOnRetirement: number;
-  state: number;
-  treasury: number;
-  trophies: number;
-  victoryPoints: number;
-}
-
 type BengalPresidency = 'BengalPresidency';
 type BombayPresidency = 'BombayPresidency';
 type MadrasPresidency = 'MadrasPresidency';
 type JoCoPresidency = BengalPresidency | BombayPresidency | MadrasPresidency;
-
-interface JoCoOfficeBase extends GamePiece {
-  familyMemberId: string | null;
-  treasury: number;
-}
-
-interface JocoOfficeStatic {
-  hirePriority: number;
-  title: string;
-}
 
 type JoCoSetupCard = JoCoSetupCardBase & JocoSetupCardStatic;
 
@@ -207,15 +182,13 @@ export type GameAlias = Game;
 export type GamedatasAlias = JohnCompanyGamedatas;
 export type PlayerAlias = JohnCompanyPlayerData;
 
-
-export interface JocoArmyPieceBase extends GamePiece {
-}
+export interface JocoArmyPieceBase extends GamePiece {}
 
 export interface JocoArmyPieceStatic {
   strength: number;
   name: string;
   region: string;
-  cost: number
+  cost: number;
 }
 
 export type JocoArmyPiece = JocoArmyPieceBase & JocoArmyPieceStatic;
@@ -291,6 +264,24 @@ export type JocoEnterpriseCard = JocoEnterpriseCardBase &
   JocoEnterpriseCardStatic;
 
 /**
+ * Family
+ */
+interface JocoFamily {
+  id: string;
+  crownPromiseCubes: number;
+  hasChairmanMarker: number;
+  isLeaderOfOpposition: number;
+  lawPieces: number;
+  location: string;
+  opportunityMarker: number;
+  spentOnRetirement: number;
+  state: number;
+  treasury: number;
+  trophies: number;
+  victoryPoints: number;
+}
+
+/**
  * Orders
  */
 interface JoCoOrderBase {
@@ -324,6 +315,21 @@ interface JocoRegionStatic {
   name: string;
   loot: number;
 }
+
+/**
+ * Offices
+ */
+interface JocoOfficeBase extends GamePiece {
+  familyMemberId: string | null;
+  treasury: number;
+}
+
+interface JocoOfficeStatic {
+  hirePriority: number;
+  title: string;
+}
+
+export type JocoOffice = JocoOfficeBase & JocoOfficeStatic;
 
 /**
  * Ships

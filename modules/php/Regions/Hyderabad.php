@@ -9,6 +9,7 @@ class Hyderabad extends \Bga\Games\JohnCompany\Models\Region
     parent::__construct($row);
     $this->id = HYDERABAD;
     $this->name = clienttranslate('Hyderabad');
+    $this->governorOfficeId = GOVERNOR_OF_HYDERABAD;
     $this->loot = 7;
     $this->adjacentRegionIds = [
       MADRAS,

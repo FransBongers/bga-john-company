@@ -11,7 +11,7 @@ class JoCoUtils
     return bga_rand(1, 6);
   }
 
-  public static function makeCheck($player, $office, $numberOfDice)
+  public static function makeCheck($player, $numberOfDice, $familyMember)
   {
     if ($numberOfDice === 0) {
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_010");
@@ -34,7 +34,7 @@ class JoCoUtils
     }
     Notifications::makeCheck($player, $dieResults, $result);
     if ($result === CATASTROPHIC_FAILURE) {
-      $office->returnFamilyMemberToSupply();
+      $familyMember->returnToSupply();
     }
     return $result;
   }

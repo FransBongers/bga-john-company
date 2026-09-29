@@ -160,3 +160,28 @@ $rows: 2;
     background-position-y: math.div($row * 100%, $rows - 1);
   }
 }
+
+.joco-trophy {
+  box-sizing: border-box;
+  background-image: url('img/hexagons.png');
+  background-size: 300% 500%;
+  background-position-y: 100%;
+  aspect-ratio: 240 / 225;
+  height: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding-top: 10px;
+
+  .joco-icon {
+    height: 16px;
+    // margin-top: 8px;
+  }
+
+  .joco-title {
+    width: 40px;
+    height: 8px;
+    font-size: 6px;
+  }
+}

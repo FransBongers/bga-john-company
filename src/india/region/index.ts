@@ -5,7 +5,12 @@ import { ControlTokensManager } from '../../token-managers/control-tokens';
 import { JocoRegionBase, GameAlias, JocoControlToken } from '../../types';
 import { createControlToken } from '../../utility';
 import { CONTROL_TOKEN_STOCK_CONFIG, TOWER_CONFIG } from './config';
-import { tplControlTokenStock, tplTowerLevel, tplTowerTop } from './templates';
+import {
+  tplControlTokenStock,
+  tplGovernorOverlay,
+  tplTowerLevel,
+  tplTowerTop,
+} from './templates';
 
 export class Region {
   private tower: HTMLElement;
@@ -14,6 +19,9 @@ export class Region {
   private controlTokenStock: InstanceType<
     typeof BgaCards.LineStock<JocoControlToken>
   >;
+  private ui: {
+    governorOverlay: HTMLElement;
+  };
 
   constructor(
     private id: string,
@@ -44,6 +52,17 @@ export class Region {
       tplControlTokenStock(data.id, CONTROL_TOKEN_STOCK_CONFIG[data.id]),
     );
 
+    map.insertAdjacentElement(
+      'beforeend',
+      createHtmlElement(tplGovernorOverlay(data.id)),
+    );
+
+    this.ui = {
+      governorOverlay: document.getElementById(
+        `joco-governor-overlay-${data.id}`,
+      ),
+    };
+
     this.controlTokenStock = new BgaCards.LineStock<JocoControlToken>(
       ControlTokensManager.getInstance(),
       document.getElementById(`joco-control-token-stock-${data.id}`),
@@ -53,6 +72,7 @@ export class Region {
     this.updateStrength(data.strength);
     this.updateCapital(data.isCapital);
     this.updateEmpire(data.isCapital, data.control);
+    this.updateCompanyControl(data);
   }
 
   public update(region: JocoRegionBase) {
@@ -65,6 +85,7 @@ export class Region {
     if (this.data.control !== region.control) {
       this.updateEmpire(region.isCapital, region.control);
     }
+    this.updateCompanyControl(region);
   }
 
   public updateCapital(isCapital: boolean) {
@@ -81,7 +102,9 @@ export class Region {
   }
 
   public updateControlToken(data: JocoRegionBase) {
-
+    if (data.control?.endsWith('Presidency')) {
+      return;
+    }
     this.controlTokenStock.addCard(createControlToken(data));
   }
 
@@ -100,6 +123,16 @@ export class Region {
         'data-empire-id',
         isCapital ? this.id : control,
       );
+    }
+  }
+
+  public async updateCompanyControl(data: JocoRegionBase) {
+    if (PRESIDENCIES.includes(data.control)) {
+      this.tower.classList.add('company-controlled');
+      this.ui.governorOverlay.classList.add('company-controlled');
+    } else {
+      this.tower.classList.remove('company-controlled');
+      this.ui.governorOverlay.classList.remove('company-controlled');
     }
   }
 
@@ -128,5 +161,9 @@ export class Region {
   public updateUnrest(value: number) {
     this.data.unrest = value;
     // TODO: implementation
+  }
+
+  public hasControlToken(token: JocoControlToken) {
+    return this.controlTokenStock.contains(token);
   }
 }

@@ -1,0 +1,13 @@
+.joco-player-area-content {
+  .joco-column,
+  .joco-row {
+    gap: 12px;
+  }
+
+  .joco-family-offices {
+    width: 225px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+}

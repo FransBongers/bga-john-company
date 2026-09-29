@@ -11,12 +11,12 @@ class Bar {
         this.active = 0;
         this.config = [
             {
-                id: 'joco-india',
-                text: _('India'),
-            },
-            {
                 id: 'joco-player-areas',
                 text: _('Player Areas'),
+            },
+            {
+                id: 'joco-india',
+                text: _('India'),
             },
             {
                 id: 'joco-company',
@@ -89,12 +89,14 @@ const PLUS = 'plus';
 const MINUS = 'minus';
 const DONE = 'done';
 const TRADE = 'trade';
+const TROPHIES = 'trophies';
 const BENYON = 'Benyon';
 const HASTINGS = 'Hastings';
 const LARKINS = 'Larkins';
 const PAXTON = 'Paxton';
 const SYKES = 'Sykes';
 const WALSH = 'Walsh';
+const FAMILIES = [BENYON, HASTINGS, LARKINS, PAXTON, SYKES, WALSH];
 const CROWN = 'Crown';
 const CROWN_PLAYER_ID = 1;
 const BLACKMAIL = 'Blackmail';
@@ -232,6 +234,8 @@ const OFFICES_WITH_TREASURY = [
     PRESIDENT_OF_MADRAS,
     PRESIDENT_OF_BENGAL,
 ];
+const VACANT_OFFICES = 'VacantOffices';
+const FAMILY_OFFICES = 'FamilyOffices';
 const COMMANDER = 'Commander';
 const OFFICER = 'Officer';
 const OFFICER_IN_TRAINING = 'OfficerInTraining';
@@ -1660,6 +1664,197 @@ class EnterpriseCardsManager extends BgaCards$1.Manager {
     }
 }
 
+const tplIcon = (type, extraClasses = '') => `<div class="joco-icon ${extraClasses ?? ''}" data-icon="${type}"></div>`;
+const getPolicyConsequenceTranslation = (consequence) => {
+    switch (consequence) {
+        case BONUS:
+            return _('Bonus');
+        case POWER:
+            return _('Power');
+        case TAX:
+            return _('Tax');
+        default:
+            return '';
+    }
+};
+const tplPolicyIcon = (type, extraClasses = '') => `<div class="joco-policy-icon ${extraClasses ?? ''}" data-policy-icon="${type}">
+    ${[BONUS, POWER, TAX].includes(type) ? `<div class="fb-font-baskerville fb-font-16 bga-autofit">${getPolicyConsequenceTranslation(type).toLocaleUpperCase()}</div>` : ''}
+  </div>`;
+const tplPowerIcon = (value, extraClasses = '') => `<div class="joco-icon ${extraClasses ?? ''}" data-icon="${POWER}${value}"></div>`;
+const tplVictoryPointsIcon = (value, extraClasses = '') => `<div class="joco-icon ${extraClasses ?? ''}" data-icon="${VICTORY_POINTS}${value}"></div>`;
+const tplDiscountIcon = (value, extraClasses = '') => `<div class="joco-icon ${extraClasses ?? ''}" data-icon="${DISCOUNT}${value}"></div>`;
+const tplTrophyIcon = (extraClasses = '') => `<div class="joco-trophy ${extraClasses ?? ''}">
+    ${tplPowerIcon(1)}
+    <div class="joco-title bga-autofit">
+      <span class="fb-font-baskerville fb-font-italic">${_('Trophy').toLocaleUpperCase()}</span>
+    </div>
+  </div>`;
+
+const tplRegiment = ({ id, extraClasses = '', }) => {
+    return `
+    <div id="${id ?? ''}" class="joco-regiment ${extraClasses}"></div>
+  `;
+};
+const tplLocalAlliance = ({ id, extraClasses = '', region, name, strength, cost }) => `
+  <div id="${id ?? ''}" class="joco-local-alliance ${extraClasses}" data-region='${region}' style="order: ${cost};">
+    <div class="joco-local-alliance-strength">
+      <div class="joco-strength-icon joco-inverted"></div>
+      <span class="fb-font-baskerville">${strength}</span>
+      <div class="joco-strength-icon"></div>
+    </div>
+    <div class="joco-local-alliance-name bga-autofit"><span class="fb-font-baskerville">${_(name)}</span></div>
+    <div class="joco-icon" data-icon="CircleDark">${tplAmount(cost, true)}</div>
+  </div>
+`;
+const tplArmyPiece = (piece) => {
+    if (piece.id.startsWith('Regiment')) {
+        return tplRegiment({ id: piece.id });
+    }
+    const armyPiece = getArmyPiece(piece);
+    return tplLocalAlliance(armyPiece);
+};
+
+const tlpLogTokenText = ({ text, tooltipId, italic = false, bold = true, }) => `<span ${tooltipId ? `id="${tooltipId}" class="log_tooltip"` : ''} style="font-weight: ${bold ? '700' : '400'};${italic ? ' font-style: italic;' : ''}">${_(text)}</span>`;
+const tplLogTokenClimate = (climate) => `<div class="log-token joco-crown-climate-icon" data-climate="${climate}"></div>`;
+const tplLogTokenElephant = () => '<div class="log-token joco-elephant"></div>';
+const tplLogTokenLocalAlliance = (id) => {
+    const staticData = StaticData.get().armyPiece(id);
+    return tplLocalAlliance({
+        extraClasses: 'log-token',
+        region: staticData.region,
+        name: staticData.name,
+        strength: staticData.strength,
+        cost: staticData.cost,
+    });
+};
+const tplLogTokenPound = () => `<div class="log-token joco_pound"></div>`;
+const tplLogTokenPromiseCube = () => '<div class="log-token joco-promise-cube"></div>';
+const tplLogTokenStormDie = (side) => `<div class="log-token joco-storm-die" data-side="${side}"></div>`;
+const tplLogTokenTrophy = () => tplTrophyIcon('log-token');
+const tplLogTokenSetupCard = (id) => `<div class="log-token joco-setup-card" data-card-id="${id}"></div>`;
+const tplLogTokenPlayerName = ({ name, color, }) => `<span class="playername" style="color:#${color};">${name}</span>`;
+const tplLogTokenShip = ({ name, side, }) => `<div class="log-token joco-ship" data-side="${side}">
+  ${tplShipContent({ name, side }, side === FATIGUED || side === EXTRA_SHIP)}
+</div>`;
+const tknPound = () => _('Pounds');
+const tknShipValue = ({ name, side, }) => {
+    return [side, name].join(':');
+};
+const tknPromiseCubes = () => 'Promise Cube(s)';
+
+const getSeaName = (seaId) => {
+    switch (seaId) {
+        case EAST_INDIAN:
+            return _('East Indian');
+        case SOUTH_INDIAN:
+            return _('South Indian');
+        case WEST_INDIAN:
+            return _('West Indian');
+        case CHINA:
+            return _('China');
+        default:
+            return '';
+    }
+};
+const getRegionName = (regionId) => {
+    switch (regionId) {
+        case BENGAL:
+            return _('Bengal');
+        case BOMBAY:
+            return _('Bombay');
+        case DELHI:
+            return _('Delhi');
+        case HYDERABAD:
+            return _('Hyderabad');
+        case MADRAS:
+            return _('Madras');
+        case MARATHA:
+            return _('Maratha');
+        case MYSORE:
+            return _('Mysore');
+        case PUNJAB:
+            return _('Punjab');
+        default:
+            return '';
+    }
+};
+const getCrownPlayerName = () => PlayerManager.getInstance().getPlayer(CROWN_PLAYER_ID).getName();
+const getShipsLog = (ships) => {
+    const shipsLog = {
+        log: '',
+        args: {},
+    };
+    ships.forEach((ship, index) => {
+        const key = `tkn_ship_${index}`;
+        shipsLog.log += `\${${key}}`;
+        shipsLog.args[key] = tknShipValue({
+            name: ship.name,
+            side: ship.side,
+        });
+    });
+    return shipsLog;
+};
+const getArmyPiece = (piece) => {
+    const staticData = StaticData.get();
+    const cardStatic = staticData.armyPiece(piece.id);
+    return {
+        ...piece,
+        ...cardStatic,
+    };
+};
+const getEnterpriseCard = (card) => {
+    const staticData = StaticData.get();
+    const cardStatic = staticData.enterpriseCard(card.id);
+    return {
+        ...card,
+        ...cardStatic,
+    };
+};
+const getLawCard = (card) => {
+    const staticData = StaticData.get();
+    const cardStatic = staticData.lawCard(card.id);
+    return {
+        ...card,
+        ...cardStatic,
+    };
+};
+const getLondonSeasonCard = (card) => {
+    const staticData = StaticData.get();
+    const cardStatic = staticData.londonSeasonCard(card.id);
+    return {
+        ...card,
+        ...cardStatic,
+    };
+};
+const getOffice = (office) => {
+    const staticData = StaticData.get();
+    const officeStatic = staticData.office(office.id);
+    return {
+        ...office,
+        ...officeStatic,
+    };
+};
+const createControlToken = (data) => {
+    const staticData = StaticData.get().region(data.id);
+    return {
+        id: 'control-token-' + data.id,
+        side: data.looted ? 'control' : 'loot',
+        regionId: data.id,
+        loot: staticData.loot,
+    };
+};
+
+const tplOfficeCard = (data) => {
+    const office = getOffice(data);
+    return `
+    <div id="OfficeCard_${data.id}" class="joco-office-card" style="order: ${office.hirePriority}">
+      <div class="joco-header joco-office-header">
+        <span class="fb-font-baskerville fb-font-16">${office.title}</span></div>
+      </div>
+    </div>
+  `;
+};
+
 const getPhaseName = (phase) => {
     switch (phase) {
         case LONDON_SEASON:
@@ -1706,6 +1901,12 @@ const STOCK_EXCHANGE_CONFIG = [
     { id: STOCK_EXCHANGE_4, value: 4 },
     { id: STOCK_EXCHANGE_5, value: 5 },
 ];
+const tplVacantOffices = () => `
+  <div class="joco-container">
+    <div><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Vacant Offices').toLocaleUpperCase()}</span></div>
+    <div id="VacantOffices"></div>
+  </div>
+`;
 const tplOfficeHeader = (familyMemberLocation, name) => `
   <div class="joco-header joco-office-header">${tplFamilyMemberSpot(familyMemberLocation)}<span class="fb-font-baskerville fb-font-16">${name.toLocaleUpperCase()}</span></div>
 `;
@@ -1943,6 +2144,68 @@ const tplCompanySpotFailed = (id) => `
 </div>
 `;
 
+class IconCounter {
+    constructor(config) {
+        this.setupIconCounter(config);
+    }
+    setupIconCounter({ id, iconElement, initialValue, parentElement, iconPosition = 'row', type, }) {
+        this.containerElement = document.createElement('div');
+        this.containerElement.id = id;
+        this.containerElement.className = 'icon-counter-container';
+        this.containerElement.dataset.type = type;
+        this.containerElement.dataset.iconPosition = iconPosition;
+        this.iconElement = iconElement ?? document.createElement('div');
+        this.iconElement.id = `${id}-icon`;
+        this.iconElement.classList.add('icon-counter-icon');
+        this.counterElement = document.createElement('span');
+        this.counterElement.id = `${id}-counter`;
+        this.counterElement.className = 'icon-counter-counter';
+        this.containerElement.appendChild(this.iconElement);
+        this.containerElement.appendChild(this.counterElement);
+        parentElement.appendChild(this.containerElement);
+        this.counter = new ebg.counter();
+        this.counter.create(`${id}-counter`);
+        this.setValue(initialValue);
+    }
+    setValue(value) {
+        this.counter.setValue(value);
+        this.checkHasValue(value);
+    }
+    incValue(value) {
+        this.counter.incValue(value);
+        this.checkHasValue(this.counter.getValue());
+    }
+    getElement() {
+        return this.containerElement;
+    }
+    getValue() {
+        return this.counter.getValue();
+    }
+    checkHasValue(value) {
+        if (value === 0) {
+            this.containerElement.classList.remove('active');
+        }
+        else {
+            this.containerElement.classList.add('active');
+        }
+    }
+}
+
+class TrophiesCounter extends IconCounter {
+    constructor(props) {
+        super({
+            ...props,
+            iconElement: createHtmlElement(tplTrophyIcon()),
+            iconPosition: 'overlap',
+            type: 'trophy',
+        });
+        this.setup();
+    }
+    setup() {
+        this.counterElement.classList.add('fb-font-baskerville');
+    }
+}
+
 const tplTreasury = (officeId) => `
 <div id="joco-treasury-${officeId}" class="joco-treasury-container" data-active="false">
   <div><span class="fb-font-baskerville fb-font-12">TREASURY</span></div>
@@ -2020,23 +2283,12 @@ const tplCompany = () => `
       
     </div>
 
-
-    <div id="joco-offices">
-    </div>
-    <div id="joco-vacant-offices">
-      Vacant Offices
-    </div>
+  ${tplVacantOffices()}
   </div>
 `;
 class Company {
     constructor(game) {
         this.game = game;
-        this.ui = {
-            stockExchange: {},
-            standing: {},
-            debt: {},
-            offices: {},
-        };
         this.treasuries = {};
         this.game = game;
         this.setup(game.gamedatas);
@@ -2079,10 +2331,24 @@ class Company {
             office: id,
         });
     }
+    setupVacantOffices(gamedatas) {
+        Object.values(gamedatas.offices).forEach((office) => {
+            if (office.location === VACANT_OFFICES) {
+                this.ui.vacantOffices.insertAdjacentHTML('beforeend', tplOfficeCard(office));
+            }
+        });
+    }
     setup(gamedatas) {
         document
             .getElementById('joco')
             .insertAdjacentHTML('afterbegin', tplCompany());
+        this.ui = {
+            stockExchange: {},
+            standing: {},
+            debt: {},
+            offices: {},
+            vacantOffices: document.getElementById(VACANT_OFFICES),
+        };
         [CHAIRMAN, DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING].forEach((officeId) => {
             this.ui.offices[officeId] = document.getElementById(officeId);
         });
@@ -2093,6 +2359,7 @@ class Company {
         this.setupTreasury(gamedatas, DIRECTOR_OF_TRADE);
         this.setupTreasury(gamedatas, MANAGER_OF_SHIPPING);
         this.updateFamilyMembers(gamedatas);
+        this.setupVacantOffices(gamedatas);
     }
     getDebtElt(debt) {
         return this.ui.debt[debt];
@@ -2189,152 +2456,6 @@ class CrownClimate {
     }
 }
 
-const tlpLogTokenText = ({ text, tooltipId, italic = false, bold = true, }) => `<span ${tooltipId ? `id="${tooltipId}" class="log_tooltip"` : ''} style="font-weight: ${bold ? '700' : '400'};${italic ? ' font-style: italic;' : ''}">${_(text)}</span>`;
-const tplLogTokenClimate = (climate) => `<div class="log-token joco-crown-climate-icon" data-climate="${climate}"></div>`;
-const tplLogTokenElephant = () => '<div class="log-token joco_elephant"></div>';
-const tplLogTokenLocalAlliance = (id) => {
-    const staticData = StaticData.get().armyPiece(id);
-    return tplLocalAlliance({
-        extraClasses: 'log-token',
-        region: staticData.region,
-        name: staticData.name,
-        strength: staticData.strength,
-        cost: staticData.cost,
-    });
-};
-const tplLogTokenPound = () => `<div class="log-token joco_pound"></div>`;
-const tplLogTokenPromiseCube = () => '<div class="log-token joco-promise-cube"></div>';
-const tplLogTokenStormDie = (side) => `<div class="log-token joco-storm-die" data-side="${side}"></div>`;
-const tplLogTokenSetupCard = (id) => `<div class="log-token joco-setup-card" data-card-id="${id}"></div>`;
-const tplLogTokenPlayerName = ({ name, color, }) => `<span class="playername" style="color:#${color};">${name}</span>`;
-const tplLogTokenShip = ({ name, side, }) => `<div class="log-token joco-ship" data-side="${side}">
-  ${tplShipContent({ name, side }, side === FATIGUED || side === EXTRA_SHIP)}
-</div>`;
-const tknPound = () => _('Pounds');
-const tknShipValue = ({ name, side, }) => {
-    return [side, name].join(':');
-};
-const tknPromiseCubes = () => 'Promise Cube(s)';
-
-const getSeaName = (seaId) => {
-    switch (seaId) {
-        case EAST_INDIAN:
-            return _('East Indian');
-        case SOUTH_INDIAN:
-            return _('South Indian');
-        case WEST_INDIAN:
-            return _('West Indian');
-        case CHINA:
-            return _('China');
-        default:
-            return '';
-    }
-};
-const getRegionName = (regionId) => {
-    switch (regionId) {
-        case BENGAL:
-            return _('Bengal');
-        case BOMBAY:
-            return _('Bombay');
-        case DELHI:
-            return _('Delhi');
-        case HYDERABAD:
-            return _('Hyderabad');
-        case MADRAS:
-            return _('Madras');
-        case MARATHA:
-            return _('Maratha');
-        case MYSORE:
-            return _('Mysore');
-        case PUNJAB:
-            return _('Punjab');
-        default:
-            return '';
-    }
-};
-const getCrownPlayerName = () => PlayerManager.getInstance().getPlayer(CROWN_PLAYER_ID).getName();
-const getShipsLog = (ships) => {
-    const shipsLog = {
-        log: '',
-        args: {},
-    };
-    ships.forEach((ship, index) => {
-        const key = `tkn_ship_${index}`;
-        shipsLog.log += `\${${key}}`;
-        shipsLog.args[key] = tknShipValue({
-            name: ship.name,
-            type: ship.type,
-            fatigued: ship.side === FATIGUED ? 1 : 0,
-        });
-    });
-    return shipsLog;
-};
-const getArmyPiece = (piece) => {
-    const staticData = StaticData.get();
-    const cardStatic = staticData.armyPiece(piece.id);
-    return {
-        ...piece,
-        ...cardStatic,
-    };
-};
-const getEnterpriseCard = (card) => {
-    const staticData = StaticData.get();
-    const cardStatic = staticData.enterpriseCard(card.id);
-    return {
-        ...card,
-        ...cardStatic,
-    };
-};
-const getLawCard = (card) => {
-    const staticData = StaticData.get();
-    const cardStatic = staticData.lawCard(card.id);
-    return {
-        ...card,
-        ...cardStatic,
-    };
-};
-const getLondonSeasonCard = (card) => {
-    const staticData = StaticData.get();
-    const cardStatic = staticData.londonSeasonCard(card.id);
-    return {
-        ...card,
-        ...cardStatic,
-    };
-};
-const createControlToken = (data) => {
-    const staticData = StaticData.get().region(data.id);
-    return {
-        id: 'control-token-' + data.id,
-        side: data.looted ? 'control' : 'loot',
-        regionId: data.id,
-        loot: staticData.loot,
-    };
-};
-
-const tplRegiment = ({ id, extraClasses = '', }) => {
-    return `
-    <div id="${id ?? ''}" class="joco-regiment ${extraClasses}"></div>
-  `;
-};
-const tplLocalAlliance = ({ id, extraClasses = '', region, name, strength, cost }) => `
-  <div id="${id ?? ''}" class="joco-local-alliance ${extraClasses}" data-region='${region}' style="order: ${cost};">
-    <div class="joco-local-alliance-strength">
-      <div class="joco-strength-icon joco-inverted"></div>
-      <span class="fb-font-baskerville">${strength}</span>
-      <div class="joco-strength-icon"></div>
-    </div>
-    <div class="joco-local-alliance-name bga-autofit"><span class="fb-font-baskerville">${_(name)}</span></div>
-    <div class="joco-icon" data-icon="CircleDark">${tplAmount(cost, true)}</div>
-  </div>
-`;
-const tplArmyPiece = (piece) => {
-    if (piece.id.startsWith('Regiment')) {
-        return tplRegiment({ id: piece.id });
-    }
-    const armyPiece = getArmyPiece(piece);
-    return tplLocalAlliance(armyPiece);
-};
-
 class Army {
     constructor(config) {
         this.id = config.id;
@@ -2410,10 +2531,10 @@ class Army {
     }
     async addPiece(piece) {
         const element = typeof piece === 'string' ? document.getElementById(piece) : piece;
-        if (parentHasChildWithId(this.ui.army.ready.id, element.id)) {
+        if (parentHasChildWithId(this.ui.army[`army_${this.id}_ready`].id, element.id)) {
             return;
         }
-        await this.game.animationManager.slideAndAttach(element, this.ui.army.ready);
+        await this.game.animationManager.slideAndAttach(element, this.ui.army[`army_${this.id}_ready`]);
     }
 }
 
@@ -2436,87 +2557,6 @@ const ORDERS_CONFIG = {
     [ORDER_MADRAS_1]: { top: 629, left: 550 },
     [ORDER_MADRAS_2]: { top: 706, left: 502 },
 };
-
-class Presidency {
-    constructor(config) {
-        this.tplInnerContainer = () => {
-            return `
-    <div class="joco-inner-container">
-      <div id="Writers_${this.id}" class="joco-family-members-stock"></div>
-      <div>
-        <span class="fb-font-baskerville fb-font-12">${_('Writers').toLocaleUpperCase()}</span>
-      </div>
-    </div>`;
-        };
-        this.id = config.id;
-        this.setup(config);
-    }
-    setup(config) {
-        const parentElement = typeof config.parentElement === 'string'
-            ? document.getElementById(config.parentElement)
-            : config.parentElement;
-        if (!parentElement) {
-            throw new Error('FE_PRESIDENCY_01');
-        }
-        parentElement.insertAdjacentHTML('beforeend', this.tplPresidency());
-        const presidencyContainer = document.getElementById(`PresidencyOf${this.id}`);
-        const company = Company.getInstance();
-        company.treasuries[`PresidentOf${this.id}`] = new Treasury({
-            parent: presidencyContainer,
-            gamedatas: config.gamedatas,
-            office: `PresidentOf${this.id}`,
-        });
-        presidencyContainer.insertAdjacentHTML('beforeend', this.tplInnerContainer());
-        this.ui = {
-            parent: parentElement,
-            writers: document.getElementById(`Writers_${this.id}`),
-            president: document.getElementById(`PresidentOf${this.id}`),
-        };
-        this.updateFamilyMembers(config.gamedatas);
-    }
-    tplPresidency() {
-        return `
-      <div id="PresidencyOf${this.id}" class="joco-office joco-presidency joco-container">
-        ${tplOfficeHeader(`PresidentOf${this.id}`, this.getName())}
-       <!-- <div class="joco-treasury-container">
-          <div><span class="fb-font-baskerville fb-font-12">${_('Treasury').toLocaleUpperCase()}</span></div>
-          <div class="joco-treasury-counter-container">
-            <span class="fb-font-baskerville fb-font-12">£</span><span id="joco-treasury-${this.id.toLocaleLowerCase()}" class="fb-font-baskerville fb-font-20"></span>
-          </div>
-        </div> -->
-
-      </div>
-    `;
-    }
-    updateFamilyMembers(gamedatas) {
-        Object.values(gamedatas.familyMembers).forEach((member) => {
-            if (member.location === `Writers_${this.id}`) {
-                const writerElement = createFamilyMember(member.familyId, member.id);
-                this.ui.writers.appendChild(writerElement);
-            }
-            else if (member.location === `PresidentOf${this.id}`) {
-                const presidentElement = createFamilyMember(member.familyId, member.id);
-                this.ui.president.appendChild(presidentElement);
-            }
-        });
-    }
-    getTreasury() {
-        const company = Company.getInstance();
-        return company.treasuries[`PresidentOf${this.id}`];
-    }
-    getName() {
-        switch (this.id) {
-            case BENGAL:
-                return 'Presidency of Bengal';
-            case BOMBAY:
-                return 'Presidency of Bombay';
-            case MADRAS:
-                return 'Presidency of Madras';
-            default:
-                return '';
-        }
-    }
-}
 
 const BgaAnimations = await globalThis.importEsmLib('bga-animations', '1.x');
 const BgaCards = await globalThis.importEsmLib('bga-cards', '1.x');
@@ -2577,6 +2617,96 @@ class ControlTokensManager extends BgaCards$1.Manager {
     }
 }
 
+class Presidency {
+    constructor(config) {
+        this.id = config.id;
+        this.setup(config);
+    }
+    setup(config) {
+        const parentElement = typeof config.parentElement === 'string'
+            ? document.getElementById(config.parentElement)
+            : config.parentElement;
+        if (!parentElement) {
+            throw new Error('FE_PRESIDENCY_01');
+        }
+        parentElement.insertAdjacentHTML('beforeend', this.tplPresidency());
+        const presidencyContainer = document.getElementById(`PresidencyOf${this.id}`);
+        this.ui = {
+            parent: parentElement,
+            writers: document.getElementById(`Writers_${this.id}`),
+            president: document.getElementById(`PresidentOf${this.id}`),
+            tokensAndTreasury: document.getElementById(`joco-control-tokens-and-treasury-${this.id}`),
+        };
+        this.setupTreasury(config.gamedatas);
+        this.setupControlTokens(config.gamedatas);
+        this.updateFamilyMembers(config.gamedatas);
+    }
+    setupControlTokens(gamedatas) {
+        this.controlTokenStock = new BgaCards.LineStock(ControlTokensManager.getInstance(), document.getElementById(`joco-control-tokens-PresidencyOf${this.id}`));
+        Object.values(gamedatas.regions).forEach((region) => {
+            if (region.control === `${this.id}Presidency`) {
+                console.log(`Adding control token for region: ${region.id}`);
+                this.controlTokenStock.addCard(createControlToken(region));
+            }
+        });
+    }
+    setupTreasury(gamedatas) {
+        const company = Company.getInstance();
+        company.treasuries[`PresidentOf${this.id}`] = new Treasury({
+            parent: this.ui.tokensAndTreasury,
+            gamedatas,
+            office: `PresidentOf${this.id}`,
+        });
+    }
+    tplPresidency() {
+        return `
+      <div id="PresidencyOf${this.id}" class="joco-office joco-presidency joco-container">
+        ${tplOfficeHeader(`PresidentOf${this.id}`, this.getName())}
+        <div id="joco-control-tokens-and-treasury-${this.id}" class="joco-row joco-control-tokens-treasury">
+          <div id="joco-control-tokens-PresidencyOf${this.id}"></div>
+        </div>
+        <div class="joco-inner-container">
+          <div id="Writers_${this.id}" class="joco-family-members-stock"></div>
+          <div>
+            <span class="fb-font-baskerville fb-font-12">${_('Writers').toLocaleUpperCase()}</span>
+          </div>
+        </div>
+      </div>
+    `;
+    }
+    updateFamilyMembers(gamedatas) {
+        Object.values(gamedatas.familyMembers).forEach((member) => {
+            if (member.location === `Writers_${this.id}`) {
+                const writerElement = createFamilyMember(member.familyId, member.id);
+                this.ui.writers.appendChild(writerElement);
+            }
+            else if (member.location === `PresidentOf${this.id}`) {
+                const presidentElement = createFamilyMember(member.familyId, member.id);
+                this.ui.president.appendChild(presidentElement);
+            }
+        });
+    }
+    async addControlToken(controlToken) {
+        await this.controlTokenStock.addCard(controlToken);
+    }
+    getTreasury() {
+        const company = Company.getInstance();
+        return company.treasuries[`PresidentOf${this.id}`];
+    }
+    getName() {
+        switch (this.id) {
+            case BENGAL:
+                return 'Presidency of Bengal';
+            case BOMBAY:
+                return 'Presidency of Bombay';
+            case MADRAS:
+                return 'Presidency of Madras';
+            default:
+                return '';
+        }
+    }
+}
+
 const TOWER_CONFIG = {
     [BENGAL]: { bottom: 697, left: 849 },
     [BOMBAY]: { bottom: 409, left: 245 },
@@ -2608,6 +2738,22 @@ const tplTowerTop = () => `
 </div>`;
 const tplControlTokenStock = (regionId, position) => `
 <div id="joco-control-token-stock-${regionId}" class="joco-control-token-stock" style="top: ${position.top}px; left: ${position.left}px;"></div>`;
+const tplGovernorOverlay = (regionId) => `
+  <div id="joco-governor-overlay-${regionId}" class="joco-governor-overlay-container" data-region="${regionId}">
+    <div class="joco-governor-overlay">
+      <div class="joco-family-member-spot-wrapper">
+        <div id="GovernorOf${regionId}" class="joco-family-member-spot">
+          <div class="joco-family-member-spot-background">
+            <div class="joco-region-icon" data-region="${regionId}"></div>
+            <div class="joco-presidency-icon"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="GovernorCompanyShipOf${regionId}" class="joco-governor-company-ship">
+    </div>
+  </div>
+`;
 
 class Region {
     constructor(id, game, data) {
@@ -2627,11 +2773,16 @@ class Region {
         elt.appendChild(this.towerTop);
         map.appendChild(elt);
         map.insertAdjacentHTML('beforeend', tplControlTokenStock(data.id, CONTROL_TOKEN_STOCK_CONFIG[data.id]));
+        map.insertAdjacentElement('beforeend', createHtmlElement(tplGovernorOverlay(data.id)));
+        this.ui = {
+            governorOverlay: document.getElementById(`joco-governor-overlay-${data.id}`),
+        };
         this.controlTokenStock = new BgaCards.LineStock(ControlTokensManager.getInstance(), document.getElementById(`joco-control-token-stock-${data.id}`));
         this.updateControlToken(data);
         this.updateStrength(data.strength);
         this.updateCapital(data.isCapital);
         this.updateEmpire(data.isCapital, data.control);
+        this.updateCompanyControl(data);
     }
     update(region) {
         if (this.data.strength !== region.strength) {
@@ -2643,6 +2794,7 @@ class Region {
         if (this.data.control !== region.control) {
             this.updateEmpire(region.isCapital, region.control);
         }
+        this.updateCompanyControl(region);
     }
     updateCapital(isCapital) {
         this.data.isCapital = isCapital;
@@ -2652,6 +2804,9 @@ class Region {
         }
     }
     updateControlToken(data) {
+        if (data.control?.endsWith('Presidency')) {
+            return;
+        }
         this.controlTokenStock.addCard(createControlToken(data));
     }
     updateEmpire(isCapital, control) {
@@ -2660,6 +2815,16 @@ class Region {
         this.tower.children[0].setAttribute('data-empire', isPartOfEmpire ? 'true' : 'false');
         if (isPartOfEmpire) {
             this.tower.children[0].setAttribute('data-empire-id', isCapital ? this.id : control);
+        }
+    }
+    async updateCompanyControl(data) {
+        if (PRESIDENCIES.includes(data.control)) {
+            this.tower.classList.add('company-controlled');
+            this.ui.governorOverlay.classList.add('company-controlled');
+        }
+        else {
+            this.tower.classList.remove('company-controlled');
+            this.ui.governorOverlay.classList.remove('company-controlled');
         }
     }
     updateStrength(value) {
@@ -2673,6 +2838,9 @@ class Region {
     }
     updateUnrest(value) {
         this.data.unrest = value;
+    }
+    hasControlToken(token) {
+        return this.controlTokenStock.contains(token);
     }
 }
 
@@ -2815,13 +2983,13 @@ class India {
     }
     setupPresidencies(gamedatas) {
         const presidencyContainer = document.getElementById('joco-presidencies-and-armies');
-        [BOMBAY, MADRAS, BENGAL].forEach((presidency) => {
+        [BOMBAY, MADRAS, BENGAL].forEach((regionId) => {
             const presidencyInstance = new Presidency({
                 gamedatas,
                 parentElement: presidencyContainer,
-                id: presidency,
+                id: regionId,
             });
-            this.presidencies[presidency] = presidencyInstance;
+            this.presidencies[`${regionId}Presidency`] = presidencyInstance;
         });
     }
     setupOrders(gamedatas) {
@@ -2877,33 +3045,126 @@ class India {
     getArmy(regionId) {
         return this.armies[regionId];
     }
+    getPresidency(presidencyId) {
+        return this.presidencies[presidencyId];
+    }
     getSeaZone(seaZone) {
         return this.seaZones[seaZone];
+    }
+    getRegion(regionId) {
+        return this.regions[regionId];
+    }
+}
+
+class PlayerArea {
+    constructor(config) {
+        this.counters = {};
+        this.game = config.game;
+        this.familyId = config.player.familyId;
+        this.player = config.player;
+        this.setup(config);
+    }
+    setup(config) {
+        const parentElement = typeof config.parentElement === 'string'
+            ? document.getElementById(config.parentElement)
+            : config.parentElement;
+        if (!parentElement) {
+            throw new Error('FE_PLAYER_AREA_01');
+        }
+        parentElement.insertAdjacentHTML('beforeend', this.tplPlayerArea());
+        this.ui = {
+            parent: parentElement,
+            counters: document.getElementById(`joco-counters-${this.familyId}`),
+            offices: document.getElementById(`FamilyOffices_${this.familyId}`),
+        };
+        this.setupEnterprises(config.gamedatas);
+        this.setupOffices(config.gamedatas);
+        this.setupTrophiesCounter(config.gamedatas);
+    }
+    setupEnterprises(gamedatas) {
+        this.enterprises = new BgaCards.LineStock(EnterpriseCardsManager.getInstance(), document.getElementById(`joco-enterprises-${this.familyId}`));
+        this.updateEnterprises(gamedatas);
+    }
+    setupOffices(gamedatas) {
+        Object.entries(gamedatas.offices).forEach(([officeId, office]) => {
+            if (office.location !== `FamilyOffices_${this.familyId}`) {
+                return;
+            }
+            this.ui.offices.insertAdjacentHTML('beforeend', tplOfficeCard(office));
+        });
+    }
+    setupTrophiesCounter(gamedatas) {
+        this.counters[TROPHIES] = new TrophiesCounter({
+            id: `joco-trophies-${this.familyId}`,
+            parentElement: this.ui.counters,
+            initialValue: gamedatas.families[this.familyId].trophies,
+        });
+    }
+    tplPlayerArea() {
+        return `
+      <div class="joco-player-area joco-container">
+        <div class="joco-player-name" style="background-color:#${this.player.color};"><span class="fb-font-baskerville fb-font-16 fb-font-semi-bold">${this.player.name}</span></div>
+        <div class="joco-player-area-content">
+          <div id="joco-counters-${this.familyId}" class="joco-player-area-counters">
+          </div>
+          <div class="joco-row">
+            <div class="joco-inner-container joco-column">
+              <span class="joco-header">${_('Offices')}</span>
+              <div id="FamilyOffices_${this.familyId}" class="joco-family-offices"></div>
+            </div>
+            <div class="joco-column" style="flex-grow: 1;">
+              <div class="joco-inner-container">
+                <span class="joco-header">${_('Enterprises')}</span>
+                <div id="joco-enterprises-${this.familyId}" class="joco-enterprises"></div>
+              </div>
+              <div class="joco-inner-container">
+                <span class="joco-header">${_('Prestige & Blackmail cards')}</span>
+                <div id="joco-prestige-blackmail-${this.familyId}" class="joco-prestige-blackmail"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    }
+    updateEnterprises(gamedatas) {
+        const ships = Object.values(gamedatas.ships);
+        Object.values(gamedatas.enterprises).forEach((enterprise) => {
+            if (enterprise.location !== this.familyId) {
+                return;
+            }
+            this.enterprises.addCard(getEnterpriseCard(enterprise));
+            if (enterprise.type === SHIPYARD) {
+                const ship = ships.find((s) => s.location === enterprise.id);
+                if (ship) {
+                    const shipStock = EnterpriseCardsManager.getInstance().shipStocks[enterprise.shipId];
+                    if (shipStock) {
+                        shipStock.addCard(ship);
+                    }
+                }
+            }
+        });
+    }
+    async addEnterprise(enterprise) {
+        await this.enterprises.addCard(getEnterpriseCard(enterprise));
+    }
+    incCounters(changes) {
+        Object.entries(changes).forEach(([counterId, change]) => {
+            if (!this.counters[counterId]) {
+                return;
+            }
+            this.counters[counterId].incValue(change);
+        });
     }
 }
 
 const tplPlayerAreas = () => `<div id="joco-player-areas">
 </div>`;
-const tplPlayerArea = (player) => `
-  <div class="joco-player-area joco-container">
-    <div class="joco-player-name" style="background-color:#${player.color};"><span class="fb-font-baskerville fb-font-16 fb-font-semi-bold">${player.name}</span></div>
-    <div class="joco-player-area-content">
-      <div class="joco-inner-container">
-        <span class="joco-header">${_('Enterprises')}</span>
-        <div id="joco-enterprises-${player.familyId}" class="joco-enterprises"></div>
-      </div>
-      <div class="joco-inner-container">
-        <span class="joco-header">${_('Prestige & Blackmail cards')}</span>
-        <div id="joco-prestige-blackmail-${player.familyId}" class="joco-prestige-blackmail"></div>
-      </div>
-    </div>
-  </div>
-`;
 
 class PlayerAreas {
     constructor(game) {
         this.game = game;
-        this.enterprises = {};
+        this.playerAreas = {};
         this.game = game;
         this.setup(game.gamedatas);
     }
@@ -2920,35 +3181,12 @@ class PlayerAreas {
         const container = document.getElementById('joco-player-areas');
         this.game.playerOrder.forEach((playerId) => {
             const player = gamedatas.players[playerId];
-            container.insertAdjacentHTML('beforeend', tplPlayerArea(gamedatas.players[playerId]));
-            this.enterprises[player.familyId] =
-                new BgaCards$1.LineStock(EnterpriseCardsManager.getInstance(), document.getElementById(`joco-enterprises-${player.familyId}`));
-        });
-        this.updateEnterprises(gamedatas);
-    }
-    async addEnterprise(enterprise) {
-        const stock = this.enterprises[enterprise.location];
-        if (stock) {
-            await stock.addCard(getEnterpriseCard(enterprise));
-        }
-    }
-    updateEnterprises(gamedatas) {
-        const ships = Object.values(gamedatas.ships);
-        Object.values(gamedatas.enterprises).forEach((enterprise) => {
-            const stock = this.enterprises[enterprise.location];
-            if (!stock) {
-                return;
-            }
-            stock.addCard(getEnterpriseCard(enterprise));
-            if (enterprise.type === SHIPYARD) {
-                const ship = ships.find((s) => s.location === enterprise.id);
-                if (ship) {
-                    const shipStock = EnterpriseCardsManager.getInstance().shipStocks[enterprise.shipId];
-                    if (shipStock) {
-                        shipStock.addCard(ship);
-                    }
-                }
-            }
+            this.playerAreas[player.familyId] = new PlayerArea({
+                parentElement: container,
+                game: this.game,
+                player,
+                gamedatas,
+            });
         });
     }
 }
@@ -3086,10 +3324,21 @@ class NotificationManager {
         }
         await this.game.animationManager.slideAndAttach(elt, locationElt);
     }
+    updateCountersForTarget(target, counterChanges) {
+        if (FAMILIES.includes(target)) {
+            PlayerAreas.getInstance().playerAreas[target].incCounters(counterChanges);
+        }
+    }
     async notif_log(notif) {
         debug('notif_log', notif);
     }
     async notif_message(notif) {
+    }
+    async notif_updateCountersMultipleTargets(notif) {
+        const { counterChanges: counterChangesPerTarget } = notif;
+        Object.entries(counterChangesPerTarget).forEach(([target, counterChanges]) => {
+            this.updateCountersForTarget(target, counterChanges);
+        });
     }
     async notif_draftCardPrivate(notif) {
         const { cardIds } = notif;
@@ -3173,8 +3422,7 @@ class NotificationManager {
     }
     async notif_moveCompanyBalance(notif) {
         const { companyBalance } = notif;
-        const board = Board.getInstance();
-        await board.movePawn('balance', companyBalance);
+        Company.getInstance().balance.toValue(companyBalance);
     }
     async notif_moveCompanyDebt(notif) {
         const { companyBalance, companyDebt } = notif;
@@ -3212,6 +3460,25 @@ class NotificationManager {
         const element = document.getElementById(armyPiece.id);
         await this.game.animationManager.slideAndAttach(element, document.getElementById(armyPiece.location));
     }
+    async notif_moveOfficeCard(notif) {
+        const { office } = notif;
+        let element = document.getElementById(`${office.id}OfficeCard`);
+        if (!element) {
+            element = createHtmlElement(tplOfficeCard(office));
+        }
+        const locationElt = document.getElementById(office.location);
+        locationElt.appendChild(element);
+    }
+    async notif_movePieces(notif) {
+        const { pieces } = notif;
+        await Promise.all(pieces.map(async (piece, index) => {
+            if (parentHasChildWithId(piece.location, piece.id)) {
+                return;
+            }
+            const element = document.getElementById(piece.id);
+            await this.game.animationManager.slideAndAttach(element, document.getElementById(piece.location));
+        }));
+    }
     async notif_moveShip(notif) {
         const { from, ship } = notif;
         const seaZone = India.getInstance().getSeaZone(ship.location);
@@ -3243,11 +3510,11 @@ class NotificationManager {
         }
     }
     async notif_purchaseEnterprise(notif) {
-        const { playerId, enterprise, type, amount, ship } = notif;
+        const { playerId, enterprise, type, amount, ship, familyId } = notif;
         await this.pay(playerId, amount);
         const player = this.getPlayer(playerId);
         player.counters[this.getEnterpriseCounter(type)].incValue(1);
-        await PlayerAreas.getInstance().addEnterprise(getEnterpriseCard(enterprise));
+        await PlayerAreas.getInstance().playerAreas[familyId].addEnterprise(getEnterpriseCard(enterprise));
         if (type === SHIPYARD && ship) {
             player.counters[SHIPS_COUNTER].incValue(1);
             EnterpriseCardsManager.getInstance().shipStocks[ship.id].addCard(ship);
@@ -3255,9 +3522,9 @@ class NotificationManager {
     }
     async notif_returnFamilyMemberToSupply(notif) {
         const { familyMember, playerId } = notif;
-        const element = Board.getInstance().ui.familyMembers[familyMember.id];
         const toElement = document.getElementById(`joco-familyMembers-${playerId}`);
-        this.game.animationManager.slideOutAndDestroy(element, toElement);
+        const familyMemberElt = document.getElementById(familyMember.id);
+        familyMemberElt.remove();
         this.getPlayer(playerId).counters[FAMILY_MEMBERS_COUNTER].incValue(1);
     }
     async notif_seekShare(notif) {
@@ -3308,8 +3575,15 @@ class NotificationManager {
         await Promise.all(promises);
     }
     async notif_updateRegion(notif) {
-        const { region } = notif;
-        Board.getInstance().regions[region.id].update(region);
+        const { region: data } = notif;
+        const india = India.getInstance();
+        const region = india.getRegion(data.id);
+        region.update(data);
+        const controlToken = createControlToken(data);
+        if (PRESIDENCIES.includes(data.control) &&
+            region.hasControlToken(controlToken)) {
+            await india.getPresidency(data.control).addControlToken(controlToken);
+        }
     }
 }
 
@@ -3439,26 +3713,6 @@ class ResolveChoice {
         });
     }
 }
-
-const tplIcon = (type, extraClasses = '') => `<div class="joco-icon ${extraClasses ?? ''}" data-icon="${type}"></div>`;
-const getPolicyConsequenceTranslation = (consequence) => {
-    switch (consequence) {
-        case BONUS:
-            return _('Bonus');
-        case POWER:
-            return _('Power');
-        case TAX:
-            return _('Tax');
-        default:
-            return '';
-    }
-};
-const tplPolicyIcon = (type, extraClasses = '') => `<div class="joco-policy-icon ${extraClasses ?? ''}" data-policy-icon="${type}">
-    ${[BONUS, POWER, TAX].includes(type) ? `<div class="fb-font-baskerville fb-font-16 bga-autofit">${getPolicyConsequenceTranslation(type).toLocaleUpperCase()}</div>` : ''}
-  </div>`;
-const tplPowerIcon = (value, extraClasses = '') => `<div class="joco-icon ${extraClasses ?? ''}" data-icon="${POWER}${value}"></div>`;
-const tplVictoryPointsIcon = (value, extraClasses = '') => `<div class="joco-icon ${extraClasses ?? ''}" data-icon="${VICTORY_POINTS}${value}"></div>`;
-const tplDiscountIcon = (value, extraClasses = '') => `<div class="joco-icon ${extraClasses ?? ''}" data-icon="${DISCOUNT}${value}"></div>`;
 
 const tplCardText = (text, { containerClass = 'fb-card-text', textClass = 'fb-font-12 fb-font-baskerville', }) => {
     return `
@@ -3682,6 +3936,7 @@ const LOG_TOKEN_PROMISE_CUBE = 'promiseCube';
 const LOG_TOKEN_SETUP_CARD = 'setupCard';
 const LOG_TOKEN_SHIP = 'ship';
 const LOG_TOKEN_STORM_DIE = 'stormDie';
+const LOG_TOKEN_TROPHY = 'trophy';
 const CLASS_LOG_TOKEN = 'log-token';
 let tooltipIdCounter = 0;
 const getTokenDiv = ({ key, value, game, }) => {
@@ -3725,6 +3980,8 @@ const getTokenDiv = ({ key, value, game, }) => {
             });
         case LOG_TOKEN_STORM_DIE:
             return tplLogTokenStormDie(value);
+        case LOG_TOKEN_TROPHY:
+            return tplLogTokenTrophy();
         case LOG_TOKEN_NEW_LINE:
             return '<br class="joco-new-line">';
         case LOG_TOKEN_PLAYER_NAME:
@@ -4205,17 +4462,132 @@ class CommanderDeploy {
     onEnteringState(args) {
         debug('Entering CommanderDeploy state');
         this.args = args;
+        this.selectedPieces = {
+            officers: [],
+            armyPieces: [],
+        };
         this.updateInterfaceInitialStep();
+        Bar.getInstance().goTo('joco-india');
     }
     onLeavingState() {
         debug('Leaving CommanderDeploy state');
     }
-    setDescription(activePlayerIds, args) { }
+    setDescription(activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} may deploy'), {
+            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        });
+    }
     updateInterfaceInitialStep() {
         clearPossible();
-        updatePageTitle(_('${you} may perform an action'), {});
-        addConfirmButton(() => {
-            performAction('actCommanderDeploy', {});
+        updatePageTitle(_('Deploy: ${you} may choose a target'), {});
+        Object.entries(this.args.options).forEach(([regionId, requiredStrength]) => {
+            addPrimaryActionButton({
+                id: `deploy-${regionId}`,
+                text: getRegionName(regionId),
+                callback: () => {
+                    this.targetId = regionId;
+                    this.updateInterfaceSelectArmyPieces();
+                },
+            });
+        });
+        addPassButton(this.args.optionalAction, _('Do not deploy'));
+    }
+    updateInterfaceSelectArmyPieces() {
+        clearPossible();
+        updatePageTitle(_('Deploy: ${you} must exhaust ready pieces'), {});
+        Object.entries(this.args.armyPieces).forEach(([pieceId, piece]) => {
+            onClick(pieceId, async () => {
+                if (this.selectedPieces.armyPieces.includes(pieceId)) {
+                    this.selectedPieces.armyPieces =
+                        this.selectedPieces.armyPieces.filter((id) => id !== pieceId);
+                    await this.movePiece(pieceId, 'ready');
+                }
+                else {
+                    this.selectedPieces.armyPieces.push(pieceId);
+                    await this.movePiece(pieceId, 'exhausted');
+                }
+                this.updateInterfaceSelectArmyPieces();
+            });
+        });
+        Object.entries(this.args.officers).forEach(([pieceId, piece]) => {
+            onClick(pieceId, async () => {
+                if (this.selectedPieces.officers.includes(pieceId)) {
+                    this.selectedPieces.officers = this.selectedPieces.officers.filter((id) => id !== pieceId);
+                    await this.movePiece(pieceId, 'ready');
+                }
+                else {
+                    this.selectedPieces.officers.push(pieceId);
+                    await this.movePiece(pieceId, 'exhausted');
+                }
+                this.updateInterfaceSelectArmyPieces();
+            });
+        });
+        this.setSelectedPieces();
+        addPrimaryActionButton({
+            id: 'done-btb',
+            text: _('Done'),
+            callback: () => {
+                this.updateInterfaceConfirm();
+            },
+            extraClasses: this.getTotalStrength() <= this.args.options[this.targetId]
+                ? DISABLED
+                : undefined,
+        });
+        this.addCancelButton();
+    }
+    updateInterfaceConfirm() {
+        clearPossible();
+        const numberOfDice = this.getTotalStrength() - this.args.options[this.targetId];
+        updatePageTitle(numberOfDice === 1
+            ? _('Deploy to ${regionName} and make a check with ${number} die?')
+            : _('Deploy to ${regionName} and make a check with ${number} dice?'), {
+            regionName: getRegionName(this.targetId),
+            number: numberOfDice,
+        });
+        this.setSelectedPieces();
+        addConfirmButton(() => performAction('actCommanderDeploy', {
+            regionId: this.targetId,
+            armyPieces: this.selectedPieces.armyPieces,
+            officers: this.selectedPieces.officers,
+        }));
+        this.addCancelButton();
+    }
+    setSelectedPieces() {
+        [
+            ...this.selectedPieces.armyPieces,
+            ...this.selectedPieces.officers,
+        ].forEach((pieceId) => {
+            setSelected(pieceId);
+        });
+    }
+    async movePiece(pieceId, targetId) {
+        const targetElement = document.getElementById(`army_${this.args.regionId}_${targetId}`);
+        await this.game.animationManager.slideAndAttach(document.getElementById(pieceId), targetElement);
+    }
+    getTotalStrength() {
+        let strength = this.selectedPieces.officers.length;
+        const staticData = StaticData.get();
+        this.selectedPieces.armyPieces.forEach((pieceId) => {
+            strength += staticData.armyPiece(pieceId).strength;
+        });
+        return strength;
+    }
+    async returnPieces() {
+        const ids = [
+            ...this.selectedPieces.armyPieces,
+            ...this.selectedPieces.officers,
+        ];
+        const readyBox = document.getElementById(`army_${this.args.regionId}_ready`);
+        await Promise.all(ids.map((pieceId) => this.movePiece(pieceId, 'ready')));
+    }
+    addCancelButton() {
+        addDangerActionButton({
+            id: 'cancel_btn',
+            text: _('Cancel'),
+            callback: async () => {
+                await this.returnPieces();
+                this.game.onCancel();
+            },
         });
     }
 }
@@ -4235,6 +4607,7 @@ class CommanderPurchaseLocalAlliance {
         debug('Entering CommanderPurchaseLocalAlliance state');
         this.args = args;
         this.updateInterfaceInitialStep();
+        Bar.getInstance().goTo('joco-india');
     }
     onLeavingState() {
         debug('Leaving CommanderPurchaseLocalAlliance state');
@@ -4248,7 +4621,7 @@ class CommanderPurchaseLocalAlliance {
         clearPossible();
         updatePageTitle(_('${you} may purchase a local alliance'), {});
         this.args.options.forEach((option) => onClick(option.id, () => this.updateInterfaceConfirm(option)));
-        addPassButton(this.args.optionalAction);
+        addPassButton(this.args.optionalAction, _('Do not purchase a local alliance'));
     }
     updateInterfaceConfirm(localAlliance) {
         clearPossible();
@@ -5286,7 +5659,11 @@ class FamilyAction {
         debug('Leaving FamilyAction state');
     }
     setDescription(activePlayerIds, args) {
-        updatePageTitle(_('${actplayer} must perform a family action'), {});
+        updatePageTitle(_('${player_name} must perform a family action'), {
+            player_name: PlayerManager.getInstance()
+                .getPlayer(activePlayerIds[0])
+                .getName(),
+        });
     }
     updateInterfaceInitialStep() {
         this.game.clearPossible();
@@ -5719,7 +6096,7 @@ class ParliamentMeets {
     updateInterfaceInitialStep() {
         this.game.clearPossible();
         updatePageTitle(_('${you} must meet Parliament'));
-        const board = Board.getInstance();
+        addPassButton(this.args.optionalAction);
     }
     updateInterfaceConfirm() {
         clearPossible();
@@ -5870,6 +6247,9 @@ class PresidencyTrade {
         });
         if (this.selectedRegionIds.length > 1) {
             addCancelButton();
+        }
+        else {
+            addPassButton(this.args.optionalAction);
         }
     }
     setMinSpendAmount() {
@@ -6093,6 +6473,7 @@ class RevenuePayDividends {
         this.args = args;
         this.selectedNumberOfDividends = 0;
         this.updateInterfaceInitialStep();
+        Bar.getInstance().goTo('joco-company');
     }
     onLeavingState() {
         debug('Leaving RevenuePayDividends state');
@@ -6290,6 +6671,7 @@ class Game {
             ManagerOfShipping,
             MilitaryAffairsAssign,
             MilitaryAffairsTransfers,
+            ParliamentMeets,
             PlayerTurn,
             PresidencyDecideOrder,
             PresidencyTrade,

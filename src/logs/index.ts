@@ -18,6 +18,7 @@ import {
   tplLogTokenPlayerName,
   tplLogTokenShip,
   tplLogTokenLocalAlliance,
+  tplLogTokenTrophy,
 } from './templates';
 
 const LOG_TOKEN_BOLD_TEXT = 'boldText';
@@ -39,6 +40,7 @@ const LOG_TOKEN_PROMISE_CUBE = 'promiseCube';
 const LOG_TOKEN_SETUP_CARD = 'setupCard';
 const LOG_TOKEN_SHIP = 'ship';
 const LOG_TOKEN_STORM_DIE = 'stormDie';
+const LOG_TOKEN_TROPHY = 'trophy';
 
 const CLASS_LOG_TOKEN = 'log-token';
 
@@ -93,6 +95,8 @@ export const getTokenDiv = ({
       });
     case LOG_TOKEN_STORM_DIE:
       return tplLogTokenStormDie(value);
+    case LOG_TOKEN_TROPHY:
+      return tplLogTokenTrophy();
     case LOG_TOKEN_NEW_LINE:
       return '<br class="joco-new-line">';
     case LOG_TOKEN_PLAYER_NAME:

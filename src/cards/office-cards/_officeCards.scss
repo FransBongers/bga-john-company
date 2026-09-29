@@ -1,0 +1,62 @@
+@use '../../base';
+
+.joco-office-card {
+  box-sizing: border-box;
+  // min-width: 0;
+  width: 225px;
+
+  // &.joco-container {
+  //   padding: 0;
+  // }
+
+  .joco-header {
+    padding: 8px;
+    // padding-left: 52px;
+    // border-top-left-radius: 5px;
+    // border-top-right-radius: 5px;
+    justify-content: flex-start;
+    background-color: base.$joco-red;
+    // color: white;
+    // border-color: base.$joco-red;
+
+    // .joco-family-member-spot {
+    //   position: absolute;
+    //   left: 4px;
+    //   top: -7px;
+    //   outline: 1px solid white;
+    //   border: 2px solid;
+    //   border-color: base.$joco-red;
+    // }
+
+    span {
+      color: white;
+    }
+  }
+
+  &#OfficeCard_PresidentOfBengal {
+    .joco-header {
+      background-color: base.$bengal-color;
+      span {
+        color: black;
+      }
+    }
+  }
+
+  &#OfficeCard_PresidentOfBombay {
+    .joco-header {
+      background-color: base.$bombay-color;
+      span {
+        color: black;
+      }
+    }
+  }
+
+  &#OfficeCard_PresidentOfMadras {
+    .joco-header {
+      background-color: base.$madras-color;
+      span {
+        color: black;
+      }
+    }
+  }
+}

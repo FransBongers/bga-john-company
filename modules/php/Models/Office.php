@@ -3,6 +3,7 @@
 namespace Bga\Games\JohnCompany\Models;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Players;
@@ -106,5 +107,14 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   {
     $this->incTreasury(-$amount);
     Notifications::payFromTreasury($player, $this, $amount, $this->getTreasury());
+  }
+
+  public function moveToVacantOffices($player)
+  {
+    if($this->getFamilyMemberId() !== null) {
+      $this->returnFamilyMemberToSupply();
+    }
+    $this->setLocation(Locations::vacantOffices());
+    Notifications::moveOfficeCard($player, $this);
   }
 }

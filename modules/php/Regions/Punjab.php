@@ -9,6 +9,7 @@ class Punjab extends \Bga\Games\JohnCompany\Models\Region
     parent::__construct($row);
     $this->id = PUNJAB;
     $this->name = clienttranslate('Punjab');
+    $this->governorOfficeId = GOVERNOR_OF_PUNJAB;
     $this->loot = 6;
     $this->adjacentRegionIds = [
       BOMBAY,

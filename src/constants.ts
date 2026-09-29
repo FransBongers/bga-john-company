@@ -10,6 +10,11 @@ export const DONE = 'done';
 export const TRADE = 'trade';
 
 /**
+ * Counters
+ */
+export const TROPHIES = 'trophies';
+
+/**
  * Families
  */
 export const BENYON = 'Benyon';
@@ -18,6 +23,8 @@ export const LARKINS = 'Larkins';
 export const PAXTON = 'Paxton';
 export const SYKES = 'Sykes';
 export const WALSH = 'Walsh';
+
+export const FAMILIES = [BENYON, HASTINGS, LARKINS, PAXTON, SYKES, WALSH];
 
 export const CROWN = 'Crown';
 export const CROWN_PLAYER_ID = 1;
@@ -195,6 +202,9 @@ export const OFFICES_WITH_TREASURY = [
   PRESIDENT_OF_MADRAS,
   PRESIDENT_OF_BENGAL,
 ];
+
+export const VACANT_OFFICES = 'VacantOffices';
+export const FAMILY_OFFICES = 'FamilyOffices';
 
 /**
  * Family member positions

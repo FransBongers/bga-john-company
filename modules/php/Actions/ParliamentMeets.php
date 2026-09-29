@@ -62,9 +62,10 @@ class ParliamentMeets extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   public function actPassParliamentMeets()
   {
-    $player = self::getPlayer();
+    $playerId = $this->checkPlayer();
     // Stats::incPassActionCount($player->getId(), 1);
     // Engine::resolve(PASS);
+    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
     $this->resolveAction(PASS, true);
   }
 

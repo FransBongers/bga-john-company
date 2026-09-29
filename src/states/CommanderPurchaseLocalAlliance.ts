@@ -1,3 +1,4 @@
+import { Bar } from '../bar';
 import {
   addCancelButton,
   addConfirmButton,
@@ -39,6 +40,7 @@ export class CommanderPurchaseLocalAlliance implements GameState<OnEnteringComma
     debug('Entering CommanderPurchaseLocalAlliance state');
     this.args = args;
     this.updateInterfaceInitialStep();
+    Bar.getInstance().goTo('joco-india');
   }
 
   onLeavingState() {
@@ -78,7 +80,7 @@ export class CommanderPurchaseLocalAlliance implements GameState<OnEnteringComma
       onClick(option.id, () => this.updateInterfaceConfirm(option)),
     );
 
-    addPassButton(this.args.optionalAction);
+    addPassButton(this.args.optionalAction, _('Do not purchase a local alliance'));
   }
 
   private updateInterfaceConfirm(localAlliance: JocoArmyPieceBase) {

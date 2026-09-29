@@ -1,3 +1,4 @@
+import { Bar } from '../bar';
 import {
   debug,
   updatePageTitle,
@@ -38,6 +39,7 @@ export class RevenuePayDividends implements GameState<OnEnteringRevenuePayDivide
     this.args = args;
     this.selectedNumberOfDividends = 0;
     this.updateInterfaceInitialStep();
+    Bar.getInstance().goTo('joco-company');
   }
 
   onLeavingState() {

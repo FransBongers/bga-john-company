@@ -118,4 +118,17 @@ class Elephant
   {
     return in_array(self::getLocation(), BORDERS);
   }
+
+  public static function checkRedirect(string $regionId)
+  {
+    $elephant = self::get();
+    $location = $elephant[LOCATION];
+
+    if (isset(BORDERS_CONNECTED_REGIONS_MAP[$location]) && in_array($regionId, BORDERS_CONNECTED_REGIONS_MAP[$location]) && FACING !== $regionId) {
+      $elephant[FACING] = '';
+      $elephant[LOCATION] = $regionId;
+      Globals::setElephant($elephant);
+      Notifications::elephantMarch($elephant, true);
+    }
+  }
 }

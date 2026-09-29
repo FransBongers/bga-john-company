@@ -111,13 +111,13 @@ export class India {
     const presidencyContainer = document.getElementById(
       'joco-presidencies-and-armies',
     );
-    [BOMBAY, MADRAS, BENGAL].forEach((presidency) => {
+    [BOMBAY, MADRAS, BENGAL].forEach((regionId) => {
       const presidencyInstance = new Presidency({
         gamedatas,
         parentElement: presidencyContainer!,
-        id: presidency,
+        id: regionId,
       });
-      this.presidencies[presidency] = presidencyInstance;
+      this.presidencies[`${regionId}Presidency`] = presidencyInstance;
     });
   }
 
@@ -197,7 +197,15 @@ export class India {
     return this.armies[regionId];
   }
 
+  public getPresidency(presidencyId: string): Presidency {
+    return this.presidencies[presidencyId];
+  }
+
   public getSeaZone(seaZone: string): ShipZone {
     return this.seaZones[seaZone];
+  }
+
+  public getRegion(regionId: string): Region {
+    return this.regions[regionId];
   }
 }

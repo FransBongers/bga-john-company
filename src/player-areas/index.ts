@@ -1,16 +1,10 @@
-import { EnterpriseCardsManager } from '../cards/enterprise-cards';
-import { SHIPYARD } from '../constants';
-import { BgaCards } from '../libs';
-import { GameAlias, GamedatasAlias, JocoEnterpriseCard } from '../types';
-import { getEnterpriseCard } from '../utility';
-import { tplPlayerAreas, tplPlayerArea } from './templates';
+import { GameAlias, GamedatasAlias, PlayerAlias } from '../types';
+import { PlayerArea } from './player-area';
+import { tplPlayerAreas } from './templates';
 
 export class PlayerAreas {
   private static instance: PlayerAreas;
-  private enterprises: Record<
-    string,
-    InstanceType<typeof BgaCards.LineStock<JocoEnterpriseCard>>
-  > = {};
+  public playerAreas: Record<string, PlayerArea> = {};
 
   constructor(private game: GameAlias) {
     this.game = game;
@@ -39,21 +33,23 @@ export class PlayerAreas {
       .insertAdjacentHTML('afterbegin', tplPlayerAreas());
     const container = document.getElementById('joco-player-areas');
     this.game.playerOrder.forEach((playerId) => {
-      const player = gamedatas.players[playerId];
+      const player: PlayerAlias = gamedatas.players[playerId];
 
-      container.insertAdjacentHTML(
-        'beforeend',
-        tplPlayerArea(gamedatas.players[playerId]),
-      );
+      this.playerAreas[player.familyId] = new PlayerArea({
+        parentElement: container,
+        game: this.game,
+        player,
+        gamedatas,
+      });
+      //   container.insertAdjacentHTML(
+      //     'beforeend',
+      //     tplPlayerArea(gamedatas.players[playerId]),
+      //   );
 
-      this.enterprises[player.familyId] =
-        new BgaCards.LineStock<JocoEnterpriseCard>(
-          EnterpriseCardsManager.getInstance(),
-          document.getElementById(`joco-enterprises-${player.familyId}`)!,
-        );
+      //   const countersContainer = document.getElementById(
+      //     `joco-counters-${player.familyId}`,
+      //   );
     });
-
-    this.updateEnterprises(gamedatas);
   }
 
   // .##.....##.########..########.....###....########.########....##.....##.####
@@ -63,32 +59,4 @@ export class PlayerAreas {
   // .##.....##.##........##.....##.#########....##....##..........##.....##..##.
   // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
   // ..#######..##........########..##.....##....##....########.....#######..####
-
-  public async addEnterprise(enterprise: JocoEnterpriseCard) {
-    const stock = this.enterprises[enterprise.location];
-    if (stock) {
-      await stock.addCard(getEnterpriseCard(enterprise));
-    }
-  }
-
-  private updateEnterprises(gamedatas: GamedatasAlias) {
-    const ships = Object.values(gamedatas.ships);
-    Object.values(gamedatas.enterprises).forEach((enterprise) => {
-      const stock = this.enterprises[enterprise.location];
-      if (!stock) {
-        return;
-      }
-      stock.addCard(getEnterpriseCard(enterprise));
-      if (enterprise.type === SHIPYARD) {
-        const ship = ships.find((s) => s.location === enterprise.id);
-        if (ship) {
-          const shipStock =
-            EnterpriseCardsManager.getInstance().shipStocks[enterprise.shipId];
-          if (shipStock) {
-            shipStock.addCard(ship);
-          }
-        }
-      }
-    });
-  }
 }

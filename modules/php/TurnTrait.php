@@ -536,6 +536,7 @@ trait TurnTrait
         [
           'action' => PARLIAMENT_MEETS,
           'playerId' => 'some',
+          'optional' => true,
           // TODO: actual prime minister player
           'activePlayerIds' => [Players::getAll()->toArray()[0]->getId()],
         ],

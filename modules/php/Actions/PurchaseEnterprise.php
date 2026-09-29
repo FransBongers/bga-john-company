@@ -36,7 +36,7 @@ class PurchaseEnterprise extends \Bga\Games\JohnCompany\Models\AtomicAction
     $family->incTreasury(-$amount);
 
     // Notifications::pay($player, $amount);
-    Notifications::purchaseEnterprise($player, $enterprise, $amount);
+    Notifications::purchaseEnterprise($player, $enterprise, $amount, $family->getId() );
 
 
     // TODO: insert action for bonus action

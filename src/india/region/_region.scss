@@ -19,6 +19,10 @@
   &:has(> :only-child) {
     padding-bottom: 7px;
   }
+
+  &.company-controlled {
+    display: none;
+  }
 }
 
 .joco-tower-level {
@@ -35,9 +39,9 @@
     }
   }
 
-  &.hidden {
-    display: none;
-  }
+  // &.hidden {
+  //   display: none;
+  // }
 }
 
 .joco-tower-top {
@@ -121,5 +125,172 @@
 .joco-tower-top[data-empire-id='Punjab'] {
   .joco-tower-flag {
     background-color: base.$punjab-color;
+  }
+}
+
+.joco-governor-overlay-container {
+  // width: 50px;
+  // height: 50px;
+  // background-color: rgba(yellow, 0.5);
+  // opacity: 0.5;
+  position: absolute;
+  display: none;
+
+  .joco-governor-overlay {
+    border-radius: 50%;
+    outline: 1px solid black;
+    border: 12px solid #c32034;
+  }
+
+  .joco-family-member-spot {
+    height: 65px;
+    border: 1px solid black;
+    outline: 2px solid black;
+
+    .joco-family-member-spot-background {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      .joco-region-icon {
+        width: 35px;
+      }
+
+      .joco-presidency-icon {
+        width: 25px;
+        // margin-top: -4px;
+      }
+    }
+  }
+
+  .joco-family-member-spot-wrapper {
+    border: 4px solid black;
+    outline: 1px solid black;
+    border-radius: 50%;
+  }
+
+  &.company-controlled {
+    display: block;
+  }
+
+  &[data-region='Bengal'] {
+    top: 156px;
+    left: 845px;
+
+    .joco-family-member-spot-wrapper {
+      outline-color: base.$bengal-color;
+    }
+
+    .joco-family-member-spot {
+      background-color: base.$bengal-color;
+      outline-color: base.$bengal-color;
+    }
+  }
+  &[data-region='Bombay'] {
+    top: 443px;
+    left: 236px;
+
+    .joco-family-member-spot-wrapper {
+      outline-color: base.$bombay-color;
+    }
+
+    .joco-family-member-spot {
+      background-color: base.$bombay-color;
+      outline-color: base.$bombay-color;
+    }
+  }
+  &[data-region='Delhi'] {
+    top: 10px;
+    left: 607px;
+
+    .joco-family-member-spot-wrapper {
+      outline-color: base.$delhi-color;
+    }
+
+    .joco-family-member-spot {
+      background-color: base.$delhi-color;
+      outline-color: base.$delhi-color;
+    }
+
+    .joco-presidency-icon {
+      margin-top: 4px;
+    }
+  }
+  &[data-region='Hyderabad'] {
+    top: 452px;
+    left: 374px;
+
+    .joco-family-member-spot-wrapper {
+      outline-color: base.$hyderabad-color;
+    }
+
+    .joco-family-member-spot {
+      background-color: base.$hyderabad-color;
+      outline-color: base.$hyderabad-color;
+    }
+  }
+  &[data-region='Madras'] {
+    top: 773px;
+    left: 486px;
+
+    .joco-family-member-spot-wrapper {
+      outline-color: base.$madras-color;
+    }
+
+    .joco-family-member-spot {
+      background-color: base.$madras-color;
+      outline-color: base.$madras-color;
+    }
+
+    .joco-presidency-icon {
+      margin-top: -4px;
+    }
+  }
+  &[data-region='Maratha'] {
+    top: 153px;
+    left: 462px;
+
+    .joco-family-member-spot-wrapper {
+      outline-color: base.$maratha-color;
+    }
+
+    .joco-family-member-spot {
+      background-color: base.$maratha-color;
+      outline-color: base.$maratha-color;
+    }
+
+    .joco-presidency-icon {
+      margin-top: 4px;
+    }
+  }
+  &[data-region='Mysore'] {
+    top: 647px;
+    left: 286px;
+
+    .joco-family-member-spot-wrapper {
+      outline-color: base.$mysore-color;
+    }
+
+    .joco-family-member-spot {
+      background-color: base.$mysore-color;
+      outline-color: base.$mysore-color;
+    }
+  }
+  &[data-region='Punjab'] {
+    top: 30px;
+    left: 80px;
+
+    .joco-family-member-spot-wrapper {
+      outline-color: base.$punjab-color;
+    }
+
+    .joco-family-member-spot {
+      background-color: base.$punjab-color;
+      outline-color: base.$punjab-color;
+    }
   }
 }

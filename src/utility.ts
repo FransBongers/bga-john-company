@@ -26,6 +26,8 @@ import {
   JocoLawCardBase,
   JocoLondonSeasonCard,
   JocoLondonSeasonCardBase,
+  JocoOffice,
+  JocoOfficeBase,
   JocoRegionBase,
   JocoShipBase,
 } from './types';
@@ -82,8 +84,7 @@ export const getShipsLog = (ships: JocoShipBase[]) => {
     shipsLog.log += `\${${key}}`;
     shipsLog.args[key] = tknShipValue({
       name: ship.name,
-      type: ship.type,
-      fatigued: ship.side === FATIGUED ? 1 : 0,
+      side: ship.side,
     });
   });
 
@@ -127,6 +128,15 @@ export const getLondonSeasonCard = (
   return {
     ...card,
     ...cardStatic,
+  };
+};
+
+export const getOffice = (office: JocoOfficeBase): JocoOffice => {
+  const staticData = StaticData.get();
+  const officeStatic = staticData.office(office.id);
+  return {
+    ...office,
+    ...officeStatic,
   };
 };
 

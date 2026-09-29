@@ -135,6 +135,37 @@
   font-style: italic;
 }
 
+.icon-counter-container {
+  position: relative;
+  height: 50px;
+  aspect-ratio: 1/1;
+  opacity: 0.3;
+}
+.icon-counter-container .icon-counter-counter {
+  cursor: default;
+  font-weight: bold;
+  font-size: 20px;
+}
+.icon-counter-container:not([data-icon-position=overlap]) {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+.icon-counter-container.active {
+  opacity: 1;
+}
+.icon-counter-container[data-icon-position=overlap] .icon-counter-icon {
+  position: absolute;
+}
+.icon-counter-container[data-icon-position=overlap] .icon-counter-counter {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
+  text-shadow: #fff 0 0 2px, #fff 0 0 2px, #fff 0 0 2px, #fff 0 0 2px, #fff 0 0 2px, #fff 0 0 2px;
+}
+
 /* make space between buttons on touch devices */
 @media (hover: none) {
   #page-title .action-button.bgabutton,
@@ -247,6 +278,46 @@ span[style*="color:#addb90"] {
 }
 .joco-enterprise-card .joco-ship {
   z-index: 1;
+}
+
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
+.joco-office-card {
+  box-sizing: border-box;
+  width: 225px;
+}
+.joco-office-card .joco-header {
+  padding: 8px;
+  justify-content: flex-start;
+  background-color: rgb(183, 98, 85);
+}
+.joco-office-card .joco-header span {
+  color: white;
+}
+.joco-office-card#OfficeCard_PresidentOfBengal .joco-header {
+  background-color: #b47860;
+}
+.joco-office-card#OfficeCard_PresidentOfBengal .joco-header span {
+  color: black;
+}
+.joco-office-card#OfficeCard_PresidentOfBombay .joco-header {
+  background-color: #a1b4ab;
+}
+.joco-office-card#OfficeCard_PresidentOfBombay .joco-header span {
+  color: black;
+}
+.joco-office-card#OfficeCard_PresidentOfMadras .joco-header {
+  background-color: #e9ca92;
+}
+.joco-office-card#OfficeCard_PresidentOfMadras .joco-header span {
+  color: black;
 }
 
 .joco-card {
@@ -1265,6 +1336,28 @@ span[style*="color:#addb90"] {
   background-position-y: 100%;
 }
 
+.joco-trophy {
+  box-sizing: border-box;
+  background-image: url("img/hexagons.png");
+  background-size: 300% 500%;
+  background-position-y: 100%;
+  aspect-ratio: 240/225;
+  height: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding-top: 10px;
+}
+.joco-trophy .joco-icon {
+  height: 16px;
+}
+.joco-trophy .joco-title {
+  width: 40px;
+  height: 8px;
+  font-size: 6px;
+}
+
 #joco-london {
   width: 1000px;
   margin: 0 auto;
@@ -1334,7 +1427,7 @@ span[style*="color:#addb90"] {
   position: relative;
   border-radius: 50%;
   height: 46px;
-  width: 39px;
+  aspect-ratio: 39/46;
   border: 3px double black;
   background-color: white;
 }
@@ -1558,6 +1651,17 @@ span[style*="color:#addb90"] {
 }
 .joco-strength-icon.joco-inverted {
   transform: scaleX(-1);
+}
+
+.joco-player-area-content .joco-column,
+.joco-player-area-content .joco-row {
+  gap: 12px;
+}
+.joco-player-area-content .joco-family-offices {
+  width: 225px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 #joco-player-areas {
@@ -2019,6 +2123,13 @@ span[style*="color:#addb90"] {
   outline: 4px solid blue !important;
 }
 
+.icon-counter-container[data-type=trophy] {
+  aspect-ratio: 240/225;
+}
+.icon-counter-container[data-type=trophy] .icon-counter-counter {
+  right: 4px;
+}
+
 .joco-treasury-container {
   display: flex;
   flex-direction: row;
@@ -2158,11 +2269,16 @@ span[style*="color:#c0c0c0"] {
   margin-left: 1px;
   margin-right: 1px;
 }
-.log-token.joco-local-alliance {
+.log-token.joco-trophy, .log-token.joco-local-alliance {
   display: inline-flex;
 }
-.log-token.joco-local-alliance .joco-icon {
+.log-token.joco-trophy .joco-icon, .log-token.joco-local-alliance .joco-icon {
   height: 16px !important;
+}
+.log-token.joco-elephant {
+  width: 30px;
+  display: inline-block !important;
+  position: relative;
 }
 
 #customActions {
@@ -2320,7 +2436,7 @@ span[style*="color:#c0c0c0"] {
   border-color: #e9ca92;
 }
 
-.joco_elephant,
+.joco-elephant,
 #joco-elephant {
   position: absolute;
   background-image: url("img/elephant.svg");
@@ -2329,6 +2445,7 @@ span[style*="color:#c0c0c0"] {
   width: 70px;
   aspect-ratio: 60/51;
   z-index: 1;
+  transition: transform 500ms ease-in-out, top 500ms ease-in-out, left 500ms ease-in-out;
 }
 
 #joco-elephant[data-location=Bengal] {
@@ -2354,7 +2471,7 @@ span[style*="color:#c0c0c0"] {
 }
 
 #joco-elephant[data-location=Madras] {
-  top: 283px;
+  top: 583px;
   left: 479px;
 }
 
@@ -2531,6 +2648,11 @@ span[style*="color:#c0c0c0"] {
 .joco-presidency.joco-container {
   padding: 0;
 }
+.joco-presidency .joco-control-tokens-treasury {
+  padding: 8px;
+  padding-bottom: 0px;
+  justify-content: space-between;
+}
 .joco-presidency .joco-inner-container {
   display: flex;
   flex-direction: column;
@@ -2593,6 +2715,9 @@ span[style*="color:#c0c0c0"] {
 .joco-tower:has(> :only-child) {
   padding-bottom: 7px;
 }
+.joco-tower.company-controlled {
+  display: none;
+}
 
 .joco-tower-level {
   background-image: url("img/tower_level.png");
@@ -2615,9 +2740,6 @@ span[style*="color:#c0c0c0"] {
 }
 .joco-tower-level:nth-child(6) {
   z-index: 1;
-}
-.joco-tower-level.hidden {
-  display: none;
 }
 
 .joco-tower-top {
@@ -2679,6 +2801,141 @@ span[style*="color:#c0c0c0"] {
 
 .joco-tower-top[data-empire-id=Punjab] .joco-tower-flag {
   background-color: #8a8e99;
+}
+
+.joco-governor-overlay-container {
+  position: absolute;
+  display: none;
+}
+.joco-governor-overlay-container .joco-governor-overlay {
+  border-radius: 50%;
+  outline: 1px solid black;
+  border: 12px solid #c32034;
+}
+.joco-governor-overlay-container .joco-family-member-spot {
+  height: 65px;
+  border: 1px solid black;
+  outline: 2px solid black;
+}
+.joco-governor-overlay-container .joco-family-member-spot .joco-family-member-spot-background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.joco-governor-overlay-container .joco-family-member-spot .joco-family-member-spot-background .joco-region-icon {
+  width: 35px;
+}
+.joco-governor-overlay-container .joco-family-member-spot .joco-family-member-spot-background .joco-presidency-icon {
+  width: 25px;
+}
+.joco-governor-overlay-container .joco-family-member-spot-wrapper {
+  border: 4px solid black;
+  outline: 1px solid black;
+  border-radius: 50%;
+}
+.joco-governor-overlay-container.company-controlled {
+  display: block;
+}
+.joco-governor-overlay-container[data-region=Bengal] {
+  top: 156px;
+  left: 845px;
+}
+.joco-governor-overlay-container[data-region=Bengal] .joco-family-member-spot-wrapper {
+  outline-color: #b47860;
+}
+.joco-governor-overlay-container[data-region=Bengal] .joco-family-member-spot {
+  background-color: #b47860;
+  outline-color: #b47860;
+}
+.joco-governor-overlay-container[data-region=Bombay] {
+  top: 443px;
+  left: 236px;
+}
+.joco-governor-overlay-container[data-region=Bombay] .joco-family-member-spot-wrapper {
+  outline-color: #a1b4ab;
+}
+.joco-governor-overlay-container[data-region=Bombay] .joco-family-member-spot {
+  background-color: #a1b4ab;
+  outline-color: #a1b4ab;
+}
+.joco-governor-overlay-container[data-region=Delhi] {
+  top: 10px;
+  left: 607px;
+}
+.joco-governor-overlay-container[data-region=Delhi] .joco-family-member-spot-wrapper {
+  outline-color: #8e867c;
+}
+.joco-governor-overlay-container[data-region=Delhi] .joco-family-member-spot {
+  background-color: #8e867c;
+  outline-color: #8e867c;
+}
+.joco-governor-overlay-container[data-region=Delhi] .joco-presidency-icon {
+  margin-top: 4px;
+}
+.joco-governor-overlay-container[data-region=Hyderabad] {
+  top: 452px;
+  left: 374px;
+}
+.joco-governor-overlay-container[data-region=Hyderabad] .joco-family-member-spot-wrapper {
+  outline-color: #a4a576;
+}
+.joco-governor-overlay-container[data-region=Hyderabad] .joco-family-member-spot {
+  background-color: #a4a576;
+  outline-color: #a4a576;
+}
+.joco-governor-overlay-container[data-region=Madras] {
+  top: 773px;
+  left: 486px;
+}
+.joco-governor-overlay-container[data-region=Madras] .joco-family-member-spot-wrapper {
+  outline-color: #e9ca92;
+}
+.joco-governor-overlay-container[data-region=Madras] .joco-family-member-spot {
+  background-color: #e9ca92;
+  outline-color: #e9ca92;
+}
+.joco-governor-overlay-container[data-region=Madras] .joco-presidency-icon {
+  margin-top: -4px;
+}
+.joco-governor-overlay-container[data-region=Maratha] {
+  top: 153px;
+  left: 462px;
+}
+.joco-governor-overlay-container[data-region=Maratha] .joco-family-member-spot-wrapper {
+  outline-color: #cd9f6b;
+}
+.joco-governor-overlay-container[data-region=Maratha] .joco-family-member-spot {
+  background-color: #cd9f6b;
+  outline-color: #cd9f6b;
+}
+.joco-governor-overlay-container[data-region=Maratha] .joco-presidency-icon {
+  margin-top: 4px;
+}
+.joco-governor-overlay-container[data-region=Mysore] {
+  top: 647px;
+  left: 286px;
+}
+.joco-governor-overlay-container[data-region=Mysore] .joco-family-member-spot-wrapper {
+  outline-color: #c9bda5;
+}
+.joco-governor-overlay-container[data-region=Mysore] .joco-family-member-spot {
+  background-color: #c9bda5;
+  outline-color: #c9bda5;
+}
+.joco-governor-overlay-container[data-region=Punjab] {
+  top: 30px;
+  left: 80px;
+}
+.joco-governor-overlay-container[data-region=Punjab] .joco-family-member-spot-wrapper {
+  outline-color: #8a8e99;
+}
+.joco-governor-overlay-container[data-region=Punjab] .joco-family-member-spot {
+  background-color: #8a8e99;
+  outline-color: #8a8e99;
 }
 
 .joco-sea-zone {
@@ -2793,7 +3050,7 @@ span[style*="color:#c0c0c0"] {
 .joco-order-token[data-type=filled] {
   background-image: url("img/filled_order.png");
   background-size: 100% 100%;
-  border-color: #f1e8e4 #cfaea0 #cfaea0 #f1e8e4;
+  border-color: #f1e8e4 #f1e8e4 #cfaea0 #cfaea0;
 }
 .joco-order-token[data-type=closed] {
   background-color: black;

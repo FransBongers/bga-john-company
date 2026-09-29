@@ -1,0 +1,58 @@
+@use 'sass:math';
+
+.icon-counter-container {
+  position: relative;
+  // width: 50px;
+  height: 50px;
+  aspect-ratio: 1/1;
+
+  // justify-content: center;
+
+  opacity: 0.3;
+
+  .icon-counter-counter {
+    cursor: default;
+    font-weight: bold;
+    font-size: 20px;
+  }
+
+  .icon-counter-icon {
+  }
+
+  &:not([data-icon-position='overlap']) {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &.active {
+    opacity: 1;
+  }
+
+  &[data-icon-position='overlap'] {
+    // align-items: flex-end;
+    // justify-content: flex-end;
+
+    .icon-counter-icon {
+      position: absolute;
+      // display: flex;
+      // align-items: center;
+      // justify-content: center;
+    }
+
+    .icon-counter-counter {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      z-index: 1;
+      text-shadow:
+        #fff 0 0 2px,
+        #fff 0 0 2px,
+        #fff 0 0 2px,
+        #fff 0 0 2px,
+        #fff 0 0 2px,
+        #fff 0 0 2px;
+    }
+  }
+}

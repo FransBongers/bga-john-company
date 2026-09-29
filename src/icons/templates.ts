@@ -38,3 +38,13 @@ export const tplDiscountIcon = (
   extraClasses: string = '',
 ) =>
   `<div class="joco-icon ${extraClasses ?? ''}" data-icon="${DISCOUNT}${value}"></div>`;
+
+export const tplTrophyIcon = (
+  extraClasses: string = '',
+) =>
+  `<div class="joco-trophy ${extraClasses ?? ''}">
+    ${tplPowerIcon(1)}
+    <div class="joco-title bga-autofit">
+      <span class="fb-font-baskerville fb-font-italic">${_('Trophy').toLocaleUpperCase()}</span>
+    </div>
+  </div>`;

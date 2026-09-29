@@ -17,6 +17,13 @@ export const STOCK_EXCHANGE_CONFIG: Array<{ id: string; value: number }> = [
   { id: STOCK_EXCHANGE_5, value: 5 },
 ];
 
+export const tplVacantOffices = () => `
+  <div class="joco-container">
+    <div><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Vacant Offices').toLocaleUpperCase()}</span></div>
+    <div id="VacantOffices"></div>
+  </div>
+`
+
 export const tplOfficeHeader = (familyMemberLocation: string, name: string) => `
   <div class="joco-header joco-office-header">${tplFamilyMemberSpot(familyMemberLocation)}<span class="fb-font-baskerville fb-font-16">${name.toLocaleUpperCase()}</span></div>
 `

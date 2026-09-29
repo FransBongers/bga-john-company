@@ -1,9 +1,16 @@
 import { createFamilyMember, tplFamilyMemberSpot } from '../../templates';
 import { BENGAL, BOMBAY, MADRAS } from '../../constants';
-import { GamedatasAlias, JocoFamilyMember } from '../../types';
+import {
+  GamedatasAlias,
+  JocoControlToken,
+  JocoFamilyMember,
+} from '../../types';
 import { tplOfficeHeader } from '../../company/templates';
 import { Treasury } from '../../ui-components';
 import { Company } from '../../company';
+import { BgaCards } from '../../libs copy';
+import { ControlTokensManager } from '../../token-managers/control-tokens';
+import { createControlToken } from '../../utility';
 
 export interface PresidencyProps {
   gamedatas: GamedatasAlias;
@@ -16,8 +23,12 @@ export class Presidency {
     parent: HTMLElement;
     writers: HTMLElement;
     president: HTMLElement;
+    tokensAndTreasury: HTMLElement;
   };
   private id: string;
+  private controlTokenStock: InstanceType<
+    typeof BgaCards.LineStock<JocoControlToken>
+  >;
 
   constructor(config: PresidencyProps) {
     this.id = config.id;
@@ -46,18 +57,6 @@ export class Presidency {
     const presidencyContainer = document.getElementById(
       `PresidencyOf${this.id}`,
     ) as HTMLElement;
-    const company = Company.getInstance();
-
-    company.treasuries[`PresidentOf${this.id}`] = new Treasury({
-      parent: presidencyContainer,
-      gamedatas: config.gamedatas,
-      office: `PresidentOf${this.id}`,
-    });
-
-    presidencyContainer.insertAdjacentHTML(
-      'beforeend',
-      this.tplInnerContainer(),
-    );
 
     this.ui = {
       parent: parentElement,
@@ -65,8 +64,13 @@ export class Presidency {
       president: document.getElementById(
         `PresidentOf${this.id}`,
       ) as HTMLElement,
+      tokensAndTreasury: document.getElementById(
+        `joco-control-tokens-and-treasury-${this.id}`,
+      ) as HTMLElement,
     };
 
+    this.setupTreasury(config.gamedatas);
+    this.setupControlTokens(config.gamedatas);
     // this.treasury = new ebg.counter();
     // this.treasury.create(`joco-treasury-${this.id.toLocaleLowerCase()}`);
     // this.treasury.setValue(
@@ -76,30 +80,46 @@ export class Presidency {
     this.updateFamilyMembers(config.gamedatas);
   }
 
+  private setupControlTokens(gamedatas: GamedatasAlias) {
+    this.controlTokenStock = new BgaCards.LineStock<JocoControlToken>(
+      ControlTokensManager.getInstance(),
+      document.getElementById(`joco-control-tokens-PresidencyOf${this.id}`),
+    );
+
+    Object.values(gamedatas.regions).forEach((region) => {
+      if (region.control === `${this.id}Presidency`) {
+        console.log(`Adding control token for region: ${region.id}`);
+        this.controlTokenStock.addCard(createControlToken(region));
+      }
+    });
+  }
+
+  private setupTreasury(gamedatas: GamedatasAlias) {
+    const company = Company.getInstance();
+
+    company.treasuries[`PresidentOf${this.id}`] = new Treasury({
+      parent: this.ui.tokensAndTreasury,
+      gamedatas,
+      office: `PresidentOf${this.id}`,
+    });
+  }
+
   private tplPresidency() {
     return `
       <div id="PresidencyOf${this.id}" class="joco-office joco-presidency joco-container">
         ${tplOfficeHeader(`PresidentOf${this.id}`, this.getName())}
-       <!-- <div class="joco-treasury-container">
-          <div><span class="fb-font-baskerville fb-font-12">${_('Treasury').toLocaleUpperCase()}</span></div>
-          <div class="joco-treasury-counter-container">
-            <span class="fb-font-baskerville fb-font-12">£</span><span id="joco-treasury-${this.id.toLocaleLowerCase()}" class="fb-font-baskerville fb-font-20"></span>
+        <div id="joco-control-tokens-and-treasury-${this.id}" class="joco-row joco-control-tokens-treasury">
+          <div id="joco-control-tokens-PresidencyOf${this.id}"></div>
+        </div>
+        <div class="joco-inner-container">
+          <div id="Writers_${this.id}" class="joco-family-members-stock"></div>
+          <div>
+            <span class="fb-font-baskerville fb-font-12">${_('Writers').toLocaleUpperCase()}</span>
           </div>
-        </div> -->
-
+        </div>
       </div>
     `;
   }
-
-  private tplInnerContainer = () => {
-    return `
-    <div class="joco-inner-container">
-      <div id="Writers_${this.id}" class="joco-family-members-stock"></div>
-      <div>
-        <span class="fb-font-baskerville fb-font-12">${_('Writers').toLocaleUpperCase()}</span>
-      </div>
-    </div>`;
-  };
 
   // .##.....##.########..########.....###....########.########....##.....##.####
   // .##.....##.##.....##.##.....##...##.##......##....##..........##.....##..##.
@@ -131,6 +151,10 @@ export class Presidency {
   // .##.....##....##.....##..##........##.....##.......##...
   // .##.....##....##.....##..##........##.....##.......##...
   // ..#######.....##....####.########.####....##.......##...
+
+  public async addControlToken(controlToken: JocoControlToken) {
+    await this.controlTokenStock.addCard(controlToken);
+  }
 
   public getTreasury() {
     const company = Company.getInstance();

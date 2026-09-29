@@ -66,11 +66,16 @@ class Offices extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
       // TODO: set location based on scenario
       $offices[$officeId] = [
         'id' => $officeId,
-        'location' => 'inPlay',
+        'location' => DECK,
         'treasury' => in_array($officeId, OFFICES_WITH_TREASURY) ? $companyTreasuries : 0,
       ];
     }
 
     self::create($offices, null);
+  }
+
+  public static function getPresidentOfficeForPresidency(string $presidencyId)
+  {
+    return self::get(PRESIDENCY_PRESIDENT_OFFICE_MAP[$presidencyId]);
   }
 }

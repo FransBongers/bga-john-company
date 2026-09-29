@@ -8,6 +8,7 @@
 
 import { Board } from '../../board';
 import { EnterpriseCardsManager } from '../../cards/enterprise-cards';
+import { tplOfficeCard } from '../../cards/office-cards';
 import { Company } from '../../company';
 
 import {
@@ -31,6 +32,8 @@ import {
   HEX_COLOR_COLOR_MAP,
   COURT_OF_DIRECTORS,
   CHAIRMAN,
+  FAMILIES,
+  PRESIDENCIES,
 } from '../../constants';
 import { CrownClimate } from '../../crown/climate';
 import { India } from '../../india';
@@ -40,9 +43,9 @@ import { JocoPlayer } from '../../player-manager/player';
 import { SetupArea } from '../../setup-area';
 import { createFamilyMember } from '../../templates';
 import { GameAlias, JocoFamilyMember, OtherShipType } from '../../types';
-import { getEnterpriseCard } from '../../utility';
+import { createControlToken, getEnterpriseCard } from '../../utility';
 import { Interaction } from '../interaction';
-import { debug, parentHasChildWithId } from '../utility';
+import { createHtmlElement, debug, parentHasChildWithId } from '../utility';
 import {
   NotifAllocateBalanceToOffice,
   NotifChangeOrderStatus,
@@ -73,6 +76,9 @@ import {
   NotifSetupFamilyMembers,
   NotifTransferPromiseCubes,
   NotifUpdateRegion,
+  NotifMovePieces,
+  NotifUpdateCountersMultipleTargets,
+  NotifMoveOfficeCard,
 } from './types';
 
 //  .##.....##....###....##....##....###.....######...########.########.
@@ -341,6 +347,15 @@ export class NotificationManager {
     await this.game.animationManager.slideAndAttach(elt, locationElt);
   }
 
+  updateCountersForTarget(
+    target: string,
+    counterChanges: Record<string, number>,
+  ) {
+    if (FAMILIES.includes(target)) {
+      PlayerAreas.getInstance().playerAreas[target].incCounters(counterChanges);
+    }
+  }
+
   // .##....##..#######..########.####.########..######.
   // .###...##.##.....##....##.....##..##.......##....##
   // .####..##.##.....##....##.....##..##.......##......
@@ -356,6 +371,18 @@ export class NotificationManager {
 
   async notif_message(notif: unknown) {
     // Only here so messages get displayed in title bar
+  }
+
+  async notif_updateCountersMultipleTargets(
+    notif: NotifUpdateCountersMultipleTargets,
+  ) {
+    const { counterChanges: counterChangesPerTarget } = notif;
+
+    Object.entries(counterChangesPerTarget).forEach(
+      ([target, counterChanges]) => {
+        this.updateCountersForTarget(target, counterChanges);
+      },
+    );
   }
 
   // TODO: make private notif
@@ -487,9 +514,9 @@ export class NotificationManager {
 
   async notif_moveCompanyBalance(notif: NotifMoveCompanyBalance) {
     const { companyBalance } = notif;
-    const board = Board.getInstance();
+    
 
-    await board.movePawn('balance', companyBalance);
+    Company.getInstance().balance.toValue(companyBalance);
   }
 
   async notif_moveCompanyDebt(notif: NotifMoveCompanyDebt) {
@@ -532,6 +559,7 @@ export class NotificationManager {
     // board.updateFamilyMembers(familyMembers);
   }
 
+  // TODO: replace everywhere with move pieces?
   async notif_moveArmyPiece(notif: NotifMoveArmyPiece) {
     const { armyPiece } = notif;
 
@@ -542,6 +570,34 @@ export class NotificationManager {
     await this.game.animationManager.slideAndAttach(
       element,
       document.getElementById(armyPiece.location),
+    );
+  }
+
+  async notif_moveOfficeCard(notif: NotifMoveOfficeCard) {
+    const { office } = notif;
+    let element = document.getElementById(`${office.id}OfficeCard`);
+    if (!element) {
+      element = createHtmlElement(tplOfficeCard(office));
+    }
+    const locationElt = document.getElementById(office.location);
+    locationElt.appendChild(element);
+  }
+
+  async notif_movePieces(notif: NotifMovePieces) {
+    const { pieces } = notif;
+
+    await Promise.all(
+      pieces.map(async (piece, index) => {
+        if (parentHasChildWithId(piece.location, piece.id)) {
+          return;
+        }
+        // await Interaction.use().wait(index * 200);
+        const element = document.getElementById(piece.id);
+        await this.game.animationManager.slideAndAttach(
+          element,
+          document.getElementById(piece.location),
+        );
+      }),
     );
   }
 
@@ -566,7 +622,6 @@ export class NotificationManager {
 
   async notif_nextPhase(notif: NotifNextPhase) {
     const { phase } = notif;
-    
   }
 
   async notif_payFromTreasury(notif: NotifPayFromTreasury) {
@@ -590,13 +645,13 @@ export class NotificationManager {
   }
 
   async notif_purchaseEnterprise(notif: NotifPurchaseEnterprise) {
-    const { playerId, enterprise, type, amount, ship } = notif;
+    const { playerId, enterprise, type, amount, ship, familyId } = notif;
 
     await this.pay(playerId, amount);
 
     const player = this.getPlayer(playerId);
     player.counters[this.getEnterpriseCounter(type)].incValue(1);
-    await PlayerAreas.getInstance().addEnterprise(
+    await PlayerAreas.getInstance().playerAreas[familyId].addEnterprise(
       getEnterpriseCard(enterprise),
     );
     if (type === SHIPYARD && ship) {
@@ -609,15 +664,17 @@ export class NotificationManager {
     notif: NotifReturnFamilyMemberToSupply,
   ) {
     const { familyMember, playerId } = notif;
-    const element = Board.getInstance().ui.familyMembers[familyMember.id];
+
     const toElement = document.getElementById(`joco-familyMembers-${playerId}`);
-    this.game.animationManager.slideOutAndDestroy(element, toElement);
-    // await moveToAnimation({
-    //   game: this.game,
-    //   element,
-    //   toId: `joco-familyMembers-${playerId}`,
-    //   remove: true,
-    // });
+    const familyMemberElt = document.getElementById(familyMember.id)!;
+    familyMemberElt.remove();
+    // console.log('notif_returnFamilyMemberToSupply elts', familyMemberElt, toElement);
+    // TODO: check animation
+    // await this.game.animationManager.slideOutAndDestroy(
+    //   familyMemberElt,
+    //   toElement,
+    // );
+
     this.getPlayer(playerId).counters[FAMILY_MEMBERS_COUNTER].incValue(1);
   }
 
@@ -704,7 +761,18 @@ export class NotificationManager {
   }
 
   async notif_updateRegion(notif: NotifUpdateRegion) {
-    const { region } = notif;
-    Board.getInstance().regions[region.id].update(region);
+    const { region: data } = notif;
+    const india = India.getInstance();
+    const region = india.getRegion(data.id);
+    region.update(data);
+
+    const controlToken = createControlToken(data);
+
+    if (
+      PRESIDENCIES.includes(data.control) &&
+      region.hasControlToken(controlToken)
+    ) {
+      await india.getPresidency(data.control).addControlToken(controlToken);
+    }
   }
 }

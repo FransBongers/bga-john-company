@@ -118,7 +118,7 @@ class AtomicActions
     $args = \method_exists($action, $methodName) ? $action->$methodName() : [];
     return array_merge($args, [
       'optionalAction' => $ctx->isOptional(),
-      'activePlayerIds' => $ctx->getInfo()['activePlayerIds']
+      'activePlayerIds' => $ctx->getInfo()['activePlayerIds'] ?? null,
     ]);
   }
 

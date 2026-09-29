@@ -171,6 +171,11 @@ const CROWN_MANAGER_OF_SHIPPING_PLACE_SHIPS = 'CrownManagerOfShippingPlaceShips'
 // const GOVERNOR_OF_MYSORE = 'GovernorOfMysore';
 
 /**
+ * Counters
+ */
+const TROPHIES = 'trophies';
+
+/**
  * Company
  */
 const BALANCE = 'balance';
@@ -327,6 +332,9 @@ const GOVERNOR_OF_DELHI = 'GovernorOfDelhi';
 const GOVERNOR_OF_MARATHA = 'GovernorOfMaratha';
 const GOVERNOR_OF_HYDERABAD = 'GovernorOfHyderabad';
 const GOVERNOR_OF_MYSORE = 'GovernorOfMysore';
+
+const VACANT_OFFICES = 'VacantOffices';
+const FAMILY_OFFICES = 'FamilyOffices';
 
 const OFFICES = [
   CHAIRMAN,
@@ -628,6 +636,7 @@ const SHIP_NAMES = [
  */
 const REGIMENT = 'Regiment';
 const LOCAL_ALLIANCE = 'LocalAlliance';
+const FAMILY_MEMBER = 'FamilyMember';
 // Bengal
 const AWADH = 'Awadh';
 const JAGAT_SETHS = 'JagatSeths';

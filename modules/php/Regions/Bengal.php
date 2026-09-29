@@ -10,6 +10,7 @@ class Bengal extends \Bga\Games\JohnCompany\Models\Region
     $this->id = BENGAL;
     $this->name = clienttranslate('Bengal');
     $this->loot = 6;
+    $this->governorOfficeId = GOVERNOR_OF_BENGAL;
     $this->adjacentRegionIds = [
       DELHI,
       MARATHA,

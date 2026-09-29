@@ -123,4 +123,10 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     $this->incTreasury($amount);
     Notifications::gainCash($this->getPlayer(), $amount);
   }
+
+  public function gainTrophies($amount)
+  {
+    $this->incTrophies($amount);
+    Notifications::gainTrophies($this->getPlayer(), $amount);
+  }
 }

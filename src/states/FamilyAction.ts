@@ -21,6 +21,7 @@ import {
   SEEK_SHARE,
   SHARE,
 } from '../constants';
+import { PlayerManager } from '../player-manager';
 import { CommonStateArgs, GameState, GameAlias } from '../types';
 
 interface OnEnteringFamilyActionArgs extends CommonStateArgs {
@@ -52,14 +53,11 @@ export class FamilyAction implements GameState<OnEnteringFamilyActionArgs> {
   }
 
   setDescription(activePlayerIds: number[], args: OnEnteringFamilyActionArgs) {
-    updatePageTitle(
-      _('${actplayer} must perform a family action'),
-      {
-        // tkn_playerName: PlayerManager.getInstance()
-        //   .getPlayer(activePlayerIds[0])
-        //   .getName(),
-      },
-    );
+    updatePageTitle(_('${player_name} must perform a family action'), {
+      player_name: PlayerManager.getInstance()
+        .getPlayer(activePlayerIds[0])
+        .getName(),
+    });
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########

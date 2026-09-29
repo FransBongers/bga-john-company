@@ -3,6 +3,7 @@ import {
   addCancelButton,
   addConfirmButton,
   addDangerActionButton,
+  addPassButton,
   addPrimaryActionButton,
   addSecondaryActionButton,
   clearPossible,
@@ -131,6 +132,8 @@ export class PresidencyTrade implements GameState<OnEnteringPresidencyTradeArgs>
     // >1 because home region is already selected.
     if (this.selectedRegionIds.length > 1) {
       addCancelButton();
+    } else {
+      addPassButton(this.args.optionalAction);
     }
   }
 

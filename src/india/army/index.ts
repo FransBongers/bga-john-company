@@ -3,7 +3,7 @@ import { BENGAL, BOMBAY, MADRAS } from '../../constants';
 import { createFamilyMember, tplFamilyMemberSpot } from '../../templates';
 import { GameAlias, GamedatasAlias } from '../../types';
 
-import { tplArmyPiece, tplRegiment } from './templates';
+import { tplArmyPiece } from './templates';
 
 export interface ArmyProps {
   parentElement: HTMLElement | string;
@@ -137,12 +137,14 @@ export class Army {
   public async addPiece(piece: HTMLElement | string) {
     const element =
       typeof piece === 'string' ? document.getElementById(piece) : piece;
-    if (parentHasChildWithId(this.ui.army.ready.id, element.id)) {
+    if (
+      parentHasChildWithId(this.ui.army[`army_${this.id}_ready`].id, element.id)
+    ) {
       return;
     }
     await this.game.animationManager.slideAndAttach(
       element,
-      this.ui.army.ready,
+      this.ui.army[`army_${this.id}_ready`],
     );
   }
 }

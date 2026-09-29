@@ -110,11 +110,18 @@ span[style*='color:#c0c0c0'] {
   margin-left: 1px;
   margin-right: 1px;
 
+  &.joco-trophy,
   &.joco-local-alliance {
     display: inline-flex;
     .joco-icon {
       height: 16px !important;
     }
+  }
+
+  &.joco-elephant {
+    width: 30px;
+    display: inline-block !important;
+    position: relative;
   }
 }
 

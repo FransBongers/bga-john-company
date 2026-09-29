@@ -572,7 +572,7 @@ $machinestates = [
         'descriptionmyturn' => clienttranslate('${you}'),
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
-        'possibleactions' => ['act' . PARLIAMENT_MEETS, 'actTakeAtomicAction'],
+        'possibleactions' => ['act' . PARLIAMENT_MEETS, 'actPassOptionalAction', 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 

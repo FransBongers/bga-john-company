@@ -9,6 +9,7 @@ class Madras extends \Bga\Games\JohnCompany\Models\Region
     parent::__construct($row);
     $this->id = MADRAS;
     $this->name = clienttranslate('Madras');
+    $this->governorOfficeId = GOVERNOR_OF_MADRAS;
     $this->loot = 5;
     $this->adjacentRegionIds = [
       HYDERABAD,

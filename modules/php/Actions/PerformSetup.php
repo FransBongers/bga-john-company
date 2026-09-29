@@ -69,6 +69,7 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
                 $families[$familyId]->setHasChairmanMarker(1);
               }
               $offices[$item['value']]->setFamilyMemberId($familyMember->getId());
+              $offices[$item['value']]->setLocation(Locations::familyOffices($familyId));
               break;
             case COMPANY_SHARE:
               $familyMember = FamilyMembers::getMemberFor($familyId);

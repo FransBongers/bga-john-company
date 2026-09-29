@@ -126,7 +126,7 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
 
     $office->pay($player, $spend);
 
-    $checkResult = JoCoUtils::makeCheck($player, $office, $numberOfDice);
+    $checkResult = JoCoUtils::makeCheck($player, $numberOfDice, $office->getFamilyMember());
 
     if ($checkResult === SUCCESS) {
       $action = [

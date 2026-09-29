@@ -9,6 +9,7 @@ class Mysore extends \Bga\Games\JohnCompany\Models\Region
     parent::__construct($row);
     $this->id = MYSORE;
     $this->name = clienttranslate('Mysore');
+    $this->governorOfficeId = GOVERNOR_OF_MYSORE;
     $this->loot = 5;
     $this->adjacentRegionIds = [
       BOMBAY,

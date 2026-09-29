@@ -10,6 +10,7 @@ class Delhi extends \Bga\Games\JohnCompany\Models\Region
     $this->id = DELHI;
     $this->name = clienttranslate('Delhi');
     $this->loot = 8;
+    $this->governorOfficeId = GOVERNOR_OF_DELHI;
     $this->adjacentRegionIds = [
       PUNJAB,
       BOMBAY,

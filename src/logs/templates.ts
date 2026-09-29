@@ -1,6 +1,7 @@
 /* ------- DEFAULT LOG TOKENS ------- */
 
 import { EXTRA_SHIP, FATIGUED } from '../constants';
+import { tplTrophyIcon } from '../icons/templates';
 import { tplLocalAlliance } from '../india/army/templates';
 import { StaticData } from '../static-data';
 import { tplShipContent } from '../token-managers/ship-tokens/templates';
@@ -29,7 +30,7 @@ export const tplLogTokenClimate = (climate: string) =>
   `<div class="log-token joco-crown-climate-icon" data-climate="${climate}"></div>`;
 
 export const tplLogTokenElephant = () =>
-  '<div class="log-token joco_elephant"></div>';
+  '<div class="log-token joco-elephant"></div>';
 
 export const tplLogTokenLocalAlliance = (id: string) => {
   const staticData = StaticData.get().armyPiece(id);
@@ -51,6 +52,7 @@ export const tplLogTokenPromiseCube = () =>
 export const tplLogTokenStormDie = (side: string) =>
   `<div class="log-token joco-storm-die" data-side="${side}"></div>`;
 
+export const tplLogTokenTrophy = () => tplTrophyIcon('log-token');
 // export const tplLogTokenIcon = (type: string) =>
 //   `<div class="log-token joco-icon" data-icon="${type}"></div>`;
 

@@ -1,6 +1,12 @@
-import { Board } from "../board";
-import { debug, updatePageTitle, getPlayerName, clearPossible } from "../boilerplate";
-import { CommonStateArgs, GameState, GameAlias } from "../types";
+import { Board } from '../board';
+import {
+  debug,
+  updatePageTitle,
+  getPlayerName,
+  clearPossible,
+  addPassButton,
+} from '../boilerplate';
+import { CommonStateArgs, GameState, GameAlias } from '../types';
 
 interface OnEnteringParliamentMeetsArgs extends CommonStateArgs {}
 
@@ -30,12 +36,9 @@ export class ParliamentMeets implements GameState<OnEnteringParliamentMeetsArgs>
   }
 
   setDescription(activePlayerIds: number, args: OnEnteringParliamentMeetsArgs) {
-    updatePageTitle(
-      _('${tkn_playerName} meets'),
-      {
-        tkn_playerName: getPlayerName(activePlayerIds[0]),
-      },
-    );
+    updatePageTitle(_('${tkn_playerName} meets'), {
+      tkn_playerName: getPlayerName(activePlayerIds[0]),
+    });
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########
@@ -58,7 +61,8 @@ export class ParliamentMeets implements GameState<OnEnteringParliamentMeetsArgs>
     this.game.clearPossible();
 
     updatePageTitle(_('${you} must meet Parliament'));
-    const board = Board.getInstance();
+
+    addPassButton(this.args.optionalAction);
   }
 
   private updateInterfaceConfirm() {

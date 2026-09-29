@@ -5,6 +5,7 @@ import {
   DIRECTOR_OF_TRADE,
   MANAGER_OF_SHIPPING,
   STOCK_EXCHANGE_POSITIONS,
+  VACANT_OFFICES,
 } from '../constants';
 import { GameAlias, GamedatasAlias } from '../types';
 import {
@@ -16,9 +17,11 @@ import {
   COMPANY_DEBT_CONFIG,
   tplCompanyBalance,
   tplOffice,
+  tplVacantOffices,
 } from './templates';
 import { getPhaseName } from '../phase-tracker/translations';
 import { Treasury } from '../ui-components';
+import { tplOfficeCard } from '../cards/office-cards';
 
 const tplCompany = () => `
   <div id="joco-company" class="joco-tab">
@@ -36,12 +39,7 @@ const tplCompany = () => `
       
     </div>
 
-
-    <div id="joco-offices">
-    </div>
-    <div id="joco-vacant-offices">
-      Vacant Offices
-    </div>
+  ${tplVacantOffices()}
   </div>
 `;
 
@@ -53,11 +51,7 @@ export class Company {
     standing: Record<string, HTMLElement>;
     debt: Record<number, HTMLElement>;
     offices: Record<string, HTMLElement>;
-  } = {
-    stockExchange: {},
-    standing: {},
-    debt: {},
-    offices: {},
+    vacantOffices: HTMLElement;
   };
   public balance: Counter;
   public treasuries: Record<string, Treasury> = {};
@@ -129,10 +123,29 @@ export class Company {
     // this.treasuries[id].setValue(gamedatas.offices[id].treasury);
   }
 
+  private setupVacantOffices(gamedatas: GamedatasAlias) {
+    Object.values(gamedatas.offices).forEach((office) => {
+      if (office.location === VACANT_OFFICES) {
+        this.ui.vacantOffices.insertAdjacentHTML(
+          'beforeend',
+          tplOfficeCard(office),
+        );
+      }
+    });
+  }
+
   setup(gamedatas: GamedatasAlias) {
     document
       .getElementById('joco')
       .insertAdjacentHTML('afterbegin', tplCompany());
+
+    this.ui = {
+      stockExchange: {},
+      standing: {},
+      debt: {},
+      offices: {},
+      vacantOffices: document.getElementById(VACANT_OFFICES)!,
+    };
 
     [CHAIRMAN, DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING].forEach((officeId) => {
       this.ui.offices[officeId] = document.getElementById(officeId)!;
@@ -145,6 +158,7 @@ export class Company {
     this.setupTreasury(gamedatas, DIRECTOR_OF_TRADE);
     this.setupTreasury(gamedatas, MANAGER_OF_SHIPPING);
     this.updateFamilyMembers(gamedatas);
+    this.setupVacantOffices(gamedatas);
   }
 
   // .##.....##.########..########.....###....########.########....##.....##.####
