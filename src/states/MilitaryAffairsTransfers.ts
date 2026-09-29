@@ -165,8 +165,8 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
     setSelected(regiment.id);
 
     locations.forEach((to) => {
-      const regionId = to.split('_')[1];
-      onClick(`ArmyOf${regionId}`, async () => {
+      const regionId = to.split('_')[2];
+      onClick(`ArmyOfPresidency_${regionId}`, async () => {
         const from = regiment.location;
         this.transfers.regiments[regiment.id] = {
           regiment,
@@ -175,7 +175,7 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
         };
         regiment.location = to;
         clearPossible();
-        await India.getInstance().getArmy(regionId).addPiece(regiment.id);
+        await India.getInstance().getArmy(`Presidency_${regionId}`).addPiece(regiment.id);
         this.updateInterfaceInitialStep();
       });
     });
@@ -242,7 +242,7 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
     const india = India.getInstance();
     for (let data of Object.values(this.transfers.regiments)) {
       data.regiment.location = data.from;
-      await india.getArmy(data.from).addPiece(data.regiment.id);
+      await india.getArmy(`Presidency_${data.from.split('_')[2]}`).addPiece(data.regiment.id);
     }
     // for (let data of Object.values(this.transfers.writers)) {
     //   data.writer.location = data.from;

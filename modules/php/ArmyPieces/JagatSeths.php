@@ -9,7 +9,7 @@ class JagatSeths extends \Bga\Games\JohnCompany\ArmyPieces\LocalAlliance
     parent::__construct($row);
     $this->id = JAGAT_SETHS;
     $this->name = clienttranslate('Jagat Seths');
-    $this->region = BENGAL;
+    $this->presidencyId = BENGAL_PRESIDENCY;
     $this->cost = 4;
     $this->strength = 2;
   }

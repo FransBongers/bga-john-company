@@ -70,8 +70,8 @@ class ArmyPieces extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 
     self::shuffle(Locations::supplyRegiments());
 
-    foreach (HOME_REGIONS as $regionId) {
-      self::pickForLocation($startingRegiments, Locations::supplyRegiments(), Locations::armyOfReady($regionId));
+    foreach (PRESIDENCIES as $presidencyId) {
+      self::pickForLocation($startingRegiments, Locations::supplyRegiments(), Locations::armyOfReady($presidencyId));
     }
 
     $localAlliances = [];
@@ -81,7 +81,7 @@ class ArmyPieces extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 
       $localAlliances[$pieceId] = [
         'id' => $pieceId,
-        'location' => Locations::armyOfExhausted($piece->getRegion()),
+        'location' => Locations::armyOfExhausted($piece->getPresidencyId()),
       ];
     }
 
@@ -107,9 +107,9 @@ class ArmyPieces extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   {
     $regiments = self::getRegiments()->toArray();
 
-    $armyLocations = array_map(function ($regionId) {
-      return Locations::armyOfReady($regionId);
-    }, HOME_REGIONS);
+    $armyLocations = array_map(function ($presidencyId) {
+      return Locations::armyOfReady($presidencyId);
+    }, PRESIDENCIES);
 
     return Utils::filter($regiments, function ($regiment) use ($armyLocations) {
       return in_array($regiment->getLocation(), $armyLocations);

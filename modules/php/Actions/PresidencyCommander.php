@@ -35,7 +35,7 @@ class PresidencyCommander extends \Bga\Games\JohnCompany\Models\AtomicAction
     $args = $this->ctx->getArgs();
     $officeId = $args['officeId']; // president office
 
-
+    $presidencyId = $args['presidencyId'];
     $presidentOffice = Offices::get($officeId);
     // Family Member
     $commander = $presidentOffice->getCommander();
@@ -54,6 +54,7 @@ class PresidencyCommander extends \Bga\Games\JohnCompany\Models\AtomicAction
               'args' => [
                 'commanderPlayerId' => $commander->getPlayerId(),
                 'regionId' => $presidentOffice->getRegionId(),
+                'presidencyId' => $presidencyId,
                 'presidentOfficeId' => $presidentOffice->getId(),
                 'first' => true,
               ]
@@ -66,6 +67,7 @@ class PresidencyCommander extends \Bga\Games\JohnCompany\Models\AtomicAction
               'args' => [
                 'commanderPlayerId' => $commander->getPlayerId(),
                 'presidentOfficeId' => $presidentOffice->getId(),
+                'presidencyId' => $presidencyId,
                 'first' => true,
               ]
             ]

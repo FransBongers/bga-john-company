@@ -75,17 +75,13 @@ class Order extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implemen
     if ($this->status === FILLED_BY_WRITER) {
       $writers = FamilyMembers::getInLocation($this->id);
       // Note should always only be one writer
-      foreach($writers as $writer) {
+      foreach ($writers as $writer) {
         $writer->returnToSupply();
       }
     }
     $this->setStatus(CLOSED);
-    if ($player === null) {
-      Notifications::changeOrderStatusByGame($this, CLOSED);
-    } else {
-      Notifications::changeOrderStatus($player, $this, CLOSED);
-    }
-    
+
+    Notifications::changeOrderStatus($player, $this, CLOSED);
   }
 
   public function fill($player, $familyMember = null)
@@ -102,13 +98,9 @@ class Order extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implemen
     Notifications::fillOrder($player, $this, $familyMember !== null, $familyMember, $from);
   }
 
-  public function open($player = null)
+  public function open($player = null, $skipMessage = false)
   {
     $this->setStatus(OPEN);
-    if ($player === null) {
-      Notifications::changeOrderStatusByGame($this, OPEN);
-    } else {
-      Notifications::changeOrderStatus($player, $this, OPEN);
-    }
+    Notifications::changeOrderStatus($player, $this, OPEN, $skipMessage);
   }
 }

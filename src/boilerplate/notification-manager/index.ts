@@ -43,6 +43,7 @@ import { PlayerManager } from '../../player-manager';
 import { JocoPlayer } from '../../player-manager/player';
 import { SetupArea } from '../../setup-area';
 import { createFamilyMember } from '../../templates';
+import { ShipsManager } from '../../token-managers/ship-tokens';
 import { GameAlias, JocoFamilyMember, OtherShipType } from '../../types';
 import { createControlToken, getEnterpriseCard } from '../../utility';
 import { Interaction } from '../interaction';
@@ -81,6 +82,9 @@ import {
   NotifUpdateCountersMultipleTargets,
   NotifMoveOfficeCard,
   NotifTurn,
+  NotifReturnShipsToSupply,
+  NotifRefreshArmies,
+  NotifReturnWritersToPresidencies,
 } from './types';
 
 //  .##.....##....###....##....##....###.....######...########.########.
@@ -337,11 +341,11 @@ export class NotificationManager {
 
     const elt = document.getElementById(id);
 
-    if (location.startsWith('Army')) {
-      const regionId = location.split('_')[1];
-      await India.getInstance().getArmy(regionId).addPiece(elt);
-      return;
-    }
+    // if (location.startsWith('Army')) {
+    //   const regionId = location.split('_')[2];
+    //   await India.getInstance().getArmy(`Presidency_${regionId}`).addPiece(elt);
+    //   return;
+    // }
     const locationElt = document.getElementById(location);
     if (parentHasChildWithId(locationElt, id)) {
       return;
@@ -516,7 +520,6 @@ export class NotificationManager {
 
   async notif_moveCompanyBalance(notif: NotifMoveCompanyBalance) {
     const { companyBalance } = notif;
-    
 
     Company.getInstance().balance.toValue(companyBalance);
   }
@@ -668,6 +671,32 @@ export class NotificationManager {
     }
   }
 
+  async notif_refreshArmies(notif: NotifRefreshArmies) {
+    const { armyPieces, officers } = notif;
+
+    await Promise.all(
+      officers.map(async (officer, index) => {
+        Interaction.use().wait(index * 100);
+        const element = document.getElementById(officer.id);
+        await this.game.animationManager.slideAndAttach(
+          element,
+          document.getElementById(officer.location),
+        );
+      }),
+    );
+
+    await Promise.all(
+      armyPieces.map(async (armyPiece, index) => {
+        Interaction.use().wait(index * 100);
+        const element = document.getElementById(armyPiece.id);
+        await this.game.animationManager.slideAndAttach(
+          element,
+          document.getElementById(armyPiece.location),
+        );
+      }),
+    );
+  }
+
   async notif_returnFamilyMemberToSupply(
     notif: NotifReturnFamilyMemberToSupply,
   ) {
@@ -684,6 +713,28 @@ export class NotificationManager {
     // );
 
     this.getPlayer(playerId).counters[FAMILY_MEMBERS_COUNTER].incValue(1);
+  }
+
+  async notif_returnShipsToSupply(notif: NotifReturnShipsToSupply) {
+    const { ships } = notif;
+    const manager = ShipsManager.getInstance();
+
+    await Promise.all(ships.map((ship) => manager.removeCard(ship)));
+  }
+
+  async notif_returnWritersToPresidencies(
+    notif: NotifReturnWritersToPresidencies,
+  ) {
+    const { writers } = notif;
+
+    const interaction = Interaction.use();
+
+    await Promise.all(
+      writers.map(async (writer, index) => {
+        interaction.wait(index * 100);
+        await this.moveFamilyMember(writer);
+      }),
+    );
   }
 
   async notif_seekShare(notif: NotifSeekShare) {

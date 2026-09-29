@@ -13,7 +13,7 @@ class ArmyPiece extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impl
   protected $cost = 0;
   protected $type;
   protected $strength = 1;
-  protected $region = null;
+  protected $presidencyId = null;
 
   public function __construct($row)
   {
@@ -31,7 +31,7 @@ class ArmyPiece extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impl
   protected $staticAttributes = [
     'name',
     'cost',
-    'region',
+    'presidencyId',
     'strength',
     'type'
   ];

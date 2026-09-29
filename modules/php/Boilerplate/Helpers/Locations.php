@@ -75,9 +75,9 @@ class Locations
     return 'setupCards_' . $familyId;
   }
 
-  public static function writers(string $regionId)
+  public static function writers(string $presidencyId)
   {
-    return 'Writers_' . $regionId;
+    return 'Writers_' . $presidencyId;
   }
 
 

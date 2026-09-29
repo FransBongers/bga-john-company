@@ -9,7 +9,7 @@ class Arcot extends \Bga\Games\JohnCompany\ArmyPieces\LocalAlliance
     parent::__construct($row);
     $this->id = ARCOT;
     $this->name = clienttranslate('Arcot');
-    $this->region = MADRAS;
+    $this->presidencyId = MADRAS_PRESIDENCY;
     $this->cost = 4;
     $this->strength = 2;
   }

@@ -466,9 +466,9 @@ const HOME_REGIONS = [
   MADRAS,
 ];
 
-const BENGAL_PRESIDENCY = 'BengalPresidency';
-const BOMBAY_PRESIDENCY = 'BombayPresidency';
-const MADRAS_PRESIDENCY = 'MadrasPresidency';
+const BENGAL_PRESIDENCY = 'Presidency_Bengal';
+const BOMBAY_PRESIDENCY = 'Presidency_Bombay';
+const MADRAS_PRESIDENCY = 'Presidency_Madras';
 
 const PRESIDENCIES = [
   BENGAL_PRESIDENCY,
@@ -506,9 +506,9 @@ const ARMY_REGION_MAP = [
   MADRAS_ARMY => MADRAS,
 ];
 
-const BENGAL_WRITERS = 'Writers_Bengal';
-const BOMBAY_WRITERS = 'Writers_Bombay';
-const MADRAS_WRITERS = 'Writers_Madras';
+const BENGAL_WRITERS = 'Writers_Presidency_Bengal';
+const BOMBAY_WRITERS = 'Writers_Presidency_Bombay';
+const MADRAS_WRITERS = 'Writers_Presidency_Madras';
 
 /**
  * Shapes on map

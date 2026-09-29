@@ -9,7 +9,7 @@ class Orissa extends \Bga\Games\JohnCompany\ArmyPieces\LocalAlliance
     parent::__construct($row);
     $this->id = ORISSA;
     $this->name = clienttranslate('Orissa');
-    $this->region = BENGAL;
+    $this->presidencyId = BENGAL_PRESIDENCY;
     $this->cost = 2;
     $this->strength = 1;
   }

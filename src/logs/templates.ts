@@ -36,7 +36,7 @@ export const tplLogTokenLocalAlliance = (id: string) => {
   const staticData = StaticData.get().armyPiece(id);
   return tplLocalAlliance({
     extraClasses: 'log-token',
-    region: staticData.region,
+    presidencyId: staticData.presidencyId,
     name: staticData.name,
     strength: staticData.strength,
     cost: staticData.cost,

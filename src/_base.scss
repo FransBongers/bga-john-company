@@ -4,7 +4,7 @@ $selected-color: blue;
 $player-purple: #c7b4e1;
 $player-purple-highlight: hsl(265, 43%, 89%);
 $player-purple-shadow: hsl(265, 43%, 69%);
-$player-purple-dark: #880064; 
+$player-purple-dark: #880064;
 $player-blue: #99dae9;
 $player-blue-highlight: hsl(191, 65%, 86%);
 $player-blue-shadow: hsl(191, 65%, 66%);
@@ -59,14 +59,17 @@ $mysore-color: #c9bda5;
 $mysore-color-highlight: #dcd4c5;
 $mysore-color-shadow: #b6a685;
 
+.joco-background-presidency_bombay,
 .joco-background-bombay {
   background-color: $bombay-color;
 }
 
+.joco-background-presidency_madras,
 .joco-background-madras {
   background-color: $madras-color;
 }
 
+.joco-background-presidency_bengal,
 .joco-background-bengal {
   background-color: $bengal-color;
 }

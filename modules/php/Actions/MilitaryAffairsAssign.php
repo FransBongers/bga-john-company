@@ -43,9 +43,9 @@ class MilitaryAffairsAssign extends \Bga\Games\JohnCompany\Models\AtomicAction
     $officersInTraining = FamilyMembers::getInLocation(Locations::officerInTraining());
 
     $data = [
-      'armies' => array_map(function ($region) {
-        return Locations::armyOfReady($region);
-      }, [BOMBAY, MADRAS, BENGAL]),
+      'armies' => array_map(function ($presidencyId) {
+        return Locations::armyOfReady($presidencyId);
+      }, [BOMBAY_PRESIDENCY, MADRAS_PRESIDENCY, BENGAL_PRESIDENCY]),
       'officersInTraining' => $officersInTraining,
     ];
 

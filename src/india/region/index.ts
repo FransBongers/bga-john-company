@@ -102,7 +102,7 @@ export class Region {
   }
 
   public updateControlToken(data: JocoRegionBase) {
-    if (data.control?.endsWith('Presidency')) {
+    if (data.control?.startsWith('Presidency')) {
       return;
     }
     this.controlTokenStock.addCard(createControlToken(data));

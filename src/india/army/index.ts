@@ -1,5 +1,5 @@
 import { parentHasChildWithId } from '../../boilerplate';
-import { BENGAL, BOMBAY, MADRAS } from '../../constants';
+import { BENGAL, BENGAL_PRESIDENCY, BOMBAY, BOMBAY_PRESIDENCY, MADRAS, MADRAS_PRESIDENCY } from '../../constants';
 import { createFamilyMember, tplFamilyMemberSpot } from '../../templates';
 import { GameAlias, GamedatasAlias } from '../../types';
 
@@ -57,7 +57,7 @@ export class Army {
           `army_${this.id}_exhausted`,
         ) as HTMLElement,
       },
-      commander: document.getElementById(`Commander_${this.id}`) as HTMLElement,
+      commander: document.getElementById(this.getCommanderId()) as HTMLElement,
     };
 
     this.addPieces(config.gamedatas);
@@ -71,7 +71,7 @@ export class Army {
           <div><span class="fb-font-baskerville fb-font-12">${_('Ready pieces').toLocaleUpperCase()}</span></div>
           <div id="army_${this.id}_ready" class="joco-army-stock"></div>
         </div>
-        <div class="joco-army-banner joco-background-${this.id.toLocaleLowerCase()}">${tplFamilyMemberSpot(`Commander_${this.id}`)}<span class="fb-font-baskerville fb-font-16">${this.getName().toLocaleUpperCase()}</span></div>
+        <div class="joco-army-banner joco-background-${this.id.toLocaleLowerCase()}">${tplFamilyMemberSpot(this.getCommanderId())}<span class="fb-font-baskerville fb-font-16">${this.getName().toLocaleUpperCase()}</span></div>
         <div class="joco-inner-container">
           <div id="army_${this.id}_exhausted" class="joco-army-stock joco-exhausted"></div>
           <div><span class="fb-font-baskerville fb-font-12">${_('Exhausted pieces & Local Alliances').toLocaleUpperCase()}</span></div>
@@ -105,7 +105,7 @@ export class Army {
         // Officers
         const officerElement = createFamilyMember(member.familyId, member.id);
         this.ui.army[member.location].appendChild(officerElement);
-      } else if (member.location === `Commander_${this.id}`) {
+      } else if (member.location === this.getCommanderId()) {
         // Commander
         const commanderElement = createFamilyMember(member.familyId, member.id);
         this.ui.commander.appendChild(commanderElement);
@@ -121,13 +121,17 @@ export class Army {
   // .##.....##....##.....##..##........##.....##.......##...
   // ..#######.....##....####.########.####....##.......##...
 
+  private getCommanderId() {
+    return `Commander_${this.id.split('_')[1]}`;
+  }
+
   public getName() {
     switch (this.id) {
-      case BENGAL:
+      case BENGAL_PRESIDENCY:
         return 'Army of Bengal';
-      case BOMBAY:
+      case BOMBAY_PRESIDENCY:
         return 'Army of Bombay';
-      case MADRAS:
+      case MADRAS_PRESIDENCY:
         return 'Army of Madras';
       default:
         return '';

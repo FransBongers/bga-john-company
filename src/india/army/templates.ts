@@ -17,15 +17,15 @@ export const tplRegiment = ({
 export const tplLocalAlliance = ({
   id,
   extraClasses = '',
-  region,
+  presidencyId,
   name,
   strength,
   cost
 }: {
   extraClasses?: string;
   id?: string;
-} & Pick<JocoArmyPiece, 'region' | 'name' | 'strength' | 'cost'>) => `
-  <div id="${id ?? ''}" class="joco-local-alliance ${extraClasses}" data-region='${region}' style="order: ${cost};">
+} & Pick<JocoArmyPiece, 'presidencyId' | 'name' | 'strength' | 'cost'>) => `
+  <div id="${id ?? ''}" class="joco-local-alliance ${extraClasses}" data-presidency='${presidencyId}' style="order: ${cost};">
     <div class="joco-local-alliance-strength">
       <div class="joco-strength-icon joco-inverted"></div>
       <span class="fb-font-baskerville">${strength}</span>

@@ -674,7 +674,7 @@ trait TurnTrait
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  function setupPresidencyOperations($presidency)
+  function setupPresidencyOperations(string $presidencyId)
   {
     $presidencyOfficeMap = [
       BOMBAY_PRESIDENCY => PRESIDENT_OF_BOMBAY,
@@ -694,7 +694,7 @@ trait TurnTrait
     //     ]
     //   ],
     // ];
-    $presidentOffice = $offices[$presidencyOfficeMap[$presidency]];
+    $presidentOffice = $offices[$presidencyOfficeMap[$presidencyId]];
     $commander = $presidentOffice->getCommander();
 
 
@@ -719,6 +719,7 @@ trait TurnTrait
         'activePlayerIds' => [$commander->getPlayerId()],
         'args' => [
           'officeId' => $presidentOffice->getId(),
+          'presidencyId' => $presidencyId,
         ],
       ];
     }

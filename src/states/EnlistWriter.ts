@@ -12,13 +12,18 @@ import {
   setSelected,
   updatePageTitle,
 } from '../boilerplate';
-import { WRITER, BENGAL, BOMBAY, MADRAS } from '../constants';
+import {
+  WRITER,
+  PRESIDENCY_REGION_MAP,
+} from '../constants';
 import { PlayerManager } from '../player-manager';
 import { StaticData } from '../static-data';
 import { CommonStateArgs, GameAlias } from '../types';
 import { getRegionName } from '../utility';
 
-interface OnEnteringEnlistWriterArgs extends CommonStateArgs {}
+interface OnEnteringEnlistWriterArgs extends CommonStateArgs {
+  options: string[];
+}
 
 export class EnlistWriter implements GameState<OnEnteringEnlistWriterArgs> {
   private static instance: EnlistWriter;
@@ -82,28 +87,26 @@ export class EnlistWriter implements GameState<OnEnteringEnlistWriterArgs> {
       },
     );
 
-    [BOMBAY, MADRAS, BENGAL].forEach((region) => {
-      // const box = Board.getInstance().ui.selectBoxes[`Writers_${region}`];
-      // onClick(box, () => this.updateInterfaceConfirm(region));
-      onClick(`PresidencyOf${region}`, () =>
-        this.updateInterfaceConfirm(region),
-      );
+    this.args.options.forEach((presidencyId) => {
+      onClick(presidencyId, () => this.updateInterfaceConfirm(presidencyId));
     });
   }
 
-  private updateInterfaceConfirm(regionId: string) {
+  private updateInterfaceConfirm(presidencyId: string) {
     clearPossible();
 
-    setSelected(Board.getInstance().ui.selectBoxes[`Writers_${regionId}`]);
+    setSelected(presidencyId);
 
     updatePageTitle(_('Enlist ${tkn_icon} in ${regionName}?'), {
       tkn_icon: WRITER,
-      regionName: _(StaticData.get().region(regionId).name),
+      regionName: _(
+        StaticData.get().region(PRESIDENCY_REGION_MAP[presidencyId]).name,
+      ),
     });
 
     const callback = () =>
       performAction('actEnlistWriter', {
-        regionId,
+        presidencyId,
       });
 
     addConfirmButton(callback);

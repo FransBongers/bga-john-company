@@ -90,13 +90,13 @@ class DirectorOfTradeTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
     }
 
     // Generate all writer locations. Same Ids are used for select boxes in UI
-    $writerLocations = array_map(function ($regionId) {
-      return Locations::writers($regionId);
-    }, HOME_REGIONS);
+    $writerLocations = array_map(function ($presidencyId) {
+      return Locations::writers($presidencyId);
+    }, PRESIDENCIES);
     $writers = FamilyMembers::getWriters();
 
     /**
-     * For each writer, options are the other two regions
+     * For each writer, options are the other two presidencies
      */
     foreach ($writers as $writer) {
       $options['writers'][$writer->getId()] = [
@@ -194,9 +194,9 @@ class DirectorOfTradeTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
     }
     $writers = FamilyMembers::getWriters();
     $writerCountPerRegion = [
-      Locations::writers(BENGAL) => 0,
-      Locations::writers(BOMBAY) => 0,
-      Locations::writers(MADRAS) => 0,
+      Locations::writers(BENGAL_PRESIDENCY) => 0,
+      Locations::writers(BOMBAY_PRESIDENCY) => 0,
+      Locations::writers(MADRAS_PRESIDENCY) => 0,
     ];
     foreach($writers as $writer) {
       $writerCountPerRegion[$writer->getLocation()] += 1;

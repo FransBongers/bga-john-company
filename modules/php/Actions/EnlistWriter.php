@@ -71,30 +71,30 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
     self::checkAction('actEnlistWriter');
     $playerId = $this->checkPlayer();
 
-    $regionId = $args->regionId;
+    $presidencyId = $args->presidencyId;
 
     $stateArgs = $this->argsEnlistWriter();
 
-    if (!in_array($regionId, $stateArgs['options'])) {
+    if (!in_array($presidencyId, $stateArgs['options'])) {
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_004");
     }
 
-    $this->performAction($playerId, $regionId);
+    $this->performAction($playerId, $presidencyId);
 
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
     $this->resolveAction([], true);
   }
 
-  public function performAction($playerId, $regionId)
+  public function performAction(string $playerId, string $presidencyId)
   {
     $player = Players::get($playerId);
     $familyId = $player->getFamilyId();
 
     $familyMember = FamilyMembers::getMemberFor($familyId);
-    $familyMember->setLocation(Locations::writers($regionId));
-    $familyMember->setPresidency(Locations::presidency($regionId));
+    $familyMember->setLocation(Locations::writers($presidencyId));
+    $familyMember->setPresidency($presidencyId);
 
-    Notifications::enlistWriter($player, $familyMember, Regions::get($regionId));
+    Notifications::enlistWriter($player, $familyMember, Regions::get(PRESIDENCY_HOME_REGION_MAP[$presidencyId]));
 
     // TODO: insert extra actions
   }
@@ -122,7 +122,7 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
     if (!$canPlaceFamilyMembers) {
       return [];
     }
-    return [BENGAL, BOMBAY, MADRAS];
+    return [BENGAL_PRESIDENCY, BOMBAY_PRESIDENCY, MADRAS_PRESIDENCY];
   }
 
   // ..######..########...#######..##......##.##....##

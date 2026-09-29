@@ -16,7 +16,7 @@ class Setup1710_10 extends \Bga\Games\JohnCompany\Models\SetupCard
       ],
       [
         'type' => WRITER,
-        'value' => BENGAL
+        'value' => BENGAL_PRESIDENCY,
       ],
       [
         'type' => CASH,

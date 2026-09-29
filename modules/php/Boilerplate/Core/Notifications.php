@@ -12,7 +12,9 @@ use Bga\Games\JohnCompany\Models\ArmyPiece;
 use Bga\Games\JohnCompany\Models\Enterprise;
 use Bga\Games\JohnCompany\Models\FamilyMember;
 use Bga\Games\JohnCompany\Models\Office;
+use Bga\Games\JohnCompany\Models\Order;
 use Bga\Games\JohnCompany\Models\Player;
+use Bga\Games\JohnCompany\Models\Ship;
 
 class Notifications
 {
@@ -224,7 +226,7 @@ class Notifications
 
   private static function getRegionNameForArmy($armyLocation)
   {
-    $regionId = explode('_', $armyLocation)[1];
+    $regionId = explode('_', $armyLocation)[2];
 
     $idNameMap = [
       BENGAL => clienttranslate('Bengal'),
@@ -266,23 +268,23 @@ class Notifications
     return isset($idNameMap[$regionId]) ? $idNameMap[$regionId] : 'Unmapped region';
   }
 
-  private static function getLocationNameForFamilyMember($location)
+  private static function getLocationNameForFamilyMember(string $location)
   {
     // TODO: this needs to be used for more than just the current locations, potentially all locations for family members?
     $locationNameMap = [
       BENGAL_WRITERS  => clienttranslate('Bengal'),
       BOMBAY_WRITERS => clienttranslate('Bombay'),
       MADRAS_WRITERS => clienttranslate('Madras'),
-      Locations::armyOfReady(BENGAL) => clienttranslate('army of Bengal'),
-      Locations::armyOfReady(BOMBAY) => clienttranslate('army of Bombay'),
-      Locations::armyOfReady(MADRAS) => clienttranslate('army of Madras'),
-      Locations::armyOfExhausted(BENGAL) => clienttranslate('army of Bengal'),
-      Locations::armyOfExhausted(BOMBAY) => clienttranslate('army of Bombay'),
-      Locations::armyOfExhausted(MADRAS) => clienttranslate('army of Madras'),
+      Locations::armyOfReady(BENGAL_PRESIDENCY) => clienttranslate('army of Bengal'),
+      Locations::armyOfReady(BOMBAY_PRESIDENCY) => clienttranslate('army of Bombay'),
+      Locations::armyOfReady(MADRAS_PRESIDENCY) => clienttranslate('army of Madras'),
+      Locations::armyOfExhausted(BENGAL_PRESIDENCY) => clienttranslate('army of Bengal'),
+      Locations::armyOfExhausted(BOMBAY_PRESIDENCY) => clienttranslate('army of Bombay'),
+      Locations::armyOfExhausted(MADRAS_PRESIDENCY) => clienttranslate('army of Madras'),
       OFFICER_IN_TRAINING => clienttranslate('officers-in-training')
     ];
     if (!isset($locationNameMap[$location])) {
-      throw new \Bga\GameFramework\VisibleSystemException("ERROR_021");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_021: " . $location);
     }
     return $locationNameMap[$location];
   }
@@ -336,28 +338,34 @@ class Notifications
     ]);
   }
 
-  public static function changeOrderStatus($player, $order, $status)
+  public static function changeOrderStatus(Player | null $player, Order $order, string $status, $noMessage = false)
   {
-    $text = $status === OPEN ? clienttranslate('${player_name} opens an order in ${tkn_boldText_region}') : clienttranslate('${player_name} closes an order in ${tkn_boldText_region}');
+    $args = [];
+    $text = '';
 
-    self::notifyAll('changeOrderStatus', $text, [
-      'player' => $player,
+    if ($player === null && $status === OPEN) {
+      $text = clienttranslate('An order in ${tkn_boldText_region} is opened');
+    } else if ($player === null && $status === CLOSED) {
+      $text = clienttranslate('An order in ${tkn_boldText_region} is closed');
+    } else if ($player !== null && $status === OPEN) {
+      $text = clienttranslate('${player_name} opens an order in ${tkn_boldText_region}');
+      $args['player'] = $player;
+    } else if ($player !== null && $status === CLOSED) {
+      $text = clienttranslate('${player_name} closes an order in ${tkn_boldText_region}');
+      $args['player'] = $player;
+    }
+
+    if ($noMessage) {
+      $text = '';
+    }
+
+    self::notifyAll('changeOrderStatus', $text, array_merge([
       'tkn_boldText_region' => Regions::get($order->getLocation())->getName(),
       'order' => $order->jsonSerialize(),
       'i18n' => ['tkn_boldText_region'],
-    ]);
+    ], $args));
   }
 
-  public static function changeOrderStatusByGame($order, $status)
-  {
-    $text = $status === OPEN ? clienttranslate('An order in ${tkn_boldText_region} is opened') : clienttranslate('An order in ${tkn_boldText_region} is closed');
-
-    self::notifyAll('changeOrderStatus', $text, [
-      'tkn_boldText_region' => Regions::get($order->getLocation())->getName(),
-      'order' => $order->jsonSerialize(),
-      'i18n' => ['tkn_boldText_region'],
-    ]);
-  }
 
   public static function companyOperationChairman($player, $companyDebt, $debtIncreased, $updatedTreasuries, $companyBalance)
   {
@@ -789,6 +797,14 @@ class Notifications
     ]);
   }
 
+  public static function refreshArmies(array $movedArmyPieces, array $movedOfficers)
+  {
+    self::notifyAll('refreshArmies', clienttranslate('All officers and regiments become active. All local alliances are exhausted'), [
+      'armyPieces' => $movedArmyPieces,
+      'officers' => $movedOfficers,
+    ]);
+  }
+
   public static function regionBecomesPartOfEmpire($region, $capital)
   {
     self::notifyAll('updateRegion', clienttranslate('${tkn_boldText_region} becomes part of the ${tkn_boldText_capital} empire'), [
@@ -814,6 +830,13 @@ class Notifications
       'player' => $player,
       'familyMember' => $familyMember,
       'tkn_familyMember' => self::tknFamilyMember($familyMember),
+    ]);
+  }
+
+  public static function returnWritersToPresidencies(array $writersToReturn)
+  {
+    self::notifyAll('returnWritersToPresidencies', clienttranslate('All writers are returned to their associated Presidency'), [
+      'writers' => $writersToReturn,
     ]);
   }
 
@@ -871,9 +894,11 @@ class Notifications
     ]);
   }
 
-  public static function moveShip($player, $ship, $from)
+  public static function moveShip(Player $player, Ship $ship, string $from)
   {
-    self::notifyAll('moveShip', clienttranslate('${player_name} moves the ${tkn_boldText_shipName} from ${tkn_boldText_from} to ${tkn_boldText_to}'), [
+    $text = clienttranslate('${player_name} moves the ${tkn_boldText_shipName} from ${tkn_boldText_from} to ${tkn_boldText_to}');
+
+    self::notifyAll('moveShip', $text, [
       'player' => $player,
       'ship' => $ship->jsonSerialize(),
       'from' => $from,
@@ -900,6 +925,14 @@ class Notifications
       'armyPiece' => $armyPiece->jsonSerialize(),
       'tkn_localAlliance' => $armyPiece->getId(),
       'i18n' => [],
+    ]);
+  }
+
+  public static function returnShipsToSupply(array $ships)
+  {
+    self::notifyAll('returnShipsToSupply', clienttranslate('All ${tkn_ship} are returned to the supply'), [
+      'ships' => $ships,
+      'tkn_ship' => self::tknShip($ships[0]),
     ]);
   }
 

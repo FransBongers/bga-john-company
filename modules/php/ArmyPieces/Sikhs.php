@@ -9,7 +9,7 @@ class Sikhs extends \Bga\Games\JohnCompany\ArmyPieces\LocalAlliance
     parent::__construct($row);
     $this->id = SIKHS;
     $this->name = clienttranslate('Sikhs');
-    $this->region = BOMBAY;
+    $this->presidencyId = BOMBAY_PRESIDENCY;
     $this->cost = 3;
     $this->strength = 2;
   }

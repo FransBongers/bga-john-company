@@ -9,7 +9,7 @@ class RajputPrince extends \Bga\Games\JohnCompany\ArmyPieces\LocalAlliance
     parent::__construct($row);
     $this->id = RAJPUT_PRINCE;
     $this->name = clienttranslate('Rajput Prince');
-    $this->region = BOMBAY;
+    $this->presidencyId = BOMBAY_PRESIDENCY;
     $this->cost = 5;
     $this->strength = 3;
   }

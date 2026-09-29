@@ -51,7 +51,7 @@ class Ship extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implement
     return $this->jsonSerialize(); // Static datas are already in js file
   }
 
-  public function moveTo($player, $newLocation)
+  public function moveTo(Player $player, string $newLocation)
   {
     $from = $this->getLocation();
     $this->setLocation($newLocation);

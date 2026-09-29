@@ -45,9 +45,9 @@ class MilitaryAffairsTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
       'regiments' => [],
     ];
 
-    $armyLocations = array_map(function ($regionId) {
-      return Locations::armyOfReady($regionId);
-    }, HOME_REGIONS);
+    $armyLocations = array_map(function ($presidencyId) {
+      return Locations::armyOfReady($presidencyId);
+    }, PRESIDENCIES);
 
     $officers = FamilyMembers::getOfficers();
     /**

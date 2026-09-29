@@ -153,8 +153,21 @@ export interface NotifPurchaseEnterprise extends NotifWithPlayerArgs {
   familyId: string;
 }
 
+export interface NotifRefreshArmies {
+  armyPieces: JocoArmyPieceBase[];
+  officers: JocoFamilyMember[];
+}
+
 export interface NotifReturnFamilyMemberToSupply extends NotifWithPlayerArgs {
   familyMember: JocoFamilyMember;
+}
+
+export interface NotifReturnShipsToSupply {
+  ships: JocoShipBase[];
+}
+
+export interface NotifReturnWritersToPresidencies {
+  writers: JocoFamilyMember[];
 }
 
 export interface NotifSeekShare extends NotifWithPlayerArgs {

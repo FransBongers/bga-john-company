@@ -51,7 +51,7 @@ class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidenc
       'orders' => $options['orders'],
       'homePortOrderId' => $options['homePortOrderId'],
       'officeId' => $info['officeId'],
-      'writers' => FamilyMembers::getWriters($office->getRegionId()),
+      'writers' => FamilyMembers::getWriters($office->getPresidencyId()),
       'numberOfOrdersToFill' => min($options['shipCount'], count($options['orders'])),
     ];
     return $data;
@@ -92,7 +92,6 @@ class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidenc
     $orders = $stateArgs['orders'];
     $writers = $stateArgs['writers'];
 
-    Notifications::log('args', $args);
     if (count($filledOrders) !== $stateArgs['numberOfOrdersToFill']) {
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_028");
     }

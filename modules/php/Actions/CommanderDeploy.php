@@ -70,16 +70,17 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
     $presidentOfficeId = $args['presidentOfficeId'];
     $president = Offices::get($presidentOfficeId);
     $homeRegionId = $president->getRegionId();
+    $presidencyId = $president->getPresidencyId();
 
     $options = $this->getOptions();
 
     return [
       'options' => $options,
       'skipOnEnteringState' => count($options) === 0,
-      'armyPieces' => ArmyPieces::getInLocation(Locations::armyOfReady($homeRegionId)),
-      'officers' => FamilyMembers::getInLocation(Locations::armyOfReady($homeRegionId)),
+      'armyPieces' => ArmyPieces::getInLocation(Locations::armyOfReady($presidencyId)),
+      'officers' => FamilyMembers::getInLocation(Locations::armyOfReady($presidencyId)),
       'regionId' => $homeRegionId,
-      'presidencyId' => $president->getPresidencyId(),
+      'presidencyId' => $presidencyId,
     ];
   }
 
@@ -131,7 +132,7 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
         throw new \Bga\GameFramework\VisibleSystemException("ERROR_050");
       }
       $piece = $stateArgs['armyPieces'][$pieceId];
-      $piece->setLocation(Locations::armyOfExhausted($stateArgs['regionId']));
+      $piece->setLocation(Locations::armyOfExhausted($stateArgs['presidencyId']));
       $selectedStrength += $piece->getStrength();
       $selectedPieces[] = $piece;
     }
@@ -141,7 +142,7 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
         throw new \Bga\GameFramework\VisibleSystemException("ERROR_051");
       }
       $officer = $stateArgs['officers'][$pieceId];
-      $officer->setLocation(Locations::armyOfExhausted($stateArgs['regionId']));
+      $officer->setLocation(Locations::armyOfExhausted($stateArgs['presidencyId']));
       $selectedStrength++;
       $selectedPieces[] = $officer;
     }
@@ -307,7 +308,7 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
     $presidencyId = $president->getPresidencyId();
 
     $regionsById = Regions::getAll();
-    $availableStrength = $this->getAvailableStrength($homeRegionId);
+    $availableStrength = $this->getAvailableStrength($presidencyId);
 
     $associatedRegionIds = Utils::filter(REGIONS, function ($regionId) use ($regionsById, $presidencyId, $homeRegionId) {
       return $regionsById[$regionId]->getControl() === $presidencyId;
@@ -363,9 +364,9 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
    * member and regiment in its home region's army, plus the strength of
    * each ready local alliance.
    */
-  private function getAvailableStrength($homeRegionId)
+  private function getAvailableStrength(string $presidencyId)
   {
-    $readyLocation = Locations::armyOfReady($homeRegionId);
+    $readyLocation = Locations::armyOfReady($presidencyId);
 
     $strength = count(FamilyMembers::getInLocation($readyLocation)->toArray());
 
@@ -404,6 +405,7 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
     $args = $this->ctx->getArgs();
     $commanderPlayerId = $args['commanderPlayerId'];
     $presidentOfficeId = $args['presidentOfficeId'];
+    $presidencyId = $args['presidencyId'];
 
 
     $this->ctx->insertAsBrother(new LeafNode([
@@ -414,6 +416,7 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
       'args' => [
         'commanderPlayerId' => $commanderPlayerId,
         'presidentOfficeId' => $presidentOfficeId,
+        'presidencyId' => $presidencyId ?? MADRAS_PRESIDENCY,
       ]
     ]));
   }

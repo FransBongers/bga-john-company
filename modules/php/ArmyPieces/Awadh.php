@@ -9,7 +9,7 @@ class Awadh extends \Bga\Games\JohnCompany\ArmyPieces\LocalAlliance
     parent::__construct($row);
     $this->id = AWADH;
     $this->name = clienttranslate('Awadh');
-    $this->region = BENGAL;
+    $this->presidencyId = BENGAL_PRESIDENCY;
     $this->cost = 4;
     $this->strength = 2;
   }

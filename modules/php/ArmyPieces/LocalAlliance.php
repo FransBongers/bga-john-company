@@ -19,7 +19,7 @@ class LocalAlliance extends \Bga\Games\JohnCompany\Models\ArmyPiece
   {
     $office = Offices::get($presidentOfficeId);
     $office->pay($player, $this->getCost());
-    $this->setLocation(Locations::armyOfReady($this->getRegion()));
+    $this->setLocation(Locations::armyOfReady($this->getPresidencyId()));
     Notifications::purchaseLocalAlliance($player, $this);
   }
 }

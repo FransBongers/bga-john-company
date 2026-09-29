@@ -10,6 +10,9 @@ import {
   MILITARY_AFFAIRS,
   OFFICER_IN_TRAINING,
   FILLED_BY_WRITER,
+  BOMBAY_PRESIDENCY,
+  BENGAL_PRESIDENCY,
+  MADRAS_PRESIDENCY,
 } from '../constants';
 import { createFamilyMember } from '../templates';
 import { GameAlias, GamedatasAlias, JocoRegionBase } from '../types';
@@ -96,7 +99,7 @@ export class India {
     const presidencyContainer = document.getElementById(
       'joco-presidencies-and-armies',
     );
-    [BOMBAY, MADRAS, BENGAL].forEach((army) => {
+    [BOMBAY_PRESIDENCY, MADRAS_PRESIDENCY, BENGAL_PRESIDENCY].forEach((army) => {
       const armyInstance = new Army({
         parentElement: presidencyContainer!,
         id: army,
@@ -111,13 +114,13 @@ export class India {
     const presidencyContainer = document.getElementById(
       'joco-presidencies-and-armies',
     );
-    [BOMBAY, MADRAS, BENGAL].forEach((regionId) => {
+    [BOMBAY_PRESIDENCY, MADRAS_PRESIDENCY, BENGAL_PRESIDENCY].forEach((presidencyId) => {
       const presidencyInstance = new Presidency({
         gamedatas,
         parentElement: presidencyContainer!,
-        id: regionId,
+        id: presidencyId,
       });
-      this.presidencies[`${regionId}Presidency`] = presidencyInstance;
+      this.presidencies[presidencyId] = presidencyInstance;
     });
   }
 
@@ -193,8 +196,8 @@ export class India {
     });
   }
 
-  public getArmy(regionId: string): Army {
-    return this.armies[regionId];
+  public getArmy(presidencyId: string): Army {
+    return this.armies[presidencyId];
   }
 
   public getPresidency(presidencyId: string): Presidency {

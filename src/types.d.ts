@@ -150,9 +150,9 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   turn: number;
 }
 
-type BengalPresidency = 'BengalPresidency';
-type BombayPresidency = 'BombayPresidency';
-type MadrasPresidency = 'MadrasPresidency';
+type BengalPresidency = 'Presidency_Bengal';
+type BombayPresidency = 'Presidency_Bombay';
+type MadrasPresidency = 'Presidency_Madras';
 type JoCoPresidency = BengalPresidency | BombayPresidency | MadrasPresidency;
 
 type JoCoSetupCard = JoCoSetupCardBase & JocoSetupCardStatic;
@@ -188,7 +188,7 @@ export interface JocoArmyPieceBase extends GamePiece {}
 export interface JocoArmyPieceStatic {
   strength: number;
   name: string;
-  region: string;
+  presidencyId: string;
   cost: number;
 }
 

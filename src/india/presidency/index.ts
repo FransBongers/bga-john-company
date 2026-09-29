@@ -1,5 +1,5 @@
 import { createFamilyMember, tplFamilyMemberSpot } from '../../templates';
-import { BENGAL, BOMBAY, MADRAS } from '../../constants';
+import { BENGAL, BENGAL_PRESIDENCY, BOMBAY, BOMBAY_PRESIDENCY, MADRAS, MADRAS_PRESIDENCY } from '../../constants';
 import {
   GamedatasAlias,
   JocoControlToken,
@@ -62,7 +62,7 @@ export class Presidency {
       parent: parentElement,
       writers: document.getElementById(`Writers_${this.id}`) as HTMLElement,
       president: document.getElementById(
-        `PresidentOf${this.id}`,
+        this.getPresidentId(),
       ) as HTMLElement,
       tokensAndTreasury: document.getElementById(
         `joco-control-tokens-and-treasury-${this.id}`,
@@ -83,12 +83,11 @@ export class Presidency {
   private setupControlTokens(gamedatas: GamedatasAlias) {
     this.controlTokenStock = new BgaCards.LineStock<JocoControlToken>(
       ControlTokensManager.getInstance(),
-      document.getElementById(`joco-control-tokens-PresidencyOf${this.id}`),
+      document.getElementById(`joco-control-tokens-${this.id}`),
     );
 
     Object.values(gamedatas.regions).forEach((region) => {
-      if (region.control === `${this.id}Presidency`) {
-        console.log(`Adding control token for region: ${region.id}`);
+      if (region.control === this.id) {
         this.controlTokenStock.addCard(createControlToken(region));
       }
     });
@@ -97,19 +96,19 @@ export class Presidency {
   private setupTreasury(gamedatas: GamedatasAlias) {
     const company = Company.getInstance();
 
-    company.treasuries[`PresidentOf${this.id}`] = new Treasury({
+    company.treasuries[this.getPresidentId()] = new Treasury({
       parent: this.ui.tokensAndTreasury,
       gamedatas,
-      office: `PresidentOf${this.id}`,
+      office: this.getPresidentId(),
     });
   }
 
   private tplPresidency() {
     return `
-      <div id="PresidencyOf${this.id}" class="joco-office joco-presidency joco-container">
-        ${tplOfficeHeader(`PresidentOf${this.id}`, this.getName())}
+      <div id="${this.id}" class="joco-office joco-presidency joco-container">
+        ${tplOfficeHeader(this.getPresidentId(), this.getName())}
         <div id="joco-control-tokens-and-treasury-${this.id}" class="joco-row joco-control-tokens-treasury">
-          <div id="joco-control-tokens-PresidencyOf${this.id}"></div>
+          <div id="joco-control-tokens-${this.id}"></div>
         </div>
         <div class="joco-inner-container">
           <div id="Writers_${this.id}" class="joco-family-members-stock"></div>
@@ -136,7 +135,7 @@ export class Presidency {
         // Writers
         const writerElement = createFamilyMember(member.familyId, member.id);
         this.ui.writers.appendChild(writerElement);
-      } else if (member.location === `PresidentOf${this.id}`) {
+      } else if (member.location === this.getPresidentId()) {
         // President
         const presidentElement = createFamilyMember(member.familyId, member.id);
         this.ui.president.appendChild(presidentElement);
@@ -152,22 +151,26 @@ export class Presidency {
   // .##.....##....##.....##..##........##.....##.......##...
   // ..#######.....##....####.########.####....##.......##...
 
+  private getPresidentId() {
+    return `PresidentOf${this.id.split('_')[1]}`;
+  }
+
   public async addControlToken(controlToken: JocoControlToken) {
     await this.controlTokenStock.addCard(controlToken);
   }
 
   public getTreasury() {
     const company = Company.getInstance();
-    return company.treasuries[`PresidentOf${this.id}`];
+    return company.treasuries[this.getPresidentId()];
   }
 
   public getName() {
     switch (this.id) {
-      case BENGAL:
+      case BENGAL_PRESIDENCY:
         return 'Presidency of Bengal';
-      case BOMBAY:
+      case BOMBAY_PRESIDENCY:
         return 'Presidency of Bombay';
-      case MADRAS:
+      case MADRAS_PRESIDENCY:
         return 'Presidency of Madras';
       default:
         return '';

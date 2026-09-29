@@ -24,6 +24,7 @@ interface OnEnteringCommanderDeployArgs extends CommonStateArgs {
   options: Record<string, number>; // regionId => minimum strength required to deploy there
   armyPieces: Record<string, JocoArmyPieceBase>;
   officers: Record<string, JocoFamilyMember>;
+  presidencyId: string;
   regionId: string;
 }
 
@@ -199,7 +200,7 @@ export class CommanderDeploy implements GameState<OnEnteringCommanderDeployArgs>
 
   private async movePiece(pieceId: string, targetId: 'ready' | 'exhausted') {
     const targetElement = document.getElementById(
-      `army_${this.args.regionId}_${targetId}`,
+      `army_${this.args.presidencyId}_${targetId}`,
     ) as HTMLElement;
     await this.game.animationManager.slideAndAttach(
       document.getElementById(pieceId) as HTMLElement,
@@ -221,9 +222,6 @@ export class CommanderDeploy implements GameState<OnEnteringCommanderDeployArgs>
       ...this.selectedPieces.armyPieces,
       ...this.selectedPieces.officers,
     ];
-    const readyBox = document.getElementById(
-      `army_${this.args.regionId}_ready`,
-    ) as HTMLElement;
     await Promise.all(ids.map((pieceId) => this.movePiece(pieceId, 'ready')));
   }
 

@@ -157,6 +157,7 @@ class CommanderPurchaseLocalAlliance extends \Bga\Games\JohnCompany\Models\Atomi
     $commanderPlayerId = $args['commanderPlayerId'];
     $presidentOfficeId = $args['presidentOfficeId'];
     $regionId = $args['regionId'];
+    $presidencyId = $args['presidencyId'];
 
 
     $this->ctx->insertAsBrother(new LeafNode([
@@ -168,6 +169,7 @@ class CommanderPurchaseLocalAlliance extends \Bga\Games\JohnCompany\Models\Atomi
         'commanderPlayerId' => $commanderPlayerId,
         'regionId' => $regionId,
         'presidentOfficeId' => $presidentOfficeId,
+        'presidencyId' => $presidencyId,
       ]
     ]));
   }
@@ -175,11 +177,11 @@ class CommanderPurchaseLocalAlliance extends \Bga\Games\JohnCompany\Models\Atomi
   private function getOptions()
   {
     $args = $this->ctx->getArgs();
-    $regionId = $args['regionId'];
+    $presidencyId =  $args['presidencyId'];
     $presidentOfficeId = $args['presidentOfficeId'];
     $treasury = Offices::get($presidentOfficeId)->getTreasury();
 
-    $armyPieces = ArmyPieces::getInLocation(Locations::armyOfExhausted($regionId))->toArray();
+    $armyPieces = ArmyPieces::getInLocation(Locations::armyOfExhausted($presidencyId))->toArray();
 
     return Utils::filter($armyPieces, function ($piece) use ($treasury) {
       return $piece->getType() === LOCAL_ALLIANCE && $piece->getCost() <= $treasury;

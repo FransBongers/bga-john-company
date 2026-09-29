@@ -248,15 +248,21 @@ export const PUNJAB = 'Punjab';
 /**
  * Presidencies
  */
-export const BENGAL_PRESIDENCY = 'BengalPresidency';
-export const BOMBAY_PRESIDENCY = 'BombayPresidency';
-export const MADRAS_PRESIDENCY = 'MadrasPresidency';
+export const BENGAL_PRESIDENCY = 'Presidency_Bengal';
+export const BOMBAY_PRESIDENCY = 'Presidency_Bombay';
+export const MADRAS_PRESIDENCY = 'Presidency_Madras';
 
 export const PRESIDENCIES = [
   BENGAL_PRESIDENCY,
   BOMBAY_PRESIDENCY,
   MADRAS_PRESIDENCY,
 ];
+
+export const PRESIDENCY_REGION_MAP = {
+  [BENGAL_PRESIDENCY]: BENGAL,
+  [BOMBAY_PRESIDENCY]: BOMBAY,
+  [MADRAS_PRESIDENCY]: MADRAS,
+};
 
 export const BENGAL_WRITERS = 'Writers_Bengal';
 export const BOMBAY_WRITERS = 'Writers_Bombay';

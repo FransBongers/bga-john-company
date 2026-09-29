@@ -1,3 +1,4 @@
+import { Bar } from '../bar';
 import {
   debug,
   updatePageTitle,
@@ -50,6 +51,7 @@ export class MilitaryAffairsAssign implements GameState<OnEnteringMilitaryAffair
     this.assignedOfficers = {};
 
     this.updateInterfaceInitialStep();
+    Bar.getInstance().goTo('joco-india');
   }
 
   onLeavingState() {
@@ -120,11 +122,11 @@ export class MilitaryAffairsAssign implements GameState<OnEnteringMilitaryAffair
     setSelected(officer.id);
 
     this.args.armies.forEach((to) => {
-      const regionId = to.split('_')[1];
-      onClick(`ArmyOf${regionId}`, async () => {
+      const regionId = to.split('_')[2];
+      onClick(`ArmyOfPresidency_${regionId}`, async () => {
         
         clearPossible();
-        await India.getInstance().getArmy(regionId).addPiece(officer.id);
+        await India.getInstance().getArmy(`Presidency_${regionId}`).addPiece(officer.id);
         this.assignedOfficers[officer.id] = { officer, to };
         this.updateInterfaceInitialStep();
       });
