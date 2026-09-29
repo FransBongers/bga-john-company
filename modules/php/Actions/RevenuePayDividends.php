@@ -161,6 +161,7 @@ class RevenuePayDividends extends \Bga\Games\JohnCompany\Actions\PresidencyActio
       Company::adjustStanding(1);
     }
 
+    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
     $this->resolveAction([], true);
   }
 

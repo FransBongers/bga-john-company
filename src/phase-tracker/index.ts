@@ -50,7 +50,7 @@ const tplCurrentPhase = (phase: string) => `
       <span class="fb-font-baskerville fb-font-bold fb-font-16">${_('PHASE')}</span>
     </div>
     <div class="joco-current-phase">
-      <span class="fb-font-baskerville fb-font-bold fb-font-16">${getPhaseName(phase).toLocaleUpperCase()}</span>
+      <span id="joco-current-phase-text" class="fb-font-baskerville fb-font-bold fb-font-16">${getPhaseName(phase).toLocaleUpperCase()}</span>
     </div>
   </div>
 `;
@@ -60,9 +60,15 @@ const tplCurrentTurn = (turn: number) => `
     <div class="joco-label">
       <span class="fb-font-baskerville fb-font-bold fb-font-16">${_('TURN')}</span>
     </div>
-    <div class="joco-turn-numbers">
-      ${[1,2,3,4,5,6,7,8].map((t) => `<span class="joco-turn-number fb-font-baskerville fb-font-bold fb-font-16" data-active="${t === turn}">${t}</span>`).join('')}
+    <div id="joco-turn-numbers" class="joco-turn-numbers">
+
     </div>
+  </div>
+`;
+
+const tplTurnItem = (turn: number) => `
+  <div id="joco-turn-number-${turn}" class="joco-turn-number">
+    <span class="fb-font-baskerville fb-font-bold fb-font-16">${turn}</span>
   </div>
 `;
 
@@ -71,6 +77,7 @@ export class PhaseTracker {
   private ui: {
     container: HTMLElement;
     phases: Record<string, HTMLElement>;
+    turns: Record<number, HTMLElement>;
   };
 
   constructor(private game: GameAlias) {
@@ -95,16 +102,28 @@ export class PhaseTracker {
   // ..######..########....##.....#######..##.......
 
   private setupPhases(gamedatas: GamedatasAlias) {
+    // Turn tracker
     this.ui.container.insertAdjacentHTML(
       'beforeend',
       tplCurrentTurn(gamedatas.turn),
     );
 
-    this.ui.container.insertAdjacentHTML(
-      'beforeend',
-      tplDivider('vertical'),
-    );
+    const turnsContainer = document.getElementById('joco-turn-numbers');
+    for (
+      let t = gamedatas.scenario.startTurn;
+      t <= gamedatas.scenario.endTurn;
+      t++
+    ) {
+      this.ui.turns[t] = createHtmlElement(tplTurnItem(t));
+      turnsContainer.appendChild(this.ui.turns[t]);
+    }
 
+    this.setTurn(gamedatas.turn);
+
+    // Divider
+    this.ui.container.insertAdjacentHTML('beforeend', tplDivider('vertical'));
+
+    // Phase tracker
     this.ui.container.insertAdjacentHTML(
       'beforeend',
       tplCurrentPhase(gamedatas.phase),
@@ -124,7 +143,14 @@ export class PhaseTracker {
     this.ui = {
       container: document.getElementById('joco-trackers') as HTMLElement,
       phases: {},
+      turns: {},
     };
+
+    // ${[1,2,3,4,5,6,7,8].map((t) => `
+    //   <div id="joco-turn-number-${t}" class="joco-turn-number" data-active="${t === turn}">
+    //     <span class="fb-font-baskerville fb-font-bold fb-font-16">${t}</span>
+    //   </div>
+    //   `).join('')}
 
     this.setupPhases(gamedatas);
   }
@@ -136,4 +162,21 @@ export class PhaseTracker {
   // .##.....##.##........##.....##.#########....##....##..........##.....##..##.
   // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
   // ..#######..##........########..##.....##....##....########.....#######..####
+
+  public setTurn(turnNumber: number) {
+    Object.keys(this.ui.turns).forEach((t) => {
+      const turn = parseInt(t, 10);
+      if (turn === turnNumber) {
+        this.ui.turns[turn].classList.add('active');
+      } else {
+        this.ui.turns[turn].classList.remove('active');
+      }
+    });
+  }
+
+  public setPhase(phase: string) {
+    if (PHASES.includes(phase)) {
+      document.getElementById('joco-current-phase-text')!.textContent = getPhaseName(phase).toLocaleUpperCase();
+    }
+  }
 }

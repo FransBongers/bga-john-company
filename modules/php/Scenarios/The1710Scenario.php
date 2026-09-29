@@ -15,6 +15,7 @@ class The1710Scenario extends \Bga\Games\JohnCompany\Models\Scenario
     $this->companyTreasuries = 3;
     $this->companyShips = [];
     $this->startTurn = 1;
+    $this->endTurn = 5;
     $this->orders = [
       ORDER_PUNJAB_1 => CLOSED,
       ORDER_DELHI_2 => CLOSED,

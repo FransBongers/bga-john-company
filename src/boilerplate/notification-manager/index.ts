@@ -37,6 +37,7 @@ import {
 } from '../../constants';
 import { CrownClimate } from '../../crown/climate';
 import { India } from '../../india';
+import { PhaseTracker } from '../../phase-tracker';
 import { PlayerAreas } from '../../player-areas';
 import { PlayerManager } from '../../player-manager';
 import { JocoPlayer } from '../../player-manager/player';
@@ -79,6 +80,7 @@ import {
   NotifMovePieces,
   NotifUpdateCountersMultipleTargets,
   NotifMoveOfficeCard,
+  NotifTurn,
 } from './types';
 
 //  .##.....##....###....##....##....###.....######...########.########.
@@ -622,6 +624,12 @@ export class NotificationManager {
 
   async notif_nextPhase(notif: NotifNextPhase) {
     const { phase } = notif;
+    PhaseTracker.getInstance().setPhase(phase);
+  }
+
+  async notif_turn(notif: NotifTurn) {
+    const { turnNumber } = notif;
+    PhaseTracker.getInstance().setTurn(turnNumber);
   }
 
   async notif_payFromTreasury(notif: NotifPayFromTreasury) {

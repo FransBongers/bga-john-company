@@ -135,6 +135,7 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   phase: string;
   powerTokens: string[];
   regions: Record<string, JocoRegionBase>;
+  scenario: JocoScenario;
   ships: Record<string, JocoShipBase>;
   staticData: {
     armyPieces: Record<string, JocoArmyPieceStatic>;
@@ -192,6 +193,13 @@ export interface JocoArmyPieceStatic {
 }
 
 export type JocoArmyPiece = JocoArmyPieceBase & JocoArmyPieceStatic;
+
+export interface JocoScenario {
+  id: string;
+  name: string;
+  startTurn: number;
+  endTurn: number;
+}
 
 interface JocoFamilyMember {
   id: string;

@@ -17,6 +17,8 @@ export * from './DraftCard';
 export * from './EnlistWriter';
 export * from './EventsInIndiaCrisisDefense';
 export * from './FamilyAction';
+export * from './LondonSeasonChooseCard';
+export * from './LondonSeasonRetire';
 export * from './ManagerOfShipping';
 export * from './MilitaryAffairsAssign';
 export * from './MilitaryAffairsTransfers';

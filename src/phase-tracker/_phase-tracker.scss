@@ -55,7 +55,7 @@
         border: 2px solid black;
         border-radius: 4px;
 
-        &:not([data-active='true']) {
+        &:not(.active) {
           opacity: 0.5;
         }
       }

@@ -170,6 +170,10 @@ export interface NotifSetupFamilyMembers extends NotifWithPlayerArgs {
   familyMembers: JocoFamilyMember[];
 }
 
+export interface NotifTurn extends NotifWithPlayerArgs {
+  turnNumber: number;
+}
+
 export interface NotifTransferPromiseCubes extends NotifWithPlayerArgs {
   amount: number;
 }

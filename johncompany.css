@@ -1410,7 +1410,7 @@ span[style*="color:#addb90"] {
   border: 2px solid black;
   border-radius: 4px;
 }
-#joco-trackers .joco-turn-tracker .joco-turn-numbers .joco-turn-number:not([data-active=true]) {
+#joco-trackers .joco-turn-tracker .joco-turn-numbers .joco-turn-number:not(.active) {
   opacity: 0.5;
 }
 
@@ -2352,12 +2352,15 @@ span[style*="color:#c0c0c0"] {
   --tokenScale: 0.8;
 }
 
+.notif_turn .roundedboxinner,
+.notif_turn .roundedbox,
 .notif_nextPhase .roundedboxinner,
 .notif_nextPhase .roundedbox {
   font-weight: bold;
   text-align: center;
 }
 
+.notif_turn .roundedbox,
 .notif_nextPhase .roundedbox {
   border-top: 1px solid black;
   border-bottom: 1px solid black;

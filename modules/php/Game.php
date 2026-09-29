@@ -370,6 +370,7 @@ class Game extends \Bga\GameFramework\Table
             'regions' => Regions::getAll(),
             'ships' => Ships::getAll(),
             'passedLaws' => LawCards::getInLocationOrdered(PASSED_LAWS)->toArray(),
+            'scenario' => Scenarios::get(),
             'staticData' => [
                 'armyPieces' => ArmyPieces::getStaticUiData(),
                 'enterpriseCards' => Enterprises::getStaticUiData(),

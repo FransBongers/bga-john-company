@@ -3056,6 +3056,107 @@ class India {
     }
 }
 
+const tplDivider = (style = 'horizontal', extraClasses = '') => `<div class="fb-divider ${extraClasses}" data-style="${style}"></div>`;
+
+const PHASES = [
+    LONDON_SEASON,
+    FAMILY,
+    HIRING,
+    CHAIRMAN,
+    DIRECTOR_OF_TRADE,
+    MANAGER_OF_SHIPPING,
+    MILITARY_AFFAIRS,
+    BOMBAY_PRESIDENCY,
+    MADRAS_PRESIDENCY,
+    BENGAL_PRESIDENCY,
+    BONUSES,
+    REVENUE,
+    EVENTS_IN_INDIA,
+    PARLIAMENT_MEETS,
+    UPKEEP_AND_REFRESH,
+];
+const tplPhaseTracker = (phases) => `
+  <div id="joco-trackers">
+
+  </div>
+`;
+const tplCurrentPhase = (phase) => `
+  <div class="joco-phase-tracker" id="joco-current-phase">
+    <div class="joco-label">
+      <span class="fb-font-baskerville fb-font-bold fb-font-16">${_('PHASE')}</span>
+    </div>
+    <div class="joco-current-phase">
+      <span id="joco-current-phase-text" class="fb-font-baskerville fb-font-bold fb-font-16">${getPhaseName(phase).toLocaleUpperCase()}</span>
+    </div>
+  </div>
+`;
+const tplCurrentTurn = (turn) => `
+  <div class="joco-turn-tracker" id="joco-phase-turn">
+    <div class="joco-label">
+      <span class="fb-font-baskerville fb-font-bold fb-font-16">${_('TURN')}</span>
+    </div>
+    <div id="joco-turn-numbers" class="joco-turn-numbers">
+
+    </div>
+  </div>
+`;
+const tplTurnItem = (turn) => `
+  <div id="joco-turn-number-${turn}" class="joco-turn-number">
+    <span class="fb-font-baskerville fb-font-bold fb-font-16">${turn}</span>
+  </div>
+`;
+class PhaseTracker {
+    constructor(game) {
+        this.game = game;
+        this.game = game;
+        this.setup(game.gamedatas);
+    }
+    static create(game) {
+        PhaseTracker.instance = new PhaseTracker(game);
+    }
+    static getInstance() {
+        return PhaseTracker.instance;
+    }
+    setupPhases(gamedatas) {
+        this.ui.container.insertAdjacentHTML('beforeend', tplCurrentTurn(gamedatas.turn));
+        const turnsContainer = document.getElementById('joco-turn-numbers');
+        for (let t = gamedatas.scenario.startTurn; t <= gamedatas.scenario.endTurn; t++) {
+            this.ui.turns[t] = createHtmlElement(tplTurnItem(t));
+            turnsContainer.appendChild(this.ui.turns[t]);
+        }
+        this.setTurn(gamedatas.turn);
+        this.ui.container.insertAdjacentHTML('beforeend', tplDivider('vertical'));
+        this.ui.container.insertAdjacentHTML('beforeend', tplCurrentPhase(gamedatas.phase));
+    }
+    setup(gamedatas) {
+        document
+            .getElementById('game_play_area')
+            .insertAdjacentHTML('afterbegin', tplPhaseTracker(PHASES));
+        this.ui = {
+            container: document.getElementById('joco-trackers'),
+            phases: {},
+            turns: {},
+        };
+        this.setupPhases(gamedatas);
+    }
+    setTurn(turnNumber) {
+        Object.keys(this.ui.turns).forEach((t) => {
+            const turn = parseInt(t, 10);
+            if (turn === turnNumber) {
+                this.ui.turns[turn].classList.add('active');
+            }
+            else {
+                this.ui.turns[turn].classList.remove('active');
+            }
+        });
+    }
+    setPhase(phase) {
+        if (PHASES.includes(phase)) {
+            document.getElementById('joco-current-phase-text').textContent = getPhaseName(phase).toLocaleUpperCase();
+        }
+    }
+}
+
 class PlayerArea {
     constructor(config) {
         this.counters = {};
@@ -3495,6 +3596,11 @@ class NotificationManager {
     }
     async notif_nextPhase(notif) {
         const { phase } = notif;
+        PhaseTracker.getInstance().setPhase(phase);
+    }
+    async notif_turn(notif) {
+        const { turnNumber } = notif;
+        PhaseTracker.getInstance().setTurn(turnNumber);
     }
     async notif_payFromTreasury(notif) {
         const { treasury, officeId } = notif;
@@ -4079,79 +4185,6 @@ class Negotiation {
         document
             .getElementById('joco')
             .insertAdjacentHTML('afterbegin', tplNegotiation());
-    }
-}
-
-const tplDivider = (style = 'horizontal', extraClasses = '') => `<div class="fb-divider ${extraClasses}" data-style="${style}"></div>`;
-
-const PHASES = [
-    LONDON_SEASON,
-    FAMILY,
-    HIRING,
-    CHAIRMAN,
-    DIRECTOR_OF_TRADE,
-    MANAGER_OF_SHIPPING,
-    MILITARY_AFFAIRS,
-    BOMBAY_PRESIDENCY,
-    MADRAS_PRESIDENCY,
-    BENGAL_PRESIDENCY,
-    BONUSES,
-    REVENUE,
-    EVENTS_IN_INDIA,
-    PARLIAMENT_MEETS,
-    UPKEEP_AND_REFRESH,
-];
-const tplPhaseTracker = (phases) => `
-  <div id="joco-trackers">
-
-  </div>
-`;
-const tplCurrentPhase = (phase) => `
-  <div class="joco-phase-tracker" id="joco-current-phase">
-    <div class="joco-label">
-      <span class="fb-font-baskerville fb-font-bold fb-font-16">${_('PHASE')}</span>
-    </div>
-    <div class="joco-current-phase">
-      <span class="fb-font-baskerville fb-font-bold fb-font-16">${getPhaseName(phase).toLocaleUpperCase()}</span>
-    </div>
-  </div>
-`;
-const tplCurrentTurn = (turn) => `
-  <div class="joco-turn-tracker" id="joco-phase-turn">
-    <div class="joco-label">
-      <span class="fb-font-baskerville fb-font-bold fb-font-16">${_('TURN')}</span>
-    </div>
-    <div class="joco-turn-numbers">
-      ${[1, 2, 3, 4, 5, 6, 7, 8].map((t) => `<span class="joco-turn-number fb-font-baskerville fb-font-bold fb-font-16" data-active="${t === turn}">${t}</span>`).join('')}
-    </div>
-  </div>
-`;
-class PhaseTracker {
-    constructor(game) {
-        this.game = game;
-        this.game = game;
-        this.setup(game.gamedatas);
-    }
-    static create(game) {
-        PhaseTracker.instance = new PhaseTracker(game);
-    }
-    static getInstance() {
-        return PhaseTracker.instance;
-    }
-    setupPhases(gamedatas) {
-        this.ui.container.insertAdjacentHTML('beforeend', tplCurrentTurn(gamedatas.turn));
-        this.ui.container.insertAdjacentHTML('beforeend', tplDivider('vertical'));
-        this.ui.container.insertAdjacentHTML('beforeend', tplCurrentPhase(gamedatas.phase));
-    }
-    setup(gamedatas) {
-        document
-            .getElementById('game_play_area')
-            .insertAdjacentHTML('afterbegin', tplPhaseTracker(PHASES));
-        this.ui = {
-            container: document.getElementById('joco-trackers'),
-            phases: {},
-        };
-        this.setupPhases(gamedatas);
     }
 }
 
@@ -5696,6 +5729,62 @@ class FamilyAction {
     }
 }
 
+class LondonSeasonChooseCard {
+    constructor(game) {
+        this.game = game;
+    }
+    static create(game) {
+        LondonSeasonChooseCard.instance = new LondonSeasonChooseCard(game);
+    }
+    static getInstance() {
+        return LondonSeasonChooseCard.instance;
+    }
+    onEnteringState(args) {
+        debug('Entering LondonSeasonChooseCard state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    }
+    onLeavingState() {
+        debug('Leaving LondonSeasonChooseCard state');
+    }
+    setDescription(activePlayerIds, args) { }
+    updateInterfaceInitialStep() {
+        clearPossible();
+        updatePageTitle(_('${you} must choose a card'), {});
+        addConfirmButton(() => {
+            performAction('actLondonSeasonChooseCard', {});
+        });
+    }
+}
+
+class LondonSeasonRetire {
+    constructor(game) {
+        this.game = game;
+    }
+    static create(game) {
+        LondonSeasonRetire.instance = new LondonSeasonRetire(game);
+    }
+    static getInstance() {
+        return LondonSeasonRetire.instance;
+    }
+    onEnteringState(args) {
+        debug('Entering LondonSeasonRetire state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    }
+    onLeavingState() {
+        debug('Leaving LondonSeasonRetire state');
+    }
+    setDescription(activePlayerIds, args) { }
+    updateInterfaceInitialStep() {
+        clearPossible();
+        updatePageTitle(_('${you} may retire a family member'), {});
+        addConfirmButton(() => {
+            performAction('actLondonSeasonRetire', {});
+        });
+    }
+}
+
 class ManagerOfShipping {
     constructor(game) {
         this.game = game;
@@ -6668,6 +6757,8 @@ class Game {
             EnlistWriter,
             EventsInIndiaCrisisDefense,
             FamilyAction,
+            LondonSeasonChooseCard,
+            LondonSeasonRetire,
             ManagerOfShipping,
             MilitaryAffairsAssign,
             MilitaryAffairsTransfers,

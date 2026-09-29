@@ -591,4 +591,70 @@ $machinestates = [
         'action' => 'stAtomicAction',
         'transitions' => [],
     ],
+
+    ST_UPKEEP_CHECK_PRIZES => [
+        'name' => UPKEEP_CHECK_PRIZES,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_REFRESH_BOARD => [
+        'name' => \REFRESH_BOARD,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_FINAL_SCORING => [
+        'name' => FINAL_SCORING,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_LONDON_SEASON_ATTRITION => [
+        'name' => LONDON_SEASON_ATTRITION,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_LONDON_SEASON_RETIRE => [
+        'name' => LONDON_SEASON_RETIRE,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer} may retire a family member'),
+        'descriptionmyturn' => clienttranslate('${you} may retire a family member'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => [
+            'actLondonSeasonRetire',
+            'actPass',
+            'actPassOptionalAction',
+            'actTakeAtomicAction',
+            'actUndoToStep',
+        ],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_LONDON_SEASON_CHOOSE_CARD => [
+        'name' => LONDON_SEASON_CHOOSE_CARD,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer} must choose a card'),
+        'descriptionmyturn' => clienttranslate('${you} must choose a card'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => [
+            'actLondonSeasonChooseCard',
+            'actPass',
+            'actPassOptionalAction',
+            'actTakeAtomicAction',
+            'actUndoToStep',
+        ],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
 ];

@@ -978,6 +978,13 @@ class Notifications
     ]);
   }
 
+  public static function turn(int $turnNumber)
+  {
+    self::notifyAll('turn', clienttranslate('TURN ${turnNumber}'), [
+      'turnNumber' => $turnNumber,
+    ]);
+  }
+
   public static function updateTowerLevel($region, $change)
   {
     $text = '';

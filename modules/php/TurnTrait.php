@@ -13,7 +13,7 @@ use Bga\Games\JohnCompany\Managers\Crown;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
-
+use Bga\Games\JohnCompany\Managers\Scenarios;
 
 trait TurnTrait
 {
@@ -79,9 +79,16 @@ trait TurnTrait
 
   function stStartOfRound()
   {
-    // TODO: move round marker
+    $currentTurn = Globals::getTurn();
+    Notifications::turn($currentTurn);
 
-    $this->stSetupLondonSeason();
+    $isFirstTurn = Scenarios::get()->getStartTurn() === $currentTurn;
+
+    if ($isFirstTurn) {
+      $this->stSetupFamilyActions();
+    } else {
+      $this->stSetupLondonSeason();
+    }
   }
 
 
@@ -103,11 +110,18 @@ trait TurnTrait
 
   function stSetupLondonSeason()
   {
-    /**
-     * Skip in first round of scenario,
-     * otherwise setup
-     */
-    $this->stSetupFamilyActions();
+    $this->updatePhase(LONDON_SEASON);
+
+    $node = [
+      'children' => [
+        [
+          'action' => LONDON_SEASON_ATTRITION,
+        ]
+      ],
+    ];
+
+    Engine::setup($node, ['method' => 'stSetupFamilyActions']);
+    Engine::proceed();
   }
 
 
@@ -566,7 +580,45 @@ trait TurnTrait
   function stSetupUpkeepAndRefresh()
   {
     $this->updatePhase(UPKEEP_AND_REFRESH);
-    $this->stStartOfRound();
+
+    $node = [
+      'children' => [
+        [
+          'action' => UPKEEP_CHECK_PRIZES,
+        ],
+        [
+          'action' => REFRESH_BOARD,
+        ],
+      ],
+    ];
+
+    Engine::setup($node, ['method' => 'stLastRoundCheck']);
+    Engine::proceed();
+  }
+
+  function stLastRoundCheck()
+  {
+    $currentTurn = Globals::getTurn();
+    $lastRound = Scenarios::get()->getEndTurn() === $currentTurn;
+
+    if ($lastRound) {
+
+      $node = [
+        'children' => [
+          [
+            'action' => FINAL_SCORING,
+          ],
+
+        ],
+      ];
+
+      Engine::setup($node, ['method' => '']);
+      Engine::proceed();
+      return;
+    } else {
+      Globals::setTurn($currentTurn + 1);
+      $this->stStartOfRound();
+    }
   }
 
   function setupGameTurn() {}

@@ -77,6 +77,8 @@ const ST_PRESIDENCY_COMMANDER = 124;
 const ST_COMMANDER_PURCHASE_LOCAL_ALLIANCE = 125;
 const ST_COMMANDER_DEPLOY = 126;
 const ST_COMMANDER_APPROVE_LOCAL_ALLIANCE = 127;
+const ST_UPKEEP_CHECK_PRIZES = 128;
+const ST_REFRESH_BOARD = 129;
 
 const ST_BONUSES = 60;
 const ST_REVENUE_EXPENSES = 61;
@@ -103,6 +105,10 @@ const ST_CROWN_MANAGER_OF_SHIPPING_FIT_SHIPS = 120;
 const ST_CROWN_MANAGER_OF_SHIPPING_BUY_COMPANY_SHIPS = 121;
 const ST_CROWN_MANAGER_OF_SHIPPING_LEASE_EXTRA_SHIPS = 122;
 const ST_CROWN_MANAGER_OF_SHIPPING_PLACE_SHIPS = 123;
+const ST_FINAL_SCORING = 130;
+const ST_LONDON_SEASON_ATTRITION = 131;
+const ST_LONDON_SEASON_RETIRE = 132;
+const ST_LONDON_SEASON_CHOOSE_CARD = 133;
 
 
 const BONUSES = 'Bonuses';
@@ -112,7 +118,11 @@ const EVENTS_IN_INDIA_CRISIS_DEFENSE = 'EventsInIndiaCrisisDefense';
 const EVENTS_IN_INDIA_STORMS = 'EventsInIndiaStorms';
 const EVENTS_IN_INDIA_RESOLVE_EVENT = 'EventsInIndiaResolveEvent';
 const FAMILY_ACTION = 'FamilyAction';
+const FINAL_SCORING = 'FinalScoring';
 const FOREIGN_INVASION_END = 'ForeignInvasionEnd';
+const LONDON_SEASON_ATTRITION = 'LondonSeasonAttrition';
+const LONDON_SEASON_RETIRE = 'LondonSeasonRetire';
+const LONDON_SEASON_CHOOSE_CARD = 'LondonSeasonChooseCard';
 const NEW_COMPANY_SHARES = 'NewCompanyShares';
 const PARLIAMENT_MEETS = 'ParliamentMeets';
 const PERFORM_SETUP = 'PerformSetup';
@@ -121,6 +131,8 @@ const REVENUE_EXPENSES = 'RevenueExpenses';
 const REVENUE_CHECK_EXPECTATIONS = 'RevenueCheckExpectations';
 const REVENUE_ROYAL_PARDON = 'RevenueRoyalPardon';
 const REVENUE_PAY_DIVIDENDS = 'RevenuePayDividends';
+const REFRESH_BOARD = 'RefreshBoard';
+const UPKEEP_CHECK_PRIZES = 'UpkeepCheckPrizes';
 // Family Actions
 const ENLIST_WRITER = 'EnlistWriter';
 const ENLIST_OFFICER = 'EnlistOfficer';
