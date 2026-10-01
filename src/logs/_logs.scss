@@ -123,6 +123,13 @@ span[style*='color:#c0c0c0'] {
     display: inline-block !important;
     position: relative;
   }
+
+  &.joco-icon[data-icon='VictoryPoints'] {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px !important;
+  }
 }
 
 #customActions {

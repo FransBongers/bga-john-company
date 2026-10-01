@@ -109,10 +109,11 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     Notifications::payFromTreasury($player, $this, $amount, $this->getTreasury());
   }
 
-  public function moveToVacantOffices($player)
+  public function moveToVacantOffices(Player $player)
   {
     if($this->getFamilyMemberId() !== null) {
-      $this->returnFamilyMemberToSupply();
+      $this->setFamilyMemberId(null);
+      // $this->returnFamilyMemberToSupply();
     }
     $this->setLocation(Locations::vacantOffices());
     Notifications::moveOfficeCard($player, $this);

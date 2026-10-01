@@ -624,6 +624,22 @@ $machinestates = [
         'transitions' => [],
     ],
 
+    ST_LONDON_SEASON_ORDER => [
+        'name' => LONDON_SEASON_ORDER,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_LONDON_SEASON_CLEANUP => [
+        'name' => LONDON_SEASON_CLEANUP,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
     ST_LONDON_SEASON_RETIRE => [
         'name' => LONDON_SEASON_RETIRE,
         'type' => 'multipleactiveplayer',

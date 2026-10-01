@@ -1,5 +1,7 @@
 /img/*
 /img_metadata/*
 /.vscode/*
+/.github/*
 .DS_Store
+docs
 node_modules

@@ -244,10 +244,6 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
       data.regiment.location = data.from;
       await india.getArmy(`Presidency_${data.from.split('_')[2]}`).addPiece(data.regiment.id);
     }
-    // for (let data of Object.values(this.transfers.writers)) {
-    //   data.writer.location = data.from;
-    //   await board.moveFamilyMemberBetweenLocations(data.writer, data.to);
-    // }
   }
 
   //  ..######..##.......####..######..##....##

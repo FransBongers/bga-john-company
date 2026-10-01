@@ -63,11 +63,17 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
     Notifications::returnFamilyMemberToSupply(Players::getPlayerForFamily($this->familyId), $this);
   }
 
-  public function moveTo(Player $player, string $to)
+  public function moveTo(Player $player, string $to, bool $skipFrom = false)
   {
-    $from = $this->getLocation();
+    $from = $skipFrom ? null : $this->getLocation();
     $this->setLocation($to);
     Notifications::moveFamilyMember($player, $this, $from);
+  }
+
+  public function retireTo(Player $player, string $prize, int $cost)
+  {
+    $this->setLocation($prize);
+    Notifications::retireFamilyMember($player, $this, $cost);
   }
 
   public function getPlayer()

@@ -1,7 +1,108 @@
+@use '../base';
+
 #joco-london {
   width: 1000px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
+
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+
+  .joco-left-column {
+    width: 250px;
+  }
+
+  .joco-column {
+    gap: 8px;
+  }
+
+  #joco-pensioners {
+    padding: 8px;
+  }
+}
+
+.joco-prize {
+  padding: 8px;
+
+  .joco-row {
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .joco-upkeep-container {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    // gap: -2px;
+
+    .joco-upkeep {
+      box-sizing: border-box;
+      position: absolute;
+      left: 90%;
+      border-radius: 50%;
+      height: 24px;
+      width: 24px;
+      border: 1px solid black;
+      background-color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .joco-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &[data-icon='CircleDark'] {
+      color: white;
+      z-index: 1;
+      height: 48px;
+
+      .joco-amount-pound {
+        font-size: 12px;
+      }
+
+      .joco-amount-value {
+        font-size: 16px;
+      }
+    }
+
+    &[data-icon='VictoryPoints'] {
+      color: black;
+      height: 48px;
+    }
+  }
+
+  .joco-windows-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    .joco-icon {
+      height: 24px;
+    }
+  }
+
+  .joco-prize-description {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  &.selectable {
+    cursor: pointer;
+    outline: 4px solid base.$selectable-color !important;
+  }
+
+  &.selectable:hover,
+  &.selected {
+    cursor: pointer;
+    outline: 4px solid base.$selected-color !important;
+  }
 }

@@ -37,6 +37,7 @@ import {
 } from '../../constants';
 import { CrownClimate } from '../../crown/climate';
 import { India } from '../../india';
+import { London } from '../../london';
 import { PhaseTracker } from '../../phase-tracker';
 import { PlayerAreas } from '../../player-areas';
 import { PlayerManager } from '../../player-manager';
@@ -85,6 +86,8 @@ import {
   NotifReturnShipsToSupply,
   NotifRefreshArmies,
   NotifReturnWritersToPresidencies,
+  NotifRetireFamilyMember,
+  NotifUpdateLondonSeasonOrder,
 } from './types';
 
 //  .##.....##....###....##....##....###.....######...########.########.
@@ -561,7 +564,17 @@ export class NotificationManager {
         await this.moveFamilyMember(familyMember);
       }),
     );
-    // board.updateFamilyMembers(familyMembers);
+  }
+
+  async notif_retireFamilyMember(notif: NotifRetireFamilyMember) {
+    const { familyMember, cost, playerId } = notif;
+
+    if (parentHasChildWithId(familyMember.location, familyMember.id)) {
+      return;
+    }
+
+    this.getPlayer(playerId).counters[CASH_COUNTER].incValue(-cost);
+    await this.moveFamilyMember(familyMember);
   }
 
   // TODO: replace everywhere with move pieces?
@@ -817,6 +830,11 @@ export class NotificationManager {
     );
 
     await Promise.all(promises);
+  }
+
+  async notif_updateLondonSeasonOrder(notif: NotifUpdateLondonSeasonOrder) {
+    const { order, cashSpent } = notif;
+    London.getInstance().updateLondonSeasonOrder({ order, cashSpent });
   }
 
   async notif_updateRegion(notif: NotifUpdateRegion) {

@@ -9,6 +9,7 @@ use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\Players;
 
 class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
@@ -128,5 +129,36 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   {
     $this->incTrophies($amount);
     Notifications::gainTrophies($this->getPlayer(), $amount);
+  }
+
+    /**
+   * Total windows owned by a player's family: retired family members on
+   * prizes, plus enterprises, plus prestige cards.
+   */
+  public function getWindowCount()
+  {
+    $familyId = $this->id;
+  
+    $windows = 0;
+
+    $prizeMembers = Utils::filter(FamilyMembers::getAll()->toArray(), function ($familyMember) use ($familyId) {
+      return $familyMember->getFamilyId() === $familyId && array_key_exists($familyMember->getLocation(), PRIZES);
+    });
+    foreach ($prizeMembers as $familyMember) {
+      $windows += PRIZES[$familyMember->getLocation()][WINDOWS];
+    }
+
+    foreach ($this->getEnterprises() as $enterprise) {
+      $windows += $enterprise->getWindows();
+    }
+
+    $prestigeCards = Utils::filter(LondonSeasonCards::getAll()->toArray(), function ($card) use ($familyId) {
+      return $card->getLocation() === $familyId && $card->getType() === PRESTIGE;
+    });
+    foreach ($prestigeCards as $card) {
+      $windows += $card->getWindows() ?? 0;
+    }
+
+    return $windows;
   }
 }

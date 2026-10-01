@@ -128,6 +128,10 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   enterprises: Record<string, JocoEnterpriseCardBase>;
   families: Record<string, JocoFamily>;
   familyMembers: Record<string, JocoFamilyMember>;
+  londonSeason: {
+    order: number[];
+    cashSpent: Record<number, number>;
+  };
   londonSeasonDisplay: JocoLondonSeasonCardBase[];
   offices: Record<string, JocoOfficeBase>;
   orders: Record<string, JoCoOrderBase>;
@@ -338,6 +342,17 @@ interface JocoOfficeStatic {
 }
 
 export type JocoOffice = JocoOfficeBase & JocoOfficeStatic;
+
+/**
+ * Prizes
+ */
+interface JocoPrize {
+  id: string;
+  VictoryPoints: number;
+  cost: number;
+  upkeep: number;
+  windows: number;
+}
 
 /**
  * Ships

@@ -73,4 +73,9 @@ export class PlayerManager {
   getCurrentPlayerId() {
     return this.game.getPlayerId();
   }
+
+  getCurrentPlayer(): JocoPlayer {
+    const currentPlayerId = this.getCurrentPlayerId();
+    return this.getPlayer(currentPlayerId);
+  }
 }

@@ -839,7 +839,6 @@ span[style*="color:#addb90"] {
 .joco-container {
   position: relative;
   border: 3px double #000;
-  width: fit-content;
   border-radius: 8px;
   padding: 16px;
   display: flex;
@@ -1244,6 +1243,11 @@ span[style*="color:#addb90"] {
   background-position-y: 100%;
 }
 
+.joco-icon[data-icon=VictoryPoints] {
+  background-position-x: 100%;
+  background-position-y: 100%;
+}
+
 .joco-icon[data-icon=Power] {
   display: flex;
   justify-content: center;
@@ -1361,12 +1365,101 @@ span[style*="color:#addb90"] {
   font-size: 6px;
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
 #joco-london {
   width: 1000px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+#joco-london .joco-left-column {
+  width: 250px;
+}
+#joco-london .joco-column {
+  gap: 8px;
+}
+#joco-london #joco-pensioners {
+  padding: 8px;
+}
+
+.joco-prize {
+  padding: 8px;
+}
+.joco-prize .joco-row {
+  justify-content: space-between;
+  align-items: center;
+}
+.joco-prize .joco-upkeep-container {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.joco-prize .joco-upkeep-container .joco-upkeep {
+  box-sizing: border-box;
+  position: absolute;
+  left: 90%;
+  border-radius: 50%;
+  height: 24px;
+  width: 24px;
+  border: 1px solid black;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.joco-prize .joco-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.joco-prize .joco-icon[data-icon=CircleDark] {
+  color: white;
+  z-index: 1;
+  height: 48px;
+}
+.joco-prize .joco-icon[data-icon=CircleDark] .joco-amount-pound {
+  font-size: 12px;
+}
+.joco-prize .joco-icon[data-icon=CircleDark] .joco-amount-value {
+  font-size: 16px;
+}
+.joco-prize .joco-icon[data-icon=VictoryPoints] {
+  color: black;
+  height: 48px;
+}
+.joco-prize .joco-windows-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.joco-prize .joco-windows-container .joco-icon {
+  height: 24px;
+}
+.joco-prize .joco-prize-description {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.joco-prize.selectable {
+  cursor: pointer;
+  outline: 4px solid yellow !important;
+}
+.joco-prize.selectable:hover, .joco-prize.selected {
+  cursor: pointer;
+  outline: 4px solid blue !important;
 }
 
 #joco-trackers {
@@ -2283,6 +2376,12 @@ span[style*="color:#c0c0c0"] {
   display: inline-block !important;
   position: relative;
 }
+.log-token.joco-icon[data-icon=VictoryPoints] {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px !important;
+}
 
 #customActions {
   --iconScale: 0.75;
@@ -2894,7 +2993,7 @@ span[style*="color:#c0c0c0"] {
   outline-color: #a4a576;
 }
 .joco-governor-overlay-container[data-region=Madras] {
-  top: 773px;
+  top: 774px;
   left: 486px;
 }
 .joco-governor-overlay-container[data-region=Madras] .joco-family-member-spot-wrapper {

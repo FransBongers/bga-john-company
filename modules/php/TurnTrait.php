@@ -116,6 +116,9 @@ trait TurnTrait
       'children' => [
         [
           'action' => LONDON_SEASON_ATTRITION,
+        ],
+        [
+          'action' => LONDON_SEASON_CLEANUP,
         ]
       ],
     ];

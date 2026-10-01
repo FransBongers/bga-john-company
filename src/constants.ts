@@ -1,3 +1,5 @@
+import { JocoPrize } from "./types";
+
 /**
  * Var names
  */
@@ -215,6 +217,7 @@ export const OFFICER_IN_TRAINING = 'OfficerInTraining';
 export const WRITER = 'Writer';
 
 export const COURT_OF_DIRECTORS = 'CourtOfDirectors';
+export const PENSIONERS = 'Pensioners';
 
 /**
  * Borders
@@ -374,3 +377,55 @@ export const CROWN_CLIMATE = [BULL, STAG, LION, BEAR, PEACOCK];
 export const BUY_COMPANY_SHIP = 'BUY_COMPANY_SHIP';
 export const DO_NOT_BUY_COMPANY_SHIP = 'BUY_COMPANY_SHIP';
 export const BUY_AS_MANY_SHIPS_AS_YOU_WISH = 'BUY_AS_MANY_SHIPS_AS_YOU_WISH';
+
+/**
+ * PRIZES
+ */
+export const PRIZE_0 = 'Prize_0';
+export const PRIZE_2 = 'Prize_2';
+export const PRIZE_4 = 'Prize_4';
+export const PRIZE_8 = 'Prize_8';
+export const PRIZE_12 = 'Prize_12';
+
+export const COST = 'cost';
+export const UPKEEP = 'upkeep';
+
+export const WINDOWS = 'windows';
+
+export const PRIZES: Record<string, JocoPrize> = {
+  [PRIZE_0]: {
+    id: PRIZE_0,
+    [COST]: 2,
+    [UPKEEP]: 0,
+    [VICTORY_POINTS]: 0,
+    [WINDOWS]: 0,
+  },
+  [PRIZE_2]: {
+    id: PRIZE_2,
+    [COST]: 4,
+    [UPKEEP]: 1,
+    [VICTORY_POINTS]: 2,
+    [WINDOWS]: 1,
+  },
+  [PRIZE_4]: {
+    id: PRIZE_4,
+    [COST]: 8,
+    [UPKEEP]: 2,
+    [VICTORY_POINTS]: 4,
+    [WINDOWS]: 2,
+  },
+  [PRIZE_8]: {
+    id: PRIZE_8,
+    [COST]: 14,
+    [UPKEEP]: 3,
+    [VICTORY_POINTS]: 8,
+    [WINDOWS]: 3,
+  },
+  [PRIZE_12]: {
+    id: PRIZE_12,
+    [COST]: 20,
+    [UPKEEP]: 4,
+    [VICTORY_POINTS]: 12,
+    [WINDOWS]: 4,
+  },
+};

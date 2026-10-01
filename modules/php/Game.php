@@ -42,6 +42,7 @@ use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Orders;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\PrimeMinister;
+use Bga\Games\JohnCompany\Managers\Prizes;
 use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Managers\Scenarios;
 use Bga\Games\JohnCompany\Managers\SetupCards;
@@ -362,6 +363,10 @@ class Game extends \Bga\GameFramework\Table
             'families' => Families::getAll(),
             'familyMembers' => FamilyMembers::getAll(),
             'londonSeasonDisplay' => LondonSeasonCards::getInLocationOrdered(LONDON_SEASON_DISPLAY)->toArray(),
+            'londonSeason' => [
+                'order' => Prizes::getLondonSeasonOrder(),
+                'cashSpent' => Globals::getRetirementMoney()
+            ],
             'offices' => Offices::getAll(),
             'orders' => Orders::getAll(),
             'playerOrder' => Players::getTurnOrder($playerId),

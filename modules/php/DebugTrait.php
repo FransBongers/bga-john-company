@@ -39,10 +39,11 @@ trait DebugTrait
 
   function debug_test()
   {
-    Globals::setElephant([
-      FACING => HYDERABAD,
-      LOCATION => HYDERABAD_MADRAS_BORDER
-    ]);
+    Globals::setRetirementMoney([]);
+    // Globals::setElephant([
+    //   FACING => HYDERABAD,
+    //   LOCATION => HYDERABAD_MADRAS_BORDER
+    // ]);
     // Ships::get('Zenobia')->setSide(FATIGUED);
     // Enterprises::get('Workshop_2')->setInvested(1);
     // LondonSeasonCards::setupLoadBlackmailCards();

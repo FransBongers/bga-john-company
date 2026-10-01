@@ -6,6 +6,7 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\Players;
+use Bga\Games\JohnCompany\Managers\Prizes;
 use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Managers\Ships;
 use Bga\Games\JohnCompany\Models\ArmyPiece;
@@ -281,7 +282,8 @@ class Notifications
       Locations::armyOfExhausted(BENGAL_PRESIDENCY) => clienttranslate('army of Bengal'),
       Locations::armyOfExhausted(BOMBAY_PRESIDENCY) => clienttranslate('army of Bombay'),
       Locations::armyOfExhausted(MADRAS_PRESIDENCY) => clienttranslate('army of Madras'),
-      OFFICER_IN_TRAINING => clienttranslate('officers-in-training')
+      OFFICER_IN_TRAINING => clienttranslate('officers-in-training'),
+      PENSIONERS => clienttranslate('Pensioners'),
     ];
     if (!isset($locationNameMap[$location])) {
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_021: " . $location);
@@ -571,6 +573,7 @@ class Notifications
       MADRAS_PRESIDENCY => clienttranslate('Madras Presidency'),
       BENGAL_PRESIDENCY => clienttranslate('Bengal Presidency'),
       SUPERINTENDENT_OF_TRADE_IN_CHINA => clienttranslate('Superintendent of Trade in China'),
+      LONDON_SEASON => clienttranslate('The London Season'),
       BONUSES => clienttranslate('Bonuses'),
       REVENUE => clienttranslate('Revenue'),
       EVENTS_IN_INDIA => clienttranslate('Events in India'),
@@ -870,15 +873,31 @@ class Notifications
     ]);
   }
 
-  public static function moveFamilyMember($player, $familyMember, $from)
+  public static function moveFamilyMember(Player $player, FamilyMember $familyMember, string | null $from)
   {
-    self::notifyAll('moveFamilyMember', clienttranslate('${player_name} moves ${tkn_familyMember} from ${tkn_boldText_from} to ${tkn_boldText_to}'), [
+    $text = $from !== null ? clienttranslate('${player_name} moves ${tkn_familyMember} from ${tkn_boldText_from} to ${tkn_boldText_to}') : clienttranslate('${player_name} moves ${tkn_familyMember} to ${tkn_boldText_to}');
+
+    self::notifyAll('moveFamilyMember', $text, [
       'player' => $player,
       'familyMember' => $familyMember->jsonSerialize(),
       'tkn_familyMember' => self::tknFamilyMember($familyMember),
-      'tkn_boldText_from' => self::getLocationNameForFamilyMember($from),
+      'tkn_boldText_from' => $from !== null ? self::getLocationNameForFamilyMember($from) : '',
       'tkn_boldText_to' => self::getLocationNameForFamilyMember($familyMember->getLocation()),
       'i18n' => ['tkn_boldText_from', 'tkn_boldText_to'],
+    ]);
+  }
+
+  public static function retireFamilyMember(Player $player, FamilyMember $familyMember, int $cost)
+  {
+    $text =  clienttranslate('${player_name} pays ${tkn_boldText_cost} and retires ${tkn_familyMember} to the ${tkn_victoryPoints} prize');
+
+    self::notifyAll('retireFamilyMember', $text, [
+      'player' => $player,
+      'cost' => $cost,
+      'familyMember' => $familyMember->jsonSerialize(),
+      'tkn_familyMember' => self::tknFamilyMember($familyMember),
+      'tkn_boldText_cost' => '£' . $cost,
+      'tkn_victoryPoints' => Prizes::get($familyMember->getLocation())[VICTORY_POINTS],
     ]);
   }
 
@@ -1015,6 +1034,14 @@ class Notifications
   {
     self::notifyAll('turn', clienttranslate('TURN ${turnNumber}'), [
       'turnNumber' => $turnNumber,
+    ]);
+  }
+
+  public static function updateLondonSeasonOrder()
+  {
+    self::notifyAll('updateLondonSeasonOrder', '', [
+      'order' => Prizes::getLondonSeasonOrder(),
+      'cashSpent' => Globals::getRetirementMoney()
     ]);
   }
 

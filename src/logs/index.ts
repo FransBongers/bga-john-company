@@ -2,7 +2,7 @@ import {
   createRegiment,
   // createShip,
 } from '../board/utility';
-import { tplIcon, tplPolicyIcon } from '../icons/templates';
+import { tplIcon, tplPolicyIcon, tplVictoryPointsIcon } from '../icons/templates';
 import { PlayerManager } from '../player-manager';
 import { createFamilyMember } from '../templates';
 import { GameAlias } from '../types';
@@ -41,6 +41,7 @@ const LOG_TOKEN_SETUP_CARD = 'setupCard';
 const LOG_TOKEN_SHIP = 'ship';
 const LOG_TOKEN_STORM_DIE = 'stormDie';
 const LOG_TOKEN_TROPHY = 'trophy';
+const LOG_TOKEN_VICTORY_POINTS = 'victoryPoints';
 
 const CLASS_LOG_TOKEN = 'log-token';
 
@@ -109,6 +110,8 @@ export const getTokenDiv = ({
             color: player.getColor(),
           })
         : value;
+      case LOG_TOKEN_VICTORY_POINTS:
+        return tplVictoryPointsIcon(value, 'log-token');
     default:
       return value;
   }

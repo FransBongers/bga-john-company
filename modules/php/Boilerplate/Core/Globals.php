@@ -39,6 +39,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     'powerTokens' => 'obj',
     'primeMinister' => 'obj',
     'eventsToResolve' => 'int',
+    'retirementMoney' => 'obj',
   ];
 
   protected static $table = 'global_variables';
@@ -182,6 +183,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     self::setScenarioId(SCENARIO_OPTION_SCENARIO_ID_MAP[intval($options[OPTION_SCENARIO])]);
     self::setDraftSetup(intval($options[OPTION_DRAFT_SETUP_CARDS]) === OPTION_DRAFT_SETUP_CARDS_ENABLED);
     self::setOptions($options);
+    self::setRetirementMoney([]);
     // self::setScenarioId(THE_1710_SCENARIO);
     
   }

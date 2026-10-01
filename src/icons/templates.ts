@@ -30,8 +30,15 @@ export const tplPowerIcon = (
 export const tplVictoryPointsIcon = (
   value: string | number,
   extraClasses: string = '',
-) =>
-  `<div class="joco-icon ${extraClasses ?? ''}" data-icon="${VICTORY_POINTS}${value}"></div>`;
+) => {
+  // return `<div class="joco-icon ${extraClasses ?? ''}" data-icon="${VICTORY_POINTS}${value}"></div>`;
+  return `<div class="joco-icon ${extraClasses ?? ''}" data-icon="VictoryPoints">
+          <span class="fb-font-baskerville fb-font-semi-bold fb-font-20">${value}</span>
+        </div>`;
+};
+  
+
+
 
 export const tplDiscountIcon = (
   value: string | number,

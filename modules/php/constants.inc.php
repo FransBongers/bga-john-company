@@ -109,6 +109,8 @@ const ST_FINAL_SCORING = 130;
 const ST_LONDON_SEASON_ATTRITION = 131;
 const ST_LONDON_SEASON_RETIRE = 132;
 const ST_LONDON_SEASON_CHOOSE_CARD = 133;
+const ST_LONDON_SEASON_ORDER = 134;
+const ST_LONDON_SEASON_CLEANUP = 135;
 
 
 const BONUSES = 'Bonuses';
@@ -123,6 +125,8 @@ const FOREIGN_INVASION_END = 'ForeignInvasionEnd';
 const LONDON_SEASON_ATTRITION = 'LondonSeasonAttrition';
 const LONDON_SEASON_RETIRE = 'LondonSeasonRetire';
 const LONDON_SEASON_CHOOSE_CARD = 'LondonSeasonChooseCard';
+const LONDON_SEASON_ORDER = 'LondonSeasonOrder';
+const LONDON_SEASON_CLEANUP = 'LondonSeasonCleanup';
 const NEW_COMPANY_SHARES = 'NewCompanyShares';
 const PARLIAMENT_MEETS = 'ParliamentMeets';
 const PERFORM_SETUP = 'PerformSetup';
@@ -387,6 +391,7 @@ const WRITER = 'Writer';
 
 const COURT_OF_DIRECTORS = 'CourtOfDirectors';
 
+const PENSIONERS = 'Pensioners';
 /**
  * Borders
  */
@@ -818,5 +823,58 @@ const PRIME_MINISTER_DIAL = [
   [
     TYPE => TAX,
     TARGET => SHIPYARD,
+  ],
+];
+
+/**
+ * PRIZES
+ */
+const PRIZE_0 = 'Prize_0';
+const PRIZE_2 = 'Prize_2';
+const PRIZE_4 = 'Prize_4';
+const PRIZE_8 = 'Prize_8';
+const PRIZE_12 = 'Prize_12';
+
+const COST = 'cost';
+const UPKEEP = 'upkeep';
+const VICTORY_POINTS = 'VictoryPoints';
+const WINDOWS = 'windows';
+
+
+const PRIZES = [
+  PRIZE_0 => [
+    'id' => PRIZE_0,
+    COST => 2,
+    UPKEEP => 0,
+    VICTORY_POINTS => 0,
+    WINDOWS => 0,
+  ],
+  PRIZE_2 => [
+    'id' => PRIZE_2,
+    COST => 4,
+    UPKEEP => 1,
+    VICTORY_POINTS => 2,
+    WINDOWS => 1,
+  ],
+  PRIZE_4 => [
+    'id' => PRIZE_4,
+    COST => 8,
+    UPKEEP => 2,
+    VICTORY_POINTS => 4,
+    WINDOWS => 2,
+  ],
+  PRIZE_8 => [
+    'id' => PRIZE_8,
+    COST => 14,
+    UPKEEP => 3,
+    VICTORY_POINTS => 8,
+    WINDOWS => 3,
+  ],
+  PRIZE_12 => [
+    'id' => PRIZE_12,
+    COST => 20,
+    UPKEEP => 4,
+    VICTORY_POINTS => 12,
+    WINDOWS => 4,
   ],
 ];

@@ -102,6 +102,7 @@ export interface NotifMoveFamilyMember {
 
 export interface NotifMoveFamilyMembers {
   familyMembers: JocoFamilyMember[];
+
 }
 
 export interface NotifMoveArmyPiece extends NotifWithPlayerArgs {
@@ -153,6 +154,11 @@ export interface NotifPurchaseEnterprise extends NotifWithPlayerArgs {
   familyId: string;
 }
 
+export interface NotifRetireFamilyMember extends NotifWithPlayerArgs {
+  familyMember: JocoFamilyMember;
+  cost: number;
+}
+
 export interface NotifRefreshArmies {
   armyPieces: JocoArmyPieceBase[];
   officers: JocoFamilyMember[];
@@ -189,6 +195,11 @@ export interface NotifTurn extends NotifWithPlayerArgs {
 
 export interface NotifTransferPromiseCubes extends NotifWithPlayerArgs {
   amount: number;
+}
+
+export interface NotifUpdateLondonSeasonOrder {
+  order: number[];
+  cashSpent: Record<number, number>;
 }
 
 export interface NotifUpdateRegion {

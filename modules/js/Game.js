@@ -11,6 +11,10 @@ class Bar {
         this.active = 0;
         this.config = [
             {
+                id: 'joco-london',
+                text: _('London'),
+            },
+            {
                 id: 'joco-india',
                 text: _('India'),
             },
@@ -21,10 +25,6 @@ class Bar {
             {
                 id: 'joco-company',
                 text: _('Company'),
-            },
-            {
-                id: 'joco-london',
-                text: _('London'),
             },
             {
                 id: 'joco-board',
@@ -241,6 +241,7 @@ const OFFICER = 'Officer';
 const OFFICER_IN_TRAINING = 'OfficerInTraining';
 const WRITER = 'Writer';
 const COURT_OF_DIRECTORS = 'CourtOfDirectors';
+const PENSIONERS = 'Pensioners';
 const BENGAL_DELHI_BORDER = 'Bengal_Delhi_border';
 const BENGAL_MARATHA_BORDER = 'Bengal_Maratha_border';
 const BOMBAY_DELHI_BORDER = 'Bombay_Delhi_border';
@@ -349,6 +350,51 @@ const CROWN_CLIMATE = [BULL, STAG, LION, BEAR, PEACOCK];
 const BUY_COMPANY_SHIP = 'BUY_COMPANY_SHIP';
 const DO_NOT_BUY_COMPANY_SHIP = 'BUY_COMPANY_SHIP';
 const BUY_AS_MANY_SHIPS_AS_YOU_WISH = 'BUY_AS_MANY_SHIPS_AS_YOU_WISH';
+const PRIZE_0 = 'Prize_0';
+const PRIZE_2 = 'Prize_2';
+const PRIZE_4 = 'Prize_4';
+const PRIZE_8 = 'Prize_8';
+const PRIZE_12 = 'Prize_12';
+const COST = 'cost';
+const UPKEEP = 'upkeep';
+const WINDOWS = 'windows';
+const PRIZES = {
+    [PRIZE_0]: {
+        id: PRIZE_0,
+        [COST]: 2,
+        [UPKEEP]: 0,
+        [VICTORY_POINTS]: 0,
+        [WINDOWS]: 0,
+    },
+    [PRIZE_2]: {
+        id: PRIZE_2,
+        [COST]: 4,
+        [UPKEEP]: 1,
+        [VICTORY_POINTS]: 2,
+        [WINDOWS]: 1,
+    },
+    [PRIZE_4]: {
+        id: PRIZE_4,
+        [COST]: 8,
+        [UPKEEP]: 2,
+        [VICTORY_POINTS]: 4,
+        [WINDOWS]: 2,
+    },
+    [PRIZE_8]: {
+        id: PRIZE_8,
+        [COST]: 14,
+        [UPKEEP]: 3,
+        [VICTORY_POINTS]: 8,
+        [WINDOWS]: 3,
+    },
+    [PRIZE_12]: {
+        id: PRIZE_12,
+        [COST]: 20,
+        [UPKEEP]: 4,
+        [VICTORY_POINTS]: 12,
+        [WINDOWS]: 4,
+    },
+};
 
 const tplPlayArea = () => `
   <div id="joco-play-area">
@@ -358,7 +404,7 @@ const tplPlayArea = () => `
     </div>
   </div>
 `;
-const tplAmount = (value, small = false) => `
+const tplAmount$1 = (value, small = false) => `
   <div class="fb-font-baskerville joco-amount">
     <span class="${small ? 'fb-font-8' : 'fb-font-16'} joco-amount-pound">£</span><span class="${small ? 'fb-font-12' : 'fb-font-24'} joco-amount-value">${value}</span>
   </div>
@@ -641,6 +687,10 @@ class PlayerManager {
     }
     getCurrentPlayerId() {
         return this.game.getPlayerId();
+    }
+    getCurrentPlayer() {
+        const currentPlayerId = this.getCurrentPlayerId();
+        return this.getPlayer(currentPlayerId);
     }
 }
 
@@ -1686,7 +1736,11 @@ const tplPolicyIcon = (type, extraClasses = '') => `<div class="joco-policy-icon
     ${[BONUS, POWER, TAX].includes(type) ? `<div class="fb-font-baskerville fb-font-16 bga-autofit">${getPolicyConsequenceTranslation(type).toLocaleUpperCase()}</div>` : ''}
   </div>`;
 const tplPowerIcon = (value, extraClasses = '') => `<div class="joco-icon ${extraClasses ?? ''}" data-icon="${POWER}${value}"></div>`;
-const tplVictoryPointsIcon = (value, extraClasses = '') => `<div class="joco-icon ${extraClasses ?? ''}" data-icon="${VICTORY_POINTS}${value}"></div>`;
+const tplVictoryPointsIcon = (value, extraClasses = '') => {
+    return `<div class="joco-icon ${extraClasses ?? ''}" data-icon="VictoryPoints">
+          <span class="fb-font-baskerville fb-font-semi-bold fb-font-20">${value}</span>
+        </div>`;
+};
 const tplDiscountIcon = (value, extraClasses = '') => `<div class="joco-icon ${extraClasses ?? ''}" data-icon="${DISCOUNT}${value}"></div>`;
 const tplTrophyIcon = (extraClasses = '') => `<div class="joco-trophy ${extraClasses ?? ''}">
     ${tplPowerIcon(1)}
@@ -1708,7 +1762,7 @@ const tplLocalAlliance = ({ id, extraClasses = '', presidencyId, name, strength,
       <div class="joco-strength-icon"></div>
     </div>
     <div class="joco-local-alliance-name bga-autofit"><span class="fb-font-baskerville">${_(name)}</span></div>
-    <div class="joco-icon" data-icon="CircleDark">${tplAmount(cost, true)}</div>
+    <div class="joco-icon" data-icon="CircleDark">${tplAmount$1(cost, true)}</div>
   </div>
 `;
 const tplArmyPiece = (piece) => {
@@ -2072,7 +2126,7 @@ const tplCompanyStanding = () => `
     return `
         <div class="joco-column">
           ${tplCompanySpotIcon(item.icon)(item.id)}
-          ${item.amount ? tplAmount(item.amount, true) : `<span class="fb-font-baskerville fb-font-semi-bold fb-font-8" style="margin-top: 4px;">${item.text ?? ''}</span>`}
+          ${item.amount ? tplAmount$1(item.amount, true) : `<span class="fb-font-baskerville fb-font-semi-bold fb-font-8" style="margin-top: 4px;">${item.text ?? ''}</span>`}
         </div>`;
 }).join('')}
     </div>
@@ -2575,7 +2629,7 @@ const tplControlTokenContent = (token, back = false) => {
     ${back ? '' : `<div class="joco-presidency-icon joco-inverted"></div>`}
     <div class="joco-region-icon" data-region='${token.regionId}'></div>
     ${back ? '' : `<div class="joco-presidency-icon"></div>`}
-    ${back ? tplAmount(token.loot, true) : ''}
+    ${back ? tplAmount$1(token.loot, true) : ''}
   `;
 };
 class ControlTokensManager extends BgaCards$1.Manager {
@@ -2893,7 +2947,7 @@ class ShipZone {
     }
     async addShip(ship, fromSea = null) {
         if (fromSea) {
-            India.getInstance().getSeaZone(fromSea).updateCount(-1);
+            India$1.getInstance().getSeaZone(fromSea).updateCount(-1);
         }
         await this.stock.addCard(ship);
         this.updateCount();
@@ -2910,8 +2964,8 @@ class ShipZone {
 const tplOrder = (orderId, { top, left }) => {
     const staticData = StaticData.get().order(orderId);
     return `<div id="${orderId}" class="joco-order" style="top: ${top}px; left: ${left}px;" data-is-home-port="${staticData.homePort !== null}">
-          <div class="joco-order-value">${tplAmount(staticData.value)}</div>
-          <div class="joco-filled-order-value">${tplAmount(staticData.filledValue, true)}</div>
+          <div class="joco-order-value">${tplAmount$1(staticData.value)}</div>
+          <div class="joco-filled-order-value">${tplAmount$1(staticData.filledValue, true)}</div>
         </div>`;
 };
 const tplOrderToken = (type) => `
@@ -2944,7 +2998,7 @@ const tplIndia = () => `
     </div>
   </div>
 `;
-class India {
+let India$1 = class India {
     constructor(game) {
         this.game = game;
         this.armies = {};
@@ -3063,6 +3117,353 @@ class India {
     }
     getRegion(regionId) {
         return this.regions[regionId];
+    }
+};
+
+const tplCardText = (text, { containerClass = 'fb-card-text', textClass = 'fb-font-12 fb-font-baskerville', }) => {
+    return `
+    <div class="${containerClass} bga-autofit">
+      ${text
+        .map((item) => {
+        if (typeof item === 'string') {
+            return `<span class="${textClass}">${item}</span>`;
+        }
+        else {
+            return `<span class="${textClass}">${formatStringRecursive(_(item.log), item.args)}</span>`;
+        }
+    })
+        .join('')}
+    
+    </div>
+  `;
+};
+
+const lawCardHeaderText = (header) => {
+    switch (header) {
+        case 'dilemma':
+            return _('Dilemma before Parliament');
+        case 'special':
+            return _('Special Session of Parliament');
+        default:
+            return _('Law before Parliament');
+    }
+};
+const tplInitialSupport = (votes) => `
+  <div class="joco-icon" data-icon="VoteClear">
+    <div class="joco-initial-support-icon" data-initial-support='${votes}'></div>
+  </div>
+`;
+const POLICY_TARGET_ICON_MAP = {
+    [BONUS]: 'Bonus',
+    [POWER]: 'Power',
+    [TAX]: 'Tax',
+    [WORKSHOP]: 'Manufacturing',
+    [SHARE]: 'CompanyShare',
+    [SHIPYARD]: 'Shipping',
+    [LUXURY]: 'Social',
+};
+const EXTRA_ACTION_ICON_MAP = {
+    [ENLIST_WRITER]: WRITER,
+    [ENLIST_OFFICER]: OFFICER_IN_TRAINING,
+    [PURCHASE_LUXURY]: LUXURY,
+    [PURCHASE_SHIPYARD]: SHIPYARD,
+    [PURCHASE_WORKSHOP]: WORKSHOP,
+    [SEEK_SHARE]: SHARE,
+};
+const tplDeregulation = () => `
+  <div class="joco-deregulation-1 fb-font-baskerville fb-font-8 fb-font-italic bga-autofit">${_('At the start of a turn, the Prime Minister may call a session of Parliament to vote on this law if either Standing or Debt is on a lined space. If either piece is on a space with a star, the session must be called. In either case, no policy is proposed.')}</div>
+  <div class="joco-deregulation-2 fb-font-baskerville fb-font-8 fb-font-italic bga-autofit">${_('The initial support of the law depends on the status of Standing and Debt:')}</div>
+  
+`;
+const tplLawCardContent = (card) => `
+  <div class="joco-card-header fb-font-baskerville  fb-font-16 fb-font-italic bga-autofit">${lawCardHeaderText(card.header)}</div>
+  <div class="joco-title fb-font-bebas-neue fb-font-40 bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
+  ${tplCardText(card.text, { textClass: 'fb-font-16 fb-font-baskerville' })}
+  ${card.initialSupport !== null ? tplInitialSupport(card.initialSupport) : ''}
+  ${card.policyTarget !== null && POLICY_TARGET_ICON_MAP[card.policyTarget] ? tplPolicyIcon(POLICY_TARGET_ICON_MAP[card.policyTarget]) : ''}
+  ${card.policyConsequence !== null && POLICY_TARGET_ICON_MAP[card.policyConsequence] ? tplPolicyIcon(POLICY_TARGET_ICON_MAP[card.policyConsequence]) : ''}
+  ${card.extraAction !== null && EXTRA_ACTION_ICON_MAP[card.extraAction] ? tplIcon(EXTRA_ACTION_ICON_MAP[card.extraAction], 'joco-extra-action-icon') : ''}
+  ${card.extraActionText !== null ? `<div class="joco-extra-action-header fb-font-baskerville fb-font-italic fb-font-16">${_('Extra Action')}</div>` + tplCardText(card.extraActionText, { containerClass: 'joco-extra-action-text', textClass: 'fb-font-12 fb-font-baskerville' }) : ''}
+  ${card.id === 'LawCard_56' ? tplDeregulation() : ''}
+`;
+
+class LawCardsManager extends BgaCards$1.Manager {
+    static create(game) {
+        LawCardsManager.instance = new LawCardsManager(game);
+    }
+    static getInstance() {
+        return LawCardsManager.instance;
+    }
+    constructor(game) {
+        super({
+            getId: (card) => card.id,
+            setupDiv: (card, div) => this.setupDiv(card, div),
+            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
+            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
+            isCardVisible: (card) => this.isCardVisible(card),
+            animationManager: game.animationManager,
+            cardHeight: 351,
+            cardWidth: 225,
+            type: 'law-card',
+        });
+        this.game = game;
+    }
+    clearInterface() { }
+    setupDiv(card, div) {
+        div.classList.add('joco-law-card');
+    }
+    setupFrontDiv(card, div) {
+        div.classList.add('joco-law-card');
+        div.setAttribute('data-background', card.background);
+        if (div.children.length) {
+            return;
+        }
+        div.insertAdjacentHTML('beforeend', tplLawCardContent(card));
+    }
+    setupBackDiv(card, div) {
+        div.setAttribute('data-background', 'LawBack');
+    }
+    isCardVisible(card) {
+        return true;
+    }
+}
+
+const tplSpouse = (card) => `
+  <div class="joco-card-title fb-font-16 fb-font-baskerville bga-autofit">${_('SPOUSE')}</div>
+  <div class="joco-card-subtitle fb-font-12 fb-font-italic fb-font-baskerville bga-autofit">${_('You cannot transfer this card')}</div>
+  <div class="joco-card-name fb-font-24 fb-font-parisienne fb-font-bold bga-autofit">${_(card.title)}</div>
+  ${tplCardText(card.text, {})}
+  ${card.textNote
+    ? tplCardText([card.textNote], {
+        containerClass: 'fb-card-text-note',
+        textClass: 'fb-font-12 fb-font-baskerville fb-font-italic',
+    })
+    : ''}
+  ${card.victoryPoints !== null ? tplVictoryPointsIcon(card.victoryPoints) : ''}
+  ${card.power !== null ? tplPowerIcon(card.power) : ''}
+  ${card.discount !== null ? tplDiscountIcon(card.discount) : ''}
+`;
+const tplEnterprise = (card) => `
+  <div class="joco-card-name fb-font-16 fb-font-baskerville bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
+  <div class="joco-enterprise-icon">${tplIcon(card.enterpriseType)}</div>
+  ${tplCardText(card.text, {})}
+`;
+const tplScottishCastle = (card) => `
+  <div class="joco-card-name fb-font-16 fb-font-baskerville bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
+  <div class="joco-enterprise-icon">${tplIcon(card.enterpriseType)}</div>
+    ${tplPowerIcon('3')}
+    ${tplIcon(WINDOW, 'joco-window-1')}
+    ${tplIcon(WINDOW, 'joco-window-2')}
+`;
+const tplLondonSeasonCardContent = (card) => {
+    if (card.background === 'ScottishCastle') {
+        return tplScottishCastle(card);
+    }
+    if (card.type === PRESTIGE && card.subtype === SPOUSE) {
+        return tplSpouse(card);
+    }
+    else if (card.type === PRESTIGE && card.subtype === ENTERPRISE) {
+        return tplEnterprise(card);
+    }
+    return null;
+};
+
+class LondonSeasonCardsManager extends BgaCards$1.Manager {
+    static create(game) {
+        LondonSeasonCardsManager.instance = new LondonSeasonCardsManager(game);
+    }
+    static getInstance() {
+        return LondonSeasonCardsManager.instance;
+    }
+    constructor(game) {
+        super({
+            getId: (card) => card.id,
+            setupDiv: (card, div) => this.setupDiv(card, div),
+            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
+            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
+            isCardVisible: (card) => this.isCardVisible(card),
+            animationManager: game.animationManager,
+            cardHeight: 351,
+            cardWidth: 225,
+        });
+        this.game = game;
+    }
+    clearInterface() { }
+    setupDiv(card, div) {
+        div.classList.add('joco-card-container');
+        div.setAttribute('data-type', card.type);
+        if (card.type === PRESTIGE) {
+            div.setAttribute('data-subtype', card.subtype);
+        }
+        div.setAttribute('data-has-text-note', card.textNote ? 'true' : 'false');
+    }
+    setupFrontDiv(card, div) {
+        div.classList.add('joco-card');
+        div.setAttribute('data-background', card.background);
+        if (div.children.length) {
+            return;
+        }
+        const cardContent = tplLondonSeasonCardContent(card);
+        if (cardContent) {
+            div.insertAdjacentHTML('beforeend', cardContent);
+        }
+    }
+    setupBackDiv(card, div) {
+        div.classList.add('joco-card');
+        div.setAttribute('data-background', card.type === PRESTIGE ? 'PrestigeBack' : 'BlackmailBack');
+    }
+    isCardVisible(card) {
+        return card.type !== BLACKMAIL;
+    }
+}
+
+const tplLondonSeasonOrder = ({ order, cashSpent, }) => {
+    const playerManager = PlayerManager.getInstance();
+    let playerLog = '';
+    let playerArgs = {};
+    order.forEach((playerId, index) => {
+        playerLog +=
+            '${tkn_playerName_' +
+                index +
+                '}' +
+                ' (${tkn_boldText_amount_' +
+                index +
+                '})' + (index === order.length - 1 ? '' : ', ');
+        playerArgs['tkn_playerName_' + index] = playerManager
+            .getPlayer(playerId)
+            .getName();
+        playerArgs['tkn_boldText_amount_' + index] = '£' + cashSpent[playerId];
+    });
+    return `
+    <span class="fb-font-baskerville fb-font-12">
+      ${formatStringRecursive(_('Order for choosing cards from the London Season Display: ${playerLog}'), {
+        playerLog: {
+            log: playerLog,
+            args: playerArgs,
+        },
+    })}
+    </span>
+  `;
+};
+const tplPrize = (prize) => {
+    return `
+    <div id="${prize.id}-container" class="joco-container joco-column joco-prize">
+      <div class="joco-row">
+        <div class="joco-upkeep-container">
+          <div class="joco-icon" data-icon="CircleDark">
+            ${tplAmount$1(prize.cost)}
+          </div>
+          ${prize.upkeep
+        ? `<div class="joco-upkeep">
+            ${tplAmount$1(prize.upkeep, true)}
+          </div>`
+        : ''}
+        </div>
+        <div class="joco-windows-container">
+          ${Array.from({ length: prize.windows })
+        .map(() => `<div class="joco-icon" data-icon="Window"></div>`)
+        .join('')}
+        </div>
+        <div class="joco-icon" data-icon="VictoryPoints">
+          <span class="fb-font-baskerville fb-font-semi-bold fb-font-20">${prize.VictoryPoints}</span>
+        </div>
+      </div>
+      <div id="${prize.id}" class="joco-family-members-stock"></div>
+      <div class="joco-prize-description">
+        <span class="fb-font-baskerville fb-font-12">${_('Prize').toLocaleUpperCase()}</span>
+      </div>
+    </div>
+  `;
+};
+
+const tplLondon = () => `
+  <div id="joco-london" class="joco-tab">
+    <div class="joco-left-column joco-column">
+      <div id="joco-pensioners" class="joco-container">
+        <div class="joco-header"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Pensioners').toLocaleUpperCase()}</span></div>
+        <div id="${PENSIONERS}" class="joco-family-members-stock">
+        </div>
+      </div>
+      ${Object.entries(PRIZES)
+    .map(([key, prize]) => tplPrize(prize))
+    .join('')}
+    </div>
+    <div class="joco-right-column joco-column">
+      <div class="joco-container">
+        <div class="joco-header"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('London Season Display').toLocaleUpperCase()}</span></div>
+        <div id="joco-london-season-display">
+          
+        </div>
+        <div id="joco-london-season-order">
+
+        </div>
+      </div>
+      <div class="joco-container">
+        <div class="joco-header"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Passed Laws').toLocaleUpperCase()}</span></div>
+        <div id="joco-london-laws">
+          
+        </div>
+      </div>
+    </div>
+  </div>
+`;
+class London {
+    constructor(game) {
+        this.game = game;
+        this.game = game;
+        this.setup(game.gamedatas);
+    }
+    static create(game) {
+        London.instance = new London(game);
+    }
+    static getInstance() {
+        return London.instance;
+    }
+    setupPassedLaws(gamedatas) {
+        this.passedLaws = new BgaCards$1.LineStock(LawCardsManager.getInstance(), document.getElementById('joco-london-laws'));
+        this.updatePassedLaws(gamedatas);
+    }
+    setupLondonSeasonDisplay(gamedatas) {
+        this.seasonDisplay = new BgaCards$1.LineStock(LondonSeasonCardsManager.getInstance(), document.getElementById('joco-london-season-display'));
+        this.updateLondonSeasonDisplay(gamedatas);
+    }
+    setup(gamedatas) {
+        document
+            .getElementById('joco')
+            .insertAdjacentHTML('afterbegin', tplLondon());
+        this.setupLondonSeasonDisplay(gamedatas);
+        this.setupPassedLaws(gamedatas);
+        this.updateFamilyMembers(gamedatas);
+        this.updateLondonSeasonOrder(gamedatas.londonSeason);
+    }
+    updateLondonSeasonDisplay(gamedatas) {
+        const cards = gamedatas.londonSeasonDisplay.map(getLondonSeasonCard);
+        this.seasonDisplay.addCards(cards);
+    }
+    updateLondonSeasonOrder(data) {
+        if (!data.order || data.order.length === 0)
+            return;
+        const orderContainer = document.getElementById('joco-london-season-order');
+        orderContainer.replaceChildren();
+        orderContainer.insertAdjacentHTML('beforeend', tplLondonSeasonOrder(data));
+    }
+    updatePassedLaws(gamedatas) {
+        const cards = gamedatas.passedLaws.map(getLawCard);
+        this.passedLaws.addCards(cards);
+    }
+    updateFamilyMembers(gamedatas) {
+        const pensionersBox = document.getElementById(PENSIONERS);
+        Object.values(gamedatas.familyMembers).forEach((familyMember) => {
+            const location = familyMember.location;
+            if (location === PENSIONERS) {
+                pensionersBox?.appendChild(createFamilyMember(familyMember.familyId, familyMember.id));
+            }
+            else if (location.startsWith('Prize')) {
+                document
+                    .getElementById(location)
+                    ?.appendChild(createFamilyMember(familyMember.familyId, familyMember.id));
+            }
+        });
     }
 }
 
@@ -3460,7 +3861,7 @@ class NotificationManager {
     }
     async notif_changeOrderStatus(notif) {
         const { order } = notif;
-        India.getInstance().ui.orders[order.id].setAttribute('data-status', order.status);
+        India$1.getInstance().ui.orders[order.id].setAttribute('data-status', order.status);
     }
     async notif_companyOperationChairman(notif) {
         const { debtIncreased, companyDebt, treasuries, companyBalance } = notif;
@@ -3477,7 +3878,7 @@ class NotificationManager {
         SetupArea.getInstance().newCards(cardIds, lastCard);
     }
     async notif_elephantMarch(notif) {
-        India.getInstance().updateElephant(notif);
+        India$1.getInstance().updateElephant(notif);
         await Interaction.use().wait(500);
     }
     async notif_enlistFamilyMember(notif) {
@@ -3558,6 +3959,14 @@ class NotificationManager {
             await this.moveFamilyMember(familyMember);
         }));
     }
+    async notif_retireFamilyMember(notif) {
+        const { familyMember, cost, playerId } = notif;
+        if (parentHasChildWithId(familyMember.location, familyMember.id)) {
+            return;
+        }
+        this.getPlayer(playerId).counters[CASH_COUNTER].incValue(-cost);
+        await this.moveFamilyMember(familyMember);
+    }
     async notif_moveArmyPiece(notif) {
         const { armyPiece } = notif;
         if (parentHasChildWithId(armyPiece.location, armyPiece.id)) {
@@ -3587,7 +3996,7 @@ class NotificationManager {
     }
     async notif_moveShip(notif) {
         const { from, ship } = notif;
-        const seaZone = India.getInstance().getSeaZone(ship.location);
+        const seaZone = India$1.getInstance().getSeaZone(ship.location);
         if (!seaZone.hasShip(ship.id)) {
             await seaZone.addShip(ship, from);
         }
@@ -3614,7 +4023,7 @@ class NotificationManager {
     async notif_placeShip(notif) {
         const { playerId, ship } = notif;
         let placedShip = ship;
-        const india = India.getInstance();
+        const india = India$1.getInstance();
         const seaZone = india.getSeaZone(ship.location);
         if (!seaZone.hasShip(ship.id)) {
             await seaZone.addShip(placedShip);
@@ -3711,9 +4120,13 @@ class NotificationManager {
         });
         await Promise.all(promises);
     }
+    async notif_updateLondonSeasonOrder(notif) {
+        const { order, cashSpent } = notif;
+        London.getInstance().updateLondonSeasonOrder({ order, cashSpent });
+    }
     async notif_updateRegion(notif) {
         const { region: data } = notif;
-        const india = India.getInstance();
+        const india = India$1.getInstance();
         const region = india.getRegion(data.id);
         region.update(data);
         const controlToken = createControlToken(data);
@@ -3851,203 +4264,6 @@ class ResolveChoice {
     }
 }
 
-const tplCardText = (text, { containerClass = 'fb-card-text', textClass = 'fb-font-12 fb-font-baskerville', }) => {
-    return `
-    <div class="${containerClass} bga-autofit">
-      ${text
-        .map((item) => {
-        if (typeof item === 'string') {
-            return `<span class="${textClass}">${item}</span>`;
-        }
-        else {
-            return `<span class="${textClass}">${formatStringRecursive(_(item.log), item.args)}</span>`;
-        }
-    })
-        .join('')}
-    
-    </div>
-  `;
-};
-
-const lawCardHeaderText = (header) => {
-    switch (header) {
-        case 'dilemma':
-            return _('Dilemma before Parliament');
-        case 'special':
-            return _('Special Session of Parliament');
-        default:
-            return _('Law before Parliament');
-    }
-};
-const tplInitialSupport = (votes) => `
-  <div class="joco-icon" data-icon="VoteClear">
-    <div class="joco-initial-support-icon" data-initial-support='${votes}'></div>
-  </div>
-`;
-const POLICY_TARGET_ICON_MAP = {
-    [BONUS]: 'Bonus',
-    [POWER]: 'Power',
-    [TAX]: 'Tax',
-    [WORKSHOP]: 'Manufacturing',
-    [SHARE]: 'CompanyShare',
-    [SHIPYARD]: 'Shipping',
-    [LUXURY]: 'Social',
-};
-const EXTRA_ACTION_ICON_MAP = {
-    [ENLIST_WRITER]: WRITER,
-    [ENLIST_OFFICER]: OFFICER_IN_TRAINING,
-    [PURCHASE_LUXURY]: LUXURY,
-    [PURCHASE_SHIPYARD]: SHIPYARD,
-    [PURCHASE_WORKSHOP]: WORKSHOP,
-    [SEEK_SHARE]: SHARE,
-};
-const tplDeregulation = () => `
-  <div class="joco-deregulation-1 fb-font-baskerville fb-font-8 fb-font-italic bga-autofit">${_('At the start of a turn, the Prime Minister may call a session of Parliament to vote on this law if either Standing or Debt is on a lined space. If either piece is on a space with a star, the session must be called. In either case, no policy is proposed.')}</div>
-  <div class="joco-deregulation-2 fb-font-baskerville fb-font-8 fb-font-italic bga-autofit">${_('The initial support of the law depends on the status of Standing and Debt:')}</div>
-  
-`;
-const tplLawCardContent = (card) => `
-  <div class="joco-card-header fb-font-baskerville  fb-font-16 fb-font-italic bga-autofit">${lawCardHeaderText(card.header)}</div>
-  <div class="joco-title fb-font-bebas-neue fb-font-40 bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
-  ${tplCardText(card.text, { textClass: 'fb-font-16 fb-font-baskerville' })}
-  ${card.initialSupport !== null ? tplInitialSupport(card.initialSupport) : ''}
-  ${card.policyTarget !== null && POLICY_TARGET_ICON_MAP[card.policyTarget] ? tplPolicyIcon(POLICY_TARGET_ICON_MAP[card.policyTarget]) : ''}
-  ${card.policyConsequence !== null && POLICY_TARGET_ICON_MAP[card.policyConsequence] ? tplPolicyIcon(POLICY_TARGET_ICON_MAP[card.policyConsequence]) : ''}
-  ${card.extraAction !== null && EXTRA_ACTION_ICON_MAP[card.extraAction] ? tplIcon(EXTRA_ACTION_ICON_MAP[card.extraAction], 'joco-extra-action-icon') : ''}
-  ${card.extraActionText !== null ? `<div class="joco-extra-action-header fb-font-baskerville fb-font-italic fb-font-16">${_('Extra Action')}</div>` + tplCardText(card.extraActionText, { containerClass: 'joco-extra-action-text', textClass: 'fb-font-12 fb-font-baskerville' }) : ''}
-  ${card.id === 'LawCard_56' ? tplDeregulation() : ''}
-`;
-
-class LawCardsManager extends BgaCards$1.Manager {
-    static create(game) {
-        LawCardsManager.instance = new LawCardsManager(game);
-    }
-    static getInstance() {
-        return LawCardsManager.instance;
-    }
-    constructor(game) {
-        super({
-            getId: (card) => card.id,
-            setupDiv: (card, div) => this.setupDiv(card, div),
-            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
-            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
-            isCardVisible: (card) => this.isCardVisible(card),
-            animationManager: game.animationManager,
-            cardHeight: 351,
-            cardWidth: 225,
-            type: 'law-card',
-        });
-        this.game = game;
-    }
-    clearInterface() { }
-    setupDiv(card, div) {
-        div.classList.add('joco-law-card');
-    }
-    setupFrontDiv(card, div) {
-        div.classList.add('joco-law-card');
-        div.setAttribute('data-background', card.background);
-        if (div.children.length) {
-            return;
-        }
-        div.insertAdjacentHTML('beforeend', tplLawCardContent(card));
-    }
-    setupBackDiv(card, div) {
-        div.setAttribute('data-background', 'LawBack');
-    }
-    isCardVisible(card) {
-        return true;
-    }
-}
-
-const tplSpouse = (card) => `
-  <div class="joco-card-title fb-font-16 fb-font-baskerville bga-autofit">${_('SPOUSE')}</div>
-  <div class="joco-card-subtitle fb-font-12 fb-font-italic fb-font-baskerville bga-autofit">${_('You cannot transfer this card')}</div>
-  <div class="joco-card-name fb-font-24 fb-font-parisienne fb-font-bold bga-autofit">${_(card.title)}</div>
-  ${tplCardText(card.text, {})}
-  ${card.textNote
-    ? tplCardText([card.textNote], {
-        containerClass: 'fb-card-text-note',
-        textClass: 'fb-font-12 fb-font-baskerville fb-font-italic',
-    })
-    : ''}
-  ${card.victoryPoints !== null ? tplVictoryPointsIcon(card.victoryPoints) : ''}
-  ${card.power !== null ? tplPowerIcon(card.power) : ''}
-  ${card.discount !== null ? tplDiscountIcon(card.discount) : ''}
-`;
-const tplEnterprise = (card) => `
-  <div class="joco-card-name fb-font-16 fb-font-baskerville bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
-  <div class="joco-enterprise-icon">${tplIcon(card.enterpriseType)}</div>
-  ${tplCardText(card.text, {})}
-`;
-const tplScottishCastle = (card) => `
-  <div class="joco-card-name fb-font-16 fb-font-baskerville bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
-  <div class="joco-enterprise-icon">${tplIcon(card.enterpriseType)}</div>
-    ${tplPowerIcon('3')}
-    ${tplIcon(WINDOW, 'joco-window-1')}
-    ${tplIcon(WINDOW, 'joco-window-2')}
-`;
-const tplLondonSeasonCardContent = (card) => {
-    if (card.background === 'ScottishCastle') {
-        return tplScottishCastle(card);
-    }
-    if (card.type === PRESTIGE && card.subtype === SPOUSE) {
-        return tplSpouse(card);
-    }
-    else if (card.type === PRESTIGE && card.subtype === ENTERPRISE) {
-        return tplEnterprise(card);
-    }
-    return null;
-};
-
-class LondonSeasonCardsManager extends BgaCards$1.Manager {
-    static create(game) {
-        LondonSeasonCardsManager.instance = new LondonSeasonCardsManager(game);
-    }
-    static getInstance() {
-        return LondonSeasonCardsManager.instance;
-    }
-    constructor(game) {
-        super({
-            getId: (card) => card.id,
-            setupDiv: (card, div) => this.setupDiv(card, div),
-            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
-            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
-            isCardVisible: (card) => this.isCardVisible(card),
-            animationManager: game.animationManager,
-            cardHeight: 351,
-            cardWidth: 225,
-        });
-        this.game = game;
-    }
-    clearInterface() { }
-    setupDiv(card, div) {
-        div.classList.add('joco-card-container');
-        div.setAttribute('data-type', card.type);
-        if (card.type === PRESTIGE) {
-            div.setAttribute('data-subtype', card.subtype);
-        }
-        div.setAttribute('data-has-text-note', card.textNote ? 'true' : 'false');
-    }
-    setupFrontDiv(card, div) {
-        div.classList.add('joco-card');
-        div.setAttribute('data-background', card.background);
-        if (div.children.length) {
-            return;
-        }
-        const cardContent = tplLondonSeasonCardContent(card);
-        if (cardContent) {
-            div.insertAdjacentHTML('beforeend', cardContent);
-        }
-    }
-    setupBackDiv(card, div) {
-        div.classList.add('joco-card');
-        div.setAttribute('data-background', card.type === PRESTIGE ? 'PrestigeBack' : 'BlackmailBack');
-    }
-    isCardVisible(card) {
-        return card.type !== BLACKMAIL;
-    }
-}
-
 const createRegiment = (extraClasses = []) => {
     const elt = document.createElement('div');
     elt.classList.add('joco-regiment');
@@ -4074,6 +4290,7 @@ const LOG_TOKEN_SETUP_CARD = 'setupCard';
 const LOG_TOKEN_SHIP = 'ship';
 const LOG_TOKEN_STORM_DIE = 'stormDie';
 const LOG_TOKEN_TROPHY = 'trophy';
+const LOG_TOKEN_VICTORY_POINTS = 'victoryPoints';
 const CLASS_LOG_TOKEN = 'log-token';
 let tooltipIdCounter = 0;
 const getTokenDiv = ({ key, value, game, }) => {
@@ -4131,70 +4348,12 @@ const getTokenDiv = ({ key, value, game, }) => {
                     color: player.getColor(),
                 })
                 : value;
+        case LOG_TOKEN_VICTORY_POINTS:
+            return tplVictoryPointsIcon(value, 'log-token');
         default:
             return value;
     }
 };
-
-const tplLondon = () => `
-  <div id="joco-london" class="joco-tab">
-    
-    <div class="joco-container">
-      <div class="joco-header"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('London Season Display').toLocaleUpperCase()}</span></div>
-      <div id="joco-london-season-display">
-        
-      </div>
-    </div>
-    <div class="joco-container">
-      <div class="joco-header"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Passed Laws').toLocaleUpperCase()}</span></div>
-      <div id="joco-london-laws">
-        
-      </div>
-    </div>
-    <div id="joco-pensioners">
-      Pensioners
-    </div>
-    <div id="joco-prizes">
-      Prizes
-    </div>
-  </div>
-`;
-class London {
-    constructor(game) {
-        this.game = game;
-        this.game = game;
-        this.setup(game.gamedatas);
-    }
-    static create(game) {
-        London.instance = new London(game);
-    }
-    static getInstance() {
-        return London.instance;
-    }
-    setupPassedLaws(gamedatas) {
-        this.passedLaws = new BgaCards$1.LineStock(LawCardsManager.getInstance(), document.getElementById('joco-london-laws'));
-        this.updatePassedLaws(gamedatas);
-    }
-    setupLondonSeasonDisplay(gamedatas) {
-        this.seasonDisplay = new BgaCards$1.LineStock(LondonSeasonCardsManager.getInstance(), document.getElementById('joco-london-season-display'));
-        this.updateLondonSeasonDisplay(gamedatas);
-    }
-    setup(gamedatas) {
-        document
-            .getElementById('joco')
-            .insertAdjacentHTML('afterbegin', tplLondon());
-        this.setupLondonSeasonDisplay(gamedatas);
-        this.setupPassedLaws(gamedatas);
-    }
-    updateLondonSeasonDisplay(gamedatas) {
-        const cards = gamedatas.londonSeasonDisplay.map(getLondonSeasonCard);
-        this.seasonDisplay.addCards(cards);
-    }
-    updatePassedLaws(gamedatas) {
-        const cards = gamedatas.passedLaws.map(getLawCard);
-        this.passedLaws.addCards(cards);
-    }
-}
 
 const tplNegotiation = () => `<div id="joco-negotiation">
   TODO
@@ -5384,7 +5543,7 @@ class DirectorOfTradeSpecialEnvoySuccess {
         this.game.clearPossible();
         Bar.getInstance().goTo('joco-india');
         updatePageTitle(_('${you} may open trade with China or may open a closed order'));
-        const india = India.getInstance();
+        const india = India$1.getInstance();
         this.args.closedOrders.forEach((order) => {
             onClick(india.ui.orders[order.id], () => this.updateInterfaceConfirm(order));
         });
@@ -5394,7 +5553,7 @@ class DirectorOfTradeSpecialEnvoySuccess {
         updatePageTitle(_('Open closed order in ${region}?'), {
             region: _(order.location),
         });
-        setSelected(India.getInstance().ui.orders[order.id]);
+        setSelected(India$1.getInstance().ui.orders[order.id]);
         addConfirmButton(() => this.performAction(order, true));
         addCancelButton();
     }
@@ -5483,7 +5642,7 @@ class DirectorOfTradeTransfers {
         clearPossible();
         updatePageTitle(_('${you} must select a sea zone'));
         setSelected(`ship-${ship.id}`);
-        const india = India.getInstance();
+        const india = India$1.getInstance();
         locations.forEach((seaZone) => {
             addPrimaryActionButton({
                 id: `${seaZone}-btn`,
@@ -5519,7 +5678,7 @@ class DirectorOfTradeTransfers {
             Object.keys(this.transfers.writers).length);
     }
     async returnPieces() {
-        const india = India.getInstance();
+        const india = India$1.getInstance();
         for (let data of Object.values(this.transfers.ships)) {
             data.ship.location = data.from;
             await india.getSeaZone(data.from).addShip(data.ship, data.to);
@@ -5801,7 +5960,10 @@ class LondonSeasonRetire {
     onEnteringState(args) {
         debug('Entering LondonSeasonRetire state');
         this.args = args;
+        this.totalCost = 0;
+        this.selectedPrizes = {};
         this.updateInterfaceInitialStep();
+        Bar.getInstance().goTo('joco-london');
     }
     onLeavingState() {
         debug('Leaving LondonSeasonRetire state');
@@ -5809,9 +5971,89 @@ class LondonSeasonRetire {
     setDescription(activePlayerIds, args) { }
     updateInterfaceInitialStep() {
         clearPossible();
-        updatePageTitle(_('${you} may retire a family member'), {});
+        const remainingMoney = this.getRemainingMoney();
+        if (remainingMoney <= 1 ||
+            Object.keys(this.selectedPrizes).length === this.args.familyMembers.length) {
+            this.updateInterfaceConfirm();
+            return;
+        }
+        updatePageTitle(_('${you} may choose a family member to retire'));
+        this.args.familyMembers.forEach((familyMember) => {
+            if (this.selectedPrizes[familyMember.id]) {
+                return;
+            }
+            onClick(familyMember.id, () => this.updateInterfaceSelectPrize(familyMember));
+        });
+        if (Object.keys(this.selectedPrizes).length > 0) {
+            addPrimaryActionButton({
+                id: 'done-btn',
+                text: _('Done'),
+                callback: () => {
+                    this.updateInterfaceConfirm();
+                },
+            });
+            this.addCancelButton();
+        }
+        else {
+            addPassButton(this.args.optionalAction);
+        }
+    }
+    updateInterfaceSelectPrize(familyMember) {
+        clearPossible();
+        const remainingMoney = this.getRemainingMoney();
+        updatePageTitle(_('${you} must choose a prize'));
+        setSelected(familyMember.id);
+        Object.values(PRIZES).forEach((prize) => {
+            if (prize.cost > remainingMoney) {
+                return;
+            }
+            onClick(`${prize.id}-container`, async () => {
+                this.selectedPrizes[familyMember.id] = prize.id;
+                this.totalCost += prize.cost;
+                PlayerManager.getInstance()
+                    .getCurrentPlayer()
+                    .counters[CASH_COUNTER].incValue(-prize.cost);
+                await this.game.animationManager.slideAndAttach(document.getElementById(familyMember.id), document.getElementById(prize.id));
+                this.updateInterfaceInitialStep();
+            });
+        });
+        this.addCancelButton();
+    }
+    updateInterfaceConfirm() {
+        clearPossible();
+        Object.keys(this.selectedPrizes).forEach((key) => setSelected(key));
+        updatePageTitle(Object.keys(this.selectedPrizes).length > 1
+            ? _('Retire pensioners to selected prizes?')
+            : _('Retire pensioner to selected prize?'));
         addConfirmButton(() => {
-            performAction('actLondonSeasonRetire', {});
+            performAction('actLondonSeasonRetire', {
+                selectedPrizes: this.selectedPrizes,
+            });
+        });
+        this.addCancelButton();
+    }
+    getRemainingMoney() {
+        return this.args.treasury - this.totalCost;
+    }
+    async returnPieces() {
+        const interaction = Interaction.use();
+        PlayerManager.getInstance()
+            .getCurrentPlayer()
+            .counters[CASH_COUNTER].incValue(this.totalCost);
+        await Promise.all(Object.keys(this.selectedPrizes).map(async (key, index) => {
+            interaction.wait(200 * index);
+            const pensionersBox = document.getElementById('Pensioners');
+            await this.game.animationManager.slideAndAttach(document.getElementById(key), pensionersBox);
+        }));
+    }
+    addCancelButton() {
+        addDangerActionButton({
+            id: 'cancel_btn',
+            text: _('Cancel'),
+            callback: async () => {
+                await this.returnPieces();
+                this.game.onCancel();
+            },
         });
     }
 }
@@ -5944,7 +6186,7 @@ class ManagerOfShipping {
             this.placedCompanyShips[ship.id] = { ship, seaZone };
             this.pay(5);
         }
-        await India.getInstance().getSeaZone(seaZone).addShip(ship);
+        await India$1.getInstance().getSeaZone(seaZone).addShip(ship);
         this.updateInterfaceInitialStep();
     }
     updateInterfaceConfirm() {
@@ -5968,7 +6210,7 @@ class ManagerOfShipping {
     }
     async returnPieces() {
         Company.getInstance().treasuries[MANAGER_OF_SHIPPING].toValue(this.args.treasury);
-        const india = India.getInstance();
+        const india = India$1.getInstance();
         const enterpriseCardsManager = EnterpriseCardsManager.getInstance();
         [this.placedCompanyShips, this.placedExtraShips].forEach((category) => {
             Object.entries(category).forEach(([shipId, { ship, seaZone }]) => {
@@ -6048,7 +6290,7 @@ class MilitaryAffairsAssign {
             const regionId = to.split('_')[2];
             onClick(`ArmyOfPresidency_${regionId}`, async () => {
                 clearPossible();
-                await India.getInstance().getArmy(`Presidency_${regionId}`).addPiece(officer.id);
+                await India$1.getInstance().getArmy(`Presidency_${regionId}`).addPiece(officer.id);
                 this.assignedOfficers[officer.id] = { officer, to };
                 this.updateInterfaceInitialStep();
             });
@@ -6152,7 +6394,7 @@ class MilitaryAffairsTransfers {
                 };
                 regiment.location = to;
                 clearPossible();
-                await India.getInstance().getArmy(`Presidency_${regionId}`).addPiece(regiment.id);
+                await India$1.getInstance().getArmy(`Presidency_${regionId}`).addPiece(regiment.id);
                 this.updateInterfaceInitialStep();
             });
         });
@@ -6173,7 +6415,7 @@ class MilitaryAffairsTransfers {
             Object.keys(this.transfers.regiments).length);
     }
     async returnPieces() {
-        const india = India.getInstance();
+        const india = India$1.getInstance();
         for (let data of Object.values(this.transfers.regiments)) {
             data.regiment.location = data.from;
             await india.getArmy(`Presidency_${data.from.split('_')[2]}`).addPiece(data.regiment.id);
@@ -6934,7 +7176,7 @@ class Game {
         Board.create(this);
         Company.create(this);
         London.create(this);
-        India.create(this);
+        India$1.create(this);
         Bar.create(this);
         if (this.playerOrder.includes(this.getPlayerId()) &&
             gamedatas.phase === SETUP) {

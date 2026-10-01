@@ -39,6 +39,11 @@ class Locations
     return OFFICER_IN_TRAINING;
   }
 
+  public static function pensioners()
+  {
+    return PENSIONERS;
+  }
+
   public static function supplyEnterprises(string $type)
   {
     return 'supply_' . $type;
