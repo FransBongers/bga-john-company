@@ -25,6 +25,7 @@ import {
 import { ConfirmPartialTurn } from './boilerplate/states/ConfirmPartialTurn';
 import { ConfirmTurn } from './boilerplate/states/ConfirmTurn';
 import { ResolveChoice } from './boilerplate/states/ResolveChoice';
+import { TooltipManager } from './boilerplate/tooltip-manager';
 import { EnterpriseCardsManager } from './cards/enterprise-cards';
 import { LawCardsManager } from './cards/law-cards';
 import { LondonSeasonCardsManager } from './cards/london-season-cards';
@@ -110,13 +111,13 @@ export class Game {
   // Boiler plate
   //  private alwaysFixTopActions: boolean;
   //  private alwaysFixTopActionsMaximum: number;
-  //  public tooltipsToMap: [tooltipId: number, card_id: string][] = [];
+  public tooltipsToMap: [tooltipId: number, card_id: string][] = [];
   public _connections: unknown[];
   //  public _displayedTooltip = null;
   //  public _dragndropMode = false; // Not used but present in boiler plate code
   public _helpMode = false; // Use to implement help mode
   private _last_notif = null;
-  //  public _last_tooltip_id = 0;
+  public _last_tooltip_id = 0;
   private _notif_uid_to_log_id = {};
   private _notif_uid_to_mobile_log_id = {};
   private _selectableNodes = []; // TODO: use to keep track of selectable classed?
@@ -369,7 +370,7 @@ export class Game {
 
     Object.values(this.states).forEach((state) => state.create(this));
 
-    //  this.tooltipManager = new TooltipManager(this);
+    TooltipManager.create(this);
     //  this.playerManager = new PlayerManager(this);
     //  this.infoPanel = new InfoPanel(this);
     //  this.settings = new Settings(this);
@@ -861,24 +862,29 @@ export class Game {
       dojo.addClass('dockedlog_' + notif.mobileLogId, 'notif_' + type);
     }
 
-    //  while (this.tooltipsToMap.length) {
-    // 	 const tooltipToMap = this.tooltipsToMap.pop();
-    // 	 if (!tooltipToMap || !tooltipToMap[1]) {
-    // 		 console.error('error tooltipToMap', tooltipToMap);
-    // 	 } else {
-    // 		 this.addLogTooltip({
-    // 			 tooltipId: tooltipToMap[0],
-    // 			 cardId: tooltipToMap[1],
-    // 		 });
-    // 	 }
-    //  }
+    while (this.tooltipsToMap.length) {
+      const tooltipToMap = this.tooltipsToMap.pop();
+      if (!tooltipToMap || !tooltipToMap[1]) {
+        console.error('error tooltipToMap', tooltipToMap);
+      } else {
+        this.addLogTooltip({
+          tooltipId: tooltipToMap[0],
+          cardId: tooltipToMap[1],
+        });
+      }
+    }
   }
 
   addLogTooltip({ tooltipId, cardId }: { tooltipId: number; cardId: string }) {
-    //  this.tooltipManager.addCardTooltip({
-    // 	 nodeId: `gest_tooltip_${tooltipId}`,
-    // 	 cardId,
-    //  });
+    const tooltipManager = TooltipManager.getInstance();
+    if (cardId.startsWith('BlackmailCard')) {
+      tooltipManager.addBlackmailBackTooltip(`tooltip_${tooltipId}`);
+    } else if (this.gamedatas.staticData.londonSeasonCards[cardId]) {
+      tooltipManager.addLondonSeasonCardTooltip({
+        nodeId: `tooltip_${tooltipId}`,
+        cardId,
+      });
+    }
   }
 
   updateLogTooltips() {

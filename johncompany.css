@@ -323,6 +323,15 @@ span[style*="color:#addb90"] {
   color: black;
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
 .joco-card {
   width: 225px;
   aspect-ratio: 150/234;
@@ -558,6 +567,46 @@ span[style*="color:#addb90"] {
   width: 90%;
   top: 310px;
   height: 35px;
+}
+.joco-card-container.selectable .joco-card {
+  cursor: pointer;
+  outline: 4px solid yellow;
+}
+.joco-card-container.selectable:hover .joco-card, .joco-card-container.selected .joco-card {
+  cursor: pointer;
+  outline: 4px solid blue;
+}
+
+.joco-card .joco-enterprise-icon,
+.joco-card .fb-card-text-note,
+.joco-card .fb-card-text,
+.joco-card .joco-card-title,
+.joco-card .joco-card-subtitle,
+.joco-card .joco-card-name {
+  position: absolute;
+  text-align: center;
+}
+.joco-card[data-background=Blackmail] .joco-card-name {
+  left: 45px;
+  top: 90px;
+  width: 135px;
+  height: 48px;
+  line-height: 24px;
+}
+.joco-card[data-background=Blackmail] .joco-card-name .bga-autofit__inner {
+  overflow: visible !important;
+}
+.joco-card[data-background=Blackmail] .fb-card-text {
+  top: 138px;
+  left: 40px;
+  width: 145px;
+  height: 110px;
+}
+.joco-card[data-background=Blackmail] .joco-icon[data-icon^=Power] {
+  position: absolute;
+  height: 40px;
+  left: 20px;
+  top: 265px;
 }
 
 #game-card-PrestigeCard_25 .game-card-front .joco-card-name {
@@ -1140,6 +1189,11 @@ span[style*="color:#addb90"] {
   height: 24px;
   aspect-ratio: 1/1;
 }
+.joco-icon[data-icon=VictoryPoints], .joco-icon[data-icon=Power] {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 .joco-promise-cube {
   background-image: url("img/cubes.png");
@@ -1246,12 +1300,6 @@ span[style*="color:#addb90"] {
 .joco-icon[data-icon=VictoryPoints] {
   background-position-x: 100%;
   background-position-y: 100%;
-}
-
-.joco-icon[data-icon=Power] {
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .joco-policy-icon {
@@ -1387,11 +1435,18 @@ span[style*="color:#addb90"] {
 #joco-london .joco-left-column {
   width: 250px;
 }
+#joco-london .joco-right-column {
+  flex-grow: 1;
+}
 #joco-london .joco-column {
   gap: 8px;
 }
 #joco-london #joco-pensioners {
   padding: 8px;
+}
+#joco-london #joco-london-laws,
+#joco-london #joco-london-season-display {
+  min-height: 351px;
 }
 
 .joco-prize {

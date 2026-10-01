@@ -7,6 +7,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Preferences;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 
 /*
@@ -44,12 +45,20 @@ class Player extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     $data = parent::jsonSerialize();
     $isCurrentPlayer = intval($currentPlayerId) == $this->getId();
 
+    $londonSeasonCards = array_map(function ($card) use ($isCurrentPlayer) {
+      if ($card->getType() === BLACKMAIL && $isCurrentPlayer) {
+        return $card->jsonSerializePrivate();
+      }
+      return $card->jsonSerialize();
+    }, $this->getLondonSeasonCards());
+
     return array_merge(
       $data,
       [
         'draft' => $isCurrentPlayer ? $this->getDraft() : [],
         'familyId' => $this->getFamilyId(),
         'setupCards' => $isCurrentPlayer ? $this->getSetupCards() : [],
+        'londonSeasonCards' => $londonSeasonCards,
       ],
     );
   }
@@ -86,5 +95,10 @@ class Player extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   public function getSetupCards()
   {
     return SetupCards::getInLocation(Locations::setupCards($this->getFamilyId()))->toArray();
+  }
+
+  public function getLondonSeasonCards()
+  {
+    return LondonSeasonCards::getInLocation(Locations::londonSeasonCards($this->getFamilyId()))->toArray();
   }
 }

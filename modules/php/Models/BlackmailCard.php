@@ -10,4 +10,12 @@ class BlackmailCard extends \Bga\Games\JohnCompany\Models\LondonSeasonCard
     $this->type = BLACKMAIL;
     $this->background = 'Blackmail';
   }
+
+  public function jsonSerializePrivate(): array
+  {
+    $hiddenId = $this->getId();
+    $data = parent::jsonSerialize();
+    $data['hiddenId'] = $hiddenId;
+    return $data;
+  }
 }

@@ -177,6 +177,7 @@ interface JohnCompanyPlayerData extends Player {
   draft: JoCoSetupCard[];
   familyId: string;
   setupCards: JoCoSetupCard[];
+  londonSeasonCards: JocoLondonSeasonCardBase[];
 }
 
 /**
@@ -220,6 +221,7 @@ export type JocoLondonSeasonCardType = 'Blackmail' | 'Prestige';
 
 export interface JocoLondonSeasonCardBase extends GamePiece {
   type: JocoLondonSeasonCardType;
+  hiddenId?: string;
 }
 
 export interface JocoLondonSeasonCardStatic {
@@ -232,6 +234,7 @@ export interface JocoLondonSeasonCardStatic {
   power: number | null;
   victoryPoints: number | null;
   discount: number | null;
+  type: JocoLondonSeasonCardType;
 }
 
 export type JocoLondonSeasonCard = JocoLondonSeasonCardBase &
@@ -286,7 +289,6 @@ interface JocoFamily {
   lawPieces: number;
   location: string;
   opportunityMarker: number;
-  spentOnRetirement: number;
   state: number;
   treasury: number;
   trophies: number;

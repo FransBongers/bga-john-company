@@ -85,6 +85,9 @@ export class London {
     this.seasonDisplay = new BgaCards.LineStock<JocoLondonSeasonCard>(
       LondonSeasonCardsManager.getInstance(),
       document.getElementById('joco-london-season-display')!,
+      {
+        gap: '12px',
+      },
     );
 
     this.updateLondonSeasonDisplay(gamedatas);
@@ -119,10 +122,11 @@ export class London {
   }
 
   public updateLondonSeasonOrder(data: GamedatasAlias['londonSeason']) {
-    if (!data.order || data.order.length === 0) return;
     const orderContainer = document.getElementById('joco-london-season-order');
 
     orderContainer.replaceChildren();
+    
+    if (!data.order || data.order.length === 0) return;
     orderContainer.insertAdjacentHTML('beforeend', tplLondonSeasonOrder(data));
   }
 

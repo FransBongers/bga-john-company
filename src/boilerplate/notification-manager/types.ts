@@ -8,6 +8,7 @@ import {
   JocoArmyPieceBase,
   JocoEnterpriseCardBase,
   JocoFamilyMember,
+  JocoLondonSeasonCardBase,
   JocoOfficeBase,
   JoCoOrderBase,
   JocoRegionBase,
@@ -36,6 +37,14 @@ export interface NotifAllocateBalanceToOffice extends NotifWithPlayerArgs {
 
 export interface NotifChangeOrderStatus extends NotifWithPlayerArgs {
   order: JoCoOrderBase;
+}
+
+export interface NotifDiscardLondonSeasonCard {
+  card: JocoLondonSeasonCardBase;
+}
+
+export interface NotifNewLondonSeasonDisplay {
+  cards: JocoLondonSeasonCardBase[];
 }
 
 export interface NotifCompanyOperationChairman extends NotifWithPlayerArgs {
@@ -102,11 +111,18 @@ export interface NotifMoveFamilyMember {
 
 export interface NotifMoveFamilyMembers {
   familyMembers: JocoFamilyMember[];
-
 }
 
 export interface NotifMoveArmyPiece extends NotifWithPlayerArgs {
   armyPiece: JocoArmyPieceBase;
+}
+
+export interface NotifMoveLondonSeasonCard extends NotifWithPlayerArgs {
+  card: JocoLondonSeasonCardBase;
+  _private?: {
+    playerId: number;
+    card: JocoLondonSeasonCardBase;
+  };
 }
 
 export interface NotifMoveOfficeCard extends NotifWithPlayerArgs {

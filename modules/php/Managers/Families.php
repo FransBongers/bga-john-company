@@ -22,7 +22,6 @@ class Families extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     'is_leader_of_opposition',
     'trophies',
     'law_pieces',
-    'spent_on_retirement',
   ];
   protected static $autoremovePrefix = false;
   protected static $autoreshuffle = false;

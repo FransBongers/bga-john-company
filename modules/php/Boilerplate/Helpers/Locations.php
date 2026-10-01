@@ -85,6 +85,10 @@ class Locations
     return 'Writers_' . $presidencyId;
   }
 
+  public static function londonSeasonCards(string $familyId)
+  {
+    return 'londonSeasonCards_' . $familyId;
+  }
 
   public static function londonSeasonPool(string $type)
   {

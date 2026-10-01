@@ -1,3 +1,4 @@
+@use '../../base';
 @use 'sass:math';
 @use 'sass:map';
 
@@ -195,6 +196,63 @@ $rows: 5;
         height: 35px;
         // background-color: yellow;
       }
+    }
+  }
+
+  &.selectable {
+    .joco-card {
+      cursor: pointer;
+      outline: 4px solid base.$selectable-color;
+    }
+  }
+
+  &.selectable:hover,
+  &.selected {
+    .joco-card {
+      cursor: pointer;
+      outline: 4px solid base.$selected-color;
+    }
+  }
+}
+
+.joco-card {
+  .joco-enterprise-icon,
+  .fb-card-text-note,
+  .fb-card-text,
+  .joco-card-title,
+  .joco-card-subtitle,
+  .joco-card-name {
+    position: absolute;
+    text-align: center;
+  }
+
+  &[data-background='Blackmail'] {
+    .joco-card-name {
+      left: 45px;
+      top: 90px;
+      // background-color: blue;
+      width: 135px;
+      height: 48px;
+      line-height: 24px;
+      // letter-spacing: 0.5px;
+      .bga-autofit__inner {
+        overflow: visible !important;
+      }
+    }
+
+    .fb-card-text {
+      top: 138px;
+      left: 40px;
+      width: 145px;
+      height: 110px;
+      // background-color: yellow;
+    }
+
+    .joco-icon[data-icon^='Power'] {
+      position: absolute;
+      height: 40px;
+      left: 20px;
+      top: 265px;
     }
   }
 }

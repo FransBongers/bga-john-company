@@ -2,6 +2,9 @@
 
 namespace Bga\Games\JohnCompany\Models;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+
 class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
 {
   protected $id;
@@ -46,6 +49,7 @@ class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Mod
     'discount',
     'windows'
   ];
+
   public function jsonSerialize(): array
   {
     $data = parent::jsonSerialize();
@@ -61,4 +65,17 @@ class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Mod
     return $this->jsonSerialize(); // Static datas are already in js file
   }
 
+  public function discard($player = null)
+  {
+    $from = $this->getLocation();
+    $this->setLocation(DISCARD);
+    Notifications::discardLondonSeasonCard($this, $player, $from);
+  }
+
+  public function take(Player $player)
+  {
+    $from = $this->getLocation();
+    $this->setLocation(Locations::londonSeasonCards($player->getFamilyId()));
+    Notifications::moveLondonSeasonCard($player, $this, $from);
+  }
 }

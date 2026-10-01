@@ -42,7 +42,6 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     'isPrimeMinister' => ['is_prime_minister', 'int'],
     'trophies' => ['trophies', 'int'],
     'lawPieces' => ['law_pieces', 'int'],
-    'spentOnRetirement' => ['spent_on_retirement', 'int'],
   ];
 
 

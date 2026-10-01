@@ -6,6 +6,13 @@
   background-size: 500% 400%;
   height: 24px;
   aspect-ratio: 1 / 1;
+
+  &[data-icon='VictoryPoints'],
+  &[data-icon='Power'] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 // .joco-icon[data-icon='Luxury'] {
@@ -77,12 +84,6 @@ $rows: 4;
     background-position-x: math.div($col * 100%, $cols - 1);
     background-position-y: math.div($row * 100%, $rows - 1);
   }
-}
-
-.joco-icon[data-icon='Power'] {
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .joco-policy-icon {

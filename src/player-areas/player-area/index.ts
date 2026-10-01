@@ -1,4 +1,5 @@
 import { EnterpriseCardsManager } from '../../cards/enterprise-cards';
+import { LondonSeasonCardsManager } from '../../cards/london-season-cards';
 import { tplOfficeCard } from '../../cards/office-cards';
 import { SHIPYARD, TROPHIES } from '../../constants';
 import { BgaCards } from '../../libs copy';
@@ -7,10 +8,11 @@ import {
   GameAlias,
   GamedatasAlias,
   JocoEnterpriseCard,
+  JocoLondonSeasonCard,
   PlayerAlias,
 } from '../../types';
 import { TrophiesCounter } from '../../ui-components';
-import { getEnterpriseCard } from '../../utility';
+import { getEnterpriseCard, getLondonSeasonCard } from '../../utility';
 
 export interface PlayerAreaProps {
   parentElement: HTMLElement | string;
@@ -34,6 +36,10 @@ export class PlayerArea {
   private enterprises: InstanceType<
     typeof BgaCards.LineStock<JocoEnterpriseCard>
   >;
+  public stocks: Record<
+    string,
+    InstanceType<typeof BgaCards.LineStock<JocoLondonSeasonCard>>
+  > = {};
   public counters: Record<string, TrophiesCounter> = {};
 
   constructor(config: PlayerAreaProps) {
@@ -76,6 +82,7 @@ export class PlayerArea {
     };
 
     this.setupEnterprises(config.gamedatas);
+    this.setupLondonSeasonCards(config.gamedatas);
     this.setupOffices(config.gamedatas);
     this.setupTrophiesCounter(config.gamedatas);
   }
@@ -87,6 +94,16 @@ export class PlayerArea {
     );
 
     this.updateEnterprises(gamedatas);
+  }
+
+  private setupLondonSeasonCards(gamedatas: GamedatasAlias) {
+    this.stocks[`londonSeasonCards_${this.familyId}`] =
+      new BgaCards.LineStock<JocoLondonSeasonCard>(
+        LondonSeasonCardsManager.getInstance(),
+        document.getElementById(`joco-prestige-blackmail-${this.familyId}`)!,
+      );
+
+    this.updateLondonSeasonCards(gamedatas);
   }
 
   private setupOffices(gamedatas: GamedatasAlias) {
@@ -161,6 +178,23 @@ export class PlayerArea {
         }
       }
     });
+  }
+
+  private updateLondonSeasonCards(gamedatas: GamedatasAlias) {
+    const cards = gamedatas.players[this.player.id].londonSeasonCards;
+
+    this.stocks[`londonSeasonCards_${this.familyId}`].addCards(
+      cards.map(getLondonSeasonCard),
+    );
+    // .forEach((card) => {
+    //   if (card.location !== this.familyId) {
+    //     return;
+    //   }
+
+    //   this.stocks[`londonSeasonCards-${this.familyId}`].addCard(
+    //     getLondonSeasonCard(card),
+    //   );
+    // });
   }
 
   // .##.....##.########.####.##.......####.########.##....##

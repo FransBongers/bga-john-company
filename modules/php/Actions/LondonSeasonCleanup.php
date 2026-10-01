@@ -3,6 +3,10 @@
 namespace Bga\Games\JohnCompany\Actions;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Models\Player;
 
 class LondonSeasonCleanup extends \Bga\Games\JohnCompany\Models\AtomicAction
@@ -30,9 +34,15 @@ class LondonSeasonCleanup extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   public function stLondonSeasonCleanup()
   {
+    $this->cleanupDisplay();
 
+    $pensioners = FamilyMembers::getInLocation(Locations::pensioners())->toArray();
+    foreach ($pensioners as $familyMember) {
+      $familyMember->returnToSupply();
+    }
 
     Globals::setRetirementMoney([]);
+    Notifications::updateLondonSeasonOrder();
     $this->resolveAction(['automatic' => true]);
   }
 
@@ -43,6 +53,17 @@ class LondonSeasonCleanup extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private function cleanupDisplay()
+  {
+    $remainingCards = LondonSeasonCards::getInLocation(LONDON_SEASON_DISPLAY)->toArray();
+    foreach ($remainingCards as $card) {
+      $card->discard();
+    }
+
+    $newCards = LondonSeasonCards::pickForLocation(3, DECK, LONDON_SEASON_DISPLAY)->toArray();
+    Notifications::newLondonSeasonDisplay($newCards);
+  }
 
   // .########.##....##..######...####.##....##.########
   // .##.......###...##.##....##...##..###...##.##......

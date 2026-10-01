@@ -15,12 +15,21 @@
     width: 250px;
   }
 
+  .joco-right-column {
+    flex-grow: 1;
+  }
+
   .joco-column {
     gap: 8px;
   }
 
   #joco-pensioners {
     padding: 8px;
+  }
+
+  #joco-london-laws,
+  #joco-london-season-display {
+    min-height: 351px;
   }
 }
 

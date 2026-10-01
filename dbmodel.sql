@@ -87,7 +87,6 @@ CREATE TABLE IF NOT EXISTS `families` (
   `is_prime_minister` tinyint(1) DEFAULT 0,
   `trophies` int(10) DEFAULT 0,
   `law_pieces` int(10) DEFAULT 0,
-  `spent_on_retirement` int(10) DEFAULT 0,
   PRIMARY KEY (`family_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 CREATE TABLE IF NOT EXISTS `family_members` (

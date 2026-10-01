@@ -8,6 +8,7 @@
 
 import { Board } from '../../board';
 import { EnterpriseCardsManager } from '../../cards/enterprise-cards';
+import { LondonSeasonCardsManager } from '../../cards/london-season-cards';
 import { tplOfficeCard } from '../../cards/office-cards';
 import { Company } from '../../company';
 
@@ -46,7 +47,11 @@ import { SetupArea } from '../../setup-area';
 import { createFamilyMember } from '../../templates';
 import { ShipsManager } from '../../token-managers/ship-tokens';
 import { GameAlias, JocoFamilyMember, OtherShipType } from '../../types';
-import { createControlToken, getEnterpriseCard } from '../../utility';
+import {
+  createControlToken,
+  getEnterpriseCard,
+  getLondonSeasonCard,
+} from '../../utility';
 import { Interaction } from '../interaction';
 import { createHtmlElement, debug, parentHasChildWithId } from '../utility';
 import {
@@ -88,6 +93,9 @@ import {
   NotifReturnWritersToPresidencies,
   NotifRetireFamilyMember,
   NotifUpdateLondonSeasonOrder,
+  NotifDiscardLondonSeasonCard,
+  NotifMoveLondonSeasonCard,
+  NotifNewLondonSeasonDisplay,
 } from './types';
 
 //  .##.....##....###....##....##....###.....######...########.########.
@@ -438,6 +446,22 @@ export class NotificationManager {
     company.updateCompanyDebt(companyDebt);
   }
 
+  async notif_discardLondonSeasonCard(notif: NotifDiscardLondonSeasonCard) {
+    const { card } = notif;
+
+    await LondonSeasonCardsManager.getInstance().removeCard(
+      getLondonSeasonCard(card),
+    );
+  }
+
+  async notif_newLondonSeasonDisplay(notif: NotifNewLondonSeasonDisplay) {
+    const { cards } = notif;
+
+    await London.getInstance().seasonDisplay.addCards(
+      cards.map(getLondonSeasonCard),
+    );
+  }
+
   async notif_draftNewCardsPrivate(notif: NotifDraftNewCardsPrivateArgs) {
     const { cardIds, lastCard } = notif;
 
@@ -589,6 +613,17 @@ export class NotificationManager {
       element,
       document.getElementById(armyPiece.location),
     );
+  }
+
+  async notif_moveLondonSeasonCard(notif: NotifMoveLondonSeasonCard) {
+    const { card, _private } = notif;
+
+    const cardToMove = _private?.card ?? card;
+
+    const familyId = cardToMove.location.split('_')[1];
+    await PlayerAreas.getInstance().playerAreas[familyId].stocks[
+      cardToMove.location
+    ].addCard(getLondonSeasonCard(cardToMove));
   }
 
   async notif_moveOfficeCard(notif: NotifMoveOfficeCard) {

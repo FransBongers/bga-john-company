@@ -1,7 +1,10 @@
 import { BLACKMAIL, PRESTIGE } from '../../constants';
 import { BgaCards } from '../../libs';
 import { GameAlias, JocoLondonSeasonCard } from '../../types';
-import { tplLondonSeasonCardContent } from './templates';
+import {
+  tplBlackmailCardContent,
+  tplLondonSeasonCardContent,
+} from './templates';
 
 export class LondonSeasonCardsManager extends BgaCards.Manager<JocoLondonSeasonCard> {
   private static instance: LondonSeasonCardsManager;
@@ -24,6 +27,7 @@ export class LondonSeasonCardsManager extends BgaCards.Manager<JocoLondonSeasonC
       animationManager: game.animationManager,
       cardHeight: 351,
       cardWidth: 225,
+      // cardBorderRadius: '5px',
     });
   }
 
@@ -40,12 +44,27 @@ export class LondonSeasonCardsManager extends BgaCards.Manager<JocoLondonSeasonC
 
   setupFrontDiv(card: JocoLondonSeasonCard, div: HTMLElement) {
     div.classList.add('joco-card');
-    div.setAttribute('data-background', card.background);
+    div.setAttribute(
+      'data-background',
+      card.type === BLACKMAIL ? 'Blackmail' : card.background,
+    );
 
-    if (div.children.length) {
+    if (card.type === BLACKMAIL && !card.hiddenId && div.children.length) {
+      div.replaceChildren();
       return;
     }
-    const cardContent = tplLondonSeasonCardContent(card);
+    if (div.children.length || (card.type === BLACKMAIL && !card.hiddenId)) {
+      return;
+    }
+
+    let cardContent = '';
+
+    if (card.type === BLACKMAIL && card.hiddenId) {
+      cardContent = tplBlackmailCardContent(card);
+    } else if (card.type === PRESTIGE) {
+      cardContent = tplLondonSeasonCardContent(card);
+    }
+
     if (cardContent) {
       div.insertAdjacentHTML('beforeend', cardContent);
     }
@@ -60,6 +79,8 @@ export class LondonSeasonCardsManager extends BgaCards.Manager<JocoLondonSeasonC
   }
 
   isCardVisible(card: JocoLondonSeasonCard) {
-    return card.type !== BLACKMAIL;
+    return (
+      card.type !== BLACKMAIL || (card.type === BLACKMAIL && !!card.hiddenId)
+    );
   }
 }

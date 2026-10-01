@@ -2,6 +2,7 @@
 
 namespace Bga\Games\JohnCompany\Boilerplate\Core;
 
+use Bga\GameFramework\NotificationMessage;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
@@ -12,6 +13,7 @@ use Bga\Games\JohnCompany\Managers\Ships;
 use Bga\Games\JohnCompany\Models\ArmyPiece;
 use Bga\Games\JohnCompany\Models\Enterprise;
 use Bga\Games\JohnCompany\Models\FamilyMember;
+use Bga\Games\JohnCompany\Models\LondonSeasonCard;
 use Bga\Games\JohnCompany\Models\Office;
 use Bga\Games\JohnCompany\Models\Order;
 use Bga\Games\JohnCompany\Models\Player;
@@ -421,6 +423,39 @@ class Notifications
       'piecesLog' => self::createPiecesLog($selectedPieces),
       'tkn_boldText_region' => Regions::getAll()[$regionId]->getName(),
       'i18n' => ['tkn_boldText_region'],
+    ]);
+  }
+
+  public static function discardLondonSeasonCard(LondonSeasonCard $card, $player = null, $from = null)
+  {
+    $text = '';
+    $args = [];
+    if ($player === null && $from !== null) {
+      $text = clienttranslate('${tkn_londonSeasonCard} is discarded from ${from}');
+      $args['from'] = $from === LONDON_SEASON_DISPLAY ? clienttranslate('the London Season display') : $from;
+      $args['i18n'] = ['from'];
+    } else if ($player === null) {
+      $text = clienttranslate('${tkn_londonSeasonCard} is discarded');
+    } else if ($player !== null && $from !== null) {
+      $text = clienttranslate('${player_name} discards ${tkn_londonSeasonCard} from ${from}');
+      $args['from'] = $from === LONDON_SEASON_DISPLAY ? clienttranslate('the London Season display') : $from;
+      $args['i18n'] = ['from'];
+    } else if ($player !== null) {
+      $text = clienttranslate('${player_name} discards ${tkn_londonSeasonCard}');
+    }
+
+    self::notifyAll('discardLondonSeasonCard', $text, array_merge([
+      'card' => $card->getType() === BLACKMAIL ? $card->jsonSerializePrivate() : $card->jsonSerialize(),
+      'tkn_londonSeasonCard' => $card->getId(),
+      'player' => $player,
+    ], $args));
+  }
+
+  public static function newLondonSeasonDisplay(array $cards)
+  {
+    self::notifyAll('newLondonSeasonDisplay', clienttranslate('The London Season display is refilled'), [
+      'cards' => array_map(fn($card) => $card->jsonSerialize(), $cards),
+      'tkn_boldText_nbr' => count($cards),
     ]);
   }
 
@@ -884,6 +919,32 @@ class Notifications
       'tkn_boldText_from' => $from !== null ? self::getLocationNameForFamilyMember($from) : '',
       'tkn_boldText_to' => self::getLocationNameForFamilyMember($familyMember->getLocation()),
       'i18n' => ['tkn_boldText_from', 'tkn_boldText_to'],
+    ]);
+  }
+
+  public static function moveLondonSeasonCard(Player $player, LondonSeasonCard $card, string | null $from)
+  {
+    $fromLondonSeasonDisplay = $from === Locations::londonSeasonDisplay();
+    $text = clienttranslate('${player_name} takes ${tkn_londonSeasonCard}');
+
+    $playerId = $player->getId();
+
+    Game::get()->notify->all('moveLondonSeasonCard', $text, [
+      'player_name' => $player->getName(),
+      'playerId' => $playerId,
+      'card' => $card->jsonSerialize(),
+      'tkn_londonSeasonCard' => $card->getType() === BLACKMAIL ? $card->getPublicId() : $card->getId(),
+      '_private' => [
+        $playerId => new NotificationMessage(
+          clienttranslate('${player_name} takes ${tkn_londonSeasonCard}'),
+          [
+            'player_name' => $player->getName(),
+            'playerId' => $playerId,
+            'card' => $card->getType() === BLACKMAIL ? $card->jsonSerializePrivate() : $card->jsonSerialize(),
+            'tkn_londonSeasonCard' => $card->getType() === BLACKMAIL ? $card->getPublicId() : $card->getId(),
+          ]
+        ),
+      ]
     ]);
   }
 

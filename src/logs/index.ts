@@ -2,8 +2,13 @@ import {
   createRegiment,
   // createShip,
 } from '../board/utility';
-import { tplIcon, tplPolicyIcon, tplVictoryPointsIcon } from '../icons/templates';
+import {
+  tplIcon,
+  tplPolicyIcon,
+  tplVictoryPointsIcon,
+} from '../icons/templates';
 import { PlayerManager } from '../player-manager';
+import { StaticData } from '../static-data';
 import { createFamilyMember } from '../templates';
 import { GameAlias } from '../types';
 import {
@@ -34,6 +39,7 @@ const LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
 const LOG_TOKEN_FAMILY_MEMBER = 'familyMember';
 const LOG_TOKEN_ICON = 'icon';
 const LOG_TOKEN_LOCAL_ALLIANCE = 'localAlliance';
+const LOG_TOKEN_LONDON_SEASON_CARD = 'londonSeasonCard';
 const LOG_TOKEN_POLICY_ICON = 'policyIcon';
 const LOG_TOKEN_REGIMENT = 'regiment';
 const LOG_TOKEN_PROMISE_CUBE = 'promiseCube';
@@ -58,6 +64,8 @@ export const getTokenDiv = ({
 }) => {
   const splitKey = key.split('_');
   const type = splitKey[1];
+
+  let cardNameTooltipId = undefined;
   switch (type) {
     case LOG_TOKEN_BOLD_TEXT:
       return tlpLogTokenText({ text: value });
@@ -80,6 +88,15 @@ export const getTokenDiv = ({
         .outerHTML;
     case LOG_TOKEN_LOCAL_ALLIANCE:
       return tplLogTokenLocalAlliance(value);
+    case LOG_TOKEN_LONDON_SEASON_CARD:
+      cardNameTooltipId = `tooltip_${game._last_tooltip_id}`;
+      game.tooltipsToMap.push([game._last_tooltip_id, value.split(':')[0]]);
+      game._last_tooltip_id++;
+      return tlpLogTokenText({
+        text: value.startsWith('BlackmailCard') ? _('a Blackmail card') : StaticData.get().londonSeasonCard(value).title,
+        tooltipId: cardNameTooltipId,
+        bold: true,
+      });
     case LOG_TOKEN_POUND:
       return tplLogTokenPound();
     case LOG_TOKEN_PROMISE_CUBE:
@@ -110,8 +127,8 @@ export const getTokenDiv = ({
             color: player.getColor(),
           })
         : value;
-      case LOG_TOKEN_VICTORY_POINTS:
-        return tplVictoryPointsIcon(value, 'log-token');
+    case LOG_TOKEN_VICTORY_POINTS:
+      return tplVictoryPointsIcon(value, 'log-token');
     default:
       return value;
   }

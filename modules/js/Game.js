@@ -1749,6 +1749,129 @@ const tplTrophyIcon = (extraClasses = '') => `<div class="joco-trophy ${extraCla
     </div>
   </div>`;
 
+const tplCardText = (text, { containerClass = 'fb-card-text', textClass = 'fb-font-12 fb-font-baskerville', }) => {
+    return `
+    <div class="${containerClass} bga-autofit">
+      ${text
+        .map((item) => {
+        if (typeof item === 'string') {
+            return `<span class="${textClass}">${item}</span>`;
+        }
+        else {
+            return `<span class="${textClass}">${formatStringRecursive(_(item.log), item.args)}</span>`;
+        }
+    })
+        .join('')}
+    
+    </div>
+  `;
+};
+
+const tplSpouse = (card) => `
+  <div class="joco-card-title fb-font-16 fb-font-baskerville bga-autofit">${_('SPOUSE')}</div>
+  <div class="joco-card-subtitle fb-font-12 fb-font-italic fb-font-baskerville bga-autofit">${_('You cannot transfer this card')}</div>
+  <div class="joco-card-name fb-font-24 fb-font-parisienne fb-font-bold bga-autofit">${_(card.title)}</div>
+  ${tplCardText(card.text, {})}
+  ${card.textNote
+    ? tplCardText([card.textNote], {
+        containerClass: 'fb-card-text-note',
+        textClass: 'fb-font-12 fb-font-baskerville fb-font-italic',
+    })
+    : ''}
+  ${card.victoryPoints !== null ? tplVictoryPointsIcon(card.victoryPoints) : ''}
+  ${card.power !== null ? tplPowerIcon(card.power) : ''}
+  ${card.discount !== null ? tplDiscountIcon(card.discount) : ''}
+`;
+const tplEnterprise = (card) => `
+  <div class="joco-card-name fb-font-16 fb-font-baskerville bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
+  <div class="joco-enterprise-icon">${tplIcon(card.enterpriseType)}</div>
+  ${tplCardText(card.text, {})}
+`;
+const tplScottishCastle = (card) => `
+  <div class="joco-card-name fb-font-16 fb-font-baskerville bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
+  <div class="joco-enterprise-icon">${tplIcon(card.enterpriseType)}</div>
+    ${tplPowerIcon('3')}
+    ${tplIcon(WINDOW, 'joco-window-1')}
+    ${tplIcon(WINDOW, 'joco-window-2')}
+`;
+const tplLondonSeasonCardContent = (card) => {
+    if (card.background === 'ScottishCastle') {
+        return tplScottishCastle(card);
+    }
+    if (card.type === PRESTIGE && card.subtype === SPOUSE) {
+        return tplSpouse(card);
+    }
+    else if (card.type === PRESTIGE && card.subtype === ENTERPRISE) {
+        return tplEnterprise(card);
+    }
+    return null;
+};
+const tplBlackmailCardContent = (card) => {
+    return `<div class="joco-card-name fb-font-24 fb-font-parisienne fb-font-bold bga-autofit">${_(card.title)}</div>
+  ${tplCardText(card.text, {})}
+  ${card.power ? tplPowerIcon(card.power) : ''}
+`;
+};
+
+class LondonSeasonCardsManager extends BgaCards$1.Manager {
+    static create(game) {
+        LondonSeasonCardsManager.instance = new LondonSeasonCardsManager(game);
+    }
+    static getInstance() {
+        return LondonSeasonCardsManager.instance;
+    }
+    constructor(game) {
+        super({
+            getId: (card) => card.id,
+            setupDiv: (card, div) => this.setupDiv(card, div),
+            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
+            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
+            isCardVisible: (card) => this.isCardVisible(card),
+            animationManager: game.animationManager,
+            cardHeight: 351,
+            cardWidth: 225,
+        });
+        this.game = game;
+    }
+    clearInterface() { }
+    setupDiv(card, div) {
+        div.classList.add('joco-card-container');
+        div.setAttribute('data-type', card.type);
+        if (card.type === PRESTIGE) {
+            div.setAttribute('data-subtype', card.subtype);
+        }
+        div.setAttribute('data-has-text-note', card.textNote ? 'true' : 'false');
+    }
+    setupFrontDiv(card, div) {
+        div.classList.add('joco-card');
+        div.setAttribute('data-background', card.type === BLACKMAIL ? 'Blackmail' : card.background);
+        if (card.type === BLACKMAIL && !card.hiddenId && div.children.length) {
+            div.replaceChildren();
+            return;
+        }
+        if (div.children.length || (card.type === BLACKMAIL && !card.hiddenId)) {
+            return;
+        }
+        let cardContent = '';
+        if (card.type === BLACKMAIL && card.hiddenId) {
+            cardContent = tplBlackmailCardContent(card);
+        }
+        else if (card.type === PRESTIGE) {
+            cardContent = tplLondonSeasonCardContent(card);
+        }
+        if (cardContent) {
+            div.insertAdjacentHTML('beforeend', cardContent);
+        }
+    }
+    setupBackDiv(card, div) {
+        div.classList.add('joco-card');
+        div.setAttribute('data-background', card.type === PRESTIGE ? 'PrestigeBack' : 'BlackmailBack');
+    }
+    isCardVisible(card) {
+        return (card.type !== BLACKMAIL || (card.type === BLACKMAIL && !!card.hiddenId));
+    }
+}
+
 const tplRegiment = ({ id, extraClasses = '', }) => {
     return `
     <div id="${id ?? ''}" class="joco-regiment ${extraClasses}"></div>
@@ -1879,7 +2002,9 @@ const getLawCard = (card) => {
 };
 const getLondonSeasonCard = (card) => {
     const staticData = StaticData.get();
-    const cardStatic = staticData.londonSeasonCard(card.id);
+    const cardStatic = card.hiddenId
+        ? staticData.londonSeasonCard(card.hiddenId)
+        : staticData.londonSeasonCard(card.id);
     return {
         ...card,
         ...cardStatic,
@@ -3120,24 +3245,6 @@ let India$1 = class India {
     }
 };
 
-const tplCardText = (text, { containerClass = 'fb-card-text', textClass = 'fb-font-12 fb-font-baskerville', }) => {
-    return `
-    <div class="${containerClass} bga-autofit">
-      ${text
-        .map((item) => {
-        if (typeof item === 'string') {
-            return `<span class="${textClass}">${item}</span>`;
-        }
-        else {
-            return `<span class="${textClass}">${formatStringRecursive(_(item.log), item.args)}</span>`;
-        }
-    })
-        .join('')}
-    
-    </div>
-  `;
-};
-
 const lawCardHeaderText = (header) => {
     switch (header) {
         case 'dilemma':
@@ -3225,95 +3332,6 @@ class LawCardsManager extends BgaCards$1.Manager {
     }
     isCardVisible(card) {
         return true;
-    }
-}
-
-const tplSpouse = (card) => `
-  <div class="joco-card-title fb-font-16 fb-font-baskerville bga-autofit">${_('SPOUSE')}</div>
-  <div class="joco-card-subtitle fb-font-12 fb-font-italic fb-font-baskerville bga-autofit">${_('You cannot transfer this card')}</div>
-  <div class="joco-card-name fb-font-24 fb-font-parisienne fb-font-bold bga-autofit">${_(card.title)}</div>
-  ${tplCardText(card.text, {})}
-  ${card.textNote
-    ? tplCardText([card.textNote], {
-        containerClass: 'fb-card-text-note',
-        textClass: 'fb-font-12 fb-font-baskerville fb-font-italic',
-    })
-    : ''}
-  ${card.victoryPoints !== null ? tplVictoryPointsIcon(card.victoryPoints) : ''}
-  ${card.power !== null ? tplPowerIcon(card.power) : ''}
-  ${card.discount !== null ? tplDiscountIcon(card.discount) : ''}
-`;
-const tplEnterprise = (card) => `
-  <div class="joco-card-name fb-font-16 fb-font-baskerville bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
-  <div class="joco-enterprise-icon">${tplIcon(card.enterpriseType)}</div>
-  ${tplCardText(card.text, {})}
-`;
-const tplScottishCastle = (card) => `
-  <div class="joco-card-name fb-font-16 fb-font-baskerville bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
-  <div class="joco-enterprise-icon">${tplIcon(card.enterpriseType)}</div>
-    ${tplPowerIcon('3')}
-    ${tplIcon(WINDOW, 'joco-window-1')}
-    ${tplIcon(WINDOW, 'joco-window-2')}
-`;
-const tplLondonSeasonCardContent = (card) => {
-    if (card.background === 'ScottishCastle') {
-        return tplScottishCastle(card);
-    }
-    if (card.type === PRESTIGE && card.subtype === SPOUSE) {
-        return tplSpouse(card);
-    }
-    else if (card.type === PRESTIGE && card.subtype === ENTERPRISE) {
-        return tplEnterprise(card);
-    }
-    return null;
-};
-
-class LondonSeasonCardsManager extends BgaCards$1.Manager {
-    static create(game) {
-        LondonSeasonCardsManager.instance = new LondonSeasonCardsManager(game);
-    }
-    static getInstance() {
-        return LondonSeasonCardsManager.instance;
-    }
-    constructor(game) {
-        super({
-            getId: (card) => card.id,
-            setupDiv: (card, div) => this.setupDiv(card, div),
-            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
-            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
-            isCardVisible: (card) => this.isCardVisible(card),
-            animationManager: game.animationManager,
-            cardHeight: 351,
-            cardWidth: 225,
-        });
-        this.game = game;
-    }
-    clearInterface() { }
-    setupDiv(card, div) {
-        div.classList.add('joco-card-container');
-        div.setAttribute('data-type', card.type);
-        if (card.type === PRESTIGE) {
-            div.setAttribute('data-subtype', card.subtype);
-        }
-        div.setAttribute('data-has-text-note', card.textNote ? 'true' : 'false');
-    }
-    setupFrontDiv(card, div) {
-        div.classList.add('joco-card');
-        div.setAttribute('data-background', card.background);
-        if (div.children.length) {
-            return;
-        }
-        const cardContent = tplLondonSeasonCardContent(card);
-        if (cardContent) {
-            div.insertAdjacentHTML('beforeend', cardContent);
-        }
-    }
-    setupBackDiv(card, div) {
-        div.classList.add('joco-card');
-        div.setAttribute('data-background', card.type === PRESTIGE ? 'PrestigeBack' : 'BlackmailBack');
-    }
-    isCardVisible(card) {
-        return card.type !== BLACKMAIL;
     }
 }
 
@@ -3424,7 +3442,9 @@ class London {
         this.updatePassedLaws(gamedatas);
     }
     setupLondonSeasonDisplay(gamedatas) {
-        this.seasonDisplay = new BgaCards$1.LineStock(LondonSeasonCardsManager.getInstance(), document.getElementById('joco-london-season-display'));
+        this.seasonDisplay = new BgaCards$1.LineStock(LondonSeasonCardsManager.getInstance(), document.getElementById('joco-london-season-display'), {
+            gap: '12px',
+        });
         this.updateLondonSeasonDisplay(gamedatas);
     }
     setup(gamedatas) {
@@ -3441,10 +3461,10 @@ class London {
         this.seasonDisplay.addCards(cards);
     }
     updateLondonSeasonOrder(data) {
-        if (!data.order || data.order.length === 0)
-            return;
         const orderContainer = document.getElementById('joco-london-season-order');
         orderContainer.replaceChildren();
+        if (!data.order || data.order.length === 0)
+            return;
         orderContainer.insertAdjacentHTML('beforeend', tplLondonSeasonOrder(data));
     }
     updatePassedLaws(gamedatas) {
@@ -3570,6 +3590,7 @@ class PhaseTracker {
 
 class PlayerArea {
     constructor(config) {
+        this.stocks = {};
         this.counters = {};
         this.game = config.game;
         this.familyId = config.player.familyId;
@@ -3590,12 +3611,18 @@ class PlayerArea {
             offices: document.getElementById(`FamilyOffices_${this.familyId}`),
         };
         this.setupEnterprises(config.gamedatas);
+        this.setupLondonSeasonCards(config.gamedatas);
         this.setupOffices(config.gamedatas);
         this.setupTrophiesCounter(config.gamedatas);
     }
     setupEnterprises(gamedatas) {
         this.enterprises = new BgaCards.LineStock(EnterpriseCardsManager.getInstance(), document.getElementById(`joco-enterprises-${this.familyId}`));
         this.updateEnterprises(gamedatas);
+    }
+    setupLondonSeasonCards(gamedatas) {
+        this.stocks[`londonSeasonCards_${this.familyId}`] =
+            new BgaCards.LineStock(LondonSeasonCardsManager.getInstance(), document.getElementById(`joco-prestige-blackmail-${this.familyId}`));
+        this.updateLondonSeasonCards(gamedatas);
     }
     setupOffices(gamedatas) {
         Object.entries(gamedatas.offices).forEach(([officeId, office]) => {
@@ -3656,6 +3683,10 @@ class PlayerArea {
                 }
             }
         });
+    }
+    updateLondonSeasonCards(gamedatas) {
+        const cards = gamedatas.players[this.player.id].londonSeasonCards;
+        this.stocks[`londonSeasonCards_${this.familyId}`].addCards(cards.map(getLondonSeasonCard));
     }
     async addEnterprise(enterprise) {
         await this.enterprises.addCard(getEnterpriseCard(enterprise));
@@ -3873,6 +3904,14 @@ class NotificationManager {
         company.balance.toValue(companyBalance);
         company.updateCompanyDebt(companyDebt);
     }
+    async notif_discardLondonSeasonCard(notif) {
+        const { card } = notif;
+        await LondonSeasonCardsManager.getInstance().removeCard(getLondonSeasonCard(card));
+    }
+    async notif_newLondonSeasonDisplay(notif) {
+        const { cards } = notif;
+        await London.getInstance().seasonDisplay.addCards(cards.map(getLondonSeasonCard));
+    }
     async notif_draftNewCardsPrivate(notif) {
         const { cardIds, lastCard } = notif;
         SetupArea.getInstance().newCards(cardIds, lastCard);
@@ -3974,6 +4013,12 @@ class NotificationManager {
         }
         const element = document.getElementById(armyPiece.id);
         await this.game.animationManager.slideAndAttach(element, document.getElementById(armyPiece.location));
+    }
+    async notif_moveLondonSeasonCard(notif) {
+        const { card, _private } = notif;
+        const cardToMove = _private?.card ?? card;
+        const familyId = cardToMove.location.split('_')[1];
+        await PlayerAreas.getInstance().playerAreas[familyId].stocks[cardToMove.location].addCard(getLondonSeasonCard(cardToMove));
     }
     async notif_moveOfficeCard(notif) {
         const { office } = notif;
@@ -4264,6 +4309,40 @@ class ResolveChoice {
     }
 }
 
+const tplLondonSeasonCardTooltip = (data) => `
+  <div class="joco-card" data-background="${data.background}">
+    ${data.type === PRESTIGE ? tplLondonSeasonCardContent(data) : tplBlackmailCardContent(data)}
+  </div>
+`;
+
+class TooltipManager {
+    constructor(game) {
+        this._customTooltipIdCounter = 0;
+        this._registeredCustomTooltips = {};
+        this.game = game;
+    }
+    static create(game) {
+        TooltipManager.instance = new TooltipManager(game);
+    }
+    static getInstance() {
+        return TooltipManager.instance;
+    }
+    removeTooltip(nodeId) {
+        this.game.bga.gameui.removeTooltip(nodeId);
+    }
+    setupTooltips() { }
+    addLondonSeasonCardTooltip({ nodeId, cardId, imageOnly = false, }) {
+        const card = StaticData.get().londonSeasonCard(cardId);
+        const html = tplLondonSeasonCardTooltip(card);
+        this.game.bga.gameui.addTooltipHtml(nodeId, html, 400);
+    }
+    addBlackmailBackTooltip(nodeId) {
+        const html = `<div class="joco-card" data-background="BlackmailBack"></div>`;
+        this.game.bga.gameui.addTooltipHtml(nodeId, html, 400);
+    }
+    addBoardTooltips() { }
+}
+
 const createRegiment = (extraClasses = []) => {
     const elt = document.createElement('div');
     elt.classList.add('joco-regiment');
@@ -4283,6 +4362,7 @@ const LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
 const LOG_TOKEN_FAMILY_MEMBER = 'familyMember';
 const LOG_TOKEN_ICON = 'icon';
 const LOG_TOKEN_LOCAL_ALLIANCE = 'localAlliance';
+const LOG_TOKEN_LONDON_SEASON_CARD = 'londonSeasonCard';
 const LOG_TOKEN_POLICY_ICON = 'policyIcon';
 const LOG_TOKEN_REGIMENT = 'regiment';
 const LOG_TOKEN_PROMISE_CUBE = 'promiseCube';
@@ -4296,6 +4376,7 @@ let tooltipIdCounter = 0;
 const getTokenDiv = ({ key, value, game, }) => {
     const splitKey = key.split('_');
     const type = splitKey[1];
+    let cardNameTooltipId = undefined;
     switch (type) {
         case LOG_TOKEN_BOLD_TEXT:
             return tlpLogTokenText({ text: value });
@@ -4318,6 +4399,15 @@ const getTokenDiv = ({ key, value, game, }) => {
                 .outerHTML;
         case LOG_TOKEN_LOCAL_ALLIANCE:
             return tplLogTokenLocalAlliance(value);
+        case LOG_TOKEN_LONDON_SEASON_CARD:
+            cardNameTooltipId = `tooltip_${game._last_tooltip_id}`;
+            game.tooltipsToMap.push([game._last_tooltip_id, value.split(':')[0]]);
+            game._last_tooltip_id++;
+            return tlpLogTokenText({
+                text: value.startsWith('BlackmailCard') ? _('a Blackmail card') : StaticData.get().londonSeasonCard(value).title,
+                tooltipId: cardNameTooltipId,
+                bold: true,
+            });
         case LOG_TOKEN_POUND:
             return tplLogTokenPound();
         case LOG_TOKEN_PROMISE_CUBE:
@@ -5922,6 +6012,7 @@ class FamilyAction {
 class LondonSeasonChooseCard {
     constructor(game) {
         this.game = game;
+        this.selectedCard = null;
     }
     static create(game) {
         LondonSeasonChooseCard.instance = new LondonSeasonChooseCard(game);
@@ -5932,18 +6023,61 @@ class LondonSeasonChooseCard {
     onEnteringState(args) {
         debug('Entering LondonSeasonChooseCard state');
         this.args = args;
+        this.selectedCard = null;
+        if (this.args._private) {
+            this.args._private.forEach((cardBase) => {
+                const card = getLondonSeasonCard(cardBase);
+                LondonSeasonCardsManager.getInstance().updateCardInformations(card);
+            });
+        }
         this.updateInterfaceInitialStep();
+        Bar.getInstance().goTo('joco-london');
     }
     onLeavingState() {
         debug('Leaving LondonSeasonChooseCard state');
+        if (this.args?._private) {
+            this.args._private.forEach((cardBase) => {
+                if (cardBase.id === this.selectedCard) {
+                    return;
+                }
+                cardBase.hiddenId = undefined;
+                const card = getLondonSeasonCard(cardBase);
+                LondonSeasonCardsManager.getInstance().updateCardInformations(card);
+            });
+        }
     }
     setDescription(activePlayerIds, args) { }
     updateInterfaceInitialStep() {
         clearPossible();
-        updatePageTitle(_('${you} must choose a card'), {});
-        addConfirmButton(() => {
-            performAction('actLondonSeasonChooseCard', {});
+        updatePageTitle(_('${you} must choose a card from the London Season Display to take or discard'));
+        this.args.prestigeCards.forEach((card) => onClick(`game-card-${card.id}`, () => this.updateInterfaceConfirm(card)));
+        this.args._private.forEach((card) => onClick(`game-card-${card.id}`, () => this.updateInterfaceConfirm(card)));
+    }
+    updateInterfaceConfirm(card) {
+        this.selectedCard = card.id;
+        clearPossible();
+        const data = getLondonSeasonCard(card);
+        setSelected(`game-card-${card.id}`);
+        updatePageTitle(_('Take or discard "${cardTitle}"?'), {
+            cardTitle: data.title,
         });
+        addPrimaryActionButton({
+            id: 'take-btn',
+            text: _('Take'),
+            callback: () => performAction('actLondonSeasonChooseCard', {
+                cardId: card.type === BLACKMAIL ? card.hiddenId : card.id,
+                take: true,
+            }),
+        });
+        addSecondaryActionButton({
+            id: 'discard-btn',
+            text: _('Discard'),
+            callback: () => performAction('actLondonSeasonChooseCard', {
+                cardId: card.type === BLACKMAIL ? card.hiddenId : card.id,
+                take: false,
+            }),
+        });
+        addCancelButton();
     }
 }
 
@@ -7003,8 +7137,10 @@ class Game {
     constructor(bga) {
         this.gameName = '';
         this.isLoadingComplete = false;
+        this.tooltipsToMap = [];
         this._helpMode = false;
         this._last_notif = null;
+        this._last_tooltip_id = 0;
         this._notif_uid_to_log_id = {};
         this._notif_uid_to_mobile_log_id = {};
         this._selectableNodes = [];
@@ -7151,6 +7287,7 @@ class Game {
         }
         this._connections = [];
         Object.values(this.states).forEach((state) => state.create(this));
+        TooltipManager.create(this);
         this.animationManager = new BgaAnimations$1.Manager({
             duration: 500,
             animationsActive: () => {
@@ -7355,8 +7492,30 @@ class Game {
         if ($('dockedlog_' + notif.mobileLogId)) {
             dojo.addClass('dockedlog_' + notif.mobileLogId, 'notif_' + type);
         }
+        while (this.tooltipsToMap.length) {
+            const tooltipToMap = this.tooltipsToMap.pop();
+            if (!tooltipToMap || !tooltipToMap[1]) {
+                console.error('error tooltipToMap', tooltipToMap);
+            }
+            else {
+                this.addLogTooltip({
+                    tooltipId: tooltipToMap[0],
+                    cardId: tooltipToMap[1],
+                });
+            }
+        }
     }
     addLogTooltip({ tooltipId, cardId }) {
+        const tooltipManager = TooltipManager.getInstance();
+        if (cardId.startsWith('BlackmailCard')) {
+            tooltipManager.addBlackmailBackTooltip(`tooltip_${tooltipId}`);
+        }
+        else if (this.gamedatas.staticData.londonSeasonCards[cardId]) {
+            tooltipManager.addLondonSeasonCardTooltip({
+                nodeId: `tooltip_${tooltipId}`,
+                cardId,
+            });
+        }
     }
     updateLogTooltips() {
     }

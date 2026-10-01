@@ -124,7 +124,9 @@ export const getLondonSeasonCard = (
   card: JocoLondonSeasonCardBase,
 ): JocoLondonSeasonCard => {
   const staticData = StaticData.get();
-  const cardStatic = staticData.londonSeasonCard(card.id);
+  const cardStatic = card.hiddenId
+    ? staticData.londonSeasonCard(card.hiddenId)
+    : staticData.londonSeasonCard(card.id);
   return {
     ...card,
     ...cardStatic,

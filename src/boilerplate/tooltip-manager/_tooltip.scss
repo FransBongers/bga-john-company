@@ -1,0 +1,248 @@
+@use 'sass:math';
+@use '../../base';
+
+.dijitTooltipContainer {
+  padding: 8px !important;
+  // background-color: yellow !important;
+}
+
+#ebd-body.help-mode {
+  .tooltipable {
+    cursor: help;
+  }
+}
+
+.help-marker {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  z-index: 900;
+  border: 1px solid black;
+  border-radius: 50%;
+  background-color: white;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+#ebd-body:not(.help-mode) {
+  .help-marker {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.text-tooltip-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 200px;
+
+  .title {
+    font-weight: bold;
+    font-size: 1.1em;
+  }
+}
+
+.tooltip.heg-action-card {
+  font-family: 'Montserrat', sans-serif;
+  --cardScale: 1;
+}
+
+.tooltip.heg-event-card {
+  font-family: 'Montserrat', sans-serif;
+  --cardScale: 1;
+}
+
+.tooltip.heg-company {
+  font-family: 'Montserrat', sans-serif;
+  --cardScale: 1;
+}
+
+// .dijitTooltipContainer.dijitTooltipContents {
+//   background-color: rgba(0, 0, 0, 0.3);
+// }
+
+.heg-tooltip-event-card {
+  --iconScale: 0.65;
+  --fontScale: 1;
+  --cardScale: 1.4;
+  font-family: 'Montserrat', sans-serif;
+
+  .heg-card-name {
+    // font-weight: bold;
+    // font-size: calc(var(--fontScale) * 16px);
+    text-align: center;
+    margin-bottom: 8px;
+  }
+}
+
+.heg-tooltip-action-card {
+  --iconScale: 0.65;
+  --fontScale: 1;
+  --cardScale: 1.4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: calc(var(--cardScale) * 200px);
+  font-family: 'Montserrat', sans-serif;
+  gap: 8px;
+  padding: 4px;
+  // background-color: rgba(0, 0, 0, 0.3);
+
+  .heg-divider {
+    height: 3px !important;
+    align-self: stretch;
+  }
+
+  // .heg-card-effect {
+  //   display: flex;
+  //   flex-direction: column;
+  //   // align-items: center;
+  //   // gap: 4px;
+  // }
+
+  .heg-card-effect,
+  .heg-title-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    // align-items: center;
+
+    span {
+      text-align: center;
+    }
+  }
+
+  .log-token {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    top: -3px;
+    margin-top: 3px;
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+
+  &[data-role='Capitalist'] {
+    .heg-divider {
+      background: linear-gradient(
+        to right,
+        rgba(base.$capitalist-color, 0.1),
+        rgba(base.$capitalist-color, 0.5) 30%,
+        rgba(base.$capitalist-color, 1) 50%,
+        rgba(base.$capitalist-color, 0.5) 70%,
+        rgba(base.$capitalist-color, 0.1)
+      );
+    }
+
+    .heg-or {
+      color: base.$capitalist-color;
+    }
+  }
+
+  &[data-role='MiddleClass'] {
+    .heg-divider {
+      background: linear-gradient(
+        to right,
+        rgba(base.$middle-class-color, 0.1),
+        rgba(base.$middle-class-color, 0.5) 30%,
+        rgba(base.$middle-class-color, 1) 50%,
+        rgba(base.$middle-class-color, 0.5) 70%,
+        rgba(base.$middle-class-color, 0.1)
+      );
+    }
+  }
+
+  &[data-role='WorkingClass'] {
+    .heg-divider {
+      background: linear-gradient(
+        to right,
+        rgba(base.$working-class-color, 0.1),
+        rgba(base.$working-class-color, 0.5) 30%,
+        rgba(base.$working-class-color, 1) 50%,
+        rgba(base.$working-class-color, 0.5) 70%,
+        rgba(base.$working-class-color, 0.1)
+      );
+    }
+  }
+
+  &[data-role='State'] {
+    .heg-divider {
+      background: linear-gradient(
+        to right,
+        rgba(base.$state-color, 0.1),
+        rgba(base.$state-color, 0.5) 30%,
+        rgba(base.$state-color, 1) 50%,
+        rgba(base.$state-color, 0.5) 70%,
+        rgba(base.$state-color, 0.1)
+      );
+    }
+  }
+
+  &[data-card-id='AC083_HealthCrisis'] {
+    .heg-card-effect {
+      padding: 0px 8px;
+    }
+  }
+}
+
+.heg-card-notes {
+  display: flex;
+  flex-direction: column;
+  // gap: 4px;
+}
+
+.heg-action-card-requirement {
+  width: fit-content;
+
+  .heg-requirement-title {
+    color: rgba(0, 0, 0, 0.3);
+  }
+
+  .heg-policy-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-radius: calc(var(--cardScale) * 4px);
+
+    span {
+      color: white;
+      padding: calc(var(--cardScale) * 2px);
+    }
+
+    &[data-policy-id='1'] {
+      background-color: base.$politics-fiscal-policy-color;
+    }
+
+    &[data-policy-id='2'] {
+      background-color: base.$politics-labor-market-color;
+    }
+
+    &[data-policy-id='3'] {
+      background-color: base.$politics-taxation-color;
+    }
+
+    &[data-policy-id='4'] {
+      background-color: base.$politics-health-and-benefits-color;
+    }
+
+    &[data-policy-id='5'] {
+      background-color: base.$politics-education-color;
+    }
+
+    &[data-policy-id='6'] {
+      background-color: base.$politics-foreign-trade-color;
+    }
+
+    &[data-policy-id='7'] {
+      background-color: base.$politics-immigration-color;
+    }
+  }
+}
