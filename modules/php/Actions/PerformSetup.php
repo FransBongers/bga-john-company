@@ -79,13 +79,13 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
             case WRITER:
               $familyMember = FamilyMembers::getMemberFor($familyId);
               $familyMember->setLocation(Locations::writers($item['value']));
-              $familyMember->setPresidency(Locations::presidency($item['value']));
+              $familyMember->setPresidency($item['value']);
               $familyMembers[] = $familyMember;
               break;
             case OFFICER:
               $familyMember = FamilyMembers::getMemberFor($familyId);
               $familyMember->setLocation(Locations::armyOfReady($item['value']));
-              $familyMember->setPresidency(Locations::presidency($item['value']));
+              $familyMember->setPresidency($item['value']);
               $familyMembers[] = $familyMember;
               break;
             case COMMANDER:

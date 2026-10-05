@@ -19,8 +19,8 @@ class Bar {
                 text: _('India'),
             },
             {
-                id: 'joco-player-areas',
-                text: _('Player Areas'),
+                id: 'joco-families',
+                text: _('Families'),
             },
             {
                 id: 'joco-company',
@@ -234,8 +234,10 @@ const OFFICES_WITH_TREASURY = [
     PRESIDENT_OF_MADRAS,
     PRESIDENT_OF_BENGAL,
 ];
-const VACANT_OFFICES = 'VacantOffices';
+const VACANT_OFFICES$1 = 'VacantOffices';
 const FAMILY_OFFICES = 'FamilyOffices';
+const OPPORTUNITY_MARKER = 'OpportunityMarker';
+const FAMILY_ACTION = 'FamilyAction';
 const COMMANDER = 'Commander';
 const OFFICER = 'Officer';
 const OFFICER_IN_TRAINING = 'OfficerInTraining';
@@ -2517,7 +2519,7 @@ class Company {
     }
     setupVacantOffices(gamedatas) {
         Object.values(gamedatas.offices).forEach((office) => {
-            if (office.location === VACANT_OFFICES) {
+            if (office.location === VACANT_OFFICES$1) {
                 this.ui.vacantOffices.insertAdjacentHTML('beforeend', tplOfficeCard(office));
             }
         });
@@ -2531,7 +2533,7 @@ class Company {
             standing: {},
             debt: {},
             offices: {},
-            vacantOffices: document.getElementById(VACANT_OFFICES),
+            vacantOffices: document.getElementById(VACANT_OFFICES$1),
         };
         [CHAIRMAN, DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING].forEach((officeId) => {
             this.ui.offices[officeId] = document.getElementById(officeId);
@@ -3588,7 +3590,57 @@ class PhaseTracker {
     }
 }
 
-class PlayerArea {
+class OpportunityMarker {
+    constructor(props) {
+        this.props = props;
+        this.setupUI();
+    }
+    setupUI() {
+        this.props.parentElement.insertAdjacentHTML('beforeend', this.tplOpportunityMarker());
+        this.ui = {
+            opportunityMarkerValue: document.getElementById(`joco-opportunity-marker-value-${this.props.familyId}`),
+        };
+        this.update(this.props.familyAction);
+    }
+    update(familyAction) {
+        const value = this.getOpportunityMarkerValue(familyAction);
+        const element = this.ui.opportunityMarkerValue;
+        if (element) {
+            element.replaceChildren();
+            element.insertAdjacentHTML('beforeend', value);
+        }
+    }
+    getOpportunityMarkerValue(familyAction) {
+        const map = {
+            [ENLIST_WRITER]: { text: _('Enlist Writer ${tkn_icon}'), icon: WRITER },
+            [ENLIST_OFFICER]: {
+                text: _('Officer in Training'),
+                icon: OFFICER_IN_TRAINING,
+            },
+            [SEEK_SHARE]: { text: _('Seek Share'), icon: SHARE },
+            [PURCHASE_LUXURY]: { text: _('Buy Luxury'), icon: LUXURY },
+            [PURCHASE_SHIPYARD]: { text: _('Buy Shipyard'), icon: SHIPYARD },
+            [PURCHASE_WORKSHOP]: { text: _('Buy Workshop'), icon: WORKSHOP },
+        };
+        if (familyAction && map[familyAction]) {
+            const { text, icon } = map[familyAction];
+            return formatStringRecursive(text, { tkn_icon: icon });
+        }
+        return _('Not placed');
+    }
+    tplOpportunityMarker() {
+        return `
+      <div id="joco-opportunity-marker-${this.props.familyId}" class="joco-opportunity-marker">
+        <span class="fb-font-baskerville fb-font-bold fb-font-16">${_('Opportunity Marker').toLocaleUpperCase()}</span>
+        <div class="joco-opportunity-marker-value">
+          <span id="joco-opportunity-marker-value-${this.props.familyId}" class="fb-font-baskerville fb-font-bold fb-font-16"></span>
+        </div>
+      </div>
+    `;
+    }
+}
+
+class FamilyArea {
     constructor(config) {
         this.stocks = {};
         this.counters = {};
@@ -3614,6 +3666,7 @@ class PlayerArea {
         this.setupLondonSeasonCards(config.gamedatas);
         this.setupOffices(config.gamedatas);
         this.setupTrophiesCounter(config.gamedatas);
+        this.setupOpportunityMarker(config.gamedatas);
     }
     setupEnterprises(gamedatas) {
         this.enterprises = new BgaCards.LineStock(EnterpriseCardsManager.getInstance(), document.getElementById(`joco-enterprises-${this.familyId}`));
@@ -3639,12 +3692,20 @@ class PlayerArea {
             initialValue: gamedatas.families[this.familyId].trophies,
         });
     }
+    setupOpportunityMarker(gamedatas) {
+        this.opportunityMarker = new OpportunityMarker({
+            game: this.game,
+            familyAction: gamedatas.families[this.familyId].opportunityMarker,
+            familyId: this.familyId,
+            parentElement: this.ui.counters,
+        });
+    }
     tplPlayerArea() {
         return `
-      <div class="joco-player-area joco-container">
+      <div class="joco-family-area joco-container">
         <div class="joco-player-name" style="background-color:#${this.player.color};"><span class="fb-font-baskerville fb-font-16 fb-font-semi-bold">${this.player.name}</span></div>
-        <div class="joco-player-area-content">
-          <div id="joco-counters-${this.familyId}" class="joco-player-area-counters">
+        <div class="joco-family-area-content">
+          <div id="joco-counters-${this.familyId}" class="joco-family-area-counters">
           </div>
           <div class="joco-row">
             <div class="joco-inner-container joco-column">
@@ -3701,36 +3762,39 @@ class PlayerArea {
     }
 }
 
-const tplPlayerAreas = () => `<div id="joco-player-areas">
+const tplFamilies = () => `<div id="joco-families">
 </div>`;
 
-class PlayerAreas {
+class Families {
     constructor(game) {
         this.game = game;
-        this.playerAreas = {};
+        this.families = {};
         this.game = game;
         this.setup(game.gamedatas);
     }
     static create(game) {
-        PlayerAreas.instance = new PlayerAreas(game);
+        Families.instance = new Families(game);
     }
     static getInstance() {
-        return PlayerAreas.instance;
+        return Families.instance;
     }
     setup(gamedatas) {
         document
             .getElementById('joco')
-            .insertAdjacentHTML('afterbegin', tplPlayerAreas());
-        const container = document.getElementById('joco-player-areas');
+            .insertAdjacentHTML('afterbegin', tplFamilies());
+        const container = document.getElementById('joco-families');
         this.game.playerOrder.forEach((playerId) => {
             const player = gamedatas.players[playerId];
-            this.playerAreas[player.familyId] = new PlayerArea({
+            this.families[player.familyId] = new FamilyArea({
                 parentElement: container,
                 game: this.game,
                 player,
                 gamedatas,
             });
         });
+    }
+    getFamily(familyId) {
+        return this.families[familyId];
     }
 }
 
@@ -3864,7 +3928,7 @@ class NotificationManager {
     }
     updateCountersForTarget(target, counterChanges) {
         if (FAMILIES.includes(target)) {
-            PlayerAreas.getInstance().playerAreas[target].incCounters(counterChanges);
+            Families.getInstance().getFamily(target).incCounters(counterChanges);
         }
     }
     async notif_log(notif) {
@@ -4018,7 +4082,9 @@ class NotificationManager {
         const { card, _private } = notif;
         const cardToMove = _private?.card ?? card;
         const familyId = cardToMove.location.split('_')[1];
-        await PlayerAreas.getInstance().playerAreas[familyId].stocks[cardToMove.location].addCard(getLondonSeasonCard(cardToMove));
+        await Families.getInstance()
+            .getFamily(familyId)
+            .stocks[cardToMove.location].addCard(getLondonSeasonCard(cardToMove));
     }
     async notif_moveOfficeCard(notif) {
         const { office } = notif;
@@ -4079,7 +4145,9 @@ class NotificationManager {
         await this.pay(playerId, amount);
         const player = this.getPlayer(playerId);
         player.counters[this.getEnterpriseCounter(type)].incValue(1);
-        await PlayerAreas.getInstance().playerAreas[familyId].addEnterprise(getEnterpriseCard(enterprise));
+        await Families.getInstance()
+            .getFamily(familyId)
+            .addEnterprise(getEnterpriseCard(enterprise));
         if (type === SHIPYARD && ship) {
             player.counters[SHIPS_COUNTER].incValue(1);
             EnterpriseCardsManager.getInstance().shipStocks[ship.id].addCard(ship);
@@ -4168,6 +4236,11 @@ class NotificationManager {
     async notif_updateLondonSeasonOrder(notif) {
         const { order, cashSpent } = notif;
         London.getInstance().updateLondonSeasonOrder({ order, cashSpent });
+    }
+    async notif_updateOpportunityMarker(notif) {
+        const { familyId, familyAction } = notif;
+        const family = Families.getInstance().getFamily(familyId);
+        family.opportunityMarker.update(familyAction);
     }
     async notif_updateRegion(notif) {
         const { region: data } = notif;
@@ -5889,20 +5962,27 @@ class EnlistWriter {
         debug('Leaving EnlistWriter state');
     }
     setDescription(activePlayerIds, args) {
-        updatePageTitle(_('${tkn_playerName} must select a Presidency to place their writer'), {
+        updatePageTitle(args.source === FAMILY_ACTION
+            ? _('${tkn_playerName} must select a Presidency to place their writer')
+            : _('${tkn_playerName} may select another Presidency to place a writer (${source})'), {
             tkn_playerName: PlayerManager.getInstance()
                 .getPlayer(activePlayerIds[0])
                 .getName(),
+            source: this.getSourceName(args.source).toLocaleLowerCase(),
         });
     }
     updateInterfaceInitialStep() {
         this.game.clearPossible();
-        updatePageTitle(_('${you} must select a Presidency to place your ${tkn_icon}'), {
+        updatePageTitle(this.args.source === FAMILY_ACTION
+            ? _('${you} must select a Presidency to place your ${tkn_icon}')
+            : _('${you} may select another Presidency to place a writer (${source})'), {
             tkn_icon: WRITER,
+            source: this.getSourceName(this.args.source).toLocaleLowerCase(),
         });
         this.args.options.forEach((presidencyId) => {
             onClick(presidencyId, () => this.updateInterfaceConfirm(presidencyId));
         });
+        addPassButton(this.args.optionalAction);
     }
     updateInterfaceConfirm(presidencyId) {
         clearPossible();
@@ -5916,6 +5996,18 @@ class EnlistWriter {
         });
         addConfirmButton(callback);
         addCancelButton();
+    }
+    getSourceName(source) {
+        switch (source) {
+            case FAMILY_ACTION:
+                return _('Family Action');
+            case OPPORTUNITY_MARKER:
+                return _('Opportunity Marker');
+            case VACANT_OFFICES$1:
+                return _('Vacant Offices');
+            default:
+                return _('Unknown Source');
+        }
     }
 }
 
@@ -7107,12 +7199,13 @@ class SeekShare {
     updateInterfaceInitialStep() {
         this.game.clearPossible();
         Bar.getInstance().goTo('joco-company');
-        updatePageTitle(_('${you} must select a place on the Stock Exchange track'), {
+        updatePageTitle(this.args.source === OPPORTUNITY_MARKER ? _('${you} may select an additional place on the Stock Exchange track (opportunity marker)') : _('${you} must select a place on the Stock Exchange track'), {
             tkn_icon: WRITER,
         });
         Object.entries(this.args.options).forEach(([position, price]) => {
             onClick(position, () => this.updateInterfaceConfirm(position, price));
         });
+        addPassButton(this.args.optionalAction);
     }
     updateInterfaceConfirm(position, price) {
         clearPossible();
@@ -7309,7 +7402,7 @@ class Game {
         }
         this.notificationManager = new NotificationManager(this);
         Negotiation.create(this);
-        PlayerAreas.create(this);
+        Families.create(this);
         Board.create(this);
         Company.create(this);
         London.create(this);

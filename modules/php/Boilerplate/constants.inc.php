@@ -29,6 +29,10 @@ const ST_END_GAME_NAME = 'gameEnd';
 
 const ST_CLEANUP = 88; // TODO: replace
 
+const PRIMARY = 'primary';
+const SECONDARY = 'secondary';
+const SOURCE = 'source';
+
 const LOG_PHASE = 'LogPhase';
 const RESOLVE_STACK = 'resolveStack';
 const RESOLVE_CHOICE = 'ResolveChoice';

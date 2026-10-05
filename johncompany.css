@@ -1804,30 +1804,53 @@ span[style*="color:#addb90"] {
   transform: scaleX(-1);
 }
 
-.joco-player-area-content .joco-column,
-.joco-player-area-content .joco-row {
+.joco-family-area-content .joco-column,
+.joco-family-area-content .joco-row {
   gap: 12px;
 }
-.joco-player-area-content .joco-family-offices {
+.joco-family-area-content .joco-family-offices {
   width: 225px;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
+.joco-family-area-content .joco-family-area-counters {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
 
-#joco-player-areas {
+.joco-opportunity-marker {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+.joco-opportunity-marker .joco-opportunity-marker-value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  padding: 0 8px;
+  border: 2px solid black;
+  border-radius: 4px;
+}
+
+#joco-families {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.joco-player-area {
+.joco-family-area {
   min-height: 200px;
   width: 1000px;
   margin: 0 auto;
   padding: 0;
 }
-.joco-player-area .joco-player-name {
+.joco-family-area .joco-player-name {
   padding: 8px 16px;
   display: flex;
   align-items: center;
@@ -1835,23 +1858,23 @@ span[style*="color:#addb90"] {
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
-.joco-player-area .joco-player-area-content {
+.joco-family-area .joco-family-area-content {
   padding: 12px;
 }
-.joco-player-area .joco-player-area-content .joco-inner-container {
+.joco-family-area .joco-family-area-content .joco-inner-container {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 5px;
 }
-.joco-player-area .joco-player-area-content {
+.joco-family-area .joco-family-area-content {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
-.joco-player-area .joco-player-area-content .joco-enterprises {
+.joco-family-area .joco-family-area-content .joco-enterprises {
   min-height: 150px;
 }
-.joco-player-area .joco-player-area-content .joco-prestige-blackmail {
+.joco-family-area .joco-family-area-content .joco-prestige-blackmail {
   min-height: 351px;
 }
 
@@ -2564,6 +2587,7 @@ span[style*="color:#c0c0c0"] {
   flex-direction: row;
   justify-content: flex-start;
   align-items: flex-start;
+  flex-wrap: wrap;
   gap: 8px;
 }
 .joco-army .joco-army-stock.joco-exhausted .joco-local-alliance {

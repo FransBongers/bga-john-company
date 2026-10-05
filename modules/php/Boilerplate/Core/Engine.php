@@ -232,6 +232,7 @@ class Engine
       throw new \Bga\GameFramework\VisibleSystemException('Node is already resolved');
     }
     $node->choose($nodeId, $auto);
+    self::checkpoint();
     self::save();
     self::proceed();
   }

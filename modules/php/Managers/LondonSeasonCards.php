@@ -121,4 +121,18 @@ class LondonSeasonCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Piece
     self::pickForLocation(3, DECK, LONDON_SEASON_DISPLAY);
     self::shuffle(LONDON_SEASON_DISPLAY);
   }
-}
+
+  /**
+   * Discard all remaining cards in the London Season display and reveal 3 new ones.
+   */
+  public static function cleanupDisplay()
+  {
+    $remainingCards = self::getInLocation(LONDON_SEASON_DISPLAY)->toArray();
+    foreach ($remainingCards as $card) {
+      $card->discard();
+    }
+
+    $newCards = self::pickForLocation(3, DECK, LONDON_SEASON_DISPLAY)->toArray();
+    self::shuffle(LONDON_SEASON_DISPLAY);
+    Notifications::newLondonSeasonDisplay($newCards);
+  }}

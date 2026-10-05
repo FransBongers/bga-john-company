@@ -35,7 +35,7 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     'state' => ['family_state', 'int'],
     'treasury' => ['treasury', 'int'],
     'victoryPoints' => ['victory_points', 'int'],
-    'opportunityMarker' => ['opportunity_marker', 'int'],
+    'opportunityMarker' => ['opportunity_marker', 'string'],
     'crownPromiseCubes' => ['crown_promise_cubes', 'int'],
     'hasChairmanMarker' => ['has_chairman_marker', 'int'],
     'isLeaderOfOpposition' => ['is_leader_of_opposition', 'int'], // base on number of votes?
@@ -159,5 +159,15 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     }
 
     return $windows;
+  }
+
+  public function updateOpportunityMarker(string | null $familyAction)
+  {
+    if ($familyAction === $this->getOpportunityMarker()) {
+      return;
+    }
+    // Implementation for updating the opportunity marker value for this family
+    $this->setOpportunityMarker($familyAction);
+    Notifications::updateOpportunityMarker($this, $familyAction);
   }
 }

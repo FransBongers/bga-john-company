@@ -38,7 +38,7 @@ import { getTokenDiv } from './logs';
 import { London } from './london';
 import { Negotiation } from './negotiation';
 import { PhaseTracker } from './phase-tracker';
-import { PlayerAreas } from './player-areas';
+import { Families } from './families';
 import { PlayerManager } from './player-manager';
 import { SetupArea } from './setup-area';
 import {
@@ -403,7 +403,7 @@ export class Game {
     }
     this.notificationManager = new NotificationManager(this);
     Negotiation.create(this);
-    PlayerAreas.create(this);
+    Families.create(this);
     Board.create(this);
     Company.create(this);
 

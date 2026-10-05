@@ -2,18 +2,21 @@
 
 namespace Bga\Games\JohnCompany\Actions;
 
-
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Crown;
+use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
+use Bga\Games\JohnCompany\Models\Family;
+use Bga\Games\JohnCompany\Models\Player;
 
 class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
@@ -33,10 +36,12 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
   public function argsEnlistWriter()
   {
     $info = $this->ctx->getInfo();
+    $args = $this->ctx->getArgs();
     $playerId = $info['activePlayerIds'][0];
 
     $data = [
       'options' => $this->getOptions($playerId),
+      'source' => $args[SOURCE],
     ];
 
     return $data;
@@ -79,25 +84,33 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_004");
     }
 
-    $this->performAction($playerId, $presidencyId);
+    $player = Players::get($playerId);
+    $familyId = $player->getFamilyId();
+
+    $this->performAction($player, $familyId, $presidencyId);
+
+    if ($stateArgs[SOURCE] === FAMILY_ACTION) {
+      $family = Families::get($familyId);
+
+      $this->checkExtraActionOpportunityMarker($family, $playerId);
+      $this->checkExtraActionVacantOffices($familyId, $playerId);
+
+      $family->updateOpportunityMarker(ENLIST_WRITER);
+    }
 
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
     $this->resolveAction([], true);
   }
 
-  public function performAction(string $playerId, string $presidencyId)
+  public function performAction(Player $player, string $familyId, string $presidencyId)
   {
-    $player = Players::get($playerId);
-    $familyId = $player->getFamilyId();
-
     $familyMember = FamilyMembers::getMemberFor($familyId);
     $familyMember->setLocation(Locations::writers($presidencyId));
     $familyMember->setPresidency($presidencyId);
 
     Notifications::enlistWriter($player, $familyMember, Regions::get(PRESIDENCY_HOME_REGION_MAP[$presidencyId]));
-
-    // TODO: insert extra actions
   }
+
 
   //  .##.....##.########.####.##.......####.########.##....##
   //  .##.....##....##.....##..##........##.....##.....##..##.
@@ -106,6 +119,37 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private function checkExtraActionVacantOffices(string $familyId, int $playerId)
+  {
+    $vacantOffices = Offices::countInLocation(Locations::vacantOffices());
+    if ($vacantOffices >= 4) {
+      $this->insertExtraActionNode($familyId, $playerId, VACANT_OFFICES);
+    }
+  }
+
+  private function checkExtraActionOpportunityMarker(Family $family, int $playerId)
+  {
+    $opportunityMarker = $family->getOpportunityMarker();
+    if ($opportunityMarker === ENLIST_WRITER) {
+      $this->insertExtraActionNode($family->getId(), $playerId, OPPORTUNITY_MARKER);
+    }
+  }
+
+  private function insertExtraActionNode(string $familyId, int $playerId, string $source)
+  {
+    $this->ctx->insertAsBrother(new LeafNode([
+      'action' => ENLIST_WRITER,
+      'playerId' => 'some',
+      'optional' => true,
+      'activePlayerIds' => [$playerId],
+      'args' => [
+        'familyId' => $familyId,
+        'playerId' => $playerId,
+        'source' => $source,
+      ]
+    ]));
+  }
 
   public function canBePerformedBy($family)
   {
@@ -155,7 +199,7 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
     });
     if (count($vacantWithNoCrownWriters) > 0) {
       $presidency = Crown::getPresidencyWithHighestPriority($vacantWithNoCrownWriters);
-      $this->performAction(CROWN_PLAYER_ID, $presidency->getRegionId());
+      // $this->performAction(CROWN_PLAYER_ID, $presidency->getRegionId());
       return;
     }
 
@@ -169,14 +213,14 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
     $crownPresidencies = Utils::filter($presidencies, function ($office) {
       return $office->getFamilyId() === CROWN;
     });
-    Notifications::log('crownPresidencies', $crownPresidencies);
+    // Notifications::log('crownPresidencies', $crownPresidencies);
 
     $fewestWriters = 100;
     $possiblePresidencies = [];
 
     // Determine presidencies with fewest crown writers from either crown presidencies or all presidencies
     $presidenciesToChooseFrom = count($crownPresidencies) > 0 ? $crownPresidencies : $presidencies;
-    Notifications::log('presidenciesToChooseFrom', $presidenciesToChooseFrom);
+    // Notifications::log('presidenciesToChooseFrom', $presidenciesToChooseFrom);
     foreach ($presidenciesToChooseFrom as $presidency) {
       $presidencyId = $presidency->getId();
       if ($crownWritersPerPresidency[$presidencyId] < $fewestWriters) {
@@ -190,6 +234,29 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
     // Get presidency with highest priority
     $presidency = count($possiblePresidencies) === 1 ? $possiblePresidencies[0] : Crown::getPresidencyWithHighestPriority($presidenciesToChooseFrom);
 
-    $this->performAction(CROWN_PLAYER_ID, $presidency->getRegionId());
+    // $this->performAction(CROWN_PLAYER_ID, $presidency->getRegionId());
+  }
+
+  // .########.##....##..######...####.##....##.########
+  // .##.......###...##.##....##...##..###...##.##......
+  // .##.......####..##.##.........##..####..##.##......
+  // .######...##.##.##.##...####..##..##.##.##.######..
+  // .##.......##..####.##....##...##..##..####.##......
+  // .##.......##...###.##....##...##..##...###.##......
+  // .########.##....##..######...####.##....##.########
+
+  public function getDescription(): string|array
+  {
+    return [
+      'log' => clienttranslate('Enlist Writer ${tkn_icon}'),
+      'args' => [
+        'tkn_icon' => WRITER,
+      ],
+    ];
+  }
+
+  public function isDoable(Player $player): bool
+  {
+    return true;
   }
 }

@@ -149,11 +149,26 @@ trait TurnTrait
     $turnOrder = Players::getTurnOrder($player->getId());
     $node = [
       'children' => array_map(function ($playerId) {
+        // return [
+        //   'action' => FAMILY_ACTION,
+        //   'playerId' => 'some',
+        //   'familyId' => Players::get($playerId)->getFamilyId(),
+        //   'activePlayerIds' => [$playerId],
+        // ];
         return [
-          'action' => FAMILY_ACTION,
-          'playerId' => 'some',
-          'familyId' => Players::get($playerId)->getFamilyId(),
-          'activePlayerIds' => [$playerId],
+          'type' => NODE_XOR,
+          'children' => $this->getFamilyActions($playerId),
+          'playerId' => $playerId,
+          'stateDescription' => [
+            'descriptionmyturn' => clienttranslate('${you} must select a family action'),
+            'description' => clienttranslate('${actplayer} must select a family action'),
+            'args' => []
+          ],
+          'args' => [
+            'buttonType' => SECONDARY
+          ]
+          // 'activePlayerIds' => [$presidentOffice->getPlayerId()],
+          // 'officeId' => $presidentOffice->getId(),
         ];
       }, $turnOrder),
     ];
@@ -740,7 +755,7 @@ trait TurnTrait
             'descriptionmyturn' => clienttranslate('${you} must choose who will act next'),
             'description' => clienttranslate('${actplayer} must choose who will act next'),
             'args' => []
-          ]
+          ],
           // 'activePlayerIds' => [$presidentOffice->getPlayerId()],
           // 'officeId' => $presidentOffice->getId(),
         ],
@@ -752,5 +767,70 @@ trait TurnTrait
   {
     Globals::setPhase($phase);
     Notifications::nextPhase($phase);
+  }
+
+  function getFamilyActions(int $playerId)
+  {
+    $familyId = Players::get($playerId)->getFamilyId();
+
+    return [
+      [
+        'action' => ENLIST_WRITER,
+        'playerId' => 'some',
+        'activePlayerIds' => [$playerId],
+        'args' => [
+          'familyId' => $familyId,
+          'playerId' => $playerId,
+          SOURCE => FAMILY_ACTION,
+        ]
+      ],
+      [
+        'action' => ENLIST_OFFICER,
+        'playerId' => 'some',
+        'activePlayerIds' => [$playerId],
+        'args' => [
+          'familyId' => $familyId,
+          'playerId' => $playerId,
+          SOURCE => FAMILY_ACTION,
+        ]
+      ],
+      [
+        'action' => PURCHASE_ENTERPRISE,
+        'args' => [
+          'familyId' => $familyId,
+          'type' => LUXURY,
+          'playerId' => $playerId,
+          SOURCE => FAMILY_ACTION,
+        ]
+      ],
+      [
+        'action' => PURCHASE_ENTERPRISE,
+        'args' => [
+          'familyId' => $familyId,
+          'type' => SHIPYARD,
+          'playerId' => $playerId,
+          SOURCE => FAMILY_ACTION,
+        ]
+      ],
+      [
+        'action' => PURCHASE_ENTERPRISE,
+        'args' => [
+          'familyId' => $familyId,
+          'type' => WORKSHOP,
+          'playerId' => $playerId,
+          SOURCE => FAMILY_ACTION,
+        ]
+      ],
+      [
+        'action' => SEEK_SHARE,
+        'playerId' => 'some',
+        'activePlayerIds' => [$playerId],
+        'args' => [
+          'familyId' => $familyId,
+          'playerId' => $playerId,
+          SOURCE => FAMILY_ACTION,
+        ]
+      ],
+    ];
   }
 }

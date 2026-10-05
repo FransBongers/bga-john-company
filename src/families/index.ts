@@ -1,10 +1,10 @@
 import { GameAlias, GamedatasAlias, PlayerAlias } from '../types';
-import { PlayerArea } from './player-area';
-import { tplPlayerAreas } from './templates';
+import { FamilyArea } from './family-area';
+import { tplFamilies } from './templates';
 
-export class PlayerAreas {
-  private static instance: PlayerAreas;
-  public playerAreas: Record<string, PlayerArea> = {};
+export class Families {
+  private static instance: Families;
+  public families: Record<string, FamilyArea> = {};
 
   constructor(private game: GameAlias) {
     this.game = game;
@@ -12,11 +12,11 @@ export class PlayerAreas {
   }
 
   public static create(game: GameAlias) {
-    PlayerAreas.instance = new PlayerAreas(game);
+    Families.instance = new Families(game);
   }
 
   public static getInstance() {
-    return PlayerAreas.instance;
+    return Families.instance;
   }
 
   // ..######..########.########.##.....##.########.
@@ -30,12 +30,12 @@ export class PlayerAreas {
   setup(gamedatas: GamedatasAlias) {
     document
       .getElementById('joco')
-      .insertAdjacentHTML('afterbegin', tplPlayerAreas());
-    const container = document.getElementById('joco-player-areas');
+      .insertAdjacentHTML('afterbegin', tplFamilies());
+    const container = document.getElementById('joco-families');
     this.game.playerOrder.forEach((playerId) => {
       const player: PlayerAlias = gamedatas.players[playerId];
 
-      this.playerAreas[player.familyId] = new PlayerArea({
+      this.families[player.familyId] = new FamilyArea({
         parentElement: container,
         game: this.game,
         player,
@@ -59,4 +59,8 @@ export class PlayerAreas {
   // .##.....##.##........##.....##.#########....##....##..........##.....##..##.
   // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
   // ..#######..##........########..##.....##....##....########.....#######..####
+
+  public getFamily(familyId: string): FamilyArea {
+    return this.families[familyId];
+  }
 }

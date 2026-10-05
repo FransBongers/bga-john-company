@@ -43,7 +43,7 @@ class CommanderPurchaseLocalAlliance extends \Bga\Games\JohnCompany\Models\Atomi
     $stateArgs = $this->argsCommanderPurchaseLocalAlliance();
     if ($stateArgs['skipOnEnteringState']) {
       $args = $this->ctx->getArgs();
-      if ($args['first']) {
+      if ($args['first'] ?? false) {
         Notifications::message('${player_name} cannot purchase any local alliances', [
           'player' => Players::get($args['commanderPlayerId'])
         ]);

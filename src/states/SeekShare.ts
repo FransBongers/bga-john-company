@@ -9,13 +9,15 @@ import {
   performAction,
   addConfirmButton,
   addCancelButton,
+  addPassButton,
 } from '../boilerplate';
-import { WRITER, SHARE } from '../constants';
+import { WRITER, SHARE, OPPORTUNITY_MARKER } from '../constants';
 import { PlayerManager } from '../player-manager';
 import { CommonStateArgs, GameAlias, GameState } from '../types';
 
 interface OnEnteringSeekShareArgs extends CommonStateArgs {
   options: Record<string, number>;
+  source: string;
 }
 
 export class SeekShare implements GameState<OnEnteringSeekShareArgs> {
@@ -76,7 +78,7 @@ export class SeekShare implements GameState<OnEnteringSeekShareArgs> {
     Bar.getInstance().goTo('joco-company');
 
     updatePageTitle(
-      _('${you} must select a place on the Stock Exchange track'),
+      this.args.source === OPPORTUNITY_MARKER ? _('${you} may select an additional place on the Stock Exchange track (opportunity marker)') : _('${you} must select a place on the Stock Exchange track'),
       {
         tkn_icon: WRITER,
       },
@@ -85,6 +87,8 @@ export class SeekShare implements GameState<OnEnteringSeekShareArgs> {
     Object.entries(this.args.options).forEach(([position, price]) => {
       onClick(position, () => this.updateInterfaceConfirm(position, price));
     });
+
+    addPassButton(this.args.optionalAction);
   }
 
   private updateInterfaceConfirm(position: string, price: number) {

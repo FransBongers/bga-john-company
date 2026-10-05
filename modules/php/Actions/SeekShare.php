@@ -2,7 +2,7 @@
 
 namespace Bga\Games\JohnCompany\Actions;
 
-
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
@@ -10,6 +10,8 @@ use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
+use Bga\Games\JohnCompany\Models\Family;
+use Bga\Games\JohnCompany\Models\Player;
 
 class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
@@ -28,14 +30,14 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   public function argsSeekShare()
   {
-    $info = $this->ctx->getInfo();
-    $playerId = $info['activePlayerIds'][0];
-    $player = Players::get($playerId);
-    $familyId = $player->getFamilyId();
+    $args = $this->ctx->getArgs();
+    $source = $args['source'];
+    $familyId = $args['familyId'];
     $family = Families::get($familyId);
 
     $data = [
       'options' => $this->getOptions($family),
+      'source' => $source,
     ];
 
     return $data;
@@ -82,14 +84,21 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $this->performAction($playerId, $position, $price);
 
+    if ($stateArgs[SOURCE] === FAMILY_ACTION) {
+      $familyId = $this->ctx->getArgs()['familyId'];
+      $family = Families::get($familyId);
+
+      $this->checkExtraActionOpportunityMarker($family, $playerId);
+
+      $family->updateOpportunityMarker(SEEK_SHARE);
+    }
+
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
     $this->resolveAction([], true);
   }
 
   public function performAction($playerId, $position, $price)
   {
-
-
     $player = Players::get($playerId);
     $family = $player->getFamily();
 
@@ -99,9 +108,6 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
     $familyMember->setLocation($position);
 
     Notifications::seekShare($player, $familyMember, $price);
-
-    // TODO: insert extra actions
-
   }
 
 
@@ -113,6 +119,31 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
+  private function checkExtraActionOpportunityMarker(Family $family, int $playerId)
+  {
+    $opportunityMarker = $family->getOpportunityMarker();
+    if ($opportunityMarker !== SEEK_SHARE) {
+      return;
+    }
+
+    $isDoable = $this->canBePerformedBy($family);
+    if (!$isDoable) {
+      Notifications::message(clienttranslate('${player_name} cannot seek another share'), []);
+    }
+
+    $this->ctx->insertAsBrother(new LeafNode([
+      'action' => SEEK_SHARE,
+      'playerId' => 'some',
+      'activePlayerIds' => [$playerId],
+      'optional' => true,
+      'args' => [
+        'familyId' => $family->getId(),
+        'playerId' => $playerId,
+        SOURCE => OPPORTUNITY_MARKER,
+      ]
+    ]));
+  }
+
   private function getStockPrice($stockExchangeLocation)
   {
     return intval(explode('_', $stockExchangeLocation)[1]);
@@ -123,7 +154,7 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
     return count($this->getOptions($family)) > 0;
   }
 
-  public function getOptions($family)
+  public function getOptions(Family $family)
   {
     $treasury = $family->getTreasury();
 
@@ -179,5 +210,32 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
     }
 
     $this->performAction(CROWN_PLAYER_ID, $position, $cheapest);
+  }
+
+  // .########.##....##..######...####.##....##.########
+  // .##.......###...##.##....##...##..###...##.##......
+  // .##.......####..##.##.........##..####..##.##......
+  // .######...##.##.##.##...####..##..##.##.##.######..
+  // .##.......##..####.##....##...##..##..####.##......
+  // .##.......##...###.##....##...##..##...###.##......
+  // .########.##....##..######...####.##....##.########
+
+  public function getDescription(): string|array
+  {
+    return [
+      'log' => clienttranslate('Seek Share ${tkn_icon}'),
+      'args' => [
+        'tkn_icon' => SHARE,
+      ],
+    ];
+  }
+
+  public function isDoable(Player $player): bool
+  {
+    $args = $this->ctx->getArgs();
+    $familyId = $args['familyId'];
+    $family = Families::get($familyId);
+
+    return count($this->getOptions($family)) > 0;
   }
 }

@@ -198,6 +198,15 @@ $machinestates = [
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
+
+    ST_PURCHASE_ENTERPRISE => [
+        'name' => PURCHASE_ENTERPRISE,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
     ST_NEW_COMPANY_SHARES => [
         'name' => NEW_COMPANY_SHARES,
         'description' => '',
@@ -208,13 +217,10 @@ $machinestates = [
 
     ST_ENLIST_OFFICER => [
         'name' => ENLIST_OFFICER,
-        'type' => 'multipleactiveplayer',
-        'description' => clienttranslate('${actplayer} must enlist an officer'),
-        'descriptionmyturn' => clienttranslate('${you}'),
-        'args' => 'argsAtomicAction',
+        'description' => '',
+        'type' => 'game',
         'action' => 'stAtomicAction',
-        'possibleactions' => ['actEnlistOfficer', 'actTakeAtomicAction'],
-        'transitions' => ['next' => ST_RESOLVE_STACK],
+        'transitions' => [],
     ],
 
     ST_ENLIST_WRITER => [

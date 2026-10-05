@@ -24,8 +24,8 @@ export class Bar {
       text: _('India'),
     },
     {
-      id: 'joco-player-areas',
-      text: _('Player Areas'),
+      id: 'joco-families',
+      text: _('Families'),
     },
     {
       id: 'joco-company',

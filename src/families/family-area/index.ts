@@ -13,8 +13,9 @@ import {
 } from '../../types';
 import { TrophiesCounter } from '../../ui-components';
 import { getEnterpriseCard, getLondonSeasonCard } from '../../utility';
+import { OpportunityMarker } from './opportunity-marker';
 
-export interface PlayerAreaProps {
+export interface FamilyAreaProps {
   parentElement: HTMLElement | string;
   // id: string;
   gamedatas: GamedatasAlias;
@@ -22,7 +23,7 @@ export interface PlayerAreaProps {
   player: PlayerAlias;
 }
 
-export class PlayerArea {
+export class FamilyArea {
   protected ui: {
     parent: HTMLElement;
     counters: HTMLElement;
@@ -31,6 +32,7 @@ export class PlayerArea {
   // private id: string;
   private game: GameAlias;
   // private color: string;
+  public opportunityMarker: OpportunityMarker;
   private familyId: string;
   private player: PlayerAlias;
   private enterprises: InstanceType<
@@ -42,7 +44,7 @@ export class PlayerArea {
   > = {};
   public counters: Record<string, TrophiesCounter> = {};
 
-  constructor(config: PlayerAreaProps) {
+  constructor(config: FamilyAreaProps) {
     // this.id = config.id;
     this.game = config.game;
     this.familyId = config.player.familyId;
@@ -58,7 +60,7 @@ export class PlayerArea {
   // .##....##.##..........##....##.....##.##.......
   // ..######..########....##.....#######..##.......
 
-  private setup(config: PlayerAreaProps) {
+  private setup(config: FamilyAreaProps) {
     // this.color = config.color;
     const parentElement =
       typeof config.parentElement === 'string'
@@ -85,6 +87,8 @@ export class PlayerArea {
     this.setupLondonSeasonCards(config.gamedatas);
     this.setupOffices(config.gamedatas);
     this.setupTrophiesCounter(config.gamedatas);
+    this.setupOpportunityMarker(config.gamedatas);
+
   }
 
   private setupEnterprises(gamedatas: GamedatasAlias) {
@@ -123,12 +127,21 @@ export class PlayerArea {
     });
   }
 
+  private setupOpportunityMarker(gamedatas: GamedatasAlias) {
+    this.opportunityMarker = new OpportunityMarker({
+      game: this.game,
+      familyAction: gamedatas.families[this.familyId].opportunityMarker,
+      familyId: this.familyId,
+      parentElement: this.ui.counters,
+    });
+  }
+
   private tplPlayerArea() {
     return `
-      <div class="joco-player-area joco-container">
+      <div class="joco-family-area joco-container">
         <div class="joco-player-name" style="background-color:#${this.player.color};"><span class="fb-font-baskerville fb-font-16 fb-font-semi-bold">${this.player.name}</span></div>
-        <div class="joco-player-area-content">
-          <div id="joco-counters-${this.familyId}" class="joco-player-area-counters">
+        <div class="joco-family-area-content">
+          <div id="joco-counters-${this.familyId}" class="joco-family-area-counters">
           </div>
           <div class="joco-row">
             <div class="joco-inner-container joco-column">

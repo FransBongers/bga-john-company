@@ -88,13 +88,6 @@ class ResolveChoice extends \Bga\Games\JohnCompany\Models\AtomicAction
       $args['descSuffix'] = 'xor';
     }
 
-    // $args['skipOnEnteringState'] = $numberOfChoices === 0 || ($numberOfChoices === 1 && isset($choices[PASS]));
-    // $sourceId = $node->getSourceId() ?? null;
-    // if (!isset($args['source']) && !is_null($sourceId)) {
-    //   $args['sourceId'] = $sourceId;
-    //   $args['source'] = ZooCards::get($sourceId)->getName();
-    // }
-    // $this->addArgsAnytimeAction($args, 'resolveChoice');
     return $args;
   }
 

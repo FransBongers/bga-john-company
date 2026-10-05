@@ -40,7 +40,7 @@ import { CrownClimate } from '../../crown/climate';
 import { India } from '../../india';
 import { London } from '../../london';
 import { PhaseTracker } from '../../phase-tracker';
-import { PlayerAreas } from '../../player-areas';
+import { Families } from '../../families';
 import { PlayerManager } from '../../player-manager';
 import { JocoPlayer } from '../../player-manager/player';
 import { SetupArea } from '../../setup-area';
@@ -96,6 +96,7 @@ import {
   NotifDiscardLondonSeasonCard,
   NotifMoveLondonSeasonCard,
   NotifNewLondonSeasonDisplay,
+  NotifUpdateOpportunityMarker,
 } from './types';
 
 //  .##.....##....###....##....##....###.....######...########.########.
@@ -369,7 +370,7 @@ export class NotificationManager {
     counterChanges: Record<string, number>,
   ) {
     if (FAMILIES.includes(target)) {
-      PlayerAreas.getInstance().playerAreas[target].incCounters(counterChanges);
+      Families.getInstance().getFamily(target).incCounters(counterChanges);
     }
   }
 
@@ -621,9 +622,9 @@ export class NotificationManager {
     const cardToMove = _private?.card ?? card;
 
     const familyId = cardToMove.location.split('_')[1];
-    await PlayerAreas.getInstance().playerAreas[familyId].stocks[
-      cardToMove.location
-    ].addCard(getLondonSeasonCard(cardToMove));
+    await Families.getInstance()
+      .getFamily(familyId)
+      .stocks[cardToMove.location].addCard(getLondonSeasonCard(cardToMove));
   }
 
   async notif_moveOfficeCard(notif: NotifMoveOfficeCard) {
@@ -710,9 +711,9 @@ export class NotificationManager {
 
     const player = this.getPlayer(playerId);
     player.counters[this.getEnterpriseCounter(type)].incValue(1);
-    await PlayerAreas.getInstance().playerAreas[familyId].addEnterprise(
-      getEnterpriseCard(enterprise),
-    );
+    await Families.getInstance()
+      .getFamily(familyId)
+      .addEnterprise(getEnterpriseCard(enterprise));
     if (type === SHIPYARD && ship) {
       player.counters[SHIPS_COUNTER].incValue(1);
       EnterpriseCardsManager.getInstance().shipStocks[ship.id].addCard(ship);
@@ -870,6 +871,12 @@ export class NotificationManager {
   async notif_updateLondonSeasonOrder(notif: NotifUpdateLondonSeasonOrder) {
     const { order, cashSpent } = notif;
     London.getInstance().updateLondonSeasonOrder({ order, cashSpent });
+  }
+
+  async notif_updateOpportunityMarker(notif: NotifUpdateOpportunityMarker) {
+    const { familyId, familyAction } = notif;
+    const family = Families.getInstance().getFamily(familyId);
+    family.opportunityMarker.update(familyAction);
   }
 
   async notif_updateRegion(notif: NotifUpdateRegion) {

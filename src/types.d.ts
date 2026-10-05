@@ -288,7 +288,7 @@ interface JocoFamily {
   isLeaderOfOpposition: number;
   lawPieces: number;
   location: string;
-  opportunityMarker: number;
+  opportunityMarker: string | null;
   state: number;
   treasury: number;
   trophies: number;

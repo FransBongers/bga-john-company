@@ -207,6 +207,8 @@ export const OFFICES_WITH_TREASURY = [
 
 export const VACANT_OFFICES = 'VacantOffices';
 export const FAMILY_OFFICES = 'FamilyOffices';
+export const OPPORTUNITY_MARKER = 'OpportunityMarker';
+export const FAMILY_ACTION = 'FamilyAction';
 
 /**
  * Family member positions

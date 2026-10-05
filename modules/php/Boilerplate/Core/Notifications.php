@@ -12,6 +12,7 @@ use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Managers\Ships;
 use Bga\Games\JohnCompany\Models\ArmyPiece;
 use Bga\Games\JohnCompany\Models\Enterprise;
+use Bga\Games\JohnCompany\Models\Family;
 use Bga\Games\JohnCompany\Models\FamilyMember;
 use Bga\Games\JohnCompany\Models\LondonSeasonCard;
 use Bga\Games\JohnCompany\Models\Office;
@@ -170,6 +171,16 @@ class Notifications
   protected static function tknShip($ship)
   {
     return implode(':', [$ship->getSide(), $ship->getName()]);
+  }
+
+  public static function getEnterpriseName(string $enterpriseType)
+  {
+    $enterpriseNameMap = [
+      LUXURY => clienttranslate('Luxury'),
+      SHIPYARD => clienttranslate('Shipyard'),
+      WORKSHOP => clienttranslate('Workshop'),
+    ];
+    return $enterpriseNameMap[$enterpriseType];
   }
 
   //  .##.....##.########.####.##.......####.########.##....##
@@ -1103,6 +1114,14 @@ class Notifications
     self::notifyAll('updateLondonSeasonOrder', '', [
       'order' => Prizes::getLondonSeasonOrder(),
       'cashSpent' => Globals::getRetirementMoney()
+    ]);
+  }
+
+  public static function updateOpportunityMarker(Family $family, string | null $familyAction)
+  {
+    self::notifyAll('updateOpportunityMarker', '', [
+      'familyId' => $family->getId(),
+      'familyAction' => $familyAction,
     ]);
   }
 

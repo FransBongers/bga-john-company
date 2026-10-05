@@ -218,6 +218,11 @@ export interface NotifUpdateLondonSeasonOrder {
   cashSpent: Record<number, number>;
 }
 
+export interface NotifUpdateOpportunityMarker {
+  familyId: string;
+  familyAction: string | null;
+}
+
 export interface NotifUpdateRegion {
   region: JocoRegionBase;
 }
