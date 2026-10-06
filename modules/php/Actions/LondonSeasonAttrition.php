@@ -73,7 +73,9 @@ class LondonSeasonAttrition extends \Bga\Games\JohnCompany\Models\AtomicAction
           $familyMember->incFatigue(1);
         } else {
           $familyMember->setFatigue(0);
-          $familyMember->moveTo($player, Locations::pensioners(), true);
+          $familyMember->moveTo($player, Locations::pensioners(), [
+            'skipFrom' => true
+          ]);
           $office->moveToVacantOffices($player);
           $retiredAFamilyMember = true;
         }

@@ -416,6 +416,25 @@ $machinestates = [
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
+    ST_MILITARY_AFFAIRS_ASSIGN_COMMANDER => [
+        'name' => MILITARY_AFFAIRS_ASSIGN_COMMANDER,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . MILITARY_AFFAIRS_ASSIGN_COMMANDER, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_MILITARY_AFFAIRS_CHECK_COMMANDER => [
+        'name' => MILITARY_AFFAIRS_CHECK_COMMANDER,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
     ST_PRESIDENCY_DECIDE_ORDER => [
         'name' => PRESIDENCY_DECIDE_ORDER,
         'type' => 'multipleactiveplayer',
@@ -604,6 +623,25 @@ $machinestates = [
         'type' => 'game',
         'action' => 'stAtomicAction',
         'transitions' => [],
+    ],
+
+    ST_HIRING_CHECK_VACANT_OFFICES => [
+        'name' => HIRING_CHECK_VACANT_OFFICES,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_HIRING_HIRE_FAMILY_MEMBER => [
+        'name' => HIRING_HIRE_FAMILY_MEMBER,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer} may hire a family member'),
+        'descriptionmyturn' => clienttranslate('${you} may hire a family member'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . HIRING_HIRE_FAMILY_MEMBER, 'actPassOptionalAction', 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
     ST_REFRESH_BOARD => [

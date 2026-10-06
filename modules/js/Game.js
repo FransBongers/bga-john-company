@@ -842,10 +842,10 @@ class Interaction {
 const isDebug = window.location.host == 'studio.boardgamearena.com' ||
     window.location.hash.indexOf('debug') > -1;
 const debug = isDebug ? console.info.bind(window.console) : () => { };
-const addCancelButton = (props = {}) => {
+const addCancelButton$1 = (props = {}) => {
     Interaction.use().addCancelButton(props);
 };
-const addConfirmButton = (callback) => {
+const addConfirmButton$1 = (callback) => {
     Interaction.use().addConfirmButton(callback);
 };
 const addDangerActionButton = (props) => {
@@ -880,7 +880,7 @@ const setSelected = (node) => {
     let element = typeof node === 'string' ? document.getElementById(node) : node;
     Interaction.use().setSelected(element);
 };
-const performAction = (actionName, args) => {
+const performAction$1 = (actionName, args) => {
     Interaction.use().clearPossible();
     Interaction.use().performAction(actionName, args);
 };
@@ -1179,7 +1179,7 @@ const tplBoard = (gamedatas) => `<div id="joco-board">
   <div id="joco-elephant-old"></div>
 </div>`;
 
-class Board {
+let Board$1 = class Board {
     constructor(game) {
         this.familyMembers = {};
         this.regions = {};
@@ -1523,7 +1523,7 @@ class Board {
             player.counters[SHIPS_COUNTER].incValue(1);
         }
     }
-}
+};
 
 const BgaAnimations$1 = await globalThis.importEsmLib('bga-animations', '1.x');
 const BgaCards$1 = await globalThis.importEsmLib('bga-cards', '1.x');
@@ -1925,7 +1925,23 @@ const tknShipValue = ({ name, side, }) => {
     return [side, name].join(':');
 };
 const tknPromiseCubes = () => 'Promise Cube(s)';
+const tknFamilyMember = (familyMember) => {
+    const number = parseInt(familyMember.id.split('_')[2], 10) % 18;
+    return [familyMember.familyId, number].join(':');
+};
 
+const getArmyNameForPresidency = (presidencyId) => {
+    switch (presidencyId) {
+        case BENGAL_PRESIDENCY:
+            return _('Army of Bengal');
+        case BOMBAY_PRESIDENCY:
+            return _('Army of Bombay');
+        case MADRAS_PRESIDENCY:
+            return _('Army of Madras');
+        default:
+            return '';
+    }
+};
 const getSeaName = (seaId) => {
     switch (seaId) {
         case EAST_INDIAN:
@@ -2951,9 +2967,9 @@ class Region {
         this.id = id;
         this.game = game;
         this.data = data;
-        this.setup(data);
+        this.setup(data, game);
     }
-    setup(data) {
+    setup(data, game) {
         const map = document.getElementById('joco-india-map');
         const elt = (this.tower = document.createElement('div'));
         elt.id = `joco-tower-${data.id}`;
@@ -2974,6 +2990,7 @@ class Region {
         this.updateCapital(data.isCapital);
         this.updateEmpire(data.isCapital, data.control);
         this.updateCompanyControl(data);
+        this.updateFamilyMembers(Object.values(game.gamedatas.familyMembers));
     }
     update(region) {
         if (this.data.strength !== region.strength) {
@@ -3029,6 +3046,14 @@ class Region {
     }
     updateUnrest(value) {
         this.data.unrest = value;
+    }
+    updateFamilyMembers(familyMembers) {
+        const location = `GovernorOf${this.data.id}`;
+        const governor = familyMembers.find((member) => member.location === location);
+        if (governor) {
+            const elt = createFamilyMember(governor.familyId, governor.id);
+            document.getElementById(location)?.appendChild(elt);
+        }
     }
     hasControlToken(token) {
         return this.controlTokenStock.contains(token);
@@ -3950,9 +3975,8 @@ class NotificationManager {
     }
     async notif_allocateBalanceToOffice(notif) {
         const { companyBalance, officeTreasury, officeId } = notif;
-        const board = Board.getInstance();
-        board.treasuries[officeId].toValue(officeTreasury);
-        await board.movePawn('balance', companyBalance);
+        Company.getInstance().treasuries[officeId].toValue(officeTreasury);
+        Company.getInstance().balance.toValue(companyBalance);
     }
     async notif_changeOrderStatus(notif) {
         const { order } = notif;
@@ -4036,17 +4060,14 @@ class NotificationManager {
     }
     async notif_moveCompanyDebt(notif) {
         const { companyBalance, companyDebt } = notif;
-        const board = Board.getInstance();
-        const promises = [board.movePawn('debt', companyDebt)];
-        if (companyBalance) {
-            promises.push(board.movePawn('balance', companyBalance));
+        if (companyBalance !== undefined) {
+            Company.getInstance().balance.toValue(companyBalance);
         }
-        await Promise.all(promises);
+        Company.getInstance().updateCompanyDebt(companyDebt);
     }
     async notif_moveCompanyStanding(notif) {
         const { companyStanding } = notif;
-        const board = Board.getInstance();
-        await board.movePawn('standing', companyStanding);
+        Company.getInstance().updateCompanyStanding(companyStanding);
     }
     async notif_moveFamilyMember(notif) {
         const { familyMember } = notif;
@@ -4088,11 +4109,13 @@ class NotificationManager {
     }
     async notif_moveOfficeCard(notif) {
         const { office } = notif;
-        let element = document.getElementById(`${office.id}OfficeCard`);
+        let element = document.getElementById(`OfficeCard_${office.id}`);
         if (!element) {
             element = createHtmlElement(tplOfficeCard(office));
         }
+        console.log('officeCard', element);
         const locationElt = document.getElementById(office.location);
+        console.log('location', locationElt);
         locationElt.appendChild(element);
     }
     async notif_movePieces(notif) {
@@ -4207,7 +4230,7 @@ class NotificationManager {
     }
     async notif_setupFamilyMembers(notif) {
         const { familyMembers, playerId } = notif;
-        await Board.getInstance().placeFamilyMembers(familyMembers, this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER]);
+        await this.placeFamilyMembers(familyMembers, this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER]);
     }
     async notif_transferPromiseCubes(notif) {
         const { playerId, amount } = notif;
@@ -4277,7 +4300,7 @@ class ConfirmPartialTurn {
     updateInterfaceInitialStep() {
         this.game.clearPossible();
         updatePageTitle(_('${you} must confirm your moves. You will not be able to undo'));
-        addConfirmButton(() => this.game.bga.actions.performAction('actConfirmPartialTurn'));
+        addConfirmButton$1(() => this.game.bga.actions.performAction('actConfirmPartialTurn'));
         addUndoButtons(this.args);
     }
 }
@@ -4304,7 +4327,7 @@ class ConfirmTurn {
     updateInterfaceInitialStep() {
         this.game.clearPossible();
         updatePageTitle(_('${you} must confirm or restart your turn'));
-        addConfirmButton(() => this.game.bga.actions.performAction('actConfirmTurn'));
+        addConfirmButton$1(() => this.game.bga.actions.performAction('actConfirmTurn'));
         addUndoButtons(this.args);
     }
 }
@@ -4622,7 +4645,7 @@ class Chairman {
                 value,
             });
         }
-        addConfirmButton(() => this.performAction(true, value));
+        addConfirmButton$1(() => this.performAction(true, value));
         addDangerActionButton({
             id: 'cancel_btn',
             text: _('Cancel'),
@@ -4644,7 +4667,7 @@ class Chairman {
         Object.entries(this.getTreasuries()).forEach(([office, treasury]) => {
             treasuries[office] = treasury.getValue();
         });
-        performAction('actChairman', {
+        performAction$1('actChairman', {
             companyDebt: this.currentDebt,
             debtVote: debtVote ?? null,
             treasuries,
@@ -4769,7 +4792,7 @@ class ChairmanDebtConsent {
             required: this.args.remainingVotesRequired,
             tkn_icon: SHARE,
         });
-        setSelected(Board.getInstance().ui.selectBoxes[`companyDebt_${this.args.debt}`]);
+        setSelected(Board$1.getInstance().ui.selectBoxes[`companyDebt_${this.args.debt}`]);
         addPrimaryActionButton({
             id: 'yay_btn',
             text: 'Yay',
@@ -4782,7 +4805,7 @@ class ChairmanDebtConsent {
         });
     }
     performAction(yay) {
-        performAction('actChairmanDebtConsent', {
+        performAction$1('actChairmanDebtConsent', {
             consent: yay,
         });
     }
@@ -4822,14 +4845,14 @@ class CommanderApproveLocalAlliance {
             id: 'approve-btn',
             text: _('Approve'),
             callback: () => {
-                performAction('actCommanderApproveLocalAlliance', { approve: true });
+                performAction$1('actCommanderApproveLocalAlliance', { approve: true });
             },
         });
         addDangerActionButton({
             id: 'reject-btn',
             text: _('Reject'),
             callback: () => {
-                performAction('actCommanderApproveLocalAlliance', { approve: false });
+                performAction$1('actCommanderApproveLocalAlliance', { approve: false });
             },
         });
     }
@@ -4931,7 +4954,7 @@ class CommanderDeploy {
             number: numberOfDice,
         });
         this.setSelectedPieces();
-        addConfirmButton(() => performAction('actCommanderDeploy', {
+        addConfirmButton$1(() => performAction$1('actCommanderDeploy', {
             regionId: this.targetId,
             armyPieces: this.selectedPieces.armyPieces,
             officers: this.selectedPieces.officers,
@@ -5017,12 +5040,12 @@ class CommanderPurchaseLocalAlliance {
             name: _(StaticData.get().armyPiece(localAlliance.id).name),
             tkn_localAlliance: localAlliance.id,
         });
-        addConfirmButton(() => {
-            performAction('actCommanderPurchaseLocalAlliance', {
+        addConfirmButton$1(() => {
+            performAction$1('actCommanderPurchaseLocalAlliance', {
                 localAllianceId: localAlliance.id,
             });
         });
-        addCancelButton();
+        addCancelButton$1();
     }
 }
 
@@ -5069,7 +5092,7 @@ class CrownChairmanRequestAllocation {
         addSecondaryActionButton({
             id: 'skip_btn',
             text: _('Skip'),
-            callback: () => performAction('actCrownChairmanRequestAllocation', {
+            callback: () => performAction$1('actCrownChairmanRequestAllocation', {
                 continue: true,
             }),
         });
@@ -5078,7 +5101,7 @@ class CrownChairmanRequestAllocation {
         clearPossible();
         updatePageTitle(_('${you} must select an office'));
         this.setOfficesSelectable();
-        addCancelButton();
+        addCancelButton$1();
     }
     updateInterfaceSelectAmount(officeId) {
         clearPossible();
@@ -5093,7 +5116,7 @@ class CrownChairmanRequestAllocation {
                 callback: () => this.updateInterfaceConfirm(officeId, i),
             });
         }
-        addCancelButton();
+        addCancelButton$1();
     }
     updateInterfaceConfirm(officeId, amount) {
         clearPossible();
@@ -5103,16 +5126,16 @@ class CrownChairmanRequestAllocation {
             amount,
             office: _(StaticData.get().office(officeId).title),
         });
-        addConfirmButton(() => {
-            performAction('actCrownChairmanRequestAllocation', {
+        addConfirmButton$1(() => {
+            performAction$1('actCrownChairmanRequestAllocation', {
                 officeId,
                 amount,
             });
         });
-        addCancelButton();
+        addCancelButton$1();
     }
     setOfficesSelectable() {
-        const board = Board.getInstance();
+        const board = Board$1.getInstance();
         OFFICES_WITH_TREASURY.forEach((office) => {
             const box = board.ui.selectBoxes[office];
             onClick(box, () => this.updateInterfaceSelectAmount(office));
@@ -5158,7 +5181,7 @@ class CrownChairmanRequestDebtAdvancement {
                 extraClasses: !this.args.oneLessAdvancement.playerCanPay[playerId]
                     ? DISABLED
                     : '',
-                callback: () => performAction('actCrownChairmanRequestDebtAdvancement', {
+                callback: () => performAction$1('actCrownChairmanRequestDebtAdvancement', {
                     continue: false,
                     oneLessAdvancement: true,
                     additionalAdvancement: false,
@@ -5175,7 +5198,7 @@ class CrownChairmanRequestDebtAdvancement {
                 extraClasses: !this.args.additionalAdvancement.playerCanPay[playerId]
                     ? DISABLED
                     : '',
-                callback: () => performAction('actCrownChairmanRequestDebtAdvancement', {
+                callback: () => performAction$1('actCrownChairmanRequestDebtAdvancement', {
                     continue: false,
                     oneLessAdvancement: false,
                     additionalAdvancement: true,
@@ -5185,7 +5208,7 @@ class CrownChairmanRequestDebtAdvancement {
         addPrimaryActionButton({
             id: 'continue_btn',
             text: _('Continue'),
-            callback: () => performAction('actCrownChairmanRequestDebtAdvancement', {
+            callback: () => performAction$1('actCrownChairmanRequestDebtAdvancement', {
                 continue: true,
                 oneLessAdvancement: false,
                 additionalAdvancement: false,
@@ -5195,8 +5218,8 @@ class CrownChairmanRequestDebtAdvancement {
     updateInterfaceConfirm() {
         clearPossible();
         updatePageTitle(_('Confirm ship placement'));
-        addConfirmButton(() => {
-            performAction('actCrownChairmanRequestDebtAdvancement', {});
+        addConfirmButton$1(() => {
+            performAction$1('actCrownChairmanRequestDebtAdvancement', {});
         });
     }
     updatePageTitle() {
@@ -5257,7 +5280,7 @@ class CrownManagerOfShippingBuyCompanyShips {
                                 side: COMPANY_SHIP,
                             }),
                         }),
-                        callback: () => performAction('actCrownManagerOfShippingBuyCompanyShips', {
+                        callback: () => performAction$1('actCrownManagerOfShippingBuyCompanyShips', {
                             option: BUY_COMPANY_SHIP,
                         }),
                     });
@@ -5274,7 +5297,7 @@ class CrownManagerOfShippingBuyCompanyShips {
                                 side: COMPANY_SHIP,
                             }),
                         }),
-                        callback: () => performAction('actCrownManagerOfShippingBuyCompanyShips', {
+                        callback: () => performAction$1('actCrownManagerOfShippingBuyCompanyShips', {
                             option: DO_NOT_BUY_COMPANY_SHIP,
                         }),
                     });
@@ -5286,7 +5309,7 @@ class CrownManagerOfShippingBuyCompanyShips {
         addPrimaryActionButton({
             id: 'continue_btn',
             text: _('Continue'),
-            callback: () => performAction('actCrownManagerOfShippingBuyCompanyShips', {
+            callback: () => performAction$1('actCrownManagerOfShippingBuyCompanyShips', {
                 continue: true,
             }),
         });
@@ -5294,8 +5317,8 @@ class CrownManagerOfShippingBuyCompanyShips {
     updateInterfaceConfirm() {
         clearPossible();
         updatePageTitle(_('Confirm ship placement'));
-        addConfirmButton(() => {
-            performAction('actCrownManagerOfShippingBuyCompanyShips', {});
+        addConfirmButton$1(() => {
+            performAction$1('actCrownManagerOfShippingBuyCompanyShips', {});
         });
     }
     updatePageTitle() {
@@ -5353,7 +5376,7 @@ class CrownManagerOfShippingFitShips {
         addPrimaryActionButton({
             id: 'continue_btn',
             text: _('Continue'),
-            callback: () => performAction('actCrownManagerOfShippingFitShips', {
+            callback: () => performAction$1('actCrownManagerOfShippingFitShips', {
                 continue: true,
             }),
         });
@@ -5361,8 +5384,8 @@ class CrownManagerOfShippingFitShips {
     updateInterfaceConfirm() {
         clearPossible();
         updatePageTitle(_('Confirm ship placement'));
-        addConfirmButton(() => {
-            performAction('actCrownManagerOfShippingFitShips', {});
+        addConfirmButton$1(() => {
+            performAction$1('actCrownManagerOfShippingFitShips', {});
         });
     }
     updatePageTitle() {
@@ -5426,7 +5449,7 @@ class CrownManagerOfShippingLeaseExtraShips {
                     tkn_promiseCube: tknPromiseCubes(),
                     tkn_pound: tknPound(),
                 }),
-                callback: () => performAction('actCrownManagerOfShippingBuyCompanyShips', {
+                callback: () => performAction$1('actCrownManagerOfShippingBuyCompanyShips', {
                     option: BUY_COMPANY_SHIP,
                 }),
             });
@@ -5434,7 +5457,7 @@ class CrownManagerOfShippingLeaseExtraShips {
         addPrimaryActionButton({
             id: 'continue_btn',
             text: _('Continue'),
-            callback: () => performAction('actCrownManagerOfShippingLeaseExtraShips', {
+            callback: () => performAction$1('actCrownManagerOfShippingLeaseExtraShips', {
                 continue: true,
             }),
         });
@@ -5442,8 +5465,8 @@ class CrownManagerOfShippingLeaseExtraShips {
     updateInterfaceConfirm() {
         clearPossible();
         updatePageTitle(_('Confirm ship placement'));
-        addConfirmButton(() => {
-            performAction('actCrownManagerOfShippingLeaseExtraShips', {});
+        addConfirmButton$1(() => {
+            performAction$1('actCrownManagerOfShippingLeaseExtraShips', {});
         });
     }
 }
@@ -5482,7 +5505,7 @@ class CrownManagerOfShippingPlaceShips {
         addPrimaryActionButton({
             id: 'continue_btn',
             text: _('Continue'),
-            callback: () => performAction('actCrownManagerOfShippingPlaceShips', {
+            callback: () => performAction$1('actCrownManagerOfShippingPlaceShips', {
                 continue: true,
             }),
         });
@@ -5490,8 +5513,8 @@ class CrownManagerOfShippingPlaceShips {
     updateInterfaceConfirm() {
         clearPossible();
         updatePageTitle(_('Confirm ship placement'));
-        addConfirmButton(() => {
-            performAction('actCrownManagerOfShippingPlaceShips', {});
+        addConfirmButton$1(() => {
+            performAction$1('actCrownManagerOfShippingPlaceShips', {});
         });
     }
 }
@@ -5544,18 +5567,18 @@ class CrownManagerOfShippingUnfittedShipOptions {
     updateInterfaceSelectShip() {
         this.game.clearPossible();
         updatePageTitle(_('${you} must select a ship to fit'));
-        addCancelButton();
+        addCancelButton$1();
     }
     updateInterfaceSelectSeaZone() {
         clearPossible();
-        const board = Board.getInstance();
+        const board = Board$1.getInstance();
         updatePageTitle(_('${you} must select a sea zone'));
     }
     updateInterfaceConfirm() {
         clearPossible();
         updatePageTitle(_('Confirm ship placement'));
-        addConfirmButton(() => {
-            performAction('actCrownManagerOfShippingUnfittedShipOptions', {});
+        addConfirmButton$1(() => {
+            performAction$1('actCrownManagerOfShippingUnfittedShipOptions', {});
         });
     }
     updatePageTitle() {
@@ -5667,11 +5690,11 @@ class DirectorOfTradeSpecialEnvoy {
         updatePageTitle(_('Special Envoy: make a check with ${number} dice?'), {
             number: this.spend,
         });
-        addConfirmButton(() => this.performAction(true));
-        addCancelButton();
+        addConfirmButton$1(() => this.performAction(true));
+        addCancelButton$1();
     }
     performAction(makeCheck = false) {
-        performAction('actDirectorOfTradeSpecialEnvoy', {
+        performAction$1('actDirectorOfTradeSpecialEnvoy', {
             spend: this.spend,
             makeCheck,
         });
@@ -5717,11 +5740,11 @@ class DirectorOfTradeSpecialEnvoySuccess {
             region: _(order.location),
         });
         setSelected(India$1.getInstance().ui.orders[order.id]);
-        addConfirmButton(() => this.performAction(order, true));
-        addCancelButton();
+        addConfirmButton$1(() => this.performAction(order, true));
+        addCancelButton$1();
     }
     performAction(order, perform = false) {
-        performAction('actDirectorOfTradeSpecialEnvoySuccess', {
+        performAction$1('actDirectorOfTradeSpecialEnvoySuccess', {
             orderId: order.id,
             perform,
         });
@@ -5829,8 +5852,8 @@ class DirectorOfTradeTransfers {
     updateInterfaceConfirm() {
         clearPossible();
         updatePageTitle(_('Confirm transfers'));
-        addConfirmButton(() => {
-            performAction('actDirectorOfTradeTransfers', {
+        addConfirmButton$1(() => {
+            performAction$1('actDirectorOfTradeTransfers', {
                 transfers: this.transfers,
             });
         });
@@ -5903,7 +5926,7 @@ class DraftCard {
             onClick(node, () => this.handleClick(option.id));
         });
         if (this.selectedCards.length > 0) {
-            addCancelButton();
+            addCancelButton$1();
         }
     }
     updateInterfaceConfirm() {
@@ -5915,13 +5938,13 @@ class DraftCard {
             updatePageTitle(_('Draft selected cards'));
         }
         this.setSelected();
-        addConfirmButton(() => {
-            performAction('actDraftCard', {
+        addConfirmButton$1(() => {
+            performAction$1('actDraftCard', {
                 cardIds: this.selectedCards,
             });
             this.setSelected();
         });
-        addCancelButton();
+        addCancelButton$1();
     }
     setSelected() {
         this.selectedCards.forEach((cardId) => setSelected(cardId));
@@ -5991,11 +6014,11 @@ class EnlistWriter {
             tkn_icon: WRITER,
             regionName: _(StaticData.get().region(PRESIDENCY_REGION_MAP[presidencyId]).name),
         });
-        const callback = () => performAction('actEnlistWriter', {
+        const callback = () => performAction$1('actEnlistWriter', {
             presidencyId,
         });
-        addConfirmButton(callback);
-        addCancelButton();
+        addConfirmButton$1(callback);
+        addCancelButton$1();
     }
     getSourceName(source) {
         switch (source) {
@@ -6037,7 +6060,7 @@ class EventsInIndiaCrisisDefense {
     updateInterfaceInitialStep() {
         this.game.clearPossible();
         updatePageTitle(_('${you} must meet Parliament'));
-        const board = Board.getInstance();
+        const board = Board$1.getInstance();
     }
     updateInterfaceConfirm() {
         clearPossible();
@@ -6082,11 +6105,11 @@ class FamilyAction {
     }
     updateInterfaceConfirm(familyAction) {
         clearPossible();
-        const callback = () => performAction('actFamilyAction', {
+        const callback = () => performAction$1('actFamilyAction', {
             familyAction,
         });
         callback();
-        addCancelButton();
+        addCancelButton$1();
     }
     addButton(action, icon, text) {
         if (this.args.options[action]) {
@@ -6097,6 +6120,79 @@ class FamilyAction {
                 }),
                 callback: () => this.updateInterfaceConfirm(action),
             });
+        }
+    }
+}
+
+class HiringHireFamilyMember {
+    constructor(game) {
+        this.game = game;
+    }
+    static create(game) {
+        HiringHireFamilyMember.instance = new HiringHireFamilyMember(game);
+    }
+    static getInstance() {
+        return HiringHireFamilyMember.instance;
+    }
+    onEnteringState(args) {
+        debug('Entering HiringHireFamilyMember state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+        this.goToTab();
+    }
+    onLeavingState() {
+        debug('Leaving HiringHireFamilyMember state');
+    }
+    setDescription(activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} must hire the ${officeTitle}'), {
+            officeTitle: _(getOffice(args.office).title),
+            tkn_playerName: PlayerManager.getInstance()
+                .getPlayer(args.hiringPlayerId)
+                .getName(),
+        });
+    }
+    updateInterfaceInitialStep() {
+        clearPossible();
+        updatePageTitle(_('${you} must choose a family member to hire as ${officeTitle}'), {
+            officeTitle: _(getOffice(this.args.office).title),
+        });
+        this.args.options.forEach((option) => {
+            onClick(option.id, () => this.updateInterfaceConfirm(option));
+        });
+    }
+    updateInterfaceConfirm(option) {
+        clearPossible();
+        setSelected(option.id);
+        if (this.args.constentForNepotismRequired &&
+            option.familyId === this.args.hiringFamilyId) {
+            updatePageTitle(_('Ask consent for nepotism to hire ${tkn_familyMember} as ${officeTitle}?'), {
+                tkn_familyMember: tknFamilyMember(option),
+                officeTitle: _(getOffice(this.args.office).title),
+            });
+        }
+        else {
+            updatePageTitle(_('Hire ${tkn_familyMember} as ${officeTitle}?'), {
+                tkn_familyMember: tknFamilyMember(option),
+                officeTitle: _(getOffice(this.args.office).title),
+            });
+        }
+        addConfirmButton$1(() => {
+            performAction$1('actHiringHireFamilyMember', {
+                familyMemberId: option.id,
+            });
+        });
+        addCancelButton$1();
+    }
+    goToTab() {
+        const bar = Bar.getInstance();
+        switch (this.args.office.id) {
+            case DIRECTOR_OF_TRADE:
+            case GOVERNOR_GENERAL:
+                bar.goTo('joco-company');
+                break;
+            default:
+                bar.goTo('joco-india');
+                break;
         }
     }
 }
@@ -6156,7 +6252,7 @@ class LondonSeasonChooseCard {
         addPrimaryActionButton({
             id: 'take-btn',
             text: _('Take'),
-            callback: () => performAction('actLondonSeasonChooseCard', {
+            callback: () => performAction$1('actLondonSeasonChooseCard', {
                 cardId: card.type === BLACKMAIL ? card.hiddenId : card.id,
                 take: true,
             }),
@@ -6164,12 +6260,12 @@ class LondonSeasonChooseCard {
         addSecondaryActionButton({
             id: 'discard-btn',
             text: _('Discard'),
-            callback: () => performAction('actLondonSeasonChooseCard', {
+            callback: () => performAction$1('actLondonSeasonChooseCard', {
                 cardId: card.type === BLACKMAIL ? card.hiddenId : card.id,
                 take: false,
             }),
         });
-        addCancelButton();
+        addCancelButton$1();
     }
 }
 
@@ -6251,8 +6347,8 @@ class LondonSeasonRetire {
         updatePageTitle(Object.keys(this.selectedPrizes).length > 1
             ? _('Retire pensioners to selected prizes?')
             : _('Retire pensioner to selected prize?'));
-        addConfirmButton(() => {
-            performAction('actLondonSeasonRetire', {
+        addConfirmButton$1(() => {
+            performAction$1('actLondonSeasonRetire', {
                 selectedPrizes: this.selectedPrizes,
             });
         });
@@ -6418,8 +6514,8 @@ class ManagerOfShipping {
     updateInterfaceConfirm() {
         clearPossible();
         updatePageTitle(_('Confirm ship placement'));
-        addConfirmButton(() => {
-            performAction('actManagerOfShipping', {
+        addConfirmButton$1(() => {
+            performAction$1('actManagerOfShipping', {
                 playerShips: this.getActionData(this.placedPlayerShips),
                 extraShips: this.getActionData(this.placedExtraShips),
                 companyShips: this.getActionData(this.placedCompanyShips),
@@ -6526,8 +6622,8 @@ class MilitaryAffairsAssign {
     updateInterfaceConfirm() {
         clearPossible();
         updatePageTitle(_('Assign officers?'));
-        addConfirmButton(() => {
-            performAction('actMilitaryAffairsAssign', {
+        addConfirmButton$1(() => {
+            performAction$1('actMilitaryAffairsAssign', {
                 assignedOfficers: Object.values(this.assignedOfficers).map(({ officer, to }) => ({ familyMemberId: officer.id, to })),
             });
         });
@@ -6550,6 +6646,57 @@ class MilitaryAffairsAssign {
     }
 }
 
+class MilitaryAffairsAssignCommander {
+    constructor(game) {
+        this.game = game;
+    }
+    static create(game) {
+        MilitaryAffairsAssignCommander.instance =
+            new MilitaryAffairsAssignCommander(game);
+    }
+    static getInstance() {
+        return MilitaryAffairsAssignCommander.instance;
+    }
+    onEnteringState(args) {
+        debug('Entering MilitaryAffairsAssignCommander state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+        Bar.getInstance().goTo('joco-india');
+    }
+    onLeavingState() {
+        debug('Leaving MilitaryAffairsAssignCommander state');
+    }
+    setDescription(activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} must appoint the Commander of the ${army}'), {
+            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            army: getArmyNameForPresidency(args.presidencyId),
+        });
+    }
+    updateInterfaceInitialStep() {
+        clearPossible();
+        updatePageTitle(_('${you} must choose a family member to appoint as Commander of the ${army}'), {
+            army: getArmyNameForPresidency(this.args.presidencyId),
+        });
+        this.args.options.forEach((option) => {
+            onClick(option.id, () => this.updateInterfaceConfirm(option));
+        });
+    }
+    updateInterfaceConfirm(option) {
+        clearPossible();
+        setSelected(option.id);
+        updatePageTitle(_('Appoint ${tkn_familyMember} as Commander of the ${army}?'), {
+            tkn_familyMember: tknFamilyMember(option),
+            army: getArmyNameForPresidency(this.args.presidencyId),
+        });
+        addConfirmButton$1(() => {
+            performAction$1('actMilitaryAffairsAssignCommander', {
+                familyMemberId: option.id,
+            });
+        });
+        addCancelButton$1();
+    }
+}
+
 class MilitaryAffairsTransfers {
     constructor(game) {
         this.game = game;
@@ -6563,7 +6710,7 @@ class MilitaryAffairsTransfers {
     onEnteringState(args) {
         debug('Entering MilitaryAffairsTransfers state');
         this.args = args;
-        this.transfers = args.transfers ?? {
+        this.transfers = {
             officers: {},
             regiments: {},
         };
@@ -6592,7 +6739,13 @@ class MilitaryAffairsTransfers {
             if (this.transfers.regiments[id]) {
                 return;
             }
-            onClick(id, () => this.updateInterfaceSelectArmyForRegiment(data));
+            onClick(id, () => this.updateInterfaceSelectArmy(data));
+        });
+        Object.entries(this.args.options.officers).forEach(([id, data]) => {
+            if (this.transfers.officers[id]) {
+                return;
+            }
+            onClick(id, () => this.updateInterfaceSelectArmy(data));
         });
         if (this.getTransferCount() > 0) {
             addPrimaryActionButton({
@@ -6606,21 +6759,26 @@ class MilitaryAffairsTransfers {
             addPassButton(this.args.optionalAction);
         }
     }
-    updateInterfaceSelectArmyForRegiment({ regiment, locations, }) {
+    updateInterfaceSelectArmy({ familyMember, regiment, locations, }) {
         clearPossible();
-        setSelected(regiment.id);
+        setSelected(regiment?.id ?? familyMember.id);
+        const id = regiment?.id ?? familyMember.id;
+        const type = regiment ? 'regiments' : 'officers';
+        const piece = regiment ?? familyMember;
         locations.forEach((to) => {
             const regionId = to.split('_')[2];
             onClick(`ArmyOfPresidency_${regionId}`, async () => {
-                const from = regiment.location;
-                this.transfers.regiments[regiment.id] = {
-                    regiment,
+                const from = regiment ? regiment.location : familyMember.location;
+                this.transfers[type][id] = {
+                    piece,
                     from,
                     to,
                 };
-                regiment.location = to;
+                piece.location = to;
                 clearPossible();
-                await India$1.getInstance().getArmy(`Presidency_${regionId}`).addPiece(regiment.id);
+                await India$1.getInstance()
+                    .getArmy(`Presidency_${regionId}`)
+                    .addPiece(piece.id);
                 this.updateInterfaceInitialStep();
             });
         });
@@ -6629,9 +6787,18 @@ class MilitaryAffairsTransfers {
     updateInterfaceConfirm() {
         clearPossible();
         updatePageTitle(_('Confirm transfers'));
-        addConfirmButton(() => {
-            performAction('actMilitaryAffairsTransfers', {
-                transfers: this.transfers,
+        addConfirmButton$1(() => {
+            performAction$1('actMilitaryAffairsTransfers', {
+                transfers: {
+                    officers: Object.entries(this.transfers.officers).reduce((acc, [id, { to }]) => {
+                        acc[id] = to;
+                        return acc;
+                    }, {}),
+                    regiments: Object.entries(this.transfers.regiments).reduce((acc, [id, { to }]) => {
+                        acc[id] = to;
+                        return acc;
+                    }, {}),
+                },
             });
         });
         this.addCancelButton();
@@ -6642,9 +6809,14 @@ class MilitaryAffairsTransfers {
     }
     async returnPieces() {
         const india = India$1.getInstance();
-        for (let data of Object.values(this.transfers.regiments)) {
-            data.regiment.location = data.from;
-            await india.getArmy(`Presidency_${data.from.split('_')[2]}`).addPiece(data.regiment.id);
+        for (let data of [
+            ...Object.values(this.transfers.officers),
+            ...Object.values(this.transfers.regiments),
+        ]) {
+            data.piece.location = data.from;
+            await india
+                .getArmy(`Presidency_${data.from.split('_')[2]}`)
+                .addPiece(data.piece.id);
         }
     }
     addCancelButton() {
@@ -6743,7 +6915,7 @@ class PresidencyDecideOrder {
     updateInterfaceInitialStep() {
         this.game.clearPossible();
         updatePageTitle(_('${you} must choose which is next to act'));
-        const board = Board.getInstance();
+        const board = Board$1.getInstance();
         if (this.args.trade) {
             addPrimaryActionButton({
                 id: 'trade_btn',
@@ -6770,12 +6942,12 @@ class PresidencyDecideOrder {
                 break;
             default:
         }
-        addConfirmButton(() => {
-            performAction('actPresidencyDecideOrder', {
+        addConfirmButton$1(() => {
+            performAction$1('actPresidencyDecideOrder', {
                 next,
             });
         });
-        addCancelButton();
+        addCancelButton$1();
     }
 }
 
@@ -6835,7 +7007,7 @@ class PresidencyTrade {
             callback: () => this.setMinSpendAmount(),
         });
         if (this.selectedRegionIds.length > 1) {
-            addCancelButton();
+            addCancelButton$1();
         }
         else {
             addPassButton(this.args.optionalAction);
@@ -6892,7 +7064,7 @@ class PresidencyTrade {
             number: this.spend,
             tradeLog: this.getTradeLog(),
         });
-        addConfirmButton(() => this.performAction(true));
+        addConfirmButton$1(() => this.performAction(true));
         this.addCancelButton();
     }
     getTradeLog() {
@@ -6910,7 +7082,7 @@ class PresidencyTrade {
         };
     }
     performAction(makeCheck = false) {
-        performAction('actPresidencyTrade', {
+        performAction$1('actPresidencyTrade', {
             selectedRegionIds: this.selectedRegionIds,
             spend: this.spend,
             makeCheck,
@@ -7006,7 +7178,7 @@ class PresidencyTradeFillOrders {
     updateInterfaceConfirm() {
         clearPossible();
         updatePageTitle(_('Fill orders: confirm?'));
-        addConfirmButton(() => this.performAction(true));
+        addConfirmButton$1(() => this.performAction(true));
         this.addCancelButton();
     }
     getAvailableOrderIds() {
@@ -7031,7 +7203,7 @@ class PresidencyTradeFillOrders {
     async returnPieces() {
     }
     performAction(makeCheck = false) {
-        performAction('actPresidencyTradeFillOrders', {
+        performAction$1('actPresidencyTradeFillOrders', {
             filledOrders: this.filledOrders,
         });
     }
@@ -7106,7 +7278,7 @@ class RevenuePayDividends {
             }),
             callback: () => this.updateInterfaceConfirm(),
         });
-        addCancelButton({
+        addCancelButton$1({
             extraClasses: this.selectedNumberOfDividends === 0 ? DISABLED : '',
         });
     }
@@ -7124,12 +7296,12 @@ class RevenuePayDividends {
                 tkn_pound: 'pound',
             });
         }
-        addConfirmButton(() => {
-            performAction('actRevenuePayDividends', {
+        addConfirmButton$1(() => {
+            performAction$1('actRevenuePayDividends', {
                 numberOfDividends: this.selectedNumberOfDividends,
             });
         });
-        addCancelButton();
+        addCancelButton$1();
     }
 }
 
@@ -7162,12 +7334,12 @@ class RevenueRoyalPardon {
     }
     updateInterfaceConfirm(next) {
         clearPossible();
-        addConfirmButton(() => {
-            performAction('actRevenueRoyalPardon', {
+        addConfirmButton$1(() => {
+            performAction$1('actRevenueRoyalPardon', {
                 next,
             });
         });
-        addCancelButton();
+        addCancelButton$1();
     }
 }
 
@@ -7215,11 +7387,11 @@ class SeekShare {
             tkn_pound: _('Pounds'),
             tkn_icon: SHARE,
         });
-        const callback = () => performAction('actSeekShare', {
+        const callback = () => performAction$1('actSeekShare', {
             position,
         });
-        addConfirmButton(callback);
-        addCancelButton();
+        addConfirmButton$1(callback);
+        addCancelButton$1();
     }
 }
 
@@ -7260,10 +7432,12 @@ class Game {
             EnlistWriter,
             EventsInIndiaCrisisDefense,
             FamilyAction,
+            HiringHireFamilyMember,
             LondonSeasonChooseCard,
             LondonSeasonRetire,
             ManagerOfShipping,
             MilitaryAffairsAssign,
+            MilitaryAffairsAssignCommander,
             MilitaryAffairsTransfers,
             ParliamentMeets,
             PlayerTurn,
@@ -7403,7 +7577,7 @@ class Game {
         this.notificationManager = new NotificationManager(this);
         Negotiation.create(this);
         Families.create(this);
-        Board.create(this);
+        Board$1.create(this);
         Company.create(this);
         London.create(this);
         India$1.create(this);

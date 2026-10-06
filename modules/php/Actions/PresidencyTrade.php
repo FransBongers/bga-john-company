@@ -28,6 +28,37 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
     return ST_PRESIDENCY_TRADE;
   }
 
+  // ..######..########....###....########.########
+  // .##....##....##......##.##......##....##......
+  // .##..........##.....##...##.....##....##......
+  // ..######.....##....##.....##....##....######..
+  // .......##....##....#########....##....##......
+  // .##....##....##....##.....##....##....##......
+  // ..######.....##....##.....##....##....########
+
+  // ....###.....######..########.####..#######..##....##
+  // ...##.##...##....##....##.....##..##.....##.###...##
+  // ..##...##..##..........##.....##..##.....##.####..##
+  // .##.....##.##..........##.....##..##.....##.##.##.##
+  // .#########.##..........##.....##..##.....##.##..####
+  // .##.....##.##....##....##.....##..##.....##.##...###
+  // .##.....##..######.....##....####..#######..##....##
+
+
+  public function stPresidencyTrade()
+  {
+    $stateArgs = $this->argsPresidencyTrade();
+    $args = $this->ctx->getArgs();
+    if ($stateArgs['skipOnEnteringState']) {
+      if ($args['first'] ?? false) {
+        Notifications::message('${player_name} cannot perform a Trade action', [
+          'player' => Players::get($args['presidentPlayerId'])
+        ]);
+      }
+      $this->resolveAction(['automatic' => true]);
+    }
+  }
+
   // ....###....########...######....######.
   // ...##.##...##.....##.##....##..##....##
   // ..##...##..##.....##.##........##......
@@ -38,16 +69,19 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
 
   public function argsPresidencyTrade()
   {
-    $info = $this->ctx->getInfo();
+    $args = $this->ctx->getArgs();
 
-    $office = Offices::get($info['officeId']);
+    $office = Offices::get($args['officeId']);
 
     $treasury = $office->getTreasury();
 
+    $options = $this->getOrderOptions($office);
+
     $data = [
       'treasury' => $treasury,
-      'options' => $this->getOrderOptions($office),
-      'officeId' => $info['officeId'],
+      'options' => $options,
+      'officeId' => $args['officeId'],
+      'skipOnEnteringState' => count($options['regions']) === 0 || $treasury === 0,
     ];
 
     return $data;
@@ -96,7 +130,7 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
     }
 
     // All regions need to be withing range
-    foreach($selectedRegionIds as $regionId) {
+    foreach ($selectedRegionIds as $regionId) {
       $region = Utils::array_find($stageArgs['options']['regions'], function ($region) use ($regionId) {
         return $region->getId() === $regionId;
       });
@@ -176,7 +210,7 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
     return true;
   }
 
-    // .########.##....##..######...####.##....##.########
+  // .########.##....##..######...####.##....##.########
   // .##.......###...##.##....##...##..###...##.##......
   // .##.......####..##.##.........##..####..##.##......
   // .######...##.##.##.##...####..##..##.##.##.######..
@@ -192,7 +226,8 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
 
   public function isDoable(Player $player): bool
   {
-    return true;
-  }
+    $stateArgs = $this->argsPresidencyTrade();
 
+    return !$stateArgs['skipOnEnteringState'];
+  }
 }

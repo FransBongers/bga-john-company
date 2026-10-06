@@ -20,9 +20,16 @@ use Bga\Games\JohnCompany\Models\Office;
 
 class TradeRoutes
 {
-  public static function getOrdersForTradeRoute($homePortOrderId, $maxCount, $regionIds = null)
+  public static function getOrdersForTradeRoute(string $homePortOrderId, int $maxCount, ?array $regionIds = null)
   {
     $orders = Orders::getAll();
+
+    if ($orders[$homePortOrderId]->getStatus() !== OPEN) {
+      return [
+        'orders' => [],
+        'regions' => [],
+      ];
+    }
 
     $visited = [
       $homePortOrderId => 1,

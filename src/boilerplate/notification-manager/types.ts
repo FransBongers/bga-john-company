@@ -97,7 +97,7 @@ export interface NotifMoveCompanyBalance {
 
 export interface NotifMoveCompanyDebt {
   companyDebt: number;
-  companyBalance?: number;
+  companyBalance: number | undefined;
 }
 
 export interface NotifMoveCompanyStanding {

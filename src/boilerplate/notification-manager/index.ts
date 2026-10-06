@@ -6,7 +6,6 @@
 //  .##...###.##.....##....##.....##..##......
 //  .##....##..#######.....##....####.##......
 
-import { Board } from '../../board';
 import { EnterpriseCardsManager } from '../../cards/enterprise-cards';
 import { LondonSeasonCardsManager } from '../../cards/london-season-cards';
 import { tplOfficeCard } from '../../cards/office-cards';
@@ -24,8 +23,6 @@ import {
   FILLED,
   SHIPS_COUNTER,
   SHARES_COUNTER,
-  EXTRA_SHIP,
-  COMPANY_SHIP,
   CROWN_PLAYER_ID,
   PROMISE_CUBES_COUNTER,
   COLOR_FAMILY_MAP,
@@ -421,10 +418,8 @@ export class NotificationManager {
   async notif_allocateBalanceToOffice(notif: NotifAllocateBalanceToOffice) {
     const { companyBalance, officeTreasury, officeId } = notif;
 
-    const board = Board.getInstance();
-    board.treasuries[officeId].toValue(officeTreasury);
-
-    await board.movePawn('balance', companyBalance);
+    Company.getInstance().treasuries[officeId].toValue(officeTreasury);
+    Company.getInstance().balance.toValue(companyBalance);
   }
 
   async notif_changeOrderStatus(notif: NotifChangeOrderStatus) {
@@ -554,20 +549,17 @@ export class NotificationManager {
 
   async notif_moveCompanyDebt(notif: NotifMoveCompanyDebt) {
     const { companyBalance, companyDebt } = notif;
-    const board = Board.getInstance();
-    const promises = [board.movePawn('debt', companyDebt)];
-    if (companyBalance) {
-      promises.push(board.movePawn('balance', companyBalance));
-    }
 
-    await Promise.all(promises);
+    if (companyBalance !== undefined) {
+      Company.getInstance().balance.toValue(companyBalance);
+    }
+    Company.getInstance().updateCompanyDebt(companyDebt);
   }
 
   async notif_moveCompanyStanding(notif: NotifMoveCompanyStanding) {
     const { companyStanding } = notif;
-    const board = Board.getInstance();
 
-    await board.movePawn('standing', companyStanding);
+    Company.getInstance().updateCompanyStanding(companyStanding);
   }
 
   async notif_moveFamilyMember(notif: NotifMoveFamilyMember) {
@@ -629,11 +621,13 @@ export class NotificationManager {
 
   async notif_moveOfficeCard(notif: NotifMoveOfficeCard) {
     const { office } = notif;
-    let element = document.getElementById(`${office.id}OfficeCard`);
+    let element = document.getElementById(`OfficeCard_${office.id}`);
     if (!element) {
       element = createHtmlElement(tplOfficeCard(office));
     }
+    console.log('officeCard', element);
     const locationElt = document.getElementById(office.location);
+    console.log('location', locationElt);
     locationElt.appendChild(element);
   }
 
@@ -791,10 +785,6 @@ export class NotificationManager {
     const { familyId, location, id } = familyMember;
     await this.pay(playerId, amount);
 
-    // await Board.getInstance().placeFamilyMembers(
-    //   [familyMember],
-    //   this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER],
-    // );
     const fromElement = this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER];
     const toElement = document.getElementById(location)!;
 
@@ -824,7 +814,7 @@ export class NotificationManager {
 
   async notif_setupFamilyMembers(notif: NotifSetupFamilyMembers) {
     const { familyMembers, playerId } = notif;
-    await Board.getInstance().placeFamilyMembers(
+    await this.placeFamilyMembers(
       familyMembers,
       this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER],
     );

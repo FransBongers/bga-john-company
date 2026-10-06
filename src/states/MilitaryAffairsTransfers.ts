@@ -32,16 +32,16 @@ interface OnEnteringMilitaryAffairsTransfersArgs extends CommonStateArgs {
       { regiment: JocoArmyPieceBase; locations: string[] }
     >;
   };
-  transfers: {
-    regiments: Record<
-      string,
-      { regiment: JocoArmyPieceBase; from: string; to: string }
-    >;
-    officers: Record<
-      string,
-      { officer: JocoFamilyMember; from: string; to: string }
-    >;
-  } | null;
+  // transfers: {
+  //   regiments: Record<
+  //     string,
+  //     { regiment: JocoArmyPieceBase; from: string; to: string }
+  //   >;
+  //   officers: Record<
+  //     string,
+  //     { officer: JocoFamilyMember; from: string; to: string }
+  //   >;
+  // } | null;
 }
 
 export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAffairsTransfersArgs> {
@@ -50,11 +50,11 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
   private transfers: {
     regiments: Record<
       string,
-      { regiment: JocoArmyPieceBase; from: string; to: string }
+      { piece: JocoArmyPieceBase; from: string; to: string }
     >;
     officers: Record<
       string,
-      { officer: JocoFamilyMember; from: string; to: string }
+      { piece: JocoFamilyMember; from: string; to: string }
     >;
   };
 
@@ -71,7 +71,7 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
   onEnteringState(args: OnEnteringMilitaryAffairsTransfersArgs) {
     debug('Entering MilitaryAffairsTransfers state');
     this.args = args;
-    this.transfers = args.transfers ?? {
+    this.transfers = {
       officers: {},
       regiments: {},
     };
@@ -87,12 +87,9 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
     activePlayerIds: number,
     args: OnEnteringMilitaryAffairsTransfersArgs,
   ) {
-    updatePageTitle(
-      _('${tkn_playerName} may make Army transfers'),
-      {
-        tkn_playerName: getPlayerName(activePlayerIds[0]),
-      },
-    );
+    updatePageTitle(_('${tkn_playerName} may make Army transfers'), {
+      tkn_playerName: getPlayerName(activePlayerIds[0]),
+    });
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########
@@ -131,14 +128,14 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
       if (this.transfers.regiments[id]) {
         return;
       }
-      onClick(id, () =>
-        this.updateInterfaceSelectArmyForRegiment(data),
-      );
+      onClick(id, () => this.updateInterfaceSelectArmy(data));
     });
-
-    // Object.entries(this.args.options.ships).forEach(([id, data]) =>
-    //   onClick(board.ships[id], () => this.updateInterfaceSelectSeaZone(data))
-    // );
+    Object.entries(this.args.options.officers).forEach(([id, data]) => {
+      if (this.transfers.officers[id]) {
+        return;
+      }
+      onClick(id, () => this.updateInterfaceSelectArmy(data));
+    });
 
     if (this.getTransferCount() > 0) {
       addPrimaryActionButton({
@@ -152,30 +149,36 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
     }
   }
 
-  private updateInterfaceSelectArmyForRegiment({
+  private updateInterfaceSelectArmy({
+    familyMember,
     regiment,
     locations,
   }: {
-    regiment: JocoArmyPieceBase;
+    familyMember?: JocoFamilyMember;
+    regiment?: JocoArmyPieceBase;
     locations: string[];
   }) {
     clearPossible();
 
-
-    setSelected(regiment.id);
+    setSelected(regiment?.id ?? familyMember.id);
+    const id = regiment?.id ?? familyMember.id;
+    const type = regiment ? 'regiments' : 'officers';
+    const piece = regiment ?? familyMember;
 
     locations.forEach((to) => {
       const regionId = to.split('_')[2];
       onClick(`ArmyOfPresidency_${regionId}`, async () => {
-        const from = regiment.location;
-        this.transfers.regiments[regiment.id] = {
-          regiment,
+        const from = regiment ? regiment.location : familyMember.location;
+        this.transfers[type][id] = {
+          piece,
           from,
           to,
         };
-        regiment.location = to;
+        piece.location = to;
         clearPossible();
-        await India.getInstance().getArmy(`Presidency_${regionId}`).addPiece(regiment.id);
+        await India.getInstance()
+          .getArmy(`Presidency_${regionId}`)
+          .addPiece(piece.id);
         this.updateInterfaceInitialStep();
       });
     });
@@ -183,41 +186,28 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
     this.addCancelButton();
   }
 
-  // private updateInterfaceSelectSeaZone({
-  //   ship,
-  //   locations,
-  // }: {
-  //   ship: JocoShipBase;
-  //   locations: string[];
-  // }) {
-  //   clearPossible();
-  //   const board = Board.getInstance();
-  //   setSelected(board.ships[ship.id]);
-
-  //   locations.forEach((seaZone) => {
-  //     onClick(board.selectBoxes[seaZone], async () => {
-  //       clearPossible();
-  //       const from = ship.location;
-  //       ship.location = seaZone;
-  //       this.transfers.ships[ship.id] = {
-  //         from,
-  //         to: seaZone,
-  //         ship,
-  //       };
-  //       await board.moveShip({ ship, from });
-  //       this.updateInterfaceInitialStep();
-  //     });
-  //   });
-  //   this.addCancelButton();
-  // }
-
   private updateInterfaceConfirm() {
     clearPossible();
     updatePageTitle(_('Confirm transfers'));
 
     addConfirmButton(() => {
       performAction('actMilitaryAffairsTransfers', {
-        transfers: this.transfers,
+        transfers: {
+          officers: Object.entries(this.transfers.officers).reduce(
+            (acc, [id, { to }]) => {
+              acc[id] = to;
+              return acc;
+            },
+            {},
+          ),
+          regiments: Object.entries(this.transfers.regiments).reduce(
+            (acc, [id, { to }]) => {
+              acc[id] = to;
+              return acc;
+            },
+            {},
+          ),
+        },
       });
     });
     this.addCancelButton();
@@ -240,9 +230,15 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
 
   private async returnPieces() {
     const india = India.getInstance();
-    for (let data of Object.values(this.transfers.regiments)) {
-      data.regiment.location = data.from;
-      await india.getArmy(`Presidency_${data.from.split('_')[2]}`).addPiece(data.regiment.id);
+
+    for (let data of [
+      ...Object.values(this.transfers.officers),
+      ...Object.values(this.transfers.regiments),
+    ]) {
+      data.piece.location = data.from;
+      await india
+        .getArmy(`Presidency_${data.from.split('_')[2]}`)
+        .addPiece(data.piece.id);
     }
   }
 

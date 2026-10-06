@@ -104,7 +104,7 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
   {
     $playerId = $this->checkPlayer();
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
-    $this->resolveAction(PASS);
+    $this->resolveAction(PASS, true);
   }
 
   public function actCommanderDeploy($args)

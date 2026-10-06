@@ -117,6 +117,7 @@
       .joco-court-of-directors-family-members {
         display: flex;
         flex-direction: row;
+        flex-wrap: wrap;
         gap: 4px;
         min-height: 100px;
       }

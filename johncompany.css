@@ -973,6 +973,7 @@ span[style*="color:#addb90"] {
 #joco-company .joco-court-of-directors-container #joco-court-of-directors .joco-court-of-directors-family-members {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   gap: 4px;
   min-height: 100px;
 }
@@ -3163,6 +3164,9 @@ span[style*="color:#c0c0c0"] {
   outline: 3px double black;
   border-radius: 5px;
 }
+#joco-india #joco-india-map .joco-family-member {
+  height: 65px;
+}
 #joco-india #joco-india-map .joco-order {
   position: absolute;
   border-radius: 50%;
@@ -3175,9 +3179,6 @@ span[style*="color:#c0c0c0"] {
   opacity: 0;
   position: absolute;
   transition: visibility 0s ease-out, opacity 0.3s linear;
-}
-#joco-india #joco-india-map .joco-order .joco-family-member {
-  height: 65px;
 }
 #joco-india #joco-india-map .joco-order .joco-order-value {
   position: absolute;

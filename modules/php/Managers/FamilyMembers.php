@@ -98,13 +98,13 @@ class FamilyMembers extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   }
 
   // TODO: writers on orders?
-  public static function getWriters($regionId = null)
+  public static function getWriters($presidencyId = null)
   {
     $allMembers = self::getAll()->toArray();
-    return Utils::filter($allMembers, function ($familyMember) use ($regionId) {
+    return Utils::filter($allMembers, function ($familyMember) use ($presidencyId) {
       $location = $familyMember->getLocation();
-      if ($regionId !== null) {
-        return $location === Locations::writers($regionId);
+      if ($presidencyId !== null) {
+        return $location === Locations::writers($presidencyId);
       } 
       return Utils::startsWith($location,'Writers_');
     });
@@ -114,7 +114,7 @@ class FamilyMembers extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   {
     $allMembers = self::getAll()->toArray();
     return Utils::filter($allMembers, function ($familyMember) {
-      return Utils::startsWith($familyMember->getLocation(),'Officers_');
+      return Utils::startsWith($familyMember->getLocation(),'army_');
     });
   }
 }

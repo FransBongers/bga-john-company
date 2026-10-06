@@ -1,8 +1,14 @@
 import { createHtmlElement } from '../../boilerplate';
 import { PRESIDENCIES } from '../../constants';
 import { BgaCards } from '../../libs copy';
+import { createFamilyMember } from '../../templates';
 import { ControlTokensManager } from '../../token-managers/control-tokens';
-import { JocoRegionBase, GameAlias, JocoControlToken } from '../../types';
+import {
+  JocoRegionBase,
+  GameAlias,
+  JocoControlToken,
+  JocoFamilyMember,
+} from '../../types';
 import { createControlToken } from '../../utility';
 import { CONTROL_TOKEN_STOCK_CONFIG, TOWER_CONFIG } from './config';
 import {
@@ -29,10 +35,10 @@ export class Region {
     data: JocoRegionBase,
   ) {
     this.data = data;
-    this.setup(data);
+    this.setup(data, game);
   }
 
-  private setup(data: JocoRegionBase) {
+  private setup(data: JocoRegionBase, game: GameAlias) {
     const map = document.getElementById('joco-india-map');
     // Tower
     const elt = (this.tower = document.createElement('div'));
@@ -73,6 +79,7 @@ export class Region {
     this.updateCapital(data.isCapital);
     this.updateEmpire(data.isCapital, data.control);
     this.updateCompanyControl(data);
+    this.updateFamilyMembers(Object.values(game.gamedatas.familyMembers));
   }
 
   public update(region: JocoRegionBase) {
@@ -161,6 +168,17 @@ export class Region {
   public updateUnrest(value: number) {
     this.data.unrest = value;
     // TODO: implementation
+  }
+
+  private updateFamilyMembers(familyMembers: JocoFamilyMember[]) {
+    const location = `GovernorOf${this.data.id}`;
+    const governor = familyMembers.find(
+      (member) => member.location === location,
+    );
+    if (governor) {
+      const elt = createFamilyMember(governor.familyId, governor.id);
+      document.getElementById(location)?.appendChild(elt);
+    }
   }
 
   public hasControlToken(token: JocoControlToken) {

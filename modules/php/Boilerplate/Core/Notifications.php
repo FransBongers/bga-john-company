@@ -282,26 +282,36 @@ class Notifications
     return isset($idNameMap[$regionId]) ? $idNameMap[$regionId] : 'Unmapped region';
   }
 
-  private static function getLocationNameForFamilyMember(string $location)
+  public static function getLocationNameForFamilyMember(string $location)
   {
     // TODO: this needs to be used for more than just the current locations, potentially all locations for family members?
     $locationNameMap = [
       BENGAL_WRITERS  => clienttranslate('Bengal'),
       BOMBAY_WRITERS => clienttranslate('Bombay'),
       MADRAS_WRITERS => clienttranslate('Madras'),
-      Locations::armyOfReady(BENGAL_PRESIDENCY) => clienttranslate('army of Bengal'),
-      Locations::armyOfReady(BOMBAY_PRESIDENCY) => clienttranslate('army of Bombay'),
-      Locations::armyOfReady(MADRAS_PRESIDENCY) => clienttranslate('army of Madras'),
-      Locations::armyOfExhausted(BENGAL_PRESIDENCY) => clienttranslate('army of Bengal'),
-      Locations::armyOfExhausted(BOMBAY_PRESIDENCY) => clienttranslate('army of Bombay'),
-      Locations::armyOfExhausted(MADRAS_PRESIDENCY) => clienttranslate('army of Madras'),
-      OFFICER_IN_TRAINING => clienttranslate('officers-in-training'),
+      Locations::armyOfReady(BENGAL_PRESIDENCY) => clienttranslate('Army of Bengal'),
+      Locations::armyOfReady(BOMBAY_PRESIDENCY) => clienttranslate('Army of Bombay'),
+      Locations::armyOfReady(MADRAS_PRESIDENCY) => clienttranslate('Army of Madras'),
+      Locations::armyOfExhausted(BENGAL_PRESIDENCY) => clienttranslate('Army of Bengal'),
+      Locations::armyOfExhausted(BOMBAY_PRESIDENCY) => clienttranslate('Army of Bombay'),
+      Locations::armyOfExhausted(MADRAS_PRESIDENCY) => clienttranslate('Army of Madras'),
+      OFFICER_IN_TRAINING => clienttranslate('Officers-in-training'),
       PENSIONERS => clienttranslate('Pensioners'),
     ];
     if (!isset($locationNameMap[$location])) {
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_021: " . $location);
     }
     return $locationNameMap[$location];
+  }
+
+  public static function getArmyNameForPresidency(string $presidencyId)
+  {
+    $armyNameMap = [
+      BENGAL_PRESIDENCY => clienttranslate('Army of Bengal'),
+      BOMBAY_PRESIDENCY => clienttranslate('Army of Bombay'),
+      MADRAS_PRESIDENCY => clienttranslate('Army of Madras'),
+    ];
+    return isset($armyNameMap[$presidencyId]) ? $armyNameMap[$presidencyId] : 'Unmapped army';
   }
 
   // ..######......###....##.....##.########
@@ -518,7 +528,7 @@ class Notifications
     self::notifyAll('elephantMarch', $text, $args);
   }
 
-  public static function emergencyLoans($companyDebt, $numberOfEmergencyLoans, $remainingExpenses)
+  public static function emergencyLoans(int $companyDebt, int $numberOfEmergencyLoans, int $remainingExpenses)
   {
     self::notifyAll('moveCompanyDebt', clienttranslate('The Company must take ${number} emergency loan(s) to cover remaining ${tkn_boldText_amount} ${tkn_pound} of expenses'), [
       'tkn_boldText_amount' => $remainingExpenses,
@@ -595,18 +605,16 @@ class Notifications
     ]);
   }
 
-  public static function moveOfficeCard(Player $player, Office $office)
+  public static function moveOfficeCard(Player $player, Office $office, string $text, array $textArgs)
   {
-    $text = clienttranslate('${player_name} adds ${tkn_boldText_title} to Vacant Offices');
-    self::notifyAll('moveOfficeCard', $text, [
+
+    self::notifyAll('moveOfficeCard', $text, array_merge($textArgs, [
       'player' => $player,
-      'tkn_boldText_title' => $office->getTitle(),
       'office' => $office->jsonSerialize(),
-      'i18n' => ['tkn_boldText_title'],
-    ]);
+    ]));
   }
 
-  public static function nextPhase($phase)
+  public static function nextPhase(string $phase)
   {
     $phaseNameMap = [
       FAMILY => clienttranslate('Family phase'),
@@ -919,18 +927,29 @@ class Notifications
     ]);
   }
 
-  public static function moveFamilyMember(Player $player, FamilyMember $familyMember, string | null $from)
+  public static function moveFamilyMember(Player $player, FamilyMember $familyMember, array $options = [])
   {
-    $text = $from !== null ? clienttranslate('${player_name} moves ${tkn_familyMember} from ${tkn_boldText_from} to ${tkn_boldText_to}') : clienttranslate('${player_name} moves ${tkn_familyMember} to ${tkn_boldText_to}');
+    $from = $options['from'] ?? null;
+    $text = $options['text'] ?? null;
+    $textArgs = $options['textArgs'] ?? [];
 
-    self::notifyAll('moveFamilyMember', $text, [
+    if ($text === null) {
+      $text = $from !== null ?
+        clienttranslate('${player_name} moves ${tkn_familyMember} from ${tkn_boldText_from} to ${tkn_boldText_to}') :
+        clienttranslate('${player_name} moves ${tkn_familyMember} to ${tkn_boldText_to}');
+
+      $textArgs = [
+        'tkn_boldText_from' => $from !== null ? self::getLocationNameForFamilyMember($from) : '',
+        'tkn_boldText_to' => self::getLocationNameForFamilyMember($familyMember->getLocation()),
+        'i18n' => ['tkn_boldText_from', 'tkn_boldText_to'],
+      ];
+    }
+
+    self::notifyAll('moveFamilyMember', $text, array_merge($textArgs, [
       'player' => $player,
       'familyMember' => $familyMember->jsonSerialize(),
       'tkn_familyMember' => self::tknFamilyMember($familyMember),
-      'tkn_boldText_from' => $from !== null ? self::getLocationNameForFamilyMember($from) : '',
-      'tkn_boldText_to' => self::getLocationNameForFamilyMember($familyMember->getLocation()),
-      'i18n' => ['tkn_boldText_from', 'tkn_boldText_to'],
-    ]);
+    ]));
   }
 
   public static function moveLondonSeasonCard(Player $player, LondonSeasonCard $card, string | null $from)

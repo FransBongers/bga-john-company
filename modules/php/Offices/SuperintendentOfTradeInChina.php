@@ -2,6 +2,9 @@
 
 namespace Bga\Games\JohnCompany\Offices;
 
+use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\Offices;
+
 class SuperintendentOfTradeInChina extends \Bga\Games\JohnCompany\Models\Office
 {
   public function __construct($row)
@@ -12,4 +15,13 @@ class SuperintendentOfTradeInChina extends \Bga\Games\JohnCompany\Models\Office
     $this->hirePriority = 8;
   }
 
+  public function getCandidatesForHiring(): array
+  {
+    return FamilyMembers::getWriters();
+  }
+
+  public function getHiringPlayerId(): int | null
+  {
+    return Offices::get(CHAIRMAN)->getPlayerId();
+  }
 }

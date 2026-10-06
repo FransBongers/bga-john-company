@@ -5,7 +5,7 @@ import { tplTrophyIcon } from '../icons/templates';
 import { tplLocalAlliance } from '../india/army/templates';
 import { StaticData } from '../static-data';
 import { tplShipContent } from '../token-managers/ship-tokens/templates';
-import { JocoShipBase } from '../types';
+import { JocoFamilyMember, JocoShipBase } from '../types';
 
 export const tlpLogTokenText = ({
   text,
@@ -90,3 +90,9 @@ export const tknShipValue = ({
 };
 
 export const tknPromiseCubes = () => 'Promise Cube(s)';
+
+  export const tknFamilyMember = (familyMember: JocoFamilyMember) => {
+    const number = parseInt(familyMember.id.split('_')[2], 10) % 18;
+
+    return [familyMember.familyId, number].join(':');
+  };

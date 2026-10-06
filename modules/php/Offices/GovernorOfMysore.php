@@ -2,7 +2,7 @@
 
 namespace Bga\Games\JohnCompany\Offices;
 
-class GovernorOfMysore extends \Bga\Games\JohnCompany\Models\Office
+class GovernorOfMysore extends \Bga\Games\JohnCompany\Offices\Governor
 {
   public function __construct($row)
   {
@@ -10,6 +10,7 @@ class GovernorOfMysore extends \Bga\Games\JohnCompany\Models\Office
     $this->id = GOVERNOR_OF_MYSORE;
     $this->title = clienttranslate('Governor of Mysore');
     $this->hirePriority = 16;
+    $this->regionId = MYSORE;
   }
 
 }

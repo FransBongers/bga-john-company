@@ -210,12 +210,17 @@ trait TurnTrait
   function stSetupHiring()
   {
     $this->updatePhase(HIRING);
-    Notifications::message(clienttranslate('No open positions'), []);
-    /**
-     * TODO: setup Engine if there are vacant offices,
-     * otherwise Notif that there are no vacant offices
-     */
-    $this->stSetupChairman();
+
+    $node = [
+      'children' => [
+        [
+          'action' => HIRING_CHECK_VACANT_OFFICES,
+        ],
+      ],
+    ];
+
+    Engine::setup($node, ['method' => 'stSetupChairman']);
+    Engine::proceed();
   }
 
   // ..######...#######..##.....##.########.....###....##....##.##....##
@@ -402,7 +407,25 @@ trait TurnTrait
           'action' => MILITARY_AFFAIRS_ASSIGN,
           'playerId' => 'some',
           'activePlayerIds' => [$playerId],
-        ]
+        ],
+        [
+          'action' => MILITARY_AFFAIRS_CHECK_COMMANDER,
+          'args' => [
+            'presidencyId' => BOMBAY_PRESIDENCY,
+          ]
+        ],
+        [
+          'action' => MILITARY_AFFAIRS_CHECK_COMMANDER,
+          'args' => [
+            'presidencyId' => MADRAS_PRESIDENCY,
+          ]
+        ],
+        [
+          'action' => MILITARY_AFFAIRS_CHECK_COMMANDER,
+          'args' => [
+            'presidencyId' => BENGAL_PRESIDENCY,
+          ]
+        ],
       ],
     ];
 
@@ -718,13 +741,19 @@ trait TurnTrait
 
     // TODO: check if there is a president?:
     $requiredChoiceCount = 1;
+    $presidentPlayerId = $presidentOffice->getPlayerId();
     $children = [
       [
         'action' => PRESIDENCY_TRADE,
         'playerId' => 'some',
         'optional' => true,
-        'activePlayerIds' => [$presidentOffice->getPlayerId()],
-        'officeId' => $presidentOffice->getId(),
+        'activePlayerIds' => [$presidentPlayerId],
+        'args' => [
+          'officeId' => $presidentOffice->getId(),
+          'presidencyId' => $presidencyId,
+          'first' => true,
+          'presidentPlayerId' => $presidentPlayerId
+        ],
       ],
 
     ];

@@ -14,9 +14,9 @@ class Locations
     return 'army_' . $regionId . '_exhausted';
   }
 
-  public static function commander(string $presidencyId)
+  public static function commander(string $regionId)
   {
-    return 'Commander_' . $presidencyId;
+    return 'Commander_' . $regionId;
   }
 
   public static function draft(string $familyId)

@@ -4,6 +4,7 @@ import {
   WEST_INDIAN,
   CHINA,
   CROWN_PLAYER_ID,
+  MADRAS_PRESIDENCY,
   BENGAL,
   BOMBAY,
   DELHI,
@@ -13,6 +14,8 @@ import {
   MYSORE,
   PUNJAB,
   FATIGUED,
+  BENGAL_PRESIDENCY,
+  BOMBAY_PRESIDENCY,
 } from './constants';
 import { tknShipValue } from './logs/templates';
 import { PlayerManager } from './player-manager';
@@ -31,6 +34,19 @@ import {
   JocoRegionBase,
   JocoShipBase,
 } from './types';
+
+export const getArmyNameForPresidency = (presidencyId: string) => {
+  switch (presidencyId) {
+    case BENGAL_PRESIDENCY:
+      return _('Army of Bengal');
+    case BOMBAY_PRESIDENCY:
+      return _('Army of Bombay');
+    case MADRAS_PRESIDENCY:
+      return _('Army of Madras');
+    default:
+      return '';
+  }
+};
 
 export const getSeaName = (seaId: string) => {
   switch (seaId) {

@@ -63,7 +63,7 @@ class MilitaryAffairsTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
     }
 
     $regiments = ArmyPieces::getRegimentsInArmies();
-    
+
     /**
      * For each regiments, options are the other two presidencies
      */
@@ -119,8 +119,16 @@ class MilitaryAffairsTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
 
     $player = Players::get($playerId);
 
-    foreach ($regimentTransfers as $regimentId => $data) {
-      $to = $data->to;
+    foreach ($officerTransfers as $officerId => $to) {
+
+      if (!(isset($stateArgs['options']['officers'][$officerId]) && in_array($to, $stateArgs['options']['officers'][$officerId]['locations']))) {
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_018");
+      }
+      $officer = $stateArgs['options']['officers'][$officerId]['familyMember'];
+      $officer->moveTo($player, $to);
+    }
+
+    foreach ($regimentTransfers as $regimentId => $to) {
       if (!(isset($stateArgs['options']['regiments'][$regimentId]) && in_array($to, $stateArgs['options']['regiments'][$regimentId]['locations']))) {
         throw new \Bga\GameFramework\VisibleSystemException("ERROR_018");
       }

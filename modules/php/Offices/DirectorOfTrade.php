@@ -2,6 +2,9 @@
 
 namespace Bga\Games\JohnCompany\Offices;
 
+use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\Offices;
+
 class DirectorOfTrade extends \Bga\Games\JohnCompany\Models\Office
 {
   public function __construct($row)
@@ -12,4 +15,14 @@ class DirectorOfTrade extends \Bga\Games\JohnCompany\Models\Office
     $this->hirePriority = 2;
   }
 
+  public function getCandidatesForHiring(): array
+  {
+    $candidates = $this->getOfficeholderCandidates([CHAIRMAN, GOVERNOR_GENERAL], true);
+    return count($candidates) > 0 ? $candidates : FamilyMembers::getWriters();
+  }
+
+  public function getHiringPlayerId(): int | null
+  {
+    return Offices::get(CHAIRMAN)->getPlayerId();
+  }
 }

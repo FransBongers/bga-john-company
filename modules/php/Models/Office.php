@@ -6,6 +6,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
 
 class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
@@ -93,6 +94,11 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     return $familyId === null ? null : Families::get($familyId);
   }
 
+  public function isInPlay()
+  {
+    return $this->getLocation() !== DECK;
+  }
+
   public function returnFamilyMemberToSupply()
   {
     $familyMember = FamilyMembers::get($this->familyMemberId);
@@ -111,11 +117,46 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
 
   public function moveToVacantOffices(Player $player)
   {
-    if($this->getFamilyMemberId() !== null) {
+    if ($this->getFamilyMemberId() !== null) {
       $this->setFamilyMemberId(null);
       // $this->returnFamilyMemberToSupply();
     }
     $this->setLocation(Locations::vacantOffices());
-    Notifications::moveOfficeCard($player, $this);
+
+    Notifications::moveOfficeCard($player, $this, clienttranslate('${player_name} adds ${tkn_boldText_title} to Vacant Offices'), [
+      'tkn_boldText_title' => $this->getTitle(),
+      'i18n' => ['tkn_boldText_title'],
+    ]);
+  }
+
+
+  protected function getOfficeholderCandidates(array $excludedOfficeIds = [], bool $excludeGovernors = false): array
+  {
+    $candidates = [];
+    foreach (Offices::getAll() as $office) {
+      if (in_array($office->getId(), $excludedOfficeIds, true)) {
+        continue;
+      }
+      if ($excludeGovernors && $office instanceof \Bga\Games\JohnCompany\Offices\Governor) {
+        continue;
+      }
+
+      $familyMember = $office->getFamilyMember();
+      if ($familyMember !== null) {
+        $candidates[] = $familyMember;
+      }
+    }
+    return $candidates;
+  }
+
+
+  public function getHiringPlayerId(): int | null
+  {
+    throw new \Bga\GameFramework\VisibleSystemException("OFFICE_01");
+  }
+
+  public function getCandidatesForHiring()
+  {
+    throw new \Bga\GameFramework\VisibleSystemException("OFFICE_02");
   }
 }

@@ -4,6 +4,8 @@ namespace Bga\Games\JohnCompany\Offices;
 
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\Offices;
+use Bga\Games\JohnCompany\Managers\Regions;
 
 class President extends \Bga\Games\JohnCompany\Models\Office
 {
@@ -15,7 +17,6 @@ class President extends \Bga\Games\JohnCompany\Models\Office
   public function __construct($row)
   {
     parent::__construct($row);
-
   }
 
   public function getPresidencyId()
@@ -45,5 +46,32 @@ class President extends \Bga\Games\JohnCompany\Models\Office
       return $commander[0];
     }
     return null;
+  }
+
+  public function getCandidatesForHiring(): array
+  {
+    $candidates = FamilyMembers::getWriters($this->getPresidencyId());
+    foreach (Regions::getAll() as $region) {
+      if ($region->getControl() !== $this->getPresidencyId()) {
+        continue;
+      }
+
+      $governor = Offices::get($region->getGovernorOfficeId())->getFamilyMember();
+      if ($governor !== null) {
+        $candidates[] = $governor;
+      }
+    }
+    return $candidates;
+  }
+
+  public function getHiringPlayerId(): int | null
+  {
+
+    $directorOfTrade = Offices::get(DIRECTOR_OF_TRADE);
+    if ($directorOfTrade->isInPlay()) {
+      return $directorOfTrade->getPlayerId();
+    } else {
+      return Offices::get(GOVERNOR_GENERAL)->getPlayerId();
+    }
   }
 }
