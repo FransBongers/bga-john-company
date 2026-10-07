@@ -6,6 +6,10 @@ import {
 } from './constants';
 import { PlayerManager } from './player-manager';
 
+export const tplCube = (type: 'unrest' | 'promise', extraClasses: string = '') => `
+  <div class="joco-cube ${extraClasses}" data-type="${type}"></div>
+`;
+
 export const tplPlayArea = () => `
   <div id="joco-play-area">
     <div id="joco"></div>

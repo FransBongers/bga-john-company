@@ -17,7 +17,7 @@ import {
   // tplLogTokenIcon,
   tplLogTokenElephant,
   tplLogTokenPound,
-  tplLogTokenPromiseCube,
+  tplLogTokenCube,
   tplLogTokenSetupCard,
   tplLogTokenStormDie,
   tplLogTokenPlayerName,
@@ -47,6 +47,7 @@ const LOG_TOKEN_SETUP_CARD = 'setupCard';
 const LOG_TOKEN_SHIP = 'ship';
 const LOG_TOKEN_STORM_DIE = 'stormDie';
 const LOG_TOKEN_TROPHY = 'trophy';
+const LOG_TOKEN_UNREST = 'unrest';
 const LOG_TOKEN_VICTORY_POINTS = 'victoryPoints';
 
 const CLASS_LOG_TOKEN = 'log-token';
@@ -100,7 +101,7 @@ export const getTokenDiv = ({
     case LOG_TOKEN_POUND:
       return tplLogTokenPound();
     case LOG_TOKEN_PROMISE_CUBE:
-      return tplLogTokenPromiseCube();
+      return tplLogTokenCube('promise');
     case LOG_TOKEN_REGIMENT:
       return createRegiment([CLASS_LOG_TOKEN]).outerHTML;
     case LOG_TOKEN_SETUP_CARD:
@@ -127,6 +128,8 @@ export const getTokenDiv = ({
             color: player.getColor(),
           })
         : value;
+    case LOG_TOKEN_UNREST:
+      return tplLogTokenCube('unrest');
     case LOG_TOKEN_VICTORY_POINTS:
       return tplVictoryPointsIcon(value, 'log-token');
     default:

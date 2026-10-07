@@ -11,6 +11,7 @@ class GovernorOfMadras extends \Bga\Games\JohnCompany\Offices\Governor
     $this->title = clienttranslate('Governor of Madras');
     $this->hirePriority = 10;
     $this->regionId = MADRAS;
+    $this->dicePool = 4;
   }
 
 }

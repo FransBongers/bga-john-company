@@ -158,6 +158,10 @@ export interface NotifPayFromTreasury extends NotifWithPlayerArgs {
   treasury: number;
 }
 
+export interface NotifPlaceRegiment extends NotifWithPlayerArgs {
+  regiment: JocoArmyPieceBase;
+}
+
 export interface NotifPlaceShip extends NotifWithPlayerArgs {
   ship: JocoShipBase;
 }

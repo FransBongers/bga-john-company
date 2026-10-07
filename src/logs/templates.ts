@@ -4,6 +4,7 @@ import { EXTRA_SHIP, FATIGUED } from '../constants';
 import { tplTrophyIcon } from '../icons/templates';
 import { tplLocalAlliance } from '../india/army/templates';
 import { StaticData } from '../static-data';
+import { tplCube } from '../templates';
 import { tplShipContent } from '../token-managers/ship-tokens/templates';
 import { JocoFamilyMember, JocoShipBase } from '../types';
 
@@ -46,8 +47,8 @@ export const tplLogTokenLocalAlliance = (id: string) => {
 export const tplLogTokenPound = () =>
   `<div class="log-token joco_pound"></div>`;
 
-export const tplLogTokenPromiseCube = () =>
-  '<div class="log-token joco-promise-cube"></div>';
+export const tplLogTokenCube = (type: 'unrest' | 'promise') =>
+  tplCube(type, 'log-token');
 
 export const tplLogTokenStormDie = (side: string) =>
   `<div class="log-token joco-storm-die" data-side="${side}"></div>`;

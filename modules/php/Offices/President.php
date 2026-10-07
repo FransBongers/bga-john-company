@@ -74,4 +74,21 @@ class President extends \Bga\Games\JohnCompany\Models\Office
       return Offices::get(GOVERNOR_GENERAL)->getPlayerId();
     }
   }
+
+  public function getAssociatedGovernorOffices()
+  {
+    $regions = Regions::getAll();
+    $governorOffices = [];
+    foreach ($regions as $region) {
+      if ($region->getControl() !== $this->getPresidencyId()) {
+        continue;
+      }
+      $governorOffice = Offices::get($region->getGovernorOfficeId());
+      $governorOffices[] = $governorOffice;
+    }
+
+    usort($governorOffices, fn($a, $b) => $a->getHirePriority() <=> $b->getHirePriority());
+
+    return $governorOffices;
+  }
 }

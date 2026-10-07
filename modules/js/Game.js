@@ -398,6 +398,9 @@ const PRIZES = {
     },
 };
 
+const tplCube = (type, extraClasses = '') => `
+  <div class="joco-cube ${extraClasses}" data-type="${type}"></div>
+`;
 const tplPlayArea = () => `
   <div id="joco-play-area">
     <div id="joco"></div>
@@ -406,7 +409,7 @@ const tplPlayArea = () => `
     </div>
   </div>
 `;
-const tplAmount$1 = (value, small = false) => `
+const tplAmount = (value, small = false) => `
   <div class="fb-font-baskerville joco-amount">
     <span class="${small ? 'fb-font-8' : 'fb-font-16'} joco-amount-pound">£</span><span class="${small ? 'fb-font-12' : 'fb-font-24'} joco-amount-value">${value}</span>
   </div>
@@ -559,7 +562,7 @@ const tplPlayerCounters = ({ crownInGame, familyId, playerId, }) => {
   <div id="joco-cash-${playerId}" class="log-token joco_pound"></div>
   <div id="joco-ships-${playerId}" class="joco-ship" data-type="playerOwnedShip"></div>
   ${crownInGame
-        ? `<div id="joco-promiseCubes-${playerId}" class="joco-promise-cube"></div>`
+        ? `<div id="joco-promiseCubes-${playerId}" class="joco-cube" data-type="promise"></div>`
         : '<div></div>'}
   <div class="joco-counter-container"><span id="joco-familyMembers-counter-${playerId}" class="joco-counter"></span></div>
   <div class="joco-counter-container"><span id="joco-cash-counter-${playerId}" class="joco-counter"></span></div>
@@ -851,7 +854,7 @@ const addConfirmButton$1 = (callback) => {
 const addDangerActionButton = (props) => {
     Interaction.use().addDangerActionButton(props);
 };
-const addPassButton = (optionalAction, text) => Interaction.use().addPassButton(optionalAction, text);
+const addPassButton$1 = (optionalAction, text) => Interaction.use().addPassButton(optionalAction, text);
 const addPlayerButton = (props) => Interaction.use().addPlayerButton(props);
 const addPrimaryActionButton = (props) => Interaction.use().addPrimaryActionButton(props);
 const addSecondaryActionButton = (props) => Interaction.use().addSecondaryActionButton(props);
@@ -1887,7 +1890,7 @@ const tplLocalAlliance = ({ id, extraClasses = '', presidencyId, name, strength,
       <div class="joco-strength-icon"></div>
     </div>
     <div class="joco-local-alliance-name bga-autofit"><span class="fb-font-baskerville">${_(name)}</span></div>
-    <div class="joco-icon" data-icon="CircleDark">${tplAmount$1(cost, true)}</div>
+    <div class="joco-icon" data-icon="CircleDark">${tplAmount(cost, true)}</div>
   </div>
 `;
 const tplArmyPiece = (piece) => {
@@ -1912,7 +1915,7 @@ const tplLogTokenLocalAlliance = (id) => {
     });
 };
 const tplLogTokenPound = () => `<div class="log-token joco_pound"></div>`;
-const tplLogTokenPromiseCube = () => '<div class="log-token joco-promise-cube"></div>';
+const tplLogTokenCube = (type) => tplCube(type, 'log-token');
 const tplLogTokenStormDie = (side) => `<div class="log-token joco-storm-die" data-side="${side}"></div>`;
 const tplLogTokenTrophy = () => tplTrophyIcon('log-token');
 const tplLogTokenSetupCard = (id) => `<div class="log-token joco-setup-card" data-card-id="${id}"></div>`;
@@ -2269,7 +2272,7 @@ const tplCompanyStanding = () => `
     return `
         <div class="joco-column">
           ${tplCompanySpotIcon(item.icon)(item.id)}
-          ${item.amount ? tplAmount$1(item.amount, true) : `<span class="fb-font-baskerville fb-font-semi-bold fb-font-8" style="margin-top: 4px;">${item.text ?? ''}</span>`}
+          ${item.amount ? tplAmount(item.amount, true) : `<span class="fb-font-baskerville fb-font-semi-bold fb-font-8" style="margin-top: 4px;">${item.text ?? ''}</span>`}
         </div>`;
 }).join('')}
     </div>
@@ -2772,7 +2775,7 @@ const tplControlTokenContent = (token, back = false) => {
     ${back ? '' : `<div class="joco-presidency-icon joco-inverted"></div>`}
     <div class="joco-region-icon" data-region='${token.regionId}'></div>
     ${back ? '' : `<div class="joco-presidency-icon"></div>`}
-    ${back ? tplAmount$1(token.loot, true) : ''}
+    ${back ? tplAmount(token.loot, true) : ''}
   `;
 };
 class ControlTokensManager extends BgaCards$1.Manager {
@@ -2931,7 +2934,7 @@ const CONTROL_TOKEN_STOCK_CONFIG = {
     [HYDERABAD]: { top: 459, left: 493 },
     [MADRAS]: { top: 600, left: 505 },
     [MARATHA]: { top: 273, left: 513 },
-    [MYSORE]: { top: 725, left: 390 },
+    [MYSORE]: { top: 754, left: 399 },
     [PUNJAB]: { top: 50, left: 173 },
 };
 
@@ -2945,6 +2948,8 @@ const tplTowerTop = () => `
 </div>`;
 const tplControlTokenStock = (regionId, position) => `
 <div id="joco-control-token-stock-${regionId}" class="joco-control-token-stock" style="top: ${position.top}px; left: ${position.left}px;"></div>`;
+const tplUnrestContainer = (regionId) => `
+<div id="joco-unrest-${regionId}" class="joco-unrest-container" data-region="${regionId}"></div>`;
 const tplGovernorOverlay = (regionId) => `
   <div id="joco-governor-overlay-${regionId}" class="joco-governor-overlay-container" data-region="${regionId}">
     <div class="joco-governor-overlay">
@@ -2957,7 +2962,7 @@ const tplGovernorOverlay = (regionId) => `
         </div>
       </div>
     </div>
-    <div id="GovernorCompanyShipOf${regionId}" class="joco-governor-company-ship">
+    <div id="shipConstruction_${regionId}" class="joco-governor-company-ship">
     </div>
   </div>
 `;
@@ -2981,18 +2986,33 @@ class Region {
         map.appendChild(elt);
         map.insertAdjacentHTML('beforeend', tplControlTokenStock(data.id, CONTROL_TOKEN_STOCK_CONFIG[data.id]));
         map.insertAdjacentElement('beforeend', createHtmlElement(tplGovernorOverlay(data.id)));
+        map.insertAdjacentHTML('beforeend', tplUnrestContainer(data.id));
         this.ui = {
             governorOverlay: document.getElementById(`joco-governor-overlay-${data.id}`),
+            unrestContainer: document.getElementById(`joco-unrest-${data.id}`),
         };
         this.controlTokenStock = new BgaCards.LineStock(ControlTokensManager.getInstance(), document.getElementById(`joco-control-token-stock-${data.id}`));
+        this.setupShipStock(game.gamedatas);
         this.updateControlToken(data);
         this.updateStrength(data.strength);
         this.updateCapital(data.isCapital);
         this.updateEmpire(data.isCapital, data.control);
         this.updateCompanyControl(data);
         this.updateFamilyMembers(Object.values(game.gamedatas.familyMembers));
+        this.updateUnrest(data.unrest);
+    }
+    setupShipStock(gamedatas) {
+        const regionId = this.data.id;
+        this.shipStock = new BgaCards.LineStock(ShipsManager.getInstance(), document.getElementById(`shipConstruction_${regionId}`));
+        const ship = Object.values(gamedatas.ships).find((s) => s.location === `shipConstruction_${regionId}`);
+        if (ship) {
+            this.shipStock.addCard(ship);
+        }
     }
     update(region) {
+        if (this.data.unrest !== region.unrest) {
+            this.updateUnrest(region.unrest);
+        }
         if (this.data.strength !== region.strength) {
             this.updateStrength(region.strength);
         }
@@ -3046,6 +3066,10 @@ class Region {
     }
     updateUnrest(value) {
         this.data.unrest = value;
+        this.ui.unrestContainer.replaceChildren();
+        for (let i = 0; i < value; i++) {
+            this.ui.unrestContainer.insertAdjacentHTML('beforeend', tplCube('unrest'));
+        }
     }
     updateFamilyMembers(familyMembers) {
         const location = `GovernorOf${this.data.id}`;
@@ -3057,6 +3081,12 @@ class Region {
     }
     hasControlToken(token) {
         return this.controlTokenStock.contains(token);
+    }
+    async addShip(ship, fromSea = null) {
+        if (fromSea) {
+            India$1.getInstance().getSeaZone(fromSea).updateCount(-1);
+        }
+        await this.shipStock.addCard(ship);
     }
 }
 
@@ -3116,8 +3146,8 @@ class ShipZone {
 const tplOrder = (orderId, { top, left }) => {
     const staticData = StaticData.get().order(orderId);
     return `<div id="${orderId}" class="joco-order" style="top: ${top}px; left: ${left}px;" data-is-home-port="${staticData.homePort !== null}">
-          <div class="joco-order-value">${tplAmount$1(staticData.value)}</div>
-          <div class="joco-filled-order-value">${tplAmount$1(staticData.filledValue, true)}</div>
+          <div class="joco-order-value">${tplAmount(staticData.value)}</div>
+          <div class="joco-filled-order-value">${tplAmount(staticData.filledValue, true)}</div>
         </div>`;
 };
 const tplOrderToken = (type) => `
@@ -3396,11 +3426,11 @@ const tplPrize = (prize) => {
       <div class="joco-row">
         <div class="joco-upkeep-container">
           <div class="joco-icon" data-icon="CircleDark">
-            ${tplAmount$1(prize.cost)}
+            ${tplAmount(prize.cost)}
           </div>
           ${prize.upkeep
         ? `<div class="joco-upkeep">
-            ${tplAmount$1(prize.upkeep, true)}
+            ${tplAmount(prize.upkeep, true)}
           </div>`
         : ''}
         </div>
@@ -4113,9 +4143,7 @@ class NotificationManager {
         if (!element) {
             element = createHtmlElement(tplOfficeCard(office));
         }
-        console.log('officeCard', element);
         const locationElt = document.getElementById(office.location);
-        console.log('location', locationElt);
         locationElt.appendChild(element);
     }
     async notif_movePieces(notif) {
@@ -4132,7 +4160,7 @@ class NotificationManager {
         const { from, ship } = notif;
         const seaZone = India$1.getInstance().getSeaZone(ship.location);
         if (!seaZone.hasShip(ship.id)) {
-            await seaZone.addShip(ship, from);
+            await seaZone.addShip(ship, from.startsWith('shipConstruction_') ? null : from);
         }
     }
     async notif_newCompanyShare(notif) {
@@ -4150,17 +4178,33 @@ class NotificationManager {
         const { turnNumber } = notif;
         PhaseTracker.getInstance().setTurn(turnNumber);
     }
+    async notif_addToTreasury(notif) {
+        const { treasury, officeId } = notif;
+        Company.getInstance().treasuries[officeId].toValue(treasury);
+    }
     async notif_payFromTreasury(notif) {
         const { treasury, officeId } = notif;
         Company.getInstance().treasuries[officeId].toValue(treasury);
+    }
+    async notif_placeRegiment(notif) {
+        const { regiment } = notif;
+        const elt = createHtmlElement(tplArmyPiece(regiment));
+        document.getElementById(regiment.location).appendChild(elt);
     }
     async notif_placeShip(notif) {
         const { playerId, ship } = notif;
         let placedShip = ship;
         const india = India$1.getInstance();
-        const seaZone = india.getSeaZone(ship.location);
-        if (!seaZone.hasShip(ship.id)) {
-            await seaZone.addShip(placedShip);
+        if (ship.location.startsWith('shipConstruction_')) {
+            const regionId = ship.location.split('_')[1];
+            const region = india.getRegion(regionId);
+            await region.addShip(placedShip);
+        }
+        else {
+            const seaZone = india.getSeaZone(ship.location);
+            if (!seaZone.hasShip(ship.id)) {
+                await seaZone.addShip(placedShip);
+            }
         }
     }
     async notif_purchaseEnterprise(notif) {
@@ -4246,8 +4290,9 @@ class NotificationManager {
             Interaction.use().wait(index * 250);
             fromPlayer.counters[PROMISE_CUBES_COUNTER].incValue(-1);
             const element = document.createElement('div');
-            element.classList.add('log_token');
-            element.classList.add('joco-promise-cube');
+            element.classList.add('log-token');
+            element.classList.add('joco-cube');
+            element.dataset.type = 'promise';
             element.classList.add('animation');
             toElement.insertAdjacentElement('afterbegin', element);
             await this.game.animationManager.slideIn(element, fromElement);
@@ -4466,6 +4511,7 @@ const LOG_TOKEN_SETUP_CARD = 'setupCard';
 const LOG_TOKEN_SHIP = 'ship';
 const LOG_TOKEN_STORM_DIE = 'stormDie';
 const LOG_TOKEN_TROPHY = 'trophy';
+const LOG_TOKEN_UNREST = 'unrest';
 const LOG_TOKEN_VICTORY_POINTS = 'victoryPoints';
 const CLASS_LOG_TOKEN = 'log-token';
 let tooltipIdCounter = 0;
@@ -4507,7 +4553,7 @@ const getTokenDiv = ({ key, value, game, }) => {
         case LOG_TOKEN_POUND:
             return tplLogTokenPound();
         case LOG_TOKEN_PROMISE_CUBE:
-            return tplLogTokenPromiseCube();
+            return tplLogTokenCube('promise');
         case LOG_TOKEN_REGIMENT:
             return createRegiment([CLASS_LOG_TOKEN]).outerHTML;
         case LOG_TOKEN_SETUP_CARD:
@@ -4534,6 +4580,8 @@ const getTokenDiv = ({ key, value, game, }) => {
                     color: player.getColor(),
                 })
                 : value;
+        case LOG_TOKEN_UNREST:
+            return tplLogTokenCube('unrest');
         case LOG_TOKEN_VICTORY_POINTS:
             return tplVictoryPointsIcon(value, 'log-token');
         default:
@@ -4899,7 +4947,7 @@ class CommanderDeploy {
                 },
             });
         });
-        addPassButton(this.args.optionalAction, _('Do not deploy'));
+        addPassButton$1(this.args.optionalAction, _('Do not deploy'));
     }
     updateInterfaceSelectArmyPieces() {
         clearPossible();
@@ -5029,7 +5077,7 @@ class CommanderPurchaseLocalAlliance {
         clearPossible();
         updatePageTitle(_('${you} may purchase a local alliance'), {});
         this.args.options.forEach((option) => onClick(option.id, () => this.updateInterfaceConfirm(option)));
-        addPassButton(this.args.optionalAction, _('Do not purchase a local alliance'));
+        addPassButton$1(this.args.optionalAction, _('Do not purchase a local alliance'));
     }
     updateInterfaceConfirm(localAlliance) {
         clearPossible();
@@ -5683,7 +5731,7 @@ class DirectorOfTradeSpecialEnvoy {
             text: _('Propose'),
             callback: () => this.performAction(false),
         });
-        addPassButton(this.args.optionalAction);
+        addPassButton$1(this.args.optionalAction);
     }
     updateInterfaceConfirm() {
         clearPossible();
@@ -5800,7 +5848,7 @@ class DirectorOfTradeTransfers {
             this.addCancelButton();
         }
         else {
-            addPassButton(this.args.optionalAction);
+            addPassButton$1(this.args.optionalAction);
         }
     }
     updateInterfaceSelectPresidency({ familyMember: writer, locations, }) {
@@ -5809,7 +5857,6 @@ class DirectorOfTradeTransfers {
         setSelected(writerElt);
         updatePageTitle(_('${you} must select a Presidency'));
         locations.forEach((newLocation) => {
-            console.log('writer', writer.id, 'newLocation', newLocation);
             const regionId = newLocation.split('_')[2];
             onClick(`Presidency_${regionId}`, async () => {
                 clearPossible();
@@ -6005,7 +6052,7 @@ class EnlistWriter {
         this.args.options.forEach((presidencyId) => {
             onClick(presidencyId, () => this.updateInterfaceConfirm(presidencyId));
         });
-        addPassButton(this.args.optionalAction);
+        addPassButton$1(this.args.optionalAction);
     }
     updateInterfaceConfirm(presidencyId) {
         clearPossible();
@@ -6121,6 +6168,51 @@ class FamilyAction {
                 callback: () => this.updateInterfaceConfirm(action),
             });
         }
+    }
+}
+
+class GovernorAdminister {
+    constructor(game) {
+        this.game = game;
+    }
+    static create(game) {
+        GovernorAdminister.instance = new GovernorAdminister(game);
+    }
+    static getInstance() {
+        return GovernorAdminister.instance;
+    }
+    onEnteringState(args) {
+        debug('Entering GovernorAdminister state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+        Bar.getInstance().goTo('joco-india');
+    }
+    onLeavingState() {
+        debug('Leaving GovernorAdminister state');
+    }
+    setDescription(activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} may take an Administer action with the ${governorTitle}'), {
+            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            governorTitle: _(getOffice(args.governor).title),
+        });
+    }
+    updateInterfaceInitialStep() {
+        clearPossible();
+        updatePageTitle(_('${you} may take an Administer action with the ${governorTitle}'), {
+            governorTitle: _(getOffice(this.args.governor).title),
+        });
+        addPrimaryActionButton({
+            id: 'administer-btn',
+            text: formatStringRecursive(this.args.dicePool === 1
+                ? _('Make a check with 1 die')
+                : _('Make a check with ${dicePool} dice'), {
+                dicePool: this.args.dicePool,
+            }),
+            callback: () => {
+                performAction$1('actGovernorAdminister', {});
+            },
+        });
+        addPassButton$1(this.args.optionalAction);
     }
 }
 
@@ -6317,7 +6409,7 @@ class LondonSeasonRetire {
             this.addCancelButton();
         }
         else {
-            addPassButton(this.args.optionalAction);
+            addPassButton$1(this.args.optionalAction);
         }
     }
     updateInterfaceSelectPrize(familyMember) {
@@ -6756,7 +6848,7 @@ class MilitaryAffairsTransfers {
             this.addCancelButton();
         }
         else {
-            addPassButton(this.args.optionalAction);
+            addPassButton$1(this.args.optionalAction);
         }
     }
     updateInterfaceSelectArmy({ familyMember, regiment, locations, }) {
@@ -6857,7 +6949,7 @@ class ParliamentMeets {
     updateInterfaceInitialStep() {
         this.game.clearPossible();
         updatePageTitle(_('${you} must meet Parliament'));
-        addPassButton(this.args.optionalAction);
+        addPassButton$1(this.args.optionalAction);
     }
     updateInterfaceConfirm() {
         clearPossible();
@@ -7010,7 +7102,7 @@ class PresidencyTrade {
             addCancelButton$1();
         }
         else {
-            addPassButton(this.args.optionalAction);
+            addPassButton$1(this.args.optionalAction);
         }
     }
     setMinSpendAmount() {
@@ -7377,7 +7469,7 @@ class SeekShare {
         Object.entries(this.args.options).forEach(([position, price]) => {
             onClick(position, () => this.updateInterfaceConfirm(position, price));
         });
-        addPassButton(this.args.optionalAction);
+        addPassButton$1(this.args.optionalAction);
     }
     updateInterfaceConfirm(position, price) {
         clearPossible();
@@ -7432,6 +7524,7 @@ class Game {
             EnlistWriter,
             EventsInIndiaCrisisDefense,
             FamilyAction,
+            GovernorAdminister,
             HiringHireFamilyMember,
             LondonSeasonChooseCard,
             LondonSeasonRetire,

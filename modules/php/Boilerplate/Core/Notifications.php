@@ -18,6 +18,7 @@ use Bga\Games\JohnCompany\Models\LondonSeasonCard;
 use Bga\Games\JohnCompany\Models\Office;
 use Bga\Games\JohnCompany\Models\Order;
 use Bga\Games\JohnCompany\Models\Player;
+use Bga\Games\JohnCompany\Models\Region;
 use Bga\Games\JohnCompany\Models\Ship;
 
 class Notifications
@@ -146,6 +147,11 @@ class Notifications
     return clienttranslate('Promise Cube(s)');
   }
 
+  public static function tknUnrest()
+  {
+    return clienttranslate('Unrest');
+  }
+
   public static function tknRegiment()
   {
     return clienttranslate('Regiment');
@@ -250,15 +256,20 @@ class Notifications
     return $idNameMap[$regionId];
   }
 
-  private static function getSeaName($seaId)
+  private static function getSeaName(string $locationId)
   {
+    if (Utils::startsWith($locationId, 'shipConstruction_')) {
+      $regionId = explode('_', $locationId)[1];
+      return Regions::get($regionId)->getName();
+    }
+
     $idNameMap = [
       EAST_INDIAN => clienttranslate('East Indian'),
       SOUTH_INDIAN => clienttranslate('South Indian'),
       WEST_INDIAN => clienttranslate('West Indian'),
       CHINA => clienttranslate('China'),
     ];
-    return $idNameMap[$seaId];
+    return $idNameMap[$locationId];
   }
 
   private static function getRegionNameForWriter($location)
@@ -738,6 +749,32 @@ class Notifications
     ]);
   }
 
+  public static function addCashToOffice(Player $player, Office $office, int $amount, int $treasury)
+  {
+    self::notifyAll('addToTreasury', clienttranslate('${player_name} adds ${tkn_boldText_amount} to the ${tkn_boldText_office} treasury'), [
+      'player' => $player,
+      'tkn_pound' => self::tknPound(),
+      'officeId' => $office->getId(),
+      'tkn_boldText_amount' => '£'. $amount,
+      'amount' => $amount,
+      'treasury' => $treasury,
+      'tkn_boldText_office' => $office->getTitle(),
+      'i18n' => ['tkn_boldText_office'],
+    ]);
+  }
+
+  public static function addCashToCompanyBalance(Player $player, int $amount, int $companyBalance)
+  {
+    self::notifyAll('moveCompanyBalance', clienttranslate('${player_name} adds ${tkn_boldText_amount} to the ${tkn_boldText_companyBalance}'), [
+      'player' => $player,
+      'tkn_boldText_amount' => '£'. $amount,
+      'amount' => $amount,
+      'companyBalance' => $companyBalance,
+      'tkn_boldText_companyBalance' => clienttranslate('Company Balance'),
+      'i18n' => ['tkn_boldText_companyBalance'],
+    ]);
+  }
+
   public static function payFromTreasury($player, $office, $amount, $treasury)
   {
     self::notifyAll('payFromTreasury', clienttranslate('${player_name} spends ${amount} ${tkn_pound} from the ${tkn_boldText_office} treasury'), [
@@ -826,16 +863,42 @@ class Notifications
     ]);
   }
 
-
-  public static function placeShip($player, $ship)
+  public static function placeRegiment(Player $player, ArmyPiece $regiment, string $presidencyId)
   {
-    // TODO: ship icon?
-    self::notifyAll('placeShip', clienttranslate('${player_name} places ${tkn_ship} in the ${tkn_boldText_sea}'), [
+    self::notifyAll('placeRegiment', clienttranslate('${player_name} places ${tkn_regiment} in the ${tkn_boldText_army}'), [
       'player' => $player,
-      'tkn_boldText_sea' => self::getSeaName($ship->getLocation()),
+      'regiment' => $regiment->jsonSerialize(),
+      'tkn_regiment' => self::tknArmyPiece($regiment),
+      'tkn_boldText_army' => self::getArmyNameForPresidency($presidencyId),
+      'i18n' => ['tkn_boldText_army'],
+    ]);
+  }
+
+  public static function placeShip(Player $player, Ship $ship)
+  {
+    $location = $ship->getLocation();
+    $text = '';
+    $args = [];
+
+    if (Utils::startsWith($location, 'shipConstruction_')) {
+      $text = clienttranslate('${player_name} builds ${tkn_ship} in the ${tkn_boldText_region}');
+      $args = [
+        'tkn_boldText_region' => Regions::get(explode('_', $location)[1])->getName(),
+        'i18n' => ['tkn_boldText_region']
+      ];
+    } else {
+      $text = clienttranslate('${player_name} places ${tkn_ship} in the ${tkn_boldText_sea}');
+      $args = [
+        'tkn_boldText_sea' => self::getSeaName($ship->getLocation()),
+        'i18n' => ['tkn_boldText_sea']
+      ];
+    }
+
+    self::notifyAll('placeShip', $text, array_merge([
+      'player' => $player,
       'ship' => $ship->jsonSerialize(),
       'tkn_ship' => self::tknShip($ship)
-    ]);
+    ], $args));
   }
 
   public static function purchaseEnterprise(Player $player, Enterprise $enterprise, int $amount, string $familyId)
@@ -1046,7 +1109,19 @@ class Notifications
     ]);
   }
 
-  public static function removeUnrest($region)
+  public static function addUnrest(Player $player, Region $region, int $change)
+  {
+    self::notifyAll('updateRegion', clienttranslate('${player_name} adds ${tkn_boldText_change}${tkn_unrest} to ${tkn_boldText_region}'), [
+      'player' => $player,
+      'tkn_boldText_change' => $change,
+      'tkn_boldText_region' => $region->getName(),
+      'region' => $region->jsonSerialize(),
+      'tkn_unrest' => self::tknUnrest(),
+      'i18n' => ['tkn_boldText_region'],
+    ]);
+  }
+
+  public static function removeUnrest(Region $region)
   {
     self::notifyAll('updateRegion', clienttranslate('All unrest in ${tkn_boldText_region} is removed'), [
       'tkn_boldText_region' => $region->getName(),

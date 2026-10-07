@@ -1,13 +1,17 @@
+import { India } from '..';
 import { createHtmlElement } from '../../boilerplate';
 import { PRESIDENCIES } from '../../constants';
 import { BgaCards } from '../../libs copy';
-import { createFamilyMember } from '../../templates';
+import { createFamilyMember, tplCube } from '../../templates';
 import { ControlTokensManager } from '../../token-managers/control-tokens';
+import { ShipsManager } from '../../token-managers/ship-tokens';
 import {
   JocoRegionBase,
   GameAlias,
   JocoControlToken,
   JocoFamilyMember,
+  JocoShipBase,
+  GamedatasAlias,
 } from '../../types';
 import { createControlToken } from '../../utility';
 import { CONTROL_TOKEN_STOCK_CONFIG, TOWER_CONFIG } from './config';
@@ -16,6 +20,7 @@ import {
   tplGovernorOverlay,
   tplTowerLevel,
   tplTowerTop,
+  tplUnrestContainer,
 } from './templates';
 
 export class Region {
@@ -25,8 +30,10 @@ export class Region {
   private controlTokenStock: InstanceType<
     typeof BgaCards.LineStock<JocoControlToken>
   >;
+  private shipStock: InstanceType<typeof BgaCards.LineStock<JocoShipBase>>;
   private ui: {
     governorOverlay: HTMLElement;
+    unrestContainer: HTMLElement;
   };
 
   constructor(
@@ -37,6 +44,14 @@ export class Region {
     this.data = data;
     this.setup(data, game);
   }
+
+  // ..######..########.########.##.....##.########.
+  // .##....##.##..........##....##.....##.##.....##
+  // .##.......##..........##....##.....##.##.....##
+  // ..######..######......##....##.....##.########.
+  // .......##.##..........##....##.....##.##.......
+  // .##....##.##..........##....##.....##.##.......
+  // ..######..########....##.....#######..##.......
 
   private setup(data: JocoRegionBase, game: GameAlias) {
     const map = document.getElementById('joco-india-map');
@@ -63,9 +78,17 @@ export class Region {
       createHtmlElement(tplGovernorOverlay(data.id)),
     );
 
+    map.insertAdjacentHTML(
+      'beforeend',
+      tplUnrestContainer(data.id),
+    );
+
     this.ui = {
       governorOverlay: document.getElementById(
         `joco-governor-overlay-${data.id}`,
+      ),
+      unrestContainer: document.getElementById(
+        `joco-unrest-${data.id}`,
       ),
     };
 
@@ -74,15 +97,43 @@ export class Region {
       document.getElementById(`joco-control-token-stock-${data.id}`),
     );
 
+    this.setupShipStock(game.gamedatas);
+
     this.updateControlToken(data);
     this.updateStrength(data.strength);
     this.updateCapital(data.isCapital);
     this.updateEmpire(data.isCapital, data.control);
     this.updateCompanyControl(data);
     this.updateFamilyMembers(Object.values(game.gamedatas.familyMembers));
+    this.updateUnrest(data.unrest);
   }
 
+  private setupShipStock(gamedatas: GamedatasAlias) {
+    const regionId = this.data.id;
+    this.shipStock = new BgaCards.LineStock<JocoShipBase>(
+      ShipsManager.getInstance(),
+      document.getElementById(`shipConstruction_${regionId}`),
+    );
+    const ship = Object.values(gamedatas.ships).find(
+      (s) => s.location === `shipConstruction_${regionId}`,
+    );
+    if (ship) {
+      this.shipStock.addCard(ship);
+    }
+  }
+
+  // .##.....##.########..########.....###....########.########....##.....##.####
+  // .##.....##.##.....##.##.....##...##.##......##....##..........##.....##..##.
+  // .##.....##.##.....##.##.....##..##...##.....##....##..........##.....##..##.
+  // .##.....##.########..##.....##.##.....##....##....######......##.....##..##.
+  // .##.....##.##........##.....##.#########....##....##..........##.....##..##.
+  // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
+  // ..#######..##........########..##.....##....##....########.....#######..####
+
   public update(region: JocoRegionBase) {
+    if (this.data.unrest !== region.unrest) {
+      this.updateUnrest(region.unrest);
+    }
     if (this.data.strength !== region.strength) {
       this.updateStrength(region.strength);
     }
@@ -167,7 +218,11 @@ export class Region {
 
   public updateUnrest(value: number) {
     this.data.unrest = value;
-    // TODO: implementation
+    
+    this.ui.unrestContainer.replaceChildren();
+    for (let i = 0; i < value; i++) {
+      this.ui.unrestContainer.insertAdjacentHTML('beforeend', tplCube('unrest'));
+    }
   }
 
   private updateFamilyMembers(familyMembers: JocoFamilyMember[]) {
@@ -183,5 +238,22 @@ export class Region {
 
   public hasControlToken(token: JocoControlToken) {
     return this.controlTokenStock.contains(token);
+  }
+
+
+
+  // .##.....##.########.####.##.......####.########.##....##
+  // .##.....##....##.....##..##........##.....##.....##..##.
+  // .##.....##....##.....##..##........##.....##......####..
+  // .##.....##....##.....##..##........##.....##.......##...
+  // .##.....##....##.....##..##........##.....##.......##...
+  // .##.....##....##.....##..##........##.....##.......##...
+  // ..#######.....##....####.########.####....##.......##...
+
+  public async addShip(ship: JocoShipBase, fromSea = null) {
+    if (fromSea) {
+      India.getInstance().getSeaZone(fromSea).updateCount(-1);
+    }
+    await this.shipStock.addCard(ship);
   }
 }

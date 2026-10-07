@@ -11,6 +11,7 @@ class GovernorOfDelhi extends \Bga\Games\JohnCompany\Offices\Governor
     $this->title = clienttranslate('Governor of Delhi');
     $this->hirePriority = 13;
     $this->regionId = DELHI;
+    $this->dicePool = 4;
   }
 
 }

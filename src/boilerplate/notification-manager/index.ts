@@ -94,7 +94,9 @@ import {
   NotifMoveLondonSeasonCard,
   NotifNewLondonSeasonDisplay,
   NotifUpdateOpportunityMarker,
+  NotifPlaceRegiment,
 } from './types';
+import { tplArmyPiece } from '../../india/army/templates';
 
 //  .##.....##....###....##....##....###.....######...########.########.
 //  .###...###...##.##...###...##...##.##...##....##..##.......##.....##
@@ -625,9 +627,7 @@ export class NotificationManager {
     if (!element) {
       element = createHtmlElement(tplOfficeCard(office));
     }
-    console.log('officeCard', element);
     const locationElt = document.getElementById(office.location);
-    console.log('location', locationElt);
     locationElt.appendChild(element);
   }
 
@@ -653,7 +653,7 @@ export class NotificationManager {
     const { from, ship } = notif;
     const seaZone = India.getInstance().getSeaZone(ship.location);
     if (!seaZone.hasShip(ship.id)) {
-      await seaZone.addShip(ship, from);
+      await seaZone.addShip(ship, from.startsWith('shipConstruction_') ? null : from);
     }
   }
 
@@ -678,23 +678,37 @@ export class NotificationManager {
     PhaseTracker.getInstance().setTurn(turnNumber);
   }
 
+  async notif_addToTreasury(notif: NotifPayFromTreasury) {
+    const { treasury, officeId } = notif;
+    Company.getInstance().treasuries[officeId].toValue(treasury);
+  }
+
   async notif_payFromTreasury(notif: NotifPayFromTreasury) {
     const { treasury, officeId } = notif;
     Company.getInstance().treasuries[officeId].toValue(treasury);
+  }
+
+  async notif_placeRegiment(notif: NotifPlaceRegiment) {
+    const { regiment } = notif;
+
+    const elt = createHtmlElement(tplArmyPiece(regiment));
+    document.getElementById(regiment.location).appendChild(elt);
   }
 
   async notif_placeShip(notif: NotifPlaceShip) {
     const { playerId, ship } = notif;
     let placedShip = ship;
 
-    // const isOtherShip = [EXTRA_SHIP, COMPANY_SHIP].includes(ship.type);
-
-    // const player = this.getPlayer(playerId);
     const india = India.getInstance();
-
-    const seaZone = india.getSeaZone(ship.location);
-    if (!seaZone.hasShip(ship.id)) {
-      await seaZone.addShip(placedShip);
+    if (ship.location.startsWith('shipConstruction_')) {
+      const regionId = ship.location.split('_')[1];
+      const region = india.getRegion(regionId);
+      await region.addShip(placedShip);
+    } else {
+      const seaZone = india.getSeaZone(ship.location);
+      if (!seaZone.hasShip(ship.id)) {
+        await seaZone.addShip(placedShip);
+      }
     }
   }
 
@@ -844,8 +858,9 @@ export class NotificationManager {
         Interaction.use().wait(index * 250);
         fromPlayer.counters[PROMISE_CUBES_COUNTER].incValue(-1);
         const element = document.createElement('div');
-        element.classList.add('log_token');
-        element.classList.add('joco-promise-cube');
+        element.classList.add('log-token');
+        element.classList.add('joco-cube');
+        element.dataset.type = 'promise';
         element.classList.add('animation');
         toElement.insertAdjacentElement('afterbegin', element);
 

@@ -6,9 +6,11 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Regions;
+use Bga\Games\JohnCompany\Models\Region;
 
 class Governor extends \Bga\Games\JohnCompany\Models\Office
 {
+  protected int $dicePool;
   protected string $regionId;
 
   public function __construct($row)
@@ -35,5 +37,29 @@ class Governor extends \Bga\Games\JohnCompany\Models\Office
   {
     $presidencyId = Regions::get($this->regionId)->getControl();
     return Offices::get(PRESIDENCY_PRESIDENT_OFFICE_MAP[$presidencyId])->getPlayerId();
+  }
+
+  public function getDicePool(): int
+  {
+    return $this->dicePool;
+  }
+
+  public function getPresidencyId(): string | null
+  {
+    $id = Regions::get($this->regionId)->getControl();
+    if (!in_array($id, PRESIDENCIES, true)) {
+      return null;
+    }
+    return $id;
+  }
+
+  public function getRegionId(): string
+  {
+    return $this->regionId;
+  }
+
+  public function getRegion(): Region
+  {
+    return Regions::get($this->regionId);
   }
 }

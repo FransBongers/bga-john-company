@@ -11,6 +11,7 @@ class GovernorOfPunjab extends \Bga\Games\JohnCompany\Offices\Governor
     $this->title = clienttranslate('Governor of Punjab');
     $this->hirePriority = 12;
     $this->regionId = PUNJAB;
+    $this->dicePool = 3;
   }
 
 }

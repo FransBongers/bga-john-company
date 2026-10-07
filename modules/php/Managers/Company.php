@@ -140,8 +140,6 @@ class Company
       $dieResults[] = self::rollDie();
     }
     $minResult = min($dieResults);
-    Notifications::log('dieResults', $dieResults);
-    Notifications::log('minResult', $minResult);
     return $minResult;
   }
 }

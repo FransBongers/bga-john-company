@@ -427,6 +427,17 @@ $machinestates = [
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
+    ST_GOVERNOR_ADMINISTER => [
+        'name' => GOVERNOR_ADMINISTER,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer}'),
+        'descriptionmyturn' => clienttranslate('${you}'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . GOVERNOR_ADMINISTER, 'actPassOptionalAction', 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
     ST_MILITARY_AFFAIRS_CHECK_COMMANDER => [
         'name' => MILITARY_AFFAIRS_CHECK_COMMANDER,
         'description' => '',
@@ -654,6 +665,46 @@ $machinestates = [
 
     ST_FINAL_SCORING => [
         'name' => FINAL_SCORING,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_GOVERNOR_BUILD_COMPANY_SHIP => [
+        'name' => GOVERNOR_BUILD_COMPANY_SHIP,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_GOVERNOR_COMMISSION_REGIMENT => [
+        'name' => GOVERNOR_COMMISSION_REGIMENT,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_GOVERNOR_TAX => [
+        'name' => GOVERNOR_TAX,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_ADD_CASH => [
+        'name' => ADD_CASH,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_ADD_UNREST => [
+        'name' => ADD_UNREST,
         'description' => '',
         'type' => 'game',
         'action' => 'stAtomicAction',

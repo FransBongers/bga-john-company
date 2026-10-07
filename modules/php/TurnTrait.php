@@ -771,7 +771,24 @@ trait TurnTrait
       ];
     }
 
-    // TODO: if governor, push option
+    $governorOffices = $presidentOffice->getAssociatedGovernorOffices();
+    foreach ($governorOffices as $governorOffice) {
+      if ($governorOffice->getFamilyMember() === null) {
+        continue;
+      }
+      $children[] = [
+        'action' => GOVERNOR_ADMINISTER,
+        'playerId' => 'some',
+        'activePlayerIds' => [$governorOffice->getPlayerId()],
+        'optional' => true,
+        'args' => [
+          'officeId' => $governorOffice->getId(),
+          'presidencyId' => $presidencyId,
+          'first' => true,
+        ],
+      ];
+      $requiredChoiceCount++;
+    }
 
     return [
       'children' => [

@@ -28,6 +28,6 @@ export const CONTROL_TOKEN_STOCK_CONFIG: Record<string, AbsolutePosition> = {
   [HYDERABAD]: { top: 459, left: 493 },
   [MADRAS]: { top: 600, left: 505 },
   [MARATHA]: { top: 273, left: 513 },
-  [MYSORE]: { top: 725, left: 390 },
+  [MYSORE]: { top: 754, left: 399 },
   [PUNJAB]: { top: 50, left: 173 },
 };

@@ -8,7 +8,7 @@ class Locations
   {
     return 'army_' . $regionId . '_ready';
   }
-  
+
   public static function armyOfExhausted(string $regionId)
   {
     return 'army_' . $regionId . '_exhausted';
@@ -68,6 +68,11 @@ class Locations
   public static function shipsToBePlacedByCrown()
   {
     return SHIPS_TO_BE_PLACED_BY_CROWN;
+  }
+
+  public static function shipUnderConstruction(string $regionId)
+  {
+    return 'shipConstruction_' . $regionId;
   }
 
   public static function presidency(string $regionId)

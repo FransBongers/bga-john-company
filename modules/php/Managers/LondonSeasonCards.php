@@ -77,8 +77,6 @@ class LondonSeasonCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Piece
       ];
     }
 
-    Notifications::log('setupLoadBlackmailCards', $cards);
-
     // Create the cards
     self::create($cards, null);
     self::shuffle(Locations::londonSeasonPool(BLACKMAIL));

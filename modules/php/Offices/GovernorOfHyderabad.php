@@ -11,6 +11,7 @@ class GovernorOfHyderabad extends \Bga\Games\JohnCompany\Offices\Governor
     $this->title = clienttranslate('Governor of Hyderabad');
     $this->hirePriority = 15;
     $this->regionId = HYDERABAD;
+    $this->dicePool = 3;
   }
 
 }

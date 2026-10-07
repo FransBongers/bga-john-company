@@ -1196,11 +1196,25 @@ span[style*="color:#addb90"] {
   align-items: center;
 }
 
-.joco-promise-cube {
+.joco-cube {
+  background-image: url("img/cubes.png");
+  background-size: 200% 100%;
+  height: 48px;
+  aspect-ratio: 41/48;
+}
+.joco-cube[data-type=promise] {
+  background-position-x: 0%;
+}
+.joco-cube[data-type=unrest] {
+  background-position-x: 100%;
+}
+
+.joco-unrest-cube {
   background-image: url("img/cubes.png");
   background-size: 200% 100%;
   width: calc(var(--iconScale) * 41px);
   height: calc(var(--iconScale) * 48px);
+  background-position-x: 100%;
 }
 
 .joco-icon[data-icon=Luxury] {
@@ -1889,7 +1903,7 @@ span[style*="color:#addb90"] {
   position: relative;
   margin: 0px auto;
 }
-.player-board-game-specific-content .joco-promise-cube {
+.player-board-game-specific-content .joco-cube {
   --iconScale: 1;
   position: relative;
   margin: 0px auto;
@@ -2460,6 +2474,9 @@ span[style*="color:#c0c0c0"] {
   justify-content: center;
   align-items: center;
   height: 40px !important;
+}
+.log-token.joco-cube {
+  height: 32px;
 }
 
 #customActions {
@@ -3121,6 +3138,52 @@ span[style*="color:#c0c0c0"] {
 .joco-governor-overlay-container[data-region=Punjab] .joco-family-member-spot {
   background-color: #8a8e99;
   outline-color: #8a8e99;
+}
+
+.joco-unrest-container {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+  flex-wrap: wrap;
+  width: 88px;
+  min-height: 32px;
+  justify-content: center;
+}
+.joco-unrest-container .joco-cube {
+  height: 32px;
+}
+.joco-unrest-container[data-region=Bengal] {
+  top: 50px;
+  left: 880px;
+}
+.joco-unrest-container[data-region=Bombay] {
+  top: 278px;
+  left: 153px;
+}
+.joco-unrest-container[data-region=Delhi] {
+  top: 5px;
+  left: 542px;
+}
+.joco-unrest-container[data-region=Hyderabad] {
+  top: 380px;
+  left: 360px;
+}
+.joco-unrest-container[data-region=Madras] {
+  top: 604px;
+  left: 479px;
+}
+.joco-unrest-container[data-region=Maratha] {
+  top: 200px;
+  left: 385px;
+}
+.joco-unrest-container[data-region=Mysore] {
+  top: 718px;
+  left: 373px;
+}
+.joco-unrest-container[data-region=Punjab] {
+  top: 5px;
+  left: 145px;
 }
 
 .joco-sea-zone {

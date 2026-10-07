@@ -203,7 +203,6 @@ class DirectorOfTradeTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
     }
     $values = array_values($writerCountPerRegion);
     usort($values, function ($a, $b) {return $b - $a;});
-    Notifications::log('writerValues',$values);
     if ($values[0] - $values[2] >= 2) {
       return;
     }
@@ -218,7 +217,6 @@ class DirectorOfTradeTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
     }
     $shipCounts = array_values($shipsPerRegion);
     usort($shipCounts, function ($a, $b) {return $b - $a;});
-    Notifications::log('shipCounts',$shipCounts);
     if ($shipCounts[0] - $shipCounts[2] >= 2) {
       return;
     }

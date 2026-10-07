@@ -11,6 +11,7 @@ class GovernorOfBombay extends \Bga\Games\JohnCompany\Offices\Governor
     $this->title = clienttranslate('Governor of Bombay');
     $this->hirePriority = 9;
     $this->regionId = BOMBAY;
+    $this->dicePool = 3;
   }
 
 }

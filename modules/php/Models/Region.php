@@ -147,6 +147,15 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     return $this->control === null;
   }
 
+  public function addUnrest(Player $player, int $change)
+  {
+    if ($change === 0) {
+      return;
+    }
+    $this->incUnrest($change);
+    Notifications::addUnrest($player, $this, $change);
+  }
+
   public function removeUnrest()
   {
     if ($this->unrest === 0) {

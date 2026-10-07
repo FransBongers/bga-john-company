@@ -11,6 +11,7 @@ class GovernorOfMysore extends \Bga\Games\JohnCompany\Offices\Governor
     $this->title = clienttranslate('Governor of Mysore');
     $this->hirePriority = 16;
     $this->regionId = MYSORE;
+    $this->dicePool = 3;
   }
 
 }

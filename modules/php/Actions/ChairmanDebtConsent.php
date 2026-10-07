@@ -79,7 +79,6 @@ class ChairmanDebtConsent extends \Bga\Games\JohnCompany\Models\AtomicAction
     $playerId = $this->checkPlayer();
 
     $consent = $args->consent;
-    Notifications::log('consent', $consent);
 
     $info = $this->ctx->getInfo();
     $player = Players::get($playerId);

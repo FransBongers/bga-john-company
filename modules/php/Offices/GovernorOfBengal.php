@@ -11,5 +11,6 @@ class GovernorOfBengal extends \Bga\Games\JohnCompany\Offices\Governor
     $this->title = clienttranslate('Governor of Bengal');
     $this->hirePriority = 11;
     $this->regionId = BENGAL;
+    $this->dicePool = 4;
   }
 }

@@ -11,6 +11,7 @@ class GovernorOfMaratha extends \Bga\Games\JohnCompany\Offices\Governor
     $this->title = clienttranslate('Governor of Maratha');
     $this->hirePriority = 14;
     $this->regionId = MARATHA;
+    $this->dicePool = 3;
   }
 
 }

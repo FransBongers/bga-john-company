@@ -162,7 +162,6 @@ export class DirectorOfTradeTransfers implements GameState<OnEnteringDirectorOfT
 
 
     locations.forEach((newLocation) => {
-      console.log('writer', writer.id, 'newLocation', newLocation);
       const regionId = newLocation.split('_')[2];
       
       onClick(`Presidency_${regionId}`, async () => {

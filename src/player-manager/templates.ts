@@ -31,7 +31,7 @@ export const tplPlayerCounters = ({
   <div id="joco-ships-${playerId}" class="joco-ship" data-type="playerOwnedShip"></div>
   ${
     crownInGame
-      ? `<div id="joco-promiseCubes-${playerId}" class="joco-promise-cube"></div>`
+      ? `<div id="joco-promiseCubes-${playerId}" class="joco-cube" data-type="promise"></div>`
       : '<div></div>'
   }
   <div class="joco-counter-container"><span id="joco-familyMembers-counter-${playerId}" class="joco-counter"></span></div>

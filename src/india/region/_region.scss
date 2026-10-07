@@ -294,3 +294,52 @@
     }
   }
 }
+
+.joco-unrest-container {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+  flex-wrap: wrap;
+  width: 88px;
+  min-height: 32px;
+  // background-color: rgba(yellow, 0.5);
+  justify-content: center;
+
+  .joco-cube {
+    height: 32px;
+  }
+
+  &[data-region='Bengal'] {
+    top: 50px;
+    left: 880px;
+  }
+  &[data-region='Bombay'] {
+    top: 278px;
+    left: 153px;
+  }
+  &[data-region='Delhi'] {
+    top: 5px;
+    left: 542px;
+  }
+  &[data-region='Hyderabad'] {
+    top: 380px;
+    left: 360px;
+  }
+  &[data-region='Madras'] {
+    top: 604px;
+    left: 479px;
+  }
+  &[data-region='Maratha'] {
+    top: 200px;
+    left: 385px;
+  }
+  &[data-region='Mysore'] {
+    top: 718px;
+    left: 373px;
+  }
+  &[data-region='Punjab'] {
+    top: 5px;
+    left: 145px;
+  }
+}

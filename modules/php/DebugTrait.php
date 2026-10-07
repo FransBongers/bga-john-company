@@ -39,8 +39,10 @@ trait DebugTrait
 
   function debug_test()
   {
-    Players::get(2371052)->getFamily()->updateOpportunityMarker(ENLIST_OFFICER);
-    Players::get(2371053)->getFamily()->updateOpportunityMarker(SEEK_SHARE);
+    Regions::get(PUNJAB)->setUnrest(3);
+    Regions::get(MARATHA)->setUnrest(1);
+    // Players::get(2371052)->getFamily()->updateOpportunityMarker(ENLIST_OFFICER);
+    // Players::get(2371053)->getFamily()->updateOpportunityMarker(SEEK_SHARE);
     // Globals::setRetirementMoney([]);
     // Globals::setElephant([
     //   FACING => HYDERABAD,

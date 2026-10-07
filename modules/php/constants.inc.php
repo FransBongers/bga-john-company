@@ -116,6 +116,12 @@ const ST_HIRING_CHECK_VACANT_OFFICES = 136;
 const ST_HIRING_HIRE_FAMILY_MEMBER = 137;
 const ST_MILITARY_AFFAIRS_CHECK_COMMANDER = 138;
 const ST_MILITARY_AFFAIRS_ASSIGN_COMMANDER = 139;
+const ST_GOVERNOR_ADMINISTER = 140;
+const ST_GOVERNOR_BUILD_COMPANY_SHIP = 141;
+const ST_GOVERNOR_COMMISSION_REGIMENT = 142;
+const ST_GOVERNOR_TAX = 143;
+const ST_ADD_CASH = 144;
+const ST_ADD_UNREST = 145;
 
 
 const BONUSES = 'Bonuses';
@@ -127,6 +133,12 @@ const EVENTS_IN_INDIA_RESOLVE_EVENT = 'EventsInIndiaResolveEvent';
 const FAMILY_ACTION = 'FamilyAction';
 const FINAL_SCORING = 'FinalScoring';
 const FOREIGN_INVASION_END = 'ForeignInvasionEnd';
+const ADD_CASH = 'AddCash';
+const ADD_UNREST = 'AddUnrest';
+const GOVERNOR_ADMINISTER = 'GovernorAdminister';
+const GOVERNOR_BUILD_COMPANY_SHIP = 'GovernorBuildCompanyShip';
+const GOVERNOR_COMMISSION_REGIMENT = 'GovernorCommissionRegiment';
+const GOVERNOR_TAX = 'GovernorTax';
 const HIRING_CHECK_VACANT_OFFICES = 'HiringCheckVacantOffices';
 const HIRING_HIRE_FAMILY_MEMBER = 'HiringHireFamilyMember';
 const LONDON_SEASON_ATTRITION = 'LondonSeasonAttrition';

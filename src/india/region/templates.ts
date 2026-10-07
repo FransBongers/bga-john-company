@@ -16,6 +16,9 @@ export const tplControlTokenStock = (
 ) => `
 <div id="joco-control-token-stock-${regionId}" class="joco-control-token-stock" style="top: ${position.top}px; left: ${position.left}px;"></div>`;
 
+export const tplUnrestContainer = (regionId: string) => `
+<div id="joco-unrest-${regionId}" class="joco-unrest-container" data-region="${regionId}"></div>`;
+
 export const tplGovernorOverlay = (regionId: string) => `
   <div id="joco-governor-overlay-${regionId}" class="joco-governor-overlay-container" data-region="${regionId}">
     <div class="joco-governor-overlay">
@@ -28,7 +31,7 @@ export const tplGovernorOverlay = (regionId: string) => `
         </div>
       </div>
     </div>
-    <div id="GovernorCompanyShipOf${regionId}" class="joco-governor-company-ship">
+    <div id="shipConstruction_${regionId}" class="joco-governor-company-ship">
     </div>
   </div>
 `;

@@ -2,6 +2,9 @@
 
 namespace Bga\Games\JohnCompany\Models;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+
 class ArmyPiece extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
 {
   protected $id;
@@ -46,5 +49,11 @@ class ArmyPiece extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impl
   {
     // Notifications::log('getUiData card model', []);
     return $this->jsonSerialize(); // Static datas are already in js file
+  }
+
+  public function placeInArmy(Player $player, string $presidencyId)
+  {
+    $this->setLocation(Locations::armyOfReady($presidencyId));
+    Notifications::placeRegiment($player, $this, $presidencyId);
   }
 }

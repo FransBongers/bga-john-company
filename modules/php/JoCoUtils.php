@@ -22,7 +22,6 @@ class JoCoUtils
       $dieResults[] = self::rollDie();
     }
     $minResult = min($dieResults);
-    Notifications::log('minResult', $minResult);
     
     $result = null;
     if ($minResult <= 2) {
