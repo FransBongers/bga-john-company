@@ -33,8 +33,8 @@ class Enterprise extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model imp
     'state' => ['enterprise_state', 'int'],
     'shipId' => ['ship_id', 'str'],
     'type' => ['type', 'str'],
-    'invested' => ['type', 'int'],
-    'used' => ['type', 'int'],
+    'invested' => ['invested', 'int'],
+    'used' => ['used', 'int'],
   ];
 
   protected $staticAttributes = [
@@ -50,7 +50,7 @@ class Enterprise extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model imp
   {
     $data = parent::jsonSerialize();
     $data['invested'] = $this->invested === 1;
-    $data['used'] = $this->invested === 1;
+    $data['used'] = $this->used === 1;
     return $data;
   }
 

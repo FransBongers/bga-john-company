@@ -1,0 +1,78 @@
+#joco-prime-minister-dial {
+  position: relative;
+  background-image: url('img/prime_minister_dial.webp');
+  background-size: 100% 100%;
+  width: 500px;
+  height: 500px;
+
+  .prime-minister-arm {
+    position: absolute;
+    top: 250px;
+    left: 187px;
+    transform: translate(-50%, -50%);
+    background-image: url('img/prime_minister_arm.png');
+    background-size: 100% 100%;
+    width: 150px;
+    aspect-ratio: 565 / 164;
+
+    transform-origin: calc(100% - 15px) center;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  #joco-prime-minister-right,
+  #joco-prime-minister-left {
+    opacity: 0.75;
+
+    &.hidden {
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+
+  .joco-prime-minister-title {
+    position: absolute;
+    top: 176px;
+    left: 180px;
+    line-height: 20px;
+    height: 40px;
+    width: 70px;
+    text-align: center;
+    // background-color: rgba(yellow, 0.5);
+  }
+
+  .joco-prime-minister-player-name {
+    position: absolute;
+    top: 216px;
+    left: 180px;
+    line-height: 16px;
+    height: 16px;
+    width: 70px;
+    text-align: center;
+
+    .bga-autofit__inner {
+      overflow: visible;
+    }
+
+    // background-color: rgba(yellow, 0.5);
+  }
+
+  .joco-prime-minister-dial-text {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .joco-consequence {
+      height: 20px;
+      width: 80px;
+    }
+
+    .joco-window-tax {
+      height: 12px;
+      width: 70px;
+    }
+
+    // background-color: rgba(yellow, 0.5);
+    transform-origin: center center;
+  }
+}

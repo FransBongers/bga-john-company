@@ -8,7 +8,7 @@
 
 import { StaticData } from '../../static-data';
 import { GameAlias } from '../../types';
-import { tplLondonSeasonCardTooltip } from './templates';
+import { tplLawCardTooltip, tplLondonSeasonCardTooltip } from './templates';
 export * from './templates';
 
 //  .##.....##....###....##....##....###.....######...########.########.
@@ -77,6 +77,24 @@ export class TooltipManager {
   }
 
   public setupTooltips() {}
+
+  public addLawCardTooltip({
+    nodeId,
+    cardId,
+  }: {
+    nodeId: string;
+    cardId: string;
+    imageOnly?: boolean;
+  }) {
+    const card = {
+      id: cardId,
+      ...StaticData.get().lawCard(cardId),
+    };
+    const html = tplLawCardTooltip(card);
+    // this.addCustomTooltip(nodeId, html, { forceRecreate: true });
+
+    this.game.bga.gameui.addTooltipHtml(nodeId, html, 400);
+  }
 
   public addLondonSeasonCardTooltip({
     nodeId,

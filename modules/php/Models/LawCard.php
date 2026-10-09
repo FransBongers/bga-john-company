@@ -2,6 +2,10 @@
 
 namespace Bga\Games\JohnCompany\Models;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Managers\LawCards;
+
 class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
 {
   protected $id;
@@ -50,5 +54,24 @@ class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   {
     // Notifications::log('getUiData card model', []);
     return $this->jsonSerialize(); // Static datas are already in js file
+  }
+
+  public function reveal(Player $player)
+  {
+    $state = LawCards::insertOnTop($this->getId(), Locations::revealedLaws());
+    $this->state = $state;
+    $this->location = Locations::revealedLaws();
+    Notifications::revealLaw($player, $this);
+  }
+
+  public function select(Player $player)
+  {
+    $this->setLocation(Locations::selectedLaw());
+    Notifications::selectLaw($player, $this);
+  }
+
+  public function isDilemma(): bool
+  {
+    return $this->header === 'dilemma';
   }
 }

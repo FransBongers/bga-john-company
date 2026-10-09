@@ -4,6 +4,14 @@ require_once 'gameoptions.inc.php';
 const CROWN_PLAYER_ID = 1;
 
 /**
+ * Triggers for frontend changes
+ */
+const PARLIAMENT_MEETS_START = 'ParliamentMeetsStart';
+const PARLIAMENT_MEETS_VOTING_STARTS = 'ParliamentMeetsVotingStarts';
+const PARLIAMENT_MEETS_END = 'ParliamentMeetsEnd';
+const TRIGGER = 'trigger';
+
+/**
  * Checks
  */
 const SUCCESS = 'success';
@@ -47,6 +55,8 @@ const EXTRA_SETUP = 'extraSetup';
 
 const LONDON_SEASON_DISPLAY = 'LondonSeasonDisplay';
 const PASSED_LAWS = 'PassedLaws';
+const REVEALED_LAWS = 'RevealedLaws';
+const SELECTED_LAW = 'SelectedLaw';
 
 const ST_SETUP_DRAFT = 19;
 const ST_DRAFT_CARD = 20;
@@ -94,8 +104,6 @@ const ST_EVENTS_IN_INDIA_CRISIS_DEFENSE = 73;
 const ST_FOREIGN_INVASION = 74;
 const ST_FOREIGN_INVASION_END = 75;
 
-const ST_PARLIAMENT_MEETS = 80;
-
 const ST_CROWN_CHAIRMAN_SEEK_DEBT = 110;
 const ST_CROWN_CHAIRMAN_REQUEST_DEBT_ADVANCEMENT = 111;
 const ST_CROWN_CHAIRMAN_REQUEST_ALLOCATION = 112;
@@ -122,6 +130,11 @@ const ST_GOVERNOR_COMMISSION_REGIMENT = 142;
 const ST_GOVERNOR_TAX = 143;
 const ST_ADD_CASH = 144;
 const ST_ADD_UNREST = 145;
+const ST_PARLIAMENT_MEETS_SELECT_LAW = 146;
+const ST_PARLIAMENT_MEETS_SELECT_POLICY = 147;
+const ST_PARLIAMENT_MEETS_CAST_VOTES = 148;
+const ST_PARLIAMENT_MEETS_ADDITIONAL_ROUND_OR_RESOLVE = 149;
+const ST_FRONTEND_TRIGGER = 150;
 
 
 const BONUSES = 'Bonuses';
@@ -133,6 +146,7 @@ const EVENTS_IN_INDIA_RESOLVE_EVENT = 'EventsInIndiaResolveEvent';
 const FAMILY_ACTION = 'FamilyAction';
 const FINAL_SCORING = 'FinalScoring';
 const FOREIGN_INVASION_END = 'ForeignInvasionEnd';
+const FRONTEND_TRIGGER = 'FrontendTrigger';
 const ADD_CASH = 'AddCash';
 const ADD_UNREST = 'AddUnrest';
 const GOVERNOR_ADMINISTER = 'GovernorAdminister';
@@ -147,7 +161,6 @@ const LONDON_SEASON_CHOOSE_CARD = 'LondonSeasonChooseCard';
 const LONDON_SEASON_ORDER = 'LondonSeasonOrder';
 const LONDON_SEASON_CLEANUP = 'LondonSeasonCleanup';
 const NEW_COMPANY_SHARES = 'NewCompanyShares';
-const PARLIAMENT_MEETS = 'ParliamentMeets';
 const PERFORM_SETUP = 'PerformSetup';
 const REVENUE_EMERGENCY_LOANS = 'RevenueEmergencyLoans';
 const REVENUE_EXPENSES = 'RevenueExpenses';
@@ -177,6 +190,10 @@ const PRESIDENCY_DECIDE_ORDER = 'PresidencyDecideOrder';
 const PRESIDENCY_TRADE = 'PresidencyTrade';
 const PRESIDENCY_TRADE_FILL_ORDERS = 'PresidencyTradeFillOrders';
 const PRESIDENCY_COMMANDER = 'PresidencyCommander';
+const PARLIAMENT_MEETS_SELECT_LAW = 'ParliamentMeetsSelectLaw';
+const PARLIAMENT_MEETS_SELECT_POLICY = 'ParliamentMeetsSelectPolicy';
+const PARLIAMENT_MEETS_CAST_VOTES = 'ParliamentMeetsCastVotes';
+const PARLIAMENT_MEETS_ADDITIONAL_ROUND_OR_RESOLVE = 'ParliamentMeetsAdditionalRoundOrResolve';
 const COMMANDER_PURCHASE_LOCAL_ALLIANCE = 'CommanderPurchaseLocalAlliance';
 const COMMANDER_DEPLOY = 'CommanderDeploy';
 const COMMANDER_APPROVE_LOCAL_ALLIANCE = 'CommanderApproveLocalAlliance';
@@ -287,6 +304,7 @@ const HIRING = 'hiring';
 const REVENUE = 'revenue';
 const EVENTS_IN_INDIA = 'eventsInIndia';
 const UPKEEP_AND_REFRESH = 'upkeepAndRefresh';
+const PARLIAMENT_MEETS = 'ParliamentMeets';
 
 /**
  * Families
@@ -775,76 +793,86 @@ const STORM_DIE = [FOUR, TWO_EAST, ONE_ALL, THREE_SOUTH, TWO_WEST, FOUR];
 /**
  * Prime Minister
  */
+const SUPPORT = 'support';
 const DIAL = 'dial';
 const BONUS = 'Bonus';
 const POWER = 'Power';
 const TAX = 'Tax';
 const START_SCENARIO = 'startScenario';
 const TYPE = 'type';
+const CONSEQUENCE = 'consequence';
 const TARGET = 'target';
 const WINDOW_TAX = 'windowTax';
+const OPPOSITION = 'opposition';
+const VOTES_CAST_THIS_ROUND = 'votesCastThisRound';
+
+const SELECTING_LAW = 'selectingLaw';
+
+const IN_FAVOR = 'inFavor';
+const AGAINST = 'against';
+
 
 const PRIME_MINISTER_DIAL = [
   [
-    TYPE => POWER,
+    CONSEQUENCE => POWER,
     TARGET => WORKSHOP,
     START_SCENARIO => 1710,
   ],
   [
-    TYPE => TAX,
+    CONSEQUENCE => TAX,
     TARGET => SHARE,
   ],
   [
-    TYPE => POWER,
+    CONSEQUENCE => POWER,
     TARGET => SHIPYARD,
   ],
   [
-    TYPE => TAX,
+    CONSEQUENCE => TAX,
     TARGET => LUXURY,
     WINDOW_TAX => true,
   ],
   [
-    TYPE => POWER,
+    CONSEQUENCE => POWER,
     TARGET => SHARE,
   ],
   [
-    TYPE => BONUS,
+    CONSEQUENCE => BONUS,
     TARGET => WORKSHOP,
   ],
   [
-    TYPE => POWER,
+    CONSEQUENCE => POWER,
     TARGET => SHIPYARD,
     START_SCENARIO => 1758,
   ],
   [
-    TYPE => POWER,
+    CONSEQUENCE => POWER,
     TARGET => LUXURY,
   ],
   [
-    TYPE => TAX,
+    CONSEQUENCE => TAX,
     TARGET => SHIPYARD,
     WINDOW_TAX => true,
   ],
   [
-    TYPE => BONUS,
+    CONSEQUENCE => BONUS,
     TARGET => SHARE,
   ],
   [
-    TYPE => TAX,
+    CONSEQUENCE => TAX,
     TARGET => WORKSHOP,
     START_SCENARIO => 1813,
   ],
   [
-    TYPE => BONUS,
+    CONSEQUENCE => BONUS,
     TARGET => WORKSHOP,
   ],
   [
-    TYPE => TAX,
+    CONSEQUENCE => TAX,
     TARGET => LUXURY,
     WINDOW_TAX => true,
   ],
   [
-    TYPE => TAX,
+    CONSEQUENCE => TAX,
     TARGET => SHIPYARD,
   ],
 ];

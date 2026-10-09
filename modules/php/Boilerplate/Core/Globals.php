@@ -37,7 +37,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     'turn' => 'int',
     'options' => 'obj',
     'powerTokens' => 'obj',
-    'primeMinister' => 'obj',
+    'parliament' => 'obj',
     'eventsToResolve' => 'int',
     'retirementMoney' => 'obj',
   ];

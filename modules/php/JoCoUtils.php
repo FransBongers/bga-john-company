@@ -37,4 +37,18 @@ class JoCoUtils
     }
     return $result;
   }
+
+  public static function getPolicyConsequenceTranslation(string $consequence)
+  {
+    switch ($consequence) {
+      case BONUS:
+        return clienttranslate('Bonus');
+      case POWER:
+        return clienttranslate('Power');
+      case TAX:
+        return clienttranslate('Tax');
+      default:
+        return '';
+    }
+  }
 }

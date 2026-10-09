@@ -8,6 +8,7 @@ import {
   JocoArmyPieceBase,
   JocoEnterpriseCardBase,
   JocoFamilyMember,
+  JocoLawCardBase,
   JocoLondonSeasonCardBase,
   JocoOfficeBase,
   JoCoOrderBase,
@@ -23,6 +24,10 @@ export interface Log {
 export interface NotifWithPlayerArgs {
   playerId: number;
   player_name: string;
+}
+
+export interface NotifFrontendTrigger {
+  trigger: string;
 }
 
 export interface NotifUpdateCountersMultipleTargets extends NotifWithPlayerArgs {
@@ -196,10 +201,23 @@ export interface NotifReturnWritersToPresidencies {
   writers: JocoFamilyMember[];
 }
 
+export interface NotifRevealLaw extends NotifWithPlayerArgs {
+  law: JocoLawCardBase;
+}
+
+export interface NotifSelectLaw extends NotifWithPlayerArgs {
+  law: JocoLawCardBase;
+}
+
 export interface NotifSeekShare extends NotifWithPlayerArgs {
   amount: number;
   familyMember: JocoFamilyMember;
 }
+
+export interface NotifSelectPolicy extends NotifWithPlayerArgs {
+  dial: number;
+}
+
 
 export interface NotifSetCrownClimate extends NotifWithPlayerArgs {
   climate: Climate;

@@ -1,64 +1,50 @@
-import { Bar } from '../bar';
 import {
   addConfirmButton,
-  addPassButton,
-  addPrimaryActionButton,
   clearPossible,
   CommonStateArgs,
   debug,
-  formatStringRecursive,
   GameState,
-  getPlayerName,
   performAction,
   updatePageTitle,
 } from '../boilerplate';
-import { GameAlias, JocoOfficeBase } from '../types';
-import { getOffice } from '../utility';
+import { GameAlias } from '../types';
 
-interface OnEnteringGovernorAdministerArgs extends CommonStateArgs {
-  dicePool: number;
-  governor: JocoOfficeBase;
-}
+interface OnEnteringParliamentMeetsAdditionalRoundOrResolveArgs
+  extends CommonStateArgs {}
 
-export class GovernorAdminister implements GameState<OnEnteringGovernorAdministerArgs> {
-  private static instance: GovernorAdminister;
-  private args: OnEnteringGovernorAdministerArgs;
+export class ParliamentMeetsAdditionalRoundOrResolve
+  implements GameState<OnEnteringParliamentMeetsAdditionalRoundOrResolveArgs>
+{
+  private static instance: ParliamentMeetsAdditionalRoundOrResolve;
+  private args: OnEnteringParliamentMeetsAdditionalRoundOrResolveArgs;
 
   constructor(private game: GameAlias) {}
 
   public static create(game: GameAlias) {
-    GovernorAdminister.instance = new GovernorAdminister(game);
+    ParliamentMeetsAdditionalRoundOrResolve.instance =
+      new ParliamentMeetsAdditionalRoundOrResolve(game);
   }
 
   public static getInstance() {
-    return GovernorAdminister.instance;
+    return ParliamentMeetsAdditionalRoundOrResolve.instance;
   }
 
-  onEnteringState(args: OnEnteringGovernorAdministerArgs) {
-    debug('Entering GovernorAdminister state');
+  onEnteringState(
+    args: OnEnteringParliamentMeetsAdditionalRoundOrResolveArgs,
+  ) {
+    debug('Entering ParliamentMeetsAdditionalRoundOrResolve state');
     this.args = args;
     this.updateInterfaceInitialStep();
-    Bar.getInstance().goTo('joco-india');
   }
 
   onLeavingState() {
-    debug('Leaving GovernorAdminister state');
+    debug('Leaving ParliamentMeetsAdditionalRoundOrResolve state');
   }
 
   setDescription(
     activePlayerIds: number[],
-    args: OnEnteringGovernorAdministerArgs,
-  ) {
-    updatePageTitle(
-      _(
-        '${tkn_playerName} may take an Administer action with the ${governorTitle}',
-      ),
-      {
-        tkn_playerName: getPlayerName(activePlayerIds[0]),
-        governorTitle: _(getOffice(args.governor).title),
-      },
-    );
-  }
+    args: OnEnteringParliamentMeetsAdditionalRoundOrResolveArgs,
+  ) {}
 
   //  .####.##....##.########.########.########..########....###.....######..########
   //  ..##..###...##....##....##.......##.....##.##.........##.##...##....##.##......
@@ -78,28 +64,11 @@ export class GovernorAdminister implements GameState<OnEnteringGovernorAdministe
 
   private updateInterfaceInitialStep() {
     clearPossible();
-    updatePageTitle(
-      _('${you} may take an Administer action with the ${governorTitle}'),
-      {
-        governorTitle: _(getOffice(this.args.governor).title),
-      },
-    );
+    updatePageTitle(_('${you} may perform an action'), {});
 
-    addPrimaryActionButton({
-      id: 'administer-btn',
-      text: formatStringRecursive(
-        this.args.dicePool === 1
-          ? _('Make a check with 1 die')
-          : _('Make a check with ${dicePool} dice'),
-        {
-          dicePool: this.args.dicePool,
-        },
-      ),
-      callback: () => {
-        performAction('actGovernorAdminister', {});
-      },
+    addConfirmButton(() => {
+      performAction('actParliamentMeetsAdditionalRoundOrResolve', {});
     });
-    addPassButton(this.args.optionalAction, _('Stop'));
   }
 
   //  .##.....##.########.####.##.......####.########.##....##

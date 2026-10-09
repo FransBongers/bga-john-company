@@ -27,6 +27,7 @@ use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\Elephant;
 use Bga\Games\JohnCompany\Managers\EventTiles;
+use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\ResolveCrisis;
 use Bga\Games\JohnCompany\Utils\TradeRoutes;
 
@@ -39,8 +40,17 @@ trait DebugTrait
 
   function debug_test()
   {
-    Regions::get(PUNJAB)->setUnrest(3);
-    Regions::get(MARATHA)->setUnrest(1);
+    Parliament::setSupport(-5);
+    $data = Globals::getParliament();
+    $data[OPPOSITION] = [];
+    Globals::setParliament($data);
+    // Parliament::incOppositionVotes(1,1);
+
+    // Parliament::changePrimeMinister(SYKES);
+    // Notifications::log('debug', Parliament::getPrimeMinisterPlayerId());
+
+    // Regions::get(PUNJAB)->setUnrest(3);
+    // Regions::get(MARATHA)->setUnrest(1);
     // Players::get(2371052)->getFamily()->updateOpportunityMarker(ENLIST_OFFICER);
     // Players::get(2371053)->getFamily()->updateOpportunityMarker(SEEK_SHARE);
     // Globals::setRetirementMoney([]);
@@ -52,7 +62,7 @@ trait DebugTrait
     // Enterprises::get('Workshop_2')->setInvested(1);
     // LondonSeasonCards::setupLoadBlackmailCards();
     // Notifications::log('tradeRoute', TradeRoutes::getOrdersForTradeRoute(ORDER_BOMBAY_3, 16));
-    
+
     // Notifications::log('homePorts', Orders::getHomePorts());
 
   }

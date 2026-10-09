@@ -1,4 +1,4 @@
-import { JocoPrize } from "./types";
+import { JocoPrize } from './types';
 
 /**
  * Var names
@@ -11,6 +11,16 @@ export const MINUS = 'minus';
 export const DONE = 'done';
 export const TRADE = 'trade';
 
+/**
+ * Triggers for frontend changes
+ */
+export const PARLIAMENT_MEETS_START = 'ParliamentMeetsStart';
+export const PARLIAMENT_MEETS_VOTING_STARTS = 'ParliamentMeetsVotingStarts';
+export const PARLIAMENT_MEETS_END = 'ParliamentMeetsEnd';
+
+
+export const IN_FAVOR = 'inFavor';
+export const AGAINST = 'against';
 /**
  * Counters
  */

@@ -16,7 +16,7 @@ import {
   WRITER,
 } from '../../constants';
 import { tplIcon, tplPolicyIcon } from '../../icons/templates';
-import { JocoLawCard } from '../../types';
+import { JocoLawCard, JocoLawCardStatic } from '../../types';
 import { tplCardText } from '../utility';
 
 const lawCardHeaderText = (header: string) => {
@@ -59,9 +59,9 @@ export const tplDeregulation = () => `
   <div class="joco-deregulation-1 fb-font-baskerville fb-font-8 fb-font-italic bga-autofit">${_('At the start of a turn, the Prime Minister may call a session of Parliament to vote on this law if either Standing or Debt is on a lined space. If either piece is on a space with a star, the session must be called. In either case, no policy is proposed.')}</div>
   <div class="joco-deregulation-2 fb-font-baskerville fb-font-8 fb-font-italic bga-autofit">${_('The initial support of the law depends on the status of Standing and Debt:')}</div>
   
-`
+`;
 
-export const tplLawCardContent = (card: JocoLawCard) => `
+export const tplLawCardContent = (card: JocoLawCardStatic & { id: string }) => `
   <div class="joco-card-header fb-font-baskerville  fb-font-16 fb-font-italic bga-autofit">${lawCardHeaderText(card.header)}</div>
   <div class="joco-title fb-font-bebas-neue fb-font-40 bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
   ${tplCardText(card.text, { textClass: 'fb-font-16 fb-font-baskerville' })}

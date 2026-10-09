@@ -471,11 +471,55 @@ $machinestates = [
     ST_PRESIDENCY_TRADE_FILL_ORDERS => [
         'name' => PRESIDENCY_TRADE_FILL_ORDERS,
         'type' => 'multipleactiveplayer',
+        'description' => '${actplayer}',
+        'descriptionmyturn' => '${you}',
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . PRESIDENCY_TRADE_FILL_ORDERS, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_PARLIAMENT_MEETS_SELECT_LAW => [
+        'name' => PARLIAMENT_MEETS_SELECT_LAW,
+        'type' => 'multipleactiveplayer',
+        'description' => '${actplayer}',
+        'descriptionmyturn' => '${you}',
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . PARLIAMENT_MEETS_SELECT_LAW, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_PARLIAMENT_MEETS_SELECT_POLICY => [
+        'name' => PARLIAMENT_MEETS_SELECT_POLICY,
+        'type' => 'multipleactiveplayer',
+        'description' => '${actplayer}',
+        'descriptionmyturn' => '${you} must confirm the selected policy',
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . PARLIAMENT_MEETS_SELECT_POLICY, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_PARLIAMENT_MEETS_CAST_VOTES => [
+        'name' => PARLIAMENT_MEETS_CAST_VOTES,
+        'type' => 'multipleactiveplayer',
+        'description' => '${actplayer}',
+        'descriptionmyturn' => '${you}',
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . PARLIAMENT_MEETS_CAST_VOTES, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_PARLIAMENT_MEETS_ADDITIONAL_ROUND_OR_RESOLVE => [
+        'name' => PARLIAMENT_MEETS_ADDITIONAL_ROUND_OR_RESOLVE,
+        'type' => 'multipleactiveplayer',
         'description' => clienttranslate('${actplayer}'),
         'descriptionmyturn' => clienttranslate('${you}'),
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
-        'possibleactions' => ['act' . PRESIDENCY_TRADE_FILL_ORDERS, 'actTakeAtomicAction'],
+        'possibleactions' => ['act' . PARLIAMENT_MEETS_ADDITIONAL_ROUND_OR_RESOLVE, 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
@@ -490,8 +534,8 @@ $machinestates = [
     ST_COMMANDER_PURCHASE_LOCAL_ALLIANCE => [
         'name' => COMMANDER_PURCHASE_LOCAL_ALLIANCE,
         'type' => 'multipleactiveplayer',
-        'description' => clienttranslate('${actplayer}'),
-        'descriptionmyturn' => clienttranslate('${you}'),
+        'description' => '${actplayer}',
+        'descriptionmyturn' => '${you}',
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
         'possibleactions' => ['act' . COMMANDER_PURCHASE_LOCAL_ALLIANCE, 'actPassOptionalAction', 'actTakeAtomicAction'],
@@ -501,8 +545,8 @@ $machinestates = [
     ST_COMMANDER_APPROVE_LOCAL_ALLIANCE => [
         'name' => COMMANDER_APPROVE_LOCAL_ALLIANCE,
         'type' => 'multipleactiveplayer',
-        'description' => clienttranslate('${actplayer}'),
-        'descriptionmyturn' => clienttranslate('${you}'),
+        'description' => '${actplayer}',
+        'descriptionmyturn' => '${you}',
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
         'possibleactions' => ['act' . COMMANDER_APPROVE_LOCAL_ALLIANCE, 'actTakeAtomicAction'],
@@ -601,17 +645,6 @@ $machinestates = [
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
-    ST_PARLIAMENT_MEETS => [
-        'name' => PARLIAMENT_MEETS,
-        'type' => 'multipleactiveplayer',
-        'description' => clienttranslate('${actplayer}'),
-        'descriptionmyturn' => clienttranslate('${you}'),
-        'args' => 'argsAtomicAction',
-        'action' => 'stAtomicAction',
-        'possibleactions' => ['act' . PARLIAMENT_MEETS, 'actPassOptionalAction', 'actTakeAtomicAction'],
-        'transitions' => ['next' => ST_RESOLVE_STACK],
-    ],
-
     ST_FOREIGN_INVASION => [
         'name' => FOREIGN_INVASION,
         'description' => '',
@@ -705,6 +738,14 @@ $machinestates = [
 
     ST_ADD_UNREST => [
         'name' => ADD_UNREST,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_FRONTEND_TRIGGER => [
+        'name' => FRONTEND_TRIGGER,
         'description' => '',
         'type' => 'game',
         'action' => 'stAtomicAction',

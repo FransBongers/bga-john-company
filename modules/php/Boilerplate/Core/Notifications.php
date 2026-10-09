@@ -6,6 +6,7 @@ use Bga\GameFramework\NotificationMessage;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
+use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Prizes;
 use Bga\Games\JohnCompany\Managers\Regions;
@@ -14,6 +15,7 @@ use Bga\Games\JohnCompany\Models\ArmyPiece;
 use Bga\Games\JohnCompany\Models\Enterprise;
 use Bga\Games\JohnCompany\Models\Family;
 use Bga\Games\JohnCompany\Models\FamilyMember;
+use Bga\Games\JohnCompany\Models\LawCard;
 use Bga\Games\JohnCompany\Models\LondonSeasonCard;
 use Bga\Games\JohnCompany\Models\Office;
 use Bga\Games\JohnCompany\Models\Order;
@@ -325,6 +327,21 @@ class Notifications
     return isset($armyNameMap[$presidencyId]) ? $armyNameMap[$presidencyId] : 'Unmapped army';
   }
 
+  public static function getPolicyLog(int $policyIndex): array
+  {
+    $policy = PRIME_MINISTER_DIAL[$policyIndex];
+    $windowTax = $policy[WINDOW_TAX]  ?? false;
+
+    return [
+      'log' => $windowTax ? clienttranslate('${policyConsequence} ${tkn_icon} & Window Tax') : '${policyConsequence} ${tkn_icon}',
+      'args' => [
+        'policyConsequence' => JoCoUtils::getPolicyConsequenceTranslation($policy[CONSEQUENCE]),
+        'tkn_icon' => $policy[TARGET],
+        'i18n' => ['policyConsequence'],
+      ],
+    ];
+  }
+
   // ..######......###....##.....##.########
   // .##....##....##.##...###...###.##......
   // .##.........##...##..####.####.##......
@@ -604,6 +621,13 @@ class Notifications
     ]);
   }
 
+  public static function frontendTrigger(string $trigger)
+  {
+    self::notifyAll('frontendTrigger', '', [
+      'trigger' => $trigger,
+    ]);
+  }
+
   public static function gainEnterprise($player, $enterprise)
   {
     // Notifications::message(clienttranslate('${player_name} gains a ${enterprise}'), ['player' => $player, 'enterprise' => $type]);
@@ -755,7 +779,7 @@ class Notifications
       'player' => $player,
       'tkn_pound' => self::tknPound(),
       'officeId' => $office->getId(),
-      'tkn_boldText_amount' => '£'. $amount,
+      'tkn_boldText_amount' => '£' . $amount,
       'amount' => $amount,
       'treasury' => $treasury,
       'tkn_boldText_office' => $office->getTitle(),
@@ -767,7 +791,7 @@ class Notifications
   {
     self::notifyAll('moveCompanyBalance', clienttranslate('${player_name} adds ${tkn_boldText_amount} to the ${tkn_boldText_companyBalance}'), [
       'player' => $player,
-      'tkn_boldText_amount' => '£'. $amount,
+      'tkn_boldText_amount' => '£' . $amount,
       'amount' => $amount,
       'companyBalance' => $companyBalance,
       'tkn_boldText_companyBalance' => clienttranslate('Company Balance'),
@@ -1130,7 +1154,30 @@ class Notifications
     ]);
   }
 
-  public static function seekShare($player, $familyMember, $amount)
+  public static function revealLaw(Player $player, LawCard $law)
+  {
+
+    self::notifyAll('revealLaw', clienttranslate('${player_name} draw and reveals ${tkn_lawCard}'), [
+      'player' => $player,
+      'law' => $law->jsonSerialize(),
+      'tkn_lawCard' => $law->getId(),
+    ]);
+  }
+
+  public static function selectLaw(Player $player, LawCard $law)
+  {
+    $isDilemma = $law->isDilemma();
+
+    $text = $isDilemma ? clienttranslate('Dilemma: ${player_name} must select ${tkn_lawCard}') : clienttranslate('${player_name} selects ${tkn_lawCard}');
+
+    self::notifyAll('selectLaw', $text, [
+      'player' => $player,
+      'law' => $law->jsonSerialize(),
+      'tkn_lawCard' => $law->getId(),
+    ]);
+  }
+
+  public static function seekShare(Player $player, FamilyMember $familyMember, int $amount)
   {
     self::notifyAll('seekShare', clienttranslate('${player_name} pays ${amount} ${tkn_pound} to seek a ${tkn_icon}'), [
       'player' => $player,
@@ -1141,13 +1188,21 @@ class Notifications
     ]);
   }
 
+  public static function selectPolicy(Player $player, int $dialPosition)
+  {
+    self::notifyAll('selectPolicy', clienttranslate('${player_name} selects ${policyLog}'), [
+      'player' => $player,
+      'dial' => $dialPosition,
+      'policyLog' => self::getPolicyLog($dialPosition),
+    ]);
+  }
 
   public static function setupDone()
   {
     self::notifyAll('setupDone', '', []);
   }
 
-  public static function setupFamilyMembers($player, $familyMembers)
+  public static function setupFamilyMembers(Player $player, array $familyMembers)
   {
     self::notifyAll('setupFamilyMembers', clienttranslate('${player_name} places family members'), [
       'player' => $player,

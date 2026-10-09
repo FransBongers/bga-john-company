@@ -135,6 +135,17 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   londonSeasonDisplay: JocoLondonSeasonCardBase[];
   offices: Record<string, JocoOfficeBase>;
   orders: Record<string, JoCoOrderBase>;
+  parliament: {
+    selectingLaw: boolean;
+    primeMinister: {
+      playerId: number;
+      familyId: string;
+    };
+    revealedLaws: JocoLawCardBase[];
+    selectedLaw: JocoLawCardBase | null;
+    dial: number;
+    support: number;
+  };
   passedLaws: JocoLawCardBase[];
   phase: string;
   powerTokens: string[];

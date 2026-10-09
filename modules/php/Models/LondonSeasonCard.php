@@ -26,6 +26,7 @@ class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Mod
   protected $power = null;
   protected $discount = null;
   protected $windows = null;
+  protected $votes = 0;
 
   protected $attributes = [
     'id' => ['card_id', 'str'],
@@ -47,7 +48,8 @@ class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Mod
     'victoryPoints',
     'power',
     'discount',
-    'windows'
+    'windows',
+    'votes'
   ];
 
   public function jsonSerialize(): array

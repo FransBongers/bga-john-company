@@ -3,7 +3,7 @@ import { DISCOUNT, POWER, BONUS, TAX, VICTORY_POINTS } from '../constants';
 export const tplIcon = (type: string, extraClasses: string = '') =>
   `<div class="joco-icon ${extraClasses ?? ''}" data-icon="${type}"></div>`;
 
-const getPolicyConsequenceTranslation = (consequence: string) => {
+export const getPolicyConsequenceTranslation = (consequence: string) => {
   switch (consequence) {
     case BONUS:
       return _('Bonus');

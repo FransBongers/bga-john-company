@@ -585,7 +585,7 @@ namespace Bga\GameFramework {
          * 
          * @return bool if the table is Turn-based.
          */
-        function isTurnBased(): bool {
+        public function isTurnBased(): bool {
             return false;
         }
     
@@ -594,7 +594,7 @@ namespace Bga\GameFramework {
          * 
          * @return bool if the table is Real-time.
          */
-        function isRealTime(): bool {
+        public function isRealTime(): bool {
             return false;
         }
 
@@ -603,7 +603,16 @@ namespace Bga\GameFramework {
          * 
          * @return int the game version
          */
-        function getGameVersion(): int {
+        public function getGameVersion(): int {
+            return 0;
+        }
+
+        /**
+         * Get the selected language index as defined in the gameinfos file.
+         *
+         * @return int|null the selected language index, or null if the game has no game languages.
+         */
+        public function getGameLanguage(): ?int {
             return 0;
         }
     }
@@ -1559,11 +1568,13 @@ namespace Bga\GameFramework {
         }
 
         /**
-         * Returns an index of the selected language as defined in gameinfos.inc.php.
+         * Returns an index of the selected language as defined in gameinfos.
+         * 
+         * @deprecated use $this->bga->tableOptions->getGameLanguage()
          */
-        final public function getGameLanguage(): string
+        final public function getGameLanguage(): int
         {
-            return '';
+            return 0;
         }
 
         /**

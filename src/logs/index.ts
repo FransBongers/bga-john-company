@@ -38,6 +38,7 @@ const LOG_TOKEN_ELEPHANT = 'elephant';
 const LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
 const LOG_TOKEN_FAMILY_MEMBER = 'familyMember';
 const LOG_TOKEN_ICON = 'icon';
+const LOG_TOKEN_LAW_CARD = 'lawCard';
 const LOG_TOKEN_LOCAL_ALLIANCE = 'localAlliance';
 const LOG_TOKEN_LONDON_SEASON_CARD = 'londonSeasonCard';
 const LOG_TOKEN_POLICY_ICON = 'policyIcon';
@@ -87,6 +88,15 @@ export const getTokenDiv = ({
       const [familyId, number] = value.split(':');
       return createFamilyMember(familyId, Number(number), [CLASS_LOG_TOKEN])
         .outerHTML;
+    case LOG_TOKEN_LAW_CARD:
+      cardNameTooltipId = `tooltip_${game._last_tooltip_id}`;
+      game.tooltipsToMap.push([game._last_tooltip_id, value.split(':')[0]]);
+      game._last_tooltip_id++;
+      return tlpLogTokenText({
+        text: StaticData.get().lawCard(value).title,
+        tooltipId: cardNameTooltipId,
+        bold: true,
+      });
     case LOG_TOKEN_LOCAL_ALLIANCE:
       return tplLogTokenLocalAlliance(value);
     case LOG_TOKEN_LONDON_SEASON_CARD:
@@ -94,7 +104,9 @@ export const getTokenDiv = ({
       game.tooltipsToMap.push([game._last_tooltip_id, value.split(':')[0]]);
       game._last_tooltip_id++;
       return tlpLogTokenText({
-        text: value.startsWith('BlackmailCard') ? _('a Blackmail card') : StaticData.get().londonSeasonCard(value).title,
+        text: value.startsWith('BlackmailCard')
+          ? _('a Blackmail card')
+          : StaticData.get().londonSeasonCard(value).title,
         tooltipId: cardNameTooltipId,
         bold: true,
       });

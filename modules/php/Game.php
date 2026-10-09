@@ -41,7 +41,7 @@ use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Orders;
 use Bga\Games\JohnCompany\Managers\Players;
-use Bga\Games\JohnCompany\Managers\PrimeMinister;
+use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\Prizes;
 use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Managers\Scenarios;
@@ -369,6 +369,7 @@ class Game extends \Bga\GameFramework\Table
             ],
             'offices' => Offices::getAll(),
             'orders' => Orders::getAll(),
+            'parliament' => Parliament::getUiData(),
             'playerOrder' => Players::getTurnOrder($playerId),
             'players' => Players::getUiData($playerId),
             'powerTokens' => Globals::getPowerTokens(),
@@ -419,7 +420,7 @@ class Game extends \Bga\GameFramework\Table
         Orders::setupNewGame();
         LawCards::setupNewGame();
         LondonSeasonCards::setupNewGame();
-        PrimeMinister::setupNewGame();
+        Parliament::setupNewGame();
         Regions::setupNewGame();
         SetupCards::setupNewGame();
         Ships::setupNewGame();

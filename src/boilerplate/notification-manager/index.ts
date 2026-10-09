@@ -32,6 +32,8 @@ import {
   CHAIRMAN,
   FAMILIES,
   PRESIDENCIES,
+  PARLIAMENT_MEETS_START,
+  PARLIAMENT_MEETS_VOTING_STARTS,
 } from '../../constants';
 import { CrownClimate } from '../../crown/climate';
 import { India } from '../../india';
@@ -95,8 +97,13 @@ import {
   NotifNewLondonSeasonDisplay,
   NotifUpdateOpportunityMarker,
   NotifPlaceRegiment,
+  NotifRevealLaw,
+  NotifSelectLaw,
+  NotifSelectPolicy,
+  NotifFrontendTrigger,
 } from './types';
 import { tplArmyPiece } from '../../india/army/templates';
+import { Parliament } from '../../parliament';
 
 //  .##.....##....###....##....##....###.....######...########.########.
 //  .###...###...##.##...###...##...##.##...##....##..##.......##.....##
@@ -381,6 +388,20 @@ export class NotificationManager {
   // .##...###.##.....##....##.....##..##.......##....##
   // .##....##..#######.....##....####.##........######.
 
+  async notif_frontendTrigger(notif: NotifFrontendTrigger) {
+    const { trigger } = notif;
+    // Handle the frontend trigger as needed
+    switch (trigger) {
+      case PARLIAMENT_MEETS_START:
+        Parliament.getInstance().showRevealedLaws(true);
+        break;
+      case PARLIAMENT_MEETS_VOTING_STARTS:
+        break;
+      default:
+        throw new Error('UNHANDLED_TRIGGER: ' + trigger);
+    }
+  }
+
   async notif_log(notif: unknown) {
     // this is for debugging php side
     debug('notif_log', notif);
@@ -653,7 +674,10 @@ export class NotificationManager {
     const { from, ship } = notif;
     const seaZone = India.getInstance().getSeaZone(ship.location);
     if (!seaZone.hasShip(ship.id)) {
-      await seaZone.addShip(ship, from.startsWith('shipConstruction_') ? null : from);
+      await seaZone.addShip(
+        ship,
+        from.startsWith('shipConstruction_') ? null : from,
+      );
     }
   }
 
@@ -794,6 +818,18 @@ export class NotificationManager {
     );
   }
 
+  async notif_revealLaw(notif: NotifRevealLaw) {
+    const { playerId, law } = notif;
+
+    Parliament.getInstance().revealLaw(law);
+  }
+
+  async notif_selectLaw(notif: NotifSelectLaw) {
+    const { playerId, law } = notif;
+
+    Parliament.getInstance().selectLaw(law);
+  }
+
   async notif_seekShare(notif: NotifSeekShare) {
     const { playerId, familyMember, amount } = notif;
     const { familyId, location, id } = familyMember;
@@ -815,6 +851,13 @@ export class NotificationManager {
     toElement.insertAdjacentElement('beforeend', familyMemberElement);
 
     await this.game.animationManager.slideIn(familyMemberElement, fromElement);
+  }
+
+  async notif_selectPolicy(notif: NotifSelectPolicy) {
+    const { playerId, dial } = notif;
+    const primeMinisterDial = Parliament.getInstance().getPrimeMinisterDial();
+    primeMinisterDial.showConsequenceOptions(false);
+    primeMinisterDial.updateArmPosition(dial);
   }
 
   async notif_setCrownClimate(notif: NotifSetCrownClimate) {

@@ -95,6 +95,9 @@ export class FamilyArea {
     this.enterprises = new BgaCards.LineStock<JocoEnterpriseCard>(
       EnterpriseCardsManager.getInstance(),
       document.getElementById(`joco-enterprises-${this.familyId}`)!,
+      {
+        gap: '12px',  
+      }
     );
 
     this.updateEnterprises(gamedatas);

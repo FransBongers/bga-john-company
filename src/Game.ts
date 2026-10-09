@@ -68,20 +68,24 @@ import {
   MilitaryAffairsAssign,
   MilitaryAffairsAssignCommander,
   MilitaryAffairsTransfers,
-  ParliamentMeets,
   PlayerTurn,
   PresidencyDecideOrder,
   PresidencyTrade,
   PresidencyTradeFillOrders,
+  ParliamentMeetsSelectLaw,
   RevenuePayDividends,
   RevenueRoyalPardon,
   SeekShare,
+  ParliamentMeetsSelectPolicy,
+  ParliamentMeetsCastVotes,
+  ParliamentMeetsAdditionalRoundOrResolve,
 } from './states';
 import { StaticData } from './static-data';
 import { tplPlayArea, tplCrownPlayerPanel } from './templates';
 import { ControlTokensManager } from './token-managers/control-tokens';
 import { ShipsManager } from './token-managers/ship-tokens';
 import { JohnCompanyGamedatas, GamedatasAlias } from './types';
+import { Parliament } from './parliament';
 
 // declare const define; // TODO: check if we comment here or in bga-animations module?
 // declare const ebg;
@@ -159,7 +163,10 @@ export class Game {
     MilitaryAffairsAssign,
     MilitaryAffairsAssignCommander,
     MilitaryAffairsTransfers,
-    ParliamentMeets,
+    ParliamentMeetsSelectLaw,
+    ParliamentMeetsSelectPolicy,
+    ParliamentMeetsCastVotes,
+    ParliamentMeetsAdditionalRoundOrResolve,
     PlayerTurn,
     PresidencyDecideOrder,
     PresidencyTrade,
@@ -414,6 +421,7 @@ export class Game {
     Company.create(this);
 
     London.create(this);
+    Parliament.create(this);
     India.create(this);
     Bar.create(this);
 
@@ -885,6 +893,11 @@ export class Game {
     const tooltipManager = TooltipManager.getInstance();
     if (cardId.startsWith('BlackmailCard')) {
       tooltipManager.addBlackmailBackTooltip(`tooltip_${tooltipId}`);
+    } else if (this.gamedatas.staticData.lawCards[cardId]) {
+      tooltipManager.addLawCardTooltip({
+        nodeId: `tooltip_${tooltipId}`,
+        cardId,
+      });
     } else if (this.gamedatas.staticData.londonSeasonCards[cardId]) {
       tooltipManager.addLondonSeasonCardTooltip({
         nodeId: `tooltip_${tooltipId}`,

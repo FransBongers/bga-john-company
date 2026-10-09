@@ -1,5 +1,6 @@
 @use './fonts';
 @use './ui-components/ui-components';
+@use './tooltip-manager/tooltip';
 
 /* make space between buttons on touch devices */
 @media (hover: none) {

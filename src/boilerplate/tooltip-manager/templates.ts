@@ -3,7 +3,16 @@ import {
   tplLondonSeasonCardContent,
   tplBlackmailCardContent,
 } from '../../cards/london-season-cards/templates';
-import { JocoLondonSeasonCardStatic } from '../../types';
+import { JocoLawCardStatic, JocoLondonSeasonCardStatic } from '../../types';
+import { tplLawCardContent } from '../../cards/law-cards/templates';
+
+export const tplLawCardTooltip = (
+  data: JocoLawCardStatic & { id: string },
+) => `
+  <div class="joco-law-card tooltip" data-background="${data.background}">
+    ${tplLawCardContent(data)}
+  </div>
+`;
 
 export const tplLondonSeasonCardTooltip = (
   data: JocoLondonSeasonCardStatic,

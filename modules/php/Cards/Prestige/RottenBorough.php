@@ -11,6 +11,7 @@ class RottenBorough extends \Bga\Games\JohnCompany\Models\PrestigeCard
     $this->subtype = ENTERPRISE;
     $this->background = 'RottenBorough';
     $this->enterpriseType = LUXURY;
+    $this->votes = 3;
     $this->text = [
       [
         'log' => '${tkn_icon}${tkn_icon}${tkn_icon}',

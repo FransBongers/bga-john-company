@@ -13,6 +13,7 @@ use Bga\Games\JohnCompany\Managers\Crown;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
+use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\Scenarios;
 
 trait TurnTrait
@@ -586,15 +587,29 @@ trait TurnTrait
   {
     $this->updatePhase(PARLIAMENT_MEETS);
 
+    $primeMinisterPlayerId = Parliament::getPrimeMinisterPlayerId();
+
+    Parliament::setSelectingLaw(true);
+
     $node = [
       'children' => [
         [
-          'action' => PARLIAMENT_MEETS,
-          'playerId' => 'some',
-          'optional' => true,
-          // TODO: actual prime minister player
-          'activePlayerIds' => [Players::getAll()->toArray()[0]->getId()],
+          'action' => FRONTEND_TRIGGER,
+          'args' => [
+            TRIGGER => PARLIAMENT_MEETS_START,
+          ],
         ],
+        [
+          'action' => PARLIAMENT_MEETS_SELECT_LAW,
+          'playerId' => 'some',
+          'activePlayerIds' => [$primeMinisterPlayerId],
+        ],
+        [
+          'action' => PARLIAMENT_MEETS_SELECT_POLICY,
+          'playerId' => 'some',
+          'activePlayerIds' => [$primeMinisterPlayerId],
+        ],
+        Parliament::getRoundOfVotingNodes()
       ],
     ];
 

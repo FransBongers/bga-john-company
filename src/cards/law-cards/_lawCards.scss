@@ -1,3 +1,4 @@
+@use '../../base';
 @use 'sass:math';
 @use 'sass:map';
 
@@ -174,5 +175,30 @@ $rows: 1;
     top: 135px;
     left: 5%;
     text-align: center;
+  }
+}
+
+.joco-law-card-container {
+  &.selectable {
+    .joco-law-card {
+      cursor: pointer;
+      outline: 4px solid base.$selectable-color;
+
+      * {
+        cursor: inherit;
+      }
+    }
+  }
+
+  &.selectable:hover,
+  &.selected {
+    .joco-law-card {
+      cursor: pointer;
+      outline: 4px solid base.$selected-color;
+
+      * {
+        cursor: inherit;
+      }
+    }
   }
 }

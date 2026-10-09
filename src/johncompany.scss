@@ -29,6 +29,7 @@
 @use './logs/logs';
 @use './tokens';
 @use './india/india';
+@use './parliament/parliament';
 
 html {
   background-image: url('img/background.jpg');
@@ -115,4 +116,37 @@ html {
 
 .player-button {
   background: none;
+}
+
+.joco-consequence-button {
+  background: none;
+  color: black;
+
+  .joco-icon {
+    height: 32px;
+  }
+
+  &.joco-Bonus-button {
+    background-color: rgb(195, 222, 156);
+
+    &:hover {
+      background-color: rgba(195, 222, 156, 0.8);
+    }
+  }
+
+  &.joco-Power-button {
+    background-color: rgb(221, 205, 226);
+
+    &:hover {
+      background-color: rgba(221, 205, 226, 0.8);
+    }
+  }
+
+  &.joco-Tax-button {
+    background-color: rgb(219, 140, 147);
+
+    &:hover {
+      background-color: rgba(219, 140, 147, 0.8);
+    }
+  }
 }

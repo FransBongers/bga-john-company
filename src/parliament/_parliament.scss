@@ -1,0 +1,42 @@
+@use './prime-minister-dial/prime-minister-dial';
+
+#joco-parliament {
+  width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  #joco-parliament-revealed-laws-container {
+    &.hidden {
+      display: none;
+    }
+  }
+
+  .joco-support-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+  }
+
+  #joco-parliament-revealed-laws {
+    min-height: 351px;
+  }
+
+  .joco-voting {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+
+    .joco-column {
+      align-items: center;
+      gap: 12px;
+    }
+
+    #joco-parliament-selected-law {
+      flex-grow: 1;
+    }
+  }
+}

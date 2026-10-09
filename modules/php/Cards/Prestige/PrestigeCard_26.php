@@ -12,6 +12,7 @@ class PrestigeCard_26 extends \Bga\Games\JohnCompany\Models\PrestigeCard
     $this->subtype = ENTERPRISE;
     $this->background = 'SocialMagazine';
     $this->enterpriseType = LUXURY;
+    $this->votes = 4;
     $this->text = [
       [
         'log' => '${tkn_policyIcon_social} ${tkn_policyIcon_companyShares}',

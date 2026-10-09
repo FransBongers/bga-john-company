@@ -30,7 +30,7 @@ export class LawCardsManager extends BgaCards.Manager<JocoLawCard> {
   clearInterface() {}
 
   setupDiv(card: JocoLawCard, div: HTMLElement) {
-    div.classList.add('joco-law-card');
+    div.classList.add('joco-law-card-container');
   }
 
   setupFrontDiv(card: JocoLawCard, div: HTMLElement) {

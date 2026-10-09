@@ -1,3 +1,4 @@
+@use '../base';
 @use 'sass:math';
 @use 'sass:map';
 
@@ -41,5 +42,31 @@ $rows: 2;
     // positions run from 0% to 100% inclusive so the step is 100% / ($cols - 1) or ($rows - 1).
     background-position-x: math.div($col * 100%, $cols - 1);
     background-position-y: math.div($row * 100%, $rows - 1);
+  }
+}
+
+.bga-cards_card {
+  &.selectable {
+    .bga-cards_card-side {
+      cursor: pointer;
+      outline: 4px solid base.$selectable-color;
+
+      // TODO: fix cursor when hovering over text inside the card
+      * {
+        cursor: inherit;
+      }
+    }
+  }
+
+  &.selectable:hover,
+  &.selected {
+    .bga-cards_card-side {
+      cursor: pointer;
+      outline: 4px solid base.$selected-color;
+
+      * {
+        cursor: inherit;
+      }
+    }
   }
 }

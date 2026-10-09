@@ -125,7 +125,7 @@ export class London {
     const orderContainer = document.getElementById('joco-london-season-order');
 
     orderContainer.replaceChildren();
-    
+
     if (!data.order || data.order.length === 0) return;
     orderContainer.insertAdjacentHTML('beforeend', tplLondonSeasonOrder(data));
   }

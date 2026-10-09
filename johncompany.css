@@ -169,6 +169,61 @@
   text-shadow: #fff 0 0 2px, #fff 0 0 2px, #fff 0 0 2px, #fff 0 0 2px, #fff 0 0 2px, #fff 0 0 2px;
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
+.dijitTooltipContainer {
+  padding: 8px !important;
+}
+
+#ebd-body.help-mode .tooltipable {
+  cursor: help;
+}
+
+.help-marker {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  z-index: 900;
+  border: 1px solid black;
+  border-radius: 50%;
+  background-color: white;
+}
+.help-marker svg {
+  width: 20px;
+  height: 20px;
+}
+
+#ebd-body:not(.help-mode) .help-marker {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.text-tooltip-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 200px;
+}
+.text-tooltip-container .title {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.tooltip.joco-law-card {
+  position: relative;
+  outline: 1px solid black;
+}
+
 /* make space between buttons on touch devices */
 @media (hover: none) {
   #page-title .action-button.bgabutton,
@@ -246,6 +301,15 @@ span[style*="color:#addb90"] {
   min-height: 100%;
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
 .joco-enterprise-card .joco-title {
   position: absolute;
   top: 16px;
@@ -616,6 +680,15 @@ span[style*="color:#addb90"] {
   height: 20px;
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
 .joco-law-card {
   width: 225px;
   aspect-ratio: 150/234;
@@ -742,6 +815,21 @@ span[style*="color:#addb90"] {
   top: 135px;
   left: 5%;
   text-align: center;
+}
+
+.joco-law-card-container.selectable .joco-law-card {
+  cursor: pointer;
+  outline: 4px solid yellow;
+}
+.joco-law-card-container.selectable .joco-law-card * {
+  cursor: inherit;
+}
+.joco-law-card-container.selectable:hover .joco-law-card, .joco-law-card-container.selected .joco-law-card {
+  cursor: pointer;
+  outline: 4px solid blue;
+}
+.joco-law-card-container.selectable:hover .joco-law-card *, .joco-law-card-container.selected .joco-law-card * {
+  cursor: inherit;
 }
 
 .joco-small-card-horizontal {
@@ -874,6 +962,21 @@ span[style*="color:#addb90"] {
 .joco-small-card-horizontal[data-background=""] {
   background-position-x: 100%;
   background-position-y: 400%;
+}
+
+.bga-cards_card.selectable .bga-cards_card-side {
+  cursor: pointer;
+  outline: 4px solid yellow;
+}
+.bga-cards_card.selectable .bga-cards_card-side * {
+  cursor: inherit;
+}
+.bga-cards_card.selectable:hover .bga-cards_card-side, .bga-cards_card.selected .bga-cards_card-side {
+  cursor: pointer;
+  outline: 4px solid blue;
+}
+.bga-cards_card.selectable:hover .bga-cards_card-side *, .bga-cards_card.selected .bga-cards_card-side * {
+  cursor: inherit;
 }
 
 /*
@@ -1888,6 +1991,7 @@ span[style*="color:#addb90"] {
 }
 .joco-family-area .joco-family-area-content .joco-enterprises {
   min-height: 150px;
+  padding: 4px;
 }
 .joco-family-area .joco-family-area-content .joco-prestige-blackmail {
   min-height: 351px;
@@ -3317,6 +3421,104 @@ span[style*="color:#c0c0c0"] {
   padding: 8px;
 }
 
+#joco-prime-minister-dial {
+  position: relative;
+  background-image: url("img/prime_minister_dial.webp");
+  background-size: 100% 100%;
+  width: 500px;
+  height: 500px;
+}
+#joco-prime-minister-dial .prime-minister-arm {
+  position: absolute;
+  top: 250px;
+  left: 187px;
+  transform: translate(-50%, -50%);
+  background-image: url("img/prime_minister_arm.png");
+  background-size: 100% 100%;
+  width: 150px;
+  aspect-ratio: 565/164;
+  transform-origin: calc(100% - 15px) center;
+  transition: transform 0.3s ease-in-out;
+}
+#joco-prime-minister-dial #joco-prime-minister-right,
+#joco-prime-minister-dial #joco-prime-minister-left {
+  opacity: 0.75;
+}
+#joco-prime-minister-dial #joco-prime-minister-right.hidden,
+#joco-prime-minister-dial #joco-prime-minister-left.hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+#joco-prime-minister-dial .joco-prime-minister-title {
+  position: absolute;
+  top: 176px;
+  left: 180px;
+  line-height: 20px;
+  height: 40px;
+  width: 70px;
+  text-align: center;
+}
+#joco-prime-minister-dial .joco-prime-minister-player-name {
+  position: absolute;
+  top: 216px;
+  left: 180px;
+  line-height: 16px;
+  height: 16px;
+  width: 70px;
+  text-align: center;
+}
+#joco-prime-minister-dial .joco-prime-minister-player-name .bga-autofit__inner {
+  overflow: visible;
+}
+#joco-prime-minister-dial .joco-prime-minister-dial-text {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: center center;
+}
+#joco-prime-minister-dial .joco-prime-minister-dial-text .joco-consequence {
+  height: 20px;
+  width: 80px;
+}
+#joco-prime-minister-dial .joco-prime-minister-dial-text .joco-window-tax {
+  height: 12px;
+  width: 70px;
+}
+
+#joco-parliament {
+  width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#joco-parliament #joco-parliament-revealed-laws-container.hidden {
+  display: none;
+}
+#joco-parliament .joco-support-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+#joco-parliament #joco-parliament-revealed-laws {
+  min-height: 351px;
+}
+#joco-parliament .joco-voting {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+#joco-parliament .joco-voting .joco-column {
+  align-items: center;
+  gap: 12px;
+}
+#joco-parliament .joco-voting #joco-parliament-selected-law {
+  flex-grow: 1;
+}
+
 html {
   background-image: url("img/background.jpg");
   background-attachment: fixed;
@@ -3388,6 +3590,32 @@ html {
 
 .player-button {
   background: none;
+}
+
+.joco-consequence-button {
+  background: none;
+  color: black;
+}
+.joco-consequence-button .joco-icon {
+  height: 32px;
+}
+.joco-consequence-button.joco-Bonus-button {
+  background-color: rgb(195, 222, 156);
+}
+.joco-consequence-button.joco-Bonus-button:hover {
+  background-color: rgba(195, 222, 156, 0.8);
+}
+.joco-consequence-button.joco-Power-button {
+  background-color: rgb(221, 205, 226);
+}
+.joco-consequence-button.joco-Power-button:hover {
+  background-color: rgba(221, 205, 226, 0.8);
+}
+.joco-consequence-button.joco-Tax-button {
+  background-color: rgb(219, 140, 147);
+}
+.joco-consequence-button.joco-Tax-button:hover {
+  background-color: rgba(219, 140, 147, 0.8);
 }
 
 /*# sourceMappingURL=johncompany.css.map */

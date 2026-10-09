@@ -11,6 +11,10 @@ class Bar {
         this.active = 0;
         this.config = [
             {
+                id: 'joco-parliament',
+                text: _('Parliament'),
+            },
+            {
                 id: 'joco-london',
                 text: _('London'),
             },
@@ -89,6 +93,11 @@ const PLUS = 'plus';
 const MINUS = 'minus';
 const DONE = 'done';
 const TRADE = 'trade';
+const PARLIAMENT_MEETS_START = 'ParliamentMeetsStart';
+const PARLIAMENT_MEETS_VOTING_STARTS = 'ParliamentMeetsVotingStarts';
+const PARLIAMENT_MEETS_END = 'ParliamentMeetsEnd';
+const IN_FAVOR = 'inFavor';
+const AGAINST = 'against';
 const TROPHIES = 'trophies';
 const BENYON = 'Benyon';
 const HASTINGS = 'Hastings';
@@ -234,7 +243,7 @@ const OFFICES_WITH_TREASURY = [
     PRESIDENT_OF_MADRAS,
     PRESIDENT_OF_BENGAL,
 ];
-const VACANT_OFFICES$1 = 'VacantOffices';
+const VACANT_OFFICES = 'VacantOffices';
 const FAMILY_OFFICES = 'FamilyOffices';
 const OPPORTUNITY_MARKER = 'OpportunityMarker';
 const FAMILY_ACTION = 'FamilyAction';
@@ -702,6 +711,7 @@ class PlayerManager {
 const DISABLED = 'disabled';
 const SELECTABLE = 'selectable';
 const SELECTED = 'selected';
+const USED = 'used';
 const PRIMARY = 'primary';
 const SECONDARY = 'secondary';
 
@@ -1698,7 +1708,9 @@ class EnterpriseCardsManager extends BgaCards$1.Manager {
         this.shipStocks = {};
     }
     clearInterface() { }
-    setupDiv(card, div) { }
+    setupDiv(card, div) {
+        div.classList.add('joco-enterprise-card-container');
+    }
     setupFrontDiv(card, div) {
         div.classList.add('joco-enterprise-card');
         div.classList.add('joco-small-card-horizontal');
@@ -2538,7 +2550,7 @@ class Company {
     }
     setupVacantOffices(gamedatas) {
         Object.values(gamedatas.offices).forEach((office) => {
-            if (office.location === VACANT_OFFICES$1) {
+            if (office.location === VACANT_OFFICES) {
                 this.ui.vacantOffices.insertAdjacentHTML('beforeend', tplOfficeCard(office));
             }
         });
@@ -2552,7 +2564,7 @@ class Company {
             standing: {},
             debt: {},
             offices: {},
-            vacantOffices: document.getElementById(VACANT_OFFICES$1),
+            vacantOffices: document.getElementById(VACANT_OFFICES),
         };
         [CHAIRMAN, DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING].forEach((officeId) => {
             this.ui.offices[officeId] = document.getElementById(officeId);
@@ -3374,7 +3386,7 @@ class LawCardsManager extends BgaCards$1.Manager {
     }
     clearInterface() { }
     setupDiv(card, div) {
-        div.classList.add('joco-law-card');
+        div.classList.add('joco-law-card-container');
     }
     setupFrontDiv(card, div) {
         div.classList.add('joco-law-card');
@@ -3724,7 +3736,9 @@ class FamilyArea {
         this.setupOpportunityMarker(config.gamedatas);
     }
     setupEnterprises(gamedatas) {
-        this.enterprises = new BgaCards.LineStock(EnterpriseCardsManager.getInstance(), document.getElementById(`joco-enterprises-${this.familyId}`));
+        this.enterprises = new BgaCards.LineStock(EnterpriseCardsManager.getInstance(), document.getElementById(`joco-enterprises-${this.familyId}`), {
+            gap: '12px',
+        });
         this.updateEnterprises(gamedatas);
     }
     setupLondonSeasonCards(gamedatas) {
@@ -3907,6 +3921,336 @@ class SetupArea {
     }
 }
 
+const PRIME_MINISTER_DIAL = [
+    {
+        position: {
+            left: 6,
+            top: 195,
+        },
+        rotation: -78,
+        consequence: POWER,
+        target: WORKSHOP,
+        startScenario: 1710,
+    },
+    {
+        position: {
+            left: 45,
+            top: 110,
+        },
+        rotation: -54,
+        consequence: TAX,
+        target: SHARE,
+    },
+    {
+        position: {
+            left: 119,
+            top: 49,
+        },
+        rotation: -26,
+        consequence: POWER,
+        target: SHIPYARD,
+    },
+    {
+        position: {
+            left: 210,
+            top: 29,
+        },
+        rotation: 0,
+        consequence: TAX,
+        target: LUXURY,
+        windowTax: true,
+    },
+    {
+        position: {
+            left: 300,
+            top: 49,
+        },
+        rotation: 26,
+        consequence: POWER,
+        target: SHARE,
+    },
+    {
+        position: {
+            left: 373,
+            top: 107,
+        },
+        rotation: 51,
+        consequence: BONUS,
+        target: WORKSHOP,
+    },
+    {
+        position: {
+            left: 413,
+            top: 191,
+        },
+        rotation: 77,
+        consequence: POWER,
+        target: SHIPYARD,
+        startScenario: 1758,
+    },
+    {
+        position: {
+            left: 414,
+            top: 283,
+        },
+        rotation: 103,
+        consequence: POWER,
+        target: LUXURY,
+    },
+    {
+        position: {
+            left: 371,
+            top: 363,
+        },
+        rotation: 130,
+        consequence: TAX,
+        target: SHIPYARD,
+        windowTax: true,
+    },
+    {
+        position: {
+            left: 302,
+            top: 425,
+        },
+        rotation: 154,
+        consequence: BONUS,
+        target: SHARE,
+    },
+    {
+        position: {
+            left: 212,
+            top: 446,
+        },
+        rotation: 179,
+        consequence: TAX,
+        target: WORKSHOP,
+        startScenario: 1813,
+    },
+    {
+        position: {
+            left: 121,
+            top: 426,
+        },
+        rotation: 205,
+        consequence: BONUS,
+        target: WORKSHOP,
+    },
+    {
+        position: {
+            left: 49,
+            top: 362,
+        },
+        rotation: 231,
+        consequence: TAX,
+        target: LUXURY,
+        windowTax: true,
+    },
+    {
+        position: {
+            left: 7,
+            top: 286,
+        },
+        rotation: 256,
+        consequence: TAX,
+        target: SHIPYARD,
+    },
+];
+
+class PrimeMinisterDial {
+    constructor(props) {
+        this.props = props;
+        this.setup(this.props.gamedatas);
+    }
+    setupText() {
+        PRIME_MINISTER_DIAL.forEach((item, index) => {
+            this.ui.dial.insertAdjacentHTML('beforeend', this.tplText(item));
+        });
+    }
+    setup(gamedatas) {
+        this.props.parent.insertAdjacentHTML('beforeend', this.tplPrimeMinisterDial());
+        this.ui = {
+            dial: document.getElementById('joco-prime-minister-dial'),
+            arm: document.getElementById('joco-prime-minister-arm'),
+            armLeft: document.getElementById('joco-prime-minister-left'),
+            armRight: document.getElementById('joco-prime-minister-right'),
+            playerName: document.getElementById('joco-prime-minister-player-name'),
+        };
+        this.setupText();
+        this.updateArmPosition(gamedatas.parliament.dial);
+        this.updatePlayerName(gamedatas.parliament.primeMinister.playerId);
+    }
+    tplPrimeMinisterDial() {
+        return `
+      <div id="joco-prime-minister-dial" class="prime-minister-dial">
+        <div class="joco-prime-minister-title bga-autofit">
+          <span class="fb-font-parisienne fb-font-20">${_('Prime Minister')}</span>
+        </div>
+        <div class="joco-prime-minister-player-name bga-autofit">
+          <span id="joco-prime-minister-player-name" class="fb-font-12"></span>
+        </div>
+        <div id="joco-prime-minister-left" class="prime-minister-arm hidden"></div>
+        <div id="joco-prime-minister-arm" class="prime-minister-arm"></div>
+        <div id="joco-prime-minister-right" class="prime-minister-arm hidden"></div>
+        
+      </div>
+    `;
+    }
+    tplText({ consequence, position, rotation, windowTax, }) {
+        return `
+      <div class="joco-prime-minister-dial-text" style="transform: rotate(${rotation}deg); left: ${position.left}px; top: ${position.top}px;">
+        <div class="joco-consequence bga-autofit">
+          <span class="fb-font-baskerville fb-font-16">${getPolicyConsequenceTranslation(consequence).toLocaleUpperCase()}</span>
+          ${windowTax ? `<span class="fb-font-baskerville fb-font-16">&</span>` : ''}
+        </div>
+        ${windowTax
+            ? `<div class="joco-window-tax bga-autofit">
+                <span class="fb-font-baskerville fb-font-8">${_('Window Tax').toLocaleUpperCase()}</span>
+              </div>`
+            : ''}
+    
+      </div>
+    `;
+    }
+    updatePlayerName(playerId) {
+        this.ui.playerName.replaceChildren();
+        this.ui.playerName.insertAdjacentHTML('beforeend', formatStringRecursive('${tkn_playerName}', {
+            tkn_playerName: getPlayerName(playerId),
+        }));
+    }
+    getRotationForPosition(position, currentRotation) {
+        const targetRotation = 11 + position * (360 / 14);
+        if (currentRotation === undefined) {
+            return targetRotation;
+        }
+        return (targetRotation +
+            360 * Math.round((currentRotation - targetRotation) / 360));
+    }
+    setRotation(elt, degrees) {
+        elt.style.transform = `translate(-50%, -50%) rotate(${degrees}deg)`;
+    }
+    updateArmPosition(position) {
+        this.armRotation = this.getRotationForPosition(position, this.armRotation);
+        this.setRotation(this.ui.arm, this.armRotation);
+    }
+    updateRightArmPosition(position) {
+        this.rightArmRotation = this.getRotationForPosition(position, this.rightArmRotation);
+        this.setRotation(this.ui.armRight, this.rightArmRotation);
+    }
+    updateLeftArmPosition(position) {
+        this.leftArmRotation = this.getRotationForPosition(position, this.leftArmRotation);
+        this.setRotation(this.ui.armLeft, this.leftArmRotation);
+    }
+    showConsequenceOptions(show) {
+        if (show) {
+            this.ui.armLeft.classList.remove('hidden');
+            this.ui.armRight.classList.remove('hidden');
+        }
+        else {
+            this.ui.armLeft.classList.add('hidden');
+            this.ui.armRight.classList.add('hidden');
+        }
+    }
+}
+
+const tplParliament = () => `
+  <div id="joco-parliament" class="joco-tab">
+    <div id="joco-parliament-revealed-laws-container" class="joco-container hidden">
+      <div class="joco-header"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Revealed Laws').toLocaleUpperCase()}</span></div>
+      <div id="joco-parliament-revealed-laws">
+          
+      </div>
+    </div>
+    <div class="joco-container">
+      <div class="joco-header"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Voting').toLocaleUpperCase()}</span></div>
+      <div class="joco-support-container">
+        <span class="fb-font-baskerville fb-font-12 fb-font-bold">${_('Support').toLocaleUpperCase()}</span>
+        <span id="joco-support-counter" class="fb-font-baskerville fb-font-12 fb-font-bold"></span>
+      </div>
+      <div class="joco-voting">
+        <div class="joco-column">
+          <div id="joco-parliament-selected-policy"></div>
+          <span class="fb-font-baskerville fb-font-12">${_('Policy').toLocaleUpperCase()}</span>
+        </div>
+        <div class="joco-column" style="flex-grow: 1;">
+          <div id="joco-parliament-selected-law"></div>
+          <span class="fb-font-baskerville fb-font-12">${_('Law').toLocaleUpperCase()}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+`;
+class Parliament {
+    constructor(game) {
+        this.game = game;
+        this.game = game;
+        this.setup(game.gamedatas);
+    }
+    static create(game) {
+        Parliament.instance = new Parliament(game);
+    }
+    static getInstance() {
+        return Parliament.instance;
+    }
+    setupSupportCounter(gamedatas) {
+        this.supportCounter = new ebg.counter();
+        this.supportCounter.create('joco-support-counter');
+        this.supportToValue(gamedatas.parliament.support);
+    }
+    setupStocks(gamedatas) {
+        this.revealedLaws = new BgaCards$1.LineStock(LawCardsManager.getInstance(), document.getElementById('joco-parliament-revealed-laws'), {
+            gap: '12px',
+        });
+        const cards = gamedatas.parliament.revealedLaws.map(getLawCard);
+        this.revealedLaws.addCards(cards);
+        this.selectedLaw = new BgaCards$1.LineStock(LawCardsManager.getInstance(), document.getElementById('joco-parliament-selected-law'), {
+            gap: '12px',
+        });
+        const selectedLawCard = gamedatas.parliament.selectedLaw;
+        if (selectedLawCard) {
+            this.selectedLaw.addCard(getLawCard(selectedLawCard));
+        }
+    }
+    setup(gamedatas) {
+        document
+            .getElementById('joco')
+            .insertAdjacentHTML('afterbegin', tplParliament());
+        this.primeMinisterDial = new PrimeMinisterDial({
+            parent: document.getElementById('joco-parliament-selected-policy'),
+            gamedatas,
+        });
+        this.ui = {
+            revealedLawsContainer: document.getElementById('joco-parliament-revealed-laws-container'),
+        };
+        this.setupStocks(gamedatas);
+        this.setupSupportCounter(gamedatas);
+        this.showRevealedLaws(gamedatas.parliament.selectingLaw);
+    }
+    async revealLaw(law) {
+        await this.revealedLaws.addCard(getLawCard(law));
+    }
+    async selectLaw(law) {
+        const lawCard = getLawCard(law);
+        await this.selectedLaw.addCard(lawCard);
+        this.supportToValue(lawCard.initialSupport);
+        await this.revealedLaws.removeAll();
+        this.showRevealedLaws(false);
+    }
+    getPrimeMinisterDial() {
+        return this.primeMinisterDial;
+    }
+    supportToValue(support) {
+        this.supportCounter.toValue(support);
+    }
+    async showRevealedLaws(show) {
+        if (show) {
+            this.ui.revealedLawsContainer.classList.remove('hidden');
+        }
+        else {
+            this.ui.revealedLawsContainer.classList.add('hidden');
+        }
+    }
+}
+
 const MIN_NOTIFICATION_MS = 1200;
 class NotificationManager {
     constructor(game) {
@@ -3984,6 +4328,18 @@ class NotificationManager {
     updateCountersForTarget(target, counterChanges) {
         if (FAMILIES.includes(target)) {
             Families.getInstance().getFamily(target).incCounters(counterChanges);
+        }
+    }
+    async notif_frontendTrigger(notif) {
+        const { trigger } = notif;
+        switch (trigger) {
+            case PARLIAMENT_MEETS_START:
+                Parliament.getInstance().showRevealedLaws(true);
+                break;
+            case PARLIAMENT_MEETS_VOTING_STARTS:
+                break;
+            default:
+                throw new Error('UNHANDLED_TRIGGER: ' + trigger);
         }
     }
     async notif_log(notif) {
@@ -4253,6 +4609,14 @@ class NotificationManager {
             await this.moveFamilyMember(writer);
         }));
     }
+    async notif_revealLaw(notif) {
+        const { playerId, law } = notif;
+        Parliament.getInstance().revealLaw(law);
+    }
+    async notif_selectLaw(notif) {
+        const { playerId, law } = notif;
+        Parliament.getInstance().selectLaw(law);
+    }
     async notif_seekShare(notif) {
         const { playerId, familyMember, amount } = notif;
         const { familyId, location, id } = familyMember;
@@ -4264,6 +4628,12 @@ class NotificationManager {
             : familyId, id);
         toElement.insertAdjacentElement('beforeend', familyMemberElement);
         await this.game.animationManager.slideIn(familyMemberElement, fromElement);
+    }
+    async notif_selectPolicy(notif) {
+        const { playerId, dial } = notif;
+        const primeMinisterDial = Parliament.getInstance().getPrimeMinisterDial();
+        primeMinisterDial.showConsequenceOptions(false);
+        primeMinisterDial.updateArmPosition(dial);
     }
     async notif_setCrownClimate(notif) {
         const { climate } = notif;
@@ -4450,6 +4820,11 @@ class ResolveChoice {
     }
 }
 
+const tplLawCardTooltip = (data) => `
+  <div class="joco-law-card tooltip" data-background="${data.background}">
+    ${tplLawCardContent(data)}
+  </div>
+`;
 const tplLondonSeasonCardTooltip = (data) => `
   <div class="joco-card" data-background="${data.background}">
     ${data.type === PRESTIGE ? tplLondonSeasonCardContent(data) : tplBlackmailCardContent(data)}
@@ -4472,6 +4847,14 @@ class TooltipManager {
         this.game.bga.gameui.removeTooltip(nodeId);
     }
     setupTooltips() { }
+    addLawCardTooltip({ nodeId, cardId, }) {
+        const card = {
+            id: cardId,
+            ...StaticData.get().lawCard(cardId),
+        };
+        const html = tplLawCardTooltip(card);
+        this.game.bga.gameui.addTooltipHtml(nodeId, html, 400);
+    }
     addLondonSeasonCardTooltip({ nodeId, cardId, imageOnly = false, }) {
         const card = StaticData.get().londonSeasonCard(cardId);
         const html = tplLondonSeasonCardTooltip(card);
@@ -4502,6 +4885,7 @@ const LOG_TOKEN_ELEPHANT = 'elephant';
 const LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
 const LOG_TOKEN_FAMILY_MEMBER = 'familyMember';
 const LOG_TOKEN_ICON = 'icon';
+const LOG_TOKEN_LAW_CARD = 'lawCard';
 const LOG_TOKEN_LOCAL_ALLIANCE = 'localAlliance';
 const LOG_TOKEN_LONDON_SEASON_CARD = 'londonSeasonCard';
 const LOG_TOKEN_POLICY_ICON = 'policyIcon';
@@ -4539,6 +4923,15 @@ const getTokenDiv = ({ key, value, game, }) => {
             const [familyId, number] = value.split(':');
             return createFamilyMember(familyId, Number(number), [CLASS_LOG_TOKEN])
                 .outerHTML;
+        case LOG_TOKEN_LAW_CARD:
+            cardNameTooltipId = `tooltip_${game._last_tooltip_id}`;
+            game.tooltipsToMap.push([game._last_tooltip_id, value.split(':')[0]]);
+            game._last_tooltip_id++;
+            return tlpLogTokenText({
+                text: StaticData.get().lawCard(value).title,
+                tooltipId: cardNameTooltipId,
+                bold: true,
+            });
         case LOG_TOKEN_LOCAL_ALLIANCE:
             return tplLogTokenLocalAlliance(value);
         case LOG_TOKEN_LONDON_SEASON_CARD:
@@ -4546,7 +4939,9 @@ const getTokenDiv = ({ key, value, game, }) => {
             game.tooltipsToMap.push([game._last_tooltip_id, value.split(':')[0]]);
             game._last_tooltip_id++;
             return tlpLogTokenText({
-                text: value.startsWith('BlackmailCard') ? _('a Blackmail card') : StaticData.get().londonSeasonCard(value).title,
+                text: value.startsWith('BlackmailCard')
+                    ? _('a Blackmail card')
+                    : StaticData.get().londonSeasonCard(value).title,
                 tooltipId: cardNameTooltipId,
                 bold: true,
             });
@@ -6073,7 +6468,7 @@ class EnlistWriter {
                 return _('Family Action');
             case OPPORTUNITY_MARKER:
                 return _('Opportunity Marker');
-            case VACANT_OFFICES$1:
+            case VACANT_OFFICES:
                 return _('Vacant Offices');
             default:
                 return _('Unknown Source');
@@ -6212,7 +6607,7 @@ class GovernorAdminister {
                 performAction$1('actGovernorAdminister', {});
             },
         });
-        addPassButton$1(this.args.optionalAction);
+        addPassButton$1(this.args.optionalAction, _('Stop'));
     }
 }
 
@@ -6923,37 +7318,251 @@ class MilitaryAffairsTransfers {
     }
 }
 
-class ParliamentMeets {
+class ParliamentMeetsSelectPolicy {
     constructor(game) {
         this.game = game;
     }
     static create(game) {
-        ParliamentMeets.instance = new ParliamentMeets(game);
+        ParliamentMeetsSelectPolicy.instance = new ParliamentMeetsSelectPolicy(game);
     }
     static getInstance() {
-        return ParliamentMeets.instance;
+        return ParliamentMeetsSelectPolicy.instance;
     }
     onEnteringState(args) {
-        debug('Entering ParliamentMeets state');
+        debug('Entering ParliamentMeetsSelectPolicy state');
+        this.args = args;
+        this.primeMinisterDial = Parliament.getInstance().getPrimeMinisterDial();
+        this.primeMinisterDial.updateLeftArmPosition(this.args.left);
+        this.primeMinisterDial.updateRightArmPosition(this.args.right);
+        this.primeMinisterDial.showConsequenceOptions(true);
+        this.updateInterfaceInitialStep();
+    }
+    onLeavingState() {
+        debug('Leaving ParliamentMeetsSelectPolicy state');
+    }
+    setDescription(activePlayerIds, args) {
+        const activePlayerId = activePlayerIds[0];
+        updatePageTitle(_('${player_name} must select a policy'), {
+            player_name: getPlayerName(activePlayerId),
+        });
+    }
+    updateInterfaceInitialStep() {
+        clearPossible();
+        updatePageTitle(_('${you} must select a policy'), {});
+        this.addPolicyButton(this.args.left);
+        this.addPolicyButton(this.args.right);
+    }
+    updateInterfaceConfirmStep(dialPosition, policy) {
+        clearPossible();
+        updatePageTitle(_('Select ${policy}?'), {
+            policy: this.getTextForPolicy(policy),
+        });
+        addConfirmButton$1(() => {
+            performAction$1('actParliamentMeetsSelectPolicy', {
+                dialPosition,
+            });
+        });
+        addCancelButton$1();
+    }
+    getTextForPolicy(policy) {
+        return formatStringRecursive(policy.windowTax
+            ? _('${consequence} ${tkn_icon} & WINDOW TAX')
+            : '${consequence} ${tkn_icon}', {
+            consequence: getPolicyConsequenceTranslation(policy.consequence).toLocaleUpperCase(),
+            tkn_icon: policy.target,
+        });
+    }
+    addPolicyButton(dialPosition) {
+        const policy = PRIME_MINISTER_DIAL[dialPosition];
+        addSecondaryActionButton({
+            id: `policy_${dialPosition}`,
+            text: this.getTextForPolicy(policy),
+            extraClasses: `joco-${policy.consequence}-button joco-consequence-button`,
+            callback: () => this.updateInterfaceConfirmStep(dialPosition, policy),
+        });
+    }
+}
+
+class ParliamentMeetsCastVotes {
+    constructor(game) {
+        this.game = game;
+        this.spend = 0;
+        this.treasury = 0;
+        this.selectedEnterpriseCardIds = [];
+        this.selectedLondonSeasonCardIds = [];
+    }
+    static create(game) {
+        ParliamentMeetsCastVotes.instance = new ParliamentMeetsCastVotes(game);
+    }
+    static getInstance() {
+        return ParliamentMeetsCastVotes.instance;
+    }
+    onEnteringState(args) {
+        debug('Entering ParliamentMeetsCastVotes state');
+        this.args = args;
+        this.spend = 0;
+        this.treasury = this.args.votes.money;
+        this.selectedEnterpriseCardIds = [];
+        this.selectedLondonSeasonCardIds = [];
+        this.updateInterfaceInitialStep();
+    }
+    onLeavingState() {
+        debug('Leaving ParliamentMeetsCastVotes state');
+    }
+    setDescription(activePlayerIds, args) { }
+    updateInterfaceInitialStep() {
+        clearPossible();
+        updatePageTitle(_('${you} may spend £ and enterprises to cast votes'), {});
+        const enterpriseVotes = this.args.votes.enterprises
+            .filter((card) => this.selectedEnterpriseCardIds.includes(card.id))
+            .reduce((total, card) => total + card.votes, 0);
+        const londonSeasonVotes = this.args.votes.londonSeasonCards
+            .filter((card) => this.selectedLondonSeasonCardIds.includes(card.id))
+            .reduce((total, card) => total + card.votes, 0);
+        const totalVotes = this.spend + enterpriseVotes + londonSeasonVotes;
+        this.args.votes.enterprises.forEach((card) => {
+            onClick(`enterprise-card-${card.id}`, () => this.handleCardClick(card.id, 'enterprise'));
+        });
+        this.args.votes.londonSeasonCards.forEach((card) => {
+            onClick(`game-card-${card.id}`, () => this.handleCardClick(card.id, 'london-season'));
+        });
+        this.setSelected();
+        addSecondaryActionButton({
+            id: 'minus_btn',
+            text: '-',
+            callback: () => {
+                this.spend--;
+                this.treasury++;
+                this.getCashCounter().incValue(1);
+                this.updateInterfaceInitialStep();
+            },
+            extraClasses: this.spend === 0 ? DISABLED : '',
+        });
+        if (this.args.options.includes(IN_FAVOR)) {
+            addPrimaryActionButton({
+                id: 'vote_in_favor_btn',
+                text: formatStringRecursive(_('Cast ${number} vote(s) in favor'), {
+                    number: totalVotes,
+                }),
+                callback: () => this.updateInterfaceConfirm(IN_FAVOR),
+                extraClasses: totalVotes <= 0 ? DISABLED : '',
+            });
+        }
+        if (this.args.options.includes(AGAINST)) {
+            addDangerActionButton({
+                id: 'vote_against_btn',
+                text: formatStringRecursive(_('Cast ${number} vote(s) against'), {
+                    number: totalVotes,
+                }),
+                callback: () => this.updateInterfaceConfirm(AGAINST),
+                extraClasses: totalVotes <= 0 ? DISABLED : '',
+            });
+        }
+        addSecondaryActionButton({
+            id: 'plus_btn',
+            text: '+',
+            callback: () => {
+                this.spend++;
+                this.treasury--;
+                this.getCashCounter().incValue(-1);
+                this.updateInterfaceInitialStep();
+            },
+            extraClasses: this.treasury === 0 ? DISABLED : '',
+        });
+        if (totalVotes <= 0) {
+            addPassButton$1(this.args.optionalAction, _('Do not cast any votes'));
+        }
+        else {
+            this.addCancelButton();
+        }
+    }
+    updateInterfaceConfirm(option) {
+        clearPossible();
+        updatePageTitle(_('${you} are about to cast votes'), {});
+        this.setSelected();
+        addPrimaryActionButton({
+            id: 'confirm_btn',
+            text: _('Confirm'),
+            callback: () => {
+                performAction$1('actParliamentMeetsCastVotes', {
+                    option,
+                    spend: this.spend,
+                    enterpriseCardIds: this.selectedEnterpriseCardIds,
+                    londonSeasonCardIds: this.selectedLondonSeasonCardIds,
+                });
+            },
+        });
+        this.addCancelButton();
+    }
+    setSelected() {
+        this.selectedEnterpriseCardIds.forEach((cardId) => setSelected(`enterprise-card-${cardId}`));
+        this.selectedLondonSeasonCardIds.forEach((cardId) => setSelected(`game-card-${cardId}`));
+    }
+    getCashCounter() {
+        return PlayerManager.getInstance().getCurrentPlayer().counters[CASH_COUNTER];
+    }
+    handleCardClick(cardId, type) {
+        if (type === 'enterprise') {
+            if (this.selectedEnterpriseCardIds.includes(cardId)) {
+                this.selectedEnterpriseCardIds = this.selectedEnterpriseCardIds.filter((id) => id !== cardId);
+            }
+            else {
+                this.selectedEnterpriseCardIds.push(cardId);
+            }
+        }
+        else if (type === 'london-season') {
+            if (this.selectedLondonSeasonCardIds.includes(cardId)) {
+                this.selectedLondonSeasonCardIds =
+                    this.selectedLondonSeasonCardIds.filter((id) => id !== cardId);
+            }
+            else {
+                this.selectedLondonSeasonCardIds.push(cardId);
+            }
+        }
+        this.updateInterfaceInitialStep();
+    }
+    addCancelButton() {
+        addDangerActionButton({
+            id: 'cancel_btn',
+            text: _('Cancel'),
+            callback: async () => {
+                this.getCashCounter().incValue(this.spend);
+                this.spend = 0;
+                this.treasury = this.args.votes.money;
+                this.selectedEnterpriseCardIds = [];
+                this.selectedLondonSeasonCardIds = [];
+                this.game.onCancel();
+            },
+        });
+    }
+}
+
+class ParliamentMeetsAdditionalRoundOrResolve {
+    constructor(game) {
+        this.game = game;
+    }
+    static create(game) {
+        ParliamentMeetsAdditionalRoundOrResolve.instance =
+            new ParliamentMeetsAdditionalRoundOrResolve(game);
+    }
+    static getInstance() {
+        return ParliamentMeetsAdditionalRoundOrResolve.instance;
+    }
+    onEnteringState(args) {
+        debug('Entering ParliamentMeetsAdditionalRoundOrResolve state');
         this.args = args;
         this.updateInterfaceInitialStep();
     }
     onLeavingState() {
-        debug('Leaving ParliamentMeets state');
+        debug('Leaving ParliamentMeetsAdditionalRoundOrResolve state');
     }
-    setDescription(activePlayerIds, args) {
-        updatePageTitle(_('${tkn_playerName} meets'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
-        });
-    }
+    setDescription(activePlayerIds, args) { }
     updateInterfaceInitialStep() {
-        this.game.clearPossible();
-        updatePageTitle(_('${you} must meet Parliament'));
-        addPassButton$1(this.args.optionalAction);
-    }
-    updateInterfaceConfirm() {
         clearPossible();
-        updatePageTitle(_('Assign officers?'));
+        updatePageTitle(_('${you} may perform an action'), {});
+        addConfirmButton$1(() => {
+            performAction$1('actParliamentMeetsAdditionalRoundOrResolve', {});
+        });
     }
 }
 
@@ -7311,6 +7920,127 @@ class PresidencyTradeFillOrders {
     }
 }
 
+class ParliamentMeetsSelectLaw {
+    constructor(game) {
+        this.game = game;
+    }
+    static create(game) {
+        ParliamentMeetsSelectLaw.instance = new ParliamentMeetsSelectLaw(game);
+    }
+    static getInstance() {
+        return ParliamentMeetsSelectLaw.instance;
+    }
+    onEnteringState(args) {
+        debug('Entering ParliamentMeetsSelectLaw state');
+        this.args = args;
+        this.primeMinisterDial = Parliament.getInstance().getPrimeMinisterDial();
+        this.primeMinisterDial.updateLeftArmPosition(this.args.dial);
+        this.primeMinisterDial.updateRightArmPosition(this.args.dial);
+        this.primeMinisterDial.showConsequenceOptions(true);
+        this.updateInterfaceInitialStep();
+        Bar.getInstance().goTo('joco-parliament');
+    }
+    onLeavingState() {
+        this.args.revealedLaws.forEach((law) => {
+            const node = document.getElementById(`law-card-${law.id}`);
+            if (node) {
+                node.onmouseenter = null;
+                node.onmouseleave = null;
+            }
+        });
+        this.resetArms();
+        this.primeMinisterDial.showConsequenceOptions(false);
+        debug('Leaving PrimeMinisterSelectLaw state');
+    }
+    setDescription(activePlayerIds, args) {
+        const numberOfRevealedLaws = args.revealedLaws.length;
+        const playerName = getPlayerName(activePlayerIds[0]);
+        switch (numberOfRevealedLaws) {
+            case 0:
+                updatePageTitle(_('${tkn_playerName} must draw and reveal a law'), {
+                    tkn_playerName: playerName,
+                });
+                break;
+            case 3:
+                updatePageTitle(_('${tkn_playerName} must select a law'), {
+                    tkn_playerName: playerName,
+                });
+                break;
+            default:
+                updatePageTitle(_('${tkn_playerName} must select a law or draw and reveal another'), { tkn_playerName: playerName });
+                break;
+        }
+    }
+    updateInterfaceInitialStep() {
+        clearPossible();
+        const numberOfRevealedLaws = this.args.revealedLaws.length;
+        this.updatePageTitle(numberOfRevealedLaws);
+        this.args.revealedLaws.forEach((law) => {
+            onClick(`law-card-${law.id}`, () => {
+                this.updateInterfaceConfirm('select', law);
+            });
+            this.addHover(law);
+        });
+        if (numberOfRevealedLaws < 3) {
+            addPrimaryActionButton({
+                id: 'draw-btn',
+                text: _('Draw and reveal a law'),
+                callback: () => this.updateInterfaceConfirm('draw'),
+            });
+        }
+    }
+    addHover(law) {
+        const node = document.getElementById(`law-card-${law.id}`);
+        if (!node) {
+            return;
+        }
+        node.onmouseenter = () => {
+            const options = this.args.policyOptions[law.id];
+            if (!options) {
+                return;
+            }
+            this.primeMinisterDial.updateLeftArmPosition(options.left);
+            this.primeMinisterDial.updateRightArmPosition(options.right);
+        };
+        node.onmouseleave = () => this.resetArms();
+    }
+    resetArms() {
+        this.primeMinisterDial.updateLeftArmPosition(this.args.dial);
+        this.primeMinisterDial.updateRightArmPosition(this.args.dial);
+    }
+    updateInterfaceConfirm(action, law) {
+        clearPossible();
+        if (law) {
+            setSelected(`law-card-${law.id}`);
+        }
+        updatePageTitle(action === 'draw'
+            ? _('Draw and reveal a law?')
+            : _('Bring ${lawName} up for a vote?'), {
+            lawName: law ? _(getLawCard(law).title) : '',
+        });
+        addConfirmButton$1(() => {
+            performAction$1('actParliamentMeetsSelectLaw', {
+                draw: action === 'draw',
+                lawCardId: law?.id,
+            });
+        });
+        addCancelButton$1();
+    }
+    updatePageTitle(numberOfRevealedLaws) {
+        switch (numberOfRevealedLaws) {
+            case 0:
+                updatePageTitle(_('${you} must draw and reveal a law'), {});
+                break;
+            case 3:
+                updatePageTitle(_('${you} must select a law'), {});
+                break;
+            default:
+                updatePageTitle(_('${you} must select a law or draw and reveal another'), {});
+                break;
+        }
+    }
+}
+
 class RevenuePayDividends {
     constructor(game) {
         this.game = game;
@@ -7532,7 +8262,10 @@ class Game {
             MilitaryAffairsAssign,
             MilitaryAffairsAssignCommander,
             MilitaryAffairsTransfers,
-            ParliamentMeets,
+            ParliamentMeetsSelectLaw,
+            ParliamentMeetsSelectPolicy,
+            ParliamentMeetsCastVotes,
+            ParliamentMeetsAdditionalRoundOrResolve,
             PlayerTurn,
             PresidencyDecideOrder,
             PresidencyTrade,
@@ -7673,6 +8406,7 @@ class Game {
         Board$1.create(this);
         Company.create(this);
         London.create(this);
+        Parliament.create(this);
         India$1.create(this);
         Bar.create(this);
         if (this.playerOrder.includes(this.getPlayerId()) &&
@@ -7869,6 +8603,12 @@ class Game {
         const tooltipManager = TooltipManager.getInstance();
         if (cardId.startsWith('BlackmailCard')) {
             tooltipManager.addBlackmailBackTooltip(`tooltip_${tooltipId}`);
+        }
+        else if (this.gamedatas.staticData.lawCards[cardId]) {
+            tooltipManager.addLawCardTooltip({
+                nodeId: `tooltip_${tooltipId}`,
+                cardId,
+            });
         }
         else if (this.gamedatas.staticData.londonSeasonCards[cardId]) {
             tooltipManager.addLondonSeasonCardTooltip({
