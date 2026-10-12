@@ -64,7 +64,7 @@ class ParliamentMeetsSelectPolicy extends \Bga\Games\JohnCompany\Models\AtomicAc
     $right = $stateArgs['right'];
 
     if (!in_array($dialPosition, [$left, $right])) {
-      throw new \Bga\GameFramework\VisibleSystemException("ERROR_059");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_060");
     }
 
     $player = Players::get($playerId);

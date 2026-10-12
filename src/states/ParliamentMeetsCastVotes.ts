@@ -1,6 +1,7 @@
 import {
   addDangerActionButton,
   addPassButton,
+  addPlayerButton,
   addPrimaryActionButton,
   addSecondaryActionButton,
   clearPossible,
@@ -14,7 +15,7 @@ import {
   setSelected,
   updatePageTitle,
 } from '../boilerplate';
-import { AGAINST, CASH_COUNTER, IN_FAVOR } from '../constants';
+import { AGAINST, CASH_COUNTER, CROWN_PLAYER_ID, IN_FAVOR } from '../constants';
 import { PlayerManager } from '../player-manager';
 import { GameAlias } from '../types';
 
@@ -25,6 +26,7 @@ interface OnEnteringParliamentMeetsCastVotesArgs extends CommonStateArgs {
     londonSeasonCards: { id: string; votes: number }[];
   };
   options: string[];
+  primeMinisterPlayerId: number;
 }
 
 export class ParliamentMeetsCastVotes implements GameState<OnEnteringParliamentMeetsCastVotesArgs> {
@@ -62,7 +64,13 @@ export class ParliamentMeetsCastVotes implements GameState<OnEnteringParliamentM
   setDescription(
     activePlayerIds: number[],
     args: OnEnteringParliamentMeetsCastVotesArgs,
-  ) {}
+  ) {
+    updatePageTitle(_('${tkn_playerName} may vote'), {
+      tkn_playerName: PlayerManager.getInstance()
+        .getPlayer(activePlayerIds[0])
+        .getName(),
+    });
+  }
 
   //  .####.##....##.########.########.########..########....###.....######..########
   //  ..##..###...##....##....##.......##.....##.##.........##.##...##....##.##......
@@ -84,14 +92,7 @@ export class ParliamentMeetsCastVotes implements GameState<OnEnteringParliamentM
     clearPossible();
     updatePageTitle(_('${you} may spend £ and enterprises to cast votes'), {});
 
-    // Add vote from enterprises, money and london season cards
-    const enterpriseVotes = this.args.votes.enterprises
-      .filter((card) => this.selectedEnterpriseCardIds.includes(card.id))
-      .reduce((total, card) => total + card.votes, 0);
-    const londonSeasonVotes = this.args.votes.londonSeasonCards
-      .filter((card) => this.selectedLondonSeasonCardIds.includes(card.id))
-      .reduce((total, card) => total + card.votes, 0);
-    const totalVotes = this.spend + enterpriseVotes + londonSeasonVotes;
+    const totalVotes = this.getTotalVoteCount();
 
     this.args.votes.enterprises.forEach((card) => {
       onClick(`enterprise-card-${card.id}`, () =>
@@ -134,7 +135,7 @@ export class ParliamentMeetsCastVotes implements GameState<OnEnteringParliamentM
         text: formatStringRecursive(_('Cast ${number} vote(s) against'), {
           number: totalVotes,
         }),
-        callback: () => this.updateInterfaceConfirm(AGAINST),
+        callback: () => this.updateInterfaceSelectTarget(),
         extraClasses: totalVotes <= 0 ? DISABLED : '',
       });
     }
@@ -158,9 +159,49 @@ export class ParliamentMeetsCastVotes implements GameState<OnEnteringParliamentM
     }
   }
 
-  private updateInterfaceConfirm(option: string) {
+  private updateInterfaceSelectTarget() {
     clearPossible();
-    updatePageTitle(_('${you} are about to cast votes'), {});
+    updatePageTitle(_('${you} must choose who to vote for'), {});
+    this.setSelected();
+
+    PlayerManager.getInstance()
+      .getPlayers()
+      .filter(
+        (player) =>
+          player.getPlayerId() !== this.args.primeMinisterPlayerId &&
+          player.getPlayerId() !== CROWN_PLAYER_ID,
+      )
+      .forEach((player) => {
+        addPrimaryActionButton({
+          id: `vote_for_${player.getPlayerId()}_btn`,
+          text: formatStringRecursive(_('${tkn_playerName}'), {
+            tkn_playerName: player.getName(),
+          }),
+          callback: () =>
+            this.updateInterfaceConfirm(AGAINST, player.getPlayerId()),
+        });
+      });
+
+    this.addCancelButton();
+  }
+
+  private updateInterfaceConfirm(option: string, targetPlayerId?: number) {
+    clearPossible();
+
+    const playerManager = PlayerManager.getInstance();
+    const totalVotes = this.getTotalVoteCount();
+    updatePageTitle(
+      targetPlayerId && targetPlayerId !== playerManager.getCurrentPlayerId()
+        ? _('Cast ${votes} vote(s) against the proposed law on behalf of ${tkn_playerName}?')
+        : _('Cast ${votes} vote(s) ${inFavorOrAgainst} the proposed law?'),
+      {
+        votes: totalVotes,
+        inFavorOrAgainst: option === IN_FAVOR ? _('in favor of') : _('against'),
+        tkn_playerName: targetPlayerId
+          ? playerManager.getPlayer(targetPlayerId).getName()
+          : '',
+      },
+    );
     this.setSelected();
 
     addPrimaryActionButton({
@@ -169,7 +210,8 @@ export class ParliamentMeetsCastVotes implements GameState<OnEnteringParliamentM
       callback: () => {
         performAction('actParliamentMeetsCastVotes', {
           option,
-          spend: this.spend,
+          targetPlayerId: targetPlayerId ?? null,
+          money: this.spend,
           enterpriseCardIds: this.selectedEnterpriseCardIds,
           londonSeasonCardIds: this.selectedLondonSeasonCardIds,
         });
@@ -186,6 +228,17 @@ export class ParliamentMeetsCastVotes implements GameState<OnEnteringParliamentM
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private getTotalVoteCount() {
+    // Add vote from enterprises, money and london season cards
+    const enterpriseVotes = this.args.votes.enterprises
+      .filter((card) => this.selectedEnterpriseCardIds.includes(card.id))
+      .reduce((total, card) => total + card.votes, 0);
+    const londonSeasonVotes = this.args.votes.londonSeasonCards
+      .filter((card) => this.selectedLondonSeasonCardIds.includes(card.id))
+      .reduce((total, card) => total + card.votes, 0);
+    return this.spend + enterpriseVotes + londonSeasonVotes;
+  }
 
   private setSelected() {
     this.selectedEnterpriseCardIds.forEach((cardId) =>

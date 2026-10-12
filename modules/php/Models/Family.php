@@ -38,10 +38,8 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     'opportunityMarker' => ['opportunity_marker', 'string'],
     'crownPromiseCubes' => ['crown_promise_cubes', 'int'],
     'hasChairmanMarker' => ['has_chairman_marker', 'int'],
-    'isLeaderOfOpposition' => ['is_leader_of_opposition', 'int'], // base on number of votes?
-    'isPrimeMinister' => ['is_prime_minister', 'int'],
     'trophies' => ['trophies', 'int'],
-    'lawPieces' => ['law_pieces', 'int'],
+    'passedLawTokens' => ['passed_law_tokens', 'int'], // Rename to passed law tokens
   ];
 
 
@@ -130,14 +128,20 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     Notifications::gainTrophies($this->getPlayer(), $amount);
   }
 
-    /**
+  public function gainPassedLawToken($amount = 1)
+  {
+    $this->incTrophies($amount);
+    Notifications::gainTrophies($this->getPlayer(), $amount);
+  }
+
+  /**
    * Total windows owned by a player's family: retired family members on
    * prizes, plus enterprises, plus prestige cards.
    */
   public function getWindowCount()
   {
     $familyId = $this->id;
-  
+
     $windows = 0;
 
     $prizeMembers = Utils::filter(FamilyMembers::getAll()->toArray(), function ($familyMember) use ($familyId) {

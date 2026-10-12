@@ -19,9 +19,8 @@ class Families extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     'opportunity_marker',
     'crown_promise_cubes',
     'has_chairman_marker',
-    'is_leader_of_opposition',
     'trophies',
-    'law_pieces',
+    'passed_law_tokens',
   ];
   protected static $autoremovePrefix = false;
   protected static $autoreshuffle = false;

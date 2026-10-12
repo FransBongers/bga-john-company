@@ -5,6 +5,7 @@
 
 import { Climate } from '../../crown/climate';
 import {
+  GamedatasAlias,
   JocoArmyPieceBase,
   JocoEnterpriseCardBase,
   JocoFamilyMember,
@@ -114,6 +115,10 @@ export interface NotifMoveFamilyMember {
   from: string;
 }
 
+export interface NotifMoveLaw {
+  law: JocoLawCardBase;
+}
+
 export interface NotifMoveFamilyMembers {
   familyMembers: JocoFamilyMember[];
 }
@@ -218,6 +223,17 @@ export interface NotifSelectPolicy extends NotifWithPlayerArgs {
   dial: number;
 }
 
+export interface NotifCastVotes extends NotifWithPlayerArgs {
+  money: number;
+  support: number;
+  enterpriseIds: string[];
+  londonSeasonCardIds: string[];
+  opposition: GamedatasAlias['parliament']['opposition'];
+}
+
+export interface NotifCommitToOpposition extends NotifWithPlayerArgs {
+  opposition: GamedatasAlias['parliament']['opposition'];
+}
 
 export interface NotifSetCrownClimate extends NotifWithPlayerArgs {
   climate: Climate;

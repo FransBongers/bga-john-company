@@ -37,6 +37,9 @@ export class EnterpriseCardsManager extends BgaCards.Manager<JocoEnterpriseCard>
 
   setupDiv(card: JocoEnterpriseCard, div: HTMLElement) {
     div.classList.add('joco-enterprise-card-container');
+    if (card.used) {
+      div.classList.add('used');
+    }
   }
 
   setupFrontDiv(card: JocoEnterpriseCard, div: HTMLElement) {

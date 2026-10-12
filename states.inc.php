@@ -508,7 +508,7 @@ $machinestates = [
         'descriptionmyturn' => '${you}',
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
-        'possibleactions' => ['act' . PARLIAMENT_MEETS_CAST_VOTES, 'actTakeAtomicAction'],
+        'possibleactions' => ['act' . PARLIAMENT_MEETS_CAST_VOTES, 'actPassOptionalAction', 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
@@ -520,6 +520,17 @@ $machinestates = [
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
         'possibleactions' => ['act' . PARLIAMENT_MEETS_ADDITIONAL_ROUND_OR_RESOLVE, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_PARLIAMENT_MEETS_COMMIT_TO_OPPOSITION => [
+        'name' => PARLIAMENT_MEETS_COMMIT_TO_OPPOSITION,
+        'type' => 'multipleactiveplayer',
+        'description' => '${actplayer}',
+        'descriptionmyturn' => '${you}',
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . PARLIAMENT_MEETS_COMMIT_TO_OPPOSITION, 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 

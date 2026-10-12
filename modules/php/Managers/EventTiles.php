@@ -47,7 +47,6 @@ class EventTiles extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     include dirname(__FILE__) . '/../EventTiles/list.inc.php';
 
     $tiles = [];
-    Notifications::log('ids', $eventTileIds);
     
     foreach ($eventTileIds as $index => $cId) {
       $tiles[$cId] = [
@@ -55,7 +54,6 @@ class EventTiles extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
         'location' => DECK,
       ];
     }
-    Notifications::log('tiles', $tiles);
 
     self::create($tiles);
     self::shuffle(DECK);

@@ -7,6 +7,7 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\JoCoUtils;
+use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Prizes;
 use Bga\Games\JohnCompany\Managers\Regions;
@@ -199,7 +200,7 @@ class Notifications
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  private static function getShipsLog($ships)
+  private static function getShipsLog(array $ships)
   {
     $shipsLog = '';
     $shipsLogArgs = [];
@@ -215,6 +216,41 @@ class Notifications
       'args' => $shipsLogArgs,
     ];
   }
+
+  private static function getEnterpriseLog(array $enterprises)
+  {
+    $log = '';
+    $args = [];
+
+    foreach ($enterprises as $index => $enterprise) {
+      $key = 'tkn_enterpriseCard_' . $index;
+      $log = $log . '${' . $key . '}';
+      $args[$key] = $enterprise->getId();
+    }
+
+    return [
+      'log' => $log,
+      'args' => $args,
+    ];
+  }
+
+  private static function getLondonSeasonCardLog(array $londonSeasonCards)
+  {
+    $log = '';
+    $args = [];
+
+    foreach ($londonSeasonCards as $index => $londonSeasonCard) {
+      $key = 'tkn_londonSeasonCard_' . $index;
+      $log = $log . '${' . $key . '}';
+      $args[$key] = $londonSeasonCard->getId();
+    }
+
+    return [
+      'log' => $log,
+      'args' => $args,
+    ];
+  }
+
 
   // Can consist of FamilyMembers and army pieces
   private static function createPiecesLog(array $pieces)
@@ -638,6 +674,16 @@ class Notifications
       'type' => $enterprise->getType(),
       'i18n' => ['tkn_boldText_enterprise'],
     ]);
+  }
+
+  public static function moveLaw(Player $player, LawCard $law, string | null $text = '', array | null $textArgs = [])
+  {
+
+
+    self::notifyAll('moveLaw', $text, array_merge($textArgs, [
+      'player' => $player,
+      'law' => $law->jsonSerialize(),
+    ]));
   }
 
   public static function moveOfficeCard(Player $player, Office $office, string $text, array $textArgs)
@@ -1174,6 +1220,51 @@ class Notifications
       'player' => $player,
       'law' => $law->jsonSerialize(),
       'tkn_lawCard' => $law->getId(),
+    ]);
+  }
+
+  public static function castVotes(Player $player, string $option, int $votes, int $money, int $support, ?Player $target, array $enterprises, array $londonSeasonCards)
+  {
+    $spendText = clienttranslate('${player_name} spends £${tkn_boldText_amount} ${enterpriseLog} ${londonSeasonCardLog}');
+    if ($money === 0) {
+      $spendText = clienttranslate('${player_name} spends ${enterpriseLog} ${londonSeasonCardLog}');
+    }
+    self::message($spendText, [
+      'player' => $player,
+      'tkn_boldText_amount' => $money,
+      'enterpriseLog' => self::getEnterpriseLog($enterprises),
+      'londonSeasonCardLog' => self::getLondonSeasonCardLog($londonSeasonCards),
+    ]);
+
+    $text = $target === null || $target->getId() === $player->getId() ? clienttranslate('${player_name} casts ${votes} vote(s) ${inFavorOrAgainst} the proposed law')
+      : clienttranslate('${player_name} casts ${votes} vote(s) against the proposed law on behalf of ${player_name2}');
+
+    self::notifyAll('castVotes', $text, [
+      'player' => $player,
+      'option' => $option,
+      'votes' => $votes,
+      'money' => $money,
+      'support' => $support,
+      'inFavorOrAgainst' => $option === IN_FAVOR ? clienttranslate('in favor of') : clienttranslate('against'),
+      'player_name2' => $target === null ? '' : $target->getName(),
+      'enterpriseIds' => Utils::returnIds($enterprises),
+      'londonSeasonCardIds' => Utils::returnIds($londonSeasonCards),
+      'opposition' => Parliament::getOpposition(),
+    ]);
+  }
+
+  public static function commitToOpposition(Player $player, bool $commit, Player $votingPlayer, int $votes, array $opposition)
+  {
+    $text = $commit
+      ? clienttranslate('${player_name} commits to the opposition')
+      : clienttranslate('${player_name} does not commit to the opposition; ${votes} vote(s) are added to the opposition votes of ${player_name2}');
+
+    self::notifyAll('commitToOpposition', $text, [
+      'player' => $player,
+      'commit' => $commit,
+      'votes' => $votes,
+      'player_name2' => $votingPlayer->getName(),
+      'opposition' => $opposition,
     ]);
   }
 

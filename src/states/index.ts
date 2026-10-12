@@ -28,6 +28,7 @@ export * from './MilitaryAffairsTransfers';
 export * from './ParliamentMeetsSelectPolicy';
 export * from './ParliamentMeetsCastVotes';
 export * from './ParliamentMeetsAdditionalRoundOrResolve';
+export * from './ParliamentMeetsCommitToOpposition';
 export * from './PlayerTurn';
 export * from './PresidencyDecideOrder';
 export * from './PresidencyTrade';

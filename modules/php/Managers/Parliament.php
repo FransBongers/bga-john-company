@@ -22,13 +22,17 @@ class Parliament
     Globals::setParliament([
       PRIME_MINISTER => '',
       DIAL => $position,
-      OPPOSITION => [], // array of $playerId => votes
+      OPPOSITION => [
+        'votes' => [], // array of $playerId => votes
+        'leader' => null,
+      ],
       VOTES_CAST_THIS_ROUND => 0,
+      AGAINST => [], // array of $playerId
       SELECTING_LAW => false,
     ]);
   }
 
-  private static function set(string $key, string | int $value)
+  private static function set(string $key, string | int | array $value)
   {
     $item = Globals::getParliament();
     $item[$key] = $value;
@@ -53,16 +57,59 @@ class Parliament
 
   public static function incSupport(int $change)
   {
-    self::set(SUPPORT, Globals::getParliament()[SUPPORT] + $change);
+    self::set(SUPPORT, self::getSupport() + $change);
+  }
+
+  public static function incVotesCastThisRound(int $change)
+  {
+    self::set(VOTES_CAST_THIS_ROUND, self::getVotesCastThisRound() + $change);
+  }
+
+  public static function setVotesCastThisRound(int $votesCast)
+  {
+    self::set(VOTES_CAST_THIS_ROUND, $votesCast);
+  }
+
+  public static function getSupport(): int
+  {
+    return Globals::getParliament()[SUPPORT] ?? 0;
+  }
+
+  public static function getVotesCastThisRound(): int
+  {
+    return Globals::getParliament()[VOTES_CAST_THIS_ROUND] ?? 0;
+  }
+
+  public static function getPlayersThatVotedAgainst(): array
+  {
+    return Globals::getParliament()[AGAINST] ?? [];
+  }
+
+  public static function addPlayerThatVotedAgainst(int $playerId)
+  {
+    $against = Globals::getParliament()[AGAINST] ?? [];
+    if (!in_array($playerId, $against)) {
+      $against[] = $playerId;
+      self::set(AGAINST, $against);
+    }
+  }
+
+  public static function setPlayersThatVotedAgainst(array $playerIds)
+  {
+    self::set(AGAINST, $playerIds);
   }
 
   public static function incOppositionVotes(int $playerId, int $change)
   {
-    $opposition = Globals::getParliament()[OPPOSITION] ?? [];
-    if (!isset($opposition[$playerId])) {
-      $opposition[$playerId] = 0;
+    $opposition = self::getOpposition();
+    if (!isset($opposition['votes'][$playerId])) {
+      $opposition['votes'][$playerId] = 0;
     }
-    $opposition[$playerId] += $change;
+    $opposition['votes'][$playerId] += $change;
+
+    if ($opposition['leader'] === null || $opposition['votes'][$playerId] > $opposition['votes'][$opposition['leader']]) {
+      $opposition['leader'] = $playerId;
+    }
     self::set(OPPOSITION, $opposition);
   }
 
@@ -70,7 +117,6 @@ class Parliament
   {
     $player = Players::getPlayerForFamily($familyId);
     self::set(PRIME_MINISTER, $familyId);
-    Families::get($familyId)->setIsPrimeMinister(1);
     Notifications::changePrimeMinister($player, $familyId);
   }
 
@@ -136,6 +182,14 @@ class Parliament
     }
 
     return [$left, $right];
+  }
+
+  public static function getOpposition()
+  {
+    return Globals::getParliament()[OPPOSITION] ?? [
+      'leader' => null,
+      'votes' => []
+    ];
   }
 
   public static function getRoundOfVotingNodes()

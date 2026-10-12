@@ -79,6 +79,7 @@ import {
   ParliamentMeetsSelectPolicy,
   ParliamentMeetsCastVotes,
   ParliamentMeetsAdditionalRoundOrResolve,
+  ParliamentMeetsCommitToOpposition,
 } from './states';
 import { StaticData } from './static-data';
 import { tplPlayArea, tplCrownPlayerPanel } from './templates';
@@ -167,6 +168,7 @@ export class Game {
     ParliamentMeetsSelectPolicy,
     ParliamentMeetsCastVotes,
     ParliamentMeetsAdditionalRoundOrResolve,
+    ParliamentMeetsCommitToOpposition,
     PlayerTurn,
     PresidencyDecideOrder,
     PresidencyTrade,

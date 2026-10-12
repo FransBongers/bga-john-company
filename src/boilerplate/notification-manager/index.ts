@@ -49,6 +49,7 @@ import { GameAlias, JocoFamilyMember, OtherShipType } from '../../types';
 import {
   createControlToken,
   getEnterpriseCard,
+  getLawCard,
   getLondonSeasonCard,
 } from '../../utility';
 import { Interaction } from '../interaction';
@@ -100,10 +101,15 @@ import {
   NotifRevealLaw,
   NotifSelectLaw,
   NotifSelectPolicy,
+  NotifCastVotes,
+  NotifCommitToOpposition,
   NotifFrontendTrigger,
+  NotifMoveLaw,
 } from './types';
 import { tplArmyPiece } from '../../india/army/templates';
 import { Parliament } from '../../parliament';
+import { DISCARD } from '../constants';
+import { LawCardsManager } from '../../cards/law-cards';
 
 //  .##.....##....###....##....##....###.....######...########.########.
 //  .###...###...##.##...###...##...##.##...##....##..##.......##.....##
@@ -606,6 +612,18 @@ export class NotificationManager {
     );
   }
 
+  async notif_moveLaw(notif: NotifMoveLaw) {
+    const { law } = notif;
+
+    const card = getLawCard(law);
+    if (law.location === DISCARD) {
+      await LawCardsManager.getInstance().discardCard(card);
+    } else {
+      // Currently only else case
+      await London.getInstance().addLawCard(card);
+    }
+  }
+
   async notif_retireFamilyMember(notif: NotifRetireFamilyMember) {
     const { familyMember, cost, playerId } = notif;
 
@@ -851,6 +869,40 @@ export class NotificationManager {
     toElement.insertAdjacentElement('beforeend', familyMemberElement);
 
     await this.game.animationManager.slideIn(familyMemberElement, fromElement);
+  }
+
+  async notif_castVotes(notif: NotifCastVotes) {
+    const {
+      playerId,
+      money,
+      support,
+      enterpriseIds,
+      londonSeasonCardIds,
+      opposition,
+    } = notif;
+    // Current player already updated their counter while selecting
+    if (playerId !== PlayerManager.getInstance().getCurrentPlayerId()) {
+      this.getPlayer(playerId).counters[CASH_COUNTER].incValue(-money);
+    }
+    enterpriseIds.forEach((enterpriseId) => {
+      const elt = document.getElementById(`enterprise-card-${enterpriseId}`);
+      if (elt) {
+        elt.classList.add('used');
+      }
+    });
+    londonSeasonCardIds.forEach((londonSeasonCardId) => {
+      const elt = document.getElementById(`game-card-${londonSeasonCardId}`);
+      if (elt) {
+        elt.classList.add('used');
+      }
+    });
+    const parliament = Parliament.getInstance();
+    parliament.supportToValue(support);
+    parliament.updateOpposition(opposition);
+  }
+
+  async notif_commitToOpposition(notif: NotifCommitToOpposition) {
+    Parliament.getInstance().updateOpposition(notif.opposition);
   }
 
   async notif_selectPolicy(notif: NotifSelectPolicy) {

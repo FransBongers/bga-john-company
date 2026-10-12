@@ -8,6 +8,9 @@ import {
   JocoLawCardBase,
 } from '../types';
 import { getLawCard } from '../utility';
+import { PlayerManager } from '../player-manager';
+import { formatStringRecursive, getPlayerName } from '../boilerplate';
+import { tplLeaderOfTheOpposition } from './templates';
 
 const tplParliament = () => `
   <div id="joco-parliament" class="joco-tab">
@@ -19,9 +22,16 @@ const tplParliament = () => `
     </div>
     <div class="joco-container">
       <div class="joco-header"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Voting').toLocaleUpperCase()}</span></div>
-      <div class="joco-support-container">
-        <span class="fb-font-baskerville fb-font-12 fb-font-bold">${_('Support').toLocaleUpperCase()}</span>
-        <span id="joco-support-counter" class="fb-font-baskerville fb-font-12 fb-font-bold"></span>
+      <div class="joco-row" style="margin-bottom: 12px;">
+        <div class="joco-column joco-support-container">
+          <span class="fb-font-baskerville fb-font-12 fb-font-bold">${_('Support').toLocaleUpperCase()}</span>
+          <span id="joco-support-counter" class="fb-font-baskerville fb-font-20 fb-font-bold"></span>
+        </div>
+        <div class="joco-column joco-opposition-container">
+          <span class="fb-font-baskerville fb-font-12">${_('Opposition').toLocaleUpperCase()}</span>
+          <div id="joco-parliament-opposition"></div>
+          
+        </div>
       </div>
       <div class="joco-voting">
         <div class="joco-column">
@@ -33,7 +43,9 @@ const tplParliament = () => `
           <span class="fb-font-baskerville fb-font-12">${_('Law').toLocaleUpperCase()}</span>
         </div>
       </div>
+
     </div>
+
   </div>
 `;
 
@@ -44,7 +56,8 @@ export class Parliament {
   public selectedLaw: InstanceType<typeof BgaCards.LineStock<JocoLawCard>>;
   private supportCounter: Counter;
   private ui: {
-    revealedLawsContainer: HTMLElement,
+    revealedLawsContainer: HTMLElement;
+    oppositionContainer: HTMLElement;
   };
 
   constructor(private game: GameAlias) {
@@ -112,12 +125,18 @@ export class Parliament {
     });
 
     this.ui = {
-      revealedLawsContainer: document.getElementById('joco-parliament-revealed-laws-container')!,
+      revealedLawsContainer: document.getElementById(
+        'joco-parliament-revealed-laws-container',
+      )!,
+      oppositionContainer: document.getElementById(
+        'joco-parliament-opposition',
+      )!,
     };
 
     this.setupStocks(gamedatas);
     this.setupSupportCounter(gamedatas);
     this.showRevealedLaws(gamedatas.parliament.selectingLaw);
+    this.updateOpposition(gamedatas.parliament.opposition);
   }
 
   // .##.....##.########..########.....###....########.########....##.....##.####
@@ -155,4 +174,61 @@ export class Parliament {
       this.ui.revealedLawsContainer.classList.add('hidden');
     }
   }
+
+  public updateOpposition(
+    opposition: GamedatasAlias['parliament']['opposition'],
+  ) {
+    this.ui.oppositionContainer.replaceChildren();
+    this.ui.oppositionContainer.insertAdjacentHTML(
+      'beforeend',
+      this.tplOppositionContent(opposition),
+    );
+  }
+
+  private tplOppositionContent = (
+    opposition: GamedatasAlias['parliament']['opposition'],
+  ) => {
+    const order = Object.entries(opposition.votes)
+      .map(([playerId, votes]) => ({
+        playerId: parseInt(playerId, 10),
+        playerName: getPlayerName(parseInt(playerId, 10)),
+        votes,
+      }))
+      .sort((a, b) => {
+        if (a.playerId === opposition.leader) {
+          return -1;
+        }
+        if (b.playerId === opposition.leader) {
+          return 1;
+        }
+        const difference = b.votes - a.votes;
+        return difference;
+      });
+
+    let playerLog = '';
+    let playerArgs = {};
+    order.forEach(({ playerName, votes }, index) => {
+      playerLog +=
+        `\${tkn_playerName_${index}}: \${tkn_boldText_votes_${index}} vote(s)` +
+        (index === order.length - 1 ? '' : ', ');
+      playerArgs['tkn_playerName_' + index] = playerName;
+      playerArgs['tkn_boldText_votes_' + index] = '' + votes;
+    });
+
+    return `
+        ${
+          opposition.leader !== null
+            ? tplLeaderOfTheOpposition(getPlayerName(opposition.leader))
+            : ''
+        }
+        <span class="fb-font-baskerville fb-font-16">
+          ${formatStringRecursive('${playerLog}', {
+            playerLog: {
+              log: playerLog,
+              args: playerArgs,
+            },
+          })}
+        </span>
+      `;
+  };
 }

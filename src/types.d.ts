@@ -145,6 +145,10 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
     selectedLaw: JocoLawCardBase | null;
     dial: number;
     support: number;
+    opposition: {
+      leader: number | null;
+      votes: Record<number, number>;
+    };
   };
   passedLaws: JocoLawCardBase[];
   phase: string;
@@ -296,8 +300,7 @@ interface JocoFamily {
   id: string;
   crownPromiseCubes: number;
   hasChairmanMarker: number;
-  isLeaderOfOpposition: number;
-  lawPieces: number;
+  passedLawTokens: number;
   location: string;
   opportunityMarker: string | null;
   state: number;

@@ -1,3 +1,4 @@
+import { HEX_COLOR_COLOR_MAP } from '../../constants';
 import { PlayerManager } from '../../player-manager';
 import { GameAlias } from '../../types';
 import { SELECTED } from '../constants';
@@ -32,18 +33,16 @@ export class Interaction {
     callback: Function;
     extraClasses?: string;
   }) {
+    const playerColor = PlayerManager.getInstance()
+      .getPlayer(playerId)
+      .getColor();
+
     this.addSecondaryActionButton({
       id,
       text,
       callback,
-      extraClasses: `player-button ${extraClasses}`,
+      extraClasses: `player-button ${HEX_COLOR_COLOR_MAP[playerColor]} ${extraClasses}`,
     });
-    const elt = document.getElementById(id);
-    const playerColor = PlayerManager.getInstance()
-      .getPlayer(playerId)
-      .getColor();
-    // TODO: use classes so hover effect does not break?
-    elt!.style.backgroundColor = '#' + playerColor;
   }
 
   public addPrimaryActionButton({

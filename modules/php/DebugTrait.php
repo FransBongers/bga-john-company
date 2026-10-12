@@ -40,10 +40,19 @@ trait DebugTrait
 
   function debug_test()
   {
-    Parliament::setSupport(-5);
-    $data = Globals::getParliament();
-    $data[OPPOSITION] = [];
-    Globals::setParliament($data);
+    // $parliament = Globals::getParliament();
+    // $parliament[OPPOSITION] = [
+    //   'votes' => $parliament[OPPOSITION], // array of $playerId => votes
+    //   'leader' => 2371053,
+    // ];
+    // Globals::setParliament($parliament);
+    Notifications::log('debug', Globals::getParliament());
+
+    // Parliament::setSupport(-5);
+    // $data = Globals::getParliament();
+    // $data[OPPOSITION] = [];
+    // Globals::setParliament($data);
+    // Parliament::setVotesCastThisRound(5);
     // Parliament::incOppositionVotes(1,1);
 
     // Parliament::changePrimeMinister(SYKES);

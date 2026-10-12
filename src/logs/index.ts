@@ -35,6 +35,7 @@ const LOG_TOKEN_PLAYER_NAME = 'playerName';
 const LOG_TOKEN_CLIMATE = 'climate';
 const LOG_TOKEN_POUND = 'pound';
 const LOG_TOKEN_ELEPHANT = 'elephant';
+const LOG_TOKEN_ENTERPRISE_CARD = 'enterpriseCard';
 const LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
 const LOG_TOKEN_FAMILY_MEMBER = 'familyMember';
 const LOG_TOKEN_ICON = 'icon';
@@ -77,6 +78,10 @@ export const getTokenDiv = ({
       return tlpLogTokenText({ text: value, italic: true, bold: false });
     case LOG_TOKEN_CLIMATE:
       return tplLogTokenClimate(value);
+    case LOG_TOKEN_ENTERPRISE_CARD:
+      return tlpLogTokenText({
+        text: StaticData.get().enterpriseCard(value).name,
+      });
     case LOG_TOKEN_ICON:
     case LOG_TOKEN_ENTERPRISE_ICON:
       return tplIcon(value, 'log-token');
@@ -147,4 +152,15 @@ export const getTokenDiv = ({
     default:
       return value;
   }
+};
+
+const tplTextWithTooltip = (game: GameAlias, cardId: string, text: string) => {
+  const cardNameTooltipId = `tooltip_${game._last_tooltip_id}`;
+  game.tooltipsToMap.push([game._last_tooltip_id, cardId]);
+  game._last_tooltip_id++;
+  return tlpLogTokenText({
+    text,
+    tooltipId: cardNameTooltipId,
+    bold: true,
+  });
 };

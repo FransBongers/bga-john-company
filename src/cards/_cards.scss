@@ -46,6 +46,10 @@ $rows: 2;
 }
 
 .bga-cards_card {
+  &.used {
+    opacity: 0.5;
+  }
+
   &.selectable {
     .bga-cards_card-side {
       cursor: pointer;

@@ -124,4 +124,9 @@ class Locations
   {
     return SELECTED_LAW;
   }
+
+  public static function passedLaws()
+  {
+    return PASSED_LAWS;
+  }
 }

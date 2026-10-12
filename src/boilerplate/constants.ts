@@ -8,3 +8,6 @@ export const USED = 'used';
 
 export const PRIMARY = 'primary';
 export const SECONDARY = 'secondary';
+
+export const DECK = 'deck';
+export const DISCARD = 'discard';

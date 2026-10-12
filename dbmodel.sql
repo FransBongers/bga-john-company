@@ -83,10 +83,8 @@ CREATE TABLE IF NOT EXISTS `families` (
   `opportunity_marker` varchar(32) DEFAULT NULL,
   `crown_promise_cubes` int(10) DEFAULT 0,
   `has_chairman_marker` tinyint(1) DEFAULT 0,
-  `is_leader_of_opposition` tinyint(1) DEFAULT 0,
-  `is_prime_minister` tinyint(1) DEFAULT 0,
   `trophies` int(10) DEFAULT 0,
-  `law_pieces` int(10) DEFAULT 0,
+  `passed_law_tokens` int(10) DEFAULT 0,
   PRIMARY KEY (`family_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 CREATE TABLE IF NOT EXISTS `family_members` (

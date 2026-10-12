@@ -112,6 +112,10 @@ export class London {
   // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
   // ..#######..##........########..##.....##....##....########.....#######..####
 
+  public async addLawCard(card: JocoLawCard) {
+    await this.passedLaws.addCard(card);
+  }
+
   updateLondonSeasonDisplay(gamedatas: GamedatasAlias) {
     const cards = gamedatas.londonSeasonDisplay.map(getLondonSeasonCard);
     // console.log('Updating London Season Display with cards:', cards);

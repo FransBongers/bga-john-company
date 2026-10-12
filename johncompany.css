@@ -964,6 +964,9 @@ span[style*="color:#addb90"] {
   background-position-y: 400%;
 }
 
+.bga-cards_card.used {
+  opacity: 0.5;
+}
 .bga-cards_card.selectable .bga-cards_card-side {
   cursor: pointer;
   outline: 4px solid yellow;
@@ -3496,12 +3499,19 @@ span[style*="color:#c0c0c0"] {
 #joco-parliament #joco-parliament-revealed-laws-container.hidden {
   display: none;
 }
-#joco-parliament .joco-support-container {
+#joco-parliament #joco-parliament-opposition {
   display: flex;
-  flex-direction: row;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  gap: 4px;
+  margin-top: 4px;
+}
+#joco-parliament #joco-support-counter {
+  margin-top: 4px;
+}
+#joco-parliament .joco-opposition-container,
+#joco-parliament .joco-support-container {
+  align-items: center;
+  flex-grow: 1;
 }
 #joco-parliament #joco-parliament-revealed-laws {
   min-height: 351px;
@@ -3522,6 +3532,14 @@ span[style*="color:#c0c0c0"] {
 html {
   background-image: url("img/background.jpg");
   background-attachment: fixed;
+}
+
+#joco-discard {
+  position: absolute;
+  top: -500px;
+  left: 0px;
+  width: 225px;
+  aspect-ratio: 150/234;
 }
 
 #joco #joco-overlay,
@@ -3616,6 +3634,47 @@ html {
 }
 .joco-consequence-button.joco-Tax-button:hover {
   background-color: rgba(219, 140, 147, 0.8);
+}
+
+.player-button {
+  background: none;
+  color: black;
+}
+.player-button.blue {
+  background-color: #99dae9;
+}
+.player-button.blue:hover {
+  background-color: hsl(191, 65%, 86%);
+}
+.player-button.gray {
+  background-color: #dbd9d6;
+}
+.player-button.gray:hover {
+  background-color: hsl(36, 6%, 95%);
+}
+.player-button.green {
+  background-color: #addb90;
+}
+.player-button.green:hover {
+  background-color: hsl(97, 51%, 81%);
+}
+.player-button.pink {
+  background-color: #ffb1b9;
+}
+.player-button.pink:hover {
+  background-color: hsl(354, 100%, 95%);
+}
+.player-button.purple {
+  background-color: #c7b4e1;
+}
+.player-button.purple:hover {
+  background-color: hsl(265, 43%, 89%);
+}
+.player-button.yellow {
+  background-color: #f9e08d;
+}
+.player-button.yellow:hover {
+  background-color: hsl(46, 90%, 86%);
 }
 
 /*# sourceMappingURL=johncompany.css.map */

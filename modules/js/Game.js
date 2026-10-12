@@ -411,6 +411,7 @@ const tplCube = (type, extraClasses = '') => `
   <div class="joco-cube ${extraClasses}" data-type="${type}"></div>
 `;
 const tplPlayArea = () => `
+  <div id="joco-discard"></div>
   <div id="joco-play-area">
     <div id="joco"></div>
     <div id="joco-overlay">
@@ -714,6 +715,8 @@ const SELECTED = 'selected';
 const USED = 'used';
 const PRIMARY = 'primary';
 const SECONDARY = 'secondary';
+const DECK = 'deck';
+const DISCARD = 'discard';
 
 class Interaction {
     constructor(game) {
@@ -726,17 +729,15 @@ class Interaction {
         return Interaction.instance;
     }
     addPlayerButton({ id, text, playerId, callback, extraClasses, }) {
+        const playerColor = PlayerManager.getInstance()
+            .getPlayer(playerId)
+            .getColor();
         this.addSecondaryActionButton({
             id,
             text,
             callback,
-            extraClasses: `player-button ${extraClasses}`,
+            extraClasses: `player-button ${HEX_COLOR_COLOR_MAP[playerColor]} ${extraClasses}`,
         });
-        const elt = document.getElementById(id);
-        const playerColor = PlayerManager.getInstance()
-            .getPlayer(playerId)
-            .getColor();
-        elt.style.backgroundColor = '#' + playerColor;
     }
     addPrimaryActionButton({ id, text, callback, extraClasses, }) {
         if ($(id)) {
@@ -875,7 +876,7 @@ const clearPossible = () => {
     Interaction.use().clearPossible();
 };
 const updatePageTitle = (text, args = {}) => Interaction.use().clientUpdatePageTitle(text, args);
-const formatStringRecursive = (log, args) => {
+const formatStringRecursive$1 = (log, args) => {
     return Interaction.use().formatStringRecursive(log, args);
 };
 const setAbsolutePosition = (elt, scaleVarName, { top, left }) => {
@@ -1710,6 +1711,9 @@ class EnterpriseCardsManager extends BgaCards$1.Manager {
     clearInterface() { }
     setupDiv(card, div) {
         div.classList.add('joco-enterprise-card-container');
+        if (card.used) {
+            div.classList.add('used');
+        }
     }
     setupFrontDiv(card, div) {
         div.classList.add('joco-enterprise-card');
@@ -1775,7 +1779,7 @@ const tplCardText = (text, { containerClass = 'fb-card-text', textClass = 'fb-fo
             return `<span class="${textClass}">${item}</span>`;
         }
         else {
-            return `<span class="${textClass}">${formatStringRecursive(_(item.log), item.args)}</span>`;
+            return `<span class="${textClass}">${formatStringRecursive$1(_(item.log), item.args)}</span>`;
         }
     })
         .join('')}
@@ -3135,7 +3139,7 @@ class ShipZone {
     updateCount(modifier = 0) {
         this.ui.count.replaceChildren();
         const count = this.stock.getCards().length + modifier;
-        this.ui.count.textContent = formatStringRecursive(count === 1 ? '${count} Ship' : '${count} Ships', {
+        this.ui.count.textContent = formatStringRecursive$1(count === 1 ? '${count} Ship' : '${count} Ships', {
             count,
         });
     }
@@ -3423,7 +3427,7 @@ const tplLondonSeasonOrder = ({ order, cashSpent, }) => {
     });
     return `
     <span class="fb-font-baskerville fb-font-12">
-      ${formatStringRecursive(_('Order for choosing cards from the London Season Display: ${playerLog}'), {
+      ${formatStringRecursive$1(_('Order for choosing cards from the London Season Display: ${playerLog}'), {
         playerLog: {
             log: playerLog,
             args: playerArgs,
@@ -3691,7 +3695,7 @@ class OpportunityMarker {
         };
         if (familyAction && map[familyAction]) {
             const { text, icon } = map[familyAction];
-            return formatStringRecursive(text, { tkn_icon: icon });
+            return formatStringRecursive$1(text, { tkn_icon: icon });
         }
         return _('Not placed');
     }
@@ -4113,7 +4117,7 @@ class PrimeMinisterDial {
     }
     updatePlayerName(playerId) {
         this.ui.playerName.replaceChildren();
-        this.ui.playerName.insertAdjacentHTML('beforeend', formatStringRecursive('${tkn_playerName}', {
+        this.ui.playerName.insertAdjacentHTML('beforeend', formatStringRecursive$1('${tkn_playerName}', {
             tkn_playerName: getPlayerName(playerId),
         }));
     }
@@ -4152,6 +4156,17 @@ class PrimeMinisterDial {
     }
 }
 
+const tplLeaderOfTheOpposition = (leaderName) => {
+    return `
+  <div class="joco-leader-of-the-opposition">
+    <span class="fb-font-baskerville fb-font-16 fb-font-bold">Leader:</span>
+    <span class="fb-font-baskerville fb-font-16">${formatStringRecursive$1('${tkn_playerName}', {
+        tkn_playerName: leaderName,
+    })}</span>
+  </div>
+  `;
+};
+
 const tplParliament = () => `
   <div id="joco-parliament" class="joco-tab">
     <div id="joco-parliament-revealed-laws-container" class="joco-container hidden">
@@ -4162,9 +4177,16 @@ const tplParliament = () => `
     </div>
     <div class="joco-container">
       <div class="joco-header"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Voting').toLocaleUpperCase()}</span></div>
-      <div class="joco-support-container">
-        <span class="fb-font-baskerville fb-font-12 fb-font-bold">${_('Support').toLocaleUpperCase()}</span>
-        <span id="joco-support-counter" class="fb-font-baskerville fb-font-12 fb-font-bold"></span>
+      <div class="joco-row" style="margin-bottom: 12px;">
+        <div class="joco-column joco-support-container">
+          <span class="fb-font-baskerville fb-font-12 fb-font-bold">${_('Support').toLocaleUpperCase()}</span>
+          <span id="joco-support-counter" class="fb-font-baskerville fb-font-20 fb-font-bold"></span>
+        </div>
+        <div class="joco-column joco-opposition-container">
+          <span class="fb-font-baskerville fb-font-12">${_('Opposition').toLocaleUpperCase()}</span>
+          <div id="joco-parliament-opposition"></div>
+          
+        </div>
       </div>
       <div class="joco-voting">
         <div class="joco-column">
@@ -4176,12 +4198,54 @@ const tplParliament = () => `
           <span class="fb-font-baskerville fb-font-12">${_('Law').toLocaleUpperCase()}</span>
         </div>
       </div>
+
     </div>
+
   </div>
 `;
 class Parliament {
     constructor(game) {
         this.game = game;
+        this.tplOppositionContent = (opposition) => {
+            const order = Object.entries(opposition.votes)
+                .map(([playerId, votes]) => ({
+                playerId: parseInt(playerId, 10),
+                playerName: getPlayerName(parseInt(playerId, 10)),
+                votes,
+            }))
+                .sort((a, b) => {
+                if (a.playerId === opposition.leader) {
+                    return -1;
+                }
+                if (b.playerId === opposition.leader) {
+                    return 1;
+                }
+                const difference = b.votes - a.votes;
+                return difference;
+            });
+            let playerLog = '';
+            let playerArgs = {};
+            order.forEach(({ playerName, votes }, index) => {
+                playerLog +=
+                    `\${tkn_playerName_${index}}: \${tkn_boldText_votes_${index}} vote(s)` +
+                        (index === order.length - 1 ? '' : ', ');
+                playerArgs['tkn_playerName_' + index] = playerName;
+                playerArgs['tkn_boldText_votes_' + index] = '' + votes;
+            });
+            return `
+        ${opposition.leader !== null
+                ? tplLeaderOfTheOpposition(getPlayerName(opposition.leader))
+                : ''}
+        <span class="fb-font-baskerville fb-font-16">
+          ${formatStringRecursive$1('${playerLog}', {
+                playerLog: {
+                    log: playerLog,
+                    args: playerArgs,
+                },
+            })}
+        </span>
+      `;
+        };
         this.game = game;
         this.setup(game.gamedatas);
     }
@@ -4220,10 +4284,12 @@ class Parliament {
         });
         this.ui = {
             revealedLawsContainer: document.getElementById('joco-parliament-revealed-laws-container'),
+            oppositionContainer: document.getElementById('joco-parliament-opposition'),
         };
         this.setupStocks(gamedatas);
         this.setupSupportCounter(gamedatas);
         this.showRevealedLaws(gamedatas.parliament.selectingLaw);
+        this.updateOpposition(gamedatas.parliament.opposition);
     }
     async revealLaw(law) {
         await this.revealedLaws.addCard(getLawCard(law));
@@ -4248,6 +4314,10 @@ class Parliament {
         else {
             this.ui.revealedLawsContainer.classList.add('hidden');
         }
+    }
+    updateOpposition(opposition) {
+        this.ui.oppositionContainer.replaceChildren();
+        this.ui.oppositionContainer.insertAdjacentHTML('beforeend', this.tplOppositionContent(opposition));
     }
 }
 
@@ -4469,6 +4539,13 @@ class NotificationManager {
             await this.moveFamilyMember(familyMember);
         }));
     }
+    async notif_moveLaw(notif) {
+        const { law } = notif;
+        if (law.location === DISCARD) {
+        }
+        else {
+        }
+    }
     async notif_retireFamilyMember(notif) {
         const { familyMember, cost, playerId } = notif;
         if (parentHasChildWithId(familyMember.location, familyMember.id)) {
@@ -4628,6 +4705,30 @@ class NotificationManager {
             : familyId, id);
         toElement.insertAdjacentElement('beforeend', familyMemberElement);
         await this.game.animationManager.slideIn(familyMemberElement, fromElement);
+    }
+    async notif_castVotes(notif) {
+        const { playerId, money, support, enterpriseIds, londonSeasonCardIds, opposition, } = notif;
+        if (playerId !== PlayerManager.getInstance().getCurrentPlayerId()) {
+            this.getPlayer(playerId).counters[CASH_COUNTER].incValue(-money);
+        }
+        enterpriseIds.forEach((enterpriseId) => {
+            const elt = document.getElementById(`enterprise-card-${enterpriseId}`);
+            if (elt) {
+                elt.classList.add('used');
+            }
+        });
+        londonSeasonCardIds.forEach((londonSeasonCardId) => {
+            const elt = document.getElementById(`game-card-${londonSeasonCardId}`);
+            if (elt) {
+                elt.classList.add('used');
+            }
+        });
+        const parliament = Parliament.getInstance();
+        parliament.supportToValue(support);
+        parliament.updateOpposition(opposition);
+    }
+    async notif_commitToOpposition(notif) {
+        Parliament.getInstance().updateOpposition(notif.opposition);
     }
     async notif_selectPolicy(notif) {
         const { playerId, dial } = notif;
@@ -4882,6 +4983,7 @@ const LOG_TOKEN_PLAYER_NAME = 'playerName';
 const LOG_TOKEN_CLIMATE = 'climate';
 const LOG_TOKEN_POUND = 'pound';
 const LOG_TOKEN_ELEPHANT = 'elephant';
+const LOG_TOKEN_ENTERPRISE_CARD = 'enterpriseCard';
 const LOG_TOKEN_ENTERPRISE_ICON = 'enterpriseIcon';
 const LOG_TOKEN_FAMILY_MEMBER = 'familyMember';
 const LOG_TOKEN_ICON = 'icon';
@@ -4912,6 +5014,10 @@ const getTokenDiv = ({ key, value, game, }) => {
             return tlpLogTokenText({ text: value, italic: true, bold: false });
         case LOG_TOKEN_CLIMATE:
             return tplLogTokenClimate(value);
+        case LOG_TOKEN_ENTERPRISE_CARD:
+            return tlpLogTokenText({
+                text: StaticData.get().enterpriseCard(value).name,
+            });
         case LOG_TOKEN_ICON:
         case LOG_TOKEN_ENTERPRISE_ICON:
             return tplIcon(value, 'log-token');
@@ -4982,6 +5088,16 @@ const getTokenDiv = ({ key, value, game, }) => {
         default:
             return value;
     }
+};
+const tplTextWithTooltip = (game, cardId, text) => {
+    const cardNameTooltipId = `tooltip_${game._last_tooltip_id}`;
+    game.tooltipsToMap.push([game._last_tooltip_id, cardId]);
+    game._last_tooltip_id++;
+    return tlpLogTokenText({
+        text,
+        tooltipId: cardNameTooltipId,
+        bold: true,
+    });
 };
 
 const tplNegotiation = () => `<div id="joco-negotiation">
@@ -5527,7 +5643,7 @@ class CrownChairmanRequestAllocation {
         this.setOfficesSelectable();
         addSecondaryActionButton({
             id: 'pay_btn',
-            text: formatStringRecursive(_('Pay 1 ${tkn_promiseCube}'), {
+            text: formatStringRecursive$1(_('Pay 1 ${tkn_promiseCube}'), {
                 tkn_promiseCube: tknPromiseCubes(),
             }),
             callback: () => this.updateInterfaceSelectOffice(),
@@ -5552,7 +5668,7 @@ class CrownChairmanRequestAllocation {
         for (let i = 1; i <= this.args.maxAmount; i++) {
             addSecondaryActionButton({
                 id: `amount_${i}_btn`,
-                text: formatStringRecursive(_('${amount} ${tkn_pound}'), {
+                text: formatStringRecursive$1(_('${amount} ${tkn_pound}'), {
                     amount: i,
                     tkn_pound: tknPound(),
                 }),
@@ -5617,7 +5733,7 @@ class CrownChairmanRequestDebtAdvancement {
         if (this.args.oneLessAdvancement.possible) {
             addSecondaryActionButton({
                 id: 'one_less_btn',
-                text: formatStringRecursive(_('Pay ${amount} ${tkn_promiseCube} for -1 Debt'), {
+                text: formatStringRecursive$1(_('Pay ${amount} ${tkn_promiseCube} for -1 Debt'), {
                     amount: this.args.oneLessAdvancement.cost,
                     tkn_promiseCube: tknPromiseCubes(),
                 }),
@@ -5634,7 +5750,7 @@ class CrownChairmanRequestDebtAdvancement {
         if (this.args.additionalAdvancement.possible) {
             addSecondaryActionButton({
                 id: 'additional_btn',
-                text: formatStringRecursive(_('Pay ${amount} ${tkn_promiseCube} for +1 Debt'), {
+                text: formatStringRecursive$1(_('Pay ${amount} ${tkn_promiseCube} for +1 Debt'), {
                     amount: this.args.additionalAdvancement.cost,
                     tkn_promiseCube: tknPromiseCubes(),
                 }),
@@ -5714,7 +5830,7 @@ class CrownManagerOfShippingBuyCompanyShips {
                 case BUY_COMPANY_SHIP:
                     addSecondaryActionButton({
                         id: 'buy_ship_btn',
-                        text: formatStringRecursive(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to buy ${tkn_ship}'), {
+                        text: formatStringRecursive$1(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to buy ${tkn_ship}'), {
                             amount: option.promiseCubeCost,
                             tkn_playerName_crown: getCrownPlayerName(),
                             tkn_promiseCube: tknPromiseCubes(),
@@ -5731,7 +5847,7 @@ class CrownManagerOfShippingBuyCompanyShips {
                 case DO_NOT_BUY_COMPANY_SHIP:
                     addSecondaryActionButton({
                         id: 'do_not_buy_ship_btn',
-                        text: formatStringRecursive(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to not buy ${tkn_ship}'), {
+                        text: formatStringRecursive$1(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to not buy ${tkn_ship}'), {
                             amount: option.promiseCubeCost,
                             tkn_playerName_crown: getCrownPlayerName(),
                             tkn_promiseCube: tknPromiseCubes(),
@@ -5886,7 +6002,7 @@ class CrownManagerOfShippingLeaseExtraShips {
         if (optionToLeaveTwoUnspent) {
             addSecondaryActionButton({
                 id: 'buy_ship_btn',
-                text: formatStringRecursive(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to leave 2 ${tkn_pound} unspent'), {
+                text: formatStringRecursive$1(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to leave 2 ${tkn_pound} unspent'), {
                     amount: 1,
                     tkn_playerName_crown: getCrownPlayerName(),
                     tkn_promiseCube: tknPromiseCubes(),
@@ -6107,7 +6223,7 @@ class DirectorOfTradeSpecialEnvoy {
         });
         addPrimaryActionButton({
             id: 'make_check_btn',
-            text: formatStringRecursive(_('Roll ${number} dice'), {
+            text: formatStringRecursive$1(_('Roll ${number} dice'), {
                 number: this.spend,
             }),
             callback: () => this.updateInterfaceConfirm(),
@@ -6557,7 +6673,7 @@ class FamilyAction {
         if (this.args.options[action]) {
             addSecondaryActionButton({
                 id: `${action}_btn`,
-                text: formatStringRecursive(text, {
+                text: formatStringRecursive$1(text, {
                     tkn_icon: icon,
                 }),
                 callback: () => this.updateInterfaceConfirm(action),
@@ -6598,7 +6714,7 @@ class GovernorAdminister {
         });
         addPrimaryActionButton({
             id: 'administer-btn',
-            text: formatStringRecursive(this.args.dicePool === 1
+            text: formatStringRecursive$1(this.args.dicePool === 1
                 ? _('Make a check with 1 die')
                 : _('Make a check with ${dicePool} dice'), {
                 dicePool: this.args.dicePool,
@@ -6911,7 +7027,7 @@ class ManagerOfShipping {
             playerShipsAvailable = true;
             addPlayerButton({
                 id: `${ship.id}_btn`,
-                text: formatStringRecursive(_('Fit ${tkn_ship}'), {
+                text: formatStringRecursive$1(_('Fit ${tkn_ship}'), {
                     tkn_ship: tknShipValue({ side: FULL, name }),
                 }),
                 playerId,
@@ -6923,7 +7039,7 @@ class ManagerOfShipping {
         if (this.treasury >= 2) {
             addSecondaryActionButton({
                 id: 'extraShip_btn',
-                text: formatStringRecursive(_('Lease ${tkn_ship}'), {
+                text: formatStringRecursive$1(_('Lease ${tkn_ship}'), {
                     tkn_ship: tknShipValue({
                         side: EXTRA_SHIP,
                         name: _('Extra Ship'),
@@ -6939,7 +7055,7 @@ class ManagerOfShipping {
         if (!playerShipsAvailable && this.treasury >= 5) {
             addSecondaryActionButton({
                 id: 'companyShip_btn',
-                text: formatStringRecursive(_('Buy ${tkn_ship}'), {
+                text: formatStringRecursive$1(_('Buy ${tkn_ship}'), {
                     tkn_ship: tknShipValue({
                         side: COMPANY_SHIP,
                         name: _('Company Ship'),
@@ -7365,7 +7481,7 @@ class ParliamentMeetsSelectPolicy {
         addCancelButton$1();
     }
     getTextForPolicy(policy) {
-        return formatStringRecursive(policy.windowTax
+        return formatStringRecursive$1(policy.windowTax
             ? _('${consequence} ${tkn_icon} & WINDOW TAX')
             : '${consequence} ${tkn_icon}', {
             consequence: getPolicyConsequenceTranslation(policy.consequence).toLocaleUpperCase(),
@@ -7409,17 +7525,17 @@ class ParliamentMeetsCastVotes {
     onLeavingState() {
         debug('Leaving ParliamentMeetsCastVotes state');
     }
-    setDescription(activePlayerIds, args) { }
+    setDescription(activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} may vote'), {
+            tkn_playerName: PlayerManager.getInstance()
+                .getPlayer(activePlayerIds[0])
+                .getName(),
+        });
+    }
     updateInterfaceInitialStep() {
         clearPossible();
         updatePageTitle(_('${you} may spend £ and enterprises to cast votes'), {});
-        const enterpriseVotes = this.args.votes.enterprises
-            .filter((card) => this.selectedEnterpriseCardIds.includes(card.id))
-            .reduce((total, card) => total + card.votes, 0);
-        const londonSeasonVotes = this.args.votes.londonSeasonCards
-            .filter((card) => this.selectedLondonSeasonCardIds.includes(card.id))
-            .reduce((total, card) => total + card.votes, 0);
-        const totalVotes = this.spend + enterpriseVotes + londonSeasonVotes;
+        const totalVotes = this.getTotalVoteCount();
         this.args.votes.enterprises.forEach((card) => {
             onClick(`enterprise-card-${card.id}`, () => this.handleCardClick(card.id, 'enterprise'));
         });
@@ -7441,7 +7557,7 @@ class ParliamentMeetsCastVotes {
         if (this.args.options.includes(IN_FAVOR)) {
             addPrimaryActionButton({
                 id: 'vote_in_favor_btn',
-                text: formatStringRecursive(_('Cast ${number} vote(s) in favor'), {
+                text: formatStringRecursive$1(_('Cast ${number} vote(s) in favor'), {
                     number: totalVotes,
                 }),
                 callback: () => this.updateInterfaceConfirm(IN_FAVOR),
@@ -7451,10 +7567,10 @@ class ParliamentMeetsCastVotes {
         if (this.args.options.includes(AGAINST)) {
             addDangerActionButton({
                 id: 'vote_against_btn',
-                text: formatStringRecursive(_('Cast ${number} vote(s) against'), {
+                text: formatStringRecursive$1(_('Cast ${number} vote(s) against'), {
                     number: totalVotes,
                 }),
-                callback: () => this.updateInterfaceConfirm(AGAINST),
+                callback: () => this.updateInterfaceSelectTarget(),
                 extraClasses: totalVotes <= 0 ? DISABLED : '',
             });
         }
@@ -7476,9 +7592,38 @@ class ParliamentMeetsCastVotes {
             this.addCancelButton();
         }
     }
-    updateInterfaceConfirm(option) {
+    updateInterfaceSelectTarget() {
         clearPossible();
-        updatePageTitle(_('${you} are about to cast votes'), {});
+        updatePageTitle(_('${you} must choose who to vote for'), {});
+        this.setSelected();
+        PlayerManager.getInstance()
+            .getPlayers()
+            .filter((player) => player.getPlayerId() !== this.args.primeMinisterPlayerId &&
+            player.getPlayerId() !== CROWN_PLAYER_ID)
+            .forEach((player) => {
+            addPrimaryActionButton({
+                id: `vote_for_${player.getPlayerId()}_btn`,
+                text: formatStringRecursive$1(_('${tkn_playerName}'), {
+                    tkn_playerName: player.getName(),
+                }),
+                callback: () => this.updateInterfaceConfirm(AGAINST, player.getPlayerId()),
+            });
+        });
+        this.addCancelButton();
+    }
+    updateInterfaceConfirm(option, targetPlayerId) {
+        clearPossible();
+        const playerManager = PlayerManager.getInstance();
+        const totalVotes = this.getTotalVoteCount();
+        updatePageTitle(targetPlayerId && targetPlayerId !== playerManager.getCurrentPlayerId()
+            ? _('Cast ${votes} vote(s) against the proposed law on behalf of ${tkn_playerName}?')
+            : _('Cast ${votes} vote(s) ${inFavorOrAgainst} the proposed law?'), {
+            votes: totalVotes,
+            inFavorOrAgainst: option === IN_FAVOR ? _('in favor of') : _('against'),
+            tkn_playerName: targetPlayerId
+                ? playerManager.getPlayer(targetPlayerId).getName()
+                : '',
+        });
         this.setSelected();
         addPrimaryActionButton({
             id: 'confirm_btn',
@@ -7486,13 +7631,23 @@ class ParliamentMeetsCastVotes {
             callback: () => {
                 performAction$1('actParliamentMeetsCastVotes', {
                     option,
-                    spend: this.spend,
+                    targetPlayerId: targetPlayerId ?? null,
+                    money: this.spend,
                     enterpriseCardIds: this.selectedEnterpriseCardIds,
                     londonSeasonCardIds: this.selectedLondonSeasonCardIds,
                 });
             },
         });
         this.addCancelButton();
+    }
+    getTotalVoteCount() {
+        const enterpriseVotes = this.args.votes.enterprises
+            .filter((card) => this.selectedEnterpriseCardIds.includes(card.id))
+            .reduce((total, card) => total + card.votes, 0);
+        const londonSeasonVotes = this.args.votes.londonSeasonCards
+            .filter((card) => this.selectedLondonSeasonCardIds.includes(card.id))
+            .reduce((total, card) => total + card.votes, 0);
+        return this.spend + enterpriseVotes + londonSeasonVotes;
     }
     setSelected() {
         this.selectedEnterpriseCardIds.forEach((cardId) => setSelected(`enterprise-card-${cardId}`));
@@ -7556,12 +7711,88 @@ class ParliamentMeetsAdditionalRoundOrResolve {
     onLeavingState() {
         debug('Leaving ParliamentMeetsAdditionalRoundOrResolve state');
     }
-    setDescription(activePlayerIds, args) { }
+    setDescription(activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} can decide to initiate an additional round of voting or can stop and resolve the vote'), {
+            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        });
+    }
     updateInterfaceInitialStep() {
         clearPossible();
-        updatePageTitle(_('${you} may perform an action'), {});
+        updatePageTitle(_('${you} can decide to initiate an additional round of voting or stop and resolve the vote'), {});
+        addPrimaryActionButton({
+            id: 'add-additional-round-btn',
+            text: _('Initiate additional round'),
+            callback: () => {
+                this.updateInterfaceConfirm(false);
+            },
+        });
+        addPrimaryActionButton({
+            id: 'stop-and-resolve-btn',
+            text: _('Stop and resolve'),
+            callback: () => {
+                this.updateInterfaceConfirm(true);
+            },
+        });
+    }
+    updateInterfaceConfirm(stop) {
+        clearPossible();
+        updatePageTitle(stop ? _('Stop and resolve?') : _('Initiate additional round?'), {});
         addConfirmButton$1(() => {
-            performAction$1('actParliamentMeetsAdditionalRoundOrResolve', {});
+            performAction$1('actParliamentMeetsAdditionalRoundOrResolve', { stop });
+        });
+        addCancelButton$1();
+    }
+}
+
+class ParliamentMeetsCommitToOpposition {
+    constructor(game) {
+        this.game = game;
+    }
+    static create(game) {
+        ParliamentMeetsCommitToOpposition.instance =
+            new ParliamentMeetsCommitToOpposition(game);
+    }
+    static getInstance() {
+        return ParliamentMeetsCommitToOpposition.instance;
+    }
+    onEnteringState(args) {
+        debug('Entering ParliamentMeetsCommitToOpposition state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    }
+    onLeavingState() {
+        debug('Leaving ParliamentMeetsCommitToOpposition state');
+    }
+    setDescription(activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} must decide whether to commit to the opposition or not'), {
+            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        });
+    }
+    updateInterfaceInitialStep() {
+        clearPossible();
+        updatePageTitle(_('${you} must choose whether to commit to the opposition or not'), {});
+        addPrimaryActionButton({
+            id: 'commit-btn',
+            text: _('Commit to the opposition'),
+            callback: () => {
+                this.updateInterfaceConfirm(true);
+            },
+        });
+        addPrimaryActionButton({
+            id: 'do-not-commit-btn',
+            text: _('Do not commit to the opposition'),
+            callback: () => {
+                this.updateInterfaceConfirm(false);
+            },
+        });
+    }
+    updateInterfaceConfirm(commit) {
+        clearPossible();
+        updatePageTitle(commit
+            ? _('Commit to the opposition?')
+            : _('Do not to commit to the opposition?'), {});
+        addConfirmButton$1(() => {
+            performAction$1('actParliamentMeetsCommitToOpposition', { commit });
         });
     }
 }
@@ -7741,7 +7972,7 @@ class PresidencyTrade {
         });
         addPrimaryActionButton({
             id: 'make_check_btn',
-            text: formatStringRecursive(_('Roll ${number} dice'), {
+            text: formatStringRecursive$1(_('Roll ${number} dice'), {
                 number: Math.max(this.spend - penalty, 0),
             }),
             callback: () => this.updateInterfaceConfirm(),
@@ -8095,7 +8326,7 @@ class RevenuePayDividends {
         });
         addPrimaryActionButton({
             id: 'make_check_btn',
-            text: formatStringRecursive(_('Pay ${number} dividend(s)'), {
+            text: formatStringRecursive$1(_('Pay ${number} dividend(s)'), {
                 number: this.selectedNumberOfDividends,
             }),
             callback: () => this.updateInterfaceConfirm(),
@@ -8266,6 +8497,7 @@ class Game {
             ParliamentMeetsSelectPolicy,
             ParliamentMeetsCastVotes,
             ParliamentMeetsAdditionalRoundOrResolve,
+            ParliamentMeetsCommitToOpposition,
             PlayerTurn,
             PresidencyDecideOrder,
             PresidencyTrade,

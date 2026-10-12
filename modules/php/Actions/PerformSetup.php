@@ -57,7 +57,6 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
 
       foreach ($setupCards as $card) {
         $items = $card->getItems();
-        Notifications::log('items', $items);
 
         foreach ($items as $item) {
           switch ($item['type']) {

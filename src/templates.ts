@@ -11,6 +11,7 @@ export const tplCube = (type: 'unrest' | 'promise', extraClasses: string = '') =
 `;
 
 export const tplPlayArea = () => `
+  <div id="joco-discard"></div>
   <div id="joco-play-area">
     <div id="joco"></div>
     <div id="joco-overlay">

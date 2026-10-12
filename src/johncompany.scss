@@ -36,6 +36,14 @@ html {
   background-attachment: fixed;
 }
 
+#joco-discard {
+  position: absolute;
+  top: -500px;
+  left: 0px;
+  width: 225px;
+  aspect-ratio: 150 / 234;
+}
+
 #joco #joco-overlay,
 #joco-play-area {
   left: 0;
@@ -147,6 +155,54 @@ html {
 
     &:hover {
       background-color: rgba(219, 140, 147, 0.8);
+    }
+  }
+}
+
+.player-button {
+  background: none;
+  color: black;
+
+  &.blue {
+    background-color: base.$player-blue;
+
+    &:hover {
+      background-color: base.$player-blue-highlight;
+    }
+  }
+  &.gray {
+    background-color: base.$player-gray;
+
+    &:hover {
+      background-color: base.$player-gray-highlight;
+    }
+  }
+  &.green {
+    background-color: base.$player-green;
+
+    &:hover {
+      background-color: base.$player-green-highlight;
+    }
+  }
+  &.pink {
+    background-color: base.$player-pink;
+
+    &:hover {
+      background-color: base.$player-pink-highlight;
+    }
+  }
+  &.purple {
+    background-color: base.$player-purple;
+
+    &:hover {
+      background-color: base.$player-purple-highlight;
+    }
+  }
+  &.yellow {
+    background-color: base.$player-yellow;
+
+    &:hover {
+      background-color: base.$player-yellow-highlight;
     }
   }
 }

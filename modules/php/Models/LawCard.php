@@ -74,4 +74,17 @@ class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   {
     return $this->header === 'dilemma';
   }
+
+  public function resolveImmediateEffects($passed = true)
+  {
+    // Resolve any immediate effects of the law
+  }
+
+  public function move(Player $player, string $location, $text = null, $textArgs = null)
+  {
+    $state = LawCards::insertOnTop($this->getId(), $location);
+    $this->state = $state;
+    $this->location = $location;
+    Notifications::moveLaw($player, $this, $text, $textArgs);
+  }
 }

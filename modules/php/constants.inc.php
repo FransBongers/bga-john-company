@@ -135,6 +135,7 @@ const ST_PARLIAMENT_MEETS_SELECT_POLICY = 147;
 const ST_PARLIAMENT_MEETS_CAST_VOTES = 148;
 const ST_PARLIAMENT_MEETS_ADDITIONAL_ROUND_OR_RESOLVE = 149;
 const ST_FRONTEND_TRIGGER = 150;
+const ST_PARLIAMENT_MEETS_COMMIT_TO_OPPOSITION = 151;
 
 
 const BONUSES = 'Bonuses';
@@ -194,6 +195,7 @@ const PARLIAMENT_MEETS_SELECT_LAW = 'ParliamentMeetsSelectLaw';
 const PARLIAMENT_MEETS_SELECT_POLICY = 'ParliamentMeetsSelectPolicy';
 const PARLIAMENT_MEETS_CAST_VOTES = 'ParliamentMeetsCastVotes';
 const PARLIAMENT_MEETS_ADDITIONAL_ROUND_OR_RESOLVE = 'ParliamentMeetsAdditionalRoundOrResolve';
+const PARLIAMENT_MEETS_COMMIT_TO_OPPOSITION = 'ParliamentMeetsCommitToOpposition';
 const COMMANDER_PURCHASE_LOCAL_ALLIANCE = 'CommanderPurchaseLocalAlliance';
 const COMMANDER_DEPLOY = 'CommanderDeploy';
 const COMMANDER_APPROVE_LOCAL_ALLIANCE = 'CommanderApproveLocalAlliance';
