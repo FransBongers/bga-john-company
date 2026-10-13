@@ -1,3 +1,4 @@
+@use './power-markers/power-markers';
 @use './prime-minister-dial/prime-minister-dial';
 
 #joco-parliament {
@@ -38,6 +39,22 @@
 
   #joco-parliament-revealed-laws {
     min-height: 351px;
+  }
+
+  .joco-row {
+    gap: 12px;
+  }
+
+  .joco-power-markers-container {
+    width: 200px;
+
+    #joco-power-markers {
+      position: relative;
+      background-image: url('img/power_markers.webp');
+      width: 200px;
+      background-size: 100% 100%;
+      aspect-ratio: 500 / 745;
+    }
   }
 
   .joco-voting {

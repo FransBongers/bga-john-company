@@ -105,6 +105,8 @@ import {
   NotifCommitToOpposition,
   NotifFrontendTrigger,
   NotifMoveLaw,
+  NotifWithPlayerArgs,
+  NotifSwapPowerMarkers,
 } from './types';
 import { tplArmyPiece } from '../../india/army/templates';
 import { Parliament } from '../../parliament';
@@ -487,6 +489,12 @@ export class NotificationManager {
     );
   }
 
+  async notif_changePrimeMinister(notif: NotifWithPlayerArgs) {
+    const { playerId } = notif;
+
+    Parliament.getInstance().getPrimeMinisterDial().updatePlayerName(playerId);
+  }
+
   async notif_draftNewCardsPrivate(notif: NotifDraftNewCardsPrivateArgs) {
     const { cardIds, lastCard } = notif;
 
@@ -617,7 +625,7 @@ export class NotificationManager {
 
     const card = getLawCard(law);
     if (law.location === DISCARD) {
-      await LawCardsManager.getInstance().discardCard(card);
+      await Parliament.getInstance().discardCard(card);
     } else {
       // Currently only else case
       await London.getInstance().addLawCard(card);
@@ -927,6 +935,11 @@ export class NotificationManager {
       familyMembers,
       this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER],
     );
+  }
+
+  async notif_swapPowerMarkers(notif: NotifSwapPowerMarkers) {
+    const { playerId, changes } = notif;
+    await Parliament.getInstance().getPowerMarkers().swapPowerMarkers(changes);
   }
 
   async notif_transferPromiseCubes(notif: NotifTransferPromiseCubes) {

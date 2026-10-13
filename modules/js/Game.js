@@ -31,10 +31,6 @@ class Bar {
                 text: _('Company'),
             },
             {
-                id: 'joco-board',
-                text: _('Board'),
-            },
-            {
                 id: 'joco-negotiation',
                 text: _('Negotiation'),
             },
@@ -88,6 +84,15 @@ class Bar {
     }
 }
 
+const DISABLED = 'disabled';
+const SELECTABLE = 'selectable';
+const SELECTED = 'selected';
+const USED = 'used';
+const PRIMARY = 'primary';
+const SECONDARY = 'secondary';
+const DECK = 'deck';
+const DISCARD = 'discard';
+
 const BOARD_SCALE = 'boardScale';
 const PLUS = 'plus';
 const MINUS = 'minus';
@@ -98,6 +103,7 @@ const PARLIAMENT_MEETS_VOTING_STARTS = 'ParliamentMeetsVotingStarts';
 const PARLIAMENT_MEETS_END = 'ParliamentMeetsEnd';
 const IN_FAVOR = 'inFavor';
 const AGAINST = 'against';
+const PASSED_LAW_TOKENS = 'passedLawTokens';
 const TROPHIES = 'trophies';
 const BENYON = 'Benyon';
 const HASTINGS = 'Hastings';
@@ -709,15 +715,6 @@ class PlayerManager {
     }
 }
 
-const DISABLED = 'disabled';
-const SELECTABLE = 'selectable';
-const SELECTED = 'selected';
-const USED = 'used';
-const PRIMARY = 'primary';
-const SECONDARY = 'secondary';
-const DECK = 'deck';
-const DISCARD = 'discard';
-
 class Interaction {
     constructor(game) {
         this.game = game;
@@ -852,692 +849,6 @@ class Interaction {
         return await this.game.bga.gameui.wait(ms);
     }
 }
-
-const isDebug = window.location.host == 'studio.boardgamearena.com' ||
-    window.location.hash.indexOf('debug') > -1;
-const debug = isDebug ? console.info.bind(window.console) : () => { };
-const addCancelButton$1 = (props = {}) => {
-    Interaction.use().addCancelButton(props);
-};
-const addConfirmButton$1 = (callback) => {
-    Interaction.use().addConfirmButton(callback);
-};
-const addDangerActionButton = (props) => {
-    Interaction.use().addDangerActionButton(props);
-};
-const addPassButton$1 = (optionalAction, text) => Interaction.use().addPassButton(optionalAction, text);
-const addPlayerButton = (props) => Interaction.use().addPlayerButton(props);
-const addPrimaryActionButton = (props) => Interaction.use().addPrimaryActionButton(props);
-const addSecondaryActionButton = (props) => Interaction.use().addSecondaryActionButton(props);
-const addUndoButtons = (props) => {
-    Interaction.use().addUndoButtons(props);
-};
-const clearPossible = () => {
-    Interaction.use().clearPossible();
-};
-const updatePageTitle = (text, args = {}) => Interaction.use().clientUpdatePageTitle(text, args);
-const formatStringRecursive$1 = (log, args) => {
-    return Interaction.use().formatStringRecursive(log, args);
-};
-const setAbsolutePosition = (elt, scaleVarName, { top, left }) => {
-    if (!elt) {
-        return;
-    }
-    elt.style.top = `calc(var(--${scaleVarName}) * ${top}px)`;
-    elt.style.left = `calc(var(--${scaleVarName}) * ${left}px)`;
-};
-const onClick = (node, callback, temporary = true) => {
-    let element = typeof node === 'string' ? document.getElementById(node) : node;
-    Interaction.use().onClick(element, callback, temporary);
-};
-const setSelected = (node) => {
-    let element = typeof node === 'string' ? document.getElementById(node) : node;
-    Interaction.use().setSelected(element);
-};
-const performAction$1 = (actionName, args) => {
-    Interaction.use().clearPossible();
-    Interaction.use().performAction(actionName, args);
-};
-const getPlayerName = (playerId) => {
-    return PlayerManager.getInstance().getPlayer(playerId).getName();
-};
-const createHtmlElement = (html) => {
-    const template = document.createElement('template');
-    template.innerHTML = html.trim();
-    return template.content.firstChild;
-};
-const parentHasChildWithId = (parent, child) => {
-    const locationElement = typeof parent === 'string' ? document.getElementById(parent) : parent;
-    const childId = typeof child === 'string' ? child : child.id;
-    if (Array.from(locationElement?.children ?? []).some((c) => c.id === childId)) {
-        return true;
-    }
-    return false;
-};
-
-const ORDERS_CONFIG$1 = {
-    [ORDER_PUNJAB_1]: { top: 22.5, left: 933 },
-    [ORDER_DELHI_1]: { top: 15, left: 1069 },
-    [ORDER_DELHI_2]: { top: 47, left: 1158.5 },
-    [ORDER_DELHI_3]: { top: 62, left: 1038 },
-    [ORDER_BENGAL_1]: { top: 113, left: 1276 },
-    [ORDER_BENGAL_2]: { top: 171, left: 1373 },
-    [ORDER_BOMBAY_1]: { top: 89.5, left: 955 },
-    [ORDER_BOMBAY_2]: { top: 173, left: 996.5 },
-    [ORDER_BOMBAY_3]: { top: 233, left: 941 },
-    [ORDER_MARATHA_1]: { top: 109.5, left: 1171 },
-    [ORDER_MARATHA_2]: { top: 176.5, left: 1072.5 },
-    [ORDER_MARATHA_3]: { top: 219.5, left: 1222 },
-    [ORDER_HYDERABAD_1]: { top: 300.5, left: 1133 },
-    [ORDER_MYSORE_1]: { top: 344, left: 1017.5 },
-    [ORDER_MYSORE_2]: { top: 400.5, left: 1055 },
-    [ORDER_MADRAS_1]: { top: 398, left: 1148.5 },
-    [ORDER_MADRAS_2]: { top: 447.5, left: 1118.5 },
-};
-const getCompanyBalanceConfig = (balance) => {
-    const left = 24 + 34.5 * (balance % 40);
-    return { top: 702, left };
-};
-const COMPANY_DEBT_CONFIG$1 = [
-    { top: 149, left: 370 },
-    { top: 149, left: 404.5 },
-    { top: 149, left: 439 },
-    { top: 149, left: 473.5 },
-    { top: 149, left: 508 },
-    { top: 149, left: 542 },
-    { top: 149, left: 576 },
-    { top: 149, left: 611 },
-    { top: 149, left: 644.5 },
-];
-const getCompanyDebtConfig = (debt) => {
-    return COMPANY_DEBT_CONFIG$1[debt];
-};
-const COMPANY_STANDING_CONFIG$1 = {
-    0: { top: 63, left: 370 },
-    4: { top: 63, left: 409 },
-    6: { top: 63, left: 448 },
-    8: { top: 63, left: 487 },
-    10: { top: 63, left: 526 },
-    12: { top: 63, left: 565 },
-    14: { top: 63, left: 604 },
-    16: { top: 63, left: 643 },
-};
-const getCompanyStandingConfig = (standing) => COMPANY_STANDING_CONFIG$1[standing];
-const PHASE_CONFIG = {
-    [SETUP]: { top: 466, left: 226 },
-    [LONDON_SEASON]: { top: 400, left: 226 },
-    [FAMILY]: { top: 466, left: 226 },
-    [FIRMS]: { top: 534, left: 223 },
-    [HIRING]: { top: 592, left: 223 },
-    [CHAIRMAN]: { top: 658, left: 223 },
-    [DIRECTOR_OF_TRADE]: { top: 658, left: 398 },
-    [MANAGER_OF_SHIPPING]: { top: 658, left: 536 },
-    [MILITARY_AFFAIRS]: { top: 658, left: 671 },
-    [BOMBAY_PRESIDENCY]: { top: 658, left: 808 },
-    [MADRAS_PRESIDENCY]: { top: 658, left: 998 },
-    [BENGAL_PRESIDENCY]: { top: 658, left: 1188 },
-    [SUPERINTENDENT_OF_TRADE_IN_CHINA]: { top: 600, left: 1385 },
-    [BONUSES]: { top: 540, left: 1380 },
-    [REVENUE]: { top: 464, left: 1380 },
-    [EVENTS_IN_INDIA]: { top: 399, left: 1384 },
-    [PARLIAMENT_MEETS]: { top: 332, left: 1375 },
-    [UPKEEP_AND_REFRESH]: { top: 277, left: 1382 },
-};
-const TURN_CONFIG = {
-    1: { top: 138, left: 199.5 },
-    2: { top: 169, left: 199.5 },
-    3: { top: 201, left: 199.5 },
-    4: { top: 231, left: 199.5 },
-    5: { top: 263, left: 199.5 },
-    6: { top: 293, left: 199.5 },
-    7: { top: 324, left: 199.5 },
-    8: { top: 355, left: 199.5 },
-    endGameScoring: { top: 138, left: 199.5 },
-};
-const getGroupPosition = (top, left, index, rowSize) => {
-    const row = Math.floor(index / rowSize);
-    const column = index % 4;
-    return {
-        top: top + 46 * row,
-        left: left + 39 * column,
-    };
-};
-const getRegimentGroupPosition = (top, left, index, rowSize) => {
-    const row = Math.floor(index / rowSize);
-    const column = index % 4;
-    return {
-        top: top + 46 * row,
-        left: left + 10 * column,
-    };
-};
-const getOfficerPosition = (army, index) => {
-    switch (army) {
-        case BOMBAY_ARMY:
-            return getGroupPosition(22, 760, index, 3);
-        case BENGAL_ARMY:
-            return getGroupPosition(408, 760, index, 3);
-        case MADRAS_ARMY:
-            return getGroupPosition(215, 760, index, 3);
-        default:
-            return { top: 0, left: 0 };
-    }
-};
-const getRegimentPosition = (location, index, exhausted) => {
-    switch (location) {
-        case BOMBAY_ARMY:
-            return getRegimentGroupPosition(22, 694, index, 4);
-        case BENGAL_ARMY:
-            return getRegimentGroupPosition(408, 694, index, 4);
-        case MADRAS_ARMY:
-            return getRegimentGroupPosition(215, 694, index, 4);
-        default:
-            return { top: 0, left: 0 };
-    }
-};
-const getCourtOfDirectorsPosition = (index) => getGroupPosition(555, 243, index, 4);
-const getOfficersInTrainingPosition = (index) => getGroupPosition(602, 692, index, 3);
-const getWriterPosition = (location, index) => {
-    switch (location) {
-        case BOMBAY_WRITERS:
-            return getGroupPosition(602, 894, index, 3);
-        case BENGAL_WRITERS:
-            return getGroupPosition(602, 1273, index, 3);
-        case MADRAS_WRITERS:
-            return getGroupPosition(602, 1084, index, 3);
-        default:
-            return { top: 0, left: 0 };
-    }
-};
-const getStockExchangePosition = (position) => {
-    switch (position) {
-        case STOCK_EXCHANGE_2:
-            return { top: 458, left: 249 };
-        case STOCK_EXCHANGE_3_LEFT:
-            return { top: 414, left: 275 };
-        case STOCK_EXCHANGE_3_RIGHT:
-            return { top: 458, left: 301 };
-        case STOCK_EXCHANGE_4:
-            return { top: 414, left: 327 };
-        case STOCK_EXCHANGE_5:
-            return { top: 458, left: 353 };
-        default:
-            return { top: 0, left: 0 };
-    }
-};
-const WEST_INDIAN_POSITIONS = [
-    {
-        top: 445,
-        left: 870,
-    },
-    {
-        top: 293,
-        left: 880,
-    },
-];
-const SOUTH_INDIAN_POSITIONS = [
-    {
-        top: 391,
-        left: 1233,
-    },
-    {
-        top: 491,
-        left: 1203,
-    },
-];
-const EAST_INDIAN_POSITIONS = [
-    {
-        top: 332,
-        left: 1273,
-    },
-    {
-        top: 365,
-        left: 1313,
-    },
-];
-const getShipPosition = (sea, index) => {
-    const numberOfPositions = 2;
-    const positionIndex = index % numberOfPositions;
-    const offset = Math.floor(index / numberOfPositions);
-    let position = { top: 0, left: 0 };
-    switch (sea) {
-        case WEST_INDIAN:
-            position = WEST_INDIAN_POSITIONS[positionIndex];
-            break;
-        case SOUTH_INDIAN:
-            position = SOUTH_INDIAN_POSITIONS[positionIndex];
-            break;
-        case EAST_INDIAN:
-            position = EAST_INDIAN_POSITIONS[positionIndex];
-            break;
-    }
-    position.top = position.top - 20 * offset;
-    position.left = position.left + 20 * offset;
-    return position;
-};
-const FAMILY_MEMBER_OFFICE_CONFIG = {
-    [CHAIRMAN]: { top: 662, left: 246 },
-    [DIRECTOR_OF_TRADE]: { top: 662, left: 420 },
-    [MANAGER_OF_SHIPPING]: { top: 662, left: 558 },
-    [MILITARY_AFFAIRS]: { top: 662, left: 694 },
-    [PRESIDENT_OF_BOMBAY]: { top: 662, left: 831 },
-    [PRESIDENT_OF_MADRAS]: { top: 662, left: 1021 },
-    [PRESIDENT_OF_BENGAL]: { top: 662, left: 1210 },
-    [GOVERNOR_GENERAL]: { top: 662, left: 420 },
-    [SUPERINTENDENT_OF_TRADE_IN_CHINA]: { top: 662, left: 1400 },
-    [GOVERNOR_OF_BOMBAY]: { top: 289, left: 964 },
-    [GOVERNOR_OF_MADRAS]: { top: 500, left: 1119 },
-    [GOVERNOR_OF_BENGAL]: { top: 107, left: 1349 },
-    [GOVERNOR_OF_PUNJAB]: { top: 31, left: 861 },
-    [GOVERNOR_OF_DELHI]: { top: 16, left: 1196 },
-    [GOVERNOR_OF_MARATHA]: { top: 105, left: 1105 },
-    [GOVERNOR_OF_HYDERABAD]: { top: 298, left: 1049 },
-    [GOVERNOR_OF_MYSORE]: { top: 420, left: 993 },
-    Commander_Bengal: { top: 471, left: 695 },
-    Commander_Bombay: { top: 278, left: 695 },
-    Commander_Madras: { top: 84, left: 695 },
-};
-const towerConfig = {
-    [BENGAL]: { bottom: -149, left: 1339 },
-    [BOMBAY]: { bottom: -332, left: 954 },
-    [DELHI]: { bottom: -60, left: 1186 },
-    [HYDERABAD]: { bottom: -341, left: 1038 },
-    [MADRAS]: { bottom: -542, left: 1109 },
-    [MARATHA]: { bottom: -149, left: 1095 },
-    [MYSORE]: { bottom: -462, left: 983 },
-    [PUNJAB]: { bottom: -74, left: 851 },
-};
-const TREASURY_POSITIONS = {
-    [DIRECTOR_OF_TRADE]: { top: 618, left: 416 },
-    [MANAGER_OF_SHIPPING]: { top: 618, left: 555 },
-    [PRESIDENT_OF_BOMBAY]: { top: 618, left: 806 },
-    [PRESIDENT_OF_MADRAS]: { top: 618, left: 996 },
-    [PRESIDENT_OF_BENGAL]: { top: 618, left: 1185 },
-};
-const POWER_TOKEN_POSITIONS = [
-    { top: 72, left: 276 },
-    { top: 115, left: 276 },
-    { top: 159, left: 251 },
-    { top: 159, left: 301 },
-];
-const ARMY_SELECT_POSITIONS = {
-    [BOMBAY_ARMY]: { top: 21, left: 692 },
-    [MADRAS_ARMY]: { top: 214, left: 692 },
-    [BENGAL_ARMY]: { top: 407, left: 692 },
-};
-const COMPANY_DEBT_SELECT_POSITIONS = [
-    { top: 157, left: 365.5 },
-    { top: 157, left: 400 },
-    { top: 157, left: 434 },
-    { top: 157, left: 468.5 },
-    { top: 157, left: 503 },
-    { top: 157, left: 537 },
-    { top: 157, left: 571.5 },
-    { top: 157, left: 606 },
-    { top: 157, left: 640 },
-];
-const SEA_ZONE_SELECT_POSITIONS = {
-    [WEST_INDIAN]: { top: 377, left: 885 },
-    [SOUTH_INDIAN]: { top: 432, left: 1219 },
-    [EAST_INDIAN]: { top: 301, left: 1317 },
-};
-
-const tplBoard = (gamedatas) => `<div id="joco-board">
-  <div id="joco-family-members"></div>
-  <div id="joco-orders"></div>
-  <div id="joco-regiments"></div>
-  <div id="joco-power-tokens"></div>
-  <div id="joco_ships"></div>
-  <div id="joco_towers"></div>
-  <div id="joco_treasuries"></div>
-  <div id="joco-select-boxes"></div>
-  <div id="joco-elephant-old"></div>
-</div>`;
-
-let Board$1 = class Board {
-    constructor(game) {
-        this.familyMembers = {};
-        this.regions = {};
-        this.armies = {
-            regiments: {
-                [BENGAL_ARMY]: [],
-                [BOMBAY_ARMY]: [],
-                [MADRAS_ARMY]: [],
-            },
-        };
-        this.powerTokens = {};
-        this.seas = {
-            [WEST_INDIAN]: [],
-            [SOUTH_INDIAN]: [],
-            [EAST_INDIAN]: [],
-        };
-        this.treasuries = {};
-        this.game = game;
-        this.setup(game.gamedatas);
-    }
-    static create(game) {
-        Board.instance = new Board(game);
-    }
-    static getInstance() {
-        return Board.instance;
-    }
-    setup(gamedatas) {
-        document
-            .getElementById('joco')
-            .insertAdjacentHTML('afterbegin', tplBoard(gamedatas));
-        this.ui = {
-            containers: {
-                board: document.getElementById('joco-board'),
-                familyMembers: document.getElementById('joco-family-members'),
-                orders: document.getElementById('joco-orders'),
-                regiments: document.getElementById('joco-regiments'),
-                pawns: {},
-                powerTokens: document.getElementById('joco-power-tokens'),
-                selectBoxes: document.getElementById('joco-select-boxes'),
-                ships: document.getElementById('joco_ships'),
-                treasuries: document.getElementById('joco_treasuries'),
-            },
-            armyPieces: {},
-            familyMembers: {},
-            orders: {},
-            selectBoxes: {},
-            ships: {},
-        };
-        this.setupPawns(gamedatas);
-        this.setupPowerTokens(gamedatas);
-        this.setupSelectBoxes();
-    }
-    setupPawns(gamedatas) {
-        ['balance', 'standing', 'debt', 'turn', 'phase'].forEach((pawn) => {
-            const elt = (this.ui.containers.pawns[pawn] =
-                document.createElement('div'));
-            elt.id = pawn;
-            elt.classList.add('joco_pawn');
-            elt.setAttribute('data-color', pawn === 'turn' ? 'black' : pawn === 'phase' ? 'silver' : 'red');
-            this.ui.containers.board.appendChild(elt);
-        });
-        this.updatePawns(gamedatas);
-    }
-    setupPowerTokens(gamedatas) {
-        POWER_TOKENS.forEach((token) => {
-            const elt = (this.ui.containers.powerTokens[token] =
-                document.createElement('div'));
-            elt.classList.add('joco-power-token');
-            elt.setAttribute('data-type', token);
-            const iconElt = document.createElement('div');
-            iconElt.classList.add('joco-icon');
-            iconElt.setAttribute('data-icon', POWER_TOKEN_ICON_MAP[token]);
-            elt.appendChild(iconElt);
-            this.ui.containers.powerTokens.appendChild(elt);
-        });
-        this.updatePowerTokens(gamedatas);
-    }
-    setupSelectBoxes() {
-        ARMIES.forEach((army) => {
-            const elt = (this.ui.selectBoxes[army] = document.createElement('div'));
-            elt.classList.add('joco-select-box');
-            elt.classList.add('joco-select-army');
-            setAbsolutePosition(elt, BOARD_SCALE, ARMY_SELECT_POSITIONS[army]);
-            this.ui.containers.selectBoxes.appendChild(elt);
-        });
-        [BENGAL, BOMBAY, MADRAS].forEach((region) => {
-            const elt = (this.ui.selectBoxes[`Writers_${region}`] =
-                document.createElement('div'));
-            elt.classList.add('joco-select-box');
-            elt.classList.add('joco-select-writer');
-            elt.setAttribute('data-region', region);
-            this.ui.containers.selectBoxes.appendChild(elt);
-        });
-        SEA_ZONES.forEach((seaZone) => {
-            const elt = (this.ui.selectBoxes[seaZone] =
-                document.createElement('div'));
-            elt.classList.add('joco-select-box');
-            elt.classList.add('joco-select-sea-zone');
-            setAbsolutePosition(elt, BOARD_SCALE, SEA_ZONE_SELECT_POSITIONS[seaZone]);
-            this.ui.containers.selectBoxes.appendChild(elt);
-        });
-        STOCK_EXCHANGE_POSITIONS.forEach((position) => {
-            const elt = (this.ui.selectBoxes[position] =
-                document.createElement('div'));
-            elt.classList.add('joco-select-box');
-            elt.classList.add('joco-seek-share');
-            elt.setAttribute('data-position', position);
-            this.ui.containers.selectBoxes.appendChild(elt);
-        });
-        OFFICES_WITH_TREASURY.forEach((office) => {
-            const elt = (this.ui.selectBoxes[office] = document.createElement('div'));
-            elt.classList.add('joco-select-box');
-            elt.classList.add('joco-office');
-            elt.setAttribute('data-office', office);
-            this.ui.containers.selectBoxes.appendChild(elt);
-        });
-        Array.from(Array(9).keys()).forEach((value) => {
-            const elt = (this.ui.selectBoxes[`companyDebt_${value}`] =
-                document.createElement('div'));
-            elt.classList.add('joco-select-box');
-            elt.classList.add('joco-company-debt');
-            setAbsolutePosition(elt, BOARD_SCALE, COMPANY_DEBT_SELECT_POSITIONS[value]);
-            this.ui.containers.selectBoxes.appendChild(elt);
-        });
-    }
-    updateFamilyMembers(familyMembers) {
-        familyMembers.forEach((familyMember) => {
-            const { location, id } = familyMember;
-            if (location.startsWith('supply')) {
-                return;
-            }
-            if (!this.ui.familyMembers[id].parentElement) {
-                this.ui.containers.familyMembers.appendChild(this.ui.familyMembers[id]);
-            }
-            let position = { top: 0, left: 0 };
-            switch (location) {
-                case COURT_OF_DIRECTORS:
-                    position = getCourtOfDirectorsPosition(this.familyMembers[COURT_OF_DIRECTORS].length);
-                    this.familyMembers[COURT_OF_DIRECTORS].push(familyMember);
-                    break;
-                case OFFICER_IN_TRAINING:
-                    position = getOfficersInTrainingPosition(this.familyMembers[OFFICER_IN_TRAINING].length);
-                    this.familyMembers[OFFICER_IN_TRAINING].push(familyMember);
-                    break;
-                case BENGAL_WRITERS:
-                case BOMBAY_WRITERS:
-                case MADRAS_WRITERS:
-                    position = getWriterPosition(location, this.familyMembers[location].length);
-                    this.familyMembers[location].push(familyMember);
-                    break;
-                case BENGAL_ARMY:
-                case BOMBAY_ARMY:
-                case MADRAS_ARMY:
-                    position = getOfficerPosition(location, this.familyMembers[location].length);
-                    this.familyMembers[location].push(familyMember);
-                    break;
-                case STOCK_EXCHANGE_2:
-                case STOCK_EXCHANGE_3_LEFT:
-                case STOCK_EXCHANGE_3_RIGHT:
-                case STOCK_EXCHANGE_4:
-                case STOCK_EXCHANGE_5:
-                    position = getStockExchangePosition(location);
-                    break;
-                case ORDER_PUNJAB_1:
-                case ORDER_DELHI_1:
-                case ORDER_DELHI_2:
-                case ORDER_DELHI_3:
-                case ORDER_BENGAL_1:
-                case ORDER_BENGAL_2:
-                case ORDER_BOMBAY_1:
-                case ORDER_BOMBAY_2:
-                case ORDER_BOMBAY_3:
-                case ORDER_MARATHA_1:
-                case ORDER_MARATHA_2:
-                case ORDER_MARATHA_3:
-                case ORDER_HYDERABAD_1:
-                case ORDER_MYSORE_1:
-                case ORDER_MYSORE_2:
-                case ORDER_MADRAS_1:
-                case ORDER_MADRAS_2:
-                    position = ORDERS_CONFIG$1[location];
-                    break;
-                default:
-                    position = FAMILY_MEMBER_OFFICE_CONFIG[location];
-                    break;
-            }
-            setAbsolutePosition(this.ui.familyMembers[id], BOARD_SCALE, position);
-        });
-    }
-    async moveFamilyMember({ familyMember, index = 0, }) {
-        await Interaction.use().wait(index * 200);
-        const fromRect = this.ui.familyMembers[familyMember.id].getBoundingClientRect();
-        this.updateFamilyMembers([familyMember]);
-        await this.game.animationManager.slideIn(this.ui.familyMembers[familyMember.id], this.ui.familyMembers[familyMember.id]);
-    }
-    async moveFamilyMemberBetweenLocations(familyMember, to) {
-        const from = familyMember.location;
-        familyMember.location = to;
-        if (this.familyMembers[familyMember.location] &&
-            this.familyMembers[familyMember.location].some((memberInLocation) => memberInLocation.id === familyMember.id)) {
-            return;
-        }
-        let promises = [];
-        if (this.familyMembers[from]) {
-            const remainingFamilyMembers = this.familyMembers[from].filter((member) => member.id !== familyMember.id);
-            this.familyMembers[from] = [];
-            promises = remainingFamilyMembers.map((member) => this.moveFamilyMember({ familyMember: member }));
-        }
-        promises.push(this.moveFamilyMember({ familyMember }));
-        await Promise.all(promises);
-    }
-    async placeFamilyMembers(familyMembers, fromElement) {
-        const promises = familyMembers.map(async (familyMember, index) => {
-            const { id } = familyMember;
-            const player = PlayerManager.getInstance().getPlayerForFamily(familyMember.familyId);
-            await Interaction.use().wait(index * 200);
-            player.counters[FAMILY_MEMBERS_COUNTER].incValue(-1);
-            this.updateFamilyMembers([familyMember]);
-            await this.game.animationManager.slideIn(this.ui.familyMembers[id], fromElement);
-            if (familyMember.location === COURT_OF_DIRECTORS ||
-                familyMember.location === CHAIRMAN) {
-                player.counters[SHARES_COUNTER].incValue(1);
-            }
-        });
-        await Promise.all(promises);
-    }
-    updateOrders(gamedatas) {
-        this.ui.containers.orders.replaceChildren();
-        Object.entries(gamedatas.orders).forEach(([orderId, order]) => {
-            setAbsolutePosition(this.ui.orders[orderId], BOARD_SCALE, ORDERS_CONFIG$1[orderId]);
-            this.ui.orders[orderId].setAttribute('data-status', order.status);
-            this.ui.containers.orders.appendChild(this.ui.orders[orderId]);
-        });
-    }
-    updatePowerTokens(gamedatas) {
-        gamedatas.powerTokens.forEach((token, index) => {
-            setAbsolutePosition(this.ui.containers.powerTokens[token], BOARD_SCALE, POWER_TOKEN_POSITIONS[index]);
-        });
-    }
-    async movePawn(type, value) {
-        const fromRect = this.ui.containers.pawns[type].getBoundingClientRect();
-        this.updatePawn(type, value);
-        await this.game.animationManager.slideIn(this.ui.containers.pawns[type], this.ui.containers.pawns[type]);
-    }
-    updatePawn(type, value) {
-        let position;
-        switch (type) {
-            case 'balance':
-                position = getCompanyBalanceConfig(value);
-                break;
-            case 'debt':
-                position = getCompanyDebtConfig(value);
-                break;
-            case 'phase':
-                position = PHASE_CONFIG[value];
-                break;
-            case 'standing':
-                position = getCompanyStandingConfig(value);
-                break;
-            case 'turn':
-                position = TURN_CONFIG[value];
-                break;
-        }
-        setAbsolutePosition(this.ui.containers.pawns[type], BOARD_SCALE, position);
-    }
-    updatePawns(gamedatas) {
-        const { balance, debt, standing } = gamedatas.company;
-        this.updatePawn('balance', balance);
-        this.updatePawn('debt', debt);
-        this.updatePawn('standing', standing);
-        this.updatePawn('phase', gamedatas.phase);
-        this.updatePawn('turn', gamedatas.turn);
-    }
-    async moveRegiment(regiment, index = 0) {
-        await Interaction.use().wait(index * 200);
-        const fromRect = this.ui.armyPieces[regiment.id].getBoundingClientRect();
-        this.game.animationManager.slideIn(this.ui.armyPieces[regiment.id], this.ui.armyPieces[regiment.id]);
-    }
-    async moveRegimentBetweenArmies(regiment, from) {
-        if (this.armies.regiments[regiment.location].some((regimentInLocation) => regimentInLocation.id === regiment.id)) {
-            return;
-        }
-        const remainingRegiments = this.armies.regiments[from].filter((piece) => piece.id !== regiment.id);
-        this.armies.regiments[from] = [];
-        const promises = remainingRegiments.map((remaining) => this.moveRegiment(remaining));
-        promises.push(this.moveRegiment(regiment));
-        await Promise.all(promises);
-    }
-    async moveShip({ ship, index = 0, from, }) {
-        await Interaction.use().wait(index * 200);
-        const fromRect = this.ui.ships[ship.id].getBoundingClientRect();
-        const fromIndex = this.seas[from].findIndex((shipInOldZone) => shipInOldZone?.id === ship.id);
-        this.placeShip(ship);
-        if (fromIndex >= 0) {
-            this.seas[from][fromIndex] = null;
-        }
-        const toRect = this.ui.ships[ship.id].getBoundingClientRect();
-        const delta = {
-            x: fromRect.left - toRect.left,
-            y: fromRect.top - toRect.top,
-        };
-        await this.game.animationManager.slideInFromDelta(this.ui.ships[ship.id], delta);
-    }
-    async removeShip(shipId, seaZone) {
-        this.ui.ships[shipId].remove();
-        const fromIndex = this.seas[seaZone].findIndex((shipInOldZone) => shipInOldZone?.id === shipId);
-        if (fromIndex >= 0) {
-            this.seas[seaZone][fromIndex] = null;
-        }
-    }
-    updateOtherShip(ship, type) {
-        this.ui.ships[ship.id].setAttribute('data-type', type);
-        ship.type = type;
-        ship.name = type === 'ExtraShip' ? _('Extra Ship') : _('Company Ship');
-        return ship;
-    }
-    shipAlreadyInZone(shipId, location) {
-        return this.seas[location].some((shipInLocation) => shipInLocation?.id === shipId);
-    }
-    async placeShip(ship, fromElement) {
-        const { id, location } = ship;
-        if ([SOUTH_INDIAN, WEST_INDIAN, EAST_INDIAN].includes(location)) {
-            if (this.shipAlreadyInZone(id, location)) {
-                return;
-            }
-            if (!this.ui.ships[id].parentElement) {
-                this.ui.containers.ships.appendChild(this.ui.ships[id]);
-            }
-            const nullIndex = this.seas[location].findIndex((pos) => pos === null);
-            const shipIndex = nullIndex >= 0 ? nullIndex : this.seas[location].length;
-            const position = getShipPosition(location, shipIndex);
-            this.seas[location][shipIndex] = ship;
-            setAbsolutePosition(this.ui.ships[id], BOARD_SCALE, position);
-            if (fromElement) {
-                await this.game.animationManager.slideIn(this.ui.ships[id], fromElement);
-            }
-        }
-        else if (location.startsWith(SHIPYARD)) {
-            const enterprise = this.game.gamedatas.enterprises[location];
-            const player = PlayerManager.getInstance().getPlayerForFamily(enterprise.location);
-            player.counters[SHIPS_COUNTER].incValue(1);
-        }
-    }
-};
 
 const BgaAnimations$1 = await globalThis.importEsmLib('bga-animations', '1.x');
 const BgaCards$1 = await globalThis.importEsmLib('bga-cards', '1.x');
@@ -1769,6 +1080,74 @@ const tplTrophyIcon = (extraClasses = '') => `<div class="joco-trophy ${extraCla
       <span class="fb-font-baskerville fb-font-italic">${_('Trophy').toLocaleUpperCase()}</span>
     </div>
   </div>`;
+const tplPassedLawTokenIcon = (extraClasses = '') => `<div class="joco-passed-law-token ${extraClasses ?? ''}">
+    ${tplPowerIcon(1)}
+    <div class="joco-title bga-autofit">
+      <span class="fb-font-baskerville fb-font-italic">${_('Passed Law Token').toLocaleUpperCase()}</span>
+    </div>
+  </div>`;
+
+const isDebug = window.location.host == 'studio.boardgamearena.com' ||
+    window.location.hash.indexOf('debug') > -1;
+const debug = isDebug ? console.info.bind(window.console) : () => { };
+const addCancelButton$1 = (props = {}) => {
+    Interaction.use().addCancelButton(props);
+};
+const addConfirmButton$1 = (callback) => {
+    Interaction.use().addConfirmButton(callback);
+};
+const addDangerActionButton = (props) => {
+    Interaction.use().addDangerActionButton(props);
+};
+const addPassButton$1 = (optionalAction, text) => Interaction.use().addPassButton(optionalAction, text);
+const addPlayerButton = (props) => Interaction.use().addPlayerButton(props);
+const addPrimaryActionButton = (props) => Interaction.use().addPrimaryActionButton(props);
+const addSecondaryActionButton = (props) => Interaction.use().addSecondaryActionButton(props);
+const addUndoButtons = (props) => {
+    Interaction.use().addUndoButtons(props);
+};
+const clearPossible = () => {
+    Interaction.use().clearPossible();
+};
+const updatePageTitle = (text, args = {}) => Interaction.use().clientUpdatePageTitle(text, args);
+const formatStringRecursive$1 = (log, args) => {
+    return Interaction.use().formatStringRecursive(log, args);
+};
+const setAbsolutePosition = (elt, scaleVarName, { top, left }) => {
+    if (!elt) {
+        return;
+    }
+    elt.style.top = `calc(var(--${scaleVarName}) * ${top}px)`;
+    elt.style.left = `calc(var(--${scaleVarName}) * ${left}px)`;
+};
+const onClick = (node, callback, temporary = true) => {
+    let element = typeof node === 'string' ? document.getElementById(node) : node;
+    Interaction.use().onClick(element, callback, temporary);
+};
+const setSelected = (node) => {
+    let element = typeof node === 'string' ? document.getElementById(node) : node;
+    Interaction.use().setSelected(element);
+};
+const performAction$1 = (actionName, args) => {
+    Interaction.use().clearPossible();
+    Interaction.use().performAction(actionName, args);
+};
+const getPlayerName = (playerId) => {
+    return PlayerManager.getInstance().getPlayer(playerId).getName();
+};
+const createHtmlElement = (html) => {
+    const template = document.createElement('template');
+    template.innerHTML = html.trim();
+    return template.content.firstChild;
+};
+const parentHasChildWithId = (parent, child) => {
+    const locationElement = typeof parent === 'string' ? document.getElementById(parent) : parent;
+    const childId = typeof child === 'string' ? child : child.id;
+    if (Array.from(locationElement?.children ?? []).some((c) => c.id === childId)) {
+        return true;
+    }
+    return false;
+};
 
 const tplCardText = (text, { containerClass = 'fb-card-text', textClass = 'fb-font-12 fb-font-baskerville', }) => {
     return `
@@ -2412,6 +1791,21 @@ class IconCounter {
     }
 }
 
+class PassedLawTokensCounter extends IconCounter {
+    constructor(props) {
+        super({
+            ...props,
+            iconElement: createHtmlElement(tplPassedLawTokenIcon()),
+            iconPosition: 'overlap',
+            type: 'passed-law-token',
+        });
+        this.setup();
+    }
+    setup() {
+        this.counterElement.classList.add('fb-font-baskerville');
+    }
+}
+
 class TrophiesCounter extends IconCounter {
     constructor(props) {
         super({
@@ -2782,10 +2176,6 @@ const ORDERS_CONFIG = {
     [ORDER_MADRAS_2]: { top: 706, left: 502 },
 };
 
-const BgaAnimations = await globalThis.importEsmLib('bga-animations', '1.x');
-const BgaCards = await globalThis.importEsmLib('bga-cards', '1.x');
-const BgaAutofit = await globalThis.importEsmLib('bga-autofit', '1.x');
-
 const tplControlTokenContent = (token, back = false) => {
     return `
     ${back ? '' : `<div class="joco-presidency-icon joco-inverted"></div>`}
@@ -2866,7 +2256,7 @@ class Presidency {
         this.updateFamilyMembers(config.gamedatas);
     }
     setupControlTokens(gamedatas) {
-        this.controlTokenStock = new BgaCards.LineStock(ControlTokensManager.getInstance(), document.getElementById(`joco-control-tokens-${this.id}`));
+        this.controlTokenStock = new BgaCards$1.LineStock(ControlTokensManager.getInstance(), document.getElementById(`joco-control-tokens-${this.id}`));
         Object.values(gamedatas.regions).forEach((region) => {
             if (region.control === this.id) {
                 this.controlTokenStock.addCard(createControlToken(region));
@@ -3007,7 +2397,7 @@ class Region {
             governorOverlay: document.getElementById(`joco-governor-overlay-${data.id}`),
             unrestContainer: document.getElementById(`joco-unrest-${data.id}`),
         };
-        this.controlTokenStock = new BgaCards.LineStock(ControlTokensManager.getInstance(), document.getElementById(`joco-control-token-stock-${data.id}`));
+        this.controlTokenStock = new BgaCards$1.LineStock(ControlTokensManager.getInstance(), document.getElementById(`joco-control-token-stock-${data.id}`));
         this.setupShipStock(game.gamedatas);
         this.updateControlToken(data);
         this.updateStrength(data.strength);
@@ -3019,7 +2409,7 @@ class Region {
     }
     setupShipStock(gamedatas) {
         const regionId = this.data.id;
-        this.shipStock = new BgaCards.LineStock(ShipsManager.getInstance(), document.getElementById(`shipConstruction_${regionId}`));
+        this.shipStock = new BgaCards$1.LineStock(ShipsManager.getInstance(), document.getElementById(`shipConstruction_${regionId}`));
         const ship = Object.values(gamedatas.ships).find((s) => s.location === `shipConstruction_${regionId}`);
         if (ship) {
             this.shipStock.addCard(ship);
@@ -3529,6 +2919,9 @@ class London {
         this.updateFamilyMembers(gamedatas);
         this.updateLondonSeasonOrder(gamedatas.londonSeason);
     }
+    async addLawCard(card) {
+        await this.passedLaws.addCard(card);
+    }
     updateLondonSeasonDisplay(gamedatas) {
         const cards = gamedatas.londonSeasonDisplay.map(getLondonSeasonCard);
         this.seasonDisplay.addCards(cards);
@@ -3736,18 +3129,18 @@ class FamilyArea {
         this.setupEnterprises(config.gamedatas);
         this.setupLondonSeasonCards(config.gamedatas);
         this.setupOffices(config.gamedatas);
-        this.setupTrophiesCounter(config.gamedatas);
+        this.setupCounter(config.gamedatas);
         this.setupOpportunityMarker(config.gamedatas);
     }
     setupEnterprises(gamedatas) {
-        this.enterprises = new BgaCards.LineStock(EnterpriseCardsManager.getInstance(), document.getElementById(`joco-enterprises-${this.familyId}`), {
+        this.enterprises = new BgaCards$1.LineStock(EnterpriseCardsManager.getInstance(), document.getElementById(`joco-enterprises-${this.familyId}`), {
             gap: '12px',
         });
         this.updateEnterprises(gamedatas);
     }
     setupLondonSeasonCards(gamedatas) {
         this.stocks[`londonSeasonCards_${this.familyId}`] =
-            new BgaCards.LineStock(LondonSeasonCardsManager.getInstance(), document.getElementById(`joco-prestige-blackmail-${this.familyId}`));
+            new BgaCards$1.LineStock(LondonSeasonCardsManager.getInstance(), document.getElementById(`joco-prestige-blackmail-${this.familyId}`));
         this.updateLondonSeasonCards(gamedatas);
     }
     setupOffices(gamedatas) {
@@ -3758,11 +3151,16 @@ class FamilyArea {
             this.ui.offices.insertAdjacentHTML('beforeend', tplOfficeCard(office));
         });
     }
-    setupTrophiesCounter(gamedatas) {
+    setupCounter(gamedatas) {
         this.counters[TROPHIES] = new TrophiesCounter({
             id: `joco-trophies-${this.familyId}`,
             parentElement: this.ui.counters,
             initialValue: gamedatas.families[this.familyId].trophies,
+        });
+        this.counters[PASSED_LAW_TOKENS] = new PassedLawTokensCounter({
+            id: `joco-passed-law-tokens-${this.familyId}`,
+            parentElement: this.ui.counters,
+            initialValue: gamedatas.families[this.familyId].passedLawTokens,
         });
     }
     setupOpportunityMarker(gamedatas) {
@@ -4166,7 +3564,46 @@ const tplLeaderOfTheOpposition = (leaderName) => {
   </div>
   `;
 };
-
+const tplOppositionContent = (opposition) => {
+    const order = Object.entries(opposition.votes)
+        .map(([playerId, votes]) => ({
+        playerId: parseInt(playerId, 10),
+        playerName: getPlayerName(parseInt(playerId, 10)),
+        votes,
+    }))
+        .sort((a, b) => {
+        if (a.playerId === opposition.leader) {
+            return -1;
+        }
+        if (b.playerId === opposition.leader) {
+            return 1;
+        }
+        const difference = b.votes - a.votes;
+        return difference;
+    });
+    let playerLog = '';
+    let playerArgs = {};
+    order.forEach(({ playerName, votes }, index) => {
+        playerLog +=
+            `\${tkn_playerName_${index}}: \${tkn_boldText_votes_${index}} vote(s)` +
+                (index === order.length - 1 ? '' : ', ');
+        playerArgs['tkn_playerName_' + index] = playerName;
+        playerArgs['tkn_boldText_votes_' + index] = '' + votes;
+    });
+    return `
+        ${opposition.leader !== null
+        ? tplLeaderOfTheOpposition(getPlayerName(opposition.leader))
+        : ''}
+        <span class="fb-font-baskerville fb-font-16">
+          ${formatStringRecursive$1('${playerLog}', {
+        playerLog: {
+            log: playerLog,
+            args: playerArgs,
+        },
+    })}
+        </span>
+      `;
+};
 const tplParliament = () => `
   <div id="joco-parliament" class="joco-tab">
     <div id="joco-parliament-revealed-laws-container" class="joco-container hidden">
@@ -4175,77 +3612,88 @@ const tplParliament = () => `
           
       </div>
     </div>
-    <div class="joco-container">
-      <div class="joco-header"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Voting').toLocaleUpperCase()}</span></div>
-      <div class="joco-row" style="margin-bottom: 12px;">
-        <div class="joco-column joco-support-container">
-          <span class="fb-font-baskerville fb-font-12 fb-font-bold">${_('Support').toLocaleUpperCase()}</span>
-          <span id="joco-support-counter" class="fb-font-baskerville fb-font-20 fb-font-bold"></span>
-        </div>
-        <div class="joco-column joco-opposition-container">
-          <span class="fb-font-baskerville fb-font-12">${_('Opposition').toLocaleUpperCase()}</span>
-          <div id="joco-parliament-opposition"></div>
-          
-        </div>
-      </div>
-      <div class="joco-voting">
-        <div class="joco-column">
-          <div id="joco-parliament-selected-policy"></div>
-          <span class="fb-font-baskerville fb-font-12">${_('Policy').toLocaleUpperCase()}</span>
-        </div>
-        <div class="joco-column" style="flex-grow: 1;">
-          <div id="joco-parliament-selected-law"></div>
-          <span class="fb-font-baskerville fb-font-12">${_('Law').toLocaleUpperCase()}</span>
-        </div>
-      </div>
+    <div class="joco-row">
+      <div id="joco-power-markers-container">
 
+      </div>
+      <div class="joco-container" style="flex-grow: 1;">
+        <div class="joco-header"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Voting').toLocaleUpperCase()}</span></div>
+        <div class="joco-row" style="margin-bottom: 12px;">
+          <div class="joco-column joco-support-container">
+            <span class="fb-font-baskerville fb-font-12 fb-font-bold">${_('Support').toLocaleUpperCase()}</span>
+            <span id="joco-support-counter" class="fb-font-baskerville fb-font-20 fb-font-bold"></span>
+          </div>
+          <div class="joco-column joco-opposition-container">
+            <span class="fb-font-baskerville fb-font-12">${_('Opposition').toLocaleUpperCase()}</span>
+            <div id="joco-parliament-opposition"></div>
+            
+          </div>
+        </div>
+        <div class="joco-voting">
+          <div class="joco-column">
+            <div id="joco-parliament-selected-policy"></div>
+            <span class="fb-font-baskerville fb-font-12">${_('Policy').toLocaleUpperCase()}</span>
+          </div>
+          <div class="joco-column" style="flex-grow: 1;">
+            <div id="joco-parliament-selected-law"></div>
+            <span class="fb-font-baskerville fb-font-12">${_('Law').toLocaleUpperCase()}</span>
+          </div>
+        </div>
+      </div>
     </div>
-
   </div>
 `;
+
+const tplPowerMarkersContainer = () => `
+  <div class="joco-container joco-power-markers-container">
+    <div class="joco-header"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Power Markers').toLocaleUpperCase()}</span></div>  
+    <div id="joco-power-markers">
+      ${[1, 2, 3, 4].map((n) => `<div id="joco-power-marker-position-${n}" class="joco-power-marker-position" data-position="${n}"></div>`).join('')}
+    </div>
+  </div>
+`;
+const tplPowerMarker = (type, extraClasses = '') => `
+  <div id="joco-power-marker-${type}" class="joco-power-marker ${extraClasses}" data-type="${type}">
+    <div class="joco-icon" data-icon="${type}"></div>
+  </div>
+`;
+
+class PowerMarkers {
+    constructor(props) {
+        this.parentElement = props.parentElement;
+        this.game = props.game;
+        this.setup(this.game.gamedatas);
+    }
+    createPowerMarkers(gamedatas) {
+        Object.entries(gamedatas.powerMarkers).forEach(([position, type]) => {
+            this.ui.powerMarkers[type] = createHtmlElement(tplPowerMarker(type));
+            this.ui.powerMarkerPositions[position].appendChild(this.ui.powerMarkers[type]);
+        });
+    }
+    setup(gamedatas) {
+        this.parentElement.insertAdjacentHTML('beforeend', tplPowerMarkersContainer());
+        this.ui = {
+            powerMarkers: {},
+            powerMarkerPositions: {},
+        };
+        [1, 2, 3, 4].forEach((position) => {
+            this.ui.powerMarkerPositions[`position_${position}`] =
+                document.getElementById(`joco-power-marker-position-${position}`);
+        });
+        this.createPowerMarkers(gamedatas);
+    }
+    async swapPowerMarkers(changes) {
+        await Promise.all(Object.entries(changes).map(async ([position, type]) => {
+            const marker = this.ui.powerMarkers[type];
+            const positionElement = this.ui.powerMarkerPositions[position];
+            await this.game.animationManager.slideAndAttach(marker, positionElement);
+        }));
+    }
+}
+
 class Parliament {
     constructor(game) {
         this.game = game;
-        this.tplOppositionContent = (opposition) => {
-            const order = Object.entries(opposition.votes)
-                .map(([playerId, votes]) => ({
-                playerId: parseInt(playerId, 10),
-                playerName: getPlayerName(parseInt(playerId, 10)),
-                votes,
-            }))
-                .sort((a, b) => {
-                if (a.playerId === opposition.leader) {
-                    return -1;
-                }
-                if (b.playerId === opposition.leader) {
-                    return 1;
-                }
-                const difference = b.votes - a.votes;
-                return difference;
-            });
-            let playerLog = '';
-            let playerArgs = {};
-            order.forEach(({ playerName, votes }, index) => {
-                playerLog +=
-                    `\${tkn_playerName_${index}}: \${tkn_boldText_votes_${index}} vote(s)` +
-                        (index === order.length - 1 ? '' : ', ');
-                playerArgs['tkn_playerName_' + index] = playerName;
-                playerArgs['tkn_boldText_votes_' + index] = '' + votes;
-            });
-            return `
-        ${opposition.leader !== null
-                ? tplLeaderOfTheOpposition(getPlayerName(opposition.leader))
-                : ''}
-        <span class="fb-font-baskerville fb-font-16">
-          ${formatStringRecursive$1('${playerLog}', {
-                playerLog: {
-                    log: playerLog,
-                    args: playerArgs,
-                },
-            })}
-        </span>
-      `;
-        };
         this.game = game;
         this.setup(game.gamedatas);
     }
@@ -4273,6 +3721,15 @@ class Parliament {
         if (selectedLawCard) {
             this.selectedLaw.addCard(getLawCard(selectedLawCard));
         }
+        const elt = document.getElementById('joco-discard');
+        console.log('Setting up discard stock', elt);
+        this.discard = new BgaCards$1.VoidStock(LawCardsManager.getInstance(), elt);
+    }
+    setupPowerMarkers(gamedatas) {
+        this.powerMarkers = new PowerMarkers({
+            parentElement: document.getElementById('joco-power-markers-container'),
+            game: this.game,
+        });
     }
     setup(gamedatas) {
         document
@@ -4288,6 +3745,7 @@ class Parliament {
         };
         this.setupStocks(gamedatas);
         this.setupSupportCounter(gamedatas);
+        this.setupPowerMarkers(gamedatas);
         this.showRevealedLaws(gamedatas.parliament.selectingLaw);
         this.updateOpposition(gamedatas.parliament.opposition);
     }
@@ -4304,6 +3762,9 @@ class Parliament {
     getPrimeMinisterDial() {
         return this.primeMinisterDial;
     }
+    getPowerMarkers() {
+        return this.powerMarkers;
+    }
     supportToValue(support) {
         this.supportCounter.toValue(support);
     }
@@ -4317,7 +3778,10 @@ class Parliament {
     }
     updateOpposition(opposition) {
         this.ui.oppositionContainer.replaceChildren();
-        this.ui.oppositionContainer.insertAdjacentHTML('beforeend', this.tplOppositionContent(opposition));
+        this.ui.oppositionContainer.insertAdjacentHTML('beforeend', tplOppositionContent(opposition));
+    }
+    async discardCard(card) {
+        await this.discard.addCard(card);
     }
 }
 
@@ -4456,6 +3920,10 @@ class NotificationManager {
         const { cards } = notif;
         await London.getInstance().seasonDisplay.addCards(cards.map(getLondonSeasonCard));
     }
+    async notif_changePrimeMinister(notif) {
+        const { playerId } = notif;
+        Parliament.getInstance().getPrimeMinisterDial().updatePlayerName(playerId);
+    }
     async notif_draftNewCardsPrivate(notif) {
         const { cardIds, lastCard } = notif;
         SetupArea.getInstance().newCards(cardIds, lastCard);
@@ -4541,9 +4009,12 @@ class NotificationManager {
     }
     async notif_moveLaw(notif) {
         const { law } = notif;
+        const card = getLawCard(law);
         if (law.location === DISCARD) {
+            await Parliament.getInstance().discardCard(card);
         }
         else {
+            await London.getInstance().addLawCard(card);
         }
     }
     async notif_retireFamilyMember(notif) {
@@ -4746,6 +4217,10 @@ class NotificationManager {
     async notif_setupFamilyMembers(notif) {
         const { familyMembers, playerId } = notif;
         await this.placeFamilyMembers(familyMembers, this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER]);
+    }
+    async notif_swapPowerMarkers(notif) {
+        const { playerId, changes } = notif;
+        await Parliament.getInstance().getPowerMarkers().swapPowerMarkers(changes);
     }
     async notif_transferPromiseCubes(notif) {
         const { playerId, amount } = notif;
@@ -4968,13 +4443,6 @@ class TooltipManager {
     addBoardTooltips() { }
 }
 
-const createRegiment = (extraClasses = []) => {
-    const elt = document.createElement('div');
-    elt.classList.add('joco-regiment');
-    extraClasses.forEach((className) => elt.classList.add(className));
-    return elt;
-};
-
 const LOG_TOKEN_BOLD_TEXT = 'boldText';
 const LOG_TOKEN_BOLD_ITALIC_TEXT = 'boldItalicText';
 const LOG_TOKEN_ITALIC_TEXT = 'italicText';
@@ -4991,6 +4459,7 @@ const LOG_TOKEN_LAW_CARD = 'lawCard';
 const LOG_TOKEN_LOCAL_ALLIANCE = 'localAlliance';
 const LOG_TOKEN_LONDON_SEASON_CARD = 'londonSeasonCard';
 const LOG_TOKEN_POLICY_ICON = 'policyIcon';
+const LOG_TOKEN_POWER_MARKER = 'powerMarker';
 const LOG_TOKEN_REGIMENT = 'regiment';
 const LOG_TOKEN_PROMISE_CUBE = 'promiseCube';
 const LOG_TOKEN_SETUP_CARD = 'setupCard';
@@ -5053,10 +4522,12 @@ const getTokenDiv = ({ key, value, game, }) => {
             });
         case LOG_TOKEN_POUND:
             return tplLogTokenPound();
+        case LOG_TOKEN_POWER_MARKER:
+            return tplPowerMarker(value, 'log-token');
         case LOG_TOKEN_PROMISE_CUBE:
             return tplLogTokenCube('promise');
         case LOG_TOKEN_REGIMENT:
-            return createRegiment([CLASS_LOG_TOKEN]).outerHTML;
+            return tplRegiment({ extraClasses: CLASS_LOG_TOKEN });
         case LOG_TOKEN_SETUP_CARD:
             return tplLogTokenSetupCard(value);
         case LOG_TOKEN_SHIP:
@@ -5351,7 +4822,6 @@ class ChairmanDebtConsent {
             required: this.args.remainingVotesRequired,
             tkn_icon: SHARE,
         });
-        setSelected(Board$1.getInstance().ui.selectBoxes[`companyDebt_${this.args.debt}`]);
         addPrimaryActionButton({
             id: 'yay_btn',
             text: 'Yay',
@@ -5694,11 +5164,6 @@ class CrownChairmanRequestAllocation {
         addCancelButton$1();
     }
     setOfficesSelectable() {
-        const board = Board$1.getInstance();
-        OFFICES_WITH_TREASURY.forEach((office) => {
-            const box = board.ui.selectBoxes[office];
-            onClick(box, () => this.updateInterfaceSelectAmount(office));
-        });
     }
 }
 
@@ -6130,7 +5595,6 @@ class CrownManagerOfShippingUnfittedShipOptions {
     }
     updateInterfaceSelectSeaZone() {
         clearPossible();
-        const board = Board$1.getInstance();
         updatePageTitle(_('${you} must select a sea zone'));
     }
     updateInterfaceConfirm() {
@@ -6618,7 +6082,6 @@ class EventsInIndiaCrisisDefense {
     updateInterfaceInitialStep() {
         this.game.clearPossible();
         updatePageTitle(_('${you} must meet Parliament'));
-        const board = Board$1.getInstance();
     }
     updateInterfaceConfirm() {
         clearPossible();
@@ -6920,7 +6383,7 @@ class LondonSeasonRetire {
             this.addCancelButton();
         }
         else {
-            addPassButton$1(this.args.optionalAction);
+            addPassButton$1(this.args.optionalAction, _('Skip remaining family members'));
         }
     }
     updateInterfaceSelectPrize(familyMember) {
@@ -7821,68 +7284,6 @@ class PlayerTurn {
     }
 }
 
-class PresidencyDecideOrder {
-    constructor(game) {
-        this.game = game;
-    }
-    static create(game) {
-        PresidencyDecideOrder.instance = new PresidencyDecideOrder(game);
-    }
-    static getInstance() {
-        return PresidencyDecideOrder.instance;
-    }
-    onEnteringState(args) {
-        debug('Entering PresidencyDecideOrder state');
-        this.args = args;
-        this.updateInterfaceInitialStep();
-    }
-    onLeavingState() {
-        debug('Leaving PresidencyDecideOrder state');
-    }
-    setDescription(activePlayerIds, args) {
-        updatePageTitle(_('${tkn_playerName} must choose which is next to act'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
-        });
-    }
-    updateInterfaceInitialStep() {
-        this.game.clearPossible();
-        updatePageTitle(_('${you} must choose which is next to act'));
-        const board = Board$1.getInstance();
-        if (this.args.trade) {
-            addPrimaryActionButton({
-                id: 'trade_btn',
-                text: _('Trade'),
-                callback: () => this.updateInterfaceConfirm(TRADE),
-            });
-        }
-        if (this.args.done) {
-            addPrimaryActionButton({
-                id: 'done_btn',
-                text: _('Done'),
-                callback: () => this.updateInterfaceConfirm(DONE),
-            });
-        }
-    }
-    updateInterfaceConfirm(next) {
-        clearPossible();
-        switch (next) {
-            case TRADE:
-                updatePageTitle(_('Perform the Trade action?'));
-                break;
-            case DONE:
-                updatePageTitle(_('Done?'));
-                break;
-            default:
-        }
-        addConfirmButton$1(() => {
-            performAction$1('actPresidencyDecideOrder', {
-                next,
-            });
-        });
-        addCancelButton$1();
-    }
-}
-
 class PresidencyTrade {
     constructor(game) {
         this.game = game;
@@ -8172,7 +7573,7 @@ class ParliamentMeetsSelectLaw {
         Bar.getInstance().goTo('joco-parliament');
     }
     onLeavingState() {
-        this.args.revealedLaws.forEach((law) => {
+        this.args?.revealedLaws.forEach((law) => {
             const node = document.getElementById(`law-card-${law.id}`);
             if (node) {
                 node.onmouseenter = null;
@@ -8448,6 +7849,62 @@ class SeekShare {
     }
 }
 
+class SwapPowerMarkers {
+    constructor(game) {
+        this.game = game;
+    }
+    static create(game) {
+        SwapPowerMarkers.instance = new SwapPowerMarkers(game);
+    }
+    static getInstance() {
+        return SwapPowerMarkers.instance;
+    }
+    onEnteringState(args) {
+        debug('Entering SwapPowerMarkers state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    }
+    onLeavingState() {
+        debug('Leaving SwapPowerMarkers state');
+    }
+    setDescription(activePlayerIds, args) { }
+    updateInterfaceInitialStep() {
+        this.game.clearPossible();
+        updatePageTitle(_('${you} may perform an action'), {});
+        addConfirmButton$1(() => {
+            performAction$1('actSwapPowerMarkers', {});
+        });
+    }
+}
+
+class TaxAndUpkeep {
+    constructor(game) {
+        this.game = game;
+    }
+    static create(game) {
+        TaxAndUpkeep.instance = new TaxAndUpkeep(game);
+    }
+    static getInstance() {
+        return TaxAndUpkeep.instance;
+    }
+    onEnteringState(args) {
+        debug('Entering TaxAndUpkeep state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    }
+    onLeavingState() {
+        debug('Leaving TaxAndUpkeep state');
+    }
+    setDescription(activePlayerIds, args) { }
+    updateInterfaceInitialStep() {
+        this.game.clearPossible();
+        updatePageTitle(_('${you} may perform an action'), {});
+        addConfirmButton$1(() => {
+            performAction$1('actTaxAndUpkeep', {});
+        });
+    }
+}
+
 function sleep(ms) {
     return new Promise((r) => setTimeout(r, ms));
 }
@@ -8499,12 +7956,13 @@ class Game {
             ParliamentMeetsAdditionalRoundOrResolve,
             ParliamentMeetsCommitToOpposition,
             PlayerTurn,
-            PresidencyDecideOrder,
             PresidencyTrade,
             PresidencyTradeFillOrders,
             RevenuePayDividends,
             RevenueRoyalPardon,
             SeekShare,
+            SwapPowerMarkers,
+            TaxAndUpkeep,
         };
         this.bga = bga;
         console.log('johncompany constructor');
@@ -8635,7 +8093,6 @@ class Game {
         this.notificationManager = new NotificationManager(this);
         Negotiation.create(this);
         Families.create(this);
-        Board$1.create(this);
         Company.create(this);
         London.create(this);
         Parliament.create(this);

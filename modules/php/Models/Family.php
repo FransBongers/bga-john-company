@@ -128,10 +128,10 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     Notifications::gainTrophies($this->getPlayer(), $amount);
   }
 
-  public function gainPassedLawToken($amount = 1)
+  public function gainPassedLawToken($number = 1)
   {
-    $this->incTrophies($amount);
-    Notifications::gainTrophies($this->getPlayer(), $amount);
+    $this->incPassedLawTokens($number);
+    Notifications::gainPassedLawTokens($this->getPlayer(), $number);
   }
 
   /**

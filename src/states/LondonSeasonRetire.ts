@@ -106,7 +106,7 @@ export class LondonSeasonRetire implements GameState<OnEnteringLondonSeasonRetir
       });
       this.addCancelButton();
     } else {
-      addPassButton(this.args.optionalAction);
+      addPassButton(this.args.optionalAction, _('Skip remaining family members'));
     }
   }
 

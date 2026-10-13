@@ -1534,6 +1534,28 @@ span[style*="color:#addb90"] {
   font-size: 6px;
 }
 
+.joco-passed-law-token {
+  box-sizing: border-box;
+  background-image: url("img/hexagons.png");
+  background-size: 300% 500%;
+  background-position-y: 75%;
+  aspect-ratio: 240/225;
+  height: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding-top: 10px;
+}
+.joco-passed-law-token .joco-icon {
+  height: 16px;
+}
+.joco-passed-law-token .joco-title {
+  width: 40px;
+  height: 8px;
+  font-size: 6px;
+}
+
 /*
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -1939,7 +1961,7 @@ span[style*="color:#addb90"] {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 4px;
 }
 
@@ -1948,6 +1970,7 @@ span[style*="color:#addb90"] {
   flex-direction: row;
   align-items: center;
   gap: 8px;
+  margin-left: auto;
 }
 .joco-opportunity-marker .joco-opportunity-marker-value {
   display: flex;
@@ -2584,6 +2607,13 @@ span[style*="color:#c0c0c0"] {
 }
 .log-token.joco-cube {
   height: 32px;
+}
+.log-token.joco-power-marker {
+  display: inline-flex;
+  height: 32px;
+}
+.log-token.joco-power-marker .joco-icon {
+  height: 24px !important;
 }
 
 #customActions {
@@ -3424,6 +3454,64 @@ span[style*="color:#c0c0c0"] {
   padding: 8px;
 }
 
+.joco-power-marker-position {
+  position: absolute;
+  width: 81px;
+  aspect-ratio: 290/228;
+}
+.joco-power-marker-position .joco-power-marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.joco-power-marker-position[data-position="1"] {
+  top: 35px;
+  left: 61px;
+}
+.joco-power-marker-position[data-position="2"] {
+  top: 130px;
+  left: 61px;
+}
+.joco-power-marker-position[data-position="3"] {
+  top: 225px;
+  left: 7px;
+}
+.joco-power-marker-position[data-position="4"] {
+  top: 225px;
+  left: 115px;
+}
+
+.joco-power-marker {
+  box-sizing: border-box;
+  background-image: url("img/power_tokens.jpg");
+  height: 64px;
+  aspect-ratio: 290/228;
+  background-size: 500% 100%;
+  border-radius: 6px;
+  border: 1px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.joco-power-marker .joco-icon {
+  height: 40px;
+}
+.joco-power-marker[data-type=Luxury] {
+  background-position-x: 0%;
+}
+.joco-power-marker[data-type=Share] {
+  background-position-x: 25%;
+}
+.joco-power-marker[data-type=Workshop] {
+  background-position-x: 75%;
+}
+.joco-power-marker[data-type=Shipyard] {
+  background-position-x: 50%;
+}
+.joco-power-marker[data-type=shareVictoryPoints] {
+  background-position-x: 100%;
+}
+
 #joco-prime-minister-dial {
   position: relative;
   background-image: url("img/prime_minister_dial.webp");
@@ -3515,6 +3603,19 @@ span[style*="color:#c0c0c0"] {
 }
 #joco-parliament #joco-parliament-revealed-laws {
   min-height: 351px;
+}
+#joco-parliament .joco-row {
+  gap: 12px;
+}
+#joco-parliament .joco-power-markers-container {
+  width: 200px;
+}
+#joco-parliament .joco-power-markers-container #joco-power-markers {
+  position: relative;
+  background-image: url("img/power_markers.webp");
+  width: 200px;
+  background-size: 100% 100%;
+  aspect-ratio: 500/745;
 }
 #joco-parliament .joco-voting {
   display: flex;

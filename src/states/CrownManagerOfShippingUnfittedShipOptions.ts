@@ -1,4 +1,4 @@
-import { Board } from '../board';
+// import { Board } from '../board';
 import {
   debug,
   updatePageTitle,
@@ -118,7 +118,7 @@ export class CrownManagerOfShippingUnfittedShipOptions implements GameState<OnEn
   private updateInterfaceSelectSeaZone() {
     clearPossible();
 
-    const board = Board.getInstance();
+    // const board = Board.getInstance();
 
     updatePageTitle(_('${you} must select a sea zone'));
 

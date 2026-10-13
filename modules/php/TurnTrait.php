@@ -739,17 +739,7 @@ trait TurnTrait
     ];
 
     $offices = Offices::getAll();
-
-    // return [
-    //   'children' => [
-    //     [
-    //       'action' => PRESIDENCY_DECIDE_ORDER,
-    //       'playerId' => 'some',
-    //       'activePlayerIds' => [$office->getPlayerId()],
-    //       'officeId' => $office->getId(),
-    //     ]
-    //   ],
-    // ];
+    
     $presidentOffice = $offices[$presidencyOfficeMap[$presidencyId]];
     $commander = $presidentOffice->getCommander();
 

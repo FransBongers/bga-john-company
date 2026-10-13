@@ -446,16 +446,16 @@ $machinestates = [
         'transitions' => [],
     ],
 
-    ST_PRESIDENCY_DECIDE_ORDER => [
-        'name' => PRESIDENCY_DECIDE_ORDER,
-        'type' => 'multipleactiveplayer',
-        'description' => clienttranslate('${actplayer}'),
-        'descriptionmyturn' => clienttranslate('${you}'),
-        'args' => 'argsAtomicAction',
-        'action' => 'stAtomicAction',
-        'possibleactions' => ['act' . PRESIDENCY_DECIDE_ORDER, 'actTakeAtomicAction'],
-        'transitions' => ['next' => ST_RESOLVE_STACK, BONUSES],
-    ],
+    // ST_PRESIDENCY_DECIDE_ORDER => [
+    //     'name' => PRESIDENCY_DECIDE_ORDER,
+    //     'type' => 'multipleactiveplayer',
+    //     'description' => clienttranslate('${actplayer}'),
+    //     'descriptionmyturn' => clienttranslate('${you}'),
+    //     'args' => 'argsAtomicAction',
+    //     'action' => 'stAtomicAction',
+    //     'possibleactions' => ['act' . PRESIDENCY_DECIDE_ORDER, 'actTakeAtomicAction'],
+    //     'transitions' => ['next' => ST_RESOLVE_STACK, BONUSES],
+    // ],
 
     ST_PRESIDENCY_TRADE => [
         'name' => PRESIDENCY_TRADE,
@@ -501,6 +501,22 @@ $machinestates = [
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
+    ST_PARLIAMENT_MEETS_RESOLVE_POLICY => [
+        'name' => PARLIAMENT_MEETS_RESOLVE_POLICY,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_PARLIAMENT_MEETS_RESOLVE_LAW => [
+        'name' => PARLIAMENT_MEETS_RESOLVE_LAW,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
     ST_PARLIAMENT_MEETS_CAST_VOTES => [
         'name' => PARLIAMENT_MEETS_CAST_VOTES,
         'type' => 'multipleactiveplayer',
@@ -531,6 +547,28 @@ $machinestates = [
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
         'possibleactions' => ['act' . PARLIAMENT_MEETS_COMMIT_TO_OPPOSITION, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_SWAP_POWER_MARKERS => [
+        'name' => SWAP_POWER_MARKERS,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer} must perform an action'),
+        'descriptionmyturn' => clienttranslate('${you} must perform an action'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . SWAP_POWER_MARKERS, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_TAX_AND_UPKEEP => [
+        'name' => TAX_AND_UPKEEP,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer} must perform an action'),
+        'descriptionmyturn' => clienttranslate('${you} must perform an action'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . TAX_AND_UPKEEP, 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
@@ -733,6 +771,14 @@ $machinestates = [
 
     ST_GOVERNOR_TAX => [
         'name' => GOVERNOR_TAX,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_PRE_TAX_AND_UPKEEP => [
+        'name' => PRE_TAX_AND_UPKEEP,
         'description' => '',
         'type' => 'game',
         'action' => 'stAtomicAction',

@@ -1,0 +1,66 @@
+.joco-power-marker-position {
+  position: absolute;
+  width: 81px;
+  aspect-ratio: 290 / 228;
+
+  .joco-power-marker {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  &[data-position='1'] {
+    top: 35px;
+    left: 61px;
+  }
+  &[data-position='2'] {
+    top: 130px;
+    left: 61px;
+  }
+  &[data-position='3'] {
+    top: 225px;
+    left: 7px;
+  }
+  &[data-position='4'] {
+    top: 225px;
+    left: 115px;
+  }
+}
+
+.joco-power-marker {
+  box-sizing: border-box;
+  background-image: url('img/power_tokens.jpg');
+  // width: 81px;
+  height: 64px;
+  aspect-ratio: 290 / 228;
+  background-size: 500% 100%;
+  border-radius: 6px;
+  border: 1px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .joco-icon {
+    height: 40px;
+  }
+
+  &[data-type='Luxury'] {
+    background-position-x: 0%;
+  }
+
+  &[data-type='Share'] {
+    background-position-x: 25%;
+  }
+
+  &[data-type='Workshop'] {
+    background-position-x: 75%;
+  }
+
+  &[data-type='Shipyard'] {
+    background-position-x: 50%;
+  }
+
+  &[data-type='shareVictoryPoints'] {
+    background-position-x: 100%;
+  }
+}

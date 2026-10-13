@@ -1,12 +1,10 @@
 import {
-  createRegiment,
-  // createShip,
-} from '../board/utility';
-import {
   tplIcon,
   tplPolicyIcon,
   tplVictoryPointsIcon,
 } from '../icons/templates';
+import { tplRegiment } from '../india/army/templates';
+import { tplPowerMarker } from '../parliament/power-markers/templates';
 import { PlayerManager } from '../player-manager';
 import { StaticData } from '../static-data';
 import { createFamilyMember } from '../templates';
@@ -43,6 +41,7 @@ const LOG_TOKEN_LAW_CARD = 'lawCard';
 const LOG_TOKEN_LOCAL_ALLIANCE = 'localAlliance';
 const LOG_TOKEN_LONDON_SEASON_CARD = 'londonSeasonCard';
 const LOG_TOKEN_POLICY_ICON = 'policyIcon';
+const LOG_TOKEN_POWER_MARKER = 'powerMarker';
 const LOG_TOKEN_REGIMENT = 'regiment';
 const LOG_TOKEN_PROMISE_CUBE = 'promiseCube';
 const LOG_TOKEN_SETUP_CARD = 'setupCard';
@@ -117,10 +116,12 @@ export const getTokenDiv = ({
       });
     case LOG_TOKEN_POUND:
       return tplLogTokenPound();
+    case LOG_TOKEN_POWER_MARKER:
+      return tplPowerMarker(value, 'log-token');
     case LOG_TOKEN_PROMISE_CUBE:
       return tplLogTokenCube('promise');
     case LOG_TOKEN_REGIMENT:
-      return createRegiment([CLASS_LOG_TOKEN]).outerHTML;
+      return tplRegiment({ extraClasses: CLASS_LOG_TOKEN });
     case LOG_TOKEN_SETUP_CARD:
       return tplLogTokenSetupCard(value);
     case LOG_TOKEN_SHIP:

@@ -1,7 +1,7 @@
 import { India } from '..';
 import { createHtmlElement } from '../../boilerplate';
 import { PRESIDENCIES } from '../../constants';
-import { BgaCards } from '../../libs copy';
+import { BgaCards } from '../../libs';
 import { createFamilyMember, tplCube } from '../../templates';
 import { ControlTokensManager } from '../../token-managers/control-tokens';
 import { ShipsManager } from '../../token-managers/ship-tokens';

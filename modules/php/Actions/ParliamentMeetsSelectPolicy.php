@@ -2,6 +2,7 @@
 
 namespace Bga\Games\JohnCompany\Actions;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Models\Player;
 use Bga\Games\JohnCompany\JoCoUtils;
@@ -27,13 +28,16 @@ class ParliamentMeetsSelectPolicy extends \Bga\Games\JohnCompany\Models\AtomicAc
 
   public function argsParliamentMeetsSelectPolicy()
   {
-    $law = LawCards::getTopOf(Locations::selectedLaw());
-    list($left, $right) = Parliament::getPolicyOptions($law->getPolicyTarget(), $law->getPolicyConsequence());
+    if ($this->getSource() === FAILED_LAW) {
+      list($left, $right) = Parliament::getPolicyOptionsFailedLaw();
+    } else {
+      $law = LawCards::getTopOf(Locations::selectedLaw());
+      list($left, $right) = Parliament::getPolicyOptions($law->getPolicyTarget(), $law->getPolicyConsequence());
+    }
 
     return [
       'left' => $left,
       'right' => $right,
-      'lawId' => $law->getId(),
     ];
   }
 
@@ -70,6 +74,12 @@ class ParliamentMeetsSelectPolicy extends \Bga\Games\JohnCompany\Models\AtomicAc
     $player = Players::get($playerId);
     $this->selectPolicy($player, $dialPosition);
 
+    if ($this->getSource() === FAILED_LAW) {
+      $this->ctx->insertAsBrother(new LeafNode([
+        'action' => PARLIAMENT_MEETS_RESOLVE_POLICY
+      ]));
+    }
+
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
     $this->resolveAction([], true);
   }
@@ -81,6 +91,11 @@ class ParliamentMeetsSelectPolicy extends \Bga\Games\JohnCompany\Models\AtomicAc
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private function getSource(): string | null
+  {
+    return $this->ctx->getArgs()[SOURCE] ?? null;
+  }
 
   private function selectPolicy(Player $player, int $dialPosition)
   {

@@ -81,7 +81,7 @@ const ST_MANAGER_OF_SHIPPING = 44;
 const ST_DIRECTOR_OF_TRADE_SPECIAL_ENVOY_SUCCESS = 45;
 const ST_MILITARY_AFFAIRS_TRANSFERS = 46;
 const ST_MILITARY_AFFAIRS_ASSIGN = 47;
-const ST_PRESIDENCY_DECIDE_ORDER = 49;
+// const ST_PRESIDENCY_DECIDE_ORDER = 49;
 const ST_PRESIDENCY_TRADE = 50;
 const ST_PRESIDENCY_TRADE_FILL_ORDERS = 51;
 const ST_PRESIDENCY_COMMANDER = 124;
@@ -136,6 +136,11 @@ const ST_PARLIAMENT_MEETS_CAST_VOTES = 148;
 const ST_PARLIAMENT_MEETS_ADDITIONAL_ROUND_OR_RESOLVE = 149;
 const ST_FRONTEND_TRIGGER = 150;
 const ST_PARLIAMENT_MEETS_COMMIT_TO_OPPOSITION = 151;
+const ST_SWAP_POWER_MARKERS = 152;
+const ST_PARLIAMENT_MEETS_RESOLVE_POLICY = 153;
+const ST_PARLIAMENT_MEETS_RESOLVE_LAW = 154;
+const ST_PRE_TAX_AND_UPKEEP = 155;
+const ST_TAX_AND_UPKEEP = 156;
 
 
 const BONUSES = 'Bonuses';
@@ -163,6 +168,8 @@ const LONDON_SEASON_ORDER = 'LondonSeasonOrder';
 const LONDON_SEASON_CLEANUP = 'LondonSeasonCleanup';
 const NEW_COMPANY_SHARES = 'NewCompanyShares';
 const PERFORM_SETUP = 'PerformSetup';
+const PRE_TAX_AND_UPKEEP = 'PreTaxAndUpkeep';
+const TAX_AND_UPKEEP = 'TaxAndUpkeep';
 const REVENUE_EMERGENCY_LOANS = 'RevenueEmergencyLoans';
 const REVENUE_EXPENSES = 'RevenueExpenses';
 const REVENUE_CHECK_EXPECTATIONS = 'RevenueCheckExpectations';
@@ -178,6 +185,7 @@ const PURCHASE_LUXURY = 'PurchaseLuxury';
 const PURCHASE_SHIPYARD = 'PurchaseShipyard';
 const PURCHASE_WORKSHOP = 'PurchaseWorkshop';
 const SEEK_SHARE = 'SeekShare';
+const SWAP_POWER_MARKERS = 'SwapPowerMarkers';
 // Company Operations
 const CHAIRMAN_DEBT_CONSENT = 'ChairmanDebtConsent';
 const DIRECTOR_OF_TRADE_SPECIAL_ENVOY = 'DirectorOfTradeSpecialEnvoy';
@@ -187,12 +195,14 @@ const MILITARY_AFFAIRS_TRANSFERS = 'MilitaryAffairsTransfers';
 const MILITARY_AFFAIRS_ASSIGN = 'MilitaryAffairsAssign';
 const MILITARY_AFFAIRS_CHECK_COMMANDER = 'MilitaryAffairsCheckCommander';
 const MILITARY_AFFAIRS_ASSIGN_COMMANDER = 'MilitaryAffairsAssignCommander';
-const PRESIDENCY_DECIDE_ORDER = 'PresidencyDecideOrder';
+// const PRESIDENCY_DECIDE_ORDER = 'PresidencyDecideOrder';
 const PRESIDENCY_TRADE = 'PresidencyTrade';
 const PRESIDENCY_TRADE_FILL_ORDERS = 'PresidencyTradeFillOrders';
 const PRESIDENCY_COMMANDER = 'PresidencyCommander';
 const PARLIAMENT_MEETS_SELECT_LAW = 'ParliamentMeetsSelectLaw';
 const PARLIAMENT_MEETS_SELECT_POLICY = 'ParliamentMeetsSelectPolicy';
+const PARLIAMENT_MEETS_RESOLVE_POLICY = 'ParliamentMeetsResolvePolicy';
+const PARLIAMENT_MEETS_RESOLVE_LAW = 'ParliamentMeetsResolveLaw';
 const PARLIAMENT_MEETS_CAST_VOTES = 'ParliamentMeetsCastVotes';
 const PARLIAMENT_MEETS_ADDITIONAL_ROUND_OR_RESOLVE = 'ParliamentMeetsAdditionalRoundOrResolve';
 const PARLIAMENT_MEETS_COMMIT_TO_OPPOSITION = 'ParliamentMeetsCommitToOpposition';
@@ -230,6 +240,7 @@ const CROWN_MANAGER_OF_SHIPPING_PLACE_SHIPS = 'CrownManagerOfShippingPlaceShips'
 /**
  * Counters
  */
+const PASSED_LAW_TOKENS = 'passedLawTokens';
 const TROPHIES = 'trophies';
 
 /**
@@ -721,10 +732,10 @@ const LOCAL_ALLIANCES = [
 /**
  * Power tokens
  */
-const POWER_TOKEN_COMPANY_SHARE = 'companyShare';
-const POWER_TOKEN_MANUFACTURING = 'manufacturing';
-const POWER_TOKEN_SHIPPING = 'shipping';
-const POWER_TOKEN_SOCIAL = 'social';
+const POWER_TOKEN_COMPANY_SHARE = 'Share';
+const POWER_TOKEN_MANUFACTURING = 'Workshop';
+const POWER_TOKEN_SHIPPING = 'Shipyard';
+const POWER_TOKEN_SOCIAL = 'Luxury';
 
 const SHARE_VICTORY_POINTS_TOKEN = 'shareVictoryPoints';
 
@@ -812,6 +823,8 @@ const SELECTING_LAW = 'selectingLaw';
 
 const IN_FAVOR = 'inFavor';
 const AGAINST = 'against';
+
+const FAILED_LAW = 'failedLaw';
 
 
 const PRIME_MINISTER_DIAL = [

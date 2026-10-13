@@ -1,4 +1,4 @@
-import { Board } from '../board';
+// import { Board } from '../board';
 import {
   clearPossible,
   debug,
@@ -67,7 +67,7 @@ export class EventsInIndiaCrisisDefense implements GameState<OnEnteringEventsInI
     this.game.clearPossible();
 
     updatePageTitle(_('${you} must meet Parliament'));
-    const board = Board.getInstance();
+    // const board = Board.getInstance();
   }
 
   private updateInterfaceConfirm() {

@@ -33,8 +33,7 @@ class Prizes
       return [];
     }
 
-    $primeMinisterFamilyId = Globals::getPrimeMinister()[FAMILY];
-    $primeMinisterPlayerId = $primeMinisterFamilyId !== '' ? Players::getPlayerForFamily($primeMinisterFamilyId)->getId() : null;
+    $primeMinisterPlayerId = Parliament::getPrimeMinisterPlayerId();
     $turnOrder = Players::getTurnOrder($primeMinisterPlayerId);
     $players = Players::getAll();
 
@@ -57,5 +56,4 @@ class Prizes
 
     return $playerIds;
   }
-
 }

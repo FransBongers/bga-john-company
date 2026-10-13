@@ -36,10 +36,6 @@ export class Bar {
       text: _('Company'),
     },
     {
-      id: 'joco-board',
-      text: _('Board'),
-    },
-    {
       id: 'joco-negotiation',
       text: _('Negotiation'),
     },

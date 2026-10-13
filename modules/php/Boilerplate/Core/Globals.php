@@ -3,6 +3,7 @@
 namespace Bga\Games\JohnCompany\Boilerplate\Core;
 
 use Bga\Games\JohnCompany;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\Players;
 
 
@@ -36,7 +37,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     'phase' => 'str',
     'turn' => 'int',
     'options' => 'obj',
-    'powerTokens' => 'obj',
+    'powerMarkers' => 'obj',
     'parliament' => 'obj',
     'eventsToResolve' => 'int',
     'retirementMoney' => 'obj',
@@ -171,12 +172,6 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     self::setCrown([]);
     self::setDeregulation(false);
     self::setEventsToResolve(0);
-    self::setPowerTokens([
-      POWER_TOKEN_SOCIAL,
-      POWER_TOKEN_COMPANY_SHARE,
-      POWER_TOKEN_SHIPPING,
-      POWER_TOKEN_MANUFACTURING,
-    ]);
     self::setEmpires([null, null, null]);
     // 
     // Game options - Note game option values are always a string

@@ -55,3 +55,13 @@ export const tplTrophyIcon = (
       <span class="fb-font-baskerville fb-font-italic">${_('Trophy').toLocaleUpperCase()}</span>
     </div>
   </div>`;
+
+export const tplPassedLawTokenIcon = (
+  extraClasses: string = '',
+) =>
+  `<div class="joco-passed-law-token ${extraClasses ?? ''}">
+    ${tplPowerIcon(1)}
+    <div class="joco-title bga-autofit">
+      <span class="fb-font-baskerville fb-font-italic">${_('Passed Law Token').toLocaleUpperCase()}</span>
+    </div>
+  </div>`;

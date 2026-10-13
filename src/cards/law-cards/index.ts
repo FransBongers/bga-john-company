@@ -1,11 +1,9 @@
-import { VoidStock } from '../../../bga-cards';
 import { BgaCards } from '../../libs';
 import { GameAlias, JocoLawCard } from '../../types';
 import { tplLawCardContent } from './templates';
 
 export class LawCardsManager extends BgaCards.Manager<JocoLawCard> {
   private static instance: LawCardsManager;
-  private discard: InstanceType<typeof BgaCards.VoidStock<JocoLawCard>>;
 
   public static create(game: GameAlias) {
     LawCardsManager.instance = new LawCardsManager(game);
@@ -27,11 +25,6 @@ export class LawCardsManager extends BgaCards.Manager<JocoLawCard> {
       cardWidth: 225,
       type: 'law-card',
     });
-
-    this.discard = new VoidStock(
-      this,
-      document.getElementById('joco-discard')!,
-    );
   }
 
   clearInterface() {}
@@ -56,9 +49,5 @@ export class LawCardsManager extends BgaCards.Manager<JocoLawCard> {
 
   isCardVisible(card: JocoLawCard) {
     return true;
-  }
-
-  public async discardCard(card: JocoLawCard) {
-    await this.discard.addCard(card);
   }
 }

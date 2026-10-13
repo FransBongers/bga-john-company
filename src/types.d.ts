@@ -152,7 +152,7 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   };
   passedLaws: JocoLawCardBase[];
   phase: string;
-  powerTokens: string[];
+  powerMarkers: Record<string, string>;
   regions: Record<string, JocoRegionBase>;
   scenario: JocoScenario;
   ships: Record<string, JocoShipBase>;

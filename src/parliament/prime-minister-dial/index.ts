@@ -96,7 +96,7 @@ export class PrimeMinisterDial {
     `;
   }
 
-  private updatePlayerName(playerId: number) {
+  public updatePlayerName(playerId: number) {
     this.ui.playerName.replaceChildren();
     this.ui.playerName.insertAdjacentHTML(
       'beforeend',

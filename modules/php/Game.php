@@ -42,6 +42,7 @@ use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Orders;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Parliament;
+use Bga\Games\JohnCompany\Managers\PowerMarkers;
 use Bga\Games\JohnCompany\Managers\Prizes;
 use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Managers\Scenarios;
@@ -372,7 +373,7 @@ class Game extends \Bga\GameFramework\Table
             'parliament' => Parliament::getUiData(),
             'playerOrder' => Players::getTurnOrder($playerId),
             'players' => Players::getUiData($playerId),
-            'powerTokens' => Globals::getPowerTokens(),
+            'powerMarkers' => PowerMarkers::get(),
             'regions' => Regions::getAll(),
             'ships' => Ships::getAll(),
             'passedLaws' => LawCards::getInLocationOrdered(PASSED_LAWS)->toArray(),
@@ -421,6 +422,7 @@ class Game extends \Bga\GameFramework\Table
         LawCards::setupNewGame();
         LondonSeasonCards::setupNewGame();
         Parliament::setupNewGame();
+        PowerMarkers::setupNewGame();
         Regions::setupNewGame();
         SetupCards::setupNewGame();
         Ships::setupNewGame();

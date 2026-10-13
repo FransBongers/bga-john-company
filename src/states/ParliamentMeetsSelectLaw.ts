@@ -52,7 +52,7 @@ export class ParliamentMeetsSelectLaw implements GameState<OnEnteringParliamentM
   }
 
   onLeavingState() {
-    this.args.revealedLaws.forEach((law) => {
+    this.args?.revealedLaws.forEach((law) => {
       const node = document.getElementById(`law-card-${law.id}`);
       if (node) {
         node.onmouseenter = null;
@@ -65,7 +65,7 @@ export class ParliamentMeetsSelectLaw implements GameState<OnEnteringParliamentM
   }
 
   setDescription(
-    activePlayerIds: number,
+    activePlayerIds: number[],
     args: OnEnteringParliamentMeetsSelectLawArgs,
   ) {
     const numberOfRevealedLaws = args.revealedLaws.length;

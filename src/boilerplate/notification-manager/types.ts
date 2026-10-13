@@ -243,6 +243,10 @@ export interface NotifSetupFamilyMembers extends NotifWithPlayerArgs {
   familyMembers: JocoFamilyMember[];
 }
 
+export interface NotifSwapPowerMarkers extends NotifWithPlayerArgs {
+  changes: Record<string, string>;
+}
+
 export interface NotifTurn extends NotifWithPlayerArgs {
   turnNumber: number;
 }

@@ -129,4 +129,9 @@ class Locations
   {
     return PASSED_LAWS;
   }
+
+  public static function powerTokenPosition(int $index)
+  {
+    return 'position_' . $index;
+  }
 }

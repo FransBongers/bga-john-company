@@ -14,7 +14,6 @@
  */
 
 import { Bar } from './bar';
-import { Board } from './board';
 import {
   NotificationManager,
   debug,
@@ -69,13 +68,14 @@ import {
   MilitaryAffairsAssignCommander,
   MilitaryAffairsTransfers,
   PlayerTurn,
-  PresidencyDecideOrder,
   PresidencyTrade,
   PresidencyTradeFillOrders,
   ParliamentMeetsSelectLaw,
   RevenuePayDividends,
   RevenueRoyalPardon,
   SeekShare,
+  SwapPowerMarkers,
+  TaxAndUpkeep,
   ParliamentMeetsSelectPolicy,
   ParliamentMeetsCastVotes,
   ParliamentMeetsAdditionalRoundOrResolve,
@@ -170,12 +170,13 @@ export class Game {
     ParliamentMeetsAdditionalRoundOrResolve,
     ParliamentMeetsCommitToOpposition,
     PlayerTurn,
-    PresidencyDecideOrder,
     PresidencyTrade,
     PresidencyTradeFillOrders,
     RevenuePayDividends,
     RevenueRoyalPardon,
     SeekShare,
+    SwapPowerMarkers,
+    TaxAndUpkeep,
   };
   public bga: Bga;
 
@@ -419,7 +420,6 @@ export class Game {
     this.notificationManager = new NotificationManager(this);
     Negotiation.create(this);
     Families.create(this);
-    Board.create(this);
     Company.create(this);
 
     London.create(this);

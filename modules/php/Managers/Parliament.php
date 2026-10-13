@@ -120,10 +120,21 @@ class Parliament
     Notifications::changePrimeMinister($player, $familyId);
   }
 
+  public static function getLeaderOfOpposition()
+  {
+    $opposition = self::getOpposition();
+    return $opposition['leader'] ?? null;
+  }
+
   public static function getPrimeMinisterPlayerId()
   {
+    return self::getPrimeMinisterPlayer()->getId();
+  }
+
+  public static function getPrimeMinisterPlayer()
+  {
     $familyId = Globals::getParliament()[PRIME_MINISTER];
-    return Players::getPlayerForFamily($familyId)->getId();
+    return Players::getPlayerForFamily($familyId);
   }
 
   public static function getDialPosition()
@@ -180,6 +191,20 @@ class Parliament
         }
       }
     }
+
+    return [$left, $right];
+  }
+
+  /**
+   * Returns the dial indexes of the nearest match going left and going right (wrapping around).
+   */
+  public static function getPolicyOptionsFailedLaw(): array
+  {
+    $position = Globals::getParliament()[DIAL];
+    $count = count(PRIME_MINISTER_DIAL);
+
+    $left = ($position - 1 + $count) % $count;
+    $right = ($position + 1) % $count;
 
     return [$left, $right];
   }

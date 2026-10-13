@@ -1,4 +1,4 @@
-import { Board } from '../board';
+// import { Board } from '../board';
 import {
   addCancelButton,
   addConfirmButton,
@@ -168,11 +168,11 @@ export class CrownChairmanRequestAllocation implements GameState<OnEnteringCrown
   //  ..#######.....##....####.########.####....##.......##...
 
   private setOfficesSelectable() {
-    const board = Board.getInstance();
-    OFFICES_WITH_TREASURY.forEach((office) => {
-      const box = board.ui.selectBoxes[office];
-      onClick(box, () => this.updateInterfaceSelectAmount(office));
-    });
+    // const board = Board.getInstance();
+    // OFFICES_WITH_TREASURY.forEach((office) => {
+    //   const box = board.ui.selectBoxes[office];
+    //   onClick(box, () => this.updateInterfaceSelectAmount(office));
+    // });
   }
 
   //  ..######..##.......####..######..##....##

@@ -134,6 +134,15 @@ span[style*='color:#c0c0c0'] {
   &.joco-cube {
     height: 32px;
   }
+
+  &.joco-power-marker {
+    display: inline-flex;
+    height: 32px;
+
+    .joco-icon {
+      height: 24px !important;
+    }
+  }
 }
 
 #customActions {

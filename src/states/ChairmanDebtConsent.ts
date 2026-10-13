@@ -1,4 +1,3 @@
-import { Board } from '../board';
 import {
   addDangerActionButton,
   addPrimaryActionButton,
@@ -85,9 +84,9 @@ export class ChairmanDebtConsent implements GameState<OnEnteringChairmanDebtCons
         tkn_icon: SHARE,
       },
     );
-    setSelected(
-      Board.getInstance().ui.selectBoxes[`companyDebt_${this.args.debt}`],
-    );
+    // setSelected(
+    //   Board.getInstance().ui.selectBoxes[`companyDebt_${this.args.debt}`],
+    // );
     addPrimaryActionButton({
       id: 'yay_btn',
       text: 'Yay',

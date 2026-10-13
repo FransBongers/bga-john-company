@@ -24,6 +24,7 @@ export const AGAINST = 'against';
 /**
  * Counters
  */
+export const PASSED_LAW_TOKENS = 'passedLawTokens';
 export const TROPHIES = 'trophies';
 
 /**

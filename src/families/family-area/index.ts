@@ -1,8 +1,8 @@
 import { EnterpriseCardsManager } from '../../cards/enterprise-cards';
 import { LondonSeasonCardsManager } from '../../cards/london-season-cards';
 import { tplOfficeCard } from '../../cards/office-cards';
-import { SHIPYARD, TROPHIES } from '../../constants';
-import { BgaCards } from '../../libs copy';
+import { PASSED_LAW_TOKENS, SHIPYARD, TROPHIES } from '../../constants';
+import { BgaCards } from '../../libs';
 
 import {
   GameAlias,
@@ -11,7 +11,7 @@ import {
   JocoLondonSeasonCard,
   PlayerAlias,
 } from '../../types';
-import { TrophiesCounter } from '../../ui-components';
+import { PassedLawTokensCounter, TrophiesCounter } from '../../ui-components';
 import { getEnterpriseCard, getLondonSeasonCard } from '../../utility';
 import { OpportunityMarker } from './opportunity-marker';
 
@@ -86,9 +86,8 @@ export class FamilyArea {
     this.setupEnterprises(config.gamedatas);
     this.setupLondonSeasonCards(config.gamedatas);
     this.setupOffices(config.gamedatas);
-    this.setupTrophiesCounter(config.gamedatas);
+    this.setupCounter(config.gamedatas);
     this.setupOpportunityMarker(config.gamedatas);
-
   }
 
   private setupEnterprises(gamedatas: GamedatasAlias) {
@@ -96,8 +95,8 @@ export class FamilyArea {
       EnterpriseCardsManager.getInstance(),
       document.getElementById(`joco-enterprises-${this.familyId}`)!,
       {
-        gap: '12px',  
-      }
+        gap: '12px',
+      },
     );
 
     this.updateEnterprises(gamedatas);
@@ -122,11 +121,17 @@ export class FamilyArea {
     });
   }
 
-  private setupTrophiesCounter(gamedatas: GamedatasAlias) {
+  private setupCounter(gamedatas: GamedatasAlias) {
     this.counters[TROPHIES] = new TrophiesCounter({
       id: `joco-trophies-${this.familyId}`,
       parentElement: this.ui.counters,
       initialValue: gamedatas.families[this.familyId].trophies,
+    });
+
+    this.counters[PASSED_LAW_TOKENS] = new PassedLawTokensCounter({
+      id: `joco-passed-law-tokens-${this.familyId}`,
+      parentElement: this.ui.counters,
+      initialValue: gamedatas.families[this.familyId].passedLawTokens,
     });
   }
 

@@ -417,7 +417,7 @@ class Notifications
     ]);
   }
 
-  public static function changePrimeMinister($player, $familyId)
+  public static function changePrimeMinister(Player $player, string $familyId)
   {
     self::notifyAll('changePrimeMinister', clienttranslate('${player_name} becomes ${tkn_boldText_primeMinister}'), [
       'player' => $player,
@@ -676,9 +676,11 @@ class Notifications
     ]);
   }
 
-  public static function moveLaw(Player $player, LawCard $law, string | null $text = '', array | null $textArgs = [])
+  public static function moveLaw(Player $player, LawCard $law, string | null $text, array | null $textArgs)
   {
 
+    $text = $text ?? '';
+    $textArgs = $textArgs ?? [];
 
     self::notifyAll('moveLaw', $text, array_merge($textArgs, [
       'player' => $player,
@@ -731,7 +733,19 @@ class Notifications
     ]);
   }
 
-  public static function gainTrophies($player, $amount)
+  public static function gainPassedLawTokens(Player $player, int $number)
+  {
+    $counterChanges = [
+      $player->getFamilyId() => [PASSED_LAW_TOKENS => $number],
+    ];
+    self::updateCountersMultipleTargets($counterChanges, clienttranslate('${player_name} gains ${tkn_boldText_number} ${tkn_passedLawToken}'), [
+      'player' => $player,
+      'tkn_boldText_number' => $number,
+      'tkn_passedLawToken' => clienttranslate('Passed Law Tokens'),
+    ]);
+  }
+
+  public static function gainTrophies(Player $player, int $amount)
   {
     $counterChanges = [
       $player->getFamilyId() => [TROPHIES => $amount],
@@ -1321,6 +1335,16 @@ class Notifications
       'player' => $player,
       'setupCardsLog' => $setupCardsLog,
       'tkn_newLine' => '',
+    ]);
+  }
+
+  public static function swapPowerMarkers(Player $player, string $type, string $temp, array $changes)
+  {
+    self::notifyAll('swapPowerMarkers', clienttranslate('${player_name} swaps ${tkn_powerMarker} and ${tkn_powerMarker_swapped}'), [
+      'player' => $player,
+      'tkn_powerMarker' => $type,
+      'tkn_powerMarker_swapped' => $temp,
+      'changes' => $changes,
     ]);
   }
 
