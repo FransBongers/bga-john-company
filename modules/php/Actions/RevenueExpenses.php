@@ -63,8 +63,8 @@ class RevenueExpenses extends \Bga\Games\JohnCompany\Models\AtomicAction
     $companyBalanceAfterExpenses = max(0, $companyBalance - $totalExpenses);
     Company::setBalance($companyBalanceAfterExpenses);
 
-    Notifications::message(clienttranslate('The Company must pay total expenses of ${tkn_boldText_amount} ${tkn_pound}'), [
-      'tkn_boldText_amount' => $totalExpenses,
+    Notifications::message(clienttranslate('The Company must pay total expenses of ${tkn_boldText_amount}'), [
+      'tkn_boldText_amount' => '£' . $totalExpenses,
       'tkn_pound' => Notifications::tknPound(),
     ]);
     Notifications::payCompanyExpenses($companyBalanceAfterExpenses);

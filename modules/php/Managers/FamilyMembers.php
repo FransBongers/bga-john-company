@@ -105,8 +105,8 @@ class FamilyMembers extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
       $location = $familyMember->getLocation();
       if ($presidencyId !== null) {
         return $location === Locations::writers($presidencyId);
-      } 
-      return Utils::startsWith($location,'Writers_');
+      }
+      return Utils::startsWith($location, 'Writers_');
     });
   }
 
@@ -114,7 +114,32 @@ class FamilyMembers extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   {
     $allMembers = self::getAll()->toArray();
     return Utils::filter($allMembers, function ($familyMember) {
-      return Utils::startsWith($familyMember->getLocation(),'army_');
+      return Utils::startsWith($familyMember->getLocation(), 'army_');
     });
+  }
+
+  public static function getCourtOfDirectors($includeChairman = false)
+  {
+    $allMembers = self::getAll()->toArray();
+    return Utils::filter($allMembers, function ($familyMember) use ($includeChairman) {
+      $location = $familyMember->getLocation();
+      if ($includeChairman && $location === CHAIRMAN) {
+        return true;
+      }
+      return $location === COURT_OF_DIRECTORS;
+    });
+  }
+
+  public static function getPlayerIdsWithShareInCourtOfDirectors(): array
+  {
+    $familyMembers = self::getCourtOfDirectors();
+    $playerIds = [];
+    foreach ($familyMembers as $familyMember) {
+      $playerId = $familyMember->getPlayerId();
+      if (!in_array($playerId, $playerIds)) {
+        $playerIds[] = $playerId;
+      }
+    }
+    return $playerIds;
   }
 }

@@ -341,7 +341,7 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
       }
 
       if ($region->isCompanyControlled()) {
-        if ($region->getUnrest() === 0) {
+        if ($region->getUnrest() === 0 && !$region->hasClosedOrders()) {
           continue;
         }
         $regionStrength = 0;

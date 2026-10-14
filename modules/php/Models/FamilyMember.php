@@ -5,6 +5,7 @@ namespace Bga\Games\JohnCompany\Models;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\JoCoUtils;
+use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
 
@@ -118,5 +119,10 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
       return true;
     }
     return false;
+  }
+
+  public function getFamily()
+  {
+    return Families::get($this->familyId);
   }
 }

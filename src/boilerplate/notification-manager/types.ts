@@ -85,7 +85,7 @@ export interface NotifFillOrder extends NotifWithPlayerArgs {
   familyMember: JocoFamilyMember | null;
 }
 
-export interface NotifGainCash extends NotifWithPlayerArgs {
+export interface NotifUpdateFamilyTreasury extends NotifWithPlayerArgs {
   amount: number;
 }
 
@@ -161,7 +161,11 @@ export interface NotifNewCompanyShare extends NotifWithPlayerArgs {
 export interface NotifNextPhase {
   phase: string;
 }
-
+export interface NotifParliamentMeetsCleanup {
+  parliamentData: GamedatasAlias['parliament'];
+  londonSeasonCards: JocoLondonSeasonCardBase[];
+  enterpriseCards: JocoEnterpriseCardBase[];
+}
 export interface NotifPayFromTreasury extends NotifWithPlayerArgs {
   officeId: string;
   amount: number;

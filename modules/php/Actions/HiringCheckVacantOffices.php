@@ -6,6 +6,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Models\Player;
 
@@ -40,14 +41,21 @@ class HiringCheckVacantOffices extends \Bga\Games\JohnCompany\Models\AtomicActio
     $vacantOffice = false;
 
     foreach ($offices as $office) {
-      if (count($office->getCandidatesForHiring()) === 0) {
-        // TODO: Log message?
+      $officeId = $office->getId();
+
+      if ($officeId !== CHAIRMAN && count($office->getCandidatesForHiring()) === 0) {
+        Notifications::message(clienttranslate('No eligible candidates for ${tkn_boldText_officeName}. The office is skipped in the hiring process'), [
+          'tkn_boldText_officeName' => $office->getTitle(),
+          'i18n' => ['tkn_boldText_officeName'],
+        ]);
         continue;
       }
 
-      $hirer = $office->getHiringPlayerId();
-      if ($hirer === null) {
-        // TODO: Log message?
+      if ($officeId !== CHAIRMAN && $office->getHiringPlayerId() === null) {
+        Notifications::message(clienttranslate('No hirer for ${tkn_boldText_officeName}. The office is skipped in the hiring process'), [
+          'tkn_boldText_officeName' => $office->getTitle(),
+          'i18n' => ['tkn_boldText_officeName'],
+        ]);
         continue;
       }
 
@@ -57,15 +65,36 @@ class HiringCheckVacantOffices extends \Bga\Games\JohnCompany\Models\AtomicActio
       $this->ctx->insertAsBrother(new LeafNode([
         'action' => HIRING_CHECK_VACANT_OFFICES,
       ]));
-      $this->ctx->insertAsBrother(new LeafNode([
-        'action' => HIRING_HIRE_FAMILY_MEMBER,
-        'playerId' => 'some',
-        'activePlayerIds' => [$hirer],
-        'args' => [
-          'officeId' => $office->getId(),
-          'hirerPlayerId' => $hirer,
-        ],
-      ]));
+
+      if ($officeId === CHAIRMAN) {
+        $sharesRequired = $this->getPureMajorityCourtOfDirectors();
+        Notifications::message(clienttranslate('${tkn_boldText_officeName}: it requires ${tkn_boldText_shares} shares to be elected'), [
+          'tkn_boldText_shares' => $sharesRequired,
+          'tkn_boldText_officeName' => $office->getTitle(),
+          'sharesRequired' => $sharesRequired,
+          'i18n' => ['tkn_boldText_officeName'],
+        ]);
+        $this->ctx->insertAsBrother(new LeafNode([
+          'action' => HIRING_CHAIRMAN,
+          'playerId' => 'some',
+          'activePlayerIds' => FamilyMembers::getPlayerIdsWithShareInCourtOfDirectors(),
+          'args' => [
+            'sharesRequired' => $sharesRequired
+          ]
+        ]));
+      } else {
+        $hirer = $office->getHiringPlayerId();
+        $this->ctx->insertAsBrother(new LeafNode([
+          'action' => HIRING_HIRE_FAMILY_MEMBER,
+          'playerId' => 'some',
+          'activePlayerIds' => [$hirer],
+          'args' => [
+            'officeId' => $office->getId(),
+            'hirerPlayerId' => $hirer,
+          ],
+        ]));
+      }
+
       break;
     }
 
@@ -85,6 +114,17 @@ class HiringCheckVacantOffices extends \Bga\Games\JohnCompany\Models\AtomicActio
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private function getPureMajorityCourtOfDirectors(): int
+  {
+    $count = count(FamilyMembers::getCourtOfDirectors());
+    if ($count % 2 === 0) {
+      return $count / 2 + 1;
+    }
+    return (int) ceil($count / 2);
+  }
+
+
 
   // .########.##....##..######...####.##....##.########
   // .##.......###...##.##....##...##..###...##.##......

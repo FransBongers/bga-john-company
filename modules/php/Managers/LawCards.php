@@ -89,4 +89,10 @@ class LawCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     self::setupLoadCards();
     self::setupPassedLaws();
   }
+
+  public static function isInPlay(string $cardId)
+  {
+    $card = self::get($cardId);
+    return $card && $card->getLocation() === Locations::passedLaws();
+  }
 }

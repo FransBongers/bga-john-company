@@ -60,7 +60,7 @@ export class ParliamentMeetsSelectLaw implements GameState<OnEnteringParliamentM
       }
     });
     this.resetArms();
-    this.primeMinisterDial.showConsequenceOptions(false);
+    this.primeMinisterDial?.showConsequenceOptions(false);
     debug('Leaving PrimeMinisterSelectLaw state');
   }
 
@@ -68,6 +68,7 @@ export class ParliamentMeetsSelectLaw implements GameState<OnEnteringParliamentM
     activePlayerIds: number[],
     args: OnEnteringParliamentMeetsSelectLawArgs,
   ) {
+    this.args = args;
     const numberOfRevealedLaws = args.revealedLaws.length;
     const playerName = getPlayerName(activePlayerIds[0]);
     switch (numberOfRevealedLaws) {
@@ -144,6 +145,9 @@ export class ParliamentMeetsSelectLaw implements GameState<OnEnteringParliamentM
   }
 
   private resetArms() {
+    if (!this.primeMinisterDial) {
+      return;
+    }
     this.primeMinisterDial.updateLeftArmPosition(this.args.dial);
     this.primeMinisterDial.updateRightArmPosition(this.args.dial);
   }

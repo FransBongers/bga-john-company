@@ -1,5 +1,4 @@
 import { Bar } from '../bar';
-import { Board } from '../board';
 import {
   debug,
   updatePageTitle,
@@ -96,9 +95,8 @@ export class SeekShare implements GameState<OnEnteringSeekShareArgs> {
 
     setSelected(position);
 
-    updatePageTitle(_('Pay ${amount} ${tkn_pound} to seek a ${tkn_icon}?'), {
+    updatePageTitle(_('Pay £${amount} to seek a share ${tkn_icon}?'), {
       amount: price,
-      tkn_pound: _('Pounds'),
       tkn_icon: SHARE,
     });
 

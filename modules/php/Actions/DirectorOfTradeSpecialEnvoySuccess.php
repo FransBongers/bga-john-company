@@ -63,6 +63,7 @@ class DirectorOfTradeSpecialEnvoySuccess extends \Bga\Games\JohnCompany\Models\A
 
     $data = [
       'closedOrders' => Orders::getClosedOrders(),
+      'openTradeWithChina' => !Offices::get(SUPERINTENDENT_OF_TRADE_IN_CHINA)->isInPlay(),
     ];
 
     return $data;

@@ -117,7 +117,7 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
       }
 
       Notifications::setupFamilyMembers($player, $familyMembers);
-      Notifications::gainCash($player, $cash);
+      Notifications::updateFamilyTreasury($player, $cash);
       if ($isPrimeMinister) {
         Parliament::changePrimeMinister($familyId);
       }

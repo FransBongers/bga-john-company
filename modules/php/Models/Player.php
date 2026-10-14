@@ -5,6 +5,7 @@ namespace Bga\Games\JohnCompany\Models;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine\AbstractNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Preferences;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
@@ -100,5 +101,10 @@ class Player extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   public function getLondonSeasonCards()
   {
     return LondonSeasonCards::getInLocation(Locations::londonSeasonCards($this->getFamilyId()))->toArray();
+  }
+
+  public function incScore(int $change)
+  {
+    Game::get()->bga->playerScore->inc($this->getId(), $change);
   }
 }

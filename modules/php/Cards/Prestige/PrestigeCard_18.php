@@ -2,6 +2,9 @@
 
 namespace Bga\Games\JohnCompany\Cards\Prestige;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Models\Player;
+
 class PrestigeCard_18 extends \Bga\Games\JohnCompany\Models\PrestigeCard
 {
   public function __construct($row)
@@ -15,5 +18,12 @@ class PrestigeCard_18 extends \Bga\Games\JohnCompany\Models\PrestigeCard
     $this->textNote = clienttranslate('Note: you may still gain extra actions from laws and an extra writer when there are 4+ vacancies.');
     $this->victoryPoints = 2;
     $this->discount = 2;
+  }
+
+  protected function resolveImmediateEffect(Player $player, object $ctx)
+  {
+    Notifications::log('Resolving immediate effect of PrestigeCard_18', []);
+    $family = $player->getFamily();
+    $family->updateOpportunityMarker(REMOVED);
   }
 }

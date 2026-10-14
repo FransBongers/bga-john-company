@@ -83,7 +83,7 @@ class LondonSeasonChooseCard extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $player = Players::get($playerId);
     if ($take) {
-      $card->take($player);
+      $card->take($player, $this->ctx);
     } else {
       $card->discard($player);
     }

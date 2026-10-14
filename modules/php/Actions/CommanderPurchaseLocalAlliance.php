@@ -43,7 +43,11 @@ class CommanderPurchaseLocalAlliance extends \Bga\Games\JohnCompany\Models\Atomi
     $stateArgs = $this->argsCommanderPurchaseLocalAlliance();
     if ($stateArgs['skipOnEnteringState']) {
       $args = $this->ctx->getArgs();
-      if ($args['first'] ?? false) {
+      if ($stateArgs['presidentPlayerId'] === null) {
+        Notifications::message('${player_name} cannot purchase any local alliances as they cannot be approved', [
+          'player' => Players::get($args['commanderPlayerId'])
+        ]);
+      } else if ($args['first'] ?? false) {
         Notifications::message('${player_name} cannot purchase any local alliances', [
           'player' => Players::get($args['commanderPlayerId'])
         ]);
@@ -69,10 +73,12 @@ class CommanderPurchaseLocalAlliance extends \Bga\Games\JohnCompany\Models\Atomi
 
     $options = $this->getOptions();
 
+    $presidentPlayerId = Offices::get($presidentOfficeId)->getPlayerId();
     $data = [
       'options' => $options,
-      'commanderIsPresident' => $commanderPlayerId === Offices::get($presidentOfficeId)->getPlayerId(),
-      'skipOnEnteringState' => count($options) === 0,
+      'commanderIsPresident' => $commanderPlayerId === $presidentPlayerId,
+      'skipOnEnteringState' => count($options) === 0 || $presidentPlayerId === null,
+      'presidentPlayerId' => $presidentPlayerId,
     ];
 
     return $data;

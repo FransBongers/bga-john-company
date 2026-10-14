@@ -1,5 +1,6 @@
 import {
   tplIcon,
+  tplPassedLawTokenIcon,
   tplPolicyIcon,
   tplVictoryPointsIcon,
 } from '../icons/templates';
@@ -40,6 +41,7 @@ const LOG_TOKEN_ICON = 'icon';
 const LOG_TOKEN_LAW_CARD = 'lawCard';
 const LOG_TOKEN_LOCAL_ALLIANCE = 'localAlliance';
 const LOG_TOKEN_LONDON_SEASON_CARD = 'londonSeasonCard';
+const LOG_TOKEN_PASSED_LAW_TOKEN = 'passedLawToken';
 const LOG_TOKEN_POLICY_ICON = 'policyIcon';
 const LOG_TOKEN_POWER_MARKER = 'powerMarker';
 const LOG_TOKEN_REGIMENT = 'regiment';
@@ -114,10 +116,12 @@ export const getTokenDiv = ({
         tooltipId: cardNameTooltipId,
         bold: true,
       });
+    case LOG_TOKEN_PASSED_LAW_TOKEN:
+      return tplPassedLawTokenIcon(CLASS_LOG_TOKEN);
     case LOG_TOKEN_POUND:
       return tplLogTokenPound();
     case LOG_TOKEN_POWER_MARKER:
-      return tplPowerMarker(value, 'log-token');
+      return tplPowerMarker({ type: value, extraClasses: 'log-token' });
     case LOG_TOKEN_PROMISE_CUBE:
       return tplLogTokenCube('promise');
     case LOG_TOKEN_REGIMENT:

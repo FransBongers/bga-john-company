@@ -109,7 +109,7 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     // Move office card to supply
   }
 
-  public function pay($player, $amount)
+  public function pay(Player $player, int $amount)
   {
     $this->incTreasury(-$amount);
     Notifications::payFromTreasury($player, $this, $amount, $this->getTreasury());

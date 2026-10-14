@@ -78,7 +78,6 @@ export class Parliament {
     }
 
     const elt = document.getElementById('joco-discard')!;
-    console.log('Setting up discard stock', elt);
     this.discard = new BgaCards.VoidStock(LawCardsManager.getInstance(), elt);
   }
 
@@ -167,5 +166,11 @@ export class Parliament {
 
   public async discardCard(card: JocoLawCard) {
     await this.discard.addCard(card);
+  }
+
+  public reset(data: GamedatasAlias['parliament']) {
+    this.updateOpposition(data.opposition);
+    this.showRevealedLaws(data.selectingLaw);
+    this.supportToValue(data.support);
   }
 }

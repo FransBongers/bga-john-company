@@ -1,18 +1,22 @@
 import {
+  addCancelButton,
   addConfirmButton,
   debug,
+  onClick,
   performAction,
+  setSelected,
   updatePageTitle,
 } from '../boilerplate';
 import { CommonStateArgs, GameAlias, GameState } from '../types';
 
-interface OnEnteringSwapPowerMarkersArgs extends CommonStateArgs {}
+interface OnEnteringSwapPowerMarkersArgs extends CommonStateArgs {
+  options: Record<string, string>;
+}
 
-export class SwapPowerMarkers
-  implements GameState<OnEnteringSwapPowerMarkersArgs>
-{
+export class SwapPowerMarkers implements GameState<OnEnteringSwapPowerMarkersArgs> {
   private static instance: SwapPowerMarkers;
   private args: OnEnteringSwapPowerMarkersArgs;
+  private selected = [];
 
   constructor(private game: GameAlias) {}
 
@@ -27,6 +31,7 @@ export class SwapPowerMarkers
   onEnteringState(args: OnEnteringSwapPowerMarkersArgs) {
     debug('Entering SwapPowerMarkers state');
     this.args = args;
+    this.selected = [];
     this.updateInterfaceInitialStep();
   }
 
@@ -34,7 +39,12 @@ export class SwapPowerMarkers
     debug('Leaving SwapPowerMarkers state');
   }
 
-  setDescription(activePlayerIds: number[], args: OnEnteringSwapPowerMarkersArgs) {}
+  setDescription(
+    activePlayerIds: number[],
+    args: OnEnteringSwapPowerMarkersArgs,
+  ) {
+    updatePageTitle(_('${tkn_playerName} must swap Power markers'), {});
+  }
 
   //  .####.##....##.########.########.########..########....###.....######..########
   //  ..##..###...##....##....##.......##.....##.##.........##.##...##....##.##......
@@ -54,11 +64,45 @@ export class SwapPowerMarkers
 
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
-    updatePageTitle(_('${you} may perform an action'), {});
+    updatePageTitle(_('${you} must choose two Power markers to swap'), {});
+
+    this.selected.forEach((marker) => {
+      setSelected(`joco-power-marker-${marker}`);
+    });
+
+    Object.entries(this.args.options).forEach(([location, marker]) => {
+      onClick(`joco-power-marker-${marker}`, () => {
+        if (this.selected.includes(marker)) {
+          this.selected = this.selected.filter((m) => m !== marker);
+        } else {
+          this.selected.push(marker);
+        }
+        if (this.selected.length === 2) {
+          this.updateInterfaceConfirm();
+        } else {
+          this.updateInterfaceInitialStep();
+        }
+      });
+    });
+  }
+
+  private updateInterfaceConfirm() {
+    this.game.clearPossible();
+    updatePageTitle(_('Swap ${tkn_powerMarker} and ${tkn_powerMarker_2}?'), {
+      tkn_powerMarker: this.selected[0],
+      tkn_powerMarker_2: this.selected[1],
+    });
+
+    this.selected.forEach((marker) => {
+      setSelected(`joco-power-marker-${marker}`);
+    });
 
     addConfirmButton(() => {
-      performAction('actSwapPowerMarkers', {});
+      performAction('actSwapPowerMarkers', {
+        selectedPowerMarkers: this.selected,
+      });
     });
+    addCancelButton();
   }
 
   //  .##.....##.########.####.##.......####.########.##....##

@@ -85,9 +85,12 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     return count(FamilyMembers::getInLocation(Locations::familyMemberSupply($this->id))) > 0;
   }
 
-  public function pay($amount)
+  public function pay(int $amount, $skipNotification = true)
   {
     $this->incTreasury(-$amount);
+    if (!$skipNotification) {
+      Notifications::updateFamilyTreasury($this->getPlayer(), -$amount);
+    }
   }
 
   public function payPromiseCubes($amount, $notify = true)
@@ -116,19 +119,19 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   }
 
 
-  public function gainCash($amount)
+  public function gainCash(int $amount)
   {
     $this->incTreasury($amount);
-    Notifications::gainCash($this->getPlayer(), $amount);
+    Notifications::updateFamilyTreasury($this->getPlayer(), $amount);
   }
 
-  public function gainTrophies($amount)
+  public function gainTrophies(int $amount)
   {
     $this->incTrophies($amount);
     Notifications::gainTrophies($this->getPlayer(), $amount);
   }
 
-  public function gainPassedLawToken($number = 1)
+  public function gainPassedLawToken(int $number = 1)
   {
     $this->incPassedLawTokens($number);
     Notifications::gainPassedLawTokens($this->getPlayer(), $number);
@@ -165,13 +168,23 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     return $windows;
   }
 
-  public function updateOpportunityMarker(string | null $familyAction)
+  public function updateOpportunityMarker(string | null $familyActionOrRemoved)
   {
-    if ($familyAction === $this->getOpportunityMarker()) {
+    $currentOpportunityMarker = $this->getOpportunityMarker();
+    if ($familyActionOrRemoved === $currentOpportunityMarker || $currentOpportunityMarker === REMOVED) {
       return;
     }
     // Implementation for updating the opportunity marker value for this family
-    $this->setOpportunityMarker($familyAction);
-    Notifications::updateOpportunityMarker($this, $familyAction);
+    $this->setOpportunityMarker($familyActionOrRemoved);
+    Notifications::updateOpportunityMarker($this, $familyActionOrRemoved);
   }
+
+  public function hasPrestigeCard(string $prestigeCardId): bool
+  {
+    $prestigeCards = LondonSeasonCards::getInLocation(Locations::londonSeasonCards($this->getId()))->toArray();
+    return Utils::array_some($prestigeCards, function ($card) use ($prestigeCardId) {
+      return $card->getId() === $prestigeCardId;
+    });
+  }
+
 }

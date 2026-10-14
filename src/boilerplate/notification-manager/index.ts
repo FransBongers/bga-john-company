@@ -63,7 +63,6 @@ import {
   NotifElephantMarch,
   NotifEnlistFamilyMember,
   NotifFillOrder,
-  NotifGainCash,
   NotifGainEnterprise,
   NotifMakeCheck,
   NotifMoveCompanyBalance,
@@ -107,10 +106,12 @@ import {
   NotifMoveLaw,
   NotifWithPlayerArgs,
   NotifSwapPowerMarkers,
+  NotifParliamentMeetsCleanup,
+  NotifUpdateFamilyTreasury,
 } from './types';
 import { tplArmyPiece } from '../../india/army/templates';
 import { Parliament } from '../../parliament';
-import { DISCARD } from '../constants';
+import { DISCARD, USED } from '../constants';
 import { LawCardsManager } from '../../cards/law-cards';
 
 //  .##.....##....###....##....##....###.....######...########.########.
@@ -539,39 +540,41 @@ export class NotificationManager {
     }
   }
 
-  async notif_gainCash(notif: NotifGainCash) {
+  async notif_updateFamilyTreasury(notif: NotifUpdateFamilyTreasury) {
     const { amount, playerId } = notif;
-
+    PlayerManager.getInstance()
+      .getPlayer(playerId)
+      .counters[CASH_COUNTER].incValue(amount);
     // Need to wait, otherwise the token in pagemaintitletext cannot be found
-    await Interaction.use().wait(1);
-    // let msg = this.game.format_string_recursive(
-    //   notif.log,
-    //   notif.args as unknown as Record<string, unknown>
+    // await Interaction.use().wait(1);
+    // // let msg = this.game.format_string_recursive(
+    // //   notif.log,
+    // //   notif.args as unknown as Record<string, unknown>
+    // // );
+    // // $('pagemaintitletext').innerHTML = msg;
+    // const logPound: HTMLElement = document.querySelector(
+    //   '#pagemaintitletext .joco_pound',
     // );
-    // $('pagemaintitletext').innerHTML = msg;
-    const logPound: HTMLElement = document.querySelector(
-      '#pagemaintitletext .joco_pound',
-    );
 
-    const promises = Array.from(Array(amount).keys()).map(async (_, index) => {
-      await Interaction.use().wait(index * 100);
+    // const promises = Array.from(Array(amount).keys()).map(async (_, index) => {
+    //   await Interaction.use().wait(index * 100);
 
-      const element = document.createElement('div');
-      element.classList.add('log_token');
-      element.classList.add('joco_pound');
-      element.classList.add('animation');
-      document
-        .getElementById(`joco-cash-${playerId}`)
-        .insertAdjacentElement('afterbegin', element);
-      await this.game.animationManager.slideIn(element, logPound);
+    //   const element = document.createElement('div');
+    //   element.classList.add('log_token');
+    //   element.classList.add('joco_pound');
+    //   element.classList.add('animation');
+    //   document
+    //     .getElementById(`joco-cash-${playerId}`)
+    //     .insertAdjacentElement('afterbegin', element);
+    //   await this.game.animationManager.slideIn(element, logPound);
 
-      element.remove();
-      PlayerManager.getInstance()
-        .getPlayer(playerId)
-        .counters[CASH_COUNTER].incValue(1);
-    });
+    //   element.remove();
+    //   PlayerManager.getInstance()
+    //     .getPlayer(playerId)
+    //     .counters[CASH_COUNTER].incValue(1);
+    // });
 
-    await Promise.all(promises);
+    // await Promise.all(promises);
   }
 
   async notif_makeCheck(notif: NotifMakeCheck) {
@@ -731,6 +734,26 @@ export class NotificationManager {
   async notif_addToTreasury(notif: NotifPayFromTreasury) {
     const { treasury, officeId } = notif;
     Company.getInstance().treasuries[officeId].toValue(treasury);
+  }
+
+  async notif_parliamentMeetsCleanup(notif: NotifParliamentMeetsCleanup) {
+    const { parliamentData, londonSeasonCards, enterpriseCards } = notif;
+
+    londonSeasonCards.forEach((card) => {
+      const element = document.getElementById(`game-card-${card.id}`);
+      if (element) {
+        element.classList.remove(USED);
+      }
+    });
+
+    enterpriseCards.forEach((card) => {
+      const element = document.getElementById(`enterprise-card-${card.id}`);
+      if (element) {
+        element.classList.remove(USED);
+      }
+    });
+
+    Parliament.getInstance().reset(parliamentData);
   }
 
   async notif_payFromTreasury(notif: NotifPayFromTreasury) {

@@ -3,6 +3,7 @@
 namespace Bga\Games\JohnCompany\Offices;
 
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Regions;
@@ -41,7 +42,8 @@ class Governor extends \Bga\Games\JohnCompany\Models\Office
 
   public function getDicePool(): int
   {
-    return $this->dicePool;
+    $modifier = LawCards::isInPlay(ZAMINDAR_TAXES_ID) ? 1 : 0;
+    return $this->dicePool + $modifier;
   }
 
   public function getPresidencyId(): string | null

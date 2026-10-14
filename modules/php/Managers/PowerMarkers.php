@@ -41,7 +41,25 @@ class PowerMarkers
     }
   }
 
-  public static function swap(object $ctx, Player $player, string $type)
+  public static function swap(Player $player, array $markers)
+  {
+    $powerMarkers = self::get();
+    $flipped = array_flip($powerMarkers);
+    
+    $positions = array_map(fn($type) => $flipped[$type], $markers);
+
+    $changes = [];
+
+    $temp = $powerMarkers[$positions[0]];
+    $powerMarkers[$positions[0]] = $powerMarkers[$positions[1]];
+    $changes[$positions[0]] = $powerMarkers[$positions[1]];
+    $powerMarkers[$positions[1]] = $temp;
+    $changes[$positions[1]] = $temp;
+    Globals::setPowerMarkers($powerMarkers);
+    Notifications::swapPowerMarkers($player, $markers[0], $markers[1], $changes);
+  }
+
+  public static function swapWithNextHighest(object $ctx, Player $player, string $type)
   {
     $powerMarkers = self::get();
     $flipped = array_flip($powerMarkers);

@@ -329,6 +329,14 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     if ($previousControl !== $presidencyId) {
       Offices::get($this->getGovernorOfficeId())->moveToVacantOffices($player);
     }
-    
+  }
+
+  public function hasClosedOrders(): bool
+  {
+    $orders = Orders::getMany($this->orderIds)->toArray();
+
+    return Utils::array_some($orders, function ($order) {
+      return $order->isClosed();
+    });
   }
 }

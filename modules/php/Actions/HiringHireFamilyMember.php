@@ -106,11 +106,11 @@ class HiringHireFamilyMember extends \Bga\Games\JohnCompany\Models\AtomicAction
         return clienttranslate('Commander of the Army of Madras');
       case OFFICER_IN_TRAINING:
         return clienttranslate('Officer-in-Training');
-      case Locations::armyOfReady(BENGAL):
+      case Locations::armyOfReady(BENGAL_PRESIDENCY):
         return clienttranslate('Officer in the Army of Bengal');
-      case Locations::armyOfReady(BOMBAY):
+      case Locations::armyOfReady(BOMBAY_PRESIDENCY):
         return clienttranslate('Officer in the Army of Bombay');
-      case Locations::armyOfReady(MADRAS):
+      case Locations::armyOfReady(MADRAS_PRESIDENCY):
         return clienttranslate('Officer in the Army of Madras');
       case Locations::writers(BENGAL_PRESIDENCY):
         return clienttranslate('Writer in the Bengal Presidency');

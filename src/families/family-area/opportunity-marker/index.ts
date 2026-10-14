@@ -12,6 +12,7 @@ import {
   LUXURY,
   WORKSHOP,
   SHARE,
+  REMOVED,
 } from '../../../constants';
 import { GameAlias } from '../../../types';
 
@@ -85,6 +86,7 @@ export class OpportunityMarker {
       [PURCHASE_LUXURY]: { text: _('Buy Luxury'), icon: LUXURY },
       [PURCHASE_SHIPYARD]: { text: _('Buy Shipyard'), icon: SHIPYARD },
       [PURCHASE_WORKSHOP]: { text: _('Buy Workshop'), icon: WORKSHOP },
+      [REMOVED]: { text: _('Removed'), icon: '' },
     };
 
     if (familyAction && map[familyAction]) {

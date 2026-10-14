@@ -24,7 +24,7 @@ export class PowerMarkers {
 
   private createPowerMarkers(gamedatas: GamedatasAlias) {
     Object.entries(gamedatas.powerMarkers).forEach(([position, type]) => {
-      this.ui.powerMarkers[type] = createHtmlElement(tplPowerMarker(type));
+      this.ui.powerMarkers[type] = createHtmlElement(tplPowerMarker({id: `joco-power-marker-${type}`, type}));
       this.ui.powerMarkerPositions[position].appendChild(
         this.ui.powerMarkers[type],
       );

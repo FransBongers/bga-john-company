@@ -36,7 +36,6 @@ export const addPassButton = (optionalAction: boolean, text?: string) =>
 
 export const addPlayerButton = (props: {
   id: string;
-  text: string;
   playerId: number;
   callback: Function;
   extraClasses?: string;
@@ -134,4 +133,8 @@ export const parentHasChildWithId = (
     return true;
   }
   return false;
+};
+
+export const getCurrentPlayerId = (): number => {
+  return PlayerManager.getInstance().getCurrentPlayerId();
 };

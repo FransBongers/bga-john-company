@@ -3,6 +3,7 @@
 namespace Bga\Games\JohnCompany\Actions;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\Players;
@@ -42,7 +43,7 @@ class ParliamentMeetsResolvePolicy extends \Bga\Games\JohnCompany\Models\AtomicA
         $this->resolveBonus($policy[TARGET]);
         break;
       case POWER:
-        PowerMarkers::swap($this->ctx, Parliament::getPrimeMinisterPlayer(), $policy[TARGET]);
+        PowerMarkers::swapWithNextHighest($this->ctx, Parliament::getPrimeMinisterPlayer(), $policy[TARGET]);
         break;
       case TAX:
         $this->resolveTax($policy[TARGET], $policy[WINDOW_TAX]);
@@ -64,6 +65,8 @@ class ParliamentMeetsResolvePolicy extends \Bga\Games\JohnCompany\Models\AtomicA
   {
     $playerOrder = Players::getTurnOrder(Parliament::getPrimeMinisterPlayerId());
     $players = Players::getAll();
+
+    $someoneGotMoney = false;
 
     foreach ($playerOrder as $playerId) {
       $player = $players[$playerId];
@@ -88,7 +91,11 @@ class ParliamentMeetsResolvePolicy extends \Bga\Games\JohnCompany\Models\AtomicA
 
       if ($count > 0) {
         $family->gainCash($count);
+        $someoneGotMoney = true;
       }
+    }
+    if (!$someoneGotMoney) {
+      Notifications::message(clienttranslate('No one receives a bonus'));
     }
   }
 

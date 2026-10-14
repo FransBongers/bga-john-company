@@ -7,7 +7,7 @@ use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
-
+use Bga\Games\JohnCompany\Models\Family;
 
 class Families extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 {
@@ -89,5 +89,11 @@ class Families extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
       $map[CROWN] = CROWN_PLAYER_ID;
     }
     return $map;
+  }
+
+  public static function getChairmanFamily(): Family
+  {
+    $families = self::getAll()->toArray();
+    return Utils::array_find($families, fn($family) => $family->hasChairmanMarker());
   }
 }

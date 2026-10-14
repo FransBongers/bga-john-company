@@ -257,6 +257,7 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   public function isDoable(Player $player): bool
   {
-    return true;
+    $family  = $player->getFamily();
+    return !$family->hasPrestigeCard(MR_ROCHESTER_ID);
   }
 }

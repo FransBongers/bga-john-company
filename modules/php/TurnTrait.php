@@ -609,7 +609,10 @@ trait TurnTrait
           'playerId' => 'some',
           'activePlayerIds' => [$primeMinisterPlayerId],
         ],
-        Parliament::getRoundOfVotingNodes()
+        Parliament::getRoundOfVotingNodes(),
+        [
+          'action' => PARLIAMENT_MEETS_CLEANUP,
+        ]
       ],
     ];
 
@@ -640,7 +643,10 @@ trait TurnTrait
     $node = [
       'children' => [
         [
-          'action' => UPKEEP_CHECK_PRIZES,
+          'action' => PRE_TAX_AND_UPKEEP,
+          'args' => [
+            'type' => UPKEEP,
+          ]
         ],
         [
           'action' => REFRESH_BOARD,
@@ -739,29 +745,34 @@ trait TurnTrait
     ];
 
     $offices = Offices::getAll();
-    
+
     $presidentOffice = $offices[$presidencyOfficeMap[$presidencyId]];
     $commander = $presidentOffice->getCommander();
 
 
     // TODO: check if there is a president?:
-    $requiredChoiceCount = 1;
+    $requiredChoiceCount = 0;
     $presidentPlayerId = $presidentOffice->getPlayerId();
-    $children = [
-      [
-        'action' => PRESIDENCY_TRADE,
-        'playerId' => 'some',
-        'optional' => true,
-        'activePlayerIds' => [$presidentPlayerId],
-        'args' => [
-          'officeId' => $presidentOffice->getId(),
-          'presidencyId' => $presidencyId,
-          'first' => true,
-          'presidentPlayerId' => $presidentPlayerId
-        ],
-      ],
 
-    ];
+    $children = [];
+
+    if ($presidentPlayerId !== null) {
+      $requiredChoiceCount++;
+      $children[] =
+        [
+          'action' => PRESIDENCY_TRADE,
+          'playerId' => 'some',
+          'optional' => true,
+          'activePlayerIds' => [$presidentPlayerId],
+          'args' => [
+            'officeId' => $presidentOffice->getId(),
+            'presidencyId' => $presidencyId,
+            'first' => true,
+            'presidentPlayerId' => $presidentPlayerId
+
+          ],
+        ];
+    }
 
     if ($commander !== null) {
       $requiredChoiceCount++;
@@ -800,7 +811,7 @@ trait TurnTrait
         [
           'type' => NODE_OR,
           'children' => $children,
-          'playerId' => $presidentOffice->getPlayerId(),
+          'playerId' => $presidentPlayerId ?? Offices::get(CHAIRMAN)->getPlayerId(),
           'requiredChoiceCount' => $requiredChoiceCount,
           'stateDescription' => [
             'descriptionmyturn' => clienttranslate('${you} must choose who will act next'),

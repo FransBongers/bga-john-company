@@ -162,13 +162,16 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $options = [];
 
+    // TODO: allow other players to use Stock Broker
+    $hasStockBroker = $family->hasPrestigeCard(STOCK_BROKER_ID);
+
     foreach (STOCK_EXCHANGE_POSITIONS as $location) {
-      if (Utils::array_some($membersOnStockExchange, function ($member) use ($location) {
+      if (Utils::array_some($membersOnStockExchange, function ($member) use ($location, $hasStockBroker) {
         return $member->getLocation() === $location;
       })) {
         continue;
       }
-      $price = $this->getStockPrice($location);
+      $price = $hasStockBroker ? 1 : $this->getStockPrice($location);
       if ($price <= $treasury) {
         $options[$location] = $price;
       }

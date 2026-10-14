@@ -40,19 +40,17 @@ trait DebugTrait
 
   function debug_test()
   {
-    Globals::setPowerMarkers([
-      Locations::powerTokenPosition(1) => POWER_TOKEN_SOCIAL,
-      Locations::powerTokenPosition(2) => POWER_TOKEN_COMPANY_SHARE,
-      Locations::powerTokenPosition(3) => POWER_TOKEN_SHIPPING,
-      Locations::powerTokenPosition(4) => POWER_TOKEN_MANUFACTURING,
-    ]);
+    Offices::get(PRESIDENT_OF_MADRAS)->setLocation(Locations::vacantOffices());
     // $parliament = Globals::getParliament();
     // $parliament[OPPOSITION] = [
     //   'votes' => $parliament[OPPOSITION], // array of $playerId => votes
     //   'leader' => 2371053,
     // ];
     // Globals::setParliament($parliament);
-    // Notifications::log('debug', Globals::getParliament());
+    // $chairmanFamily = Families::getChairmanFamily();
+    // $playerId = Players::getPlayerForFamily($chairmanFamily->getId());
+    
+    // Notifications::log('debug', $playerId);
 
     // Parliament::setSupport(-5);
     // $data = Globals::getParliament();

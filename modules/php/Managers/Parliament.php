@@ -29,7 +29,28 @@ class Parliament
       VOTES_CAST_THIS_ROUND => 0,
       AGAINST => [], // array of $playerId
       SELECTING_LAW => false,
+      SUPPORT => 0,
     ]);
+  }
+
+  public static function get()
+  {
+    return Globals::getParliament();
+  }
+
+  public static function reset()
+  {
+    $data = self::get();
+    $data[SUPPORT] = 0;
+    $data[VOTES_CAST_THIS_ROUND] = 0;
+    $data[AGAINST] = [];
+    $data[OPPOSITION] = [
+      'votes' => [],
+      'leader' => null,
+    ];
+    $data[SELECTING_LAW] = false;
+    Globals::setParliament($data);
+    return self::getUiData();
   }
 
   private static function set(string $key, string | int | array $value)

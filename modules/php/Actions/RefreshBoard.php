@@ -84,7 +84,9 @@ class RefreshBoard extends \Bga\Games\JohnCompany\Models\AtomicAction
       $ship->setLocation(Locations::supplyOtherShips());
       $removedShips[] = $ship;
     }
-    Notifications::returnShipsToSupply($removedShips);
+    if (count($removedShips) > 0) {
+      Notifications::returnShipsToSupply($removedShips);
+    }
   }
 
   private function refreshArmies()

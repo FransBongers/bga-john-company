@@ -22,6 +22,7 @@ class TaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
   public function argsTaxAndUpkeep()
   {
     $args = $this->ctx->getArgs();
+    $type = $args['type'];
 
     $data = [];
 

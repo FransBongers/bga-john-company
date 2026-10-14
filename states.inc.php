@@ -103,6 +103,23 @@ $machinestates = [
         ->transitions([])
         ->build(),
 
+    ST_HIRING_CHOOSE_CHAIRMAN => GameStateBuilder::create()
+        ->name(HIRING_CHOOSE_CHAIRMAN)
+        ->description('${actplayer}')
+        ->descriptionmyturn('${you}')
+        ->type(StateType::ACTIVE_PLAYER)
+        ->args('argsAtomicAction')
+        ->action('stAtomicAction')
+        ->possibleactions([
+            'act' . HIRING_CHOOSE_CHAIRMAN,
+            'actPass',
+            'actPassOptionalAction',
+            'actTakeAtomicAction',
+            'actUndoToStep',
+        ])
+        ->transitions(['next' => ST_RESOLVE_STACK])
+        ->build(),
+
     // .########.##....##.########......#######..########
     // .##.......###...##.##.....##....##.....##.##......
     // .##.......####..##.##.....##....##.....##.##......
@@ -517,6 +534,14 @@ $machinestates = [
         'transitions' => [],
     ],
 
+    ST_PARLIAMENT_MEETS_CLEANUP => [
+        'name' => PARLIAMENT_MEETS_CLEANUP,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
     ST_PARLIAMENT_MEETS_CAST_VOTES => [
         'name' => PARLIAMENT_MEETS_CAST_VOTES,
         'type' => 'multipleactiveplayer',
@@ -724,6 +749,17 @@ $machinestates = [
         'type' => 'game',
         'action' => 'stAtomicAction',
         'transitions' => [],
+    ],
+
+    ST_HIRING_CHAIRMAN => [
+        'name' => HIRING_CHAIRMAN,
+        'type' => 'multipleactiveplayer',
+        'description' => clienttranslate('${actplayer} must complete the chairman hiring step'),
+        'descriptionmyturn' => clienttranslate('${you} must complete the chairman hiring step'),
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . HIRING_CHAIRMAN, 'actPassOptionalAction', 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
     ST_HIRING_HIRE_FAMILY_MEMBER => [

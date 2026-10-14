@@ -359,6 +359,7 @@ export const PURCHASE_WORKSHOP = 'PurchaseWorkshop';
 export const SEEK_SHARE = 'SeekShare';
 export const PURCHASE_ENTERPRISE = 'PurchaseEnterprise';
 
+export const REMOVED = 'removed';
 /**
  * Stock Exchange locations
  */

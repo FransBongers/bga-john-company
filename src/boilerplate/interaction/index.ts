@@ -3,6 +3,7 @@ import { PlayerManager } from '../../player-manager';
 import { GameAlias } from '../../types';
 import { SELECTED } from '../constants';
 import { CommonStateArgs } from '../types';
+import { getPlayerName } from '../utility';
 
 export class Interaction {
   private static instance: Interaction;
@@ -22,13 +23,11 @@ export class Interaction {
 
   public addPlayerButton({
     id,
-    text,
     playerId,
     callback,
     extraClasses,
   }: {
     id: string;
-    text: string;
     playerId: number;
     callback: Function;
     extraClasses?: string;
@@ -39,7 +38,7 @@ export class Interaction {
 
     this.addSecondaryActionButton({
       id,
-      text,
+      text: getPlayerName(playerId),
       callback,
       extraClasses: `player-button ${HEX_COLOR_COLOR_MAP[playerColor]} ${extraClasses}`,
     });

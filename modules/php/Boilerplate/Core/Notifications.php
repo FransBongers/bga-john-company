@@ -724,11 +724,15 @@ class Notifications
     ]);
   }
 
-  public static function gainCash($player, $cash)
+  public static function updateFamilyTreasury(Player $player, int $cash)
   {
-    self::notifyAll('gainCash', clienttranslate('${player_name} gains ${amount} ${tkn_pound}'), [
+    $text = $cash <= 0 ? clienttranslate('${player_name} pays ${tkn_boldText_amount}') : clienttranslate('${player_name} gains ${tkn_boldText_amount}');
+
+
+    self::notifyAll('updateFamilyTreasury', $text, [
       'player' => $player,
       'amount' => $cash,
+      'tkn_boldText_amount' => '£' . abs($cash),
       'tkn_pound' => clienttranslate('Pounds')
     ]);
   }
@@ -741,16 +745,24 @@ class Notifications
     self::updateCountersMultipleTargets($counterChanges, clienttranslate('${player_name} gains ${tkn_boldText_number} ${tkn_passedLawToken}'), [
       'player' => $player,
       'tkn_boldText_number' => $number,
-      'tkn_passedLawToken' => clienttranslate('Passed Law Tokens'),
+      'tkn_passedLawToken' => clienttranslate('Passed Law Token'),
     ]);
   }
 
   public static function gainTrophies(Player $player, int $amount)
   {
+    if ($amount <= 0) {
+      Notifications::message(clienttranslate('${player_name} does not take any ${tkn_trophy}'), [
+        'player' => $player,
+        'tkn_trophy' => clienttranslate('Trophies'),
+      ]);
+      return;
+    }
+
     $counterChanges = [
       $player->getFamilyId() => [TROPHIES => $amount],
     ];
-    self::updateCountersMultipleTargets($counterChanges, clienttranslate('${player_name} gains ${tkn_boldText_amount} ${tkn_trophy}'), [
+    self::updateCountersMultipleTargets($counterChanges, clienttranslate('${player_name} takes ${tkn_boldText_amount} ${tkn_trophy}'), [
       'player' => $player,
       'tkn_boldText_amount' => $amount,
       'tkn_trophy' => clienttranslate('Trophies'),
@@ -830,6 +842,15 @@ class Notifications
       'companyBalance' => $companyBalance,
       'tkn_boldText_number' => $numberOfDividends,
       'tkn_boldText_one' => 1,
+    ]);
+  }
+
+  public static function parliamentMeetsCleanup(array $parliamentData, array $londonSeasonCards, array $enterpriseCards)
+  {
+    self::notifyAll('parliamentMeetsCleanup', '', [
+      'parliamentData' => $parliamentData,
+      'londonSeasonCards' => $londonSeasonCards,
+      'enterpriseCards' => $enterpriseCards,
     ]);
   }
 
@@ -1168,8 +1189,8 @@ class Notifications
 
   public static function payCompanyExpenses($companyBalance)
   {
-    self::notifyAll('moveCompanyBalance', clienttranslate('Company Balance is lowered to ${tkn_boldText_amount} ${tkn_pound}'), [
-      'tkn_boldText_amount' => $companyBalance,
+    self::notifyAll('moveCompanyBalance', clienttranslate('Company Balance is lowered to ${tkn_boldText_amount}'), [
+      'tkn_boldText_amount' => '£' . $companyBalance,
       'companyBalance' => $companyBalance,
       'tkn_pound' => clienttranslate('Pounds'),
     ]);

@@ -7,8 +7,8 @@ export const tplPowerMarkersContainer = () => `
   </div>
 `;
 
-export const tplPowerMarker = (type: string, extraClasses = '') => `
-  <div id="joco-power-marker-${type}" class="joco-power-marker ${extraClasses}" data-type="${type}">
+export const tplPowerMarker = ({id, type, extraClasses = ''} : {id?: string, type: string, extraClasses?: string}) => `
+  <div ${id ? `id="${id}"` : ''} class="joco-power-marker ${extraClasses}" data-type="${type}">
     <div class="joco-icon" data-icon="${type}"></div>
   </div>
 `;

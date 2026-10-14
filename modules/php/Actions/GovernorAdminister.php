@@ -7,6 +7,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\JoCoUtils;
+use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Models\Office;
@@ -90,7 +91,7 @@ class GovernorAdminister extends \Bga\Games\JohnCompany\Models\AtomicAction
       $this->insertAdministerSuccessChoice($playerId, $stateArgs['governor']->getId());
     } else {
       $region = $stateArgs['governor']->getRegion();
-      $region->addUnrest($player, 1);
+      $region->addUnrest($player, LawCards::isInPlay(ZAMINDAR_TAXES_ID) ? 2 : 1);
     }
 
 

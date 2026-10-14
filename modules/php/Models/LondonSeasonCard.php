@@ -74,10 +74,21 @@ class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Mod
     Notifications::discardLondonSeasonCard($this, $player, $from);
   }
 
-  public function take(Player $player)
+  public function take(Player $player, object $ctx)
   {
     $from = $this->getLocation();
     $this->setLocation(Locations::londonSeasonCards($player->getFamilyId()));
     Notifications::moveLondonSeasonCard($player, $this, $from);
+    if ($this->getVictoryPoints() !== null) {
+      $player->incScore($this->getVictoryPoints());
+    }
+
+    // Resolve the immediate effect of the card after it is taken
+    $this->resolveImmediateEffect($player, $ctx);
+  }
+
+  protected function resolveImmediateEffect(Player $player, object $ctx)
+  {
+    // Implement the logic for resolving the immediate effect of the London Season Card
   }
 }

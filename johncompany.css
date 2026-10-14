@@ -2455,6 +2455,7 @@ span[style*="color:#addb90"] {
   align-items: center;
   justify-content: space-between;
   padding: 4px 8px;
+  gap: 4px;
 }
 .joco-treasury-container .joco-row {
   align-items: center;
@@ -2588,10 +2589,10 @@ span[style*="color:#c0c0c0"] {
   margin-left: 1px;
   margin-right: 1px;
 }
-.log-token.joco-trophy, .log-token.joco-local-alliance {
+.log-token.joco-passed-law-token, .log-token.joco-trophy, .log-token.joco-local-alliance {
   display: inline-flex;
 }
-.log-token.joco-trophy .joco-icon, .log-token.joco-local-alliance .joco-icon {
+.log-token.joco-passed-law-token .joco-icon, .log-token.joco-trophy .joco-icon, .log-token.joco-local-alliance .joco-icon {
   height: 16px !important;
 }
 .log-token.joco-elephant {
@@ -3454,6 +3455,15 @@ span[style*="color:#c0c0c0"] {
   padding: 8px;
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
 .joco-power-marker-position {
   position: absolute;
   width: 81px;
@@ -3510,6 +3520,14 @@ span[style*="color:#c0c0c0"] {
 }
 .joco-power-marker[data-type=shareVictoryPoints] {
   background-position-x: 100%;
+}
+.joco-power-marker.selectable {
+  cursor: pointer;
+  outline: 4px solid yellow !important;
+}
+.joco-power-marker.selectable:hover, .joco-power-marker.selected {
+  cursor: pointer;
+  outline: 4px solid blue !important;
 }
 
 #joco-prime-minister-dial {

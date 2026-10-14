@@ -141,6 +141,9 @@ const ST_PARLIAMENT_MEETS_RESOLVE_POLICY = 153;
 const ST_PARLIAMENT_MEETS_RESOLVE_LAW = 154;
 const ST_PRE_TAX_AND_UPKEEP = 155;
 const ST_TAX_AND_UPKEEP = 156;
+const ST_PARLIAMENT_MEETS_CLEANUP = 157;
+const ST_HIRING_CHAIRMAN = 158;
+const ST_HIRING_CHOOSE_CHAIRMAN = 159;
 
 
 const BONUSES = 'Bonuses';
@@ -160,6 +163,8 @@ const GOVERNOR_BUILD_COMPANY_SHIP = 'GovernorBuildCompanyShip';
 const GOVERNOR_COMMISSION_REGIMENT = 'GovernorCommissionRegiment';
 const GOVERNOR_TAX = 'GovernorTax';
 const HIRING_CHECK_VACANT_OFFICES = 'HiringCheckVacantOffices';
+const HIRING_CHAIRMAN = 'HiringChairman';
+const HIRING_CHOOSE_CHAIRMAN = 'HiringChooseChairman';
 const HIRING_HIRE_FAMILY_MEMBER = 'HiringHireFamilyMember';
 const LONDON_SEASON_ATTRITION = 'LondonSeasonAttrition';
 const LONDON_SEASON_RETIRE = 'LondonSeasonRetire';
@@ -206,6 +211,7 @@ const PARLIAMENT_MEETS_RESOLVE_LAW = 'ParliamentMeetsResolveLaw';
 const PARLIAMENT_MEETS_CAST_VOTES = 'ParliamentMeetsCastVotes';
 const PARLIAMENT_MEETS_ADDITIONAL_ROUND_OR_RESOLVE = 'ParliamentMeetsAdditionalRoundOrResolve';
 const PARLIAMENT_MEETS_COMMIT_TO_OPPOSITION = 'ParliamentMeetsCommitToOpposition';
+const PARLIAMENT_MEETS_CLEANUP = 'ParliamentMeetsCleanup';
 const COMMANDER_PURCHASE_LOCAL_ALLIANCE = 'CommanderPurchaseLocalAlliance';
 const COMMANDER_DEPLOY = 'CommanderDeploy';
 const COMMANDER_APPROVE_LOCAL_ALLIANCE = 'CommanderApproveLocalAlliance';
@@ -944,3 +950,18 @@ const PRIZES = [
     WINDOWS => 4,
   ],
 ];
+
+const REMOVED = 'removed';
+
+/**
+ * PrestigeCardIds: specific card IDs that affect the game and
+ * are used in the code
+ */
+const MR_ROCHESTER_ID = 'PrestigeCard_11';
+const STOCK_BROKER_ID = 'PrestigeCard_25';
+
+/**
+ * LawCardIds: specific card IDs that affect the game and
+ * are used in the code
+ */
+const ZAMINDAR_TAXES_ID = 'LawCard_41';
