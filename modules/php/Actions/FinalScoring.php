@@ -31,6 +31,8 @@ class FinalScoring extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   public function stFinalScoring()
   {
+    $args = $this->ctx->getArgs();
+    $companyFailure = $args['companyFailure'] ?? false;
     Notifications::message('TODO: Final Scoring');
 
     Game::get()->gamestate->jumpToState(ST_END_GAME);

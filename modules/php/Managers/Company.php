@@ -90,7 +90,7 @@ class Company
   }
 
 
-  public static function adjustStanding($numberOfSpaces)
+  public static function adjustStanding(int $numberOfSpaces)
   {
     $currentStanding = self::getStanding();
     $index = Utils::array_find_index(COMPANY_EXPECTATIONS, function ($item) use ($currentStanding) {
@@ -99,8 +99,9 @@ class Company
     $newIndex = min(16, max(0, $index + $numberOfSpaces));
     $newStanding = COMPANY_EXPECTATIONS[$newIndex];
     self::setStanding($newStanding);
-    Notifications::adjustCompanyStanding($newStanding, $numberOfSpaces);
-    // TODO: company failure
+    if ($newStanding !== $currentStanding) {
+      Notifications::adjustCompanyStanding($newStanding, $numberOfSpaces);
+    }
   }
 
   public static function getOfficesWithTreasury()
@@ -141,5 +142,13 @@ class Company
     }
     $minResult = min($dieResults);
     return $minResult;
+  }
+
+  public static function resolveCompanyHumiliation()
+  {
+    $regionsLostThisTurn = Globals::getRegionsLostThisTurn();
+    $regionsLostThisTurn++;
+    Globals::setRegionsLostThisTurn($regionsLostThisTurn);
+    self::adjustStanding(-$regionsLostThisTurn);
   }
 }

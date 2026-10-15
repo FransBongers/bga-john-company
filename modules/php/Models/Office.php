@@ -109,6 +109,15 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     // Move office card to supply
   }
 
+  public function returnToSupply()
+  {
+    $this->setLocation(DECK);
+    Notifications::moveOfficeCard($this, clienttranslate('${tkn_boldText_office} is returned to the supply'), [
+      'tkn_boldText_office' => $this->getTitle(),
+      'i18n' => ['tkn_boldText_office'],
+    ]);
+  }
+
   public function pay(Player $player, int $amount)
   {
     $this->incTreasury(-$amount);
@@ -123,7 +132,8 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     }
     $this->setLocation(Locations::vacantOffices());
 
-    Notifications::moveOfficeCard($player, $this, clienttranslate('${player_name} adds ${tkn_boldText_title} to Vacant Offices'), [
+    Notifications::moveOfficeCard($this, clienttranslate('${player_name} adds ${tkn_boldText_title} to Vacant Offices'), [
+      'player' => $player,
       'tkn_boldText_title' => $this->getTitle(),
       'i18n' => ['tkn_boldText_title'],
     ]);

@@ -259,6 +259,10 @@ export interface NotifTransferPromiseCubes extends NotifWithPlayerArgs {
   amount: number;
 }
 
+export interface NotifUpdateCompanyDebt {
+  companyDebt: number;
+}
+
 export interface NotifUpdateLondonSeasonOrder {
   order: number[];
   cashSpent: Record<number, number>;

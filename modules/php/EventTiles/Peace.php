@@ -32,7 +32,7 @@ class Peace extends \Bga\Games\JohnCompany\Models\EventTile
     $this->type = PEACE;
   }
 
-  public function resolveEvent($regionId)
+  public function resolveEvent(string $regionId)
   {
     parent::resolveEvent($regionId);
     $elephantLocation = Elephant::getLocation();

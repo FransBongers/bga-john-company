@@ -1,6 +1,5 @@
 import { Bar } from '../bar';
 import {
-  addCancelButton,
   addConfirmButton,
   addDangerActionButton,
   addPassButton,
@@ -22,6 +21,7 @@ import { GameAlias, JocoFamilyMember } from '../types';
 interface OnEnteringLondonSeasonRetireArgs extends CommonStateArgs {
   familyMembers: JocoFamilyMember[];
   treasury: number;
+  discount: number;
 }
 
 export class LondonSeasonRetire implements GameState<OnEnteringLondonSeasonRetireArgs> {
@@ -76,7 +76,8 @@ export class LondonSeasonRetire implements GameState<OnEnteringLondonSeasonRetir
 
   private updateInterfaceInitialStep() {
     clearPossible();
-    const remainingMoney = this.getRemainingMoney();
+    const remainingMoney =
+      this.getRemainingMoney() + this.getRemainingDiscount();
     if (
       remainingMoney <= 1 ||
       Object.keys(this.selectedPrizes).length === this.args.familyMembers.length
@@ -106,28 +107,41 @@ export class LondonSeasonRetire implements GameState<OnEnteringLondonSeasonRetir
       });
       this.addCancelButton();
     } else {
-      addPassButton(this.args.optionalAction, _('Skip remaining family members'));
+      addPassButton(
+        this.args.optionalAction,
+        _('Skip remaining family members'),
+      );
     }
   }
 
   private updateInterfaceSelectPrize(familyMember: JocoFamilyMember) {
     clearPossible();
     const remainingMoney = this.getRemainingMoney();
+    const remainingDiscount = this.getRemainingDiscount();
+    const remainingMoneyIncludingDiscount = remainingMoney + remainingDiscount;
 
-    updatePageTitle(_('${you} must choose a prize'));
+    updatePageTitle(
+      remainingDiscount > 0
+        ? _('${you} must choose a prize (£${amount} discount)')
+        : _('${you} must choose a prize'),
+      {
+        amount: remainingDiscount,
+      },
+    );
 
     setSelected(familyMember.id);
 
     Object.values(PRIZES).forEach((prize) => {
-      if (prize.cost > remainingMoney) {
+      if (prize.cost > remainingMoneyIncludingDiscount) {
         return;
       }
       onClick(`${prize.id}-container`, async () => {
         this.selectedPrizes[familyMember.id] = prize.id;
-        this.totalCost += prize.cost;
         PlayerManager.getInstance()
           .getCurrentPlayer()
-          .counters[CASH_COUNTER].incValue(-prize.cost);
+          .counters[CASH_COUNTER].toValue(
+            this.args.treasury - this.getTotalCost(),
+          );
         await this.game.animationManager.slideAndAttach(
           document.getElementById(familyMember.id),
           document.getElementById(prize.id),
@@ -165,15 +179,38 @@ export class LondonSeasonRetire implements GameState<OnEnteringLondonSeasonRetir
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
+  private getTotalCostOfSelectedPrizes() {
+    const totalPrizeCost = Object.keys(this.selectedPrizes).reduce(
+      (total, key) => {
+        const prizeId = this.selectedPrizes[key];
+        const prize = PRIZES[prizeId];
+        return total + (prize?.cost ?? 0);
+      },
+      0,
+    );
+    return totalPrizeCost;
+  }
+
+  private getRemainingDiscount() {
+    const usedDiscount =
+      this.getTotalCostOfSelectedPrizes() - this.getTotalCost();
+    return this.args.discount - usedDiscount;
+  }
+
+  private getTotalCost(modifier = 0) {
+    const totalPrizeCost = this.getTotalCostOfSelectedPrizes();
+    return Math.max(totalPrizeCost + modifier - this.args.discount, 0);
+  }
+
   private getRemainingMoney() {
-    return this.args.treasury - this.totalCost;
+    return this.args.treasury - this.getTotalCost();
   }
 
   private async returnPieces() {
     const interaction = Interaction.use();
     PlayerManager.getInstance()
       .getCurrentPlayer()
-      .counters[CASH_COUNTER].incValue(this.totalCost);
+      .counters[CASH_COUNTER].toValue(this.args.treasury);
     await Promise.all(
       Object.keys(this.selectedPrizes).map(async (key, index) => {
         interaction.wait(200 * index);

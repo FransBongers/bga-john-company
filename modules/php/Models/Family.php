@@ -131,6 +131,13 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     Notifications::gainTrophies($this->getPlayer(), $amount);
   }
 
+  public function loseHalfTrophiesRoundedUp()
+  {
+    $amount = (int) ceil($this->getTrophies() / 2);
+    $this->incTrophies(-$amount);
+    Notifications::loseHalfTrophiesRoundedUp($this->getPlayer(), $amount);
+  }
+
   public function gainPassedLawToken(int $number = 1)
   {
     $this->incPassedLawTokens($number);
@@ -187,4 +194,15 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     });
   }
 
+  public function getRetirementDiscount()
+  {
+    $prestigeCards = LondonSeasonCards::getInLocation(Locations::londonSeasonCards($this->getId()))->toArray();
+    $discount = 0;
+    foreach ($prestigeCards as $card) {
+      if ($card->getType() === PRESTIGE) {
+        $discount += $card->getDiscount() ?? 0;
+      }
+    }
+    return $discount;
+  }
 }

@@ -18,7 +18,7 @@ class Leader extends \Bga\Games\JohnCompany\Models\EventTile
     $this->type = LEADER;
   }
 
-  public function resolveEvent($regionId)
+  public function resolveEvent(string $regionId)
   {
     parent::resolveEvent($regionId);
     $region = Regions::get($regionId);

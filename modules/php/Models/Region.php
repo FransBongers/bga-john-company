@@ -86,7 +86,7 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     Notifications::regionBecomesSovereign($this);
   }
 
-  public function incTowerLevel($change)
+  public function incTowerLevel(int $change)
   {
     if ($this->strength === 0 && $change < 0) {
       return;
@@ -338,5 +338,13 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     return Utils::array_some($orders, function ($order) {
       return $order->isClosed();
     });
+  }
+
+  public function getControllingPresidencyId(): string | null
+  {
+    if ($this->isCompanyControlled()) {
+      return $this->getControl();
+    }
+    return null;
   }
 }

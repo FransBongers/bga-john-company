@@ -1,8 +1,6 @@
 import { Bar } from '../bar';
 import {
-  addCancelButton,
   addConfirmButton,
-  addDangerActionButton,
   addPassButton,
   addPrimaryActionButton,
   clearPossible,
@@ -11,14 +9,12 @@ import {
   DISABLED,
   GameState,
   getPlayerName,
-  onClick,
   performAction,
-  setSelected,
   updatePageTitle,
 } from '../boilerplate';
-import { StaticData } from '../static-data';
 import { GameAlias, JocoArmyPieceBase, JocoFamilyMember } from '../types';
 import { getRegionName } from '../utility';
+import { ExhaustArmyPieces } from './ExhaustArmyPieces';
 
 interface OnEnteringCommanderDeployArgs extends CommonStateArgs {
   options: Record<string, number>; // regionId => minimum strength required to deploy there
@@ -28,16 +24,17 @@ interface OnEnteringCommanderDeployArgs extends CommonStateArgs {
   regionId: string;
 }
 
-export class CommanderDeploy implements GameState<OnEnteringCommanderDeployArgs> {
+export class CommanderDeploy
+  extends ExhaustArmyPieces<OnEnteringCommanderDeployArgs>
+  implements GameState<OnEnteringCommanderDeployArgs>
+{
   private static instance: CommanderDeploy;
   private args: OnEnteringCommanderDeployArgs;
   private targetId: string;
-  private selectedPieces: {
-    officers: string[];
-    armyPieces: string[];
-  };
 
-  constructor(private game: GameAlias) {}
+  constructor(game: GameAlias) {
+    super(game);
+  }
 
   public static create(game: GameAlias) {
     CommanderDeploy.instance = new CommanderDeploy(game);
@@ -50,15 +47,15 @@ export class CommanderDeploy implements GameState<OnEnteringCommanderDeployArgs>
   onEnteringState(args: OnEnteringCommanderDeployArgs) {
     debug('Entering CommanderDeploy state');
     this.args = args;
-    this.selectedPieces = {
-      officers: [],
-      armyPieces: [],
-    };
+    this.presidencyId = this.args.presidencyId;
+    super.onEnteringState(args);
+
     this.updateInterfaceInitialStep();
     Bar.getInstance().goTo('joco-india');
   }
 
   onLeavingState() {
+    super.onLeavingState();
     debug('Leaving CommanderDeploy state');
   }
 
@@ -109,34 +106,7 @@ export class CommanderDeploy implements GameState<OnEnteringCommanderDeployArgs>
 
     updatePageTitle(_('Deploy: ${you} must exhaust ready pieces'), {});
 
-    Object.entries(this.args.armyPieces).forEach(([pieceId, piece]) => {
-      onClick(pieceId, async () => {
-        if (this.selectedPieces.armyPieces.includes(pieceId)) {
-          this.selectedPieces.armyPieces =
-            this.selectedPieces.armyPieces.filter((id) => id !== pieceId);
-          await this.movePiece(pieceId, 'ready');
-        } else {
-          this.selectedPieces.armyPieces.push(pieceId);
-          await this.movePiece(pieceId, 'exhausted');
-        }
-        this.updateInterfaceSelectArmyPieces();
-      });
-    });
-
-    Object.entries(this.args.officers).forEach(([pieceId, piece]) => {
-      onClick(pieceId, async () => {
-        if (this.selectedPieces.officers.includes(pieceId)) {
-          this.selectedPieces.officers = this.selectedPieces.officers.filter(
-            (id) => id !== pieceId,
-          );
-          await this.movePiece(pieceId, 'ready');
-        } else {
-          this.selectedPieces.officers.push(pieceId);
-          await this.movePiece(pieceId, 'exhausted');
-        }
-        this.updateInterfaceSelectArmyPieces();
-      });
-    });
+    this.setSelectablePieces(() => this.updateInterfaceConfirm());
 
     this.setSelectedPieces();
 
@@ -179,60 +149,5 @@ export class CommanderDeploy implements GameState<OnEnteringCommanderDeployArgs>
       }),
     );
     this.addCancelButton();
-  }
-
-  //  .##.....##.########.####.##.......####.########.##....##
-  //  .##.....##....##.....##..##........##.....##.....##..##.
-  //  .##.....##....##.....##..##........##.....##......####..
-  //  .##.....##....##.....##..##........##.....##.......##...
-  //  .##.....##....##.....##..##........##.....##.......##...
-  //  .##.....##....##.....##..##........##.....##.......##...
-  //  ..#######.....##....####.########.####....##.......##...
-
-  private setSelectedPieces() {
-    [
-      ...this.selectedPieces.armyPieces,
-      ...this.selectedPieces.officers,
-    ].forEach((pieceId) => {
-      setSelected(pieceId);
-    });
-  }
-
-  private async movePiece(pieceId: string, targetId: 'ready' | 'exhausted') {
-    const targetElement = document.getElementById(
-      `army_${this.args.presidencyId}_${targetId}`,
-    ) as HTMLElement;
-    await this.game.animationManager.slideAndAttach(
-      document.getElementById(pieceId) as HTMLElement,
-      targetElement,
-    );
-  }
-
-  private getTotalStrength() {
-    let strength = this.selectedPieces.officers.length;
-    const staticData = StaticData.get();
-    this.selectedPieces.armyPieces.forEach((pieceId) => {
-      strength += staticData.armyPiece(pieceId).strength;
-    });
-    return strength;
-  }
-
-  private async returnPieces() {
-    const ids = [
-      ...this.selectedPieces.armyPieces,
-      ...this.selectedPieces.officers,
-    ];
-    await Promise.all(ids.map((pieceId) => this.movePiece(pieceId, 'ready')));
-  }
-
-  private addCancelButton() {
-    addDangerActionButton({
-      id: 'cancel_btn',
-      text: _('Cancel'),
-      callback: async () => {
-        await this.returnPieces();
-        this.game.onCancel();
-      },
-    });
   }
 }

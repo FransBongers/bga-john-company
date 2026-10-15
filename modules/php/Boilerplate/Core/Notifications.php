@@ -475,19 +475,6 @@ class Notifications
     ]);
   }
 
-  public static function crisis($attackerName, $defenderName, $isInvasion)
-  {
-    $text = $isInvasion ?
-      clienttranslate('${tkn_boldText_attacker} invades ${tkn_boldText_defender}') :
-      clienttranslate('${tkn_boldText_attacker} rebels against ${tkn_boldText_defender}');
-
-    Notifications::message($text, [
-      'tkn_boldText_attacker' => $attackerName,
-      'tkn_boldText_defender' => $defenderName,
-      'i18n' => ['tkn_boldText_attacker', 'tkn_boldText_defender'],
-    ]);
-  }
-
   public static function crisisResult($attackStrength, $defenderStrength)
   {
     $text = $attackStrength > $defenderStrength ?
@@ -497,6 +484,16 @@ class Notifications
     Notifications::message($text, [
       'tkn_boldText_attackerTotal' => $attackStrength,
       'tkn_boldText_defenderTotal' => $defenderStrength,
+    ]);
+  }
+
+  public static function exhaustPieces(Player $player, array $selectedPieces)
+  {
+    self::notifyAll('movePieces', clienttranslate('${player_name} exhausts ${piecesLog}'), [
+      'player' => $player,
+      'pieces' => $selectedPieces,
+      'piecesLog' => self::createPiecesLog($selectedPieces),
+      'i18n' => [],
     ]);
   }
 
@@ -626,15 +623,15 @@ class Notifications
   public static function fillOrder($player, $order, $filledByWriter, $familyMember = null, $from = null)
   {
     $text = $filledByWriter ?
-      clienttranslate('${player_name} places ${tkn_familyMember} on an order with value of ${amount} ${tkn_pound} in ${tkn_boldText_regionName}') :
-      clienttranslate('${player_name} places a filled order token on an order with value of ${amount} ${tkn_pound} in ${tkn_boldText_regionName}');
+      clienttranslate('${player_name} places ${tkn_familyMember} on an order with value of ${tkn_boldText_amount} in ${tkn_boldText_regionName}') :
+      clienttranslate('${player_name} places a filled order token on an order with value of ${tkn_boldText_amount} in ${tkn_boldText_regionName}');
 
     $args = [
       'player' => $player,
       'amount' => $order->getValue(),
+      'tkn_boldText_amount' => '£' . $order->getValue(),
       'from' => $from,
       'tkn_boldText_regionName' => $order->getRegion()->getName(),
-      'tkn_pound' => self::tknPound(),
       'order' => $order->jsonSerialize(),
       'familyMember' => $familyMember,
       'i18n' => ['tkn_boldText_regionName'],
@@ -688,11 +685,9 @@ class Notifications
     ]));
   }
 
-  public static function moveOfficeCard(Player $player, Office $office, string $text, array $textArgs)
+  public static function moveOfficeCard(Office $office, string $text, array $textArgs)
   {
-
     self::notifyAll('moveOfficeCard', $text, array_merge($textArgs, [
-      'player' => $player,
       'office' => $office->jsonSerialize(),
     ]));
   }
@@ -769,20 +764,46 @@ class Notifications
     ]);
   }
 
-  public static function updateCountersMultipleTargets($counterChangesPerTarget, $text = '', $textArgs = [])
+  public static function loseHalfTrophiesRoundedUp(Player $player, int $number)
+  {
+    if ($number === 0) {
+      Notifications::message(clienttranslate('${player_name} does not lose any ${tkn_trophy}'), [
+        'player' => $player,
+        'tkn_trophy' => clienttranslate('Trophies'),
+      ]);
+      return;
+    }
+
+    $counterChanges = [
+      $player->getFamilyId() => [TROPHIES => -$number],
+    ];
+    self::updateCountersMultipleTargets($counterChanges, clienttranslate('${player_name} loses ${tkn_boldText_amount} ${tkn_trophy}'), [
+      'player' => $player,
+      'tkn_boldText_amount' => $number,
+      'tkn_trophy' => clienttranslate('Trophies'),
+    ]);
+  }
+
+  public static function updateCountersMultipleTargets(array $counterChangesPerTarget, $text = '', $textArgs = [])
   {
     self::notifyAll('updateCountersMultipleTargets', $text, array_merge([
       'counterChanges' => $counterChangesPerTarget,
     ], $textArgs));
   }
 
+  public static function updateCompanyDebt(int $companyDebt, $text = '', $textArgs = [])
+  {
+    self::notifyAll('updateCompanyDebt', $text, array_merge([
+      'companyDebt' => $companyDebt,
+    ], $textArgs));
+  }
+
   public static function increaseCompanyBalance($player, $companyBalance, $companyBalanceIncrease)
   {
-    self::notifyAll('moveCompanyBalance', clienttranslate('${player_name} increases Company Balance by ${tkn_boldText_amount} ${tkn_pound}'), [
+    self::notifyAll('moveCompanyBalance', clienttranslate('${player_name} increases Company Balance by ${tkn_boldText_amount}'), [
       'player' => $player,
-      'tkn_boldText_amount' => $companyBalanceIncrease,
+      'tkn_boldText_amount' => '£' . $companyBalanceIncrease,
       'companyBalance' => $companyBalance,
-      'tkn_pound' => clienttranslate('Pounds'),
       'i18n' => ['tkn_boldText_value'],
     ]);
   }
@@ -832,13 +853,13 @@ class Notifications
   public static function payDividends($player, $numberOfDividends, $companyBalance, $totalCost)
   {
     $text = $numberOfDividends === 1 ?
-      clienttranslate('${player_name} spends ${amount} ${tkn_pound} from the Company Balance to pay ${tkn_boldText_one} dividend') :
-      clienttranslate('${player_name} spends ${amount} ${tkn_pound} from the Company Balance to pay ${tkn_boldText_number} dividends');
+      clienttranslate('${player_name} spends ${tkn_boldText_amount} from the Company Balance to pay ${tkn_boldText_one} dividend') :
+      clienttranslate('${player_name} spends ${tkn_boldText_amount} from the Company Balance to pay ${tkn_boldText_number} dividends');
 
     self::notifyAll('moveCompanyBalance', $text, [
       'player' => $player,
-      'tkn_pound' => self::tknPound(),
       'amount' => $totalCost,
+      'tkn_boldText_amount' => '£' . $totalCost,
       'companyBalance' => $companyBalance,
       'tkn_boldText_number' => $numberOfDividends,
       'tkn_boldText_one' => 1,
@@ -880,20 +901,21 @@ class Notifications
     ]);
   }
 
-  public static function payFromTreasury($player, $office, $amount, $treasury)
+  public static function payFromTreasury(Player $player, Office $office, int $amount, int $treasury)
   {
-    self::notifyAll('payFromTreasury', clienttranslate('${player_name} spends ${amount} ${tkn_pound} from the ${tkn_boldText_office} treasury'), [
+    self::notifyAll('payFromTreasury', clienttranslate('${player_name} spends ${tkn_boldText_amount} from the ${tkn_boldText_office} treasury'), [
       'player' => $player,
       'tkn_pound' => self::tknPound(),
       'officeId' => $office->getId(),
       'amount' => $amount,
+      'tkn_boldText_amount' => '£' . $amount,
       'treasury' => $treasury,
       'tkn_boldText_office' => $office->getTitle(),
       'i18n' => ['tkn_boldText_office'],
     ]);
   }
 
-  public static function gainPromiseCubes($player, $amount)
+  public static function gainPromiseCubes(Player $player, int $amount)
   {
     self::notifyAll('transferPromiseCubes', clienttranslate('${player_name} gains ${tkn_boldText_amount} ${tkn_promiseCube} from the ${tkn_boldText_crown}'), [
       'player' => $player,
@@ -905,7 +927,7 @@ class Notifications
     ]);
   }
 
-  public static function payPromiseCubes($player, $amount)
+  public static function payPromiseCubes(Player $player, int $amount)
   {
     self::notifyAll('transferPromiseCubes', clienttranslate('${player_name} pays ${tkn_boldText_amount} ${tkn_promiseCube} to the ${tkn_boldText_crown}'), [
       'player' => $player,
@@ -917,7 +939,7 @@ class Notifications
     ]);
   }
 
-  public static function payPromiseCubesForConsent($player, $amount)
+  public static function payPromiseCubesForConsent(Player $player, int $amount)
   {
     self::notifyAll('transferPromiseCubes', clienttranslate('${player_name} pays ${tkn_boldText_amount} ${tkn_promiseCube} to the ${tkn_playerName_crown} to give consent'), [
       'player' => $player,
@@ -1008,10 +1030,11 @@ class Notifications
 
   public static function purchaseEnterprise(Player $player, Enterprise $enterprise, int $amount, string $familyId)
   {
-    self::notifyAll('purchaseEnterprise', clienttranslate('${player_name} pays ${amount} ${tkn_pound} to purchase a ${tkn_boldText_enterprise} ${tkn_enterpriseIcon}'), [
+    self::notifyAll('purchaseEnterprise', clienttranslate('${player_name} pays ${tkn_boldText_amount} to purchase a ${tkn_boldText_enterprise} ${tkn_enterpriseIcon}'), [
       'player' => $player,
       'tkn_boldText_enterprise' => $enterprise->getName(),
       'tkn_enterpriseIcon' => $enterprise->getType(),
+      'tkn_boldText_amount' => '£' .  $amount,
       'amount' => $amount,
       'enterprise' => $enterprise,
       'familyId' => $familyId,
@@ -1212,6 +1235,22 @@ class Notifications
       'ships' => $ships,
       'tkn_ship' => self::tknShip($ships[0]),
     ]);
+  }
+
+  public static function returnShipToSupply(Ship $ship, ?Player $player = null)
+  {
+    $text =  clienttranslate('${tkn_ship} is returned to the supply');
+    $args = [];
+
+    if ($player !== null) {
+      $text = clienttranslate('${player_name} returns the ${tkn_ship} to the supply');
+      $args['player'] = $player;
+    }
+
+    self::notifyAll('returnShipsToSupply', $text, array_merge($args, [
+      'ships' => [$ship->jsonSerialize()],
+      'tkn_ship' => self::tknShip($ship),
+    ]));
   }
 
   public static function addUnrest(Player $player, Region $region, int $change)

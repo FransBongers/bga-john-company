@@ -4,18 +4,19 @@ namespace Bga\Games\JohnCompany\Boilerplate\Helpers;
 
 class Locations
 {
-  public static function armyOfReady(string $regionId)
+  public static function armyOfReady(string $presidencyId)
   {
-    return 'army_' . $regionId . '_ready';
+    return 'army_' . $presidencyId . '_ready';
   }
 
-  public static function armyOfExhausted(string $regionId)
+  public static function armyOfExhausted(string $presidencyId)
   {
-    return 'army_' . $regionId . '_exhausted';
+    return 'army_' . $presidencyId . '_exhausted';
   }
 
   public static function commander(string $regionId)
   {
+    // TODO: change to presidencyId
     return 'Commander_' . $regionId;
   }
 

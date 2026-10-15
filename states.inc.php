@@ -743,6 +743,14 @@ $machinestates = [
         'transitions' => [],
     ],
 
+    ST_CHECK_COMPANY_FAILURE => [
+        'name' => CHECK_COMPANY_FAILURE,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
     ST_HIRING_CHECK_VACANT_OFFICES => [
         'name' => HIRING_CHECK_VACANT_OFFICES,
         'description' => '',

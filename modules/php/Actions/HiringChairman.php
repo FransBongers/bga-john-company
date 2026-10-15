@@ -161,7 +161,7 @@ class HiringChairman extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $office->setFamilyMemberId($familyMember->getId());
     $office->setLocation(Locations::familyOffices($familyMember->getFamilyId()));
-    Notifications::moveOfficeCard($player, $office, '', []);
+    Notifications::moveOfficeCard($office, '', []);
   }
 
   private function checkRequiredSupport()

@@ -40,7 +40,7 @@ class EventTile extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     return $this->jsonSerialize(); // Static datas are already in js file
   }
 
-  public function resolveEvent($regionId)
+  public function resolveEvent(string$regionId)
   {
     Notifications::message('Resolve ${title}. Top of draw stack shows ${regionId}', [
       'title' => $this->title,

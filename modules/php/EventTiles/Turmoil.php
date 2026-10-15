@@ -14,7 +14,7 @@ class Turmoil extends \Bga\Games\JohnCompany\Models\EventTile
     $this->type = TURMOIL;
   }
 
-  public function resolveEvent($regionId)
+  public function resolveEvent(string $regionId)
   {
     parent::resolveEvent($regionId);
 

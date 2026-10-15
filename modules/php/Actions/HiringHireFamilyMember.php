@@ -144,7 +144,7 @@ class HiringHireFamilyMember extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $office->setFamilyMemberId($familyMember->getId());
     $office->setLocation(Locations::familyOffices($familyMember->getFamilyId()));
-    Notifications::moveOfficeCard($hiredPlayer, $office, '', []);
+    Notifications::moveOfficeCard($office, '', []);
 
     if ($previousOffice !== null) {
       $previousOffice->moveToVacantOffices($hiredPlayer);

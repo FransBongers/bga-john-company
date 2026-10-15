@@ -108,10 +108,11 @@ import {
   NotifSwapPowerMarkers,
   NotifParliamentMeetsCleanup,
   NotifUpdateFamilyTreasury,
+  NotifUpdateCompanyDebt,
 } from './types';
 import { tplArmyPiece } from '../../india/army/templates';
 import { Parliament } from '../../parliament';
-import { DISCARD, USED } from '../constants';
+import { DECK, DISCARD, USED } from '../constants';
 import { LawCardsManager } from '../../cards/law-cards';
 
 //  .##.....##....###....##....##....###.....######...########.########.
@@ -306,33 +307,34 @@ export class NotificationManager {
   }
 
   async pay(playerId: number, amount: number) {
-    await Interaction.use().wait(1);
+    this.getPlayer(playerId).counters[CASH_COUNTER].incValue(-amount);
+    // await Interaction.use().wait(1);
 
-    const logPound: HTMLElement = document.querySelector(
-      '#pagemaintitletext .joco_pound',
-    );
+    // const logPound: HTMLElement = document.querySelector(
+    //   '#pagemaintitletext .joco_pound',
+    // );
 
-    const playerCashElt = document.getElementById(`joco-cash-${playerId}`);
+    // const playerCashElt = document.getElementById(`joco-cash-${playerId}`);
 
-    const player = PlayerManager.getInstance().getPlayer(playerId);
+    // const player = PlayerManager.getInstance().getPlayer(playerId);
 
-    const promises = Array.from(Array(amount).keys()).map(async (_, index) => {
-      await Interaction.use().wait(index * 150);
-      player.counters[CASH_COUNTER].incValue(-1);
-      const element = document.createElement('div');
-      element.classList.add('log_token');
-      element.classList.add('joco_pound');
-      element.classList.add('animation');
-      // document
-      //   .getElementById(`joco-cash-${playerId}`)
-      //   .insertAdjacentElement('afterbegin', element);
-      logPound.insertAdjacentElement('afterbegin', element);
-      await this.game.animationManager.slideIn(element, playerCashElt);
+    // const promises = Array.from(Array(amount).keys()).map(async (_, index) => {
+    //   await Interaction.use().wait(index * 150);
+    //   player.counters[CASH_COUNTER].incValue(-1);
+    //   const element = document.createElement('div');
+    //   element.classList.add('log_token');
+    //   element.classList.add('joco_pound');
+    //   element.classList.add('animation');
+    //   // document
+    //   //   .getElementById(`joco-cash-${playerId}`)
+    //   //   .insertAdjacentElement('afterbegin', element);
+    //   logPound.insertAdjacentElement('afterbegin', element);
+    //   await this.game.animationManager.slideIn(element, playerCashElt);
 
-      element.remove();
-    });
+    //   element.remove();
+    // });
 
-    await Promise.all(promises);
+    // await Promise.all(promises);
   }
 
   async placeFamilyMembers(
@@ -677,8 +679,12 @@ export class NotificationManager {
     if (!element) {
       element = createHtmlElement(tplOfficeCard(office));
     }
-    const locationElt = document.getElementById(office.location);
-    locationElt.appendChild(element);
+    if (office.location === DECK) {
+      element.remove();
+    } else {
+      const locationElt = document.getElementById(office.location);
+      locationElt.appendChild(element);
+    }
   }
 
   async notif_movePieces(notif: NotifMovePieces) {
@@ -1002,6 +1008,11 @@ export class NotificationManager {
     );
 
     await Promise.all(promises);
+  }
+
+  async notif_updateCompanyDebt(notif: NotifUpdateCompanyDebt) {
+    const { companyDebt } = notif;
+    Company.getInstance().updateCompanyDebt(companyDebt);
   }
 
   async notif_updateLondonSeasonOrder(notif: NotifUpdateLondonSeasonOrder) {

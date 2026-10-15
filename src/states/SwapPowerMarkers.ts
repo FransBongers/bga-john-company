@@ -2,6 +2,7 @@ import {
   addCancelButton,
   addConfirmButton,
   debug,
+  getPlayerName,
   onClick,
   performAction,
   setSelected,
@@ -43,7 +44,9 @@ export class SwapPowerMarkers implements GameState<OnEnteringSwapPowerMarkersArg
     activePlayerIds: number[],
     args: OnEnteringSwapPowerMarkersArgs,
   ) {
-    updatePageTitle(_('${tkn_playerName} must swap Power markers'), {});
+    updatePageTitle(_('${tkn_playerName} must swap Power markers'), {
+      tkn_playerName: getPlayerName(activePlayerIds[0]),
+    });
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########

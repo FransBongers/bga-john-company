@@ -103,17 +103,18 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
     return null;
   }
 
-  public function checkForLosses()
+  public function checkForLosses(string $source = CHECK_FOR_LOSSES)
   {
     $dieResult = JoCoUtils::rollDie();
     // $dieResult = 6;
     $player = $this->getPlayer();
-    Notifications::message(clienttranslate('Check for losses: ${player_name} rolls ${tkn_boldText_dieResult} for ${tkn_familyMember}'), [
+    Notifications::message(clienttranslate('${tkn_boldText_source}: ${player_name} rolls ${tkn_boldText_dieResult} for ${tkn_familyMember}'), [
       'player' => $player,
       'tkn_boldText_dieResult' => $dieResult,
+      'tkn_boldText_source' => $source === CHECK_FOR_LOSSES ? clienttranslate('Check for losses') : clienttranslate('Officer Rout'),
       'tkn_familyMember' => Notifications::tknFamilyMember($this),
     ]);
-    
+
     if ($dieResult === 6) {
       $this->returnToSupply();
       return true;

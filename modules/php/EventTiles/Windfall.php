@@ -18,7 +18,7 @@ class Windfall extends \Bga\Games\JohnCompany\Models\EventTile
     $this->type = WINDFALL;
   }
 
-  public function resolveEvent($regionId)
+  public function resolveEvent(string $regionId)
   {
     parent::resolveEvent($regionId);
 

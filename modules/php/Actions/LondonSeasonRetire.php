@@ -38,6 +38,7 @@ class LondonSeasonRetire extends \Bga\Games\JohnCompany\Models\AtomicAction
     $data = [
       'familyMembers' => Utils::filter(FamilyMembers::getInLocation(Locations::pensioners())->toArray(), fn($fm) => $fm->getFamilyId() === $familyId),
       'treasury' => $family->getTreasury(),
+      'discount' => $family->getRetirementDiscount()
     ];
 
     return $data;
@@ -80,6 +81,8 @@ class LondonSeasonRetire extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $totalCost = 0;
     $totalVictoryPoints = 0;
+    $remainingDiscount = $stateArgs['discount'];
+
     $initialTreasury = $family->getTreasury();
     foreach ($selectedPrizes as $familyMemberId => $prizeId) {
       if (!in_array($familyMemberId, $familyMemberIds)) {
@@ -93,6 +96,9 @@ class LondonSeasonRetire extends \Bga\Games\JohnCompany\Models\AtomicAction
       }
 
       $prizeCost = $prize[COST];
+      $discountUsed = min($prizeCost, $remainingDiscount);
+      $prizeCost -= $discountUsed;
+      $remainingDiscount -= $discountUsed;
 
       $totalCost += $prizeCost;
       $totalVictoryPoints += $prize[VICTORY_POINTS];
@@ -108,7 +114,7 @@ class LondonSeasonRetire extends \Bga\Games\JohnCompany\Models\AtomicAction
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_055");
     }
 
-    if ($totalCost > 0) {
+    if (count($selectedPrizes) > 0) {
       $retirementsMoney = Globals::getRetirementMoney();
       $retirementsMoney[$player->getId()] = $totalCost;
       Globals::setRetirementMoney($retirementsMoney);

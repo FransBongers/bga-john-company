@@ -144,6 +144,7 @@ const ST_TAX_AND_UPKEEP = 156;
 const ST_PARLIAMENT_MEETS_CLEANUP = 157;
 const ST_HIRING_CHAIRMAN = 158;
 const ST_HIRING_CHOOSE_CHAIRMAN = 159;
+const ST_CHECK_COMPANY_FAILURE = 160;
 
 
 const BONUSES = 'Bonuses';
@@ -193,6 +194,7 @@ const SEEK_SHARE = 'SeekShare';
 const SWAP_POWER_MARKERS = 'SwapPowerMarkers';
 // Company Operations
 const CHAIRMAN_DEBT_CONSENT = 'ChairmanDebtConsent';
+const CHECK_COMPANY_FAILURE = 'CheckCompanyFailure';
 const DIRECTOR_OF_TRADE_SPECIAL_ENVOY = 'DirectorOfTradeSpecialEnvoy';
 const DIRECTOR_OF_TRADE_SPECIAL_ENVOY_SUCCESS = 'DirectorOfTradeSpecialEnvoySuccess';
 const DIRECTOR_OF_TRADE_TRANSFERS = 'DirectorOfTradeTransfers';
@@ -243,6 +245,8 @@ const CROWN_MANAGER_OF_SHIPPING_PLACE_SHIPS = 'CrownManagerOfShippingPlaceShips'
 // const GOVERNOR_OF_HYDERABAD = 'GovernorOfHyderabad';
 // const GOVERNOR_OF_MYSORE = 'GovernorOfMysore';
 
+const EXTRA_ACTION = 'extraAction';
+
 /**
  * Counters
  */
@@ -255,6 +259,7 @@ const TROPHIES = 'trophies';
 const BALANCE = 'balance';
 const DEBT = 'debt';
 const STANDING = 'standing';
+const COMPANY = 'company';
 
 const COMPANY_EXPECTATIONS = [0, 4, 6, 8, 10, 12, 14, 16];
 const MAX_DEBT = 8;
@@ -950,6 +955,15 @@ const PRIZES = [
     WINDOWS => 4,
   ],
 ];
+
+/**
+ * Sources
+ */
+const CHECK_FOR_LOSSES = 'checkForLosses';
+const OFFICER_ROUT = 'officerRout';
+
+
+
 
 const REMOVED = 'removed';
 

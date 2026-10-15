@@ -6,6 +6,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Players;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 
 class Ship extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
 {
@@ -92,5 +93,12 @@ class Ship extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implement
   public function isFatigued()
   {
     return $this->getType() === PLAYER_OWNED_SHIP && $this->getSide() === FATIGUED;
+  }
+
+  public function returnToSupply($player = null)
+  {
+    $location = $this->isOtherShip() ? Locations::supplyOtherShips() : Locations::supplyPlayerShips();
+    $this->setLocation($location);
+    Notifications::returnShipToSupply($this, $player);
   }
 }

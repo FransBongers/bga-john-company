@@ -23,7 +23,7 @@ class Crisis extends \Bga\Games\JohnCompany\Models\EventTile
     $this->type = CRISIS;
   }
 
-  public function resolveEvent($regionId)
+  public function resolveEvent(string $regionId)
   {
     parent::resolveEvent($regionId);
 

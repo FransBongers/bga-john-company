@@ -18,7 +18,6 @@ export const PARLIAMENT_MEETS_START = 'ParliamentMeetsStart';
 export const PARLIAMENT_MEETS_VOTING_STARTS = 'ParliamentMeetsVotingStarts';
 export const PARLIAMENT_MEETS_END = 'ParliamentMeetsEnd';
 
-
 export const IN_FAVOR = 'inFavor';
 export const AGAINST = 'against';
 /**
@@ -443,3 +442,9 @@ export const PRIZES: Record<string, JocoPrize> = {
     [WINDOWS]: 4,
   },
 };
+
+/**
+ * Army Pieces
+ */
+export const REGIMENT = 'Regiment';
+

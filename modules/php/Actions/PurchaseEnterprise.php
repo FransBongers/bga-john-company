@@ -7,7 +7,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine\OrNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
-
+use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
@@ -90,11 +90,15 @@ class PurchaseEnterprise extends \Bga\Games\JohnCompany\Models\AtomicAction
     $enterprise->changeOwner($family->getId());
 
     $amount = $this->enterprisePrice[$enterpriseType];
-
     $family->incTreasury(-$amount);
 
     // Notifications::pay($player, $amount);
     Notifications::purchaseEnterprise($player, $enterprise, $amount, $family->getId());
+
+    $victoryPoints = $enterprise->getVictoryPoints();
+    if ($victoryPoints > 0) {
+      Game::get()->bga->playerScore->inc($playerId, $victoryPoints);
+    }
   }
 
   private function checkExtraActionOpportunityMarker(Family $family, int $playerId, string $enterpriseType)

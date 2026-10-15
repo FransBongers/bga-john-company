@@ -7,6 +7,7 @@ use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Regions;
+use Bga\Games\JohnCompany\Managers\Ships;
 use Bga\Games\JohnCompany\Models\Region;
 
 class Governor extends \Bga\Games\JohnCompany\Models\Office
@@ -63,5 +64,23 @@ class Governor extends \Bga\Games\JohnCompany\Models\Office
   public function getRegion(): Region
   {
     return Regions::get($this->regionId);
+  }
+
+  public function eliminate()
+  {
+    $familyMember = $this->getFamilyMember();
+    if ($familyMember !== null) {
+      $familyMember->returnToSupply();
+    }
+    $this->removeCompanyShip();
+    $this->returnToSupply();
+  }
+
+  public function removeCompanyShip()
+  {
+    $ship = Ships::getTopOf(Locations::shipUnderConstruction($this->regionId));
+    if ($ship !== null) {
+      $ship->returnToSupply();
+    }
   }
 }

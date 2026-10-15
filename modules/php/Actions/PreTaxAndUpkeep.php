@@ -43,6 +43,9 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
     if ($type === UPKEEP) {
       $this->resolveUpkeep();
     }
+    if ($type === TAX) {
+      $this->resolveTax($args['target'], $args['windowTax']);
+    }
 
     $data = [];
 
@@ -99,6 +102,11 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
         ],
       ]));
     }
+  }
+
+  private function resolveTax(string $target, bool $windowTax)
+  {
+    // Implement the logic for resolving tax here
   }
 
   // .########.##....##..######...####.##....##.########

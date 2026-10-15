@@ -40,7 +40,8 @@ trait DebugTrait
 
   function debug_test()
   {
-    Offices::get(PRESIDENT_OF_MADRAS)->setLocation(Locations::vacantOffices());
+    ResolveCrisis::performRegionLossSteps(BENGAL, MARATHA);
+    // Offices::get(PRESIDENT_OF_MADRAS)->setLocation(Locations::vacantOffices());
     // $parliament = Globals::getParliament();
     // $parliament[OPPOSITION] = [
     //   'votes' => $parliament[OPPOSITION], // array of $playerId => votes
