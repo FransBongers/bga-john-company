@@ -7,6 +7,7 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\JoCoUtils;
 
 class Ship extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
 {
@@ -100,5 +101,47 @@ class Ship extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implement
     $location = $this->isOtherShip() ? Locations::supplyOtherShips() : Locations::supplyPlayerShips();
     $this->setLocation($location);
     Notifications::returnShipToSupply($this, $player);
+  }
+
+  public function flipToFatigued(Player $player)
+  {
+    if ($this->isOtherShip()) {
+      // Should never happen
+      throw new \Bga\GameFramework\VisibleSystemException("SHIP_001");
+    }
+    $this->setSide(FATIGUED);
+    Notifications::flipShip($player, $this);
+  }
+
+  public function returnToShipyard(Player $player)
+  {
+    $shipyard = Enterprises::getShipyardForShip($this->getId());
+    if ($shipyard === null) {
+      throw new \Bga\GameFramework\VisibleSystemException("SHIP_002");
+    }
+    $from = $this->getLocation();
+    $this->setLocation($shipyard->getId());
+    Notifications::moveShip($player, $this, $from);
+  }
+
+  public function resolveStorm(Player $player)
+  {
+    $dieResult = JoCoUtils::rollDie();
+
+    Notifications::message(clienttranslate('${player_name} rolls ${tkn_boldText_dieResult} for the ${tkn_boldText_shipName} ${tkn_ship}'), [
+      'player' => $player,
+      'tkn_boldText_dieResult' => $dieResult,
+      'tkn_ship' => Notifications::tknShip($this),
+      'tkn_boldText_shipName' => $this->getName(),
+      'i18n' => ['tkn_boldText_shipName'],
+    ]);
+
+    if ($dieResult <= 2) {
+      return;
+    } else if ($dieResult <= 4 && !$this->isFatigued()) {
+      $this->flipToFatigued($player);
+    } else {
+      $this->returnToShipyard($player);
+    }
   }
 }

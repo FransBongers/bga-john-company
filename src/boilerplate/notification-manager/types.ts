@@ -85,6 +85,10 @@ export interface NotifFillOrder extends NotifWithPlayerArgs {
   familyMember: JocoFamilyMember | null;
 }
 
+export interface NotifFlipShip extends NotifWithPlayerArgs {
+  ship: JocoShipBase;
+}
+
 export interface NotifUpdateFamilyTreasury extends NotifWithPlayerArgs {
   amount: number;
 }

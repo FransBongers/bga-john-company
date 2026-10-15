@@ -2383,7 +2383,7 @@ span[style*="color:#addb90"] {
  * -----
  */
 .joco-ship {
-  width: 75px;
+  height: 68px;
   aspect-ratio: 40/36;
   background-size: 100% 100%;
   box-shadow: none !important;
@@ -2622,7 +2622,7 @@ span[style*="color:#c0c0c0"] {
   --tokenScale: 0.6;
 }
 #customActions .joco-ship {
-  width: 50px;
+  height: 45px;
 }
 
 #pagemaintitletext,
@@ -2633,7 +2633,7 @@ span[style*="color:#c0c0c0"] {
 }
 #pagemaintitletext .joco-ship,
 #gameaction_status .joco-ship {
-  width: 40px;
+  height: 36px;
 }
 #pagemaintitletext .joco-icon,
 #gameaction_status .joco-icon {
@@ -2645,37 +2645,12 @@ span[style*="color:#c0c0c0"] {
 #gameaction_status .joco-new-line {
   display: none;
 }
-#pagemaintitletext .joco-crown-climate-icon,
-#gameaction_status .joco-crown-climate-icon {
-  --iconScale: 0.85;
-}
 #pagemaintitletext .joco-family-member,
 #gameaction_status .joco-family-member {
   display: inline-flex;
   --tokenScale: 0.85;
 }
-#pagemaintitletext .joco-ship,
-#gameaction_status .joco-ship {
-  --tokenScale: 0.9;
-}
-#pagemaintitletext .joco-regiment,
-#gameaction_status .joco-regiment {
-  --tokenScale: 1;
-}
 
-.log > .roundedbox,
-.log > .roundedboxinner {
-  --tokenScale: 0.6;
-  --iconScale: 0.7;
-}
-.log > .roundedbox .joco-setup-card,
-.log > .roundedboxinner .joco-setup-card {
-  --cardScale: 0.74;
-}
-.log > .roundedbox .joco-crown-climate-icon,
-.log > .roundedboxinner .joco-crown-climate-icon {
-  --iconScale: 0.9;
-}
 .log > .roundedbox .joco-family-member,
 .log > .roundedboxinner .joco-family-member {
   display: inline-flex;
@@ -2683,9 +2658,9 @@ span[style*="color:#c0c0c0"] {
   top: -4px;
   margin-top: 4px;
 }
-.log > .roundedbox .joco-regiment,
-.log > .roundedboxinner .joco-regiment {
-  --tokenScale: 0.8;
+.log > .roundedbox .joco-ship,
+.log > .roundedboxinner .joco-ship {
+  height: 32px;
 }
 
 .notif_turn .roundedboxinner,

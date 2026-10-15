@@ -1321,7 +1321,7 @@ const tplLogTokenTrophy = () => tplTrophyIcon('log-token');
 const tplLogTokenSetupCard = (id) => `<div class="log-token joco-setup-card" data-card-id="${id}"></div>`;
 const tplLogTokenPlayerName = ({ name, color, }) => `<span class="playername" style="color:#${color};">${name}</span>`;
 const tplLogTokenShip = ({ name, side, }) => `<div class="log-token joco-ship" data-side="${side}">
-  ${tplShipContent({ name, side }, side === FATIGUED || side === EXTRA_SHIP)}
+  ${tplShipContent({ name, side, type: [FULL, FATIGUED].includes(side) ? PLAYER_OWNED_SHIP : OTHER_SHIP }, side === FATIGUED || side === EXTRA_SHIP)}
 </div>`;
 const tknPound = () => _('Pounds');
 const tknShipValue = ({ name, side, }) => {
@@ -3942,6 +3942,10 @@ class NotificationManager {
         }
         await Promise.all(promises);
     }
+    async notif_flipShip(notif) {
+        const { playerId, ship } = notif;
+        ShipsManager.getInstance().updateCardInformations(ship);
+    }
     async notif_gainEnterprise(notif) {
         const { playerId, type } = notif;
         const player = this.getPlayer(playerId);
@@ -4047,6 +4051,12 @@ class NotificationManager {
     }
     async notif_moveShip(notif) {
         const { from, ship } = notif;
+        if (ship.location.startsWith(SHIPYARD)) {
+            India$1.getInstance().getSeaZone(from).updateCount(-1);
+            await EnterpriseCardsManager.getInstance().shipStocks[ship.id].addCard(ship);
+            return;
+        }
+        1;
         const seaZone = India$1.getInstance().getSeaZone(ship.location);
         if (!seaZone.hasShip(ship.id)) {
             await seaZone.addShip(ship, from.startsWith('shipConstruction_') ? null : from);

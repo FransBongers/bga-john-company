@@ -10,6 +10,7 @@ use Bga\Games\JohnCompany\Managers\ArmyPieces;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\EventTiles;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Ships;
 
@@ -17,12 +18,20 @@ use Bga\Games\JohnCompany\Models\SetupCard;
 
 class EventsInIndiaStorms extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
-  protected $stormDieEventCountMap = [
+  protected array $stormDieEventCountMap = [
     ONE_ALL => 1,
     TWO_EAST => 2,
     TWO_WEST => 2,
     THREE_SOUTH => 3,
     FOUR => 4,
+  ];
+
+  protected array $stormDieSeaZoneMap = [
+    ONE_ALL => [WEST_INDIAN, SOUTH_INDIAN, EAST_INDIAN],
+    TWO_EAST => [EAST_INDIAN],
+    TWO_WEST => [WEST_INDIAN],
+    THREE_SOUTH => [SOUTH_INDIAN],
+    FOUR => [],
   ];
 
   public function getState()
@@ -59,6 +68,7 @@ class EventsInIndiaStorms extends \Bga\Games\JohnCompany\Models\AtomicAction
     $numberOfEvents = $this->stormDieEventCountMap[$side];
 
     Globals::setEventsToResolve($numberOfEvents);
+    $this->rollForShips($side);
 
     $this->resolveAction(['automatic' => true]);
   }
@@ -72,4 +82,20 @@ class EventsInIndiaStorms extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
+  public function rollForShips(string $side)
+  {
+    $seaZones = $this->stormDieSeaZoneMap[$side];
+    $playerOrder = Players::getTurnOrder(Parliament::getPrimeMinisterPlayerId());
+    $players = Players::getAll();
+
+    foreach ($seaZones as $seaZone) {
+      $ships = Ships::getInLocationOrdered($seaZone)->toArray();
+      foreach ($playerOrder as $playerId) {
+        $playerShips = array_filter($ships, fn($ship) => $ship->getOwnerPlayerId() == $playerId && !$ship->isOtherShip());
+        foreach ($playerShips as $ship) {
+          $ship->resolveStorm($players[$playerId]);
+        }
+      }
+    }
+  }
 }

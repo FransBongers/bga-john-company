@@ -1,6 +1,12 @@
 /* ------- DEFAULT LOG TOKENS ------- */
 
-import { EXTRA_SHIP, FATIGUED } from '../constants';
+import {
+  EXTRA_SHIP,
+  FATIGUED,
+  FULL,
+  OTHER_SHIP,
+  PLAYER_OWNED_SHIP,
+} from '../constants';
 import { tplTrophyIcon } from '../icons/templates';
 import { tplLocalAlliance } from '../india/army/templates';
 import { StaticData } from '../static-data';
@@ -75,7 +81,7 @@ export const tplLogTokenShip = ({
   name: string;
   side: string;
 }) => `<div class="log-token joco-ship" data-side="${side}">
-  ${tplShipContent({ name, side } as JocoShipBase, side === FATIGUED || side === EXTRA_SHIP)}
+  ${tplShipContent({ name, side, type: [FULL, FATIGUED].includes(side) ? PLAYER_OWNED_SHIP : OTHER_SHIP } as JocoShipBase, side === FATIGUED || side === EXTRA_SHIP)}
 </div>`;
 
 export const tknPound = () => _('Pounds');
@@ -92,8 +98,8 @@ export const tknShipValue = ({
 
 export const tknPromiseCubes = () => 'Promise Cube(s)';
 
-  export const tknFamilyMember = (familyMember: JocoFamilyMember) => {
-    const number = parseInt(familyMember.id.split('_')[2], 10) % 18;
+export const tknFamilyMember = (familyMember: JocoFamilyMember) => {
+  const number = parseInt(familyMember.id.split('_')[2], 10) % 18;
 
-    return [familyMember.familyId, number].join(':');
-  };
+  return [familyMember.familyId, number].join(':');
+};

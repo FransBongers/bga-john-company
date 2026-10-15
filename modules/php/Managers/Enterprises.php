@@ -94,4 +94,15 @@ class Enterprises extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
       self::shuffle(Locations::supplyEnterprises($enterpriseType));
     }
   }
+
+  public static function getShipyardForShip(string $shipId)
+  {
+    $shipyards = self::getAll()->toArray();
+    foreach ($shipyards as $shipyard) {
+      if ($shipyard->getShipId() === $shipId) {
+        return $shipyard;
+      }
+    }
+    return null;
+  }
 }

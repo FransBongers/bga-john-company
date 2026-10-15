@@ -109,6 +109,7 @@ import {
   NotifParliamentMeetsCleanup,
   NotifUpdateFamilyTreasury,
   NotifUpdateCompanyDebt,
+  NotifFlipShip,
 } from './types';
 import { tplArmyPiece } from '../../india/army/templates';
 import { Parliament } from '../../parliament';
@@ -532,6 +533,11 @@ export class NotificationManager {
     await Promise.all(promises);
   }
 
+  async notif_flipShip(notif: NotifFlipShip) {
+    const { playerId, ship } = notif;
+    ShipsManager.getInstance().updateCardInformations(ship);
+  }
+
   async notif_gainEnterprise(notif: NotifGainEnterprise) {
     const { playerId, type } = notif;
 
@@ -707,6 +713,14 @@ export class NotificationManager {
 
   async notif_moveShip(notif: NotifMoveShipArgs) {
     const { from, ship } = notif;
+    if (ship.location.startsWith(SHIPYARD)) {
+      India.getInstance().getSeaZone(from).updateCount(-1);
+      await EnterpriseCardsManager.getInstance().shipStocks[ship.id].addCard(
+        ship,
+      );
+      return;
+    }
+    1;
     const seaZone = India.getInstance().getSeaZone(ship.location);
     if (!seaZone.hasShip(ship.id)) {
       await seaZone.addShip(

@@ -177,7 +177,7 @@ class Notifications
     return implode(':', [$familyMember->getFamilyId(), $number]);
   }
 
-  protected static function tknShip($ship)
+  public static function tknShip(Ship $ship)
   {
     return implode(':', [$ship->getSide(), $ship->getName()]);
   }
@@ -641,6 +641,17 @@ class Notifications
     }
 
     self::notifyAll('fillOrder', $text, $args);
+  }
+
+  public static function flipShip(Player $player, Ship $ship)
+  {
+    self::notifyAll('flipShip', clienttranslate('${player_name} flips the ${tkn_boldText_shipName} to ${tkn_ship}'), [
+      'player' => $player,
+      'tkn_boldText_shipName' => $ship->getName(),
+      'ship' => $ship->jsonSerialize(),
+      'tkn_ship' => self::tknShip($ship),
+      'i18n' => ['tkn_boldText_shipName'],
+    ]);
   }
 
   public static function foreignInvasion($regionName, $strength)
@@ -1197,17 +1208,29 @@ class Notifications
 
   public static function moveShip(Player $player, Ship $ship, string $from)
   {
-    $text = clienttranslate('${player_name} moves the ${tkn_boldText_shipName} from ${tkn_boldText_from} to ${tkn_boldText_to}');
+    $text = '';
+    $textArgs = [];
+    if (Utils::startsWith($ship->getLocation(), SHIPYARD)) {
+      $text = clienttranslate('${player_name} returns the ${tkn_boldText_shipName} to its Shipyard');
+      $textArgs = [
+        'i18n' => ['tkn_boldText_shipName'],
+      ];
+    } else {
+      $text = clienttranslate('${player_name} moves the ${tkn_boldText_shipName} from ${tkn_boldText_from} to ${tkn_boldText_to}');
+      $textArgs = [
+        'tkn_boldText_from' => self::getSeaName($from),
+        'tkn_boldText_to' => self::getSeaName($ship->getLocation()),
+        'i18n' => ['tkn_boldText_shipName', 'tkn_boldText_from', 'tkn_boldText_to'],
+      ];
+    }
 
-    self::notifyAll('moveShip', $text, [
+    self::notifyAll('moveShip', $text, array_merge([
       'player' => $player,
       'ship' => $ship->jsonSerialize(),
       'from' => $from,
       'tkn_boldText_shipName' => $ship->getName(),
-      'tkn_boldText_from' => self::getSeaName($from),
-      'tkn_boldText_to' => self::getSeaName($ship->getLocation()),
-      'i18n' => ['tkn_boldText_shipName', 'tkn_boldText_from', 'tkn_boldText_to'],
-    ]);
+
+    ], $textArgs));
   }
 
   public static function payCompanyExpenses($companyBalance)

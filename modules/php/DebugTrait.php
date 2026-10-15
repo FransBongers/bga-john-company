@@ -40,7 +40,7 @@ trait DebugTrait
 
   function debug_test()
   {
-    ResolveCrisis::performRegionLossSteps(BENGAL, MARATHA);
+    AtomicActions::get(EVENTS_IN_INDIA_STORMS)->rollForShips(ONE_ALL);
     // Offices::get(PRESIDENT_OF_MADRAS)->setLocation(Locations::vacantOffices());
     // $parliament = Globals::getParliament();
     // $parliament[OPPOSITION] = [
