@@ -17,7 +17,6 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
   protected $location;
   protected $state;
   protected $familyId;
-  protected $fatigue;
   protected $presidency = null;
   protected $type = FAMILY_MEMBER;
 
@@ -33,7 +32,6 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
     'location' => 'family_member_location',
     'state' => ['family_member_state', 'int'],
     'familyId' => ['family_id', 'str'],
-    'fatigue' => ['fatigue', 'int'],
     'presidency' => ['presidency', 'str'],
   ];
 

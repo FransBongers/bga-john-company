@@ -166,8 +166,8 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
     const piece = regiment ?? familyMember;
 
     locations.forEach((to) => {
-      const regionId = to.split('_')[2];
-      onClick(`ArmyOfPresidency_${regionId}`, async () => {
+      const presidencyId = to.split('_')[1];
+      onClick(`ArmyOf${presidencyId}`, async () => {
         const from = regiment ? regiment.location : familyMember.location;
         this.transfers[type][id] = {
           piece,
@@ -177,7 +177,7 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
         piece.location = to;
         clearPossible();
         await India.getInstance()
-          .getArmy(`Presidency_${regionId}`)
+          .getArmy(presidencyId)
           .addPiece(piece.id);
         this.updateInterfaceInitialStep();
       });

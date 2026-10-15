@@ -169,9 +169,9 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   turn: number;
 }
 
-type BengalPresidency = 'Presidency_Bengal';
-type BombayPresidency = 'Presidency_Bombay';
-type MadrasPresidency = 'Presidency_Madras';
+type BengalPresidency = 'PresidencyBengal';
+type BombayPresidency = 'PresidencyBombay';
+type MadrasPresidency = 'PresidencyMadras';
 type JoCoPresidency = BengalPresidency | BombayPresidency | MadrasPresidency;
 
 type JoCoSetupCard = JoCoSetupCardBase & JocoSetupCardStatic;

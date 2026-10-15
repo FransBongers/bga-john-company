@@ -263,9 +263,9 @@ export const PUNJAB = 'Punjab';
 /**
  * Presidencies
  */
-export const BENGAL_PRESIDENCY = 'Presidency_Bengal';
-export const BOMBAY_PRESIDENCY = 'Presidency_Bombay';
-export const MADRAS_PRESIDENCY = 'Presidency_Madras';
+export const BENGAL_PRESIDENCY = 'PresidencyBengal';
+export const BOMBAY_PRESIDENCY = 'PresidencyBombay';
+export const MADRAS_PRESIDENCY = 'PresidencyMadras';
 
 export const PRESIDENCIES = [
   BENGAL_PRESIDENCY,

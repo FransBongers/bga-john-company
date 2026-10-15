@@ -14,10 +14,10 @@ class Locations
     return 'army_' . $presidencyId . '_exhausted';
   }
 
-  public static function commander(string $regionId)
+  public static function commander(string $presidencyId)
   {
     // TODO: change to presidencyId
-    return 'Commander_' . $regionId;
+    return 'Commander_' . $presidencyId;
   }
 
   public static function draft(string $familyId)

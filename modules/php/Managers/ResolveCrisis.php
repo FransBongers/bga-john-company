@@ -5,6 +5,7 @@ namespace Bga\Games\JohnCompany\Managers;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Collection;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Models\Region;
@@ -71,7 +72,7 @@ class ResolveCrisis
     return $defenderStrength;
   }
 
-  public static function resolveInvasionAgainstTheCompany(array $regions, string $attackerId, string $defenderId, int $eventTileStrength)
+  public static function resolveInvasionAgainstTheCompany(Collection $regions, string $attackerId, string $defenderId, int $eventTileStrength)
   {
     Notifications::message(clienttranslate('${tkn_boldText_attacker} invades ${tkn_boldText_defender} and attacks the ${tkn_boldText_company}'), [
       'tkn_boldText_attacker' => $regions[$attackerId]->getName(),
@@ -106,12 +107,12 @@ class ResolveCrisis
     $node->insertAsBrother(Engine::buildTree($action));
   }
 
-  public static function resolveRebellionAgainstTheCompany(array $regions, string $attackerId, int $eventTileStrength)
+  public static function resolveRebellionAgainstTheCompany(Collection $regions, string $attackerId, int $eventTileStrength)
   {
     Notifications::message(clienttranslate('${tkn_boldText_attacker} rebels against the ${tkn_boldText_company}'), [
       'tkn_boldText_attacker' => $regions[$attackerId]->getName(),
-      'tkn_boldText_defender' => clienttranslate('Company'),
-      'i18n' => ['tkn_boldText_attacker', 'tkn_boldText_defender'],
+      'tkn_boldText_company' => clienttranslate('Company'),
+      'i18n' => ['tkn_boldText_attacker', 'tkn_boldText_company'],
     ]);
     // TODO: rebellion against the company
 
@@ -119,7 +120,7 @@ class ResolveCrisis
     return false;
   }
 
-  public static function resolveRebellion(array $regions, string $attackerId, string $defenderId, int $eventTileStrength)
+  public static function resolveRebellion(Collection $regions, string $attackerId, string $defenderId, int $eventTileStrength)
   {
     Notifications::message(clienttranslate('${tkn_boldText_attacker} rebels against ${tkn_boldText_defender}'), [
       'tkn_boldText_attacker' => $regions[$attackerId]->getName(),
@@ -152,7 +153,7 @@ class ResolveCrisis
     $attacker = $regions[$attackerId];
 
     $presidencyId = $region->getControllingPresidencyId();
-    $commander = FamilyMembers::getTopOf(Locations::commander(PRESIDENCY_HOME_REGION_MAP[$presidencyId]));
+    $commander = FamilyMembers::getTopOf(Locations::commander($presidencyId));
 
     Notifications::message(clienttranslate('The ${tkn_boldText_company} loses control of ${tkn_boldText_region}'), [
       'tkn_boldText_region' => $region->getName(),
@@ -186,7 +187,7 @@ class ResolveCrisis
     // Restore Local Authority
     $region->incTowerLevel(1);
     $region->removeUnrest();
-       
+
 
     $triggeredByInvastion = $attackerId !== $regionId;
     if ($triggeredByInvastion) {

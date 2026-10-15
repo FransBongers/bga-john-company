@@ -11,17 +11,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Parisienne&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap");
-.joco-background-presidency_bombay,
+.joco-background-PresidencyBombay,
 .joco-background-bombay {
   background-color: #a1b4ab;
 }
 
-.joco-background-presidency_madras,
+.joco-background-PresidencyMadras,
 .joco-background-madras {
   background-color: #e9ca92;
 }
 
-.joco-background-presidency_bengal,
+.joco-background-PresidencyBengal,
 .joco-background-bengal {
   background-color: #b47860;
 }
@@ -1893,13 +1893,13 @@ span[style*="color:#addb90"] {
 .joco-local-alliance .joco-icon span {
   color: white;
 }
-.joco-local-alliance[data-presidency=Presidency_Bengal] {
+.joco-local-alliance[data-presidency=PresidencyBengal] {
   background-position-y: 0%;
 }
-.joco-local-alliance[data-presidency=Presidency_Bombay] {
+.joco-local-alliance[data-presidency=PresidencyBombay] {
   background-position-y: 25%;
 }
-.joco-local-alliance[data-presidency=Presidency_Madras] {
+.joco-local-alliance[data-presidency=PresidencyMadras] {
   background-position-y: 50%;
 }
 .joco-local-alliance.selectable {
@@ -2764,15 +2764,15 @@ span[style*="color:#c0c0c0"] {
   outline: 4px solid blue !important;
 }
 
-#ArmyOfPresidency_Bengal .joco-family-member-spot {
+#ArmyOfPresidencyBengal .joco-family-member-spot {
   border-color: #b47860;
 }
 
-#ArmyOfPresidency_Bombay .joco-family-member-spot {
+#ArmyOfPresidencyBombay .joco-family-member-spot {
   border-color: #a1b4ab;
 }
 
-#ArmyOfPresidency_Madras .joco-family-member-spot {
+#ArmyOfPresidencyMadras .joco-family-member-spot {
   border-color: #e9ca92;
 }
 
@@ -3002,22 +3002,22 @@ span[style*="color:#c0c0c0"] {
 .joco-presidency .joco-header span {
   color: black;
 }
-.joco-presidency#Presidency_Bengal .joco-header {
+.joco-presidency#PresidencyBengal .joco-header {
   background-color: #b47860;
 }
-.joco-presidency#Presidency_Bengal .joco-family-member-spot {
+.joco-presidency#PresidencyBengal .joco-family-member-spot {
   border-color: #b47860;
 }
-.joco-presidency#Presidency_Bombay .joco-header {
+.joco-presidency#PresidencyBombay .joco-header {
   background-color: #a1b4ab;
 }
-.joco-presidency#Presidency_Bombay .joco-family-member-spot {
+.joco-presidency#PresidencyBombay .joco-family-member-spot {
   border-color: #a1b4ab;
 }
-.joco-presidency#Presidency_Madras .joco-header {
+.joco-presidency#PresidencyMadras .joco-header {
   background-color: #e9ca92;
 }
-.joco-presidency#Presidency_Madras .joco-family-member-spot {
+.joco-presidency#PresidencyMadras .joco-family-member-spot {
   border-color: #e9ca92;
 }
 .joco-presidency.selectable {

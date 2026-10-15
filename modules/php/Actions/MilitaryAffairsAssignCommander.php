@@ -76,7 +76,7 @@ class MilitaryAffairsAssignCommander extends \Bga\Games\JohnCompany\Models\Atomi
     }
 
     $player = Players::get($playerId);
-    $commanderLocation = Locations::commander(PRESIDENCY_HOME_REGION_MAP[$presidencyId]);
+    $commanderLocation = Locations::commander($presidencyId);
 
     $currentCommander = FamilyMembers::getTopOf($commanderLocation);
     if ($currentCommander !== null) {
@@ -106,7 +106,7 @@ class MilitaryAffairsAssignCommander extends \Bga\Games\JohnCompany\Models\Atomi
 
   public function getOptions(string $presidencyId)
   {
-    $commander = FamilyMembers::getTopOf(Locations::commander(PRESIDENCY_HOME_REGION_MAP[$presidencyId]));
+    $commander = FamilyMembers::getTopOf(Locations::commander($presidencyId));
 
     $officers =
       FamilyMembers::getInLocation(Locations::armyOfReady($presidencyId))->toArray();

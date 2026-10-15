@@ -278,16 +278,18 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   public function getActingCommander()
   {
     $presidency = $this->getControl();
-    $familyMembers = FamilyMembers::getInLocation(Locations::commander(PRESIDENCY_HOME_REGION_MAP[$presidency]))->toArray();
+    $familyMember = FamilyMembers::getTopOf(Locations::commander($presidency));
     // Should always only be 1
-    if (count($familyMembers) > 0) {
-      return $familyMembers[0];
+    if ($familyMember !== null) {
+      return $familyMember;
     }
     $militaryAffairs = Offices::get(MILITARY_AFFAIRS)->getFamilyMember();
     if ($militaryAffairs !== null) {
       return $militaryAffairs;
     }
-    return Offices::get(CHAIRMAN)->getFamilyMember();
+    $chairmain = Offices::get(CHAIRMAN)->getFamilyMember();
+
+    return $chairmain;
   }
 
   public function shatterEmpire()

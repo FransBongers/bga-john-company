@@ -41,7 +41,7 @@ class President extends \Bga\Games\JohnCompany\Models\Office
 
   public function getCommander()
   {
-    $commander = FamilyMembers::getInLocation(Locations::commander($this->regionId))->toArray();
+    $commander = FamilyMembers::getInLocation(Locations::commander($this->presidencyId))->toArray();
     if (count($commander) > 0) {
       return $commander[0];
     }

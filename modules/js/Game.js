@@ -11,16 +11,16 @@ class Bar {
         this.active = 0;
         this.config = [
             {
+                id: 'joco-india',
+                text: _('India'),
+            },
+            {
                 id: 'joco-parliament',
                 text: _('Parliament'),
             },
             {
                 id: 'joco-london',
                 text: _('London'),
-            },
-            {
-                id: 'joco-india',
-                text: _('India'),
             },
             {
                 id: 'joco-families',
@@ -280,9 +280,9 @@ const MADRAS = 'Madras';
 const MARATHA = 'Maratha';
 const MYSORE = 'Mysore';
 const PUNJAB = 'Punjab';
-const BENGAL_PRESIDENCY = 'Presidency_Bengal';
-const BOMBAY_PRESIDENCY = 'Presidency_Bombay';
-const MADRAS_PRESIDENCY = 'Presidency_Madras';
+const BENGAL_PRESIDENCY = 'PresidencyBengal';
+const BOMBAY_PRESIDENCY = 'PresidencyBombay';
+const MADRAS_PRESIDENCY = 'PresidencyMadras';
 const PRESIDENCIES = [
     BENGAL_PRESIDENCY,
     BOMBAY_PRESIDENCY,
@@ -2108,7 +2108,7 @@ class Army {
           <div><span class="fb-font-baskerville fb-font-12">${_('Ready pieces').toLocaleUpperCase()}</span></div>
           <div id="army_${this.id}_ready" class="joco-army-stock"></div>
         </div>
-        <div class="joco-army-banner joco-background-${this.id.toLocaleLowerCase()}">${tplFamilyMemberSpot(this.getCommanderId())}<span class="fb-font-baskerville fb-font-16">${this.getName().toLocaleUpperCase()}</span></div>
+        <div class="joco-army-banner joco-background-${this.id}">${tplFamilyMemberSpot(this.getCommanderId())}<span class="fb-font-baskerville fb-font-16">${this.getName().toLocaleUpperCase()}</span></div>
         <div class="joco-inner-container">
           <div id="army_${this.id}_exhausted" class="joco-army-stock joco-exhausted"></div>
           <div><span class="fb-font-baskerville fb-font-12">${_('Exhausted pieces & Local Alliances').toLocaleUpperCase()}</span></div>
@@ -2138,7 +2138,7 @@ class Army {
         });
     }
     getCommanderId() {
-        return `Commander_${this.id.split('_')[1]}`;
+        return `Commander_${this.id}`;
     }
     getName() {
         switch (this.id) {
@@ -2305,7 +2305,7 @@ class Presidency {
         });
     }
     getPresidentId() {
-        return `PresidentOf${this.id.split('_')[1]}`;
+        return `PresidentOf${this.id.replace('Presidency', '')}`;
     }
     async addControlToken(controlToken) {
         await this.controlTokenStock.addCard(controlToken);
@@ -4994,6 +4994,8 @@ class CommanderDeploy extends ExhaustArmyPieces {
         debug('Entering CommanderDeploy state');
         this.args = args;
         this.presidencyId = this.args.presidencyId;
+        this.armyPieces = this.args.armyPieces;
+        this.officers = this.args.officers;
         super.onEnteringState(args);
         this.updateInterfaceInitialStep();
         Bar.getInstance().goTo('joco-india');
@@ -5025,7 +5027,7 @@ class CommanderDeploy extends ExhaustArmyPieces {
     updateInterfaceSelectArmyPieces() {
         clearPossible();
         updatePageTitle(_('Deploy: ${you} must exhaust ready pieces'), {});
-        this.setSelectablePieces(() => this.updateInterfaceConfirm());
+        this.setSelectablePieces(() => this.updateInterfaceSelectArmyPieces());
         this.setSelectedPieces();
         addPrimaryActionButton({
             id: 'done-btb',
@@ -5861,8 +5863,8 @@ class DirectorOfTradeTransfers {
         setSelected$1(writerElt);
         updatePageTitle(_('${you} must select a Presidency'));
         locations.forEach((newLocation) => {
-            const regionId = newLocation.split('_')[2];
-            onClick(`Presidency_${regionId}`, async () => {
+            const presidencyId = newLocation.split('_')[1];
+            onClick(presidencyId, async () => {
                 clearPossible();
                 this.transfers.writers[writer.id] = {
                     writer,
@@ -6846,10 +6848,10 @@ class MilitaryAffairsAssign {
         clearPossible();
         setSelected$1(officer.id);
         this.args.armies.forEach((to) => {
-            const regionId = to.split('_')[2];
-            onClick(`ArmyOfPresidency_${regionId}`, async () => {
+            const presidencyId = to.split('_')[1];
+            onClick(`ArmyOf${presidencyId}`, async () => {
                 clearPossible();
-                await India$1.getInstance().getArmy(`Presidency_${regionId}`).addPiece(officer.id);
+                await India$1.getInstance().getArmy(presidencyId).addPiece(officer.id);
                 this.assignedOfficers[officer.id] = { officer, to };
                 this.updateInterfaceInitialStep();
             });
@@ -7003,8 +7005,8 @@ class MilitaryAffairsTransfers {
         const type = regiment ? 'regiments' : 'officers';
         const piece = regiment ?? familyMember;
         locations.forEach((to) => {
-            const regionId = to.split('_')[2];
-            onClick(`ArmyOfPresidency_${regionId}`, async () => {
+            const presidencyId = to.split('_')[1];
+            onClick(`ArmyOf${presidencyId}`, async () => {
                 const from = regiment ? regiment.location : familyMember.location;
                 this.transfers[type][id] = {
                     piece,
@@ -7014,7 +7016,7 @@ class MilitaryAffairsTransfers {
                 piece.location = to;
                 clearPossible();
                 await India$1.getInstance()
-                    .getArmy(`Presidency_${regionId}`)
+                    .getArmy(presidencyId)
                     .addPiece(piece.id);
                 this.updateInterfaceInitialStep();
             });

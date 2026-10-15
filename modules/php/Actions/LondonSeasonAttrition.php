@@ -53,7 +53,7 @@ class LondonSeasonAttrition extends \Bga\Games\JohnCompany\Models\AtomicAction
 
       foreach ($offices as $office) {
         $familyMember = $office->getFamilyMember();
-        $fatigue = $familyMember->getFatigue();
+        $fatigue = $office->getFatigue();
         $modifier = $fatigue + ($office->getId() === CHAIRMAN ? 1 : 0);
 
         $dieResult = JoCoUtils::rollDie();
@@ -70,9 +70,9 @@ class LondonSeasonAttrition extends \Bga\Games\JohnCompany\Models\AtomicAction
         if ($result <= 2) {
           // Nothing happens
         } else if ($result <= 4) {
-          $familyMember->incFatigue(1);
+          $office->incFatigue(1);
         } else {
-          $familyMember->setFatigue(0);
+          $office->setFatigue(0);
           $familyMember->moveTo($player, Locations::pensioners(), [
             'skipFrom' => true
           ]);

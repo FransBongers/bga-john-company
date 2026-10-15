@@ -3,6 +3,8 @@
 namespace Bga\Games\JohnCompany;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Models\FamilyMember;
+use Bga\Games\JohnCompany\Models\Player;
 
 class JoCoUtils
 {
@@ -11,7 +13,7 @@ class JoCoUtils
     return bga_rand(1, 6);
   }
 
-  public static function makeCheck($player, $numberOfDice, $familyMember)
+  public static function makeCheck(Player $player, int $numberOfDice, FamilyMember $familyMember)
   {
     if ($numberOfDice === 0) {
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_010");
@@ -33,7 +35,11 @@ class JoCoUtils
     }
     Notifications::makeCheck($player, $dieResults, $result);
     if ($result === CATASTROPHIC_FAILURE) {
+      $office = $familyMember->getOffice();
       $familyMember->returnToSupply();
+      if ($office !== null) {
+        $office->moveToVacantOffices($player);
+      }
     }
     return $result;
   }

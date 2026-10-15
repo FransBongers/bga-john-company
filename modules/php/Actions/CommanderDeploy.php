@@ -154,7 +154,7 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_052");
     }
 
-    $familyMember = FamilyMembers::getInLocation(Locations::commander($stateArgs['regionId']))->toArray()[0];
+    $familyMember = FamilyMembers::getInLocation(Locations::commander($stateArgs['presidencyId']))->toArray()[0];
     $checkResult = JoCoUtils::makeCheck($player, $numberOfDice, $familyMember);
 
     $survivingPieces = $this->checkForLosses($selectedPieces);

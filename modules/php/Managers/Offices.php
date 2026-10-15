@@ -16,6 +16,7 @@ class Offices extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   protected static $customFields = [
     'treasury',
     'family_member_id',
+    'fatigue',
   ];
   protected static $autoremovePrefix = false;
   protected static $autoreshuffle = false;

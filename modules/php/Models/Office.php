@@ -19,6 +19,7 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   protected $treasury = 0;
   protected $hirePriority;
   protected $title;
+  protected $fatigue;
   protected $familyMemberId;
 
   public function __construct($row)
@@ -32,6 +33,7 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     'id' => ['office_id', 'str'],
     'location' => 'office_location',
     'state' => ['office_state', 'int'],
+    'fatigue' => ['fatigue', 'int'],
     'treasury' => ['treasury', 'int'],
     'familyMemberId' => ['family_member_id', 'str'],
   ];

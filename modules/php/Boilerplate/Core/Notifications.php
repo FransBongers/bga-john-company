@@ -282,14 +282,14 @@ class Notifications
     ];
   }
 
-  private static function getRegionNameForArmy($armyLocation)
+  private static function getRegionNameForArmy(string $armyLocation)
   {
-    $regionId = explode('_', $armyLocation)[2];
+    $regionId = explode('_', $armyLocation)[1];
 
     $idNameMap = [
-      BENGAL => clienttranslate('Bengal'),
-      BOMBAY => clienttranslate('Bombay'),
-      MADRAS => clienttranslate('Madras'),
+      BENGAL_PRESIDENCY => clienttranslate('Bengal'),
+      BOMBAY_PRESIDENCY => clienttranslate('Bombay'),
+      MADRAS_PRESIDENCY => clienttranslate('Madras'),
     ];
     return $idNameMap[$regionId];
   }

@@ -48,6 +48,8 @@ export class CommanderDeploy
     debug('Entering CommanderDeploy state');
     this.args = args;
     this.presidencyId = this.args.presidencyId;
+    this.armyPieces = this.args.armyPieces;
+    this.officers = this.args.officers;
     super.onEnteringState(args);
 
     this.updateInterfaceInitialStep();
@@ -106,7 +108,7 @@ export class CommanderDeploy
 
     updatePageTitle(_('Deploy: ${you} must exhaust ready pieces'), {});
 
-    this.setSelectablePieces(() => this.updateInterfaceConfirm());
+    this.setSelectablePieces(() => this.updateInterfaceSelectArmyPieces());
 
     this.setSelectedPieces();
 

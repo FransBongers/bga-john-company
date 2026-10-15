@@ -12,7 +12,7 @@ class Setup1710_09 extends \Bga\Games\JohnCompany\Models\SetupCard
     $this->items = [
       [
         'type' => COMMANDER,
-        'value' => MADRAS,
+        'value' => MADRAS_PRESIDENCY,
       ],
       [
         'type' => WRITER,

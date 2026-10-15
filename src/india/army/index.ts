@@ -71,7 +71,7 @@ export class Army {
           <div><span class="fb-font-baskerville fb-font-12">${_('Ready pieces').toLocaleUpperCase()}</span></div>
           <div id="army_${this.id}_ready" class="joco-army-stock"></div>
         </div>
-        <div class="joco-army-banner joco-background-${this.id.toLocaleLowerCase()}">${tplFamilyMemberSpot(this.getCommanderId())}<span class="fb-font-baskerville fb-font-16">${this.getName().toLocaleUpperCase()}</span></div>
+        <div class="joco-army-banner joco-background-${this.id}">${tplFamilyMemberSpot(this.getCommanderId())}<span class="fb-font-baskerville fb-font-16">${this.getName().toLocaleUpperCase()}</span></div>
         <div class="joco-inner-container">
           <div id="army_${this.id}_exhausted" class="joco-army-stock joco-exhausted"></div>
           <div><span class="fb-font-baskerville fb-font-12">${_('Exhausted pieces & Local Alliances').toLocaleUpperCase()}</span></div>
@@ -122,7 +122,7 @@ export class Army {
   // ..#######.....##....####.########.####....##.......##...
 
   private getCommanderId() {
-    return `Commander_${this.id.split('_')[1]}`;
+    return `Commander_${this.id}`;
   }
 
   public getName() {

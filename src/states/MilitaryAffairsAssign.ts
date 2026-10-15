@@ -122,11 +122,11 @@ export class MilitaryAffairsAssign implements GameState<OnEnteringMilitaryAffair
     setSelected(officer.id);
 
     this.args.armies.forEach((to) => {
-      const regionId = to.split('_')[2];
-      onClick(`ArmyOfPresidency_${regionId}`, async () => {
+      const presidencyId = to.split('_')[1];
+      onClick(`ArmyOf${presidencyId}`, async () => {
         
         clearPossible();
-        await India.getInstance().getArmy(`Presidency_${regionId}`).addPiece(officer.id);
+        await India.getInstance().getArmy(presidencyId).addPiece(officer.id);
         this.assignedOfficers[officer.id] = { officer, to };
         this.updateInterfaceInitialStep();
       });

@@ -98,11 +98,11 @@ class HiringHireFamilyMember extends \Bga\Games\JohnCompany\Models\AtomicAction
   private function getPreviousFunctionFromLocation(string $location): string
   {
     switch ($location) {
-      case 'Commander_Bengal':
+      case Locations::commander(BENGAL_PRESIDENCY):
         return clienttranslate('Commander of the Army of Bengal');
-      case 'Commander_Bombay':
+      case Locations::commander(BOMBAY_PRESIDENCY):
         return clienttranslate('Commander of the Army of Bombay');
-      case 'Commander_Madras':
+      case Locations::commander(MADRAS_PRESIDENCY):
         return clienttranslate('Commander of the Army of Madras');
       case OFFICER_IN_TRAINING:
         return clienttranslate('Officer-in-Training');

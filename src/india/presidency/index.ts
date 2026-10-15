@@ -152,7 +152,7 @@ export class Presidency {
   // ..#######.....##....####.########.####....##.......##...
 
   private getPresidentId() {
-    return `PresidentOf${this.id.split('_')[1]}`;
+    return `PresidentOf${this.id.replace('Presidency', '')}`;
   }
 
   public async addControlToken(controlToken: JocoControlToken) {

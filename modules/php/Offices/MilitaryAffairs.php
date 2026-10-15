@@ -20,10 +20,9 @@ class MilitaryAffairs extends \Bga\Games\JohnCompany\Models\Office
   {
     $commanders = [];
     foreach (PRESIDENCIES as $presidencyId) {
-      $homeRegionId = PRESIDENCY_HOME_REGION_MAP[$presidencyId];
       $commanders = array_merge(
         $commanders,
-        FamilyMembers::getInLocation(Locations::commander($homeRegionId))->toArray()
+        FamilyMembers::getInLocation(Locations::commander($presidencyId))->toArray()
       );
     }
     if (count($commanders) > 0) {

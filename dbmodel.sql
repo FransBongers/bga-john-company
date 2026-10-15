@@ -93,7 +93,6 @@ CREATE TABLE IF NOT EXISTS `family_members` (
   `family_member_state` int(10) DEFAULT 0,
   `family_id` varchar(16) NOT NULL,
   `presidency` varchar(32) DEFAULT NULL,
-  `fatigue` int(10) DEFAULT 0,
   PRIMARY KEY (`family_member_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 CREATE TABLE IF NOT EXISTS `law_cards` (
@@ -117,6 +116,7 @@ CREATE TABLE IF NOT EXISTS `offices` (
   `office_state` int(10) DEFAULT 0,
   `treasury` int(10) DEFAULT 0,
   `family_member_id` varchar(32) NULL,
+  `fatigue` int(10) DEFAULT 0,
   PRIMARY KEY (`office_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 CREATE TABLE IF NOT EXISTS `orders` (

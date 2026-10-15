@@ -16,7 +16,6 @@ class FamilyMembers extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   protected static $prefix = 'family_member_';
   protected static $customFields = [
     'family_id',
-    'fatigue',
     'presidency',
   ];
   protected static $autoremovePrefix = false;
