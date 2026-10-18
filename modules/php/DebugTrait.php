@@ -25,6 +25,7 @@ use Bga\Games\JohnCompany\Models\Enterprise;
 use Bga\Games\JohnCompany\Models\FamilyMember;
 use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Managers\AtomicActions;
+use Bga\Games\JohnCompany\Managers\ControlTokens;
 use Bga\Games\JohnCompany\Managers\Elephant;
 use Bga\Games\JohnCompany\Managers\EventTiles;
 use Bga\Games\JohnCompany\Managers\Parliament;
@@ -40,7 +41,13 @@ trait DebugTrait
 
   function debug_test()
   {
-    AtomicActions::get(EVENTS_IN_INDIA_STORMS)->rollForShips(ONE_ALL);
+
+    // $topOfDeck = EventTiles::getTopOf(DECK);
+    // $regionName = $topOfDeck !== null ? Regions::get($topOfDeck->getRegionId())->getName() : null;
+    Notifications::log('debug region', EventTiles::getTopOf(DECK));
+
+
+    // AtomicActions::get(EVENTS_IN_INDIA_STORMS)->rollForShips(ONE_ALL);
     // Offices::get(PRESIDENT_OF_MADRAS)->setLocation(Locations::vacantOffices());
     // $parliament = Globals::getParliament();
     // $parliament[OPPOSITION] = [
@@ -50,8 +57,8 @@ trait DebugTrait
     // Globals::setParliament($parliament);
     // $chairmanFamily = Families::getChairmanFamily();
     // $playerId = Players::getPlayerForFamily($chairmanFamily->getId());
-    
-    // Notifications::log('debug', $playerId);
+
+    // Notifications::log('debug', ControlTokens::getByRegion(MADRAS));
 
     // Parliament::setSupport(-5);
     // $data = Globals::getParliament();

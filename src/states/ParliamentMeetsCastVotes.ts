@@ -22,6 +22,7 @@ import { GameAlias } from '../types';
 interface OnEnteringParliamentMeetsCastVotesArgs extends CommonStateArgs {
   votes: {
     money: number;
+    pricePerVote: number;
     enterprises: { id: string; votes: number }[];
     londonSeasonCards: { id: string; votes: number }[];
   };
@@ -111,9 +112,9 @@ export class ParliamentMeetsCastVotes implements GameState<OnEnteringParliamentM
       id: 'minus_btn',
       text: '-',
       callback: () => {
-        this.spend--;
-        this.treasury++;
-        this.getCashCounter().incValue(1);
+        this.spend -= this.args.votes.pricePerVote;
+        this.treasury += this.args.votes.pricePerVote;
+        this.getCashCounter().incValue(this.args.votes.pricePerVote);
         this.updateInterfaceInitialStep();
       },
       extraClasses: this.spend === 0 ? DISABLED : '',
@@ -144,12 +145,12 @@ export class ParliamentMeetsCastVotes implements GameState<OnEnteringParliamentM
       id: 'plus_btn',
       text: '+',
       callback: () => {
-        this.spend++;
-        this.treasury--;
-        this.getCashCounter().incValue(-1);
+        this.spend += this.args.votes.pricePerVote;
+        this.treasury -= this.args.votes.pricePerVote;
+        this.getCashCounter().incValue(-this.args.votes.pricePerVote);
         this.updateInterfaceInitialStep();
       },
-      extraClasses: this.treasury === 0 ? DISABLED : '',
+      extraClasses: this.treasury < this.args.votes.pricePerVote ? DISABLED : '',
     });
 
     if (totalVotes <= 0) {
@@ -237,7 +238,7 @@ export class ParliamentMeetsCastVotes implements GameState<OnEnteringParliamentM
     const londonSeasonVotes = this.args.votes.londonSeasonCards
       .filter((card) => this.selectedLondonSeasonCardIds.includes(card.id))
       .reduce((total, card) => total + card.votes, 0);
-    return this.spend + enterpriseVotes + londonSeasonVotes;
+    return (this.spend / this.args.votes.pricePerVote) + enterpriseVotes + londonSeasonVotes;
   }
 
   private setSelected() {

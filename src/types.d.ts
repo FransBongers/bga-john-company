@@ -117,6 +117,7 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
     balance: number;
     standing: number | 'fail';
   };
+  controlTokens: Record<string, JocoControlToken>;
   crown?: {
     color: string;
     climate?: Climate;
@@ -126,6 +127,11 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
     facing: string;
   };
   enterprises: Record<string, JocoEnterpriseCardBase>;
+  eventTiles: {
+    deck: JocoEventTileBase | null;
+    discard: JocoEventTileBase | null;
+    all: JocoEventTileBase[];
+  };
   families: Record<string, JocoFamily>;
   familyMembers: Record<string, JocoFamilyMember>;
   londonSeason: {
@@ -159,6 +165,7 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   staticData: {
     armyPieces: Record<string, JocoArmyPieceStatic>;
     enterpriseCards: Record<string, JocoEnterpriseCardStatic>;
+    eventTiles: Record<string, JocoEventTileStatic>;
     lawCards: Record<string, JocoLawCardStatic>;
     londonSeasonCards: Record<string, JocoLondonSeasonCardStatic>;
     offices: Record<string, JocoOfficeStatic>;
@@ -228,6 +235,30 @@ interface JocoFamilyMember {
   familyId: string;
   presidency: JoCoPresidency | null;
 }
+
+/**
+ * Control Tokens
+ */
+export interface JocoControlToken extends GamePiece {
+  looted: boolean;
+}
+
+/**
+ * Event Tiles
+ */
+export interface JocoEventTileBase extends GamePiece {
+  // type: string;
+  // hiddenId?: string;
+}
+
+export interface JocoEventTileStatic {
+  regionId: string;
+  background: string;
+  title: string;
+  type: string;
+}
+
+export type JocoEventTile = JocoEventTileBase & JocoEventTileStatic;
 
 /*
  * London Season Cards
@@ -380,11 +411,4 @@ interface JocoShipBase extends GamePiece {
   side: string;
   name: string;
   owner: number | null;
-}
-
-interface JocoControlToken {
-  id: string;
-  side: 'loot' | 'control';
-  loot: number;
-  regionId: string;
 }

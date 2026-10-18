@@ -1,8 +1,8 @@
 .joco-storm-die {
   background-image: url('img/storm_die.png');
   background-size: 500% 100%;
-  width: calc(var(--iconScale) * 50px);
-  height: calc(var(--iconScale) * 50px);
+  height: 50px;
+  aspect-ratio: 1 / 1;
 }
 
 .joco-storm-die[data-side="four"] {

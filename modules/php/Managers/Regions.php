@@ -14,7 +14,6 @@ class Regions extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   protected static $table = 'regions';
   protected static $prefix = 'region_';
   protected static $customFields = [
-    'looted',
     'unrest',
     'strength',
     'control',

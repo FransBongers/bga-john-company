@@ -75,7 +75,7 @@ class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     return $this->header === 'dilemma';
   }
 
-  public function resolveImmediateEffects($passed = true)
+  public function resolveImmediateEffects($ctx, $passed = true)
   {
     // Resolve any immediate effects of the law
   }

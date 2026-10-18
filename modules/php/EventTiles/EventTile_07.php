@@ -11,5 +11,6 @@ class EventTile_07 extends \Bga\Games\JohnCompany\EventTiles\Crisis
     $this->regionId = MYSORE;
     $this->shape = SQUARE;
     $this->strength = 2;
+    $this->background = 'crisis_square_2';
   }
 }

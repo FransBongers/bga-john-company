@@ -2,6 +2,7 @@
 
 namespace Bga\Games\JohnCompany\Managers;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
@@ -86,12 +87,28 @@ class Elephant
     ]);
   }
 
+  public static function insertMarchNode($ctx, $capitalRegionId = null)
+  {
+    $action = [
+      'action' => EVENTS_IN_INDIA_ELEPHANT_MARCH,
+      'args' => [
+        'capitalRegionId' => $capitalRegionId,
+      ]
+    ];
+    $ctx->insertAsBrother(Engine::buildTree($action));
+  }
+
   /**
    * if capitalRegionId is set there was a successful Invasion Crisis and
    * elephant needs to be moved to the capitals's region (Imperial Ambitions);
    */
-  public static function march($shape, $capitalRegionId = null)
+  public static function march($capitalRegionId = null)
   {
+    $topTile = EventTiles::getTopOf(DISCARD);
+    if ($topTile === null) {
+      throw new \Bga\GameFramework\VisibleSystemException("ELEPHANT_001");
+    }
+    $shape = $topTile->getShape();
     $regionId = $capitalRegionId === null ? EventTiles::getRegionIdForEvent() : $capitalRegionId;
 
     $region = Regions::get($regionId);

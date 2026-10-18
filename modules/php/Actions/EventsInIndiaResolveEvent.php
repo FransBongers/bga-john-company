@@ -4,6 +4,7 @@ namespace Bga\Games\JohnCompany\Actions;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Managers\ArmyPieces;
@@ -51,11 +52,11 @@ class EventsInIndiaResolveEvent extends \Bga\Games\JohnCompany\Models\AtomicActi
       $this->ctx->insertAsBrother(Engine::buildTree($action));
     }
     $eventTile = EventTiles::getTopOf(DECK);
-    EventTiles::insertOnTop($eventTile->getId(), DISCARD);
+    $eventTile->draw();
 
     $regionId = EventTiles::getRegionIdForEvent();
 
-    $eventTile->resolveEvent($regionId);
+    $eventTile->resolveEvent($regionId, $this->ctx);
 
     $this->resolveAction(['automatic' => true]);
   }

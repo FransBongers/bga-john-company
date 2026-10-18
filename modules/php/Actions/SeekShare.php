@@ -128,7 +128,10 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $isDoable = $this->canBePerformedBy($family);
     if (!$isDoable) {
-      Notifications::message(clienttranslate('${player_name} cannot seek another share'), []);
+      Notifications::message(clienttranslate('${player_name} cannot seek another share'), [
+        'player' => Players::get($playerId),
+      ]);
+      return;
     }
 
     $this->ctx->insertAsBrother(new LeafNode([

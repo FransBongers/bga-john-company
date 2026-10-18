@@ -3,6 +3,7 @@
 namespace Bga\Games\JohnCompany\EventTiles;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
@@ -23,18 +24,19 @@ class Crisis extends \Bga\Games\JohnCompany\Models\EventTile
     $this->type = CRISIS;
   }
 
-  public function resolveEvent(string $regionId)
+  public function resolveEvent(string $regionId, $ctx)
   {
-    parent::resolveEvent($regionId);
+    // parent::resolveEvent($regionId, $ctx);
 
     $elephantLocation = Elephant::getLocation();
 
     $regions = Regions::getAll();
 
+    $type = null;
+
     if (!Elephant::isOnBorder()) {
       // Elephant is in Region. Rebellion against the Company
-      ResolveCrisis::resolveRebellionAgainstTheCompany($regions, $elephantLocation, $this->strength);
-      // TODO: elephant march
+      $this->insertResolveCrisisNode($ctx, REBELLION_AGAINST_COMPANY, $elephantLocation, null, $this->strength);
       return;
     }
 
@@ -43,15 +45,33 @@ class Crisis extends \Bga\Games\JohnCompany\Models\EventTile
     $attackerId = Utils::array_find($regionIds, function ($regionId) use ($defenderId) {
       return $regionId !== $defenderId;
     });
+    $type = null;
     if ($regions[$attackerId]->isDominatedByRegion()) {
-      ResolveCrisis::resolveRebellion($regions, $attackerId, $defenderId, $this->strength);
-      Elephant::march($this->shape);
+      $type = REBELLION;
     } else if ($regions[$defenderId]->isCompanyControlled()) {
-      ResolveCrisis::resolveInvasionAgainstTheCompany($regions, $attackerId, $defenderId, $this->strength);
-      // TODO: elephant march
+      $type = INVASION_AGAINST_COMPANY;
     } else {
-      $successfulInvasion = ResolveCrisis::resolveInvasion($regions, $attackerId, $defenderId, $this->strength);
-      Elephant::march($this->shape, $successfulInvasion ? $attackerId : null);
+      $type = INVASION;
     }
+    $this->insertResolveCrisisNode($ctx, $type, $attackerId, $defenderId, $this->strength);
+  }
+
+  private function insertResolveCrisisNode($ctx, string $type, string $attackerId, string | null $defenderId, int $eventTileStrength)
+  {
+    $ctx->insertAsBrother(new LeafNode([
+      'action' => EVENTS_IN_INDIA_RESOLVE_CRISIS,
+      'args' => [
+        'type' => $type,
+        'attackerId' => $attackerId,
+        'defenderId' => $defenderId,
+        'eventTileStrength' => $eventTileStrength,
+        'primaryCrisis' => true,
+      ]
+    ]));
+  }
+
+  public function getNotificationText()
+  {
+    return '${tkn_boldText_eventTitle}';
   }
 }

@@ -4,6 +4,11 @@ namespace Bga\Games\JohnCompany\Boilerplate\Helpers;
 
 class Locations
 {
+  public static function controlToken(string $regionId)
+  {
+    return $regionId;
+  }
+
   public static function armyOfReady(string $presidencyId)
   {
     return 'army_' . $presidencyId . '_ready';

@@ -78,18 +78,13 @@ export class Region {
       createHtmlElement(tplGovernorOverlay(data.id)),
     );
 
-    map.insertAdjacentHTML(
-      'beforeend',
-      tplUnrestContainer(data.id),
-    );
+    map.insertAdjacentHTML('beforeend', tplUnrestContainer(data.id));
 
     this.ui = {
       governorOverlay: document.getElementById(
         `joco-governor-overlay-${data.id}`,
       ),
-      unrestContainer: document.getElementById(
-        `joco-unrest-${data.id}`,
-      ),
+      unrestContainer: document.getElementById(`joco-unrest-${data.id}`),
     };
 
     this.controlTokenStock = new BgaCards.LineStock<JocoControlToken>(
@@ -99,7 +94,7 @@ export class Region {
 
     this.setupShipStock(game.gamedatas);
 
-    this.updateControlToken(data);
+    this.updateControlToken(game.gamedatas);
     this.updateStrength(data.strength);
     this.updateCapital(data.isCapital);
     this.updateEmpire(data.isCapital, data.control);
@@ -159,11 +154,12 @@ export class Region {
     }
   }
 
-  public updateControlToken(data: JocoRegionBase) {
-    if (data.control?.startsWith('Presidency')) {
+  public updateControlToken(gamedatas: GamedatasAlias) {
+    const token = gamedatas.controlTokens[`ControlToken_${this.data.id}`];
+    if (!token || token.location !== this.data.id) {
       return;
     }
-    this.controlTokenStock.addCard(createControlToken(data));
+    this.controlTokenStock.addCard(token);
   }
 
   public updateEmpire(isCapital: boolean, control: string | null) {
@@ -218,10 +214,13 @@ export class Region {
 
   public updateUnrest(value: number) {
     this.data.unrest = value;
-    
+
     this.ui.unrestContainer.replaceChildren();
     for (let i = 0; i < value; i++) {
-      this.ui.unrestContainer.insertAdjacentHTML('beforeend', tplCube('unrest'));
+      this.ui.unrestContainer.insertAdjacentHTML(
+        'beforeend',
+        tplCube('unrest'),
+      );
     }
   }
 
@@ -240,8 +239,6 @@ export class Region {
     return this.controlTokenStock.contains(token);
   }
 
-
-
   // .##.....##.########.####.##.......####.########.##....##
   // .##.....##....##.....##..##........##.....##.....##..##.
   // .##.....##....##.....##..##........##.....##......####..
@@ -249,6 +246,10 @@ export class Region {
   // .##.....##....##.....##..##........##.....##.......##...
   // .##.....##....##.....##..##........##.....##.......##...
   // ..#######.....##....####.########.####....##.......##...
+
+  public async addControlToken(controlToken: JocoControlToken) {
+    await this.controlTokenStock.addCard(controlToken);
+  }
 
   public async addShip(ship: JocoShipBase, fromSea = null) {
     if (fromSea) {

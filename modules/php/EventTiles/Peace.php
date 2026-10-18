@@ -32,9 +32,9 @@ class Peace extends \Bga\Games\JohnCompany\Models\EventTile
     $this->type = PEACE;
   }
 
-  public function resolveEvent(string $regionId)
+  public function resolveEvent(string $regionId, $ctx)
   {
-    parent::resolveEvent($regionId);
+    // parent::resolveEvent($regionId, $ctx);
     $elephantLocation = Elephant::getLocation();
 
     $isOnBorder = in_array($elephantLocation, BORDERS);
@@ -45,14 +45,14 @@ class Peace extends \Bga\Games\JohnCompany\Models\EventTile
       // is in region
       $this->openAllOrdersInRegionAndRemoveUnrest($elephantLocation);
     }
-    Elephant::march($this->shape);
+    Elephant::march();
   }
 
   private function addTowerLevels($border)
   {
     $regions = Regions::getAll();
 
-    foreach(BORDERS_CONNECTED_REGIONS_MAP[$border] as $regionId) {
+    foreach (BORDERS_CONNECTED_REGIONS_MAP[$border] as $regionId) {
       $region = $regions[$regionId];
       if (!$region->isCompanyControlled()) {
         $region->incTowerLevel(1);
@@ -60,11 +60,11 @@ class Peace extends \Bga\Games\JohnCompany\Models\EventTile
     }
   }
 
-  private function openAllOrdersInRegionAndRemoveUnrest($regionId) 
+  private function openAllOrdersInRegionAndRemoveUnrest($regionId)
   {
     $region = Regions::get($regionId);
     $orders = $region->getOrders();
-    foreach($orders as $order) {
+    foreach ($orders as $order) {
       if ($order->getStatus() === CLOSED) {
         $order->open();
       }
@@ -77,11 +77,16 @@ class Peace extends \Bga\Games\JohnCompany\Models\EventTile
   {
     $orders = Orders::getAll();
 
-    foreach($this->bordersConnectedOrdersMap[$border] as $orderId) {
+    foreach ($this->bordersConnectedOrdersMap[$border] as $orderId) {
       $order = $orders[$orderId];
       if ($order->getStatus() === CLOSED) {
         $order->open();
       }
     }
+  }
+
+  public function getNotificationText()
+  {
+    return '${tkn_boldText_eventTitle}';
   }
 }

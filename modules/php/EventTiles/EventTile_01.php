@@ -11,5 +11,6 @@ class EventTile_01 extends \Bga\Games\JohnCompany\EventTiles\Crisis
     $this->regionId = DELHI;
     $this->shape = TRIANGLE;
     $this->strength = 0;
+    $this->background = 'crisis_triangle_0';
   }
 }

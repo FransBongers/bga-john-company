@@ -20,7 +20,8 @@ class Delhi extends \Bga\Games\JohnCompany\Models\Region
     $this->exportIcons = 1;
     $this->orderIds = [
       ORDER_DELHI_1,
-      ORDER_DELHI_2
+      ORDER_DELHI_2,
+      ORDER_DELHI_3,
     ];
     $this->adjacentRegionBorderMap = [
       BENGAL => BENGAL_DELHI_BORDER,

@@ -1,0 +1,184 @@
+@use '../../base';
+@use 'sass:math';
+@use 'sass:map';
+
+.joco-event-tile-container {
+  // .bga-cards_card-sides {
+  // border-radius: 100%;
+  // }
+}
+
+.joco-event-tile {
+  width: 300px;
+  aspect-ratio: 1 / 1;
+  background-image: url('img/ganjifa_tiles.webp');
+  background-size: 600% 400%;
+
+  .joco-event-tile-title {
+    // position: absolute;
+    top: 35px;
+    left: 25px;
+    width: 250px;
+    height: 60px;
+    line-height: 28px;
+
+    // text-align: center;
+    // background-color: rgba(yellow, 0.5);
+  }
+
+  .joco-event-tile-text {
+    // position: absolute;
+    top: 135px;
+    left: 25px;
+    width: 250px;
+    height: 60px;
+    // background-color: rgba(yellow, 0.5);
+    // text-align: center;
+    // line-height: 16px;
+  }
+
+  &[data-type='Crisis'] {
+    .joco-event-tile-imperial-ambitions {
+      top: 212px;
+      left: 89px;
+      width: 126px;
+      height: 16px;
+    }
+    .joco-event-tile-otherwise {
+      top: 232px;
+      left: 121px;
+      width: 58px;
+      height: 10px;
+    }
+    .joco-event-tile-top-of-stack {
+      top: 246px;
+      left: 108px;
+      width: 84px;
+      height: 16px;
+      // line-height: 12px;
+    }
+    .joco-event-tile-top-of-stack-sub {
+      top: 262px;
+      left: 108px;
+      width: 84px;
+      height: 12px;
+      font-size: 6px;
+    }
+  }
+
+  &[data-type='ForeignInvasion'] {
+    .joco-event-tile-text {
+      top: 155px;
+      left: 30px;
+      height: 105px;
+      width: 240px;
+    }
+  }
+
+  &[data-type='Leader'] {
+    .joco-event-tile-leader-left,
+    .joco-event-tile-leader-right {
+      width: 90px;
+      height: 32px;
+    }
+
+    .joco-event-tile-leader-left {
+      top: 182px;
+      left: 44px;
+    }
+    .joco-event-tile-leader-right {
+      top: 182px;
+      left: 159px;
+    }
+  }
+
+  &[data-type='Peace'] {
+    .joco-event-tile-text {
+      top: 164px;
+      left: 30px;
+      height: 56px;
+      width: 240px;
+    }
+
+    .joco-event-tile-top-of-stack {
+      top: 229px;
+      left: 118px;
+      width: 74px;
+      height: 16px;
+    }
+    .joco-event-tile-top-of-stack-sub {
+      top: 245px;
+      left: 118px;
+      width: 74px;
+      height: 12px;
+      font-size: 6px;
+    }
+  }
+
+  &[data-type='Shuffle'] {
+    .joco-event-tile-text {
+      top: 170px;
+      left: 50px;
+      width: 200px;
+    }
+  }
+
+  &[data-type='Turmoil'] {
+    .joco-event-tile-text {
+      top: 175px;
+    }
+  }
+
+  &[data-type='Windfall'] {
+    .joco-event-tile-text {
+      top: 190px;
+      left: 50px;
+      width: 200px;
+      height: 40px;
+    }
+  }
+}
+
+$tiles: (
+  1: 'Bengal',
+  2: 'Bombay',
+  3: 'Delhi',
+  4: 'Hyderabad',
+  5: 'Madras',
+  6: 'Maratha',
+  7: 'Mysore',
+  8: 'Punjab',
+  9: 'crisis_circle_1_minus',
+  10: 'crisis_circle_3',
+  11: 'crisis_square_1',
+  12: 'crisis_square_2',
+  13: 'crisis_triangle_0',
+  14: 'crisis_triangle_1',
+  15: 'foreign_invasion',
+  16: 'leader_circle_3',
+  17: 'leader_square_2',
+  18: 'leader_triangle_2',
+  19: 'leader_triangle_4',
+  20: 'peace_square',
+  21: 'peace_triangle',
+  22: 'shuffle_circle',
+  23: 'turmoil',
+  24: 'windfall',
+);
+
+$cols: 6;
+$rows: 4;
+
+@for $i from 1 through 24 {
+  $index: $i - 1;
+  $col: $index % $cols;
+  $row: math.floor(math.div($index, $cols));
+
+  .joco-event-tile[data-background='#{map.get($tiles,$i)}'] {
+    // For a sprite sheet with $cols columns and $rows rows where
+    // background-size is ($cols * 100%) by ($rows * 100%),
+    // positions run from 0% to 100% inclusive so the step is 100% / ($cols - 1) or ($rows - 1).
+    background-position-x: math.div($col * 100%, $cols - 1);
+    background-position-y: math.div($row * 100%, $rows - 1);
+  }
+}

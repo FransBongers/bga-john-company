@@ -30,6 +30,8 @@ interface OnEnteringResolveChoiceArgs extends CommonStateArgs {
   descSuffix: 'xor'; // Can be removed
   buttonType: 'primary' | 'secondary';
   description?: string;
+  descriptionmyturn?: string;
+  textArgs: Record<string, unknown>;
 }
 
 export class ResolveChoice implements GameState<OnEnteringResolveChoiceArgs> {
@@ -58,7 +60,7 @@ export class ResolveChoice implements GameState<OnEnteringResolveChoiceArgs> {
   setDescription(activePlayerId: number, args: OnEnteringResolveChoiceArgs) {
     this.args = args;
     if (this.args.description && typeof this.args.description === 'string') {
-      updatePageTitle(_(this.args.description));
+      updatePageTitle(_(this.args.description), this.args.textArgs);
     } else if (
       this.args.description &&
       typeof this.args.description === 'object'
@@ -94,8 +96,8 @@ export class ResolveChoice implements GameState<OnEnteringResolveChoiceArgs> {
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
 
-    if (this.args.description && typeof this.args.description === 'string') {
-      updatePageTitle(_(this.args.description));
+    if (this.args.descriptionmyturn && typeof this.args.descriptionmyturn === 'string') {
+      updatePageTitle(_(this.args.descriptionmyturn), this.args.textArgs);
     } else if (
       this.args.description &&
       typeof this.args.description === 'object'

@@ -11,5 +11,6 @@ class EventTile_03 extends \Bga\Games\JohnCompany\EventTiles\Crisis
     $this->regionId = MARATHA;
     $this->shape = CIRCLE;
     $this->strength = 3;
+    $this->background = 'crisis_circle_3';
   }
 }

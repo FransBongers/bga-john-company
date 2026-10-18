@@ -11,5 +11,6 @@ class EventTile_02 extends \Bga\Games\JohnCompany\EventTiles\Crisis
     $this->regionId = PUNJAB;
     $this->shape = CIRCLE;
     $this->strength = -1;
+    $this->background = 'crisis_circle_1_minus';
   }
 }

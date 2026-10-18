@@ -52,6 +52,7 @@ class CommanderPurchaseLocalAlliance extends \Bga\Games\JohnCompany\Models\Atomi
           'player' => Players::get($args['commanderPlayerId'])
         ]);
       }
+      Game::get()->gamestate->setPlayerNonMultiactive($args['commanderPlayerId'], 'next');
       $this->resolveAction(['automatic' => true]);
     }
   }

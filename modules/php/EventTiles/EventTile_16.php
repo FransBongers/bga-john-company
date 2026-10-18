@@ -10,10 +10,6 @@ class EventTile_16 extends \Bga\Games\JohnCompany\EventTiles\Peace
     $this->id = 'EventTile_16';
     $this->regionId = MADRAS;
     $this->shape = TRIANGLE;
+    $this->background = 'peace_triangle';
   }
-
-  // public function resolveEvent($regionId)
-  // {
-    
-  // }
 }

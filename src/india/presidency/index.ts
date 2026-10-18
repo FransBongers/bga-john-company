@@ -86,9 +86,9 @@ export class Presidency {
       document.getElementById(`joco-control-tokens-${this.id}`),
     );
 
-    Object.values(gamedatas.regions).forEach((region) => {
-      if (region.control === this.id) {
-        this.controlTokenStock.addCard(createControlToken(region));
+    Object.values(gamedatas.controlTokens).forEach((token) => {
+      if (token.location === this.id) {
+        this.controlTokenStock.addCard(token);
       }
     });
   }

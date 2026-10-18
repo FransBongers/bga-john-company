@@ -18,9 +18,9 @@ class Shuffle extends \Bga\Games\JohnCompany\Models\EventTile
     $this->type = SHUFFLE;
   }
 
-  public function resolveEvent(string $regionId)
+  public function resolveEvent(string $regionId, $ctx)
   {
-    parent::resolveEvent($regionId);
+    // parent::resolveEvent($regionId, $ctx);
     $elephantMarchLast = EventTiles::countInLocation(DECK) === 0;
     if (!$elephantMarchLast) {
       Elephant::march($this->shape);
@@ -43,5 +43,10 @@ class Shuffle extends \Bga\Games\JohnCompany\Models\EventTile
     if ($elephantMarchLast) {
       Elephant::march($this->shape);
     }
+  }
+
+  public function getNotificationText()
+  {
+    return '${tkn_boldText_eventTitle}';
   }
 }

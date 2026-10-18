@@ -11,5 +11,6 @@ class EventTile_20 extends \Bga\Games\JohnCompany\EventTiles\Leader
     $this->regionId = BOMBAY;
     $this->shape = SQUARE;
     $this->strength = 2;
+    $this->background = 'leader_square_2';
   }
 }

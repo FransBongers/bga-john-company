@@ -448,3 +448,13 @@ export const PRIZES: Record<string, JocoPrize> = {
  */
 export const REGIMENT = 'Regiment';
 
+/**
+ * Event Types
+ */
+export const FOREIGN_INVASION = 'ForeignInvasion'; // Doubles as action name
+export const LEADER = 'Leader';
+export const PEACE = 'Peace';
+export const CRISIS = 'Crisis';
+export const SHUFFLE = 'Shuffle';
+export const TURMOIL = 'Turmoil';
+export const WINDFALL = 'Windfall';

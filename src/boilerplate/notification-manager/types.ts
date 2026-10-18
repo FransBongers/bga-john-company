@@ -7,7 +7,9 @@ import { Climate } from '../../crown/climate';
 import {
   GamedatasAlias,
   JocoArmyPieceBase,
+  JocoControlToken,
   JocoEnterpriseCardBase,
+  JocoEventTileBase,
   JocoFamilyMember,
   JocoLawCardBase,
   JocoLondonSeasonCardBase,
@@ -72,6 +74,11 @@ export interface NotifElephantMarch {
 
 export interface NotifDraftCardPrivateArgs extends NotifWithPlayerArgs {
   cardIds: string[];
+}
+
+export interface NotifDrawEventTile {
+  eventTile: JocoEventTileBase;
+  topOfDeck: JocoEventTileBase | null;
 }
 
 export interface NotifEnlistFamilyMember extends NotifWithPlayerArgs {
@@ -278,5 +285,6 @@ export interface NotifUpdateOpportunityMarker {
 }
 
 export interface NotifUpdateRegion {
+  controlToken: JocoControlToken;
   region: JocoRegionBase;
 }

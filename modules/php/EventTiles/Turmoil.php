@@ -14,9 +14,9 @@ class Turmoil extends \Bga\Games\JohnCompany\Models\EventTile
     $this->type = TURMOIL;
   }
 
-  public function resolveEvent(string $regionId)
+  public function resolveEvent(string $regionId, $ctx)
   {
-    parent::resolveEvent($regionId);
+    // parent::resolveEvent($regionId, $ctx);
 
     Regions::get($regionId)->closeNorthernMostOpenOrder();
 

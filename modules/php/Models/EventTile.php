@@ -3,6 +3,7 @@
 namespace Bga\Games\JohnCompany\Models;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Managers\EventTiles;
 
 class EventTile extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
 {
@@ -15,6 +16,8 @@ class EventTile extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   protected $title;
   protected $type;
   protected $regionId; // Back of tile
+  protected $shape = null; // Front of tile
+  protected $background; // Front of tile
 
   protected $attributes = [
     'id' => ['event_tile_id', 'str'],
@@ -26,7 +29,8 @@ class EventTile extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     'regionId',
     'title',
     'type',
-
+    'shape',
+    'background',
   ];
   public function jsonSerialize(): array
   {
@@ -40,11 +44,20 @@ class EventTile extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     return $this->jsonSerialize(); // Static datas are already in js file
   }
 
-  public function resolveEvent(string$regionId)
+  public function resolveEvent(string $regionId, $ctx)
   {
-    Notifications::message('Resolve ${title}. Top of draw stack shows ${regionId}', [
-      'title' => $this->title,
-      'regionId' => $regionId
-    ]);
+  }
+
+  public function getNotificationText()
+  {
+    return clienttranslate('${tkn_boldText_eventTitle} in ${tkn_boldText_region}');
+  }
+
+  public function draw()
+  {
+    $this->state = EventTiles::insertOnTop($this->getId(), DISCARD);
+    $this->location = DISCARD;
+
+    Notifications::drawEventTile($this);
   }
 }

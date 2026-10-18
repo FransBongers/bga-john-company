@@ -17,6 +17,7 @@ class FamilyMembers extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   protected static $customFields = [
     'family_id',
     'presidency',
+    'used',
   ];
   protected static $autoremovePrefix = false;
   protected static $autoreshuffle = false;

@@ -164,7 +164,9 @@ class EnlistOfficer extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   public function isDoable(Player $player): bool
   {
-    return true;
+    $source = $this->ctx->getArgs()[SOURCE];
+    $family  = $player->getFamily();
+    return $source === EXTRA_ACTION || !$family->hasPrestigeCard(WILLIAM_COLLINS_ID);
   }
 
   public function isAutomatic(?Player $player = null): bool

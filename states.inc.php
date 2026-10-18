@@ -708,6 +708,22 @@ $machinestates = [
         'transitions' => [],
     ],
 
+    ST_EVENTS_IN_INDIA_RESOLVE_CRISIS => [
+        'name' => EVENTS_IN_INDIA_RESOLVE_CRISIS,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_EVENTS_IN_INDIA_ELEPHANT_MARCH => [
+        'name' => EVENTS_IN_INDIA_ELEPHANT_MARCH,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
     ST_EVENTS_IN_INDIA_CRISIS_DEFENSE => [
         'name' => EVENTS_IN_INDIA_CRISIS_DEFENSE,
         'type' => 'multipleactiveplayer',

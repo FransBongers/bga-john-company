@@ -1,3 +1,4 @@
+import { Bar } from '../bar';
 import {
   addCancelButton,
   addConfirmButton,
@@ -50,6 +51,7 @@ export class ParliamentMeetsSelectPolicy implements GameState<OnEnteringParliame
     this.primeMinisterDial.updateRightArmPosition(this.args.right);
     this.primeMinisterDial.showConsequenceOptions(true);
     this.updateInterfaceInitialStep();
+    // Bar.getInstance().goTo('joco-parliament');
   }
 
   onLeavingState() {
@@ -103,6 +105,8 @@ export class ParliamentMeetsSelectPolicy implements GameState<OnEnteringParliame
     updatePageTitle(_('Select ${policy}?'), {
       policy: this.getTextForPolicy(policy),
     });
+    this.primeMinisterDial.updateLeftArmPosition(dialPosition);
+    this.primeMinisterDial.updateRightArmPosition(dialPosition);
 
     addConfirmButton(() => {
       performAction('actParliamentMeetsSelectPolicy', {

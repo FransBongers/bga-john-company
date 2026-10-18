@@ -11,5 +11,6 @@ class EventTile_19 extends \Bga\Games\JohnCompany\EventTiles\Leader
     $this->regionId = PUNJAB;
     $this->shape = CIRCLE;
     $this->strength = 3;
+    $this->background = 'leader_circle_3';
   }
 }

@@ -82,8 +82,9 @@ class ResolveChoice extends \Bga\Games\JohnCompany\Models\AtomicAction
     if ($node->getStateDescription() != "") {
       $desc = $node->getStateDescription();
       $args['description'] = $desc['description'];
-      $args[' '] = $desc['descriptionmyturn'];
-      $args = array_merge($args, $desc['args'] ?? []);
+      $args['descriptionmyturn'] = $desc['descriptionmyturn'];
+      $args['textArgs'] = $desc['args'] ?? [];
+      // $args = array_merge($args, $desc['args'] ?? []);
     } else if ($node instanceof XorNode) {
       $args['descSuffix'] = 'xor';
     }

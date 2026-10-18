@@ -1,4 +1,5 @@
 import { BgaCards } from '../../libs';
+import { StaticData } from '../../static-data';
 import { tplAmount } from '../../templates';
 import { GameAlias, JocoControlToken } from '../../types';
 
@@ -6,11 +7,12 @@ export const tplControlTokenContent = (
   token: JocoControlToken,
   back = false,
 ) => {
+  const regionId = token.id.split('_')[1];
   return `
     ${back ? '' : `<div class="joco-presidency-icon joco-inverted"></div>`}
-    <div class="joco-region-icon" data-region='${token.regionId}'></div>
+    <div class="joco-region-icon" data-region='${regionId}'></div>
     ${back ? '' : `<div class="joco-presidency-icon"></div>`}
-    ${back ? tplAmount(token.loot, true) : ''}
+    ${back ? tplAmount(StaticData.get().region(regionId).loot, true) : ''}
   `;
 };
 
@@ -48,7 +50,7 @@ export class ControlTokensManager extends BgaCards.Manager<JocoControlToken> {
 
   setupFrontDiv(card: JocoControlToken, div: HTMLElement) {
     div.classList.add('joco-control-token');
-    div.setAttribute('data-region', card.regionId);
+    div.setAttribute('data-region', card.id.split('_')[1]);
 
     if (div.children.length) {
       return;
@@ -58,7 +60,7 @@ export class ControlTokensManager extends BgaCards.Manager<JocoControlToken> {
 
   setupBackDiv(card: JocoControlToken, div: HTMLElement) {
     div.classList.add('joco-control-token');
-    div.setAttribute('data-region', card.regionId);
+    div.setAttribute('data-region', card.id.split('_')[1]);
 
     if (div.children.length) {
       return;
@@ -67,6 +69,6 @@ export class ControlTokensManager extends BgaCards.Manager<JocoControlToken> {
   }
 
   isCardVisible(card: JocoControlToken) {
-    return card.side === 'control';
+    return card.looted;
   }
 }

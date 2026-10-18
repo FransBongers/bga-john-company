@@ -9,5 +9,6 @@ class EventTile_18 extends \Bga\Games\JohnCompany\EventTiles\ForeignInvasion
     parent::__construct($row);
     $this->id = 'EventTile_18';
     $this->regionId = MARATHA;
+    $this->background = 'foreign_invasion';
   }
 }

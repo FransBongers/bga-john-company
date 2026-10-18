@@ -32,7 +32,7 @@ class ResolveCrisis
     $defender = $regions[$defenderId];
     $defenderStrength = self::getDefenderStrengthInvasion($regions, $defender);
 
-    Notifications::crisisResult($attackStrength, $defenderStrength);
+    Notifications::crisisResult($attackStrength, $defenderStrength, INVASION);
     $successfulInvasion = $attackStrength > $defenderStrength;
     if ($successfulInvasion) {
       if ($defender->isCapital()) {
@@ -92,32 +92,49 @@ class ResolveCrisis
       }
     }
 
+    $actingCommanderId = $defender->getActingCommander()->getPlayerId();
+
+    self::insertCrisisDefenseNode($attackerId, $attackerId, $actingCommanderId, $attackStrength, INVASION);
+
     Notifications::message(clienttranslate('Attacker total is ${tkn_boldText_attackerTotal}'), [
       'tkn_boldText_attackerTotal' => $attackStrength
     ]);
-    $action = [
-      'action' => EVENTS_IN_INDIA_CRISIS_DEFENSE,
-      'playerId' => 'some',
-      'attackerStrength' => $attackStrength,
-      'attackerId' => $attackerId,
-      'defenderId' => $defenderId,
-      'activePlayerIds' => [$defender->getActingCommander()->getPlayerId()],
-    ];
-    $node = Engine::getNextUnresolved();
-    $node->insertAsBrother(Engine::buildTree($action));
   }
 
   public static function resolveRebellionAgainstTheCompany(Collection $regions, string $attackerId, int $eventTileStrength)
   {
-    Notifications::message(clienttranslate('${tkn_boldText_attacker} rebels against the ${tkn_boldText_company}'), [
+    $attacker = $regions[$attackerId];
+    $attackStrength = $attacker->getUnrest() + $eventTileStrength;
+
+    Notifications::message(clienttranslate('${tkn_boldText_attacker} rebels against the ${tkn_boldText_company} with a strength of ${tkn_boldText_attackStrength}'), [
       'tkn_boldText_attacker' => $regions[$attackerId]->getName(),
       'tkn_boldText_company' => clienttranslate('Company'),
-      'i18n' => ['tkn_boldText_attacker', 'tkn_boldText_company'],
+      'tkn_boldText_attackStrength' => $attackStrength,
+      'i18n' => ['tkn_boldText_attacker', 'tkn_boldText_company', 'tkn_boldText_attackStrength'],
     ]);
-    // TODO: rebellion against the company
 
-    // Return if rebellion was successful
-    return false;
+    $actingCommanderId = $attacker->getActingCommander()->getPlayerId();
+
+    self::insertCrisisDefenseNode($attackerId, $attackerId, $actingCommanderId, $attackStrength, REBELLION);
+  }
+
+  public static function insertCrisisDefenseNode(string $attackerId, string $defenderId, int $actingCommanderId, int $attackStrength, string $type)
+  {
+    $action = [
+      'action' => EVENTS_IN_INDIA_CRISIS_DEFENSE,
+      'playerId' => 'some',
+      'activePlayerIds' => [$actingCommanderId],
+      'args' => [
+        'attackerStrength' => $attackStrength,
+        'attackerId' => $attackerId,
+        'defenderId' => $defenderId,
+        'type' => $type,
+        'actingCommanderId' => $actingCommanderId,
+      ]
+    ];
+
+    $node = Engine::getNextUnresolved();
+    $node->insertAsBrother(Engine::buildTree($action));
   }
 
   public static function resolveRebellion(Collection $regions, string $attackerId, string $defenderId, int $eventTileStrength)
@@ -130,23 +147,31 @@ class ResolveCrisis
 
     $attackStrength = $regions[$attackerId]->getStrength() + $eventTileStrength;
     $defenderStrength = $regions[$defenderId]->getStrength();
+  }
 
-    Notifications::crisisResult($attackStrength, $defenderStrength);
+
+  public static function resolveSuccessfulRebellion(Collection $regions, string $attackerId, string $defenderId, int $attackStrength, int $defenderStrength, bool $againstCompany)
+  {
+    Notifications::crisisResult($attackStrength, $defenderStrength, REBELLION);
 
     if ($attackStrength > $defenderStrength) {
       $attacker = $regions[$attackerId];
-      $attacker->becomeSovereign();
       $attacker->closeAllOrders();
+      if (!$againstCompany) {
+        $attacker->becomeSovereign();
+      } else {
+        self::performRegionLossSteps($attacker->getId(), $attackerId, REBELLION);
+      }
+      
     } else {
       $regions[$defenderId]->incTowerLevel(-1);
     }
 
     Globals::setCascadedRegions([]);
-    // return if rebellion was successful
-    return $attackStrength > $defenderStrength;
   }
 
-  public static function performRegionLossSteps(string $regionId, string $attackerId)
+
+  public static function performRegionLossSteps(string $regionId, string $attackerId, string $type)
   {
     $regions = Regions::getAll();
     $region = $regions[$regionId];
@@ -164,7 +189,7 @@ class ResolveCrisis
     // Tarnish the Commander’s Name
     if ($commander !== null) {
       $family = $commander->getFamily();
-      $commander->loseHalfTrophiesRoundedUp();
+      $family->loseHalfTrophiesRoundedUp();
       $commander->returnToSupply();
     }
 
@@ -189,8 +214,7 @@ class ResolveCrisis
     $region->removeUnrest();
 
 
-    $triggeredByInvastion = $attackerId !== $regionId;
-    if ($triggeredByInvastion) {
+    if ($type === INVASION) {
       self::placeAppropriateFlag($attacker, $region);
       $region->closeAllOrders();
     }

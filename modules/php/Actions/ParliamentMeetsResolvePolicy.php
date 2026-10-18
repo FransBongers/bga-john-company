@@ -46,7 +46,7 @@ class ParliamentMeetsResolvePolicy extends \Bga\Games\JohnCompany\Models\AtomicA
         PowerMarkers::swapWithNextHighest($this->ctx, Parliament::getPrimeMinisterPlayer(), $policy[TARGET]);
         break;
       case TAX:
-        $this->resolveTax($policy[TARGET], $policy[WINDOW_TAX]);
+        $this->resolveTax($policy[TARGET], $policy[WINDOW_TAX] ?? false);
         break;
     }
 

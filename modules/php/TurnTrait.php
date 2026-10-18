@@ -812,9 +812,11 @@ trait TurnTrait
           'playerId' => $presidentPlayerId ?? Offices::get(CHAIRMAN)->getPlayerId(),
           'requiredChoiceCount' => $requiredChoiceCount,
           'stateDescription' => [
-            'descriptionmyturn' => clienttranslate('${you} must choose who will act next'),
-            'description' => clienttranslate('${actplayer} must choose who will act next'),
-            'args' => []
+            'descriptionmyturn' => clienttranslate('${presidency}: ${you} must choose who will act next'),
+            'description' => clienttranslate('${presidency}: ${actplayer} must choose who will act next'),
+            'args' => [
+              'presidency' => Notifications::getPhaseName($presidencyId),
+            ]
           ],
           // 'activePlayerIds' => [$presidentOffice->getPlayerId()],
           // 'officeId' => $presidentOffice->getId(),

@@ -11,5 +11,6 @@ class EventTile_14 extends \Bga\Games\JohnCompany\EventTiles\Leader
     $this->regionId = BENGAL;
     $this->shape = TRIANGLE;
     $this->strength = 2;
+    $this->background = 'leader_triangle_2';
   }
 }

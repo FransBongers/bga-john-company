@@ -13,6 +13,7 @@ use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\JoCoUtils;
+use Bga\Games\JohnCompany\Managers\ControlTokens;
 use Bga\Games\JohnCompany\Managers\Elephant;
 use Bga\Games\JohnCompany\Models\Player;
 use Bga\Games\JohnCompany\Models\Region;
@@ -51,6 +52,7 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
           'player' => Players::get($args['commanderPlayerId'])
         ]);
       }
+      Game::get()->gamestate->setPlayerNonMultiactive($args['commanderPlayerId'], 'next');
       $this->resolveAction(['automatic' => true]);
     }
   }
@@ -197,7 +199,8 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
       return;
     }
     if ($checkResult === CATASTROPHIC_FAILURE) {
-      // handle;
+      $family = $player->getFamily();
+      $family->loseHalfTrophiesRoundedUp();
       return;
     }
     $region = Regions::get($regionId);
@@ -223,10 +226,11 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
    *
    * @return array Map of playerId (or 'bank') => cash received
    */
-  private function distributeLoot($region, $pieces, $commanderPlayerId)
+  private function distributeLoot(Region $region, array $pieces, int $commanderPlayerId)
   {
+    $controlToken = ControlTokens::getByRegion($region->getId());
 
-    $wasLooted = $region->isLooted();
+    $wasLooted = $controlToken->isLooted();
 
     $officers = Utils::filter($pieces, function ($piece) {
       return $piece->getType() === FAMILY_MEMBER;
@@ -240,7 +244,7 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
     ]);
 
     if (!$wasLooted) {
-      $region->setLooted(true);
+      $controlToken->setLooted(1);
     }
 
     $officerCountByPlayerId = [];

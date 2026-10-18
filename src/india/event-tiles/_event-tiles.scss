@@ -1,0 +1,20 @@
+.joco-event-tiles-container {
+  .joco-row {
+    gap: 12px;
+  }
+
+  .joco-event-tiles-stock {
+    position: relative;
+    width: 300px;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+
+    .joco-event-tile-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  }
+}

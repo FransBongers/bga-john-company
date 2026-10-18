@@ -10,5 +10,6 @@ class EventTile_15 extends \Bga\Games\JohnCompany\EventTiles\Peace
     $this->id = 'EventTile_15';
     $this->regionId = MYSORE;
     $this->shape = SQUARE;
+    $this->background = 'peace_square';
   }
 }

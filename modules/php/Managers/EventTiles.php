@@ -31,6 +31,19 @@ class EventTiles extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     return new $className($data);
   }
 
+  /**
+   * getStaticUiData : return static data
+   */
+  public static function getStaticUiData()
+  {
+    $pieces = self::getAll()->toArray();
+
+    $data = [];
+    foreach ($pieces as $index => $piece) {
+      $data[$piece->getId()] = $piece->getStaticData();
+    }
+    return $data;
+  }
 
   // ..######..########.########.##.....##.########.
   // .##....##.##..........##....##.....##.##.....##
@@ -47,7 +60,7 @@ class EventTiles extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     include dirname(__FILE__) . '/../EventTiles/list.inc.php';
 
     $tiles = [];
-    
+
     foreach ($eventTileIds as $index => $cId) {
       $tiles[$cId] = [
         'id' => $cId,
@@ -59,7 +72,7 @@ class EventTiles extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     self::shuffle(DECK);
   }
 
-    // ..######...########.########.########.########.########...######.
+  // ..######...########.########.########.########.########...######.
   // .##....##..##..........##.......##....##.......##.....##.##....##
   // .##........##..........##.......##....##.......##.....##.##......
   // .##...####.######......##.......##....######...########...######.

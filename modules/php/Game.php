@@ -30,6 +30,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Stats;
 use Bga\Games\JohnCompany\Managers\AICards;
 use Bga\Games\JohnCompany\Managers\ArmyPieces;
 use Bga\Games\JohnCompany\Managers\Company;
+use Bga\Games\JohnCompany\Managers\ControlTokens;
 use Bga\Games\JohnCompany\Managers\Crown;
 use Bga\Games\JohnCompany\Managers\Elephant;
 use Bga\Games\JohnCompany\Managers\Enterprises;
@@ -359,8 +360,14 @@ class Game extends \Bga\GameFramework\Table
             'phase' => Globals::getPhase(),
             'armyPieces' => ArmyPieces::getAll(),
             'company' => Company::get(),
+            'controlTokens' => ControlTokens::getAll(),
             'elephant' => Elephant::get(),
             'enterprises' => Enterprises::getAll(),
+            'eventTiles' => [
+                'deck' => EventTiles::getTopOf(DECK),
+                'discard' => EventTiles::getTopOf(DISCARD),
+                'all' => EventTiles::getAll()->toArray(),
+            ],
             'families' => Families::getAll(),
             'familyMembers' => FamilyMembers::getAll(),
             'londonSeasonDisplay' => LondonSeasonCards::getInLocationOrdered(LONDON_SEASON_DISPLAY)->toArray(),
@@ -381,6 +388,7 @@ class Game extends \Bga\GameFramework\Table
             'staticData' => [
                 'armyPieces' => ArmyPieces::getStaticUiData(),
                 'enterpriseCards' => Enterprises::getStaticUiData(),
+                'eventTiles' => EventTiles::getStaticUiData(),
                 'lawCards' => LawCards::getStaticUiData(),
                 'londonSeasonCards' => LondonSeasonCards::getStaticUiData(),
                 'offices' => Offices::getStaticUiData(),
@@ -411,6 +419,7 @@ class Game extends \Bga\GameFramework\Table
 
         Scenarios::setupNewGame($players, $options);
         ArmyPieces::setupNewGame();
+        ControlTokens::setupNewGame();
         Elephant::setupNewGame();
         Enterprises::setupNewGame();
         EventTiles::setupNewGame();

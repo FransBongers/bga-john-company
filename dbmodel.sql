@@ -58,6 +58,13 @@ CREATE TABLE IF NOT EXISTS `army_pieces` (
   `exhausted` tinyint(1) DEFAULT 0,
   PRIMARY KEY (`army_piece_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+CREATE TABLE IF NOT EXISTS `control_tokens` (
+  `control_token_id` varchar(32) NOT NULL,
+  `control_token_location` varchar(32) NOT NULL,
+  `control_token_state` int(10) DEFAULT 0,
+  `looted` tinyint(1) DEFAULT 0,
+  PRIMARY KEY (`control_token_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 CREATE TABLE IF NOT EXISTS `enterprises` (
   `enterprise_id` varchar(32) NOT NULL,
   `enterprise_location` varchar(32) NOT NULL,
@@ -92,6 +99,7 @@ CREATE TABLE IF NOT EXISTS `family_members` (
   `family_member_location` varchar(32) NOT NULL,
   `family_member_state` int(10) DEFAULT 0,
   `family_id` varchar(16) NOT NULL,
+  `used` tinyint(1) DEFAULT 0,
   `presidency` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`family_member_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
@@ -130,7 +138,6 @@ CREATE TABLE IF NOT EXISTS `regions` (
   `region_id` varchar(32) NOT NULL,
   `region_location` varchar(32) NOT NULL,
   `region_state` int(10) DEFAULT 0,
-  `looted` tinyint(1) DEFAULT 0,
   `unrest` int(10) DEFAULT 0,
   `strength` int(10) DEFAULT 0,
   `control` varchar(32) NULL,

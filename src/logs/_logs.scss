@@ -132,6 +132,7 @@ span[style*='color:#c0c0c0'] {
     height: 40px !important;
   }
 
+  &.joco-storm-die,
   &.joco-cube {
     height: 32px;
   }
@@ -216,11 +217,13 @@ span[style*='color:#c0c0c0'] {
   //   --tokenScale: 0.8;
   // }
 
+  .joco-storm-die,
   .joco-ship {
     height: 32px;
   }
 }
 
+.notif_drawEventTile,
 .notif_turn,
 .notif_nextPhase {
   .roundedboxinner,
@@ -232,6 +235,7 @@ span[style*='color:#c0c0c0'] {
   }
 }
 
+.notif_drawEventTile,
 .notif_turn,
 .notif_nextPhase {
   .roundedbox {

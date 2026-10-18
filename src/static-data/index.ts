@@ -10,6 +10,7 @@ import {
   JocoShipBase,
   JocoRegionStatic,
   JocoArmyPieceStatic,
+  JocoEventTileStatic,
 } from '../types';
 
 export class StaticData {
@@ -50,7 +51,15 @@ export class StaticData {
     const card =
       this.staticData.enterpriseCards[id] ?? ({} as JocoEnterpriseCardStatic);
     if (!card) {
-      throw new Error('STATIC_DATA_ERROR_001');
+      throw new Error('STATIC_DATA_ERROR_002');
+    }
+    return card;
+  }
+
+  public eventTile(id: string): JocoEventTileStatic {
+    const card = this.staticData.eventTiles[id] ?? ({} as JocoEventTileStatic);
+    if (!card) {
+      throw new Error('STATIC_DATA_ERROR_002');
     }
     return card;
   }

@@ -414,6 +414,13 @@ const PRIZES = {
     },
 };
 const REGIMENT = 'Regiment';
+const FOREIGN_INVASION = 'ForeignInvasion';
+const LEADER = 'Leader';
+const PEACE = 'Peace';
+const CRISIS$1 = 'Crisis';
+const SHUFFLE = 'Shuffle';
+const TURMOIL = 'Turmoil';
+const WINDFALL = 'Windfall';
 
 const tplCube = (type, extraClasses = '') => `
   <div class="joco-cube ${extraClasses}" data-type="${type}"></div>
@@ -972,7 +979,7 @@ class ShipsManager extends BgaCards$1.Manager {
     }
 }
 
-let StaticData$1 = class StaticData {
+class StaticData {
     constructor(game) {
         this.game = game;
         this.staticData = game.gamedatas.staticData;
@@ -993,7 +1000,14 @@ let StaticData$1 = class StaticData {
     enterpriseCard(id) {
         const card = this.staticData.enterpriseCards[id] ?? {};
         if (!card) {
-            throw new Error('STATIC_DATA_ERROR_001');
+            throw new Error('STATIC_DATA_ERROR_002');
+        }
+        return card;
+    }
+    eventTile(id) {
+        const card = this.staticData.eventTiles[id] ?? {};
+        if (!card) {
+            throw new Error('STATIC_DATA_ERROR_002');
         }
         return card;
     }
@@ -1046,12 +1060,12 @@ let StaticData$1 = class StaticData {
     ship(id) {
         return this.game.gamedatas.ships[id];
     }
-};
+}
 
 const tplEnterpriseCardContent = (card) => {
     let shipName = null;
     if (card.type === SHIPYARD) {
-        shipName = StaticData$1.get().ship(card.shipId).name;
+        shipName = StaticData.get().ship(card.shipId).name;
     }
     return `
   <div class="joco-title fb-font-baskerville  fb-font-12 bga-autofit">${card.type === WORKSHOP && card.invested ? _('Invested Workshop').toLocaleUpperCase() : _(card.name).toLocaleUpperCase()}</div>
@@ -1305,7 +1319,7 @@ const tlpLogTokenText = ({ text, tooltipId, italic = false, bold = true, }) => `
 const tplLogTokenClimate = (climate) => `<div class="log-token joco-crown-climate-icon" data-climate="${climate}"></div>`;
 const tplLogTokenElephant = () => '<div class="log-token joco-elephant"></div>';
 const tplLogTokenLocalAlliance = (id) => {
-    const staticData = StaticData$1.get().armyPiece(id);
+    const staticData = StaticData.get().armyPiece(id);
     return tplLocalAlliance({
         extraClasses: 'log-token',
         presidencyId: staticData.presidencyId,
@@ -1398,7 +1412,7 @@ const getShipsLog = (ships) => {
     return shipsLog;
 };
 const getArmyPiece = (piece) => {
-    const staticData = StaticData$1.get();
+    const staticData = StaticData.get();
     const cardStatic = staticData.armyPiece(piece.id);
     return {
         ...piece,
@@ -1406,15 +1420,23 @@ const getArmyPiece = (piece) => {
     };
 };
 const getEnterpriseCard = (card) => {
-    const staticData = StaticData$1.get();
+    const staticData = StaticData.get();
     const cardStatic = staticData.enterpriseCard(card.id);
     return {
         ...card,
         ...cardStatic,
     };
 };
+const getEventTile$1 = (tile) => {
+    const staticData = StaticData.get();
+    const tileStatic = staticData.eventTile(tile.id);
+    return {
+        ...tile,
+        ...tileStatic,
+    };
+};
 const getLawCard = (card) => {
-    const staticData = StaticData$1.get();
+    const staticData = StaticData.get();
     const cardStatic = staticData.lawCard(card.id);
     return {
         ...card,
@@ -1422,7 +1444,7 @@ const getLawCard = (card) => {
     };
 };
 const getLondonSeasonCard = (card) => {
-    const staticData = StaticData$1.get();
+    const staticData = StaticData.get();
     const cardStatic = card.hiddenId
         ? staticData.londonSeasonCard(card.hiddenId)
         : staticData.londonSeasonCard(card.id);
@@ -1431,8 +1453,8 @@ const getLondonSeasonCard = (card) => {
         ...cardStatic,
     };
 };
-const getOffice$1 = (office) => {
-    const staticData = StaticData$1.get();
+const getOffice = (office) => {
+    const staticData = StaticData.get();
     const officeStatic = staticData.office(office.id);
     return {
         ...office,
@@ -1440,7 +1462,7 @@ const getOffice$1 = (office) => {
     };
 };
 const createControlToken = (data) => {
-    const staticData = StaticData$1.get().region(data.id);
+    const staticData = StaticData.get().region(data.id);
     return {
         id: 'control-token-' + data.id,
         side: data.looted ? 'control' : 'loot',
@@ -1450,7 +1472,7 @@ const createControlToken = (data) => {
 };
 
 const tplOfficeCard = (data) => {
-    const office = getOffice$1(data);
+    const office = getOffice(data);
     return `
     <div id="OfficeCard_${data.id}" class="joco-office-card" style="order: ${office.hirePriority}">
       <div class="joco-header joco-office-header">
@@ -2182,11 +2204,12 @@ const ORDERS_CONFIG = {
 };
 
 const tplControlTokenContent = (token, back = false) => {
+    const regionId = token.id.split('_')[1];
     return `
     ${back ? '' : `<div class="joco-presidency-icon joco-inverted"></div>`}
-    <div class="joco-region-icon" data-region='${token.regionId}'></div>
+    <div class="joco-region-icon" data-region='${regionId}'></div>
     ${back ? '' : `<div class="joco-presidency-icon"></div>`}
-    ${back ? tplAmount(token.loot, true) : ''}
+    ${back ? tplAmount(StaticData.get().region(regionId).loot, true) : ''}
   `;
 };
 class ControlTokensManager extends BgaCards$1.Manager {
@@ -2217,7 +2240,7 @@ class ControlTokensManager extends BgaCards$1.Manager {
     }
     setupFrontDiv(card, div) {
         div.classList.add('joco-control-token');
-        div.setAttribute('data-region', card.regionId);
+        div.setAttribute('data-region', card.id.split('_')[1]);
         if (div.children.length) {
             return;
         }
@@ -2225,14 +2248,14 @@ class ControlTokensManager extends BgaCards$1.Manager {
     }
     setupBackDiv(card, div) {
         div.classList.add('joco-control-token');
-        div.setAttribute('data-region', card.regionId);
+        div.setAttribute('data-region', card.id.split('_')[1]);
         if (div.children.length) {
             return;
         }
         div.insertAdjacentHTML('beforeend', tplControlTokenContent(card, true));
     }
     isCardVisible(card) {
-        return card.side === 'control';
+        return card.looted;
     }
 }
 
@@ -2262,9 +2285,9 @@ class Presidency {
     }
     setupControlTokens(gamedatas) {
         this.controlTokenStock = new BgaCards$1.LineStock(ControlTokensManager.getInstance(), document.getElementById(`joco-control-tokens-${this.id}`));
-        Object.values(gamedatas.regions).forEach((region) => {
-            if (region.control === this.id) {
-                this.controlTokenStock.addCard(createControlToken(region));
+        Object.values(gamedatas.controlTokens).forEach((token) => {
+            if (token.location === this.id) {
+                this.controlTokenStock.addCard(token);
             }
         });
     }
@@ -2404,7 +2427,7 @@ class Region {
         };
         this.controlTokenStock = new BgaCards$1.LineStock(ControlTokensManager.getInstance(), document.getElementById(`joco-control-token-stock-${data.id}`));
         this.setupShipStock(game.gamedatas);
-        this.updateControlToken(data);
+        this.updateControlToken(game.gamedatas);
         this.updateStrength(data.strength);
         this.updateCapital(data.isCapital);
         this.updateEmpire(data.isCapital, data.control);
@@ -2442,11 +2465,12 @@ class Region {
             this.updateEmpire(isCapital, null);
         }
     }
-    updateControlToken(data) {
-        if (data.control?.startsWith('Presidency')) {
+    updateControlToken(gamedatas) {
+        const token = gamedatas.controlTokens[`ControlToken_${this.data.id}`];
+        if (!token || token.location !== this.data.id) {
             return;
         }
-        this.controlTokenStock.addCard(createControlToken(data));
+        this.controlTokenStock.addCard(token);
     }
     updateEmpire(isCapital, control) {
         this.data.control = control;
@@ -2492,6 +2516,9 @@ class Region {
     }
     hasControlToken(token) {
         return this.controlTokenStock.contains(token);
+    }
+    async addControlToken(controlToken) {
+        await this.controlTokenStock.addCard(controlToken);
     }
     async addShip(ship, fromSea = null) {
         if (fromSea) {
@@ -2555,7 +2582,7 @@ class ShipZone {
 }
 
 const tplOrder = (orderId, { top, left }) => {
-    const staticData = StaticData$1.get().order(orderId);
+    const staticData = StaticData.get().order(orderId);
     return `<div id="${orderId}" class="joco-order" style="top: ${top}px; left: ${left}px;" data-is-home-port="${staticData.homePort !== null}">
           <div class="joco-order-value">${tplAmount(staticData.value)}</div>
           <div class="joco-filled-order-value">${tplAmount(staticData.filledValue, true)}</div>
@@ -2750,7 +2777,7 @@ const tplDeregulation = () => `
   <div class="joco-deregulation-2 fb-font-baskerville fb-font-8 fb-font-italic bga-autofit">${_('The initial support of the law depends on the status of Standing and Debt:')}</div>
   
 `;
-const tplLawCardContent = (card) => `
+const tplLawCardContent$1 = (card) => `
   <div class="joco-card-header fb-font-baskerville  fb-font-16 fb-font-italic bga-autofit">${lawCardHeaderText(card.header)}</div>
   <div class="joco-title fb-font-bebas-neue fb-font-40 bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
   ${tplCardText(card.text, { textClass: 'fb-font-16 fb-font-baskerville' })}
@@ -2793,7 +2820,7 @@ class LawCardsManager extends BgaCards$1.Manager {
         if (div.children.length) {
             return;
         }
-        div.insertAdjacentHTML('beforeend', tplLawCardContent(card));
+        div.insertAdjacentHTML('beforeend', tplLawCardContent$1(card));
     }
     setupBackDiv(card, div) {
         div.setAttribute('data-background', 'LawBack');
@@ -3297,7 +3324,7 @@ class SetupArea {
             chosenCards: document.getElementById('joco_chosen_cards'),
             draft: document.getElementById('joco_draft_cards'),
         };
-        StaticData$1.get()
+        StaticData.get()
             .setupCards()
             .forEach((card) => {
             const elt = (this.cards[card.id] = document.createElement('div'));
@@ -3795,6 +3822,143 @@ class Parliament {
     }
 }
 
+const getEventTileText = (type) => {
+    switch (type) {
+        case CRISIS$1:
+            return '';
+        case WINDFALL:
+            return _('Gain for writers here and in adjacent regions.');
+        case TURMOIL:
+            return _('Close northernmost open order. If all are closed, perform Cascade (close orders in connected regions).');
+        case LEADER:
+            return '';
+        case PEACE:
+            return _('If the Elephant is fully in a Company-controlled region, clear unrest and open all orders instead.');
+        case SHUFFLE:
+            return _('Shuffle this tile in with the deck. Then shuffle the discards and place them on top.');
+        case FOREIGN_INVASION:
+            return _('Roll storm die and resolve an Invasion in each region linked to a storm. (If none, use top event card.) For each, roll a die to determine strength. If this region falls, close every order there and set its strength to half of the die roll (round down).');
+        default:
+            return _(type);
+    }
+};
+const tplCrisisContent = () => `
+  <div class="joco-event-tile-imperial-ambitions joco-card-text fb-font-baskerville fb-font-12 bga-autofit">${_('Imperial Ambitions?')}</div>
+  <div class="joco-event-tile-otherwise joco-card-text fb-font-baskerville fb-font-8 fb-font-italic bga-autofit">${_('Otherwise').toLocaleUpperCase()}</div>
+  <div class="joco-event-tile-top-of-stack joco-card-text fb-font-baskerville fb-font-12 bga-autofit">${_('Top of Stack')}</div>
+  <div class="joco-event-tile-top-of-stack-sub joco-card-text fb-font-baskerville fb-font-8 fb-font-italic bga-autofit">${_('Invade or Rebel?').toLocaleUpperCase()}</div>
+`;
+const tplPeaceContent = () => `
+  <div class="joco-event-tile-top-of-stack joco-card-text fb-font-baskerville fb-font-12 bga-autofit">${_('Top of Stack')}</div>
+  <div class="joco-event-tile-top-of-stack-sub joco-card-text fb-font-baskerville fb-font-8 fb-font-italic bga-autofit">${_('Invade or Rebel?').toLocaleUpperCase()}</div>
+`;
+const tplLeaderContent = () => `
+  <div class="joco-event-tile-leader-left joco-card-text fb-font-baskerville fb-font-12 bga-autofit">${_('Strengthen if sovereign.')}</div>
+  <div class="joco-event-tile-leader-right joco-card-text fb-font-baskerville fb-font-12 bga-autofit">${_('Rebellion if dominated.')}</div>
+`;
+const tplEventTileContent = (card) => {
+    const title = card.type === CRISIS$1 ? _('Resolve Crisis') : _(card.title);
+    const text = getEventTileText(card.type);
+    return `
+    <div class="joco-event-tile-title joco-card-text fb-font-baskerville fb-font-28 fb-font-bold bga-autofit">${title.toLocaleUpperCase()}</div>
+    ${text ? `<div class="joco-event-tile-text joco-card-text fb-font-baskerville fb-font-12 bga-autofit">${text}</div>` : ''}
+    ${card.type === CRISIS$1 ? tplCrisisContent() : ''}
+    ${card.type === PEACE ? tplPeaceContent() : ''}
+    ${card.type === LEADER ? tplLeaderContent() : ''}
+  `;
+};
+
+let EventTilesManager$1 = class EventTilesManager extends BgaCards$1.Manager {
+    static create(game) {
+        EventTilesManager.instance = new EventTilesManager(game);
+    }
+    static getInstance() {
+        return EventTilesManager.instance;
+    }
+    constructor(game) {
+        super({
+            getId: (card) => card.id,
+            setupDiv: (card, div) => this.setupDiv(card, div),
+            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
+            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
+            isCardVisible: (card) => this.isCardVisible(card),
+            animationManager: game.animationManager,
+            cardHeight: 300,
+            cardWidth: 300,
+            type: 'event-tile',
+            cardBorderRadius: '100%',
+        });
+        this.game = game;
+    }
+    clearInterface() { }
+    setupDiv(card, div) {
+        div.classList.add('joco-event-tile-container');
+    }
+    setupFrontDiv(card, div) {
+        div.classList.add('joco-event-tile');
+        div.setAttribute('data-background', card.background);
+        div.setAttribute('data-type', card.type);
+        if (div.children.length) {
+            return;
+        }
+        div.insertAdjacentHTML('beforeend', tplEventTileContent(card));
+    }
+    setupBackDiv(card, div) {
+        div.classList.add('joco-event-tile');
+        div.setAttribute('data-background', card.regionId);
+    }
+    isCardVisible(card) {
+        return card.location === DISCARD;
+    }
+};
+
+class EventTiles {
+    constructor(game) {
+        this.game = game;
+        this.game = game;
+        this.setup(game.gamedatas);
+    }
+    static create(game) {
+        EventTiles.instance = new EventTiles(game);
+    }
+    static getInstance() {
+        return EventTiles.instance;
+    }
+    setup(gamedatas) {
+        document
+            .getElementById('joco-india')
+            .insertAdjacentHTML('beforeend', this.tplEventTiles());
+        this.ui = {};
+        this.setupStocks(gamedatas);
+    }
+    setupStocks(gamedatas) {
+        this.discard = new BgaCards$1.LineStock(EventTilesManager$1.getInstance(), document.getElementById(`joco-event-tiles-discard`));
+        this.deck = new BgaCards$1.LineStock(EventTilesManager$1.getInstance(), document.getElementById(`joco-event-tiles-deck`));
+        if (gamedatas.eventTiles.deck) {
+            this.deck.addCard(getEventTile$1(gamedatas.eventTiles.deck));
+        }
+        if (gamedatas.eventTiles.discard) {
+            this.discard.addCard(getEventTile$1(gamedatas.eventTiles.discard));
+        }
+    }
+    tplEventTiles() {
+        return `
+    <div class="joco-container joco-event-tiles-container">
+      <div class="joco-header"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Event Tiles').toLocaleUpperCase()}</span></div>
+      <div class="joco-row">
+        <div id="joco-event-tiles-discard" class="joco-event-tiles-stock"></div>
+        <div id="joco-event-tiles-deck" class="joco-event-tiles-stock"></div>
+      </div>
+    </div>`;
+    }
+    async drawEventTile(eventTile, topOfDeck) {
+        await Promise.all([
+            this.discard.addCard(getEventTile$1(eventTile)),
+            this.deck.addCard(getEventTile$1(topOfDeck)),
+        ]);
+    }
+}
+
 const MIN_NOTIFICATION_MS = 1200;
 class NotificationManager {
     constructor(game) {
@@ -3887,6 +4051,10 @@ class NotificationManager {
         await Promise.all(cardIds.map(async (cardId, index) => {
             await this.game.animationManager.slideAndAttach(document.getElementById(cardId), document.getElementById('joco_chosen_cards'));
         }));
+    }
+    async notif_drawEventTile(notif) {
+        const { eventTile, topOfDeck } = notif;
+        await EventTiles.getInstance().drawEventTile(eventTile, topOfDeck);
     }
     async notif_allocateBalanceToOffice(notif) {
         const { companyBalance, officeTreasury, officeId } = notif;
@@ -4272,13 +4440,17 @@ class NotificationManager {
         family.opportunityMarker.update(familyAction);
     }
     async notif_updateRegion(notif) {
-        const { region: data } = notif;
+        const { region: data, controlToken } = notif;
         const india = India$1.getInstance();
         const region = india.getRegion(data.id);
         region.update(data);
-        const controlToken = createControlToken(data);
+        const regionHasControlToken = region.hasControlToken(controlToken);
         if (PRESIDENCIES.includes(data.control) &&
-            region.hasControlToken(controlToken)) {
+            regionHasControlToken) {
+            await india.getPresidency(data.control).addControlToken(controlToken);
+        }
+        else if (!PRESIDENCIES.includes(data.control) &&
+            !regionHasControlToken) {
             await india.getPresidency(data.control).addControlToken(controlToken);
         }
     }
@@ -4358,7 +4530,7 @@ class ResolveChoice {
     setDescription(activePlayerId, args) {
         this.args = args;
         if (this.args.description && typeof this.args.description === 'string') {
-            updatePageTitle(_(this.args.description));
+            updatePageTitle(_(this.args.description), this.args.textArgs);
         }
         else if (this.args.description &&
             typeof this.args.description === 'object') {
@@ -4367,8 +4539,8 @@ class ResolveChoice {
     }
     updateInterfaceInitialStep() {
         this.game.clearPossible();
-        if (this.args.description && typeof this.args.description === 'string') {
-            updatePageTitle(_(this.args.description));
+        if (this.args.descriptionmyturn && typeof this.args.descriptionmyturn === 'string') {
+            updatePageTitle(_(this.args.descriptionmyturn), this.args.textArgs);
         }
         else if (this.args.description &&
             typeof this.args.description === 'object') {
@@ -4413,7 +4585,7 @@ class ResolveChoice {
 
 const tplLawCardTooltip = (data) => `
   <div class="joco-law-card tooltip" data-background="${data.background}">
-    ${tplLawCardContent(data)}
+    ${tplLawCardContent$1(data)}
   </div>
 `;
 const tplLondonSeasonCardTooltip = (data) => `
@@ -4441,13 +4613,13 @@ class TooltipManager {
     addLawCardTooltip({ nodeId, cardId, }) {
         const card = {
             id: cardId,
-            ...StaticData$1.get().lawCard(cardId),
+            ...StaticData.get().lawCard(cardId),
         };
         const html = tplLawCardTooltip(card);
         this.game.bga.gameui.addTooltipHtml(nodeId, html, 400);
     }
     addLondonSeasonCardTooltip({ nodeId, cardId, imageOnly = false, }) {
-        const card = StaticData$1.get().londonSeasonCard(cardId);
+        const card = StaticData.get().londonSeasonCard(cardId);
         const html = tplLondonSeasonCardTooltip(card);
         this.game.bga.gameui.addTooltipHtml(nodeId, html, 400);
     }
@@ -4501,7 +4673,7 @@ const getTokenDiv = ({ key, value, game, }) => {
             return tplLogTokenClimate(value);
         case LOG_TOKEN_ENTERPRISE_CARD:
             return tlpLogTokenText({
-                text: StaticData$1.get().enterpriseCard(value).name,
+                text: StaticData.get().enterpriseCard(value).name,
             });
         case LOG_TOKEN_ICON:
         case LOG_TOKEN_ENTERPRISE_ICON:
@@ -4519,7 +4691,7 @@ const getTokenDiv = ({ key, value, game, }) => {
             game.tooltipsToMap.push([game._last_tooltip_id, value.split(':')[0]]);
             game._last_tooltip_id++;
             return tlpLogTokenText({
-                text: StaticData$1.get().lawCard(value).title,
+                text: StaticData.get().lawCard(value).title,
                 tooltipId: cardNameTooltipId,
                 bold: true,
             });
@@ -4532,7 +4704,7 @@ const getTokenDiv = ({ key, value, game, }) => {
             return tlpLogTokenText({
                 text: value.startsWith('BlackmailCard')
                     ? _('a Blackmail card')
-                    : StaticData$1.get().londonSeasonCard(value).title,
+                    : StaticData.get().londonSeasonCard(value).title,
                 tooltipId: cardNameTooltipId,
                 bold: true,
             });
@@ -4885,7 +5057,7 @@ class CommanderApproveLocalAlliance {
         clearPossible();
         updatePageTitle(_('${player_name} requests £${amount} to purchase a local alliance with ${tkn_localAlliance}'), {
             player_name: getPlayerName(this.args.commanderPlayerId),
-            amount: StaticData$1.get().armyPiece(this.args.localAlliance.id).cost,
+            amount: StaticData.get().armyPiece(this.args.localAlliance.id).cost,
             tkn_localAlliance: this.args.localAlliance.id,
         });
         addPrimaryActionButton({
@@ -4965,7 +5137,7 @@ class ExhaustArmyPieces {
     }
     getTotalStrength() {
         let strength = this.selectedPieces.officers.length;
-        const staticData = StaticData$1.get();
+        const staticData = StaticData.get();
         this.selectedPieces.armyPieces.forEach((pieceId) => {
             strength += staticData.armyPiece(pieceId).strength;
         });
@@ -5107,7 +5279,7 @@ class CommanderPurchaseLocalAlliance {
         updatePageTitle(this.args.commanderIsPresident
             ? _('Purchase an alliance with ${tkn_localAlliance}?')
             : _('Requests funds to purchase an alliance with ${tkn_localAlliance}?'), {
-            name: _(StaticData$1.get().armyPiece(localAlliance.id).name),
+            name: _(StaticData.get().armyPiece(localAlliance.id).name),
             tkn_localAlliance: localAlliance.id,
         });
         addConfirmButton$1(() => {
@@ -5194,7 +5366,7 @@ class CrownChairmanRequestAllocation {
             tkn_promiseCube: tknPromiseCubes(),
             tkn_pound: tknPound(),
             amount,
-            office: _(StaticData$1.get().office(officeId).title),
+            office: _(StaticData.get().office(officeId).title),
         });
         addConfirmButton$1(() => {
             performAction$1('actCrownChairmanRequestAllocation', {
@@ -6075,7 +6247,7 @@ class EnlistWriter {
         setSelected$1(presidencyId);
         updatePageTitle(_('Enlist ${tkn_icon} in ${regionName}?'), {
             tkn_icon: WRITER,
-            regionName: _(StaticData$1.get().region(PRESIDENCY_REGION_MAP[presidencyId]).name),
+            regionName: _(StaticData.get().region(PRESIDENCY_REGION_MAP[presidencyId]).name),
         });
         const callback = () => performAction$1('actEnlistWriter', {
             presidencyId,
@@ -6234,13 +6406,13 @@ class GovernorAdminister {
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} may take an Administer action with the ${governorTitle}'), {
             tkn_playerName: getPlayerName(activePlayerIds[0]),
-            governorTitle: _(getOffice$1(args.governor).title),
+            governorTitle: _(getOffice(args.governor).title),
         });
     }
     updateInterfaceInitialStep() {
         clearPossible();
         updatePageTitle(_('${you} may take an Administer action with the ${governorTitle}'), {
-            governorTitle: _(getOffice$1(this.args.governor).title),
+            governorTitle: _(getOffice(this.args.governor).title),
         });
         addPrimaryActionButton({
             id: 'administer-btn',
@@ -6373,7 +6545,7 @@ class HiringHireFamilyMember {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} must hire the ${officeTitle}'), {
-            officeTitle: _(getOffice$1(args.office).title),
+            officeTitle: _(getOffice(args.office).title),
             tkn_playerName: PlayerManager$1.getInstance()
                 .getPlayer(args.hiringPlayerId)
                 .getName(),
@@ -6382,7 +6554,7 @@ class HiringHireFamilyMember {
     updateInterfaceInitialStep() {
         clearPossible();
         updatePageTitle(_('${you} must choose a family member to hire as ${officeTitle}'), {
-            officeTitle: _(getOffice$1(this.args.office).title),
+            officeTitle: _(getOffice(this.args.office).title),
         });
         this.args.options.forEach((option) => {
             onClick(option.id, () => this.updateInterfaceConfirm(option));
@@ -6395,13 +6567,13 @@ class HiringHireFamilyMember {
             option.familyId === this.args.hiringFamilyId) {
             updatePageTitle(_('Ask consent for nepotism to hire ${tkn_familyMember} as ${officeTitle}?'), {
                 tkn_familyMember: tknFamilyMember(option),
-                officeTitle: _(getOffice$1(this.args.office).title),
+                officeTitle: _(getOffice(this.args.office).title),
             });
         }
         else {
             updatePageTitle(_('Hire ${tkn_familyMember} as ${officeTitle}?'), {
                 tkn_familyMember: tknFamilyMember(option),
-                officeTitle: _(getOffice$1(this.args.office).title),
+                officeTitle: _(getOffice(this.args.office).title),
             });
         }
         addConfirmButton$1(() => {
@@ -7119,6 +7291,8 @@ class ParliamentMeetsSelectPolicy {
         updatePageTitle(_('Select ${policy}?'), {
             policy: this.getTextForPolicy(policy),
         });
+        this.primeMinisterDial.updateLeftArmPosition(dialPosition);
+        this.primeMinisterDial.updateRightArmPosition(dialPosition);
         addConfirmButton$1(() => {
             performAction$1('actParliamentMeetsSelectPolicy', {
                 dialPosition,
@@ -7193,9 +7367,9 @@ class ParliamentMeetsCastVotes {
             id: 'minus_btn',
             text: '-',
             callback: () => {
-                this.spend--;
-                this.treasury++;
-                this.getCashCounter().incValue(1);
+                this.spend -= this.args.votes.pricePerVote;
+                this.treasury += this.args.votes.pricePerVote;
+                this.getCashCounter().incValue(this.args.votes.pricePerVote);
                 this.updateInterfaceInitialStep();
             },
             extraClasses: this.spend === 0 ? DISABLED : '',
@@ -7224,12 +7398,12 @@ class ParliamentMeetsCastVotes {
             id: 'plus_btn',
             text: '+',
             callback: () => {
-                this.spend++;
-                this.treasury--;
-                this.getCashCounter().incValue(-1);
+                this.spend += this.args.votes.pricePerVote;
+                this.treasury -= this.args.votes.pricePerVote;
+                this.getCashCounter().incValue(-this.args.votes.pricePerVote);
                 this.updateInterfaceInitialStep();
             },
-            extraClasses: this.treasury === 0 ? DISABLED : '',
+            extraClasses: this.treasury < this.args.votes.pricePerVote ? DISABLED : '',
         });
         if (totalVotes <= 0) {
             addPassButton(this.args.optionalAction, _('Do not cast any votes'));
@@ -7293,7 +7467,7 @@ class ParliamentMeetsCastVotes {
         const londonSeasonVotes = this.args.votes.londonSeasonCards
             .filter((card) => this.selectedLondonSeasonCardIds.includes(card.id))
             .reduce((total, card) => total + card.votes, 0);
-        return this.spend + enterpriseVotes + londonSeasonVotes;
+        return (this.spend / this.args.votes.pricePerVote) + enterpriseVotes + londonSeasonVotes;
     }
     setSelected() {
         this.selectedEnterpriseCardIds.forEach((cardId) => setSelected$1(`enterprise-card-${cardId}`));
@@ -7503,7 +7677,7 @@ class PresidencyTrade {
             return;
         }
         updatePageTitle(_('Trade check: ${you} must select the regions in which you wish to trade'));
-        const staticData = StaticData$1.get();
+        const staticData = StaticData.get();
         Object.entries(this.args.options.regions).forEach(([regionId, region]) => {
             if (this.selectedRegionIds.includes(regionId)) {
                 return;
@@ -7586,7 +7760,7 @@ class PresidencyTrade {
     getTradeLog() {
         let log = [];
         const args = {};
-        const staticData = StaticData$1.get();
+        const staticData = StaticData.get();
         this.selectedRegionIds.forEach((regionId, index) => {
             const key = `key_${index}`;
             log.push(['${', key, '}'].join(''));
@@ -7675,7 +7849,7 @@ class PresidencyTradeFillOrders {
             onClick(orderId, async () => {
                 this.filledOrders.push({ orderId, filledBy: writer?.id || FILLED });
                 const promises = [];
-                const order = StaticData$1.get().order(orderId);
+                const order = StaticData.get().order(orderId);
                 this.balance += order.value;
                 if (writer) {
                     promises.push(this.game.animationManager.slideAndAttach(document.getElementById(writer.id), document.getElementById(orderId)));
@@ -7702,7 +7876,7 @@ class PresidencyTradeFillOrders {
         if (filledOrderIds.length === 0) {
             return [this.args.homePortOrderId];
         }
-        const staticData = StaticData$1.get();
+        const staticData = StaticData.get();
         const orderIds = [];
         Object.values(this.args.orders).forEach((order) => {
             if (filledOrderIds.includes(order.id)) {
@@ -8304,8 +8478,9 @@ class Game {
                 return showAnimations && this.bga.gameui.bgaAnimationsActive();
             },
         });
-        StaticData$1.create(this);
+        StaticData.create(this);
         EnterpriseCardsManager.create(this);
+        EventTilesManager$1.create(this);
         LawCardsManager.create(this);
         LondonSeasonCardsManager.create(this);
         ShipsManager.create(this);
@@ -8323,6 +8498,7 @@ class Game {
         London.create(this);
         Parliament.create(this);
         India$1.create(this);
+        EventTiles.create(this);
         Bar.create(this);
         if (this.playerOrder.includes(this.getPlayerId()) &&
             gamedatas.phase === SETUP) {

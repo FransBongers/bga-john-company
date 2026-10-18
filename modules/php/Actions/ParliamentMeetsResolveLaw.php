@@ -37,7 +37,7 @@ class ParliamentMeetsResolveLaw extends \Bga\Games\JohnCompany\Models\AtomicActi
     $lawCardId = $args['lawCardId'];
 
     $law = LawCards::get($lawCardId);
-    $law->resolveImmediateEffects($passed);
+    $law->resolveImmediateEffects($this->ctx, $passed);
 
     $this->resolveAction(['automatic' => true]);
   }

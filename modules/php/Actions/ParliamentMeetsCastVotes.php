@@ -9,6 +9,7 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\Players;
@@ -90,7 +91,7 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
     if (!in_array($option, $stateArgs['options'])) {
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_061");
     }
-    if ($money < 0 || $money > $stateArgs['votes']['money']) {
+    if ($money < 0 || $money > $stateArgs['votes']['money'] || $money % $stateArgs['votes']['pricePerVote'] !== 0) {
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_062");
     }
     if (
@@ -103,7 +104,7 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
     $player = Players::get($playerId);
     $family = $player->getFamily();
 
-    $totalVotes = $money;
+    $totalVotes = $money / $stateArgs['votes']['pricePerVote'];
     $enterprises = [];
     $londonSeasonCards = [];
     foreach (array_unique($enterpriseCardIds) as $cardId) {
@@ -230,6 +231,7 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
 
     $options = [
       'money' => $family->getTreasury(),
+      'pricePerVote' => LawCards::isInPlay(MASSED_DEMAND_FRANCHISE_ID) ? 2 : 1,
       'enterprises' => [],
       'londonSeasonCards' => [],
     ];

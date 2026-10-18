@@ -11,5 +11,6 @@ class EventTile_04 extends \Bga\Games\JohnCompany\EventTiles\Crisis
     $this->regionId = BOMBAY;
     $this->shape = SQUARE;
     $this->strength = 1;
+    $this->background = 'crisis_square_1';
   }
 }

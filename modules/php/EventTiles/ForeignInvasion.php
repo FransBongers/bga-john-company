@@ -17,10 +17,10 @@ class ForeignInvasion extends \Bga\Games\JohnCompany\Models\EventTile
     $this->type = FOREIGN_INVASION;
   }
 
-  public function resolveEvent($regionId)
+  public function resolveEvent($regionId, $ctx)
   {
-    parent::resolveEvent($regionId);
-    $side = ONE_ALL;// EventTiles::rollStormDie();
+    // parent::resolveEvent($regionId, $ctx);
+    $side = EventTiles::rollStormDie();
 
     $sideRegionMap = [
       ONE_ALL => [BOMBAY, MADRAS, BENGAL],
@@ -51,7 +51,10 @@ class ForeignInvasion extends \Bga\Games\JohnCompany\Models\EventTile
 
     $currentNode = Engine::getNextUnresolved();
     $currentNode->insertAsBrother(Engine::buildTree($node));
-    
   }
 
+  public function getNotificationText()
+  {
+    return '${tkn_boldText_eventTitle}';
+  }
 }

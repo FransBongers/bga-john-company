@@ -356,6 +356,232 @@ span[style*="color:#addb90"] {
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  * -----
  */
+.joco-event-tile {
+  width: 300px;
+  aspect-ratio: 1/1;
+  background-image: url("img/ganjifa_tiles.webp");
+  background-size: 600% 400%;
+}
+.joco-event-tile .joco-event-tile-title {
+  top: 35px;
+  left: 25px;
+  width: 250px;
+  height: 60px;
+  line-height: 28px;
+}
+.joco-event-tile .joco-event-tile-text {
+  top: 135px;
+  left: 25px;
+  width: 250px;
+  height: 60px;
+}
+.joco-event-tile[data-type=Crisis] .joco-event-tile-imperial-ambitions {
+  top: 212px;
+  left: 89px;
+  width: 126px;
+  height: 16px;
+}
+.joco-event-tile[data-type=Crisis] .joco-event-tile-otherwise {
+  top: 232px;
+  left: 121px;
+  width: 58px;
+  height: 10px;
+}
+.joco-event-tile[data-type=Crisis] .joco-event-tile-top-of-stack {
+  top: 246px;
+  left: 108px;
+  width: 84px;
+  height: 16px;
+}
+.joco-event-tile[data-type=Crisis] .joco-event-tile-top-of-stack-sub {
+  top: 262px;
+  left: 108px;
+  width: 84px;
+  height: 12px;
+  font-size: 6px;
+}
+.joco-event-tile[data-type=ForeignInvasion] .joco-event-tile-text {
+  top: 155px;
+  left: 30px;
+  height: 105px;
+  width: 240px;
+}
+.joco-event-tile[data-type=Leader] .joco-event-tile-leader-left,
+.joco-event-tile[data-type=Leader] .joco-event-tile-leader-right {
+  width: 90px;
+  height: 32px;
+}
+.joco-event-tile[data-type=Leader] .joco-event-tile-leader-left {
+  top: 182px;
+  left: 44px;
+}
+.joco-event-tile[data-type=Leader] .joco-event-tile-leader-right {
+  top: 182px;
+  left: 159px;
+}
+.joco-event-tile[data-type=Peace] .joco-event-tile-text {
+  top: 164px;
+  left: 30px;
+  height: 56px;
+  width: 240px;
+}
+.joco-event-tile[data-type=Peace] .joco-event-tile-top-of-stack {
+  top: 229px;
+  left: 118px;
+  width: 74px;
+  height: 16px;
+}
+.joco-event-tile[data-type=Peace] .joco-event-tile-top-of-stack-sub {
+  top: 245px;
+  left: 118px;
+  width: 74px;
+  height: 12px;
+  font-size: 6px;
+}
+.joco-event-tile[data-type=Shuffle] .joco-event-tile-text {
+  top: 170px;
+  left: 50px;
+  width: 200px;
+}
+.joco-event-tile[data-type=Turmoil] .joco-event-tile-text {
+  top: 175px;
+}
+.joco-event-tile[data-type=Windfall] .joco-event-tile-text {
+  top: 190px;
+  left: 50px;
+  width: 200px;
+  height: 40px;
+}
+
+.joco-event-tile[data-background=Bengal] {
+  background-position-x: 0%;
+  background-position-y: 0%;
+}
+
+.joco-event-tile[data-background=Bombay] {
+  background-position-x: 20%;
+  background-position-y: 0%;
+}
+
+.joco-event-tile[data-background=Delhi] {
+  background-position-x: 40%;
+  background-position-y: 0%;
+}
+
+.joco-event-tile[data-background=Hyderabad] {
+  background-position-x: 60%;
+  background-position-y: 0%;
+}
+
+.joco-event-tile[data-background=Madras] {
+  background-position-x: 80%;
+  background-position-y: 0%;
+}
+
+.joco-event-tile[data-background=Maratha] {
+  background-position-x: 100%;
+  background-position-y: 0%;
+}
+
+.joco-event-tile[data-background=Mysore] {
+  background-position-x: 0%;
+  background-position-y: 33.3333333333%;
+}
+
+.joco-event-tile[data-background=Punjab] {
+  background-position-x: 20%;
+  background-position-y: 33.3333333333%;
+}
+
+.joco-event-tile[data-background=crisis_circle_1_minus] {
+  background-position-x: 40%;
+  background-position-y: 33.3333333333%;
+}
+
+.joco-event-tile[data-background=crisis_circle_3] {
+  background-position-x: 60%;
+  background-position-y: 33.3333333333%;
+}
+
+.joco-event-tile[data-background=crisis_square_1] {
+  background-position-x: 80%;
+  background-position-y: 33.3333333333%;
+}
+
+.joco-event-tile[data-background=crisis_square_2] {
+  background-position-x: 100%;
+  background-position-y: 33.3333333333%;
+}
+
+.joco-event-tile[data-background=crisis_triangle_0] {
+  background-position-x: 0%;
+  background-position-y: 66.6666666667%;
+}
+
+.joco-event-tile[data-background=crisis_triangle_1] {
+  background-position-x: 20%;
+  background-position-y: 66.6666666667%;
+}
+
+.joco-event-tile[data-background=foreign_invasion] {
+  background-position-x: 40%;
+  background-position-y: 66.6666666667%;
+}
+
+.joco-event-tile[data-background=leader_circle_3] {
+  background-position-x: 60%;
+  background-position-y: 66.6666666667%;
+}
+
+.joco-event-tile[data-background=leader_square_2] {
+  background-position-x: 80%;
+  background-position-y: 66.6666666667%;
+}
+
+.joco-event-tile[data-background=leader_triangle_2] {
+  background-position-x: 100%;
+  background-position-y: 66.6666666667%;
+}
+
+.joco-event-tile[data-background=leader_triangle_4] {
+  background-position-x: 0%;
+  background-position-y: 100%;
+}
+
+.joco-event-tile[data-background=peace_square] {
+  background-position-x: 20%;
+  background-position-y: 100%;
+}
+
+.joco-event-tile[data-background=peace_triangle] {
+  background-position-x: 40%;
+  background-position-y: 100%;
+}
+
+.joco-event-tile[data-background=shuffle_circle] {
+  background-position-x: 60%;
+  background-position-y: 100%;
+}
+
+.joco-event-tile[data-background=turmoil] {
+  background-position-x: 80%;
+  background-position-y: 100%;
+}
+
+.joco-event-tile[data-background=windfall] {
+  background-position-x: 100%;
+  background-position-y: 100%;
+}
+
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
 .joco-office-card {
   box-sizing: border-box;
   width: 225px;
@@ -832,6 +1058,11 @@ span[style*="color:#addb90"] {
   cursor: inherit;
 }
 
+.joco-card-text {
+  position: absolute;
+  text-align: center;
+}
+
 .joco-small-card-horizontal {
   height: 150px;
   aspect-ratio: 610/400;
@@ -1266,8 +1497,8 @@ span[style*="color:#addb90"] {
 .joco-storm-die {
   background-image: url("img/storm_die.png");
   background-size: 500% 100%;
-  width: calc(var(--iconScale) * 50px);
-  height: calc(var(--iconScale) * 50px);
+  height: 50px;
+  aspect-ratio: 1/1;
 }
 
 .joco-storm-die[data-side=four] {
@@ -2606,7 +2837,7 @@ span[style*="color:#c0c0c0"] {
   align-items: center;
   height: 40px !important;
 }
-.log-token.joco-cube {
+.log-token.joco-storm-die, .log-token.joco-cube {
   height: 32px;
 }
 .log-token.joco-power-marker {
@@ -2658,11 +2889,15 @@ span[style*="color:#c0c0c0"] {
   top: -4px;
   margin-top: 4px;
 }
+.log > .roundedbox .joco-storm-die,
 .log > .roundedbox .joco-ship,
+.log > .roundedboxinner .joco-storm-die,
 .log > .roundedboxinner .joco-ship {
   height: 32px;
 }
 
+.notif_drawEventTile .roundedboxinner,
+.notif_drawEventTile .roundedbox,
 .notif_turn .roundedboxinner,
 .notif_turn .roundedbox,
 .notif_nextPhase .roundedboxinner,
@@ -2671,6 +2906,7 @@ span[style*="color:#c0c0c0"] {
   text-align: center;
 }
 
+.notif_drawEventTile .roundedbox,
 .notif_turn .roundedbox,
 .notif_nextPhase .roundedbox {
   border-top: 1px solid black;
@@ -2945,6 +3181,23 @@ span[style*="color:#c0c0c0"] {
 }
 #joco-elephant[data-location=Madras_Mysore_border][data-facing=Mysore] {
   transform: scaleX(-1);
+}
+
+.joco-event-tiles-container .joco-row {
+  gap: 12px;
+}
+.joco-event-tiles-container .joco-event-tiles-stock {
+  position: relative;
+  width: 300px;
+  aspect-ratio: 1/1;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+}
+.joco-event-tiles-container .joco-event-tiles-stock .joco-event-tile-container {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 /*
@@ -3283,8 +3536,9 @@ span[style*="color:#c0c0c0"] {
   left: 360px;
 }
 .joco-unrest-container[data-region=Madras] {
-  top: 604px;
-  left: 479px;
+  top: 645px;
+  left: 488px;
+  width: 66px;
 }
 .joco-unrest-container[data-region=Maratha] {
   top: 200px;

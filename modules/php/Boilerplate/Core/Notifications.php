@@ -7,6 +7,8 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\JoCoUtils;
+use Bga\Games\JohnCompany\Managers\ControlTokens;
+use Bga\Games\JohnCompany\Managers\EventTiles;
 use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Prizes;
@@ -14,6 +16,7 @@ use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Managers\Ships;
 use Bga\Games\JohnCompany\Models\ArmyPiece;
 use Bga\Games\JohnCompany\Models\Enterprise;
+use Bga\Games\JohnCompany\Models\EventTile;
 use Bga\Games\JohnCompany\Models\Family;
 use Bga\Games\JohnCompany\Models\FamilyMember;
 use Bga\Games\JohnCompany\Models\LawCard;
@@ -475,15 +478,17 @@ class Notifications
     ]);
   }
 
-  public static function crisisResult($attackStrength, $defenderStrength)
+  public static function crisisResult(int $attackStrength, int $defenderStrength, string $type)
   {
     $text = $attackStrength > $defenderStrength ?
-      clienttranslate('The attack succeeds with a total of ${tkn_boldText_attackerTotal} vs ${tkn_boldText_defenderTotal}') :
-      clienttranslate('The attack fails with a total of ${tkn_boldText_attackerTotal} vs ${tkn_boldText_defenderTotal}');
+      clienttranslate('The ${invasionOrRebellion} succeeds with a total of ${tkn_boldText_attackerTotal} vs ${tkn_boldText_defenderTotal}') :
+      clienttranslate('The ${invasionOrRebellion} fails with a total of ${tkn_boldText_attackerTotal} vs ${tkn_boldText_defenderTotal}');
 
     Notifications::message($text, [
+      'invasionOrRebellion' => in_array($type, [INVASION, INVASION_AGAINST_COMPANY]) ? clienttranslate('Invasion') : clienttranslate('Rebellion'),
       'tkn_boldText_attackerTotal' => $attackStrength,
       'tkn_boldText_defenderTotal' => $defenderStrength,
+      'i18n' => ['invasionOrRebellion'],
     ]);
   }
 
@@ -559,6 +564,20 @@ class Notifications
     self::notify($player, 'draftNewCardsPrivate', '', [
       'cardIds' => $cardIds,
       'lastCard' => $lastCard,
+    ]);
+  }
+
+  public static function drawEventTile(EventTile $eventTile)
+  {
+    $topOfDeck = EventTiles::getTopOf(DECK);
+    $regionName = $topOfDeck !== null ? Regions::get($topOfDeck->getRegionId())->getName() : null;
+
+    self::notifyAll('drawEventTile', $eventTile->getNotificationText(), [
+      'eventTile' => $eventTile->jsonSerialize(),
+      'tkn_boldText_eventTitle' => $eventTile->getTitle(),
+      'tkn_boldText_region' => $regionName,
+      'i18n' => ['tkn_boldText_eventTitle', 'tkn_boldText_region'],
+      'topOfDeck' => $topOfDeck->jsonSerialize()
     ]);
   }
 
@@ -703,7 +722,7 @@ class Notifications
     ]));
   }
 
-  public static function nextPhase(string $phase)
+  public static function getPhaseName(string $phase)
   {
     $phaseNameMap = [
       FAMILY => clienttranslate('Family phase'),
@@ -724,8 +743,12 @@ class Notifications
       UPKEEP_AND_REFRESH => clienttranslate('Upkeep & Refresh'),
     ];
     $text = isset($phaseNameMap[$phase]) ? $phaseNameMap[$phase] : $phase;
+    return $text;
+  }
 
-    self::notifyAll('nextPhase', $text, [
+  public static function nextPhase(string $phase)
+  {
+    self::notifyAll('nextPhase', self::getPhaseName($phase), [
       'phase' => $phase,
     ]);
   }
@@ -740,6 +763,29 @@ class Notifications
       'amount' => $cash,
       'tkn_boldText_amount' => '£' . abs($cash),
       'tkn_pound' => clienttranslate('Pounds')
+    ]);
+  }
+
+  public static function payTax(Player $player, int $amount, string $target)
+  {
+    $targetName = $target === SHARE ? clienttranslate('Shares') : self::getEnterpriseName($target);
+    self::notifyAll('updateFamilyTreasury', clienttranslate('${player_name} pays ${tkn_boldText_amount} in taxes'), [
+      'player' => $player,
+      'amount' => -$amount,
+      'tkn_boldText_amount' => '£' . $amount,
+      'targetName' => $targetName,
+      'i18n' => ['targetName'],
+      'tkn_pound' => clienttranslate('Pounds'),
+    ]);
+  }
+
+  public static function payWindowTax(Player $player, int $amount)
+  {
+    self::notifyAll('updateFamilyTreasury', clienttranslate('${player_name} pays a window tax of ${tkn_boldText_amount}'), [
+      'player' => $player,
+      'amount' => -$amount,
+      'tkn_boldText_amount' => '£' . $amount,
+      'tkn_pound' => clienttranslate('Pounds'),
     ]);
   }
 
@@ -1064,21 +1110,20 @@ class Notifications
     ]);
   }
 
-  public static function regionBecomesPartOfEmpire($region, $capital)
+  public static function regionBecomesPartOfEmpire(Region $region, Region $capital)
   {
-    self::notifyAll('updateRegion', clienttranslate('${tkn_boldText_region} becomes part of the ${tkn_boldText_capital} empire'), [
+    $text = clienttranslate('${tkn_boldText_region} becomes part of the ${tkn_boldText_capital} empire');
+    self::updateRegion($region, $text, [
       'tkn_boldText_region' => $region->getName(),
       'tkn_boldText_capital' => $capital->getName(),
-      'region' => $region->jsonSerialize(),
       'i18n' => ['tkn_boldText_region']
     ]);
   }
 
-  public static function regionBecomesSovereign($region)
+  public static function regionBecomesSovereign(Region $region)
   {
-    self::notifyAll('updateRegion', clienttranslate('${tkn_boldText_region} becomes sovereign'), [
+    self::updateRegion($region, clienttranslate('${tkn_boldText_region} becomes sovereign'), [
       'tkn_boldText_region' => $region->getName(),
-      'region' => $region->jsonSerialize(),
       'i18n' => ['tkn_boldText_region']
     ]);
   }
@@ -1276,23 +1321,27 @@ class Notifications
     ]));
   }
 
-  public static function addUnrest(Player $player, Region $region, int $change)
+  public static function addUnrest(Player | null $player, Region $region, int $change)
   {
-    self::notifyAll('updateRegion', clienttranslate('${player_name} adds ${tkn_boldText_change}${tkn_unrest} to ${tkn_boldText_region}'), [
-      'player' => $player,
+    $text = clienttranslate('${tkn_boldText_change}${tkn_unrest} is added to ${tkn_boldText_region}');
+    $textArgs = [];
+    if ($player !== null) {
+      $text = clienttranslate('Adds ${tkn_boldText_change}${tkn_unrest} to ${tkn_boldText_region}');
+      $textArgs['player'] = $player;
+    }
+
+    self::updateRegion($region, $text, array_merge($textArgs, [
       'tkn_boldText_change' => $change,
       'tkn_boldText_region' => $region->getName(),
-      'region' => $region->jsonSerialize(),
       'tkn_unrest' => self::tknUnrest(),
       'i18n' => ['tkn_boldText_region'],
-    ]);
+    ]));
   }
 
   public static function removeUnrest(Region $region)
   {
-    self::notifyAll('updateRegion', clienttranslate('All unrest in ${tkn_boldText_region} is removed'), [
+    self::updateRegion($region, clienttranslate('All unrest in ${tkn_boldText_region} is removed'), [
       'tkn_boldText_region' => $region->getName(),
-      'region' => $region->jsonSerialize(),
       'i18n' => ['tkn_boldText_region']
     ]);
   }
@@ -1431,19 +1480,17 @@ class Notifications
     ]);
   }
 
-  public static function formEmpire($region)
+  public static function formEmpire(Region $region)
   {
-    self::notifyAll('updateRegion', clienttranslate('The ${tkn_boldText_region} empire is formed'), [
-      'region' => $region->jsonSerialize(),
+    self::updateRegion($region, clienttranslate('The ${tkn_boldText_region} empire is formed'), [
       'tkn_boldText_region' => $region->getName(),
       'i18n' => ['tkn_boldText_region']
     ]);
   }
 
-  public static function shatterEmpire($region)
+  public static function shatterEmpire(Region $region)
   {
-    self::notifyAll('updateRegion', clienttranslate('The ${tkn_boldText_region} empire shatters'), [
-      'region' => $region->jsonSerialize(),
+    self::updateRegion($region, clienttranslate('The ${tkn_boldText_region} empire shatters'), [
       'tkn_boldText_region' => $region->getName(),
       'i18n' => ['tkn_boldText_region']
     ]);
@@ -1472,7 +1519,7 @@ class Notifications
     ]);
   }
 
-  public static function updateTowerLevel($region, $change)
+  public static function updateTowerLevel(Region $region, int $change)
   {
     $text = '';
     if ($change === 1) {
@@ -1483,18 +1530,24 @@ class Notifications
     } else if ($change < 0) {
     }
 
-    self::notifyAll('updateRegion', $text, [
-      'region' => $region->jsonSerialize(),
+    self::updateRegion($region, $text, [
       'tkn_boldText_region' => $region->getName(),
       'i18n' => ['tkn_boldText_region']
     ]);
   }
 
-  public static function removeTower($player, $region)
+  public static function updateRegion(Region $region, string $text, array $textArgs = [])
   {
-    self::notifyAll('updateRegion', clienttranslate('${player_name} removes the tower from ${tkn_boldText_region}'), [
-      'player' => $player,
+    self::notifyAll('updateRegion', $text, array_merge($textArgs, [
       'region' => $region->jsonSerialize(),
+      'controlToken' => ControlTokens::getByRegion($region->getId())->jsonSerialize()
+    ]));
+  }
+
+  public static function removeTower(Player $player, Region $region)
+  {
+    self::updateRegion($region, clienttranslate('${player_name} removes the tower from ${tkn_boldText_region}'), [
+      'player_name' => $player->getName(),
       'tkn_boldText_region' => $region->getName(),
       'i18n' => ['tkn_boldText_region']
     ]);

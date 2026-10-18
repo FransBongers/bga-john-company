@@ -9,5 +9,6 @@ class EventTile_08 extends \Bga\Games\JohnCompany\EventTiles\Windfall
     parent::__construct($row);
     $this->id = 'EventTile_08';
     $this->regionId = MADRAS;
+    $this->background = 'windfall';
   }
 }

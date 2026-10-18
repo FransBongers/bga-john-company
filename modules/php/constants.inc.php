@@ -101,6 +101,8 @@ const ST_REVENUE_PAY_DIVIDENDS = 65;
 const ST_EVENTS_IN_INDIA_STORMS = 70;
 const ST_EVENTS_IN_INDIA_RESOLVE_EVENT = 71;
 const ST_EVENTS_IN_INDIA_CRISIS_DEFENSE = 73;
+const ST_EVENTS_IN_INDIA_RESOLVE_CRISIS = 161;
+const ST_EVENTS_IN_INDIA_ELEPHANT_MARCH = 163;
 const ST_FOREIGN_INVASION = 74;
 const ST_FOREIGN_INVASION_END = 75;
 
@@ -151,8 +153,10 @@ const BONUSES = 'Bonuses';
 const DRAFT_CARD = 'DraftCard';
 const DRAFT_CARD_NEXT_STEP = 'DraftCardNextStep';
 const EVENTS_IN_INDIA_CRISIS_DEFENSE = 'EventsInIndiaCrisisDefense';
+const EVENTS_IN_INDIA_RESOLVE_CRISIS = 'EventsInIndiaResolveCrisis';
 const EVENTS_IN_INDIA_STORMS = 'EventsInIndiaStorms';
 const EVENTS_IN_INDIA_RESOLVE_EVENT = 'EventsInIndiaResolveEvent';
+const EVENTS_IN_INDIA_ELEPHANT_MARCH = 'EventsInIndiaElephantMarch';
 const FAMILY_ACTION = 'FamilyAction';
 const FINAL_SCORING = 'FinalScoring';
 const FOREIGN_INVASION_END = 'ForeignInvasionEnd';
@@ -503,6 +507,8 @@ const MARATHA = 'Maratha';
 const MYSORE = 'Mysore';
 const PUNJAB = 'Punjab';
 
+const CONTROL_TOKEN = 'ControlToken';
+
 const REGIONS = [
   BENGAL,
   BOMBAY,
@@ -541,9 +547,9 @@ const BOMBAY_PRESIDENCY = 'PresidencyBombay';
 const MADRAS_PRESIDENCY = 'PresidencyMadras';
 
 const PRESIDENCIES = [
-  BENGAL_PRESIDENCY,
   BOMBAY_PRESIDENCY,
   MADRAS_PRESIDENCY,
+  BENGAL_PRESIDENCY,
 ];
 
 const PRESIDENCY_HOME_REGION_MAP = [
@@ -802,6 +808,10 @@ const WINDFALL = 'Windfall';
 const LOCATION = 'location';
 const FACING = 'facing';
 
+const INVASION = 'invasion';
+const REBELLION = 'rebellion';
+const INVASION_AGAINST_COMPANY = 'invasionAgainstCompany';
+const REBELLION_AGAINST_COMPANY = 'rebellionAgainstCompany';
 
 /**
  * Storm Die
@@ -973,9 +983,11 @@ const REMOVED = 'removed';
  */
 const MR_ROCHESTER_ID = 'PrestigeCard_11';
 const STOCK_BROKER_ID = 'PrestigeCard_25';
+CONST WILLIAM_COLLINS_ID = 'PrestigeCard_17';
 
 /**
  * LawCardIds: specific card IDs that affect the game and
  * are used in the code
  */
+const MASSED_DEMAND_FRANCHISE_ID = 'LawCard_54';
 const ZAMINDAR_TAXES_ID = 'LawCard_41';

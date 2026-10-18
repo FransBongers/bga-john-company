@@ -6,6 +6,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
+use Bga\Games\JohnCompany\Managers\ControlTokens;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Orders;
@@ -19,7 +20,6 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   protected $location;
   protected $state;
   protected $control;
-  protected $looted;
   protected $strength;
   protected $unrest;
   // static
@@ -45,7 +45,6 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     'location' => 'region_location',
     'state' => ['region_state', 'int'],
     'control' => ['control', 'str'],
-    'looted' => ['looted', 'int'],
     'strength' => ['strength', 'int'],
     'unrest' => ['unrest', 'int'],
   ];
@@ -64,7 +63,6 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     $data = parent::jsonSerialize();
     unset($data['state']);
     unset($data['location']);
-    $data['looted'] = $this->looted === 1;
     $data['isCapital'] = $this->isCapital();
     return $data;
   }
@@ -147,7 +145,7 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     return $this->control === null;
   }
 
-  public function addUnrest(Player $player, int $change)
+  public function addUnrest(Player | null $player, int $change)
   {
     if ($change === 0) {
       return;
@@ -317,6 +315,8 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     // Remove tower and check empire
     $this->setStrength(0);
     $this->setControl($presidencyId);
+    $controlToken = ControlTokens::getByRegion($this->getId());
+    $controlToken->setLocation($presidencyId);
     if ($this->isCapital()) {
       $this->shatterEmpire();
     } else if ($previousControl !== $presidencyId) {

@@ -24,7 +24,7 @@ class LawCard_35 extends \Bga\Games\JohnCompany\Models\LawCard
     ];
   }
 
-  public function resolveImmediateEffects($passed = true)
+  public function resolveImmediateEffects($ctx, $passed = true)
   {
     Company::setDebt(0);
 

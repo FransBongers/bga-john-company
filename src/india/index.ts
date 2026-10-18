@@ -1,11 +1,5 @@
 import { createHtmlElement } from '../boilerplate';
 import {
-  BOMBAY,
-  MADRAS,
-  BENGAL,
-  ORDER_MADRAS_2,
-  ORDER_HYDERABAD_1,
-  WEST_INDIAN,
   SEA_ZONES,
   MILITARY_AFFAIRS,
   OFFICER_IN_TRAINING,

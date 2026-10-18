@@ -25,6 +25,8 @@ import {
   JocoControlToken,
   JocoEnterpriseCard,
   JocoEnterpriseCardBase,
+  JocoEventTile,
+  JocoEventTileBase,
   JocoLawCard,
   JocoLawCardBase,
   JocoLondonSeasonCard,
@@ -124,6 +126,15 @@ export const getEnterpriseCard = (
   return {
     ...card,
     ...cardStatic,
+  };
+};
+
+export const getEventTile = (tile: JocoEventTileBase): JocoEventTile => {
+  const staticData = StaticData.get();
+  const tileStatic = staticData.eventTile(tile.id);
+  return {
+    ...tile,
+    ...tileStatic,
   };
 };
 

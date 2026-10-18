@@ -9,5 +9,6 @@ class EventTile_09 extends \Bga\Games\JohnCompany\EventTiles\Turmoil
     parent::__construct($row);
     $this->id = 'EventTile_09';
     $this->regionId = DELHI;
+    $this->background = 'turmoil';
   }
 }

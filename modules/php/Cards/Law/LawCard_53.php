@@ -2,6 +2,10 @@
 
 namespace Bga\Games\JohnCompany\Cards\Law;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
+use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
+use Bga\Games\JohnCompany\Managers\Regions;
+
 class LawCard_53 extends \Bga\Games\JohnCompany\Models\LawCard
 {
   public function __construct($row)
@@ -29,5 +33,28 @@ class LawCard_53 extends \Bga\Games\JohnCompany\Models\LawCard
         ],
       ],
     ];
+  }
+
+  public function resolveImmediateEffects($ctx, $passed = true)
+  {
+    if ($passed) {
+      $ctx->insertAsBrother(new LeafNode([
+        'action' => PARLIAMENT_MEETS_RESOLVE_POLICY
+      ]));
+      return;
+    }
+    // The Turmoil event occurs in each home region. Add 1 unrest to every Company-controlled region.
+    $regions = Regions::getAll();
+
+    foreach (HOME_REGIONS as $regionId) {
+      $regions[$regionId]->closeNorthernMostOpenOrder();
+      Globals::setCascadedRegions([]);
+    }
+
+    foreach ($regions as $region) {
+      if ($region->isCompanyControlled()) {
+        $region->addUnrest(null, 1);
+      }
+    }
   }
 }

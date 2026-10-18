@@ -110,11 +110,14 @@ import {
   NotifUpdateFamilyTreasury,
   NotifUpdateCompanyDebt,
   NotifFlipShip,
+  NotifDrawEventTile,
 } from './types';
 import { tplArmyPiece } from '../../india/army/templates';
 import { Parliament } from '../../parliament';
 import { DECK, DISCARD, USED } from '../constants';
 import { LawCardsManager } from '../../cards/law-cards';
+import { ControlTokensManager } from '../../token-managers/control-tokens';
+import { EventTiles } from '../../india/event-tiles';
 
 //  .##.....##....###....##....##....###.....######...########.########.
 //  .###...###...##.##...###...##...##.##...##....##..##.......##.....##
@@ -448,6 +451,12 @@ export class NotificationManager {
         );
       }),
     );
+  }
+
+  async notif_drawEventTile(notif: NotifDrawEventTile) {
+    const { eventTile, topOfDeck } = notif;
+
+    await EventTiles.getInstance().drawEventTile(eventTile, topOfDeck);
   }
 
   async notif_allocateBalanceToOffice(notif: NotifAllocateBalanceToOffice) {
@@ -1041,16 +1050,20 @@ export class NotificationManager {
   }
 
   async notif_updateRegion(notif: NotifUpdateRegion) {
-    const { region: data } = notif;
+    const { region: data, controlToken } = notif;
     const india = India.getInstance();
     const region = india.getRegion(data.id);
     region.update(data);
 
-    const controlToken = createControlToken(data);
-
+    const regionHasControlToken = region.hasControlToken(controlToken);
     if (
       PRESIDENCIES.includes(data.control) &&
-      region.hasControlToken(controlToken)
+      regionHasControlToken
+    ) {
+      await india.getPresidency(data.control).addControlToken(controlToken);
+    } else if (
+      !PRESIDENCIES.includes(data.control) &&
+      !regionHasControlToken
     ) {
       await india.getPresidency(data.control).addControlToken(controlToken);
     }

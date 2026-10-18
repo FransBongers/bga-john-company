@@ -89,6 +89,8 @@ import { ControlTokensManager } from './token-managers/control-tokens';
 import { ShipsManager } from './token-managers/ship-tokens';
 import { JohnCompanyGamedatas, GamedatasAlias } from './types';
 import { Parliament } from './parliament';
+import { EventTiles } from './india/event-tiles';
+import { EventTilesManager } from './cards/event-tiles';
 
 // declare const define; // TODO: check if we comment here or in bga-animations module?
 // declare const ebg;
@@ -406,6 +408,7 @@ export class Game {
     });
     StaticData.create(this);
     EnterpriseCardsManager.create(this);
+    EventTilesManager.create(this);
     LawCardsManager.create(this);
     LondonSeasonCardsManager.create(this);
     ShipsManager.create(this);
@@ -429,6 +432,7 @@ export class Game {
     London.create(this);
     Parliament.create(this);
     India.create(this);
+    EventTiles.create(this);
     Bar.create(this);
 
     if (

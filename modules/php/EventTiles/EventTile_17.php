@@ -10,5 +10,6 @@ class EventTile_17 extends \Bga\Games\JohnCompany\EventTiles\Shuffle
     $this->id = 'EventTile_17';
     $this->regionId = MADRAS;
     $this->shape = CIRCLE;
+    $this->background = 'shuffle_circle';
   }
 }

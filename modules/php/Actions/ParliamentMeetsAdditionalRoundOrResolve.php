@@ -147,7 +147,7 @@ class ParliamentMeetsAdditionalRoundOrResolve extends \Bga\Games\JohnCompany\Mod
   private function handleFailedLaw(LawCard $law)
   {
     // Fail any if failed effects if dilemma
-    $law->resolveImmediateEffects(false);
+    $law->resolveImmediateEffects($this->ctx, false);
 
     $leaderOppositionPlayerId = Parliament::getLeaderOfOpposition();
     // Discard Law

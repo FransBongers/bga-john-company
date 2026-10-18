@@ -3,10 +3,17 @@
 @use 'sass:map';
 
 @use './enterprise-cards/enterpriseCards';
+@use './event-tiles/event-tiles';
 @use './office-cards/officeCards';
 @use './london-season-cards/londonSeasonCards';
 @use './law-cards/lawCards';
 @use './setup-cards/setupCards';
+
+.joco-card-text {
+  position: absolute;
+  text-align: center;
+  // background-color: rgba(yellow, 0.5);
+}
 
 .joco-small-card-horizontal {
   height: 150px;

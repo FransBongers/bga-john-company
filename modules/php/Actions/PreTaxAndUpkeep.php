@@ -78,8 +78,6 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
         }
       }
 
-      Notifications::log('resolveUpkeep', ['playerId' => $playerId, 'upkeep' => $upkeep]);
-
       if ($upkeep === 0) {
         continue;
       }
@@ -106,7 +104,64 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   private function resolveTax(string $target, bool $windowTax)
   {
-    // Implement the logic for resolving tax here
+    $playersThatCannotPayTaxes = [];
+
+    $primeMinisterPlayerId = Parliament::getPrimeMinisterPlayerId();
+    foreach (Players::getTurnOrder($primeMinisterPlayerId) as $playerId) {
+      $player = Players::get($playerId);
+      $family = $player->getFamily();
+
+      if ($target === SHARE) {
+        $count = $family->getShareCount();
+      } else {
+        $count = 0;
+        foreach ($family->getEnterprises() as $enterprise) {
+          if ($enterprise->getType() === $target) {
+            $count++;
+          }
+        }
+        foreach ($player->getLondonSeasonCards() as $card) {
+          if ($card->getEnterpriseType() === $target) {
+            $count++;
+          }
+        }
+      }
+
+      $totalTaxes = $count;
+      $windows = 0;
+      if ($windowTax) {
+        $windows = $family->getWindowCount();
+        $totalTaxes += $windows;
+      }
+
+      if ($totalTaxes > $family->getTreasury()) {
+        $playersThatCannotPayTaxes[] = $playerId;
+        continue;
+      }
+
+      if ($count > 0) {
+        $family->pay($count);
+        Notifications::payTax($player, $count, $target);
+      }
+
+      if ($windowTax && $windows > 0) {
+        $family->pay($windows);
+        Notifications::payWindowTax($player, $windows);
+      }
+    }
+
+    if (count($playersThatCannotPayTaxes) > 0) {
+      $this->ctx->insertAsBrother(new LeafNode([
+        'action' => TAX_AND_UPKEEP,
+        'playerId' => 'some',
+        'activePlayerIds' => $playersThatCannotPayTaxes,
+        'args' => [
+          'type' => TAX,
+          'target' => $target,
+          'windowTax' => $windowTax,
+        ],
+      ]));
+    }
   }
 
   // .########.##....##..######...####.##....##.########
