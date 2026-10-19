@@ -22,7 +22,7 @@ interface OnEnteringHiringHireFamilyMemberArgs extends CommonStateArgs {
   options: JocoFamilyMember[];
   hiringFamilyId: string;
   hiringPlayerId: number;
-  constentForNepotismRequired: boolean;
+  consentForNepotismRequired: boolean;
 }
 
 export class HiringHireFamilyMember implements GameState<OnEnteringHiringHireFamilyMemberArgs> {
@@ -97,7 +97,7 @@ export class HiringHireFamilyMember implements GameState<OnEnteringHiringHireFam
     setSelected(option.id);
 
     if (
-      this.args.constentForNepotismRequired &&
+      this.args.consentForNepotismRequired &&
       option.familyId === this.args.hiringFamilyId
     ) {
       updatePageTitle(

@@ -769,7 +769,7 @@ const performAction$1 = (actionName, args) => {
     Interaction.use().clearPossible();
     Interaction.use().performAction(actionName, args);
 };
-const getPlayerName = (playerId) => {
+const getPlayerName$1 = (playerId) => {
     return PlayerManager$1.getInstance().getPlayer(playerId).getName();
 };
 const createHtmlElement = (html) => {
@@ -805,7 +805,7 @@ class Interaction {
             .getColor();
         this.addSecondaryActionButton({
             id,
-            text: getPlayerName(playerId),
+            text: getPlayerName$1(playerId),
             callback,
             extraClasses: `player-button ${HEX_COLOR_COLOR_MAP[playerColor]} ${extraClasses}`,
         });
@@ -3549,7 +3549,7 @@ class PrimeMinisterDial {
     updatePlayerName(playerId) {
         this.ui.playerName.replaceChildren();
         this.ui.playerName.insertAdjacentHTML('beforeend', formatStringRecursive('${tkn_playerName}', {
-            tkn_playerName: getPlayerName(playerId),
+            tkn_playerName: getPlayerName$1(playerId),
         }));
     }
     getRotationForPosition(position, currentRotation) {
@@ -3601,7 +3601,7 @@ const tplOppositionContent = (opposition) => {
     const order = Object.entries(opposition.votes)
         .map(([playerId, votes]) => ({
         playerId: parseInt(playerId, 10),
-        playerName: getPlayerName(parseInt(playerId, 10)),
+        playerName: getPlayerName$1(parseInt(playerId, 10)),
         votes,
     }))
         .sort((a, b) => {
@@ -3625,7 +3625,7 @@ const tplOppositionContent = (opposition) => {
     });
     return `
         ${opposition.leader !== null
-        ? tplLeaderOfTheOpposition(getPlayerName(opposition.leader))
+        ? tplLeaderOfTheOpposition(getPlayerName$1(opposition.leader))
         : ''}
         <span class="fb-font-baskerville fb-font-16">
           ${formatStringRecursive('${playerLog}', {
@@ -4809,7 +4809,7 @@ class Chairman {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} may increase Company Debt and must allocate the Company Balance'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -5008,7 +5008,7 @@ class ChairmanDebtConsent {
         this.game.clearPossible();
         updatePageTitle(_('${tkn_playerName} asks for your consent to increase Company Debt to ${value} (${required} more ${tkn_icon} required)'), {
             value: this.args.debt,
-            tkn_playerName: getPlayerName(this.args.chairmanPlayerId),
+            tkn_playerName: getPlayerName$1(this.args.chairmanPlayerId),
             required: this.args.remainingVotesRequired,
             tkn_icon: SHARE,
         });
@@ -5050,13 +5050,13 @@ class CommanderApproveLocalAlliance {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${player_name} must approve or reject funds for a local alliance'), {
-            player_name: getPlayerName(activePlayerIds[0]),
+            player_name: getPlayerName$1(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
         clearPossible();
         updatePageTitle(_('${player_name} requests £${amount} to purchase a local alliance with ${tkn_localAlliance}'), {
-            player_name: getPlayerName(this.args.commanderPlayerId),
+            player_name: getPlayerName$1(this.args.commanderPlayerId),
             amount: StaticData.get().armyPiece(this.args.localAlliance.id).cost,
             tkn_localAlliance: this.args.localAlliance.id,
         });
@@ -5188,7 +5188,7 @@ class CommanderDeploy extends ExhaustArmyPieces {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} may deploy'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -5264,7 +5264,7 @@ class CommanderPurchaseLocalAlliance {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} may purchase a local alliance'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -5779,7 +5779,7 @@ class CrownManagerOfShippingUnfittedShipOptions {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} may fit, buy and lease ships'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -5866,19 +5866,19 @@ class DirectorOfTradeSpecialEnvoy {
     setDescription(activePlayerIds, args) {
         if (args.proposal > 0) {
             updatePageTitle(_('Special Envoy: ${tkn_playerName} proposes to spend ${amount} ${tkn_pound} to make a check'), {
-                tkn_playerName: getPlayerName(activePlayerIds[0]),
+                tkn_playerName: getPlayerName$1(activePlayerIds[0]),
                 amount: args.proposal,
                 tkn_pound: 'pound',
             });
         }
         else if (args.proposal === 0) {
             updatePageTitle(_('Special Envoy: ${tkn_playerName} proposes not to make a check'), {
-                tkn_playerName: getPlayerName(activePlayerIds[0]),
+                tkn_playerName: getPlayerName$1(activePlayerIds[0]),
             });
         }
         else {
             updatePageTitle(_('Special Envoy: ${tkn_playerName} may make a check'), {
-                tkn_playerName: getPlayerName(activePlayerIds[0]),
+                tkn_playerName: getPlayerName$1(activePlayerIds[0]),
             });
         }
     }
@@ -5958,7 +5958,7 @@ class DirectorOfTradeSpecialEnvoySuccess {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} may open trade with China or may open a closed order'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -6011,7 +6011,7 @@ class DirectorOfTradeTransfers {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} may move writers or ships'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -6296,7 +6296,7 @@ class EventsInIndiaCrisisDefense extends ExhaustArmyPieces {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} must exhaust defenders'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -6405,7 +6405,7 @@ class GovernorAdminister {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} may take an Administer action with the ${governorTitle}'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
             governorTitle: _(getOffice(args.governor).title),
         });
     }
@@ -6469,7 +6469,7 @@ class HiringChairman {
     updateInterfaceConfirm(playerId) {
         clearPossible();
         updatePageTitle(_('Hiring: support ${tkn_playerName} for Chairman with ${number} shares?'), {
-            tkn_playerName: getPlayerName(playerId),
+            tkn_playerName: getPlayerName$1(playerId),
             number: this.args.options[getCurrentPlayerId()],
         });
         addConfirmButton$1(() => {
@@ -6501,7 +6501,7 @@ class HiringChooseChairman {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('Hiring: ${tkn_playerName} must choose a player to become the new Chairman'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -6521,6 +6521,55 @@ class HiringChooseChairman {
             });
         });
         addCancelButton();
+    }
+}
+
+class HiringGiveConsentForNepotism {
+    constructor(game) {
+        this.game = game;
+    }
+    static create(game) {
+        HiringGiveConsentForNepotism.instance = new HiringGiveConsentForNepotism(game);
+    }
+    static getInstance() {
+        return HiringGiveConsentForNepotism.instance;
+    }
+    onEnteringState(args) {
+        debug('Entering HiringGiveConsentForNepotism state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    }
+    onLeavingState() {
+        debug('Leaving HiringGiveConsentForNepotism state');
+    }
+    setDescription(activePlayerIds, args) {
+        updatePageTitle(_('Consent for nepotism: ${tkn_playerName} wants to hire ${tkn_familyMember} as ${officeTitle}'), {
+            tkn_playerName: getPlayerName$1(args.hiringPlayerId),
+            tkn_familyMember: tknFamilyMember(args.familyMember),
+            officeTitle: getOffice(args.office).title,
+        });
+    }
+    updateInterfaceInitialStep() {
+        clearPossible();
+        updatePageTitle(_('Consent for nepotism: ${tkn_playerName} wants to hire ${tkn_familyMember} as ${officeTitle} (currently ${currentPosition})'), {
+            tkn_playerName: getPlayerName$1(this.args.hiringPlayerId),
+            tkn_familyMember: tknFamilyMember(this.args.familyMember),
+            officeTitle: getOffice(this.args.office).title,
+            currentPosition: _(this.args.currentPosition),
+        });
+        addPrimaryActionButton({
+            id: 'consent-yes',
+            text: _('Give consent'),
+            callback: () => this.performAction(true),
+        });
+        addSecondaryActionButton$1({
+            id: 'consent-no',
+            text: _('Do not give consent'),
+            callback: () => this.performAction(false),
+        });
+    }
+    performAction(consent) {
+        performAction$1('actHiringGiveConsentForNepotism', { consent });
     }
 }
 
@@ -6563,7 +6612,7 @@ class HiringHireFamilyMember {
     updateInterfaceConfirm(option) {
         clearPossible();
         setSelected$1(option.id);
-        if (this.args.constentForNepotismRequired &&
+        if (this.args.consentForNepotismRequired &&
             option.familyId === this.args.hiringFamilyId) {
             updatePageTitle(_('Ask consent for nepotism to hire ${tkn_familyMember} as ${officeTitle}?'), {
                 tkn_familyMember: tknFamilyMember(option),
@@ -6826,7 +6875,7 @@ class ManagerOfShipping {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} may fit, buy and lease ships'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -7005,7 +7054,7 @@ class MilitaryAffairsAssign {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} must assign officers-in-training'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -7089,7 +7138,7 @@ class MilitaryAffairsAssignCommander {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} must appoint the Commander of the ${army}'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
             army: getArmyNameForPresidency(args.presidencyId),
         });
     }
@@ -7143,7 +7192,7 @@ class MilitaryAffairsTransfers {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} may make Army transfers'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -7277,7 +7326,7 @@ class ParliamentMeetsSelectPolicy {
     setDescription(activePlayerIds, args) {
         const activePlayerId = activePlayerIds[0];
         updatePageTitle(_('${player_name} must select a policy'), {
-            player_name: getPlayerName(activePlayerId),
+            player_name: getPlayerName$1(activePlayerId),
         });
     }
     updateInterfaceInitialStep() {
@@ -7533,7 +7582,7 @@ class ParliamentMeetsAdditionalRoundOrResolve {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} can decide to initiate an additional round of voting or can stop and resolve the vote'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -7585,7 +7634,7 @@ class ParliamentMeetsCommitToOpposition {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} must decide whether to commit to the opposition or not'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -7664,7 +7713,7 @@ class PresidencyTrade {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} must choose regions to trade with and spend ${tkn_pound} to make a check'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
             amount: args.proposal,
             tkn_pound: 'pound',
         });
@@ -7813,7 +7862,7 @@ class PresidencyTradeFillOrders {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} must fill orders'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -7944,7 +7993,7 @@ class ParliamentMeetsSelectLaw {
     setDescription(activePlayerIds, args) {
         this.args = args;
         const numberOfRevealedLaws = args.revealedLaws.length;
-        const playerName = getPlayerName(activePlayerIds[0]);
+        const playerName = getPlayerName$1(activePlayerIds[0]);
         switch (numberOfRevealedLaws) {
             case 0:
                 updatePageTitle(_('${tkn_playerName} must draw and reveal a law'), {
@@ -8056,7 +8105,7 @@ class RevenuePayDividends {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} may pay dividends'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -8140,7 +8189,7 @@ class RevenueRoyalPardon {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} may pay dividends'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -8231,7 +8280,7 @@ class SwapPowerMarkers {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('${tkn_playerName} must swap Power markers'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -8343,6 +8392,7 @@ class Game {
             GovernorAdminister,
             HiringChairman,
             HiringChooseChairman,
+            HiringGiveConsentForNepotism,
             HiringHireFamilyMember,
             LondonSeasonChooseCard,
             LondonSeasonRetire,

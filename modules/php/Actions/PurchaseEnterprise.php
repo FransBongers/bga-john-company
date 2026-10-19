@@ -80,7 +80,7 @@ class PurchaseEnterprise extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  public function purchaseEnterprise(string $playerId, string $enterpriseType)
+  public function purchaseEnterprise(int $playerId, string $enterpriseType)
   {
     $player = Players::get($playerId);
     $family = $player->getFamily();

@@ -797,6 +797,23 @@ $machinestates = [
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
+    ST_HIRING_GIVE_CONSENT_FOR_NEPOTISM => GameStateBuilder::create()
+        ->name(HIRING_GIVE_CONSENT_FOR_NEPOTISM)
+        ->description(clienttranslate('${actplayer} must give consent for nepotism'))
+        ->descriptionmyturn(clienttranslate('${you} must give consent for nepotism'))
+        ->type(StateType::MULTIPLE_ACTIVE_PLAYER)
+        ->args('argsAtomicAction')
+        ->action('stAtomicAction')
+        ->possibleactions([
+            'act' . HIRING_GIVE_CONSENT_FOR_NEPOTISM,
+            'actPass',
+            'actPassOptionalAction',
+            'actTakeAtomicAction',
+            'actUndoToStep',
+        ])
+        ->transitions(['next' => ST_RESOLVE_STACK])
+        ->build(),
+
     ST_REFRESH_BOARD => [
         'name' => \REFRESH_BOARD,
         'description' => '',

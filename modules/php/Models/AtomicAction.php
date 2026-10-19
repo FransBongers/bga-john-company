@@ -8,6 +8,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Log;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 
 /*
  * Action: base class to handle atomic action
@@ -109,5 +110,33 @@ class AtomicAction
     Notifications::message("Zombie Turn not implemented for: " . $this->ctx->getAction() . ". Please create a bug report! ", []);
 
     $this->resolveAction(['automatic' => true], true);
+  }
+
+  /**
+   * JoCo specific. Returns the active players from amongst those listed in the context's activePlayerIds.
+   */
+  public function getActivePlayerIdsCurrentlyMultiactive()
+  {
+    $game = Game::get();
+    $activePlayerList = $game->gamestate->getActivePlayerList();
+
+    $activePlayerIds = $this->ctx->getInfo()['activePlayerIds'] ?? [];
+    return Utils::filter($activePlayerIds, function ($playerId) use ($activePlayerList) {
+      return in_array($playerId, $activePlayerList);
+    });
+  }
+
+  public function getActivePlayerIds()
+  {
+    $activePlayerIds = $this->ctx->getInfo()['activePlayerIds'] ?? [];
+    return $activePlayerIds;
+  }
+
+  public function setAllActivePlayerIdsNonMultiactive()
+  {
+    $activePlayerIds = $this->getActivePlayerIdsCurrentlyMultiactive();
+    foreach ($activePlayerIds as $playerId) {
+      Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    }
   }
 }

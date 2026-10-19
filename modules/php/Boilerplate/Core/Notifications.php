@@ -57,7 +57,7 @@ class Notifications
     Game::get()->notifyPlayer($playerId, $name, $msg, $data);
   }
 
-  public static function message($txt, $args = [])
+  public static function message(string $txt, $args = [])
   {
     self::notifyAll('message', $txt, $args);
   }

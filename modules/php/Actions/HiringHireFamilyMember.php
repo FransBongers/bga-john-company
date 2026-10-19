@@ -2,6 +2,7 @@
 
 namespace Bga\Games\JohnCompany\Actions;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
@@ -9,10 +10,11 @@ use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
+use Bga\Games\JohnCompany\Models\FamilyMember;
 use Bga\Games\JohnCompany\Models\Office;
 use Bga\Games\JohnCompany\Models\Player;
 
-class HiringHireFamilyMember extends \Bga\Games\JohnCompany\Models\AtomicAction
+class HiringHireFamilyMember extends Hiring
 {
   public function getState()
   {
@@ -43,7 +45,7 @@ class HiringHireFamilyMember extends \Bga\Games\JohnCompany\Models\AtomicAction
       'options' => $options,
       'hiringFamilyId' => $familyId,
       'hiringPlayerId' => $hiringPlayerId,
-      'constentForNepotismRequired' => Utils::array_some($options, function ($familyMember) use ($familyId) {
+      'consentForNepotismRequired' => Utils::array_some($options, function ($familyMember) use ($familyId) {
         return $familyMember->getFamilyId() !== $familyId;
       }),
     ];
@@ -80,8 +82,19 @@ class HiringHireFamilyMember extends \Bga\Games\JohnCompany\Models\AtomicAction
     $familyMemberId = $args->familyMemberId;
 
     $stateArgs = $this->argsHiringHireFamilyMember();
+    $familyMember = Utils::array_find($stateArgs['options'], function ($candidate) use ($familyMemberId) {
+      return $candidate->getId() === $familyMemberId;
+    });
 
-    $this->performAction($playerId, $familyMemberId, $stateArgs['office']);
+    if ($familyMember === null) {
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_070");
+    }
+
+    if ($familyMember->getPlayerId() === $stateArgs['hiringPlayerId'] && $stateArgs['consentForNepotismRequired']) {
+      $this->handleConsentForNepotism($familyMember, $playerId, $stateArgs);
+    } else {
+      $this->performAction($playerId, $familyMember, $stateArgs['office']);
+    }
 
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
     $this->resolveAction([], true);
@@ -95,61 +108,47 @@ class HiringHireFamilyMember extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  private function getPreviousFunctionFromLocation(string $location): string
+  public function getPlayerIdsThatNeedToGiveConsentForNepotism(array $candidates, int $hiringPlayerId): array
   {
-    switch ($location) {
-      case Locations::commander(BENGAL_PRESIDENCY):
-        return clienttranslate('Commander of the Army of Bengal');
-      case Locations::commander(BOMBAY_PRESIDENCY):
-        return clienttranslate('Commander of the Army of Bombay');
-      case Locations::commander(MADRAS_PRESIDENCY):
-        return clienttranslate('Commander of the Army of Madras');
-      case OFFICER_IN_TRAINING:
-        return clienttranslate('Officer-in-Training');
-      case Locations::armyOfReady(BENGAL_PRESIDENCY):
-        return clienttranslate('Officer in the Army of Bengal');
-      case Locations::armyOfReady(BOMBAY_PRESIDENCY):
-        return clienttranslate('Officer in the Army of Bombay');
-      case Locations::armyOfReady(MADRAS_PRESIDENCY):
-        return clienttranslate('Officer in the Army of Madras');
-      case Locations::writers(BENGAL_PRESIDENCY):
-        return clienttranslate('Writer in the Bengal Presidency');
-      case Locations::writers(BOMBAY_PRESIDENCY):
-        return clienttranslate('Writer in the Bombay Presidency');
-      case Locations::writers(MADRAS_PRESIDENCY):
-        return clienttranslate('Writer in the Madras Presidency');
-      default:
-        throw new \Bga\GameFramework\VisibleSystemException("ERROR_HIRING: " . $location);
+    // Implement the logic to determine which player IDs need to give consent for nepotism
+    $playerIds = [];
+    foreach ($candidates as $candidate) {
+      $candidatePlayerId = $candidate->getPlayerId();
+      if ($candidatePlayerId !== $hiringPlayerId && !in_array($candidatePlayerId, $playerIds)) {
+        $playerIds[] = $candidatePlayerId;
+      }
     }
+    // TODO: add $hiringPlayerId if they have promissory note of one or more of the playerIds
+
+    return $playerIds;
   }
 
-
-  public function performAction(int $hiringPlayerId, string $familyMemberId, Office $office)
+  private function handleConsentForNepotism(FamilyMember $familyMember, int $playerId, array $stateArgs)
   {
-    $hiringPlayer = Players::get($hiringPlayerId);
-
-    $familyMember = FamilyMembers::get($familyMemberId);
-    $hiredPlayer = $familyMember->getPlayer();
-
     $previousOffice = $familyMember->getOffice();
-
-    $familyMember->moveTo($hiringPlayer, $office->getId(), [
-      'text' => clienttranslate('${player_name} hires ${tkn_familyMember} as ${tkn_boldText_office} (previously ${previousFunction})'),
-      'textArgs' => [
-        'previousFunction' => $previousOffice !== null ? $previousOffice->getTitle() : $this->getPreviousFunctionFromLocation($familyMember->getLocation()),
-        'tkn_boldText_office' => $office->getTitle(),
-        'i18n' => ['tkn_boldText_office', 'previousFunction'],
-      ]
+    Notifications::message(clienttranslate('${player_name} want to hire ${tkn_familyMember} as ${tkn_boldText_office} (previously ${previousFunction}) and needs consent for nepotism'), [
+      'player' => Players::get($playerId),
+      'previousFunction' => $previousOffice !== null ? $previousOffice->getTitle() : $this->getPreviousFunctionFromLocation($familyMember->getLocation()),
+      'tkn_boldText_office' => $stateArgs['office']->getTitle(),
+      'tkn_familyMember' => Notifications::tknFamilyMember($familyMember),
+      'i18n' => ['tkn_boldText_office', 'previousFunction'],
     ]);
 
-    $office->setFamilyMemberId($familyMember->getId());
-    $office->setLocation(Locations::familyOffices($familyMember->getFamilyId()));
-    Notifications::moveOfficeCard($office, '', []);
-
-    if ($previousOffice !== null) {
-      $previousOffice->moveToVacantOffices($hiredPlayer);
-    }
+    $this->ctx->insertAsBrother(new LeafNode([
+      'action' => HIRING_GIVE_CONSENT_FOR_NEPOTISM,
+      'playerId' => 'some',
+      'activePlayerIds' => $this->getPlayerIdsThatNeedToGiveConsentForNepotism($stateArgs['options'], $stateArgs['hiringPlayerId']),
+      'args' => [
+        'familyMemberId' => $familyMember->getId(),
+        'officeId' => $stateArgs['office']->getId(),
+        'hiringFamilyId' => $stateArgs['hiringFamilyId'],
+        'hiringPlayerId' => $stateArgs['hiringPlayerId'],
+      ],
+    ]));
   }
+
+
+
 
   // .########.##....##..######...####.##....##.########
   // .##.......###...##.##....##...##..###...##.##......

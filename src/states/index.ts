@@ -20,6 +20,7 @@ export * from './FamilyAction';
 export * from './GovernorAdminister';
 export * from './HiringChairman';
 export * from './HiringChooseChairman';
+export * from './HiringGiveConsentForNepotism';
 export * from './HiringHireFamilyMember';
 export * from './LondonSeasonChooseCard';
 export * from './LondonSeasonRetire';
