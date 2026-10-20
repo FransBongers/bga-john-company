@@ -678,14 +678,9 @@ trait TurnTrait
     $lastRound = Scenarios::get()->getEndTurn() === $currentTurn;
 
     if ($lastRound) {
-
+      Globals::setEndOfGame(true); // Used to check end of negotiation
       $node = [
-        'children' => [
-          [
-            'action' => FINAL_SCORING,
-          ],
-
-        ],
+        'children' => $this->getFinalScoringNodes(true),
       ];
 
       Engine::setup($node, ['method' => '']);
@@ -740,6 +735,53 @@ trait TurnTrait
   }
 
   function stPreEndOfGame() {}
+
+  // .########.####.##....##....###....##......
+  // .##........##..###...##...##.##...##......
+  // .##........##..####..##..##...##..##......
+  // .######....##..##.##.##.##.....##.##......
+  // .##........##..##..####.#########.##......
+  // .##........##..##...###.##.....##.##......
+  // .##.......####.##....##.##.....##.########
+
+  // ..######...######...#######..########..####.##....##..######..
+  // .##....##.##....##.##.....##.##.....##..##..###...##.##....##.
+  // .##.......##.......##.....##.##.....##..##..####..##.##.......
+  // ..######..##.......##.....##.########...##..##.##.##.##...####
+  // .......##.##.......##.....##.##...##....##..##..####.##....##.
+  // .##....##.##....##.##.....##.##....##...##..##...###.##....##.
+  // ..######...######...#######..##.....##.####.##....##..######..
+
+  function getFinalScoringNodes(bool $companySurvived)
+  {
+    $children = [
+      [
+        'action' => FINAL_SCORING,
+        'args' => [
+          'companySurvived' => $companySurvived,
+        ]
+      ],
+    ];
+
+    if ($companySurvived) {
+      $children[] = [
+        'action' => LONDON_SEASON_ATTRITION,
+        'args' => [
+          FINAL_RETIREMENT => true
+        ]
+      ];
+    } else {
+      $children[] = [
+        'action' => RESOLVE_COMPANY_FAILURE_CARD,
+      ];
+    }
+
+    $children[] = [
+      'action' => PRE_END_OF_GAME,
+    ];
+
+    return $children;
+  }
 
 
   //  .##.....##.########.####.##.......####.########.##....##

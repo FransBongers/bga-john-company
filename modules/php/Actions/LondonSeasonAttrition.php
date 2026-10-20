@@ -35,6 +35,13 @@ class LondonSeasonAttrition extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   public function stLondonSeasonAttrition()
   {
+    $args = $this->ctx->getArgs();
+    $finalRetirement = $args[FINAL_RETIREMENT] ?? false;
+
+    if ($finalRetirement) {
+      Notifications::nextPhase(clienttranslate('Final Retirement'));
+    }
+
     $chairmanOffice = Offices::get(CHAIRMAN);
     $playerIds = Players::getTurnOrder($chairmanOffice->getPlayerId());
 
@@ -88,16 +95,19 @@ class LondonSeasonAttrition extends \Bga\Games\JohnCompany\Models\AtomicAction
           'activePlayerIds' => [$playerId],
           'optional' => true,
           'args' => [
-            'familyId' => $player->getFamilyId()
+            'familyId' => $player->getFamilyId(),
+            FINAL_RETIREMENT => $finalRetirement
           ]
         ];
       }
     }
 
     if (count($retireActions) > 0) {
-      $retireActions[] = [
-        'action' => LONDON_SEASON_ORDER,
-      ];
+      if (!$finalRetirement) {
+        $retireActions[] = [
+          'action' => LONDON_SEASON_ORDER,
+        ];
+      }
       $this->ctx->insertAsBrother(Engine::buildTree([
         'children' => $retireActions
       ]));

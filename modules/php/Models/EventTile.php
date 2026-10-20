@@ -126,18 +126,6 @@ class EventTile extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     }
 
 
-    $ctx->insertBefore(Engine::buildTree($node));
-    // $ctx->insertAsBrother(Engine::buildTree($node));
-
-    // $ctx->insertAsBrother(new LeafNode([
-    //   'action' => EVENTS_IN_INDIA_RESOLVE_CRISIS,
-    //   'args' => [
-    //     'type' => $type,
-    //     'attackerId' => $attackerId,
-    //     'defenderId' => $defenderId,
-    //     'eventTileStrength' => $eventTileStrength,
-    //     'primaryCrisis' => true,
-    //   ]
-    // ]));
+    $ctx->insertAsBrother(Engine::buildTree($node));
   }
 }

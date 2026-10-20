@@ -42,6 +42,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     'eventsToResolve' => 'int',
     'retirementMoney' => 'obj',
     'regionsLostThisTurn' => 'int',
+    'endOfGame' => 'bool'
   ];
 
   protected static $table = 'global_variables';
@@ -181,6 +182,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     self::setOptions($options);
     self::setRetirementMoney([]);
     self::setRegionsLostThisTurn(0);
+    self::setEndOfGame(false);
     // self::setScenarioId(THE_1710_SCENARIO);
     
   }

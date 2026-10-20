@@ -2,6 +2,8 @@
 
 namespace Bga\Games\JohnCompany\Cards\Law;
 
+use Bga\Games\JohnCompany\Managers\EventTiles;
+
 class LawCard_55 extends \Bga\Games\JohnCompany\Models\LawCard
 {
   public function __construct($row)
@@ -30,5 +32,14 @@ class LawCard_55 extends \Bga\Games\JohnCompany\Models\LawCard
         ],
       ],
     ];
+  }
+
+  public function resolveImmediateEffects($ctx, $passed = true)
+  {
+    if (!$passed) {
+      // Trigger Foreign Invasion event in the home region(s) associated with any sea zone shown
+      EventTiles::get(FOREIGN_INVASION_EVENT_TILE_ID)->resolveForeignInvastion($ctx, null, true);
+      return;
+    }
   }
 }

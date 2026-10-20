@@ -31,6 +31,7 @@ class Company
       BALANCE => 5,
       STANDING => $scenario->getCompanyStanding(),
       DEBT => $scenario->getCompanyDebt(),
+      SHARE_VALUE => 1,
     ]);
   }
 
@@ -57,6 +58,16 @@ class Company
   public static function getBalance()
   {
     return Globals::getCompany()[BALANCE];
+  }
+
+  public static function setShareValue(int $value)
+  {
+    self::set(SHARE_VALUE, $value);
+  }
+
+  public static function getShareValue(): int
+  {
+    return (int) Globals::getCompany()[SHARE_VALUE];
   }
 
   public static function incBalance($value)

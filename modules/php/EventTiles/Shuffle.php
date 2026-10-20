@@ -23,7 +23,7 @@ class Shuffle extends \Bga\Games\JohnCompany\Models\EventTile
     // parent::resolveEvent($regionId, $ctx);
     $elephantMarchLast = EventTiles::countInLocation(DECK) === 0;
     if (!$elephantMarchLast) {
-      Elephant::march($this->shape);
+      Elephant::march();
     }
 
     // Shuffle this tile in the deck
@@ -41,7 +41,7 @@ class Shuffle extends \Bga\Games\JohnCompany\Models\EventTile
     }
 
     if ($elephantMarchLast) {
-      Elephant::march($this->shape);
+      Elephant::march();
     }
   }
 

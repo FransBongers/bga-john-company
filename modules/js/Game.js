@@ -152,6 +152,7 @@ const REVENUE = 'revenue';
 const EVENTS_IN_INDIA = 'eventsInIndia';
 const PARLIAMENT_MEETS = 'ParliamentMeets';
 const UPKEEP_AND_REFRESH = 'upkeepAndRefresh';
+const FINAL_SCORING$1 = 'finalScoring';
 const OFFICE = 'office';
 const COMPANY_SHARE = 'companyShare';
 const CASH = 'cash';
@@ -234,7 +235,7 @@ const PRESIDENT_OF_BOMBAY = 'PresidentOfBombay';
 const PRESIDENT_OF_MADRAS = 'PresidentOfMadras';
 const PRESIDENT_OF_BENGAL = 'PresidentOfBengal';
 const GOVERNOR_GENERAL = 'GovernorGeneral';
-const SUPERINTENDENT_OF_TRADE_IN_CHINA$1 = 'SuperintendentOfTradeInChina';
+const SUPERINTENDENT_OF_TRADE_IN_CHINA = 'SuperintendentOfTradeInChina';
 const GOVERNOR_OF_BOMBAY = 'GovernorOfBombay';
 const GOVERNOR_OF_MADRAS = 'GovernorOfMadras';
 const GOVERNOR_OF_BENGAL = 'GovernorOfBengal';
@@ -418,7 +419,7 @@ const REGIMENT = 'Regiment';
 const FOREIGN_INVASION = 'ForeignInvasion';
 const LEADER = 'Leader';
 const PEACE = 'Peace';
-const CRISIS$1 = 'Crisis';
+const CRISIS = 'Crisis';
 const SHUFFLE = 'Shuffle';
 const TURMOIL = 'Turmoil';
 const WINDFALL = 'Windfall';
@@ -1368,7 +1369,7 @@ const getSeaName = (seaId) => {
             return _('South Indian');
         case WEST_INDIAN:
             return _('West Indian');
-        case SUPERINTENDENT_OF_TRADE_IN_CHINA$1:
+        case SUPERINTENDENT_OF_TRADE_IN_CHINA:
             return _('China');
         default:
             return '';
@@ -1480,6 +1481,8 @@ const getPhaseName = (phase) => {
             return _('London Season');
         case FAMILY:
             return _('Family');
+        case FINAL_SCORING$1:
+            return _('Final Scoring');
         case HIRING:
             return _('Hiring');
         case CHAIRMAN:
@@ -1496,7 +1499,7 @@ const getPhaseName = (phase) => {
             return _('Madras Presidency');
         case BENGAL_PRESIDENCY:
             return _('Bengal Presidency');
-        case SUPERINTENDENT_OF_TRADE_IN_CHINA$1:
+        case SUPERINTENDENT_OF_TRADE_IN_CHINA:
             return _('Superintendent of Trade in China');
         case BONUSES:
             return _('Bonuses');
@@ -2536,10 +2539,10 @@ class ShipZone {
         this.setup(gamedatas);
     }
     setup(gamedatas) {
-        const elementId = this.id === SUPERINTENDENT_OF_TRADE_IN_CHINA$1 ? `${SUPERINTENDENT_OF_TRADE_IN_CHINA$1}Office` : 'joco-india-map';
+        const elementId = this.id === SUPERINTENDENT_OF_TRADE_IN_CHINA ? `${SUPERINTENDENT_OF_TRADE_IN_CHINA}Office` : 'joco-india-map';
         document
             .getElementById(elementId)
-            ?.insertAdjacentHTML('beforeend', tplSeaZone(this.id, this.id === SUPERINTENDENT_OF_TRADE_IN_CHINA$1));
+            ?.insertAdjacentHTML('beforeend', tplSeaZone(this.id, this.id === SUPERINTENDENT_OF_TRADE_IN_CHINA));
         this.ui = {
             stock: document.getElementById(`joco-ship-stock-${this.id}`),
             count: document.getElementById(`joco-ship-count-${this.id}`),
@@ -2557,7 +2560,7 @@ class ShipZone {
         let textContent = formatStringRecursive(count === 1 ? _('${count} Ship') : _('${count} Ships'), {
             count,
         });
-        if (this.id === SUPERINTENDENT_OF_TRADE_IN_CHINA$1) {
+        if (this.id === SUPERINTENDENT_OF_TRADE_IN_CHINA) {
             textContent = textContent.toLocaleUpperCase();
         }
         this.ui.count.textContent = textContent;
@@ -2603,8 +2606,8 @@ const tplMilitaryAffairs = () => `
       </div>
 `;
 const tplSuperintendentOfTradeInChina$1 = () => `
-  <div id="${SUPERINTENDENT_OF_TRADE_IN_CHINA$1}Office" class="joco-office joco-container">
-    ${tplOfficeHeader(SUPERINTENDENT_OF_TRADE_IN_CHINA$1, getPhaseName(SUPERINTENDENT_OF_TRADE_IN_CHINA$1))}
+  <div id="${SUPERINTENDENT_OF_TRADE_IN_CHINA}Office" class="joco-office joco-container">
+    ${tplOfficeHeader(SUPERINTENDENT_OF_TRADE_IN_CHINA, getPhaseName(SUPERINTENDENT_OF_TRADE_IN_CHINA))}
   </div>
 `;
 
@@ -2649,8 +2652,8 @@ class India {
             elephant: document.getElementById('joco-elephant'),
             militaryAffairsOffice: document.getElementById(MILITARY_AFFAIRS),
             officersInTraining: document.getElementById(OFFICER_IN_TRAINING),
-            superintendentOfTradeInChinaOffice: document.getElementById(SUPERINTENDENT_OF_TRADE_IN_CHINA$1),
-            superintendentOfTradeInChinaContainer: document.getElementById(`${SUPERINTENDENT_OF_TRADE_IN_CHINA$1}Office`),
+            superintendentOfTradeInChinaOffice: document.getElementById(SUPERINTENDENT_OF_TRADE_IN_CHINA),
+            superintendentOfTradeInChinaContainer: document.getElementById(`${SUPERINTENDENT_OF_TRADE_IN_CHINA}Office`),
         };
         this.setupPresidencies(gamedatas);
         this.setupArmies(gamedatas);
@@ -2658,7 +2661,7 @@ class India {
         this.setupRegions(gamedatas);
         this.setupShipZones(gamedatas);
         this.updateElephant(gamedatas.elephant);
-        this.updateSuperintendentOfTradeInChina(gamedatas.offices[SUPERINTENDENT_OF_TRADE_IN_CHINA$1].location !== DECK);
+        this.updateSuperintendentOfTradeInChina(gamedatas.offices[SUPERINTENDENT_OF_TRADE_IN_CHINA].location !== DECK);
         this.updateMilitaryAffairsOfficeAndSuperintendent(gamedatas);
     }
     setupArmies(gamedatas) {
@@ -2703,7 +2706,7 @@ class India {
         SEA_ZONES.forEach((seaZone) => {
             this.seaZones[seaZone] = new ShipZone(seaZone, gamedatas);
         });
-        this.seaZones[SUPERINTENDENT_OF_TRADE_IN_CHINA$1] = new ShipZone(SUPERINTENDENT_OF_TRADE_IN_CHINA$1, gamedatas);
+        this.seaZones[SUPERINTENDENT_OF_TRADE_IN_CHINA] = new ShipZone(SUPERINTENDENT_OF_TRADE_IN_CHINA, gamedatas);
     }
     updateSuperintendentOfTradeInChina(visible) {
         const elt = this.ui.superintendentOfTradeInChinaContainer;
@@ -2723,7 +2726,7 @@ class India {
                 const presidentElement = createFamilyMember(member.familyId, member.id);
                 this.ui.militaryAffairsOffice.appendChild(presidentElement);
             }
-            else if (member.location === SUPERINTENDENT_OF_TRADE_IN_CHINA$1) {
+            else if (member.location === SUPERINTENDENT_OF_TRADE_IN_CHINA) {
                 const superintendent = createFamilyMember(member.familyId, member.id);
                 this.ui.superintendentOfTradeInChinaOffice.appendChild(superintendent);
             }
@@ -3024,6 +3027,7 @@ const PHASES = [
     EVENTS_IN_INDIA,
     PARLIAMENT_MEETS,
     UPKEEP_AND_REFRESH,
+    FINAL_SCORING$1,
 ];
 const tplPhaseTracker = (phases) => `
   <div id="joco-trackers">
@@ -3845,7 +3849,7 @@ class Parliament {
 
 const getEventTileText = (type) => {
     switch (type) {
-        case CRISIS$1:
+        case CRISIS:
             return '';
         case WINDFALL:
             return _('Gain for writers here and in adjacent regions.');
@@ -3878,12 +3882,12 @@ const tplLeaderContent = () => `
   <div class="joco-event-tile-leader-right joco-card-text fb-font-baskerville fb-font-12 bga-autofit">${_('Rebellion if dominated.')}</div>
 `;
 const tplEventTileContent = (card) => {
-    const title = card.type === CRISIS$1 ? _('Resolve Crisis') : _(card.title);
+    const title = card.type === CRISIS ? _('Resolve Crisis') : _(card.title);
     const text = getEventTileText(card.type);
     return `
     <div class="joco-event-tile-title joco-card-text fb-font-baskerville fb-font-28 fb-font-bold bga-autofit">${title.toLocaleUpperCase()}</div>
     ${text ? `<div class="joco-event-tile-text joco-card-text fb-font-baskerville fb-font-12 bga-autofit">${text}</div>` : ''}
-    ${card.type === CRISIS$1 ? tplCrisisContent() : ''}
+    ${card.type === CRISIS ? tplCrisisContent() : ''}
     ${card.type === PEACE ? tplPeaceContent() : ''}
     ${card.type === LEADER ? tplLeaderContent() : ''}
   `;
@@ -6994,7 +6998,7 @@ class ManagerOfShipping {
         updatePageTitle(_('${you} must select a sea zone'));
         const availableSeaZones = SEA_ZONES;
         if (this.args.superintendentOfTradeInChinaInPlay) {
-            availableSeaZones.push(SUPERINTENDENT_OF_TRADE_IN_CHINA$1);
+            availableSeaZones.push(SUPERINTENDENT_OF_TRADE_IN_CHINA);
         }
         SEA_ZONES.forEach((seaZone) => {
             addPrimaryActionButton({

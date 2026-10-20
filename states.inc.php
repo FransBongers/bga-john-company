@@ -107,7 +107,7 @@ $machinestates = [
         ->name(HIRING_CHOOSE_CHAIRMAN)
         ->description('${actplayer}')
         ->descriptionmyturn('${you}')
-        ->type(StateType::ACTIVE_PLAYER)
+        ->type(StateType::MULTIPLE_ACTIVE_PLAYER)
         ->args('argsAtomicAction')
         ->action('stAtomicAction')
         ->possibleactions([
@@ -124,7 +124,7 @@ $machinestates = [
         ->name(TRADE_IN_CHINA)
         ->description('${actplayer}')
         ->descriptionmyturn('${you}')
-        ->type(StateType::ACTIVE_PLAYER)
+        ->type(StateType::MULTIPLE_ACTIVE_PLAYER)
         ->args('argsAtomicAction')
         ->action('stAtomicAction')
         ->possibleactions([
@@ -784,6 +784,14 @@ $machinestates = [
         'transitions' => [],
     ],
 
+    ST_RESOLVE_COMPANY_FAILURE_CARD => [
+        'name' => RESOLVE_COMPANY_FAILURE_CARD,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
     ST_HIRING_CHECK_VACANT_OFFICES => [
         'name' => HIRING_CHECK_VACANT_OFFICES,
         'description' => '',
@@ -841,6 +849,14 @@ $machinestates = [
 
     ST_FINAL_SCORING => [
         'name' => FINAL_SCORING,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_PRE_END_OF_GAME => [
+        'name' => PRE_END_OF_GAME,
         'description' => '',
         'type' => 'game',
         'action' => 'stAtomicAction',

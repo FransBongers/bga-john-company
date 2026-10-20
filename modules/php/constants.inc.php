@@ -105,6 +105,7 @@ const ST_EVENTS_IN_INDIA_RESOLVE_CRISIS = 161;
 const ST_EVENTS_IN_INDIA_ELEPHANT_MARCH = 163;
 const ST_EVENTS_IN_INDIA_SETUP_SECONDARY_REBELLION = 166;
 const ST_CLEAR_CASCADE = 167;
+const ST_PRE_END_OF_GAME = 168;
 
 const ST_CROWN_CHAIRMAN_SEEK_DEBT = 110;
 const ST_CROWN_CHAIRMAN_REQUEST_DEBT_ADVANCEMENT = 111;
@@ -149,6 +150,7 @@ const ST_HIRING_CHAIRMAN = 158;
 const ST_HIRING_CHOOSE_CHAIRMAN = 159;
 const ST_CHECK_COMPANY_FAILURE = 160;
 const ST_TRADE_IN_CHINA = 165;
+const ST_RESOLVE_COMPANY_FAILURE_CARD = 169;
 
 
 const BONUSES = 'Bonuses';
@@ -181,6 +183,7 @@ const LONDON_SEASON_ORDER = 'LondonSeasonOrder';
 const LONDON_SEASON_CLEANUP = 'LondonSeasonCleanup';
 const NEW_COMPANY_SHARES = 'NewCompanyShares';
 const PERFORM_SETUP = 'PerformSetup';
+const PRE_END_OF_GAME = 'PreEndOfGame';
 const PRE_TAX_AND_UPKEEP = 'PreTaxAndUpkeep';
 const TAX_AND_UPKEEP = 'TaxAndUpkeep';
 const TRADE_IN_CHINA = 'TradeInChina';
@@ -204,6 +207,7 @@ const SWAP_POWER_MARKERS = 'SwapPowerMarkers';
 const CHAIRMAN_DEBT_CONSENT = 'ChairmanDebtConsent';
 const CHECK_COMPANY_FAILURE = 'CheckCompanyFailure';
 const CLEAR_CASCADE = 'ClearCascade';
+const RESOLVE_COMPANY_FAILURE_CARD = 'ResolveCompanyFailureCard';
 const DIRECTOR_OF_TRADE_SPECIAL_ENVOY = 'DirectorOfTradeSpecialEnvoy';
 const DIRECTOR_OF_TRADE_SPECIAL_ENVOY_SUCCESS = 'DirectorOfTradeSpecialEnvoySuccess';
 const DIRECTOR_OF_TRADE_TRANSFERS = 'DirectorOfTradeTransfers';
@@ -255,6 +259,7 @@ const CROWN_MANAGER_OF_SHIPPING_PLACE_SHIPS = 'CrownManagerOfShippingPlaceShips'
 // const GOVERNOR_OF_MYSORE = 'GovernorOfMysore';
 
 const EXTRA_ACTION = 'extraAction';
+const FINAL_RETIREMENT = 'finalRetirement';
 
 /**
  * Counters
@@ -269,6 +274,7 @@ const BALANCE = 'balance';
 const DEBT = 'debt';
 const STANDING = 'standing';
 const COMPANY = 'company';
+const SHARE_VALUE = 'shareValue';
 
 const COMPANY_EXPECTATIONS = [0, 4, 6, 8, 10, 12, 14, 16];
 const MAX_DEBT = 8;
@@ -997,3 +1003,8 @@ CONST WILLIAM_COLLINS_ID = 'PrestigeCard_17';
  */
 const MASSED_DEMAND_FRANCHISE_ID = 'LawCard_54';
 const ZAMINDAR_TAXES_ID = 'LawCard_41';
+
+/**
+ * Foreign Invasion Event Tile ID
+ */
+const FOREIGN_INVASION_EVENT_TILE_ID = 'EventTile_18';

@@ -757,6 +757,7 @@ class Notifications
       EVENTS_IN_INDIA => clienttranslate('Events in India'),
       PARLIAMENT_MEETS => clienttranslate('Parliament Meets'),
       UPKEEP_AND_REFRESH => clienttranslate('Upkeep & Refresh'),
+      FINAL_SCORING => clienttranslate('Final Scoring'),
     ];
     $text = isset($phaseNameMap[$phase]) ? $phaseNameMap[$phase] : $phase;
     return $text;

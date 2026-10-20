@@ -15,6 +15,7 @@ import {
   EVENTS_IN_INDIA,
   PARLIAMENT_MEETS,
   UPKEEP_AND_REFRESH,
+  FINAL_SCORING,
 } from '../constants';
 
 export const getPhaseName = (phase: string) => {
@@ -23,6 +24,8 @@ export const getPhaseName = (phase: string) => {
       return _('London Season');
     case FAMILY:
       return _('Family');
+    case FINAL_SCORING:
+      return _('Final Scoring');
     case HIRING:
       return _('Hiring');
     case CHAIRMAN:

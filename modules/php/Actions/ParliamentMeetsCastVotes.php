@@ -247,8 +247,8 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
     }
 
     $policyTargets = [
-      'PrestigeCard_23' => [MANUFACTURING_POLICY, SHIPPING_POLICY],
-      'PrestigeCard_26' => [SOCIAL_POLICY, COMPANY_SHARES_POLICY],
+      'PrestigeCard_23' => [WORKSHOP, SHIPYARD],
+      'PrestigeCard_26' => [LUXURY, SHARE],
     ];
     $cards = LondonSeasonCards::getInLocation(Locations::londonSeasonCards($family->getId()))->toArray();
     foreach ($cards as $card) {

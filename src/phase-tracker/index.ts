@@ -16,6 +16,7 @@ import {
   BOMBAY_PRESIDENCY,
   MADRAS_PRESIDENCY,
   BENGAL_PRESIDENCY,
+  FINAL_SCORING,
 } from '../constants';
 import { GameAlias, GamedatasAlias } from '../types';
 import { getPhaseName } from './translations';
@@ -36,6 +37,7 @@ const PHASES = [
   EVENTS_IN_INDIA,
   PARLIAMENT_MEETS,
   UPKEEP_AND_REFRESH,
+  FINAL_SCORING,
 ];
 
 const tplPhaseTracker = (phases: string[]) => `

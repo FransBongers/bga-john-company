@@ -38,7 +38,8 @@ class LondonSeasonRetire extends \Bga\Games\JohnCompany\Models\AtomicAction
     $data = [
       'familyMembers' => Utils::filter(FamilyMembers::getInLocation(Locations::pensioners())->toArray(), fn($fm) => $fm->getFamilyId() === $familyId),
       'treasury' => $family->getTreasury(),
-      'discount' => $family->getRetirementDiscount()
+      'discount' => $family->getRetirementDiscount(),
+      FINAL_RETIREMENT => $args[FINAL_RETIREMENT] ?? false
     ];
 
     return $data;
@@ -114,7 +115,7 @@ class LondonSeasonRetire extends \Bga\Games\JohnCompany\Models\AtomicAction
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_055");
     }
 
-    if (count($selectedPrizes) > 0) {
+    if (count($selectedPrizes) > 0 && !$stateArgs[FINAL_RETIREMENT]) {
       $retirementsMoney = Globals::getRetirementMoney();
       $retirementsMoney[$player->getId()] = $totalCost;
       Globals::setRetirementMoney($retirementsMoney);

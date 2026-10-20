@@ -20,7 +20,18 @@ class ForeignInvasion extends \Bga\Games\JohnCompany\Models\EventTile
 
   public function resolveEvent($regionId, $ctx)
   {
+    $this->resolveForeignInvastion($ctx, $regionId);
+  }
+
+  public function resolveForeignInvastion($ctx, string | null $regionId = null, bool $warAgainstFrance = false)
+  {
     $side = EventTiles::rollStormDie();
+
+    // $regionId is null in case of WAR AGAINST FRANCE law 
+    if ($warAgainstFrance && $side === FOUR) {
+      Notifications::message(clienttranslate('No invasion occurs'));
+      return;
+    }
 
     $sideRegionMap = [
       ONE_ALL => [BOMBAY, MADRAS, BENGAL],

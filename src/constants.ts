@@ -90,6 +90,7 @@ export const REVENUE = 'revenue';
 export const EVENTS_IN_INDIA = 'eventsInIndia';
 export const PARLIAMENT_MEETS = 'ParliamentMeets';
 export const UPKEEP_AND_REFRESH = 'upkeepAndRefresh';
+export const FINAL_SCORING = 'finalScoring';
 
 /**
  * Setup
