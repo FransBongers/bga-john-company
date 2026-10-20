@@ -72,15 +72,18 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     return $this->jsonSerialize(); // Static datas are already in js file
   }
 
-  public function becomePartOfEmpire($capitalRegion)
+  public function becomePartOfEmpire(Region $capitalRegion)
   {
-    $this->setControl($capitalRegion->getId());
+    $capitalRegionId = $capitalRegion->getId();
+    $this->setControl($capitalRegionId);
+    ControlTokens::get('ControlToken_' . $this->getId())->setLocation($capitalRegionId);
     Notifications::regionBecomesPartOfEmpire($this, $capitalRegion);
   }
 
   public function becomeSovereign()
   {
     $this->setControl(null);
+    ControlTokens::get('ControlToken_' . $this->getId())->setLocation($this->getId());
     Notifications::regionBecomesSovereign($this);
   }
 

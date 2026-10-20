@@ -25,4 +25,21 @@
     top: 565px;
     left: 780px;
   }
+
+  &[data-zone='SuperintendentOfTradeInChina'] {
+    position: relative;
+    width: auto;
+    height: auto;
+    align-items: flex-start;
+    padding: 8px;
+    flex-grow: 1;
+
+    .joco-ship-stock {
+      align-self: stretch;
+      flex-grow: 1;
+      justify-content: flex-start !important;
+    }
+    // top: 500px;
+    // left: 900px;
+  }
 }

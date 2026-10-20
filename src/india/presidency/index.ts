@@ -10,7 +10,6 @@ import { Treasury } from '../../ui-components';
 import { Company } from '../../company';
 import { BgaCards } from '../../libs';
 import { ControlTokensManager } from '../../token-managers/control-tokens';
-import { createControlToken } from '../../utility';
 
 export interface PresidencyProps {
   gamedatas: GamedatasAlias;

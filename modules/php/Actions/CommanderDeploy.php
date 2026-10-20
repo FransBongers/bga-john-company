@@ -118,8 +118,6 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
     $armyPieces = $args->armyPieces;
     $officers = $args->officers;
 
-    $this->insertState();
-
     $stateArgs = $this->argsCommanderDeploy();
 
     if (!isset($stateArgs['options'][$regionId])) {
@@ -159,11 +157,13 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
     $familyMember = FamilyMembers::getInLocation(Locations::commander($stateArgs['presidencyId']))->toArray()[0];
     $checkResult = JoCoUtils::makeCheck($player, $numberOfDice, $familyMember);
 
+    if ($checkResult !== CATASTROPHIC_FAILURE) {
+      $this->insertState();
+    }
+
     $survivingPieces = $this->checkForLosses($selectedPieces);
 
     $this->resolveCheck($player, $checkResult, $survivingPieces, $regionId, $stateArgs['presidencyId']);
-
-
 
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
     $this->resolveAction([], true);

@@ -1,5 +1,6 @@
 import { India } from '..';
 import { formatStringRecursive } from '../../boilerplate/utility';
+import { SUPERINTENDENT_OF_TRADE_IN_CHINA } from '../../constants';
 import { BgaCards } from '../../libs';
 import { ShipsManager } from '../../token-managers/ship-tokens';
 import { GamedatasAlias, JocoShipBase } from '../../types';
@@ -20,9 +21,10 @@ export class ShipZone {
   }
 
   private setup(gamedatas: GamedatasAlias) {
+    const elementId = this.id === SUPERINTENDENT_OF_TRADE_IN_CHINA ? `${SUPERINTENDENT_OF_TRADE_IN_CHINA}Office` : 'joco-india-map';
     document
-      .getElementById('joco-india-map')
-      ?.insertAdjacentHTML('beforeend', tplSeaZone(this.id));
+      .getElementById(elementId)
+      ?.insertAdjacentHTML('beforeend', tplSeaZone(this.id, this.id === SUPERINTENDENT_OF_TRADE_IN_CHINA));
 
     this.ui = {
       stock: document.getElementById(`joco-ship-stock-${this.id}`)!,
@@ -50,12 +52,16 @@ export class ShipZone {
   public updateCount(modifier = 0) {
     this.ui.count.replaceChildren();
     const count = this.stock.getCards().length + modifier;
-    this.ui.count.textContent = formatStringRecursive(
-      count === 1 ? '${count} Ship' : '${count} Ships',
+    let textContent = formatStringRecursive(
+      count === 1 ? _('${count} Ship') : _('${count} Ships'),
       {
         count,
       },
     );
+    if (this.id === SUPERINTENDENT_OF_TRADE_IN_CHINA) {
+      textContent = textContent.toLocaleUpperCase();
+    }
+    this.ui.count.textContent = textContent;
   }
 
   public async addShip(ship: JocoShipBase, fromSea = null) {

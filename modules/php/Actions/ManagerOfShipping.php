@@ -59,6 +59,7 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
       'playerShips' => $playerShips,
       'otherShips' => $otherShips,
       'treasury' => Offices::get(MANAGER_OF_SHIPPING)->getTreasury(),
+      'superintendentOfTradeInChinaInPlay' => Offices::get(SUPERINTENDENT_OF_TRADE_IN_CHINA)->isInPlay(),
     ];
 
     return $data;

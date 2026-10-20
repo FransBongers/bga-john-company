@@ -309,6 +309,7 @@ class Notifications
       SOUTH_INDIAN => clienttranslate('South Indian'),
       WEST_INDIAN => clienttranslate('West Indian'),
       CHINA => clienttranslate('China'),
+      SUPERINTENDENT_OF_TRADE_IN_CHINA => clienttranslate('China'),
     ];
     return $idNameMap[$locationId];
   }
@@ -481,14 +482,23 @@ class Notifications
   public static function crisisResult(int $attackStrength, int $defenderStrength, string $type)
   {
     $text = $attackStrength > $defenderStrength ?
-      clienttranslate('The ${invasionOrRebellion} succeeds with a total of ${tkn_boldText_attackerTotal} vs ${tkn_boldText_defenderTotal}') :
-      clienttranslate('The ${invasionOrRebellion} fails with a total of ${tkn_boldText_attackerTotal} vs ${tkn_boldText_defenderTotal}');
+      clienttranslate('The ${crisisType} succeeds with a total of ${tkn_boldText_attackerTotal} vs ${tkn_boldText_defenderTotal}') :
+      clienttranslate('The ${crisisType} fails with a total of ${tkn_boldText_attackerTotal} vs ${tkn_boldText_defenderTotal}');
+
+    $crisisType = null;
+    if (in_array($type, [INVASION, INVASION_AGAINST_COMPANY])) {
+      $crisisType = clienttranslate('Invasion');
+    } else if (in_array($type, [FOREIGN_INVASION, FOREIGN_INVASION_AGAINST_COMPANY])) {
+      $crisisType = clienttranslate('Foreign Invasion');
+    } else {
+      $crisisType = clienttranslate('Rebellion');
+    }
 
     Notifications::message($text, [
-      'invasionOrRebellion' => in_array($type, [INVASION, INVASION_AGAINST_COMPANY]) ? clienttranslate('Invasion') : clienttranslate('Rebellion'),
+      'crisisType' => $crisisType,
       'tkn_boldText_attackerTotal' => $attackStrength,
       'tkn_boldText_defenderTotal' => $defenderStrength,
-      'i18n' => ['invasionOrRebellion'],
+      'i18n' => ['crisisType'],
     ]);
   }
 
@@ -673,14 +683,20 @@ class Notifications
     ]);
   }
 
-  public static function foreignInvasion($regionName, $strength)
+  public static function foreignInvasion(string $regionName, int $dieRoll, int $unrest = 0)
   {
-    $text = clienttranslate('Foreign Invasion in ${tkn_boldText_defender} with a strength of ${tkn_boldText_strength}');
+    $text = clienttranslate('${tkn_boldText_foreignInvasion} in ${tkn_boldText_defender} with strength of ${tkn_boldText_strength}');
+
+    if ($unrest > 0) {
+      $text = clienttranslate('${tkn_boldText_foreignInvasion} in ${tkn_boldText_defender} with a strength of ${tkn_boldText_strength} (+${tkn_boldText_unrest} for unrest)');
+    }
 
     Notifications::message($text, [
+      'tkn_boldText_foreignInvasion' => clienttranslate('Foreign Invasion'),
       'tkn_boldText_defender' => $regionName,
-      'tkn_boldText_strength' => $strength,
-      'i18n' => ['tkn_boldText_defender'],
+      'tkn_boldText_strength' => $dieRoll,
+      'tkn_boldText_unrest' => $unrest,
+      'i18n' => ['tkn_boldText_foreignInvasion', 'tkn_boldText_defender'],
     ]);
   }
 
@@ -763,6 +779,13 @@ class Notifications
       'amount' => $cash,
       'tkn_boldText_amount' => '£' . abs($cash),
       'tkn_pound' => clienttranslate('Pounds')
+    ]);
+  }
+
+  public static function openTradeWithChina(Player $player)
+  {
+    self::notifyAll('openTradeWithChina', clienttranslate('${player_name} opens trade with China'), [
+      'player' => $player,
     ]);
   }
 

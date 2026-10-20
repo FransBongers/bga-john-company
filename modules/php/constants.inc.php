@@ -103,8 +103,8 @@ const ST_EVENTS_IN_INDIA_RESOLVE_EVENT = 71;
 const ST_EVENTS_IN_INDIA_CRISIS_DEFENSE = 73;
 const ST_EVENTS_IN_INDIA_RESOLVE_CRISIS = 161;
 const ST_EVENTS_IN_INDIA_ELEPHANT_MARCH = 163;
-const ST_FOREIGN_INVASION = 74;
-const ST_FOREIGN_INVASION_END = 75;
+const ST_EVENTS_IN_INDIA_SETUP_SECONDARY_REBELLION = 166;
+const ST_CLEAR_CASCADE = 167;
 
 const ST_CROWN_CHAIRMAN_SEEK_DEBT = 110;
 const ST_CROWN_CHAIRMAN_REQUEST_DEBT_ADVANCEMENT = 111;
@@ -148,6 +148,7 @@ const ST_PARLIAMENT_MEETS_CLEANUP = 157;
 const ST_HIRING_CHAIRMAN = 158;
 const ST_HIRING_CHOOSE_CHAIRMAN = 159;
 const ST_CHECK_COMPANY_FAILURE = 160;
+const ST_TRADE_IN_CHINA = 165;
 
 
 const BONUSES = 'Bonuses';
@@ -158,9 +159,9 @@ const EVENTS_IN_INDIA_RESOLVE_CRISIS = 'EventsInIndiaResolveCrisis';
 const EVENTS_IN_INDIA_STORMS = 'EventsInIndiaStorms';
 const EVENTS_IN_INDIA_RESOLVE_EVENT = 'EventsInIndiaResolveEvent';
 const EVENTS_IN_INDIA_ELEPHANT_MARCH = 'EventsInIndiaElephantMarch';
+const EVENTS_IN_INDIA_SETUP_SECONDARY_REBELLION = 'EventsInIndiaSetupSecondaryRebellion';
 const FAMILY_ACTION = 'FamilyAction';
 const FINAL_SCORING = 'FinalScoring';
-const FOREIGN_INVASION_END = 'ForeignInvasionEnd';
 const FRONTEND_TRIGGER = 'FrontendTrigger';
 const ADD_CASH = 'AddCash';
 const ADD_UNREST = 'AddUnrest';
@@ -182,6 +183,7 @@ const NEW_COMPANY_SHARES = 'NewCompanyShares';
 const PERFORM_SETUP = 'PerformSetup';
 const PRE_TAX_AND_UPKEEP = 'PreTaxAndUpkeep';
 const TAX_AND_UPKEEP = 'TaxAndUpkeep';
+const TRADE_IN_CHINA = 'TradeInChina';
 const REVENUE_EMERGENCY_LOANS = 'RevenueEmergencyLoans';
 const REVENUE_EXPENSES = 'RevenueExpenses';
 const REVENUE_CHECK_EXPECTATIONS = 'RevenueCheckExpectations';
@@ -201,6 +203,7 @@ const SWAP_POWER_MARKERS = 'SwapPowerMarkers';
 // Company Operations
 const CHAIRMAN_DEBT_CONSENT = 'ChairmanDebtConsent';
 const CHECK_COMPANY_FAILURE = 'CheckCompanyFailure';
+const CLEAR_CASCADE = 'ClearCascade';
 const DIRECTOR_OF_TRADE_SPECIAL_ENVOY = 'DirectorOfTradeSpecialEnvoy';
 const DIRECTOR_OF_TRADE_SPECIAL_ENVOY_SUCCESS = 'DirectorOfTradeSpecialEnvoySuccess';
 const DIRECTOR_OF_TRADE_TRANSFERS = 'DirectorOfTradeTransfers';
@@ -799,7 +802,7 @@ const DONE = 'done';
 /**
  * Event Types
  */
-const FOREIGN_INVASION = 'ForeignInvasion'; // Doubles as action name
+const FOREIGN_INVASION = 'ForeignInvasion';
 const LEADER = 'Leader';
 const PEACE = 'Peace';
 const CRISIS = 'Crisis';
@@ -814,6 +817,7 @@ const INVASION = 'invasion';
 const REBELLION = 'rebellion';
 const INVASION_AGAINST_COMPANY = 'invasionAgainstCompany';
 const REBELLION_AGAINST_COMPANY = 'rebellionAgainstCompany';
+const FOREIGN_INVASION_AGAINST_COMPANY = 'foreignInvasionAgainstCompany';
 
 /**
  * Storm Die

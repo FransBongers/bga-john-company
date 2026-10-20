@@ -15,11 +15,11 @@ class ForeignInvasion extends \Bga\Games\JohnCompany\Models\EventTile
     parent::__construct($row);
     $this->title = clienttranslate('Foreign Invasion');
     $this->type = FOREIGN_INVASION;
+    $this->shape = CIRCLE;
   }
 
   public function resolveEvent($regionId, $ctx)
   {
-    // parent::resolveEvent($regionId, $ctx);
     $side = EventTiles::rollStormDie();
 
     $sideRegionMap = [
@@ -32,25 +32,13 @@ class ForeignInvasion extends \Bga\Games\JohnCompany\Models\EventTile
 
     $regionIds = $sideRegionMap[$side];
 
-
-    $node = [
-      'children' => []
-    ];
-
-    foreach ($regionIds as $regionId) {
-      $node['children'][] = [
-        'action' => FOREIGN_INVASION,
-        'regionId' => $regionId
+    $this->insertResolveCrisisNodes($ctx, FOREIGN_INVASION, array_map(function ($regionId) {
+      return [
+        'attackerId' => null,
+        'defenderId' => $regionId,
+        'strengthModifier' => 0,
       ];
-    }
-
-    $node['children'][] = [
-      'action' => FOREIGN_INVASION_END,
-
-    ];
-
-    $currentNode = Engine::getNextUnresolved();
-    $currentNode->insertAsBrother(Engine::buildTree($node));
+    }, $regionIds));
   }
 
   public function getNotificationText()

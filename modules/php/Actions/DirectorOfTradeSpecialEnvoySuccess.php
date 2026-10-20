@@ -19,7 +19,9 @@ use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Orders;
 use Bga\Games\JohnCompany\Managers\Players;
+use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Managers\SetupCards;
+use Bga\Games\JohnCompany\Models\Player;
 
 class DirectorOfTradeSpecialEnvoySuccess extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
@@ -61,8 +63,10 @@ class DirectorOfTradeSpecialEnvoySuccess extends \Bga\Games\JohnCompany\Models\A
     // $player = self::getPlayer();
     $playerId = $info['activePlayerIds'][0];
 
+
+
     $data = [
-      'closedOrders' => Orders::getClosedOrders(),
+      'closedOrders' => $this->getClosedOrders(),
       'openTradeWithChina' => !Offices::get(SUPERINTENDENT_OF_TRADE_IN_CHINA)->isInPlay(),
     ];
 
@@ -100,11 +104,37 @@ class DirectorOfTradeSpecialEnvoySuccess extends \Bga\Games\JohnCompany\Models\A
     $playerId = $this->checkPlayer();
 
     $orderId = $args->orderId;
+    $openTradeWithChina = $args->openTradeWithChina;
     $perform = $args->perform;
 
-    $stateArgs = $this->argsDirectorOfTradeSpecialEnvoySuccess();
-
     $player = Players::get($playerId);
+
+    if ($openTradeWithChina) {
+      $this->openTradeWithChina($player);
+    } else {
+      $this->openOrder($player, $orderId);
+    }
+
+
+    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->resolveAction([], true);
+  }
+
+  //  .##.....##.########.####.##.......####.########.##....##
+  //  .##.....##....##.....##..##........##.....##.....##..##.
+  //  .##.....##....##.....##..##........##.....##......####..
+  //  .##.....##....##.....##..##........##.....##.......##...
+  //  .##.....##....##.....##..##........##.....##.......##...
+  //  .##.....##....##.....##..##........##.....##.......##...
+  //  ..#######.....##....####.########.####....##.......##...
+
+  private function openOrder(Player $player, string | null $orderId)
+  {
+    if ($orderId === null) {
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_071");
+    }
+
+    $stateArgs = $this->argsDirectorOfTradeSpecialEnvoySuccess();
 
     $order = Utils::array_find($stateArgs['closedOrders'], function ($closedOrder) use ($orderId) {
       return $closedOrder->getId() === $orderId;
@@ -119,18 +149,45 @@ class DirectorOfTradeSpecialEnvoySuccess extends \Bga\Games\JohnCompany\Models\A
     if (Crown::isInGame()) {
       $this->checkIfPlayerGainsPromiseCubeFromCrown($player, $order);
     }
-
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
-    $this->resolveAction([], true);
   }
 
-  //  .##.....##.########.####.##.......####.########.##....##
-  //  .##.....##....##.....##..##........##.....##.....##..##.
-  //  .##.....##....##.....##..##........##.....##......####..
-  //  .##.....##....##.....##..##........##.....##.......##...
-  //  .##.....##....##.....##..##........##.....##.......##...
-  //  .##.....##....##.....##..##........##.....##.......##...
-  //  ..#######.....##....####.########.####....##.......##...
+  private function openTradeWithChina(Player $player)
+  {
+    $stateArgs = $this->argsDirectorOfTradeSpecialEnvoySuccess();
+
+    if (!$stateArgs['openTradeWithChina']) {
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_072");
+    }
+
+    Notifications::openTradeWithChina($player);
+
+    $office = Offices::get(SUPERINTENDENT_OF_TRADE_IN_CHINA);
+    $office->moveToVacantOffices($player);
+
+    if (count($office->getCandidatesForHiring()) > 0) {
+      $chairmanPlayerId = Families::getChairmanFamily()->getPlayerId();
+      $this->ctx->insertAsBrother(new LeafNode([
+        'action' => HIRING_HIRE_FAMILY_MEMBER,
+        'playerId' => 'some',
+        'activePlayerIds' => [$chairmanPlayerId],
+        'args' => [
+          'officeId' => $office->getId(),
+          'hirerPlayerId' => $chairmanPlayerId,
+        ],
+      ]));
+    }
+  }
+
+  private function getClosedOrders()
+  {
+    $regions = Regions::getAll();
+    $closedOrders = Orders::getClosedOrders();
+
+    return Utils::filter($closedOrders, function ($order) use ($regions) {
+      $regionId = $order->getRegionId();
+      return !$regions[$regionId]->isCompanyControlled();
+    });
+  }
 
   private function checkIfPlayerGainsPromiseCubeFromCrown($player, $order)
   {

@@ -41,3 +41,4 @@ export * from './RevenueRoyalPardon';
 export * from './SeekShare';
 export * from './SwapPowerMarkers';
 export * from './TaxAndUpkeep';
+export * from './TradeInChina';

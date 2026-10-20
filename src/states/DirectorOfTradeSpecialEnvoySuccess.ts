@@ -10,12 +10,14 @@ import {
   addConfirmButton,
   addCancelButton,
   performAction,
+  addPrimaryActionButton,
 } from '../boilerplate';
 import { India } from '../india';
 import { CommonStateArgs, GameAlias, GameState, JoCoOrderBase } from '../types';
 
 interface OnEnteringDirectorOfTradeSpecialEnvoySuccessArgs extends CommonStateArgs {
   closedOrders: JoCoOrderBase[];
+  openTradeWithChina: boolean;
 }
 
 export class DirectorOfTradeSpecialEnvoySuccess implements GameState<OnEnteringDirectorOfTradeSpecialEnvoySuccessArgs> {
@@ -48,9 +50,11 @@ export class DirectorOfTradeSpecialEnvoySuccess implements GameState<OnEnteringD
     args: OnEnteringDirectorOfTradeSpecialEnvoySuccessArgs,
   ) {
     updatePageTitle(
-      _(
-        '${tkn_playerName} may open trade with China or may open a closed order',
-      ),
+      args.openTradeWithChina
+        ? _(
+            '${tkn_playerName} may open trade with China or may open a closed order',
+          )
+        : _('${tkn_playerName} may open a closed order'),
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
       },
@@ -78,7 +82,9 @@ export class DirectorOfTradeSpecialEnvoySuccess implements GameState<OnEnteringD
     Bar.getInstance().goTo('joco-india');
 
     updatePageTitle(
-      _('${you} may open trade with China or may open a closed order'),
+      this.args.openTradeWithChina
+        ? _('${you} may open trade with China or may open a closed order')
+        : _('${you} may open a closed order'),
     );
     const india = India.getInstance();
     this.args.closedOrders.forEach((order) => {
@@ -86,17 +92,31 @@ export class DirectorOfTradeSpecialEnvoySuccess implements GameState<OnEnteringD
         this.updateInterfaceConfirm(order),
       );
     });
+    if (this.args.openTradeWithChina) {
+      addPrimaryActionButton({
+        id: 'china-btn',
+        text: _('Open trade with China'),
+        callback: () => this.updateInterfaceConfirm(null, true),
+      });
+    }
 
     // addCancelButton();
   }
 
-  private updateInterfaceConfirm(order: JoCoOrderBase) {
+  private updateInterfaceConfirm(
+    order: JoCoOrderBase | null,
+    openTradeWithChina: boolean = false,
+  ) {
     clearPossible();
 
-    updatePageTitle(_('Open closed order in ${region}?'), {
-      region: _(order.location),
-    });
-    setSelected(India.getInstance().ui.orders[order.id]);
+    if (openTradeWithChina) {
+      updatePageTitle(_('Open trade with China?'));
+    } else {
+      updatePageTitle(_('Open closed order in ${region}?'), {
+        region: _(order.location),
+      });
+      setSelected(India.getInstance().ui.orders[order.id]);
+    }
 
     addConfirmButton(() => this.performAction(order, true));
     addCancelButton();
@@ -110,9 +130,14 @@ export class DirectorOfTradeSpecialEnvoySuccess implements GameState<OnEnteringD
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  private performAction(order: JoCoOrderBase, perform: boolean = false) {
+  private performAction(
+    order: JoCoOrderBase | null,
+    openTradeWithChina: boolean = false,
+    perform: boolean = false,
+  ) {
     performAction('actDirectorOfTradeSpecialEnvoySuccess', {
-      orderId: order.id,
+      orderId: order?.id ?? null,
+      openTradeWithChina,
       perform,
     });
   }

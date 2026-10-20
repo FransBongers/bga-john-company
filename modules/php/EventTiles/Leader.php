@@ -30,25 +30,23 @@ class Leader extends \Bga\Games\JohnCompany\Models\EventTile
 
     // Dominated by another region. Region will rebel against capital
     if ($region->isDominatedByRegion()) {
-      $this->insertResolveCrisisNode($ctx, REBELLION, $regionId, $region->getControl(), $this->strength);
+      $this->insertResolveCrisisNodes($ctx, REBELLION, [
+        [
+          'attackerId' => $regionId,
+          'defenderId' => $region->getControl(),
+          'strengthModifier' => $this->strength
+        ]
+      ]);
       return;
     }
 
     // Else region was company controlled. We resolve rebellion against the company
-    $this->insertResolveCrisisNode($ctx, REBELLION_AGAINST_COMPANY, $regionId, null, $this->strength);
-  }
-
-  private function insertResolveCrisisNode($ctx, string $type, string $attackerId, string | null $defenderId, int $eventTileStrength)
-  {
-    $ctx->insertAsBrother(new LeafNode([
-      'action' => EVENTS_IN_INDIA_RESOLVE_CRISIS,
-      'args' => [
-        'type' => $type,
-        'attackerId' => $attackerId,
-        'defenderId' => $defenderId,
-        'eventTileStrength' => $eventTileStrength,
-        'primaryCrisis' => true,
+    $this->insertResolveCrisisNodes($ctx, REBELLION_AGAINST_COMPANY, [
+      [
+        'attackerId' => $regionId,
+        'defenderId' => null,
+        'strengthModifier' => $this->strength
       ]
-    ]));
+    ]);
   }
 }

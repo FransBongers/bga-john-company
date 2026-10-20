@@ -1,5 +1,4 @@
 import { Bar } from '../bar';
-import { Board } from '../board';
 import {
   addCancelButton,
   addConfirmButton,

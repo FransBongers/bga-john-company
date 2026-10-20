@@ -120,6 +120,23 @@ $machinestates = [
         ->transitions(['next' => ST_RESOLVE_STACK])
         ->build(),
 
+    ST_TRADE_IN_CHINA => GameStateBuilder::create()
+        ->name(TRADE_IN_CHINA)
+        ->description('${actplayer}')
+        ->descriptionmyturn('${you}')
+        ->type(StateType::ACTIVE_PLAYER)
+        ->args('argsAtomicAction')
+        ->action('stAtomicAction')
+        ->possibleactions([
+            'act' . TRADE_IN_CHINA,
+            'actPass',
+            'actPassOptionalAction',
+            'actTakeAtomicAction',
+            'actUndoToStep',
+        ])
+        ->transitions(['next' => ST_RESOLVE_STACK])
+        ->build(),
+
     // .########.##....##.########......#######..########
     // .##.......###...##.##.....##....##.....##.##......
     // .##.......####..##.##.....##....##.....##.##......
@@ -724,6 +741,22 @@ $machinestates = [
         'transitions' => [],
     ],
 
+    ST_EVENTS_IN_INDIA_SETUP_SECONDARY_REBELLION => [
+        'name' => EVENTS_IN_INDIA_SETUP_SECONDARY_REBELLION,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_CLEAR_CASCADE => [
+        'name' => CLEAR_CASCADE,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
     ST_EVENTS_IN_INDIA_CRISIS_DEFENSE => [
         'name' => EVENTS_IN_INDIA_CRISIS_DEFENSE,
         'type' => 'multipleactiveplayer',
@@ -733,22 +766,6 @@ $machinestates = [
         'action' => 'stAtomicAction',
         'possibleactions' => ['act' . EVENTS_IN_INDIA_CRISIS_DEFENSE, 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
-    ],
-
-    ST_FOREIGN_INVASION => [
-        'name' => FOREIGN_INVASION,
-        'description' => '',
-        'type' => 'game',
-        'action' => 'stAtomicAction',
-        'transitions' => [],
-    ],
-
-    ST_FOREIGN_INVASION_END => [
-        'name' => FOREIGN_INVASION_END,
-        'description' => '',
-        'type' => 'game',
-        'action' => 'stAtomicAction',
-        'transitions' => [],
     ],
 
     ST_UPKEEP_CHECK_PRIZES => [

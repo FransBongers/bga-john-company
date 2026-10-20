@@ -96,6 +96,20 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
   }
+
+  #SuperintendentOfTradeInChinaOffice.hidden {
+    display: none;
+  }
+
+  #MilitaryAffairsOffice {
+    .joco-inner-container {
+      flex-grow: 1;
+    }
+    .joco-family-members-stock {
+      flex-grow: 1;
+    }
+  }
+  
 }
 
 .joco-order-token {

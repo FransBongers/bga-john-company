@@ -39,35 +39,51 @@ class EventsInIndiaResolveCrisis extends \Bga\Games\JohnCompany\Models\AtomicAct
     $type = $args['type'];
     $attackerId = $args['attackerId'];
     $defenderId = $args['defenderId'];
-    $eventTileStrength = $args['eventTileStrength'];
+    $strengthModifier = $args['strengthModifier'] ?? 0;
     $primaryCrisis = $args['primaryCrisis'] ?? false;
 
+    $successful = null;
+    $capitalRegionId = null;
     switch ($type) {
       case INVASION:
-        $this->resolveInvasion($attackerId, $defenderId, $eventTileStrength);
+        list($successful, $capitalRegionId) = $this->resolveInvasion($attackerId, $defenderId, $strengthModifier);
         break;
       case INVASION_AGAINST_COMPANY:
-        $this->resolveInvasionAgainstTheCompany($attackerId, $defenderId, $eventTileStrength, $primaryCrisis);
+        $this->resolveInvasionAgainstTheCompany($attackerId, $defenderId, $strengthModifier, $primaryCrisis);
         break;
       case REBELLION:
-        $this->resolveRebellion($attackerId, $defenderId, $eventTileStrength);
+        list($successful) = $this->resolveRebellion($attackerId, $defenderId, $strengthModifier);
         break;
       case REBELLION_AGAINST_COMPANY:
-        $this->resolveRebellionAgainstTheCompany($attackerId, $eventTileStrength, $primaryCrisis);
+        $this->resolveRebellionAgainstTheCompany($attackerId, $strengthModifier, $primaryCrisis);
+        break;
+      case FOREIGN_INVASION:
+        $this->resolveForeignInvasion($defenderId);
+        break;
+      case FOREIGN_INVASION_AGAINST_COMPANY:
+        $this->resolveForeignInvasionAgainstCompany($defenderId, $primaryCrisis);
         break;
     }
 
 
-    $this->resolveAction(['automatic' => true]);
+    $this->resolveAction([
+      'automatic' => true,
+      'type' => $type,
+      'successful' => $successful,
+      'capitalRegionId' => $capitalRegionId,
+      'primaryCrisis' => $primaryCrisis,
+    ]);
   }
 
-  //  .##.....##.########.####.##.......####.########.##....##
-  //  .##.....##....##.....##..##........##.....##.....##..##.
-  //  .##.....##....##.....##..##........##.....##......####..
-  //  .##.....##....##.....##..##........##.....##.......##...
-  //  .##.....##....##.....##..##........##.....##.......##...
-  //  .##.....##....##.....##..##........##.....##.......##...
-  //  ..#######.....##....####.########.####....##.......##...
+
+
+  // .########..########.########..########.##.......##.......####..#######..##....##
+  // .##.....##.##.......##.....##.##.......##.......##........##..##.....##.###...##
+  // .##.....##.##.......##.....##.##.......##.......##........##..##.....##.####..##
+  // .########..######...########..######...##.......##........##..##.....##.##.##.##
+  // .##...##...##.......##.....##.##.......##.......##........##..##.....##.##..####
+  // .##....##..##.......##.....##.##.......##.......##........##..##.....##.##...###
+  // .##.....##.########.########..########.########.########.####..#######..##....##
 
   public function resolveRebellion(string $attackerId, string $defenderId, int $eventTileStrength)
   {
@@ -94,8 +110,17 @@ class EventsInIndiaResolveCrisis extends \Bga\Games\JohnCompany\Models\AtomicAct
     } else {
       $defender->incTowerLevel(-1);
     }
-    Elephant::insertMarchNode($this->ctx);
+    return [$successfulRebellion];
+    // Elephant::insertMarchNode($this->ctx);
   }
+
+  // .####.##....##.##.....##....###.....######..####..#######..##....##
+  // ..##..###...##.##.....##...##.##...##....##..##..##.....##.###...##
+  // ..##..####..##.##.....##..##...##..##........##..##.....##.####..##
+  // ..##..##.##.##.##.....##.##.....##..######...##..##.....##.##.##.##
+  // ..##..##..####..##...##..#########.......##..##..##.....##.##..####
+  // ..##..##...###...##.##...##.....##.##....##..##..##.....##.##...###
+  // .####.##....##....###....##.....##..######..####..#######..##....##
 
   private function resolveInvasion(string $attackerId, string $defenderId, int $eventTileStrength)
   {
@@ -123,53 +148,33 @@ class EventsInIndiaResolveCrisis extends \Bga\Games\JohnCompany\Models\AtomicAct
     Notifications::crisisResult($attackStrength, $defenderStrength, INVASION);
     $successfulInvasion = $attackStrength > $defenderStrength;
 
+    $capitalRegionId = null;
     if ($successfulInvasion) {
-      $this->handleSuccessfulInvasion($attacker, $defender);
+      $capitalRegionId = $this->handleSuccessfulInvasion($attacker, $defender);
       // Handle successful invasion logic here
     } else {
       // Handle failed invasion logic here
       $attacker->incTowerLevel(-1);
-      Elephant::insertMarchNode($this->ctx);
+      // Elephant::insertMarchNode($this->ctx);
     }
+    return [$successfulInvasion, $capitalRegionId];
   }
 
-  private function handleSuccessfulInvasion(Region $attacker, Region $defender)
-  {
-    $capitalRegionId = null;
-    if ($defender->isCapital()) {
-      $defender->shatterEmpire();
-    }
-    $isEmpire = $attacker->isCapital();
-    if (!$isEmpire) {
-      $isEmpire = $attacker->formEmpire();
-    }
-    if ($isEmpire) {
-      $defender->becomePartOfEmpire($attacker);
-      $capitalRegionId = $attacker->getId();
-    } else {
-      $defender->becomeSovereign();
-    }
-    Elephant::insertMarchNode($this->ctx, $capitalRegionId);
-  }
+  // .####.##....##.##.....##....###.....######..####..#######..##....##
+  // ..##..###...##.##.....##...##.##...##....##..##..##.....##.###...##
+  // ..##..####..##.##.....##..##...##..##........##..##.....##.####..##
+  // ..##..##.##.##.##.....##.##.....##..######...##..##.....##.##.##.##
+  // ..##..##..####..##...##..#########.......##..##..##.....##.##..####
+  // ..##..##...###...##.##...##.....##.##....##..##..##.....##.##...###
+  // .####.##....##....###....##.....##..######..####..#######..##....##
 
-  public function getDefenderStrengthInvasion(Collection $regions, Region $defender)
-  {
-    /**
-     * Defender can either be:
-     * - part of an empire, so control will be set to a regionId of capital
-     * - the capital of an empire, other regions will have the regionId set as their control
-     */
-    $defenderStrength = 0;
-
-    foreach ($regions as $region) {
-      $regionIdToCheckFor = $defender->getControl() !== null ? $defender->getControl() : $defender->getId();
-      if ($region->getControl() === $regionIdToCheckFor || $region->getId() === $regionIdToCheckFor) {
-        $defenderStrength += $region->getStrength();
-      }
-    }
-
-    return $defenderStrength;
-  }
+  // ..######...#######..##.....##.########.....###....##....##.##....##
+  // .##....##.##.....##.###...###.##.....##...##.##...###...##..##..##.
+  // .##.......##.....##.####.####.##.....##..##...##..####..##...####..
+  // .##.......##.....##.##.###.##.########..##.....##.##.##.##....##...
+  // .##.......##.....##.##.....##.##........#########.##..####....##...
+  // .##....##.##.....##.##.....##.##........##.....##.##...###....##...
+  // ..######...#######..##.....##.##........##.....##.##....##....##...
 
   public function resolveInvasionAgainstTheCompany(string $attackerId, string $defenderId, int $eventTileStrength, bool $primaryCrisis)
   {
@@ -198,6 +203,22 @@ class EventsInIndiaResolveCrisis extends \Bga\Games\JohnCompany\Models\AtomicAct
     $this->insertCrisisDefenseNode($attackerId, $defenderId, $actingCommanderId, $attackStrength, INVASION_AGAINST_COMPANY, $primaryCrisis);
   }
 
+  // .########..########.########..########.##.......##.......####..#######..##....##
+  // .##.....##.##.......##.....##.##.......##.......##........##..##.....##.###...##
+  // .##.....##.##.......##.....##.##.......##.......##........##..##.....##.####..##
+  // .########..######...########..######...##.......##........##..##.....##.##.##.##
+  // .##...##...##.......##.....##.##.......##.......##........##..##.....##.##..####
+  // .##....##..##.......##.....##.##.......##.......##........##..##.....##.##...###
+  // .##.....##.########.########..########.########.########.####..#######..##....##
+
+  // ..######...#######..##.....##.########.....###....##....##.##....##
+  // .##....##.##.....##.###...###.##.....##...##.##...###...##..##..##.
+  // .##.......##.....##.####.####.##.....##..##...##..####..##...####..
+  // .##.......##.....##.##.###.##.########..##.....##.##.##.##....##...
+  // .##.......##.....##.##.....##.##........#########.##..####....##...
+  // .##....##.##.....##.##.....##.##........##.....##.##...###....##...
+  // ..######...#######..##.....##.##........##.....##.##....##....##...
+
   public function resolveRebellionAgainstTheCompany(string $attackerId, int $eventTileStrength, bool $primaryCrisis)
   {
     $regions = Regions::getAll();
@@ -213,10 +234,147 @@ class EventsInIndiaResolveCrisis extends \Bga\Games\JohnCompany\Models\AtomicAct
 
     $actingCommanderId = $attacker->getActingCommander()->getPlayerId();
 
-    self::insertCrisisDefenseNode($attackerId, $attackerId, $actingCommanderId, $attackStrength, REBELLION, $primaryCrisis);
+    self::insertCrisisDefenseNode($attackerId, $attackerId, $actingCommanderId, $attackStrength, REBELLION_AGAINST_COMPANY, $primaryCrisis);
   }
 
-  public function insertCrisisDefenseNode(string $attackerId, string | null $defenderId, int $actingCommanderId, int $attackStrength, string $type, bool $primaryCrisis)
+  // .########..#######..########..########.####..######...##....##
+  // .##.......##.....##.##.....##.##........##..##....##..###...##
+  // .##.......##.....##.##.....##.##........##..##........####..##
+  // .######...##.....##.########..######....##..##...####.##.##.##
+  // .##.......##.....##.##...##...##........##..##....##..##..####
+  // .##.......##.....##.##....##..##........##..##....##..##...###
+  // .##........#######..##.....##.########.####..######...##....##
+
+  // .####.##....##.##.....##....###.....######..####..#######..##....##
+  // ..##..###...##.##.....##...##.##...##....##..##..##.....##.###...##
+  // ..##..####..##.##.....##..##...##..##........##..##.....##.####..##
+  // ..##..##.##.##.##.....##.##.....##..######...##..##.....##.##.##.##
+  // ..##..##..####..##...##..#########.......##..##..##.....##.##..####
+  // ..##..##...###...##.##...##.....##.##....##..##..##.....##.##...###
+  // .####.##....##....###....##.....##..######..####..#######..##....##
+
+  private function resolveForeignInvasion(string $defenderId)
+  {
+    $regions = Regions::getAll();
+    $defender = $regions[$defenderId];
+
+    $attackStrength = bga_rand(1, 6);
+    Notifications::foreignInvasion($defender->getName(), $attackStrength);
+
+    $defenderStrength = $this->getDefenderStrengthInvasion($regions, $defender);
+
+    Notifications::crisisResult($attackStrength, $defenderStrength, FOREIGN_INVASION);
+    $successfulInvasion = $attackStrength > $defenderStrength;
+
+    if (!$successfulInvasion) {
+      return;
+    }
+
+    $defender->closeAllOrders();
+
+    if ($defender->isCapital()) {
+      $defender->shatterEmpire();
+    } else {
+      $defender->becomeSovereign();
+    }
+
+    $newTowerLevel = floor($attackStrength / 2);
+    $towerLevelChange = $newTowerLevel - $defender->getTowerLevel();
+
+
+    $defender->incTowerLevel($towerLevelChange);
+  }
+
+
+  // .########..#######..########..########.####..######...##....##
+  // .##.......##.....##.##.....##.##........##..##....##..###...##
+  // .##.......##.....##.##.....##.##........##..##........####..##
+  // .######...##.....##.########..######....##..##...####.##.##.##
+  // .##.......##.....##.##...##...##........##..##....##..##..####
+  // .##.......##.....##.##....##..##........##..##....##..##...###
+  // .##........#######..##.....##.########.####..######...##....##
+
+  // .####.##....##.##.....##....###.....######..####..#######..##....##
+  // ..##..###...##.##.....##...##.##...##....##..##..##.....##.###...##
+  // ..##..####..##.##.....##..##...##..##........##..##.....##.####..##
+  // ..##..##.##.##.##.....##.##.....##..######...##..##.....##.##.##.##
+  // ..##..##..####..##...##..#########.......##..##..##.....##.##..####
+  // ..##..##...###...##.##...##.....##.##....##..##..##.....##.##...###
+  // .####.##....##....###....##.....##..######..####..#######..##....##
+
+  // ..######...#######..##.....##.########.....###....##....##.##....##
+  // .##....##.##.....##.###...###.##.....##...##.##...###...##..##..##.
+  // .##.......##.....##.####.####.##.....##..##...##..####..##...####..
+  // .##.......##.....##.##.###.##.########..##.....##.##.##.##....##...
+  // .##.......##.....##.##.....##.##........#########.##..####....##...
+  // .##....##.##.....##.##.....##.##........##.....##.##...###....##...
+  // ..######...#######..##.....##.##........##.....##.##....##....##...
+
+  private function resolveForeignInvasionAgainstCompany(string $defenderId, bool $primaryCrisis)
+  {
+    $regions = Regions::getAll();
+    $defender = $regions[$defenderId];
+
+    $dieRoll = bga_rand(1, 6);
+    $unrest = $defender->getUnrest();
+    Notifications::foreignInvasion($defender->getName(), $dieRoll, $unrest);
+    $attackStrength = $dieRoll + $unrest;
+
+    $actingCommanderId = $defender->getActingCommander()->getPlayerId();
+
+    $this->insertCrisisDefenseNode(null, $defenderId, $actingCommanderId, $attackStrength, FOREIGN_INVASION_AGAINST_COMPANY, $primaryCrisis);
+  }
+
+
+  //  .##.....##.########.####.##.......####.########.##....##
+  //  .##.....##....##.....##..##........##.....##.....##..##.
+  //  .##.....##....##.....##..##........##.....##......####..
+  //  .##.....##....##.....##..##........##.....##.......##...
+  //  .##.....##....##.....##..##........##.....##.......##...
+  //  .##.....##....##.....##..##........##.....##.......##...
+  //  ..#######.....##....####.########.####....##.......##...
+
+  private function handleSuccessfulInvasion(Region $attacker, Region $defender)
+  {
+    $capitalRegionId = null;
+    if ($defender->isCapital()) {
+      $defender->shatterEmpire();
+    }
+    $isEmpire = $attacker->isCapital();
+    if (!$isEmpire) {
+      $isEmpire = $attacker->formEmpire();
+    }
+    if ($isEmpire) {
+      $defender->becomePartOfEmpire($attacker);
+      $capitalRegionId = $attacker->getId();
+    } else {
+      $defender->becomeSovereign();
+    }
+
+    // Elephant::insertMarchNode($this->ctx, $capitalRegionId);
+    return $capitalRegionId;
+  }
+
+  public function getDefenderStrengthInvasion(Collection $regions, Region $defender)
+  {
+    /**
+     * Defender can either be:
+     * - part of an empire, so control will be set to a regionId of capital
+     * - the capital of an empire, other regions will have the regionId set as their control
+     */
+    $defenderStrength = 0;
+
+    foreach ($regions as $region) {
+      $regionIdToCheckFor = $defender->getControl() !== null ? $defender->getControl() : $defender->getId();
+      if ($region->getControl() === $regionIdToCheckFor || $region->getId() === $regionIdToCheckFor) {
+        $defenderStrength += $region->getStrength();
+      }
+    }
+
+    return $defenderStrength;
+  }
+
+  public function insertCrisisDefenseNode(string | null $attackerId, string | null $defenderId, int $actingCommanderId, int $attackStrength, string $type, bool $primaryCrisis)
   {
     $action = [
       'action' => EVENTS_IN_INDIA_CRISIS_DEFENSE,

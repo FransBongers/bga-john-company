@@ -38,6 +38,7 @@ export const addPlayerButton = (props: {
   id: string;
   playerId: number;
   callback: Function;
+  text?: string;
   extraClasses?: string;
 }) => Interaction.use().addPlayerButton(props);
 

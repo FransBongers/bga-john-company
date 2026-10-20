@@ -1,4 +1,4 @@
-import { createHtmlElement } from '../boilerplate';
+import { createHtmlElement, DECK, HIDDEN } from '../boilerplate';
 import {
   SEA_ZONES,
   MILITARY_AFFAIRS,
@@ -7,6 +7,7 @@ import {
   BOMBAY_PRESIDENCY,
   BENGAL_PRESIDENCY,
   MADRAS_PRESIDENCY,
+  SUPERINTENDENT_OF_TRADE_IN_CHINA,
 } from '../constants';
 import { createFamilyMember } from '../templates';
 import { GameAlias, GamedatasAlias, JocoRegionBase } from '../types';
@@ -15,14 +16,22 @@ import { ORDERS_CONFIG } from './config';
 import { Presidency } from './presidency';
 import { Region } from './region';
 import { ShipZone } from './ship-zone';
-import { tplMilitaryAffairs, tplOrder, tplOrderToken } from './templates';
+import {
+  tplMilitaryAffairs,
+  tplOrder,
+  tplOrderToken,
+  tplSuperintendentOfTradeInChina,
+} from './templates';
 
 const tplIndia = () => `
   <div id="joco-india" class="joco-tab">
     <div id="joco-india-map">
       <div id="joco-elephant"></div>
     </div>
-    ${tplMilitaryAffairs()}
+    <div class="joco-row" style="align-self: stretch; gap: 12px;">
+      ${tplMilitaryAffairs()}
+      ${tplSuperintendentOfTradeInChina()}
+    </div>
     <div id="joco-presidencies-and-armies">
       
       
@@ -43,6 +52,8 @@ export class India {
     elephant: HTMLElement;
     militaryAffairsOffice: HTMLElement;
     officersInTraining: HTMLElement;
+    superintendentOfTradeInChinaContainer: HTMLElement;
+    superintendentOfTradeInChinaOffice: HTMLElement;
   };
   constructor(private game: GameAlias) {
     this.game = game;
@@ -76,6 +87,12 @@ export class India {
       elephant: document.getElementById('joco-elephant')!,
       militaryAffairsOffice: document.getElementById(MILITARY_AFFAIRS)!,
       officersInTraining: document.getElementById(OFFICER_IN_TRAINING)!,
+      superintendentOfTradeInChinaOffice: document.getElementById(
+        SUPERINTENDENT_OF_TRADE_IN_CHINA,
+      )!,
+      superintendentOfTradeInChinaContainer: document.getElementById(
+        `${SUPERINTENDENT_OF_TRADE_IN_CHINA}Office`,
+      )!,
     };
 
     this.setupPresidencies(gamedatas);
@@ -86,36 +103,41 @@ export class India {
     this.setupShipZones(gamedatas);
 
     this.updateElephant(gamedatas.elephant);
-    this.updateMilitaryAffairsOffice(gamedatas);
+    this.updateSuperintendentOfTradeInChina(gamedatas.offices[SUPERINTENDENT_OF_TRADE_IN_CHINA].location !== DECK);
+    this.updateMilitaryAffairsOfficeAndSuperintendent(gamedatas);
   }
 
   private setupArmies(gamedatas: GamedatasAlias) {
     const presidencyContainer = document.getElementById(
       'joco-presidencies-and-armies',
     );
-    [BOMBAY_PRESIDENCY, MADRAS_PRESIDENCY, BENGAL_PRESIDENCY].forEach((army) => {
-      const armyInstance = new Army({
-        parentElement: presidencyContainer!,
-        id: army,
-        gamedatas,
-        game: this.game,
-      });
-      this.armies[army] = armyInstance;
-    });
+    [BOMBAY_PRESIDENCY, MADRAS_PRESIDENCY, BENGAL_PRESIDENCY].forEach(
+      (army) => {
+        const armyInstance = new Army({
+          parentElement: presidencyContainer!,
+          id: army,
+          gamedatas,
+          game: this.game,
+        });
+        this.armies[army] = armyInstance;
+      },
+    );
   }
 
   private setupPresidencies(gamedatas: GamedatasAlias) {
     const presidencyContainer = document.getElementById(
       'joco-presidencies-and-armies',
     );
-    [BOMBAY_PRESIDENCY, MADRAS_PRESIDENCY, BENGAL_PRESIDENCY].forEach((presidencyId) => {
-      const presidencyInstance = new Presidency({
-        gamedatas,
-        parentElement: presidencyContainer!,
-        id: presidencyId,
-      });
-      this.presidencies[presidencyId] = presidencyInstance;
-    });
+    [BOMBAY_PRESIDENCY, MADRAS_PRESIDENCY, BENGAL_PRESIDENCY].forEach(
+      (presidencyId) => {
+        const presidencyInstance = new Presidency({
+          gamedatas,
+          parentElement: presidencyContainer!,
+          id: presidencyId,
+        });
+        this.presidencies[presidencyId] = presidencyInstance;
+      },
+    );
   }
 
   private setupOrders(gamedatas: GamedatasAlias) {
@@ -141,6 +163,10 @@ export class India {
     SEA_ZONES.forEach((seaZone) => {
       this.seaZones[seaZone] = new ShipZone(seaZone, gamedatas);
     });
+    this.seaZones[SUPERINTENDENT_OF_TRADE_IN_CHINA] = new ShipZone(
+      SUPERINTENDENT_OF_TRADE_IN_CHINA,
+      gamedatas,
+    );
   }
 
   // .##.....##.########..########.....###....########.########....##.....##.####
@@ -151,7 +177,17 @@ export class India {
   // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
   // ..#######..##........########..##.....##....##....########.....#######..####
 
-  updateMilitaryAffairsOffice(gamedatas: GamedatasAlias) {
+  updateSuperintendentOfTradeInChina(visible: boolean) {
+    const elt = this.ui.superintendentOfTradeInChinaContainer;
+    if (!visible) {
+      elt.classList.add(HIDDEN);
+      return;
+    }
+    elt.classList.remove(HIDDEN);
+    // Implementation for updating the Superintendent of Trade in China office
+  }
+
+  updateMilitaryAffairsOfficeAndSuperintendent(gamedatas: GamedatasAlias) {
     Object.values(gamedatas.familyMembers).forEach((member) => {
       if (member.location === OFFICER_IN_TRAINING) {
         const officer = createFamilyMember(member.familyId, member.id);
@@ -160,6 +196,9 @@ export class India {
         // President
         const presidentElement = createFamilyMember(member.familyId, member.id);
         this.ui.militaryAffairsOffice.appendChild(presidentElement);
+      } else if (member.location === SUPERINTENDENT_OF_TRADE_IN_CHINA) {
+        const superintendent = createFamilyMember(member.familyId, member.id);
+        this.ui.superintendentOfTradeInChinaOffice.appendChild(superintendent);
       }
     });
   }

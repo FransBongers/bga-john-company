@@ -16,6 +16,7 @@ import {
   FATIGUED,
   BENGAL_PRESIDENCY,
   BOMBAY_PRESIDENCY,
+  SUPERINTENDENT_OF_TRADE_IN_CHINA,
 } from './constants';
 import { tknShipValue } from './logs/templates';
 import { PlayerManager } from './player-manager';
@@ -58,7 +59,7 @@ export const getSeaName = (seaId: string) => {
       return _('South Indian');
     case WEST_INDIAN:
       return _('West Indian');
-    case CHINA:
+    case SUPERINTENDENT_OF_TRADE_IN_CHINA:
       return _('China');
     default:
       return '';
@@ -166,15 +167,5 @@ export const getOffice = (office: JocoOfficeBase): JocoOffice => {
   return {
     ...office,
     ...officeStatic,
-  };
-};
-
-export const createControlToken = (data: JocoRegionBase): JocoControlToken => {
-  const staticData = StaticData.get().region(data.id);
-  return {
-    id: 'control-token-' + data.id,
-    side: data.looted ? 'control' : 'loot',
-    regionId: data.id,
-    loot: staticData.loot,
   };
 };

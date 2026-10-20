@@ -88,9 +88,10 @@ const DISABLED = 'disabled';
 const SELECTABLE = 'selectable';
 const SELECTED = 'selected';
 const USED = 'used';
+const HIDDEN = 'hidden';
 const PRIMARY = 'primary';
 const SECONDARY = 'secondary';
-const DECK$1 = 'deck';
+const DECK = 'deck';
 const DISCARD = 'discard';
 
 const BOARD_SCALE = 'boardScale';
@@ -233,7 +234,7 @@ const PRESIDENT_OF_BOMBAY = 'PresidentOfBombay';
 const PRESIDENT_OF_MADRAS = 'PresidentOfMadras';
 const PRESIDENT_OF_BENGAL = 'PresidentOfBengal';
 const GOVERNOR_GENERAL = 'GovernorGeneral';
-const SUPERINTENDENT_OF_TRADE_IN_CHINA = 'SuperintendentOfTradeInChina';
+const SUPERINTENDENT_OF_TRADE_IN_CHINA$1 = 'SuperintendentOfTradeInChina';
 const GOVERNOR_OF_BOMBAY = 'GovernorOfBombay';
 const GOVERNOR_OF_MADRAS = 'GovernorOfMadras';
 const GOVERNOR_OF_BENGAL = 'GovernorOfBengal';
@@ -736,7 +737,7 @@ const addConfirmButton$1 = (callback) => {
 const addDangerActionButton$1 = (props) => {
     Interaction.use().addDangerActionButton(props);
 };
-const addPassButton = (optionalAction, text) => Interaction.use().addPassButton(optionalAction, text);
+const addPassButton$1 = (optionalAction, text) => Interaction.use().addPassButton(optionalAction, text);
 const addPlayerButton = (props) => Interaction.use().addPlayerButton(props);
 const addPrimaryActionButton = (props) => Interaction.use().addPrimaryActionButton(props);
 const addSecondaryActionButton$1 = (props) => Interaction.use().addSecondaryActionButton(props);
@@ -799,13 +800,13 @@ class Interaction {
     static use() {
         return Interaction.instance;
     }
-    addPlayerButton({ id, playerId, callback, extraClasses, }) {
+    addPlayerButton({ id, playerId, callback, text, extraClasses, }) {
         const playerColor = PlayerManager$1.getInstance()
             .getPlayer(playerId)
             .getColor();
         this.addSecondaryActionButton({
             id,
-            text: getPlayerName$1(playerId),
+            text: text ?? getPlayerName$1(playerId),
             callback,
             extraClasses: `player-button ${HEX_COLOR_COLOR_MAP[playerColor]} ${extraClasses}`,
         });
@@ -1367,7 +1368,7 @@ const getSeaName = (seaId) => {
             return _('South Indian');
         case WEST_INDIAN:
             return _('West Indian');
-        case CHINA:
+        case SUPERINTENDENT_OF_TRADE_IN_CHINA$1:
             return _('China');
         default:
             return '';
@@ -1427,7 +1428,7 @@ const getEnterpriseCard = (card) => {
         ...cardStatic,
     };
 };
-const getEventTile$1 = (tile) => {
+const getEventTile = (tile) => {
     const staticData = StaticData.get();
     const tileStatic = staticData.eventTile(tile.id);
     return {
@@ -1459,15 +1460,6 @@ const getOffice = (office) => {
     return {
         ...office,
         ...officeStatic,
-    };
-};
-const createControlToken = (data) => {
-    const staticData = StaticData.get().region(data.id);
-    return {
-        id: 'control-token-' + data.id,
-        side: data.looted ? 'control' : 'loot',
-        regionId: data.id,
-        loot: staticData.loot,
     };
 };
 
@@ -1504,7 +1496,7 @@ const getPhaseName = (phase) => {
             return _('Madras Presidency');
         case BENGAL_PRESIDENCY:
             return _('Bengal Presidency');
-        case SUPERINTENDENT_OF_TRADE_IN_CHINA:
+        case SUPERINTENDENT_OF_TRADE_IN_CHINA$1:
             return _('Superintendent of Trade in China');
         case BONUSES:
             return _('Bonuses');
@@ -2522,17 +2514,17 @@ class Region {
     }
     async addShip(ship, fromSea = null) {
         if (fromSea) {
-            India$1.getInstance().getSeaZone(fromSea).updateCount(-1);
+            India.getInstance().getSeaZone(fromSea).updateCount(-1);
         }
         await this.shipStock.addCard(ship);
     }
 }
 
-const tplSeaZone = (id) => `
+const tplSeaZone = (id, tradeInChina = false) => `
   <div class="joco-sea-zone" data-zone="${id}">
     <div id="joco-ship-stock-${id}" class="joco-ship-stock"></div>  
     <div class="joco-ship-count">
-      <span id="joco-ship-count-${id}" class="fb-font-baskerville fb-font-bold fb-font-12"></span>
+      <span id="joco-ship-count-${id}" class="fb-font-baskerville ${tradeInChina ? '' : 'fb-font-bold'} fb-font-12"></span>
     </div>
   </div>
 `;
@@ -2544,9 +2536,10 @@ class ShipZone {
         this.setup(gamedatas);
     }
     setup(gamedatas) {
+        const elementId = this.id === SUPERINTENDENT_OF_TRADE_IN_CHINA$1 ? `${SUPERINTENDENT_OF_TRADE_IN_CHINA$1}Office` : 'joco-india-map';
         document
-            .getElementById('joco-india-map')
-            ?.insertAdjacentHTML('beforeend', tplSeaZone(this.id));
+            .getElementById(elementId)
+            ?.insertAdjacentHTML('beforeend', tplSeaZone(this.id, this.id === SUPERINTENDENT_OF_TRADE_IN_CHINA$1));
         this.ui = {
             stock: document.getElementById(`joco-ship-stock-${this.id}`),
             count: document.getElementById(`joco-ship-count-${this.id}`),
@@ -2561,13 +2554,17 @@ class ShipZone {
     updateCount(modifier = 0) {
         this.ui.count.replaceChildren();
         const count = this.stock.getCards().length + modifier;
-        this.ui.count.textContent = formatStringRecursive(count === 1 ? '${count} Ship' : '${count} Ships', {
+        let textContent = formatStringRecursive(count === 1 ? _('${count} Ship') : _('${count} Ships'), {
             count,
         });
+        if (this.id === SUPERINTENDENT_OF_TRADE_IN_CHINA$1) {
+            textContent = textContent.toLocaleUpperCase();
+        }
+        this.ui.count.textContent = textContent;
     }
     async addShip(ship, fromSea = null) {
         if (fromSea) {
-            India$1.getInstance().getSeaZone(fromSea).updateCount(-1);
+            India.getInstance().getSeaZone(fromSea).updateCount(-1);
         }
         await this.stock.addCard(ship);
         this.updateCount();
@@ -2605,20 +2602,28 @@ const tplMilitaryAffairs = () => `
         </div>
       </div>
 `;
+const tplSuperintendentOfTradeInChina$1 = () => `
+  <div id="${SUPERINTENDENT_OF_TRADE_IN_CHINA$1}Office" class="joco-office joco-container">
+    ${tplOfficeHeader(SUPERINTENDENT_OF_TRADE_IN_CHINA$1, getPhaseName(SUPERINTENDENT_OF_TRADE_IN_CHINA$1))}
+  </div>
+`;
 
 const tplIndia = () => `
   <div id="joco-india" class="joco-tab">
     <div id="joco-india-map">
       <div id="joco-elephant"></div>
     </div>
-    ${tplMilitaryAffairs()}
+    <div class="joco-row" style="align-self: stretch; gap: 12px;">
+      ${tplMilitaryAffairs()}
+      ${tplSuperintendentOfTradeInChina$1()}
+    </div>
     <div id="joco-presidencies-and-armies">
       
       
     </div>
   </div>
 `;
-let India$1 = class India {
+class India {
     constructor(game) {
         this.game = game;
         this.armies = {};
@@ -2644,6 +2649,8 @@ let India$1 = class India {
             elephant: document.getElementById('joco-elephant'),
             militaryAffairsOffice: document.getElementById(MILITARY_AFFAIRS),
             officersInTraining: document.getElementById(OFFICER_IN_TRAINING),
+            superintendentOfTradeInChinaOffice: document.getElementById(SUPERINTENDENT_OF_TRADE_IN_CHINA$1),
+            superintendentOfTradeInChinaContainer: document.getElementById(`${SUPERINTENDENT_OF_TRADE_IN_CHINA$1}Office`),
         };
         this.setupPresidencies(gamedatas);
         this.setupArmies(gamedatas);
@@ -2651,7 +2658,8 @@ let India$1 = class India {
         this.setupRegions(gamedatas);
         this.setupShipZones(gamedatas);
         this.updateElephant(gamedatas.elephant);
-        this.updateMilitaryAffairsOffice(gamedatas);
+        this.updateSuperintendentOfTradeInChina(gamedatas.offices[SUPERINTENDENT_OF_TRADE_IN_CHINA$1].location !== DECK);
+        this.updateMilitaryAffairsOfficeAndSuperintendent(gamedatas);
     }
     setupArmies(gamedatas) {
         const presidencyContainer = document.getElementById('joco-presidencies-and-armies');
@@ -2695,8 +2703,17 @@ let India$1 = class India {
         SEA_ZONES.forEach((seaZone) => {
             this.seaZones[seaZone] = new ShipZone(seaZone, gamedatas);
         });
+        this.seaZones[SUPERINTENDENT_OF_TRADE_IN_CHINA$1] = new ShipZone(SUPERINTENDENT_OF_TRADE_IN_CHINA$1, gamedatas);
     }
-    updateMilitaryAffairsOffice(gamedatas) {
+    updateSuperintendentOfTradeInChina(visible) {
+        const elt = this.ui.superintendentOfTradeInChinaContainer;
+        if (!visible) {
+            elt.classList.add(HIDDEN);
+            return;
+        }
+        elt.classList.remove(HIDDEN);
+    }
+    updateMilitaryAffairsOfficeAndSuperintendent(gamedatas) {
         Object.values(gamedatas.familyMembers).forEach((member) => {
             if (member.location === OFFICER_IN_TRAINING) {
                 const officer = createFamilyMember(member.familyId, member.id);
@@ -2705,6 +2722,10 @@ let India$1 = class India {
             else if (member.location === MILITARY_AFFAIRS) {
                 const presidentElement = createFamilyMember(member.familyId, member.id);
                 this.ui.militaryAffairsOffice.appendChild(presidentElement);
+            }
+            else if (member.location === SUPERINTENDENT_OF_TRADE_IN_CHINA$1) {
+                const superintendent = createFamilyMember(member.familyId, member.id);
+                this.ui.superintendentOfTradeInChinaOffice.appendChild(superintendent);
             }
         });
     }
@@ -2738,7 +2759,7 @@ let India$1 = class India {
     getRegion(regionId) {
         return this.regions[regionId];
     }
-};
+}
 
 const lawCardHeaderText = (header) => {
     switch (header) {
@@ -3935,10 +3956,10 @@ class EventTiles {
         this.discard = new BgaCards$1.LineStock(EventTilesManager$1.getInstance(), document.getElementById(`joco-event-tiles-discard`));
         this.deck = new BgaCards$1.LineStock(EventTilesManager$1.getInstance(), document.getElementById(`joco-event-tiles-deck`));
         if (gamedatas.eventTiles.deck) {
-            this.deck.addCard(getEventTile$1(gamedatas.eventTiles.deck));
+            this.deck.addCard(getEventTile(gamedatas.eventTiles.deck));
         }
         if (gamedatas.eventTiles.discard) {
-            this.discard.addCard(getEventTile$1(gamedatas.eventTiles.discard));
+            this.discard.addCard(getEventTile(gamedatas.eventTiles.discard));
         }
     }
     tplEventTiles() {
@@ -3953,8 +3974,8 @@ class EventTiles {
     }
     async drawEventTile(eventTile, topOfDeck) {
         await Promise.all([
-            this.discard.addCard(getEventTile$1(eventTile)),
-            this.deck.addCard(getEventTile$1(topOfDeck)),
+            this.discard.addCard(getEventTile(eventTile)),
+            this.deck.addCard(getEventTile(topOfDeck)),
         ]);
     }
 }
@@ -4063,7 +4084,7 @@ class NotificationManager {
     }
     async notif_changeOrderStatus(notif) {
         const { order } = notif;
-        India$1.getInstance().ui.orders[order.id].setAttribute('data-status', order.status);
+        India.getInstance().ui.orders[order.id].setAttribute('data-status', order.status);
     }
     async notif_companyOperationChairman(notif) {
         const { debtIncreased, companyDebt, treasuries, companyBalance } = notif;
@@ -4092,7 +4113,7 @@ class NotificationManager {
         SetupArea.getInstance().newCards(cardIds, lastCard);
     }
     async notif_elephantMarch(notif) {
-        India$1.getInstance().updateElephant(notif);
+        India.getInstance().updateElephant(notif);
         await Interaction.use().wait(500);
     }
     async notif_enlistFamilyMember(notif) {
@@ -4199,7 +4220,7 @@ class NotificationManager {
         if (!element) {
             element = createHtmlElement(tplOfficeCard(office));
         }
-        if (office.location === DECK$1) {
+        if (office.location === DECK) {
             element.remove();
         }
         else {
@@ -4220,12 +4241,12 @@ class NotificationManager {
     async notif_moveShip(notif) {
         const { from, ship } = notif;
         if (ship.location.startsWith(SHIPYARD)) {
-            India$1.getInstance().getSeaZone(from).updateCount(-1);
+            India.getInstance().getSeaZone(from).updateCount(-1);
             await EnterpriseCardsManager.getInstance().shipStocks[ship.id].addCard(ship);
             return;
         }
         1;
-        const seaZone = India$1.getInstance().getSeaZone(ship.location);
+        const seaZone = India.getInstance().getSeaZone(ship.location);
         if (!seaZone.hasShip(ship.id)) {
             await seaZone.addShip(ship, from.startsWith('shipConstruction_') ? null : from);
         }
@@ -4248,6 +4269,9 @@ class NotificationManager {
     async notif_addToTreasury(notif) {
         const { treasury, officeId } = notif;
         Company.getInstance().treasuries[officeId].toValue(treasury);
+    }
+    async notif_openTradeWithChina(notif) {
+        India.getInstance().updateSuperintendentOfTradeInChina(true);
     }
     async notif_parliamentMeetsCleanup(notif) {
         const { parliamentData, londonSeasonCards, enterpriseCards } = notif;
@@ -4277,7 +4301,7 @@ class NotificationManager {
     async notif_placeShip(notif) {
         const { playerId, ship } = notif;
         let placedShip = ship;
-        const india = India$1.getInstance();
+        const india = India.getInstance();
         if (ship.location.startsWith('shipConstruction_')) {
             const regionId = ship.location.split('_')[1];
             const region = india.getRegion(regionId);
@@ -4441,17 +4465,17 @@ class NotificationManager {
     }
     async notif_updateRegion(notif) {
         const { region: data, controlToken } = notif;
-        const india = India$1.getInstance();
+        const india = India.getInstance();
         const region = india.getRegion(data.id);
         region.update(data);
         const regionHasControlToken = region.hasControlToken(controlToken);
-        if (PRESIDENCIES.includes(data.control) &&
-            regionHasControlToken) {
+        if (PRESIDENCIES.includes(data.control) && regionHasControlToken) {
             await india.getPresidency(data.control).addControlToken(controlToken);
         }
-        else if (!PRESIDENCIES.includes(data.control) &&
-            !regionHasControlToken) {
-            await india.getPresidency(data.control).addControlToken(controlToken);
+        else if (!PRESIDENCIES.includes(data.control) && !regionHasControlToken) {
+            await india
+                .getRegion(controlToken.location)
+                .addControlToken(controlToken);
         }
     }
 }
@@ -5204,7 +5228,7 @@ class CommanderDeploy extends ExhaustArmyPieces {
                 },
             });
         });
-        addPassButton(this.args.optionalAction, _('Do not deploy'));
+        addPassButton$1(this.args.optionalAction, _('Do not deploy'));
     }
     updateInterfaceSelectArmyPieces() {
         clearPossible();
@@ -5271,7 +5295,7 @@ class CommanderPurchaseLocalAlliance {
         clearPossible();
         updatePageTitle(_('${you} may purchase a local alliance'), {});
         this.args.options.forEach((option) => onClick(option.id, () => this.updateInterfaceConfirm(option)));
-        addPassButton(this.args.optionalAction, _('Do not purchase a local alliance'));
+        addPassButton$1(this.args.optionalAction, _('Do not purchase a local alliance'));
     }
     updateInterfaceConfirm(localAlliance) {
         clearPossible();
@@ -5919,7 +5943,7 @@ class DirectorOfTradeSpecialEnvoy {
             text: _('Propose'),
             callback: () => this.performAction(false),
         });
-        addPassButton(this.args.optionalAction);
+        addPassButton$1(this.args.optionalAction);
     }
     updateInterfaceConfirm() {
         clearPossible();
@@ -5957,31 +5981,48 @@ class DirectorOfTradeSpecialEnvoySuccess {
         debug('Leaving DirectorOfTradeSpecialEnvoySuccess state');
     }
     setDescription(activePlayerIds, args) {
-        updatePageTitle(_('${tkn_playerName} may open trade with China or may open a closed order'), {
+        updatePageTitle(args.openTradeWithChina
+            ? _('${tkn_playerName} may open trade with China or may open a closed order')
+            : _('${tkn_playerName} may open a closed order'), {
             tkn_playerName: getPlayerName$1(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
         this.game.clearPossible();
         Bar.getInstance().goTo('joco-india');
-        updatePageTitle(_('${you} may open trade with China or may open a closed order'));
-        const india = India$1.getInstance();
+        updatePageTitle(this.args.openTradeWithChina
+            ? _('${you} may open trade with China or may open a closed order')
+            : _('${you} may open a closed order'));
+        const india = India.getInstance();
         this.args.closedOrders.forEach((order) => {
             onClick(india.ui.orders[order.id], () => this.updateInterfaceConfirm(order));
         });
+        if (this.args.openTradeWithChina) {
+            addPrimaryActionButton({
+                id: 'china-btn',
+                text: _('Open trade with China'),
+                callback: () => this.updateInterfaceConfirm(null, true),
+            });
+        }
     }
-    updateInterfaceConfirm(order) {
+    updateInterfaceConfirm(order, openTradeWithChina = false) {
         clearPossible();
-        updatePageTitle(_('Open closed order in ${region}?'), {
-            region: _(order.location),
-        });
-        setSelected$1(India$1.getInstance().ui.orders[order.id]);
+        if (openTradeWithChina) {
+            updatePageTitle(_('Open trade with China?'));
+        }
+        else {
+            updatePageTitle(_('Open closed order in ${region}?'), {
+                region: _(order.location),
+            });
+            setSelected$1(India.getInstance().ui.orders[order.id]);
+        }
         addConfirmButton$1(() => this.performAction(order, true));
         addCancelButton();
     }
-    performAction(order, perform = false) {
+    performAction(order, openTradeWithChina = false, perform = false) {
         performAction$1('actDirectorOfTradeSpecialEnvoySuccess', {
-            orderId: order.id,
+            orderId: order?.id ?? null,
+            openTradeWithChina,
             perform,
         });
     }
@@ -6036,7 +6077,7 @@ class DirectorOfTradeTransfers {
             this.addCancelButton();
         }
         else {
-            addPassButton(this.args.optionalAction);
+            addPassButton$1(this.args.optionalAction);
         }
     }
     updateInterfaceSelectPresidency({ familyMember: writer, locations, }) {
@@ -6063,7 +6104,7 @@ class DirectorOfTradeTransfers {
         clearPossible();
         updatePageTitle(_('${you} must select a sea zone'));
         setSelected$1(`ship-${ship.id}`);
-        const india = India$1.getInstance();
+        const india = India.getInstance();
         locations.forEach((seaZone) => {
             addPrimaryActionButton({
                 id: `${seaZone}-btn`,
@@ -6099,7 +6140,7 @@ class DirectorOfTradeTransfers {
             Object.keys(this.transfers.writers).length);
     }
     async returnPieces() {
-        const india = India$1.getInstance();
+        const india = India.getInstance();
         for (let data of Object.values(this.transfers.ships)) {
             data.ship.location = data.from;
             await india.getSeaZone(data.from).addShip(data.ship, data.to);
@@ -6240,7 +6281,7 @@ class EnlistWriter {
         this.args.options.forEach((presidencyId) => {
             onClick(presidencyId, () => this.updateInterfaceConfirm(presidencyId));
         });
-        addPassButton(this.args.optionalAction);
+        addPassButton$1(this.args.optionalAction);
     }
     updateInterfaceConfirm(presidencyId) {
         clearPossible();
@@ -6418,14 +6459,14 @@ class GovernorAdminister {
             id: 'administer-btn',
             text: formatStringRecursive(this.args.dicePool === 1
                 ? _('Make a check with 1 die')
-                : _('Make a check with ${dicePool} dice'), {
-                dicePool: this.args.dicePool,
+                : _('Make a check with ${number} dice'), {
+                number: this.args.dicePool,
             }),
             callback: () => {
                 performAction$1('actGovernorAdminister', {});
             },
         });
-        addPassButton(this.args.optionalAction, _('Stop'));
+        addPassButton$1(this.args.optionalAction, _('Stop'));
     }
 }
 
@@ -6766,7 +6807,7 @@ class LondonSeasonRetire {
             this.addCancelButton();
         }
         else {
-            addPassButton(this.args.optionalAction, _('Skip remaining family members'));
+            addPassButton$1(this.args.optionalAction, _('Skip remaining family members'));
         }
     }
     updateInterfaceSelectPrize(familyMember) {
@@ -6951,6 +6992,10 @@ class ManagerOfShipping {
     updateInterfaceSelectSeaZone(ship, playerId) {
         clearPossible();
         updatePageTitle(_('${you} must select a sea zone'));
+        const availableSeaZones = SEA_ZONES;
+        if (this.args.superintendentOfTradeInChinaInPlay) {
+            availableSeaZones.push(SUPERINTENDENT_OF_TRADE_IN_CHINA$1);
+        }
         SEA_ZONES.forEach((seaZone) => {
             addPrimaryActionButton({
                 id: `select_${seaZone}_btn`,
@@ -6978,7 +7023,7 @@ class ManagerOfShipping {
             this.placedCompanyShips[ship.id] = { ship, seaZone };
             this.pay(5);
         }
-        await India$1.getInstance().getSeaZone(seaZone).addShip(ship);
+        await India.getInstance().getSeaZone(seaZone).addShip(ship);
         this.updateInterfaceInitialStep();
     }
     updateInterfaceConfirm() {
@@ -7002,7 +7047,7 @@ class ManagerOfShipping {
     }
     async returnPieces() {
         Company.getInstance().treasuries[MANAGER_OF_SHIPPING].toValue(this.args.treasury);
-        const india = India$1.getInstance();
+        const india = India.getInstance();
         const enterpriseCardsManager = EnterpriseCardsManager.getInstance();
         [this.placedCompanyShips, this.placedExtraShips].forEach((category) => {
             Object.entries(category).forEach(([shipId, { ship, seaZone }]) => {
@@ -7082,7 +7127,7 @@ class MilitaryAffairsAssign {
             const presidencyId = to.split('_')[1];
             onClick(`ArmyOf${presidencyId}`, async () => {
                 clearPossible();
-                await India$1.getInstance().getArmy(presidencyId).addPiece(officer.id);
+                await India.getInstance().getArmy(presidencyId).addPiece(officer.id);
                 this.assignedOfficers[officer.id] = { officer, to };
                 this.updateInterfaceInitialStep();
             });
@@ -7226,7 +7271,7 @@ class MilitaryAffairsTransfers {
             this.addCancelButton();
         }
         else {
-            addPassButton(this.args.optionalAction);
+            addPassButton$1(this.args.optionalAction);
         }
     }
     updateInterfaceSelectArmy({ familyMember, regiment, locations, }) {
@@ -7246,7 +7291,7 @@ class MilitaryAffairsTransfers {
                 };
                 piece.location = to;
                 clearPossible();
-                await India$1.getInstance()
+                await India.getInstance()
                     .getArmy(presidencyId)
                     .addPiece(piece.id);
                 this.updateInterfaceInitialStep();
@@ -7278,7 +7323,7 @@ class MilitaryAffairsTransfers {
             Object.keys(this.transfers.regiments).length);
     }
     async returnPieces() {
-        const india = India$1.getInstance();
+        const india = India.getInstance();
         for (let data of [
             ...Object.values(this.transfers.officers),
             ...Object.values(this.transfers.regiments),
@@ -7455,7 +7500,7 @@ class ParliamentMeetsCastVotes {
             extraClasses: this.treasury < this.args.votes.pricePerVote ? DISABLED : '',
         });
         if (totalVotes <= 0) {
-            addPassButton(this.args.optionalAction, _('Do not cast any votes'));
+            addPassButton$1(this.args.optionalAction, _('Do not cast any votes'));
         }
         else {
             this.addCancelButton();
@@ -7749,7 +7794,7 @@ class PresidencyTrade {
             addCancelButton();
         }
         else {
-            addPassButton(this.args.optionalAction);
+            addPassButton$1(this.args.optionalAction);
         }
     }
     setMinSpendAmount() {
@@ -8241,7 +8286,7 @@ class SeekShare {
         Object.entries(this.args.options).forEach(([position, price]) => {
             onClick(position, () => this.updateInterfaceConfirm(position, price));
         });
-        addPassButton(this.args.optionalAction);
+        addPassButton$1(this.args.optionalAction);
     }
     updateInterfaceConfirm(position, price) {
         clearPossible();
@@ -8352,6 +8397,47 @@ class TaxAndUpkeep {
     }
 }
 
+class TradeInChina {
+    constructor(game) {
+        this.game = game;
+    }
+    static create(game) {
+        TradeInChina.instance = new TradeInChina(game);
+    }
+    static getInstance() {
+        return TradeInChina.instance;
+    }
+    onEnteringState(args) {
+        debug('Entering TradeInChina state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    }
+    onLeavingState() {
+        debug('Leaving TradeInChina state');
+    }
+    setDescription(activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} may trade in China'), {
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
+        });
+    }
+    updateInterfaceInitialStep() {
+        clearPossible();
+        updatePageTitle(_('Trade in China: ${you} may make a check'), {});
+        addPrimaryActionButton({
+            id: 'trade-btn',
+            text: formatStringRecursive(this.args.numberOfDice === 1
+                ? _('Make a check with 1 die')
+                : _('Make a check with ${number} dice'), {
+                number: this.args.numberOfDice,
+            }),
+            callback: () => {
+                performAction$1('actTradeInChina', {});
+            },
+        });
+        addPassButton$1(this.args.optionalAction, _('Do not trade in China'));
+    }
+}
+
 function sleep(ms) {
     return new Promise((r) => setTimeout(r, ms));
 }
@@ -8413,6 +8499,7 @@ class Game {
             SeekShare,
             SwapPowerMarkers,
             TaxAndUpkeep,
+            TradeInChina,
         };
         this.bga = bga;
         console.log('johncompany constructor');
@@ -8547,7 +8634,7 @@ class Game {
         Company.create(this);
         London.create(this);
         Parliament.create(this);
-        India$1.create(this);
+        India.create(this);
         EventTiles.create(this);
         Bar.create(this);
         if (this.playerOrder.includes(this.getPlayerId()) &&

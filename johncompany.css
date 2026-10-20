@@ -3001,7 +3001,7 @@ span[style*="color:#c0c0c0"] {
 
 #joco-elephant[data-location=Bengal] {
   top: 105px;
-  left: 791px;
+  left: 750px;
   transform: scaleX(-1);
 }
 
@@ -3576,6 +3576,19 @@ span[style*="color:#c0c0c0"] {
   top: 565px;
   left: 780px;
 }
+.joco-sea-zone[data-zone=SuperintendentOfTradeInChina] {
+  position: relative;
+  width: auto;
+  height: auto;
+  align-items: flex-start;
+  padding: 8px;
+  flex-grow: 1;
+}
+.joco-sea-zone[data-zone=SuperintendentOfTradeInChina] .joco-ship-stock {
+  align-self: stretch;
+  flex-grow: 1;
+  justify-content: flex-start !important;
+}
 
 #joco-india {
   width: 1000px;
@@ -3642,6 +3655,15 @@ span[style*="color:#c0c0c0"] {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
+}
+#joco-india #SuperintendentOfTradeInChinaOffice.hidden {
+  display: none;
+}
+#joco-india #MilitaryAffairsOffice .joco-inner-container {
+  flex-grow: 1;
+}
+#joco-india #MilitaryAffairsOffice .joco-family-members-stock {
+  flex-grow: 1;
 }
 
 .joco-order-token {

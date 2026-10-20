@@ -72,18 +72,22 @@ class DirectorOfTradeTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
     // proposed transfers
     $transfers = isset($info['transfers']) ? $info['transfers'] : null;
 
+    $seaZones = SEA_ZONES;
 
-    $shipsInSeaZones = Utils::filter(Ships::getAll()->toArray(), function ($ship) {
-      return in_array($ship->getLocation(), SEA_ZONES);
+    if (Offices::get(SUPERINTENDENT_OF_TRADE_IN_CHINA)->isInPlay()) {
+      $seaZones[] = SUPERINTENDENT_OF_TRADE_IN_CHINA;
+    }
+
+    $shipsInSeaZones = Utils::filter(Ships::getAll()->toArray(), function ($ship) use ($seaZones) {
+      return in_array($ship->getLocation(), $seaZones);
     });
     /**
-     * For each ship, options are the other two sea zones
-     * TODO: trade with CHina when in play
+     * For each ship, options are the other sea zones
      */
     foreach ($shipsInSeaZones as $ship) {
       $options['ships'][$ship->getId()] = [
         'ship' => $ship,
-        'locations' => Utils::filter(SEA_ZONES, function ($location) use ($ship) {
+        'locations' => Utils::filter($seaZones, function ($location) use ($ship) {
           return $location !== $ship->getLocation();
         }),
       ];
@@ -198,11 +202,13 @@ class DirectorOfTradeTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
       Locations::writers(BOMBAY_PRESIDENCY) => 0,
       Locations::writers(MADRAS_PRESIDENCY) => 0,
     ];
-    foreach($writers as $writer) {
+    foreach ($writers as $writer) {
       $writerCountPerRegion[$writer->getLocation()] += 1;
     }
     $values = array_values($writerCountPerRegion);
-    usort($values, function ($a, $b) {return $b - $a;});
+    usort($values, function ($a, $b) {
+      return $b - $a;
+    });
     if ($values[0] - $values[2] >= 2) {
       return;
     }
@@ -212,15 +218,16 @@ class DirectorOfTradeTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
       WEST_INDIAN => 0,
     ];
     $ships = Ships::getShipsInSeaZones();
-    foreach($ships as $ship) {
+    foreach ($ships as $ship) {
       $shipsPerRegion[$ship->getLocation()] += 1;
     }
     $shipCounts = array_values($shipsPerRegion);
-    usort($shipCounts, function ($a, $b) {return $b - $a;});
+    usort($shipCounts, function ($a, $b) {
+      return $b - $a;
+    });
     if ($shipCounts[0] - $shipCounts[2] >= 2) {
       return;
     }
     $player->getFamily()->gainPromiseCubes(1);
   }
-
 }

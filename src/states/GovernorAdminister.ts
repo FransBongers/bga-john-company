@@ -90,9 +90,9 @@ export class GovernorAdminister implements GameState<OnEnteringGovernorAdministe
       text: formatStringRecursive(
         this.args.dicePool === 1
           ? _('Make a check with 1 die')
-          : _('Make a check with ${dicePool} dice'),
+          : _('Make a check with ${number} dice'),
         {
-          dicePool: this.args.dicePool,
+          number: this.args.dicePool,
         },
       ),
       callback: () => {

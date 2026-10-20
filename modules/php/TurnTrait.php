@@ -458,12 +458,28 @@ trait TurnTrait
 
   function stSetupSuperintendentOfTradeInChina()
   {
-    if (false) {
-      $this->updatePhase(SUPERINTENDENT_OF_TRADE_IN_CHINA);
+    $office = Offices::get(SUPERINTENDENT_OF_TRADE_IN_CHINA);
+    $inPlay = $office->isInPlay();
+    if (!$inPlay) {
+      $this->stSetupBonuses();
+      return;
     }
 
+    $this->updatePhase(SUPERINTENDENT_OF_TRADE_IN_CHINA);
 
-    $this->stSetupBonuses();
+    $node = [
+      'children' => [
+        [
+          'action' => TRADE_IN_CHINA,
+          'playerId' => 'some',
+          'optional' => true,
+          'activePlayerIds' => [$office->getPlayerId()],
+        ],
+      ],
+    ];
+
+    Engine::setup($node, ['method' => 'stSetupBonuses']);
+    Engine::proceed();
   }
 
   // .########...#######..##....##.##.....##..######..########..######.

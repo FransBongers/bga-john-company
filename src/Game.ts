@@ -79,6 +79,7 @@ import {
   SeekShare,
   SwapPowerMarkers,
   TaxAndUpkeep,
+  TradeInChina,
   ParliamentMeetsSelectPolicy,
   ParliamentMeetsCastVotes,
   ParliamentMeetsAdditionalRoundOrResolve,
@@ -185,6 +186,7 @@ export class Game {
     SeekShare,
     SwapPowerMarkers,
     TaxAndUpkeep,
+    TradeInChina,
   };
   public bga: Bga;
 

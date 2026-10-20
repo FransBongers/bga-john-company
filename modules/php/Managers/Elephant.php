@@ -148,4 +148,15 @@ class Elephant
       Notifications::elephantMarch($elephant, true);
     }
   }
+
+  public static function isFullyWithinCompanyControlledRegion(array | null $regionIdFilter = null)
+  {
+    if (self::isOnBorder()) {
+      return false;
+    }
+    if ($regionIdFilter === null) {
+      return true;
+    }
+    return in_array(self::getLocation(), $regionIdFilter);
+  }
 }

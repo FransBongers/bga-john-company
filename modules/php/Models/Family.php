@@ -74,6 +74,11 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     return Players::getPlayerForFamily($this->id);
   }
 
+  public function getPlayerId()
+  {
+    return $this->getPlayer()->getId();
+  }
+
   public function getShareCount()
   {
     return count(Company::getShares($this->getId()));

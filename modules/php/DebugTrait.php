@@ -36,16 +36,15 @@ trait DebugTrait
 {
   function setupItem($item, $families) {}
 
-
-
-
   function debug_test()
   {
-    $familyMembers = FamilyMembers::getMany(["familyMember_Walsh_1", "familyMember_Sykes_3"])->toArray();
+    EventTiles::insertOnTop('EventTile_18', DISCARD);
+
+    // $familyMembers = FamilyMembers::getMany(["familyMember_Walsh_1", "familyMember_Sykes_3"])->toArray();
 
     // $topOfDeck = EventTiles::getTopOf(DECK);
     // $regionName = $topOfDeck !== null ? Regions::get($topOfDeck->getRegionId())->getName() : null;
-    Notifications::log('debug', AtomicActions::get(HIRING_HIRE_FAMILY_MEMBER)->getPlayerIdsThatNeedToGiveConsentForNepotism($familyMembers, 2371052));
+    // Notifications::log('debug', AtomicActions::get(HIRING_HIRE_FAMILY_MEMBER)->getPlayerIdsThatNeedToGiveConsentForNepotism($familyMembers, 2371052));
 
 
     // AtomicActions::get(EVENTS_IN_INDIA_STORMS)->rollForShips(ONE_ALL);
@@ -86,6 +85,14 @@ trait DebugTrait
     // Notifications::log('tradeRoute', TradeRoutes::getOrdersForTradeRoute(ORDER_BOMBAY_3, 16));
 
     // Notifications::log('homePorts', Orders::getHomePorts());
+
+  }
+
+  function debug_eventInIndia() {
+    $ctx = Engine::getNextUnresolved();
+    EventTiles::get('EventTile_18')->resolveEvent(BENGAL, $ctx);
+    Engine::save();
+    Engine::proceed();
 
   }
 

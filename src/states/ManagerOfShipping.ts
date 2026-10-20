@@ -24,6 +24,7 @@ import {
   SHIPS_COUNTER,
   MANAGER_OF_SHIPPING,
   FULL,
+  SUPERINTENDENT_OF_TRADE_IN_CHINA,
 } from '../constants';
 import { India } from '../india';
 import { tknShipValue } from '../logs/templates';
@@ -35,6 +36,7 @@ interface OnEnteringManagerOfShippingArgs extends CommonStateArgs {
   playerShips: JocoShipBase[];
   otherShips: JocoShipBase[];
   treasury: number;
+  superintendentOfTradeInChinaInPlay: boolean;
 }
 
 export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingArgs> {
@@ -202,6 +204,10 @@ export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingA
 
     updatePageTitle(_('${you} must select a sea zone'));
 
+    const availableSeaZones = SEA_ZONES;
+    if (this.args.superintendentOfTradeInChinaInPlay) {
+      availableSeaZones.push(SUPERINTENDENT_OF_TRADE_IN_CHINA);
+    }
     SEA_ZONES.forEach((seaZone) => {
       addPrimaryActionButton({
         id: `select_${seaZone}_btn`,

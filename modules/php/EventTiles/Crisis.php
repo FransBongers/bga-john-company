@@ -36,7 +36,13 @@ class Crisis extends \Bga\Games\JohnCompany\Models\EventTile
 
     if (!Elephant::isOnBorder()) {
       // Elephant is in Region. Rebellion against the Company
-      $this->insertResolveCrisisNode($ctx, REBELLION_AGAINST_COMPANY, $elephantLocation, null, $this->strength);
+      $this->insertResolveCrisisNodes($ctx, REBELLION_AGAINST_COMPANY, [
+        [
+          'attackerId' => $elephantLocation,
+          'defenderId' => null,
+          'strengthModifier' => $this->strength
+        ]
+      ]);
       return;
     }
 
@@ -53,21 +59,13 @@ class Crisis extends \Bga\Games\JohnCompany\Models\EventTile
     } else {
       $type = INVASION;
     }
-    $this->insertResolveCrisisNode($ctx, $type, $attackerId, $defenderId, $this->strength);
-  }
-
-  private function insertResolveCrisisNode($ctx, string $type, string $attackerId, string | null $defenderId, int $eventTileStrength)
-  {
-    $ctx->insertAsBrother(new LeafNode([
-      'action' => EVENTS_IN_INDIA_RESOLVE_CRISIS,
-      'args' => [
-        'type' => $type,
+    $this->insertResolveCrisisNodes($ctx, $type, [
+      [
         'attackerId' => $attackerId,
         'defenderId' => $defenderId,
-        'eventTileStrength' => $eventTileStrength,
-        'primaryCrisis' => true,
+        'strengthModifier' => $this->strength
       ]
-    ]));
+    ]);
   }
 
   public function getNotificationText()

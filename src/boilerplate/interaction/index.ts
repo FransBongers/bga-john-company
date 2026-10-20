@@ -25,11 +25,13 @@ export class Interaction {
     id,
     playerId,
     callback,
+    text,
     extraClasses,
   }: {
     id: string;
     playerId: number;
     callback: Function;
+    text?: string;
     extraClasses?: string;
   }) {
     const playerColor = PlayerManager.getInstance()
@@ -38,7 +40,7 @@ export class Interaction {
 
     this.addSecondaryActionButton({
       id,
-      text: getPlayerName(playerId),
+      text: text ?? getPlayerName(playerId),
       callback,
       extraClasses: `player-button ${HEX_COLOR_COLOR_MAP[playerColor]} ${extraClasses}`,
     });

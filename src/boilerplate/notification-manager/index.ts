@@ -47,7 +47,6 @@ import { createFamilyMember } from '../../templates';
 import { ShipsManager } from '../../token-managers/ship-tokens';
 import { GameAlias, JocoFamilyMember, OtherShipType } from '../../types';
 import {
-  createControlToken,
   getEnterpriseCard,
   getLawCard,
   getLondonSeasonCard,
@@ -765,6 +764,10 @@ export class NotificationManager {
     Company.getInstance().treasuries[officeId].toValue(treasury);
   }
 
+  async notif_openTradeWithChina(notif: unknown) {
+    India.getInstance().updateSuperintendentOfTradeInChina(true);
+  }
+
   async notif_parliamentMeetsCleanup(notif: NotifParliamentMeetsCleanup) {
     const { parliamentData, londonSeasonCards, enterpriseCards } = notif;
 
@@ -1056,16 +1059,12 @@ export class NotificationManager {
     region.update(data);
 
     const regionHasControlToken = region.hasControlToken(controlToken);
-    if (
-      PRESIDENCIES.includes(data.control) &&
-      regionHasControlToken
-    ) {
+    if (PRESIDENCIES.includes(data.control) && regionHasControlToken) {
       await india.getPresidency(data.control).addControlToken(controlToken);
-    } else if (
-      !PRESIDENCIES.includes(data.control) &&
-      !regionHasControlToken
-    ) {
-      await india.getPresidency(data.control).addControlToken(controlToken);
+    } else if (!PRESIDENCIES.includes(data.control) && !regionHasControlToken) {
+      await india
+        .getRegion(controlToken.location)
+        .addControlToken(controlToken);
     }
   }
 }

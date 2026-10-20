@@ -12,6 +12,7 @@ use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Managers\ArmyPieces;
 use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\Company;
+use Bga\Games\JohnCompany\Managers\ControlTokens;
 use Bga\Games\JohnCompany\Managers\Elephant;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
@@ -63,11 +64,15 @@ class EventsInIndiaCrisisDefense extends ExhaustArmyPieces
       'i18n' => [],
     ]);
 
-    $this->resolveCrisisDefense($args, 0);
+    list($successful, $capitalRegionId) = $this->resolveCrisisDefense($args, 0);
 
 
     Game::get()->gamestate->setPlayerNonMultiactive($args['actingCommanderId'], 'next');
-    $this->resolveAction(['automatic' => true], true);
+    $this->resolveAction([
+      'automatic' => true,
+      'successful' => $successful,
+      'capitalRegionId' => $capitalRegionId,
+    ], true);
   }
 
   // ....###....########...######....######.
@@ -142,25 +147,26 @@ class EventsInIndiaCrisisDefense extends ExhaustArmyPieces
     $player = Players::get($playerId);
     Notifications::exhaustPieces($player, $selectedPieces);
 
-    $this->resolveCrisisDefense($stateArgs, $selectedStrength);
+    list($successful, $capitalRegionId) = $this->resolveCrisisDefense($stateArgs, $selectedStrength);
 
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
-    $this->resolveAction([], true);
+    $this->resolveAction([
+      'successful' => $successful,
+      'capitalRegionId' => $capitalRegionId,
+      'primaryCrisis' => $stateArgs['primaryCrisis'],
+    ], true);
   }
 
-  //  .##.....##.########.####.##.......####.########.##....##
-  //  .##.....##....##.....##..##........##.....##.....##..##.
-  //  .##.....##....##.....##..##........##.....##......####..
-  //  .##.....##....##.....##..##........##.....##.......##...
-  //  .##.....##....##.....##..##........##.....##.......##...
-  //  .##.....##....##.....##..##........##.....##.......##...
-  //  ..#######.....##....####.########.####....##.......##...
+
+
 
   private function resolveCrisisDefense(array $stateArgs, int $selectedStrength)
   {
+    $successful = null;
+    $capitalRegionId = null;
     switch ($stateArgs['type']) {
       case INVASION_AGAINST_COMPANY:
-        $this->resolveInvasionAgainstTheCompany(
+        list($successful, $capitalRegionId) = $this->resolveInvasionAgainstTheCompany(
           $stateArgs['attackerId'],
           $stateArgs['defenderId'],
           $stateArgs['attackerStrength'],
@@ -169,15 +175,40 @@ class EventsInIndiaCrisisDefense extends ExhaustArmyPieces
         );
         break;
       case REBELLION_AGAINST_COMPANY:
-        $this->resolveRebellionAgainstTheCompany(
+        $successful = $this->resolveRebellionAgainstTheCompany(
           $stateArgs['attackerId'],
           $stateArgs['attackerStrength'],
+          $selectedStrength,
           $stateArgs['primaryCrisis'],
-          $selectedStrength
+        );
+        break;
+      case FOREIGN_INVASION_AGAINST_COMPANY:
+        $successful = $this->resolveForeignInvasionAgainstTheCompany(
+          $stateArgs['defenderId'],
+          $stateArgs['attackerStrength'],
+          $selectedStrength,
+          $stateArgs['primaryCrisis'],
         );
         break;
     }
+    return [$successful, $capitalRegionId];
   }
+
+  // .########..########.########..########.##.......##.......####..#######..##....##
+  // .##.....##.##.......##.....##.##.......##.......##........##..##.....##.###...##
+  // .##.....##.##.......##.....##.##.......##.......##........##..##.....##.####..##
+  // .########..######...########..######...##.......##........##..##.....##.##.##.##
+  // .##...##...##.......##.....##.##.......##.......##........##..##.....##.##..####
+  // .##....##..##.......##.....##.##.......##.......##........##..##.....##.##...###
+  // .##.....##.########.########..########.########.########.####..#######..##....##
+
+  // ..######...#######..##.....##.########.....###....##....##.##....##
+  // .##....##.##.....##.###...###.##.....##...##.##...###...##..##..##.
+  // .##.......##.....##.####.####.##.....##..##...##..####..##...####..
+  // .##.......##.....##.##.###.##.########..##.....##.##.##.##....##...
+  // .##.......##.....##.##.....##.##........#########.##..####....##...
+  // .##....##.##.....##.##.....##.##........##.....##.##...###....##...
+  // ..######...#######..##.....##.##........##.....##.##....##....##...
 
   private function resolveRebellionAgainstTheCompany(string $attackerId, int $attackerStrength, int $defenderStrength, bool $primaryCrisis)
   {
@@ -190,16 +221,81 @@ class EventsInIndiaCrisisDefense extends ExhaustArmyPieces
 
     if ($attackSuccessful) {
       $attacker->closeAllOrders();
-      $this->performRegionLossSteps($attackerId, $attackerId, REBELLION_AGAINST_COMPANY);
+      $this->performRegionLossSteps($attackerId, 1, REBELLION_AGAINST_COMPANY);
     } else {
       $attacker->removeUnrest();
       $this->giveCommanderTrophy($attacker);
     }
-    if ($primaryCrisis) {
-      Elephant::insertMarchNode($this->ctx);
-    }
-    $this->insertAdditionalRebellionCrisisNodes($this->ctx, $attackerId);
+
+    return $attackSuccessful;
+    // if ($primaryCrisis) {
+    //   Elephant::insertMarchNode($this->ctx);
+    // }
+    // $this->insertAdditionalRebellionCrisisNodes($this->ctx, $attackerId);
   }
+
+  // .########..#######..########..########.####..######...##....##
+  // .##.......##.....##.##.....##.##........##..##....##..###...##
+  // .##.......##.....##.##.....##.##........##..##........####..##
+  // .######...##.....##.########..######....##..##...####.##.##.##
+  // .##.......##.....##.##...##...##........##..##....##..##..####
+  // .##.......##.....##.##....##..##........##..##....##..##...###
+  // .##........#######..##.....##.########.####..######...##....##
+
+  // .####.##....##.##.....##....###.....######..####..#######..##....##
+  // ..##..###...##.##.....##...##.##...##....##..##..##.....##.###...##
+  // ..##..####..##.##.....##..##...##..##........##..##.....##.####..##
+  // ..##..##.##.##.##.....##.##.....##..######...##..##.....##.##.##.##
+  // ..##..##..####..##...##..#########.......##..##..##.....##.##..####
+  // ..##..##...###...##.##...##.....##.##....##..##..##.....##.##...###
+  // .####.##....##....###....##.....##..######..####..#######..##....##
+
+  // ..######...#######..##.....##.########.....###....##....##.##....##
+  // .##....##.##.....##.###...###.##.....##...##.##...###...##..##..##.
+  // .##.......##.....##.####.####.##.....##..##...##..####..##...####..
+  // .##.......##.....##.##.###.##.########..##.....##.##.##.##....##...
+  // .##.......##.....##.##.....##.##........#########.##..####....##...
+  // .##....##.##.....##.##.....##.##........##.....##.##...###....##...
+  // ..######...#######..##.....##.##........##.....##.##....##....##...
+
+  private function resolveForeignInvasionAgainstTheCompany(string $defenderId, int $attackerStrength, int $defenderStrength, bool $primaryCrisis)
+  {
+    $regions = Regions::getAll();
+    $defender = $regions[$defenderId];
+
+    $attackSuccessful = $attackerStrength > $defenderStrength;
+    $dieRoll = $attackerStrength - $defender->getUnrest();
+
+    Notifications::crisisResult($attackerStrength, $defenderStrength, FOREIGN_INVASION_AGAINST_COMPANY);
+
+    if (!$attackSuccessful) {
+      $this->giveCommanderTrophy($defender);
+      return false;
+    }
+
+    $defender->closeAllOrders();
+
+    $this->performRegionLossSteps($defenderId, floor($dieRoll / 2), FOREIGN_INVASION_AGAINST_COMPANY);
+    return true;
+  }
+
+
+
+  // .####.##....##.##.....##....###.....######..####..#######..##....##
+  // ..##..###...##.##.....##...##.##...##....##..##..##.....##.###...##
+  // ..##..####..##.##.....##..##...##..##........##..##.....##.####..##
+  // ..##..##.##.##.##.....##.##.....##..######...##..##.....##.##.##.##
+  // ..##..##..####..##...##..#########.......##..##..##.....##.##..####
+  // ..##..##...###...##.##...##.....##.##....##..##..##.....##.##...###
+  // .####.##....##....###....##.....##..######..####..#######..##....##
+
+  // ..######...#######..##.....##.########.....###....##....##.##....##
+  // .##....##.##.....##.###...###.##.....##...##.##...###...##..##..##.
+  // .##.......##.....##.####.####.##.....##..##...##..####..##...####..
+  // .##.......##.....##.##.###.##.########..##.....##.##.##.##....##...
+  // .##.......##.....##.##.....##.##........#########.##..####....##...
+  // .##....##.##.....##.##.....##.##........##.....##.##...###....##...
+  // ..######...#######..##.....##.##........##.....##.##....##....##...
 
   private function resolveInvasionAgainstTheCompany(string $attackerId, string $defenderId, int $attackerStrength, int $defenderStrength, bool $primaryCrisis)
   {
@@ -210,15 +306,17 @@ class EventsInIndiaCrisisDefense extends ExhaustArmyPieces
     Notifications::crisisResult($attackerStrength, $defenderStrength, INVASION_AGAINST_COMPANY);
 
     $attackSuccessful = $attackerStrength > $defenderStrength;
+    $capitalRegionId = null;
 
     if ($attackSuccessful) {
-      $this->performRegionLossSteps($defenderId, $attackerId, INVASION_AGAINST_COMPANY);
-      $this->placeFlagAndElephantMarch($attacker, $defender, $primaryCrisis);
+      $this->performRegionLossSteps($defenderId, 1, INVASION_AGAINST_COMPANY);
+      $capitalRegionId = $this->placeFlag($attacker, $defender);
     } else {
       $defender->removeUnrest();
       $this->giveCommanderTrophy($defender);
     }
-    $this->insertAdditionalRebellionCrisisNodes($this->ctx, $defenderId);
+    // $this->insertAdditionalRebellionCrisisNodes($this->ctx, $defenderId);
+    return [$attackSuccessful, $capitalRegionId];
   }
 
   public function giveCommanderTrophy(Region $region)
@@ -227,11 +325,11 @@ class EventsInIndiaCrisisDefense extends ExhaustArmyPieces
     $commander = FamilyMembers::getTopOf(Locations::commander($presidencyId));
     if ($commander !== null) {
       $family = $commander->getFamily();
-      $family->gainTrophy();
+      $family->gainTrophies(1);
     }
   }
 
-  public function placeFlagAndElephantMarch(Region $attacker, Region $defender, bool $primaryCrisis)
+  public function placeFlag(Region $attacker, Region $defender)
   {
     $capitalRegionId = null;
     $isEmpire = $attacker->isCapital();
@@ -244,16 +342,13 @@ class EventsInIndiaCrisisDefense extends ExhaustArmyPieces
     } else {
       $defender->becomeSovereign();
     }
-    if ($primaryCrisis) {
-      Elephant::insertMarchNode($this->ctx, $capitalRegionId);
-    }
+    return $capitalRegionId;
   }
 
-  private function performRegionLossSteps(string $regionId, string $attackerId, string $type)
+  private function performRegionLossSteps(string $regionId, int $towerLevel, string $type)
   {
     $regions = Regions::getAll();
     $region = $regions[$regionId];
-    $attacker = $regions[$attackerId];
 
     $presidencyId = $region->getControllingPresidencyId();
     $commander = FamilyMembers::getTopOf(Locations::commander($presidencyId));
@@ -286,9 +381,10 @@ class EventsInIndiaCrisisDefense extends ExhaustArmyPieces
       $governorOffice->eliminate();
     }
     $region->setControl(null);
+    ControlTokens::get('ControlToken_' . $region->getId())->setLocation($region->getId());
 
     // Restore Local Authority
-    $region->incTowerLevel(1);
+    $region->incTowerLevel($towerLevel);
     $region->removeUnrest();
 
 
@@ -300,56 +396,12 @@ class EventsInIndiaCrisisDefense extends ExhaustArmyPieces
     Company::resolveCompanyHumiliation();
   }
 
-  public static function insertAdditionalRebellionCrisisNodes($ctx, string $excludedRegionId)
-  {
-    $regionsByPresidency = [BOMBAY_PRESIDENCY => [], MADRAS_PRESIDENCY => [], BENGAL_PRESIDENCY => []];
+  //  .##.....##.########.####.##.......####.########.##....##
+  //  .##.....##....##.....##..##........##.....##.....##..##.
+  //  .##.....##....##.....##..##........##.....##......####..
+  //  .##.....##....##.....##..##........##.....##.......##...
+  //  .##.....##....##.....##..##........##.....##.......##...
+  //  .##.....##....##.....##..##........##.....##.......##...
+  //  ..#######.....##....####.########.####....##.......##...
 
-    foreach (Regions::getAll() as $region) {
-      if ($region->getId() === $excludedRegionId || !$region->isCompanyControlled() || $region->getUnrest() <= 0) {
-        continue;
-      }
-      $regionsByPresidency[$region->getControllingPresidencyId()][] = $region;
-    }
-
-    $nodes = [];
-    foreach ($regionsByPresidency as $regions) {
-      if (count($regions) === 0) {
-        continue;
-      }
-      $children = array_map(function ($region) {
-        return [
-          'action' => EVENTS_IN_INDIA_RESOLVE_CRISIS,
-          'args' => [
-            'type' => REBELLION_AGAINST_COMPANY,
-            'attackerId' => $region->getId(),
-            'defenderId' => null,
-            'eventTileStrength' => 0,
-            'primaryCrisis' => false,
-          ],
-        ];
-      }, $regions);
-
-      $nodes[] = [
-        'type' => NODE_OR,
-        'playerId' => $regions[0]->getActingCommander()->getPlayerId(),
-        'children' => $children,
-        'requiredChoiceCount' => count($children),
-        'stateDescription' => [
-          'descriptionmyturn' => clienttranslate('${you} must choose where to resolve a rebellion next'),
-          'description' => clienttranslate('${actplayer} must choose where to resolve a rebellion next'),
-          'args' => []
-        ],
-      ];
-    }
-
-    if (count($nodes) === 0) {
-      return;
-    }
-
-    // Single seq node keeps presidency order; repeated insertAsBrother would reverse it
-    $ctx->insertAsBrother(Engine::buildTree([
-      'type' => NODE_SEQ,
-      'children' => $nodes,
-    ]));
-  }
 }

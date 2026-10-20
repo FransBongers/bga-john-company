@@ -1,6 +1,6 @@
 import { AbsolutePosition } from '../boilerplate/utility';
 import { tplOfficeHeader } from '../company/templates';
-import { MILITARY_AFFAIRS, OFFICER_IN_TRAINING } from '../constants';
+import { MILITARY_AFFAIRS, OFFICER_IN_TRAINING, SUPERINTENDENT_OF_TRADE_IN_CHINA } from '../constants';
 import { getPhaseName } from '../phase-tracker/translations';
 import { StaticData } from '../static-data';
 import { tplAmount } from '../templates';
@@ -30,4 +30,10 @@ export const tplMilitaryAffairs = () => `
           </div>
         </div>
       </div>
+`;
+
+export const tplSuperintendentOfTradeInChina = () => `
+  <div id="${SUPERINTENDENT_OF_TRADE_IN_CHINA}Office" class="joco-office joco-container">
+    ${tplOfficeHeader(SUPERINTENDENT_OF_TRADE_IN_CHINA, getPhaseName(SUPERINTENDENT_OF_TRADE_IN_CHINA))}
+  </div>
 `;

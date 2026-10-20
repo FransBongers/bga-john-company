@@ -13,7 +13,6 @@ import {
   JocoShipBase,
   GamedatasAlias,
 } from '../../types';
-import { createControlToken } from '../../utility';
 import { CONTROL_TOKEN_STOCK_CONFIG, TOWER_CONFIG } from './config';
 import {
   tplControlTokenStock,
