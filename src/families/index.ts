@@ -1,10 +1,14 @@
+import { TabContainer } from '../boilerplate/ui-components/tab-container';
+import { PlayerManager } from '../player-manager';
 import { GameAlias, GamedatasAlias, PlayerAlias } from '../types';
+import { getFamilyName } from '../utility';
 import { FamilyArea } from './family-area';
-import { tplFamilies } from './templates';
+import { tplFamilies, tplPlayerArea } from './templates';
 
 export class Families {
   private static instance: Families;
   public families: Record<string, FamilyArea> = {};
+  private tabContainer: TabContainer;
 
   constructor(private game: GameAlias) {
     this.game = game;
@@ -28,10 +32,28 @@ export class Families {
   // ..######..########....##.....#######..##.......
 
   setup(gamedatas: GamedatasAlias) {
+    const playerManager = PlayerManager.getInstance();
+
     document
       .getElementById('joco')
       .insertAdjacentHTML('afterbegin', tplFamilies());
     const container = document.getElementById('joco-families');
+
+    this.tabContainer = new TabContainer({
+      id: 'joco-families-tabs',
+      parentElement: container,
+      gameName: this.game.gameName,
+      tabs: this.game.playerOrder.map((playerId: number) => {
+        const player = playerManager.getPlayer(playerId);
+        return {
+          id: `joco-family-area-${player.familyId}`,
+          title: `${player.getName()} - ${getFamilyName(player.familyId)}`,
+          content: tplPlayerArea(player),
+        };
+      }),
+      initialActiveTabId: `joco-family-area-${playerManager.getPlayer(this.game.playerOrder[0]).familyId}`,
+    });
+
     this.game.playerOrder.forEach((playerId) => {
       const player: PlayerAlias = gamedatas.players[playerId];
 
@@ -41,14 +63,6 @@ export class Families {
         player,
         gamedatas,
       });
-      //   container.insertAdjacentHTML(
-      //     'beforeend',
-      //     tplPlayerArea(gamedatas.players[playerId]),
-      //   );
-
-      //   const countersContainer = document.getElementById(
-      //     `joco-counters-${player.familyId}`,
-      //   );
     });
   }
 

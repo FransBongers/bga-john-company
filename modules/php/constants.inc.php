@@ -151,6 +151,8 @@ const ST_HIRING_CHOOSE_CHAIRMAN = 159;
 const ST_CHECK_COMPANY_FAILURE = 160;
 const ST_TRADE_IN_CHINA = 165;
 const ST_RESOLVE_COMPANY_FAILURE_CARD = 169;
+const ST_CHECK_CARD_TIMING = 170;
+const ST_PLAY_BLACKMAIL_OR_PROMISE_CARD = 171;
 
 
 const BONUSES = 'Bonuses';
@@ -206,6 +208,8 @@ const SWAP_POWER_MARKERS = 'SwapPowerMarkers';
 // Company Operations
 const CHAIRMAN_DEBT_CONSENT = 'ChairmanDebtConsent';
 const CHECK_COMPANY_FAILURE = 'CheckCompanyFailure';
+const CHECK_CARD_TIMING = 'CheckCardTiming';
+const PLAY_BLACKMAIL_OR_PROMISE_CARD = 'PlayBlackmailOrPromiseCard';
 const CLEAR_CASCADE = 'ClearCascade';
 const RESOLVE_COMPANY_FAILURE_CARD = 'ResolveCompanyFailureCard';
 const DIRECTOR_OF_TRADE_SPECIAL_ENVOY = 'DirectorOfTradeSpecialEnvoy';
@@ -654,6 +658,23 @@ const FILLED_BY_WRITER = 'filledByWriter';
 const OPEN = 'open';
 
 /**
+ * Promise Cards
+ */
+const MY_CONSENT_FOR_NEPOTISM = 'MyConsentForNepotism';
+const TAKE_MY_LONDON_SEASON_CARD = 'TakeMyLondonSeasonCard';
+const TAKE_MY_OFFICE__HOLDER_BONUS = 'TakeMyOfficeHolderBonus';
+const TAKE_TWO_OR_LESS_FROM_ME = 'TakeTwoOrLessFromMe';
+const VOTE_WITH_MY_ENTERPRISES = 'VoteWithMyEnterprises';
+
+const PROMISE_CARD_TYPES = [
+  MY_CONSENT_FOR_NEPOTISM,
+  TAKE_MY_LONDON_SEASON_CARD,
+  TAKE_MY_OFFICE__HOLDER_BONUS,
+  TAKE_TWO_OR_LESS_FROM_ME,
+  VOTE_WITH_MY_ENTERPRISES,
+];
+
+/**
  * Ship types
  */
 const PLAYER_OWNED_SHIP = 'playerOwnedShip';
@@ -995,7 +1016,7 @@ const REMOVED = 'removed';
  */
 const MR_ROCHESTER_ID = 'PrestigeCard_11';
 const STOCK_BROKER_ID = 'PrestigeCard_25';
-CONST WILLIAM_COLLINS_ID = 'PrestigeCard_17';
+const WILLIAM_COLLINS_ID = 'PrestigeCard_17';
 
 /**
  * LawCardIds: specific card IDs that affect the game and

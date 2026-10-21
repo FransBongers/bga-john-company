@@ -11,6 +11,10 @@ class Bar {
         this.active = 0;
         this.config = [
             {
+                id: 'joco-families',
+                text: _('Families'),
+            },
+            {
                 id: 'joco-india',
                 text: _('India'),
             },
@@ -21,10 +25,6 @@ class Bar {
             {
                 id: 'joco-london',
                 text: _('London'),
-            },
-            {
-                id: 'joco-families',
-                text: _('Families'),
             },
             {
                 id: 'joco-company',
@@ -113,7 +113,7 @@ const PAXTON = 'Paxton';
 const SYKES = 'Sykes';
 const WALSH = 'Walsh';
 const FAMILIES = [BENYON, HASTINGS, LARKINS, PAXTON, SYKES, WALSH];
-const CROWN = 'Crown';
+const CROWN$1 = 'Crown';
 const CROWN_PLAYER_ID = 1;
 const BLACKMAIL = 'Blackmail';
 const PRESTIGE = 'Prestige';
@@ -564,7 +564,7 @@ const familyMemberSvgs = {
 };
 const createFamilyMember = (familyId, familyMemberId, extraClasses) => {
     familyId =
-        familyId === CROWN
+        familyId === CROWN$1
             ? COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[PlayerManager$1.getInstance().getPlayer(CROWN_PLAYER_ID).getColor()]]
             : familyId;
     const elt = document.createElement('div');
@@ -638,7 +638,7 @@ class JocoPlayer {
         if (!node) {
             return;
         }
-        const familyId = this.familyId === CROWN
+        const familyId = this.familyId === CROWN$1
             ? COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[this.getColor()]]
             : this.familyId;
         node.insertAdjacentHTML('afterbegin', tplPlayerCounters({
@@ -1042,6 +1042,13 @@ class StaticData {
         }
         return office;
     }
+    promiseCard(id) {
+        const card = this.staticData.promiseCards[id];
+        if (!card) {
+            throw new Error('STATIC_DATA_ERROR_007');
+        }
+        return card;
+    }
     region(id) {
         const region = this.staticData.regions[id];
         if (!region) {
@@ -1361,6 +1368,26 @@ const getArmyNameForPresidency = (presidencyId) => {
             return '';
     }
 };
+const getFamilyName$1 = (familyId) => {
+    switch (familyId) {
+        case BENYON:
+            return _('Benyon');
+        case HASTINGS:
+            return _('Hastings');
+        case LARKINS:
+            return _('Larkins');
+        case PAXTON:
+            return _('Paxton');
+        case SYKES:
+            return _('Sykes');
+        case WALSH:
+            return _('Walsh');
+        case CROWN$1:
+            return _('Crown');
+        default:
+            return '';
+    }
+};
 const getSeaName = (seaId) => {
     switch (seaId) {
         case EAST_INDIAN:
@@ -1461,6 +1488,14 @@ const getOffice = (office) => {
     return {
         ...office,
         ...officeStatic,
+    };
+};
+const getPromiseCard$1 = (card) => {
+    const staticData = StaticData.get();
+    const cardStatic = staticData.promiseCard(card.id);
+    return {
+        ...card,
+        ...cardStatic,
     };
 };
 
@@ -3111,6 +3146,63 @@ class PhaseTracker {
     }
 }
 
+const tplTabContainer = (props) => `
+  <div id="${props.id}" class="tab-container">
+    <div class="tabs">${props.tabs.map(({ id, title }) => `<div id="${id}-tab" class="tab-title heg-font-24 heg-font-semi-bold"><span>${title}</span></div>`).join('')}</div>
+    <div class="tabs-content">
+      ${props.tabs.map(({ content }) => content).join('')}
+    </div>
+  </div>
+`;
+class TabContainer {
+    constructor(config) {
+        this.gameName = config.gameName;
+        this.id = config.id;
+        this.setupTabContainer(config);
+        this.setActiveTab(config.initialActiveTabId);
+    }
+    setupTabContainer(config) {
+        const parentElement = typeof config.parentElement === 'string'
+            ? document.getElementById(config.parentElement)
+            : config.parentElement;
+        if (!parentElement) {
+            throw new Error('FE_ERROR_TAB_CONTAINER_01');
+        }
+        const tabContainer = tplTabContainer(config);
+        parentElement.insertAdjacentHTML(config.position || 'beforeend', tabContainer);
+        this.ui = {
+            parent: parentElement,
+            tabs: {},
+            content: {},
+        };
+        config.tabs.forEach(({ id }) => {
+            this.ui.tabs[id] = document.getElementById(`${id}-tab`);
+            this.ui.content[id] = document.getElementById(`${id}`);
+            this.ui.content[id].classList.add('tab-content');
+            this.ui.tabs[id].addEventListener('click', () => this.setActiveTab(id));
+        });
+    }
+    setActiveTab(tabId) {
+        this.activeTabId = tabId;
+        Object.entries(this.ui.tabs).forEach(([id, tab]) => {
+            if (id === tabId) {
+                tab.setAttribute('data-active', 'true');
+            }
+            else {
+                tab.setAttribute('data-active', 'false');
+            }
+        });
+        Object.entries(this.ui.content).forEach(([id, tab]) => {
+            if (id === tabId) {
+                tab.setAttribute('data-active', 'true');
+            }
+            else {
+                tab.setAttribute('data-active', 'false');
+            }
+        });
+    }
+}
+
 class OpportunityMarker {
     constructor(props) {
         this.props = props;
@@ -3162,6 +3254,56 @@ class OpportunityMarker {
     }
 }
 
+const tplPromiseCardContent = (card) => `
+  <div class="joco-title joco-card-text fb-font-baskerville fb-font-16 bga-autofit">${card.title}</div>
+  <div class="joco-signature joco-card-text fb-font-parisienne fb-font-20 bga-autofit">${formatStringRecursive(_('${familyName} Family'), {
+    familyName: getFamilyName$1(card.familyId),
+})}</div>
+`;
+
+class PromiseCardsManager extends BgaCards$1.Manager {
+    static create(game) {
+        PromiseCardsManager.instance = new PromiseCardsManager(game);
+    }
+    static getInstance() {
+        return PromiseCardsManager.instance;
+    }
+    constructor(game) {
+        super({
+            getId: (card) => card.id,
+            setupDiv: (card, div) => this.setupDiv(card, div),
+            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
+            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
+            isCardVisible: (card) => this.isCardVisible(card),
+            animationManager: game.animationManager,
+            cardHeight: 150,
+            cardWidth: 228.75,
+            type: 'promise-card',
+        });
+        this.game = game;
+    }
+    clearInterface() { }
+    setupDiv(card, div) {
+        div.classList.add('joco-promise-card-container');
+    }
+    setupFrontDiv(card, div) {
+        div.classList.add('joco-promise-card');
+        div.classList.add('joco-small-card-horizontal');
+        div.setAttribute('data-background', `PromiseCard${card.familyId}`);
+        if (div.children.length) {
+            return;
+        }
+        div.insertAdjacentHTML('beforeend', tplPromiseCardContent(card));
+    }
+    setupBackDiv(card, div) {
+        div.setAttribute('data-background', 'PromiseBack');
+        div.classList.add('joco-small-card-horizontal');
+    }
+    isCardVisible(card) {
+        return true;
+    }
+}
+
 class FamilyArea {
     constructor(config) {
         this.stocks = {};
@@ -3172,23 +3314,18 @@ class FamilyArea {
         this.setup(config);
     }
     setup(config) {
-        const parentElement = typeof config.parentElement === 'string'
-            ? document.getElementById(config.parentElement)
-            : config.parentElement;
-        if (!parentElement) {
-            throw new Error('FE_PLAYER_AREA_01');
-        }
-        parentElement.insertAdjacentHTML('beforeend', this.tplPlayerArea());
         this.ui = {
-            parent: parentElement,
             counters: document.getElementById(`joco-counters-${this.familyId}`),
             offices: document.getElementById(`FamilyOffices_${this.familyId}`),
+            tab: document.getElementById(`joco-family-area-${this.familyId}-tab`),
         };
+        this.ui.tab.setAttribute('data-family-id', this.familyId);
         this.setupEnterprises(config.gamedatas);
         this.setupLondonSeasonCards(config.gamedatas);
         this.setupOffices(config.gamedatas);
         this.setupCounter(config.gamedatas);
         this.setupOpportunityMarker(config.gamedatas);
+        this.setupPromiseCards(config.gamedatas);
     }
     setupEnterprises(gamedatas) {
         this.enterprises = new BgaCards$1.LineStock(EnterpriseCardsManager.getInstance(), document.getElementById(`joco-enterprises-${this.familyId}`), {
@@ -3209,6 +3346,13 @@ class FamilyArea {
             this.ui.offices.insertAdjacentHTML('beforeend', tplOfficeCard(office));
         });
     }
+    setupPromiseCards(gamedatas) {
+        this.promiseCards = new BgaCards$1.LineStock(PromiseCardsManager.getInstance(), document.getElementById(`joco-promise-cards-${this.familyId}`));
+        const cards = Object.values(gamedatas.promiseCards)
+            .filter((card) => card.location === this.familyId)
+            .map(getPromiseCard$1);
+        this.promiseCards.addCards(cards);
+    }
     setupCounter(gamedatas) {
         this.counters[TROPHIES] = new TrophiesCounter({
             id: `joco-trophies-${this.familyId}`,
@@ -3228,33 +3372,6 @@ class FamilyArea {
             familyId: this.familyId,
             parentElement: this.ui.counters,
         });
-    }
-    tplPlayerArea() {
-        return `
-      <div class="joco-family-area joco-container">
-        <div class="joco-player-name" style="background-color:#${this.player.color};"><span class="fb-font-baskerville fb-font-16 fb-font-semi-bold">${this.player.name}</span></div>
-        <div class="joco-family-area-content">
-          <div id="joco-counters-${this.familyId}" class="joco-family-area-counters">
-          </div>
-          <div class="joco-row">
-            <div class="joco-inner-container joco-column">
-              <span class="joco-header">${_('Offices')}</span>
-              <div id="FamilyOffices_${this.familyId}" class="joco-family-offices"></div>
-            </div>
-            <div class="joco-column" style="flex-grow: 1;">
-              <div class="joco-inner-container">
-                <span class="joco-header">${_('Enterprises')}</span>
-                <div id="joco-enterprises-${this.familyId}" class="joco-enterprises"></div>
-              </div>
-              <div class="joco-inner-container">
-                <span class="joco-header">${_('Prestige & Blackmail cards')}</span>
-                <div id="joco-prestige-blackmail-${this.familyId}" class="joco-prestige-blackmail"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
     }
     updateEnterprises(gamedatas) {
         const ships = Object.values(gamedatas.ships);
@@ -3293,6 +3410,36 @@ class FamilyArea {
 
 const tplFamilies = () => `<div id="joco-families">
 </div>`;
+const tplPlayerArea = (player) => {
+    return `
+      <div id="joco-family-area-${player.familyId}" class="joco-family-area">
+        <div class="joco-family-area-content">
+          <div id="joco-counters-${player.familyId}" class="joco-family-area-counters">
+          </div>
+          <div class="joco-row">
+            <div class="joco-container joco-column">
+              <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Offices').toLocaleUpperCase()}</span>
+              <div id="FamilyOffices_${player.familyId}" class="joco-family-offices"></div>
+            </div>
+            <div class="joco-column" style="flex-grow: 1;">
+              <div class="joco-container">
+                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Enterprises').toLocaleUpperCase()}</span>
+                <div id="joco-enterprises-${player.familyId}" class="joco-enterprises"></div>
+              </div>
+              <div class="joco-container">
+                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Prestige & Blackmail cards').toLocaleUpperCase()}</span>
+                <div id="joco-prestige-blackmail-${player.familyId}" class="joco-prestige-blackmail"></div>
+              </div>
+              <div class="joco-container">
+                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Promise cards').toLocaleUpperCase()}</span>
+                <div id="joco-promise-cards-${player.familyId}" class="joco-promise-cards"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+};
 
 class Families {
     constructor(game) {
@@ -3308,10 +3455,25 @@ class Families {
         return Families.instance;
     }
     setup(gamedatas) {
+        const playerManager = PlayerManager$1.getInstance();
         document
             .getElementById('joco')
             .insertAdjacentHTML('afterbegin', tplFamilies());
         const container = document.getElementById('joco-families');
+        this.tabContainer = new TabContainer({
+            id: 'joco-families-tabs',
+            parentElement: container,
+            gameName: this.game.gameName,
+            tabs: this.game.playerOrder.map((playerId) => {
+                const player = playerManager.getPlayer(playerId);
+                return {
+                    id: `joco-family-area-${player.familyId}`,
+                    title: `${player.getName()} - ${getFamilyName$1(player.familyId)}`,
+                    content: tplPlayerArea(player),
+                };
+            }),
+            initialActiveTabId: `joco-family-area-${playerManager.getPlayer(this.game.playerOrder[0]).familyId}`,
+        });
         this.game.playerOrder.forEach((playerId) => {
             const player = gamedatas.players[playerId];
             this.families[player.familyId] = new FamilyArea({
@@ -4380,7 +4542,7 @@ class NotificationManager {
         await this.pay(playerId, amount);
         const fromElement = this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER];
         const toElement = document.getElementById(location);
-        const familyMemberElement = createFamilyMember(familyId === CROWN
+        const familyMemberElement = createFamilyMember(familyId === CROWN$1
             ? COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[PlayerManager$1.getInstance().getPlayer(CROWN_PLAYER_ID).getColor()]]
             : familyId, id);
         toElement.insertAdjacentElement('beforeend', familyMemberElement);
@@ -7741,6 +7903,34 @@ class PlayerTurn {
     }
 }
 
+class PlayBlackmailOrPromiseCard {
+    constructor(game) {
+        this.game = game;
+    }
+    static create(game) {
+        PlayBlackmailOrPromiseCard.instance = new PlayBlackmailOrPromiseCard(game);
+    }
+    static getInstance() {
+        return PlayBlackmailOrPromiseCard.instance;
+    }
+    onEnteringState(args) {
+        debug('Entering PlayBlackmailOrPromiseCard state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+    }
+    onLeavingState() {
+        debug('Leaving PlayBlackmailOrPromiseCard state');
+    }
+    setDescription(activePlayerIds, args) { }
+    updateInterfaceInitialStep() {
+        clearPossible();
+        updatePageTitle(_('${you} may perform an action'), {});
+        addConfirmButton$1(() => {
+            performAction$1('actPlayBlackmailOrPromiseCard', {});
+        });
+    }
+}
+
 class PresidencyTrade {
     constructor(game) {
         this.game = game;
@@ -8498,6 +8688,7 @@ class Game {
             ParliamentMeetsAdditionalRoundOrResolve,
             ParliamentMeetsCommitToOpposition,
             PlayerTurn,
+            PlayBlackmailOrPromiseCard,
             PresidencyTrade,
             PresidencyTradeFillOrders,
             RevenuePayDividends,
@@ -8509,7 +8700,7 @@ class Game {
         };
         this.bga = bga;
         console.log('johncompany constructor');
-        this.gameName = 'hegemony';
+        this.gameName = 'johncompany';
         this.bga.gameui.onScreenWidthChange = () => this.onScreenWidthChange();
         this.overrideOnPlaceLogOnChannel();
         this.overrideAddToLog();
@@ -8626,6 +8817,7 @@ class Game {
         EventTilesManager$1.create(this);
         LawCardsManager.create(this);
         LondonSeasonCardsManager.create(this);
+        PromiseCardsManager.create(this);
         ShipsManager.create(this);
         ControlTokensManager.create(this);
         Interaction.create(this);

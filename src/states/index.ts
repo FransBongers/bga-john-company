@@ -33,6 +33,7 @@ export * from './ParliamentMeetsCastVotes';
 export * from './ParliamentMeetsAdditionalRoundOrResolve';
 export * from './ParliamentMeetsCommitToOpposition';
 export * from './PlayerTurn';
+export * from './PlayBlackmailOrPromiseCard';
 export * from './PresidencyTrade';
 export * from './PresidencyTradeFillOrders';
 export * from './ParliamentMeetsSelectLaw';

@@ -11,6 +11,7 @@ import {
   JocoRegionStatic,
   JocoArmyPieceStatic,
   JocoEventTileStatic,
+  JocoPromiseCardStatic,
 } from '../types';
 
 export class StaticData {
@@ -96,6 +97,15 @@ export class StaticData {
       throw new Error('STATIC_DATA_ERROR_004');
     }
     return office;
+  }
+
+  public promiseCard(id: string): JocoPromiseCardStatic {
+    const card =
+      this.staticData.promiseCards[id];
+    if (!card) {
+      throw new Error('STATIC_DATA_ERROR_007');
+    }
+    return card;
   }
 
   public region(id: string): JocoRegionStatic {

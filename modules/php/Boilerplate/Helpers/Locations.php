@@ -121,6 +121,11 @@ class Locations
     return FAMILY_OFFICES . '_' . $familyId;
   }
 
+  public static function promiseCards(string $familyId)
+  {
+    return $familyId;
+  }
+
   public static function revealedLaws()
   {
     return REVEALED_LAWS;

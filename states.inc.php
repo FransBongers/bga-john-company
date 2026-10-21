@@ -137,6 +137,23 @@ $machinestates = [
         ->transitions(['next' => ST_RESOLVE_STACK])
         ->build(),
 
+    ST_PLAY_BLACKMAIL_OR_PROMISE_CARD => GameStateBuilder::create()
+        ->name(PLAY_BLACKMAIL_OR_PROMISE_CARD)
+        ->description('${actplayer}')
+        ->descriptionmyturn('${you}')
+        ->type(StateType::MULTIPLE_ACTIVE_PLAYER)
+        ->args('argsAtomicAction')
+        ->action('stAtomicAction')
+        ->possibleactions([
+            'act' . PLAY_BLACKMAIL_OR_PROMISE_CARD,
+            'actPass',
+            'actPassOptionalAction',
+            'actTakeAtomicAction',
+            'actUndoToStep',
+        ])
+        ->transitions(['next' => ST_RESOLVE_STACK])
+        ->build(),
+
     // .########.##....##.########......#######..########
     // .##.......###...##.##.....##....##.....##.##......
     // .##.......####..##.##.....##....##.....##.##......
@@ -786,6 +803,14 @@ $machinestates = [
 
     ST_RESOLVE_COMPANY_FAILURE_CARD => [
         'name' => RESOLVE_COMPANY_FAILURE_CARD,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_CHECK_CARD_TIMING => [
+        'name' => CHECK_CARD_TIMING,
         'description' => '',
         'type' => 'game',
         'action' => 'stAtomicAction',

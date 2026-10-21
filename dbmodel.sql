@@ -107,6 +107,16 @@ CREATE TABLE IF NOT EXISTS `law_cards` (
   `card_id` varchar(100) NOT NULL,
   `card_location` varchar(32) NOT NULL,
   `card_state` int(10) DEFAULT 0,
+  `used` tinyint(1) DEFAULT 0,
+  PRIMARY KEY (`card_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+CREATE TABLE IF NOT EXISTS `promise_cards` (
+  `card_id` varchar(100) NOT NULL,
+  `card_location` varchar(32) NOT NULL,
+  `card_state` int(10) DEFAULT 0,
+  `type` varchar(32) NOT NULL,
+  `owner_player_id` int(10) DEFAULT NULL,
+  `family_id` varchar(16) DEFAULT NULL,
   PRIMARY KEY (`card_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 CREATE TABLE IF NOT EXISTS `london_season_cards` (

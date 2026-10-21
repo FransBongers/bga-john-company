@@ -178,6 +178,62 @@
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  * -----
  */
+.tab-container {
+  border-radius: 14px;
+  border: 2px solid rgba(0, 0, 0, 0.6);
+}
+.tab-container .tabs {
+  display: flex;
+  flex-direction: row;
+  height: 60px;
+  border-bottom: solid 2px rgba(0, 0, 0, 0.6);
+}
+.tab-container .tabs .tab-title {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.tab-container .tabs-content {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 1fr;
+}
+.tab-container .tab-content {
+  grid-column: 1/2;
+  grid-row: 1/2;
+  width: 100%;
+}
+.tab-container .tab-content[data-active=false] {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: visibility 0.3s ease-out, opacity 0.3s linear;
+}
+.tab-container .tab-content[data-active=true] {
+  opacity: 1;
+  transition: visibility 0s ease-out, opacity 0.5s linear;
+  visibility: visible;
+}
+.tab-container .tab-title[data-active=true] {
+  font-weight: bold;
+  border-bottom: solid 2px black;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.tab-container .tab-title[data-active=false] span {
+  color: black;
+}
+
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
 .dijitTooltipContainer {
   padding: 8px !important;
 }
@@ -1056,6 +1112,19 @@ span[style*="color:#addb90"] {
 }
 .joco-law-card-container.selectable:hover .joco-law-card *, .joco-law-card-container.selected .joco-law-card * {
   cursor: inherit;
+}
+
+.joco-promise-card .joco-title {
+  top: 30px;
+  left: 27px;
+  height: 63px;
+  width: 174px;
+}
+.joco-promise-card .joco-signature {
+  top: 93px;
+  left: 37px;
+  height: 28px;
+  width: 155px;
 }
 
 .joco-card-text {
@@ -2178,6 +2247,15 @@ span[style*="color:#addb90"] {
   transform: scaleX(-1);
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
 .joco-family-area-content .joco-column,
 .joco-family-area-content .joco-row {
   gap: 12px;
@@ -2217,6 +2295,58 @@ span[style*="color:#addb90"] {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+#joco-families .tab-container {
+  border: none;
+}
+#joco-families .tab-container .tab-title {
+  font-family: "Libre Baskerville", serif;
+}
+#joco-families .tab-container .tab-title[data-active=false][data-family-id=Benyon] {
+  background-color: rgba(255, 177, 185, 0.6);
+}
+#joco-families .tab-container .tab-title[data-active=false][data-family-id=Hastings] {
+  background-color: rgba(153, 218, 233, 0.6);
+}
+#joco-families .tab-container .tab-title[data-active=false][data-family-id=Larkings] {
+  background-color: rgba(249, 224, 141, 0.6);
+}
+#joco-families .tab-container .tab-title[data-active=false][data-family-id=Paxton] {
+  background-color: rgba(219, 217, 214, 0.6);
+}
+#joco-families .tab-container .tab-title[data-active=false][data-family-id=Sykes] {
+  background-color: rgba(199, 180, 225, 0.6);
+}
+#joco-families .tab-container .tab-title[data-active=false][data-family-id=Walsh] {
+  background-color: rgba(173, 219, 144, 0.6);
+}
+#joco-families .tab-container .tab-title:hover[data-family-id=Benyon],
+#joco-families .tab-container .tab-title[data-active=true][data-family-id=Benyon] {
+  background-color: #ffb1b9;
+}
+#joco-families .tab-container .tab-title:hover[data-family-id=Hastings],
+#joco-families .tab-container .tab-title[data-active=true][data-family-id=Hastings] {
+  background-color: #99dae9;
+}
+#joco-families .tab-container .tab-title:hover[data-family-id=Larkings],
+#joco-families .tab-container .tab-title[data-active=true][data-family-id=Larkings] {
+  background-color: #f9e08d;
+}
+#joco-families .tab-container .tab-title:hover[data-family-id=Paxton],
+#joco-families .tab-container .tab-title[data-active=true][data-family-id=Paxton] {
+  background-color: #dbd9d6;
+}
+#joco-families .tab-container .tab-title:hover[data-family-id=Sykes],
+#joco-families .tab-container .tab-title[data-active=true][data-family-id=Sykes] {
+  background-color: #c7b4e1;
+}
+#joco-families .tab-container .tab-title:hover[data-family-id=Walsh],
+#joco-families .tab-container .tab-title[data-active=true][data-family-id=Walsh] {
+  background-color: #addb90;
+}
+#joco-families .tab-content {
+  box-sizing: border-box;
+  width: 1000px;
 }
 
 .joco-family-area {

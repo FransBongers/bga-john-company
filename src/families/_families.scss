@@ -1,3 +1,4 @@
+@use '../base';
 @use './family-area/family-area';
 
 #joco-families {
@@ -7,6 +8,72 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+
+  .tab-container {
+    border: none;
+
+    .tab-title {
+      font-family: 'Libre Baskerville', serif;
+    }
+
+    .tab-title[data-active='false'] {
+      &[data-family-id='Benyon'] {
+        background-color: rgba(base.$player-pink, 0.6);
+      }
+
+      &[data-family-id='Hastings'] {
+        background-color: rgba(base.$player-blue, 0.6);
+      }
+
+      &[data-family-id='Larkings'] {
+        background-color: rgba(base.$player-yellow, 0.6);
+      }
+
+      &[data-family-id='Paxton'] {
+        background-color: rgba(base.$player-gray, 0.6);
+      }
+
+      &[data-family-id='Sykes'] {
+        background-color: rgba(base.$player-purple, 0.6);
+      }
+
+      &[data-family-id='Walsh'] {
+        background-color: rgba(base.$player-green, 0.6);
+      }
+    }
+
+    .tab-title:hover,
+    .tab-title[data-active='true'] {
+      &[data-family-id='Benyon'] {
+        background-color: base.$player-pink;
+      }
+
+      &[data-family-id='Hastings'] {
+        background-color: base.$player-blue;
+      }
+
+      &[data-family-id='Larkings'] {
+        background-color: base.$player-yellow;
+      }
+
+      &[data-family-id='Paxton'] {
+        background-color: base.$player-gray;
+      }
+
+      &[data-family-id='Sykes'] {
+        background-color: base.$player-purple;
+      }
+
+      &[data-family-id='Walsh'] {
+        background-color: base.$player-green;
+      }
+    }
+  }
+
+  .tab-content {
+    box-sizing: border-box;
+    width: 1000px;
+  }
 }
 
 .joco-family-area {

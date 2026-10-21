@@ -1,6 +1,7 @@
 import { EnterpriseCardsManager } from '../../cards/enterprise-cards';
 import { LondonSeasonCardsManager } from '../../cards/london-season-cards';
 import { tplOfficeCard } from '../../cards/office-cards';
+import { JocoPromiseCard } from '../../types';
 import { PASSED_LAW_TOKENS, SHIPYARD, TROPHIES } from '../../constants';
 import { BgaCards } from '../../libs';
 
@@ -12,8 +13,13 @@ import {
   PlayerAlias,
 } from '../../types';
 import { PassedLawTokensCounter, TrophiesCounter } from '../../ui-components';
-import { getEnterpriseCard, getLondonSeasonCard } from '../../utility';
+import {
+  getEnterpriseCard,
+  getLondonSeasonCard,
+  getPromiseCard,
+} from '../../utility';
 import { OpportunityMarker } from './opportunity-marker';
+import { PromiseCardsManager } from '../../cards/promise-cards';
 
 export interface FamilyAreaProps {
   parentElement: HTMLElement | string;
@@ -25,9 +31,10 @@ export interface FamilyAreaProps {
 
 export class FamilyArea {
   protected ui: {
-    parent: HTMLElement;
+    // parent: HTMLElement;
     counters: HTMLElement;
     offices: HTMLElement;
+    tab: HTMLElement;
   };
   // private id: string;
   private game: GameAlias;
@@ -42,6 +49,9 @@ export class FamilyArea {
     string,
     InstanceType<typeof BgaCards.LineStock<JocoLondonSeasonCard>>
   > = {};
+  private promiseCards: InstanceType<
+    typeof BgaCards.LineStock<JocoPromiseCard>
+  >;
   public counters: Record<string, TrophiesCounter> = {};
 
   constructor(config: FamilyAreaProps) {
@@ -62,32 +72,38 @@ export class FamilyArea {
 
   private setup(config: FamilyAreaProps) {
     // this.color = config.color;
-    const parentElement =
-      typeof config.parentElement === 'string'
-        ? document.getElementById(config.parentElement)
-        : config.parentElement;
+    // const parentElement =
+    //   typeof config.parentElement === 'string'
+    //     ? document.getElementById(config.parentElement)
+    //     : config.parentElement;
 
-    if (!parentElement) {
-      throw new Error('FE_PLAYER_AREA_01');
-    }
+    // if (!parentElement) {
+    //   throw new Error('FE_PLAYER_AREA_01');
+    // }
 
-    parentElement.insertAdjacentHTML('beforeend', this.tplPlayerArea());
+    // parentElement.insertAdjacentHTML('beforeend', this.tplPlayerArea());
 
     this.ui = {
-      parent: parentElement,
+      // parent: parentElement,
       counters: document.getElementById(
         `joco-counters-${this.familyId}`,
       ) as HTMLElement,
       offices: document.getElementById(
         `FamilyOffices_${this.familyId}`,
       ) as HTMLElement,
+      tab: document.getElementById(
+        `joco-family-area-${this.familyId}-tab`,
+      ) as HTMLElement,
     };
+
+    this.ui.tab.setAttribute('data-family-id', this.familyId);
 
     this.setupEnterprises(config.gamedatas);
     this.setupLondonSeasonCards(config.gamedatas);
     this.setupOffices(config.gamedatas);
     this.setupCounter(config.gamedatas);
     this.setupOpportunityMarker(config.gamedatas);
+    this.setupPromiseCards(config.gamedatas);
   }
 
   private setupEnterprises(gamedatas: GamedatasAlias) {
@@ -120,6 +136,18 @@ export class FamilyArea {
       this.ui.offices.insertAdjacentHTML('beforeend', tplOfficeCard(office));
     });
   }
+  private setupPromiseCards(gamedatas: GamedatasAlias) {
+    this.promiseCards = new BgaCards.LineStock<JocoPromiseCard>(
+      PromiseCardsManager.getInstance(),
+      document.getElementById(`joco-promise-cards-${this.familyId}`)!,
+    );
+
+    const cards = Object.values(gamedatas.promiseCards)
+      .filter((card) => card.location === this.familyId)
+      .map(getPromiseCard);
+
+    this.promiseCards.addCards(cards);
+  }
 
   private setupCounter(gamedatas: GamedatasAlias) {
     this.counters[TROPHIES] = new TrophiesCounter({
@@ -142,34 +170,6 @@ export class FamilyArea {
       familyId: this.familyId,
       parentElement: this.ui.counters,
     });
-  }
-
-  private tplPlayerArea() {
-    return `
-      <div class="joco-family-area joco-container">
-        <div class="joco-player-name" style="background-color:#${this.player.color};"><span class="fb-font-baskerville fb-font-16 fb-font-semi-bold">${this.player.name}</span></div>
-        <div class="joco-family-area-content">
-          <div id="joco-counters-${this.familyId}" class="joco-family-area-counters">
-          </div>
-          <div class="joco-row">
-            <div class="joco-inner-container joco-column">
-              <span class="joco-header">${_('Offices')}</span>
-              <div id="FamilyOffices_${this.familyId}" class="joco-family-offices"></div>
-            </div>
-            <div class="joco-column" style="flex-grow: 1;">
-              <div class="joco-inner-container">
-                <span class="joco-header">${_('Enterprises')}</span>
-                <div id="joco-enterprises-${this.familyId}" class="joco-enterprises"></div>
-              </div>
-              <div class="joco-inner-container">
-                <span class="joco-header">${_('Prestige & Blackmail cards')}</span>
-                <div id="joco-prestige-blackmail-${this.familyId}" class="joco-prestige-blackmail"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
   }
 
   // .##.....##.########..########.....###....########.########....##.....##.####

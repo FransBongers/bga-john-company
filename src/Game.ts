@@ -71,6 +71,7 @@ import {
   MilitaryAffairsAssignCommander,
   MilitaryAffairsTransfers,
   PlayerTurn,
+  PlayBlackmailOrPromiseCard,
   PresidencyTrade,
   PresidencyTradeFillOrders,
   ParliamentMeetsSelectLaw,
@@ -93,6 +94,7 @@ import { JohnCompanyGamedatas, GamedatasAlias } from './types';
 import { Parliament } from './parliament';
 import { EventTiles } from './india/event-tiles';
 import { EventTilesManager } from './cards/event-tiles';
+import { PromiseCardsManager } from './cards/promise-cards';
 
 // declare const define; // TODO: check if we comment here or in bga-animations module?
 // declare const ebg;
@@ -179,6 +181,7 @@ export class Game {
     ParliamentMeetsAdditionalRoundOrResolve,
     ParliamentMeetsCommitToOpposition,
     PlayerTurn,
+    PlayBlackmailOrPromiseCard,
     PresidencyTrade,
     PresidencyTradeFillOrders,
     RevenuePayDividends,
@@ -194,7 +197,7 @@ export class Game {
     this.bga = bga;
     console.log('johncompany constructor');
 
-    this.gameName = 'hegemony';
+    this.gameName = 'johncompany';
 
     this.bga.gameui.onScreenWidthChange = () => this.onScreenWidthChange();
     this.overrideOnPlaceLogOnChannel();
@@ -415,6 +418,7 @@ export class Game {
     EventTilesManager.create(this);
     LawCardsManager.create(this);
     LondonSeasonCardsManager.create(this);
+    PromiseCardsManager.create(this);
     ShipsManager.create(this);
     ControlTokensManager.create(this);
 

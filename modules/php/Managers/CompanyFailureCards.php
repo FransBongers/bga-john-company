@@ -21,8 +21,6 @@ class CompanyFailureCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pie
 
   public static function getCardInstance($id, $data = null)
   {
-    // $prefix = self::getClassPrefix($id);
-
     $className = "\Bga\Games\JohnCompany\Cards\CompanyFailure\\$id";
     return new $className($data);
   }

@@ -17,6 +17,13 @@ import {
   BENGAL_PRESIDENCY,
   BOMBAY_PRESIDENCY,
   SUPERINTENDENT_OF_TRADE_IN_CHINA,
+  LARKINS,
+  BENYON,
+  HASTINGS,
+  PAXTON,
+  SYKES,
+  WALSH,
+  CROWN,
 } from './constants';
 import { tknShipValue } from './logs/templates';
 import { PlayerManager } from './player-manager';
@@ -34,6 +41,8 @@ import {
   JocoLondonSeasonCardBase,
   JocoOffice,
   JocoOfficeBase,
+  JocoPromiseCard,
+  JocoPromiseCardBase,
   JocoRegionBase,
   JocoShipBase,
 } from './types';
@@ -46,6 +55,27 @@ export const getArmyNameForPresidency = (presidencyId: string) => {
       return _('Army of Bombay');
     case MADRAS_PRESIDENCY:
       return _('Army of Madras');
+    default:
+      return '';
+  }
+};
+
+export const getFamilyName = (familyId: string) => {
+  switch (familyId) {
+    case BENYON:
+      return _('Benyon');
+    case HASTINGS:
+      return _('Hastings');
+    case LARKINS:
+      return _('Larkins');
+    case PAXTON:
+      return _('Paxton');
+    case SYKES:
+      return _('Sykes');
+    case WALSH:
+      return _('Walsh');
+    case CROWN:
+      return _('Crown');
     default:
       return '';
   }
@@ -167,5 +197,14 @@ export const getOffice = (office: JocoOfficeBase): JocoOffice => {
   return {
     ...office,
     ...officeStatic,
+  };
+};
+
+export const getPromiseCard = (card: JocoPromiseCardBase): JocoPromiseCard => {
+  const staticData = StaticData.get();
+  const cardStatic = staticData.promiseCard(card.id);
+  return {
+    ...card,
+    ...cardStatic,
   };
 };

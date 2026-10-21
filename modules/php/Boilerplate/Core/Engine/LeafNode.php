@@ -54,7 +54,7 @@ class LeafNode extends AbstractNode
       return AtomicActions::getState($this->info['action'], $this);
     }
 
-    var_dump(\Bga\Games\Hegemony\Boilerplate\Core\Engine::$tree->toArray());
+    var_dump(\Bga\Games\JohnCompany\Boilerplate\Core\Engine::$tree->toArray());
     throw new \Bga\GameFramework\VisibleSystemException('Trying to get state on a leaf without state nor action');
   }
 

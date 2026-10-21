@@ -46,6 +46,7 @@ use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\PowerMarkers;
 use Bga\Games\JohnCompany\Managers\Prizes;
+use Bga\Games\JohnCompany\Managers\PromiseCards;
 use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Managers\Scenarios;
 use Bga\Games\JohnCompany\Managers\SetupCards;
@@ -385,6 +386,7 @@ class Game extends \Bga\GameFramework\Table
             'regions' => Regions::getAll(),
             'ships' => Ships::getAll(),
             'passedLaws' => LawCards::getInLocationOrdered(PASSED_LAWS)->toArray(),
+            'promiseCards' => PromiseCards::getAll(),
             'scenario' => Scenarios::get(),
             'staticData' => [
                 'armyPieces' => ArmyPieces::getStaticUiData(),
@@ -396,6 +398,7 @@ class Game extends \Bga\GameFramework\Table
                 'orders' => Orders::getStaticUiData(),
                 'regions' => Regions::getStaticUiData(),
                 'setupCards' => SetupCards::getStaticUiData(),
+                'promiseCards' => PromiseCards::getStaticUiData(),
             ]
         ];
 
@@ -433,6 +436,7 @@ class Game extends \Bga\GameFramework\Table
         LawCards::setupNewGame();
         LondonSeasonCards::setupNewGame();
         Parliament::setupNewGame();
+        PromiseCards::setupNewGame();
         PowerMarkers::setupNewGame();
         Regions::setupNewGame();
         SetupCards::setupNewGame();

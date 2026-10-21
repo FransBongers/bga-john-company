@@ -159,6 +159,7 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   passedLaws: JocoLawCardBase[];
   phase: string;
   powerMarkers: Record<string, string>;
+  promiseCards: Record<string, JocoPromiseCardBase>;
   regions: Record<string, JocoRegionBase>;
   scenario: JocoScenario;
   ships: Record<string, JocoShipBase>;
@@ -172,6 +173,7 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
     orders: Record<string, JoCoOrderStatic>;
     regions: Record<string, JocoRegionStatic>;
     setupCards: Record<string, JocoSetupCardStatic>;
+    promiseCards: Record<string, JocoPromiseCardStatic>;
   };
   turn: number;
 }
@@ -400,6 +402,21 @@ interface JocoPrize {
   upkeep: number;
   windows: number;
 }
+
+/**
+ * Promise Cards
+ */
+interface JocoPromiseCardBase extends GamePiece {
+  ownerPlayerId: number;
+  familyId: string;
+}
+
+interface JocoPromiseCardStatic {
+  title: string;
+}
+
+export type JocoPromiseCard = JocoPromiseCardBase & JocoPromiseCardStatic;
+ 
 
 /**
  * Ships
