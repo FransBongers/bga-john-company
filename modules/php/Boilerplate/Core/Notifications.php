@@ -459,6 +459,10 @@ class Notifications
     ], $args));
   }
 
+  public static function companyFailure()
+  {
+    self::notifyAll('companyFailure', clienttranslate('Company failure!!'), []);
+  }
 
   public static function companyOperationChairman($player, $companyDebt, $debtIncreased, $updatedTreasuries, $companyBalance)
   {

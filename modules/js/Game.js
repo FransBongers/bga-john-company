@@ -4071,6 +4071,8 @@ class NotificationManager {
             this.updateCountersForTarget(target, counterChanges);
         });
     }
+    async notif_companyFailure(notif) {
+    }
     async notif_draftCardPrivate(notif) {
         const { cardIds } = notif;
         await Promise.all(cardIds.map(async (cardId, index) => {

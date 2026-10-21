@@ -437,6 +437,10 @@ export class NotificationManager {
     );
   }
 
+  async notif_companyFailure(notif: unknown) {
+    // Handle company failure notification
+  }
+
   // TODO: make private notif
   async notif_draftCardPrivate(notif: NotifDraftCardPrivateArgs) {
     const { cardIds } = notif;

@@ -30,7 +30,7 @@ class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Mod
 
   protected $attributes = [
     'id' => ['card_id', 'str'],
-    'location' => 'card_location',
+    'location' => ['card_location', 'str'],
     'state' => ['card_state', 'int'],
     'extraData' => ['extra_data', 'obj'],
     'publicId' => ['public_id', 'str'],

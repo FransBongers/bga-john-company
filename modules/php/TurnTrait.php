@@ -5,9 +5,7 @@ namespace Bga\Games\JohnCompany;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
-use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
-use Bga\Games\JohnCompany\Managers\AICards;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Crown;
 use Bga\Games\JohnCompany\Managers\Families;
@@ -679,6 +677,7 @@ trait TurnTrait
 
     if ($lastRound) {
       Globals::setEndOfGame(true); // Used to check end of negotiation
+      Globals::setTransactionsEnabled(false);
       $node = [
         'children' => $this->getFinalScoringNodes(true),
       ];
@@ -754,31 +753,39 @@ trait TurnTrait
 
   function getFinalScoringNodes(bool $companySurvived)
   {
-    $children = [
+    $children = $companySurvived ?
       [
-        'action' => FINAL_SCORING,
-        'args' => [
-          'companySurvived' => $companySurvived,
+        [
+          'action' => LONDON_SEASON_ATTRITION,
+          'args' => [
+            FINAL_RETIREMENT => true
+          ]
         ]
-      ],
-    ];
-
-    if ($companySurvived) {
-      $children[] = [
-        'action' => LONDON_SEASON_ATTRITION,
-        'args' => [
-          FINAL_RETIREMENT => true
+      ] :
+      [
+        [
+          'action' => RESOLVE_COMPANY_FAILURE_CARD,
         ]
       ];
-    } else {
-      $children[] = [
-        'action' => RESOLVE_COMPANY_FAILURE_CARD,
-      ];
-    }
 
-    $children[] = [
-      'action' => PRE_END_OF_GAME,
-    ];
+
+    $children = array_merge(
+      $children,
+      [
+        [
+          'action' => FINAL_SCORING,
+          'args' => [
+            'companySurvived' => $companySurvived,
+          ]
+        ],
+        [
+          'action' => PRE_END_OF_GAME,
+        ],
+      ]
+    );
+
+
+
 
     return $children;
   }

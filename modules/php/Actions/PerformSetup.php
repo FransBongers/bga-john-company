@@ -141,6 +141,7 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
     }
 
     Notifications::setupDone();
+    Globals::setTransactionsEnabled(true);
 
     $this->resolveAction(['automatic' => true]);
   }

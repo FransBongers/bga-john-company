@@ -118,6 +118,12 @@ CREATE TABLE IF NOT EXISTS `london_season_cards` (
   `extra_data` JSON NULL,
   PRIMARY KEY (`card_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+CREATE TABLE IF NOT EXISTS `company_failure_cards` (
+  `card_id` varchar(100) NOT NULL,
+  `card_location` varchar(32) NOT NULL,
+  `card_state` int(10) DEFAULT 0,
+  PRIMARY KEY (`card_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 CREATE TABLE IF NOT EXISTS `offices` (
   `office_id` varchar(32) NOT NULL,
   `office_location` varchar(32) NOT NULL,

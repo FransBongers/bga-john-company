@@ -3,7 +3,9 @@
 namespace Bga\Games\JohnCompany\Actions;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Models\Player;
 
@@ -36,10 +38,9 @@ class CheckCompanyFailure extends \Bga\Games\JohnCompany\Models\AtomicAction
     $standing = Company::getStanding();
 
     if ($standing === 0) {
-      Notifications::message(clienttranslate('Company failure!!'));
-      $this->ctx->insertAsBrother(new LeafNode([
-        'action' => FINAL_SCORING,
-        'args' => ['companyFailure' => true],
+      Notifications::companyFailure();
+      $this->ctx->insertAsBrother(Engine::buildTree([
+        'children' => Game::get()->getFinalScoringNodes(false)
       ]));
     }
 

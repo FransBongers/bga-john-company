@@ -30,6 +30,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Stats;
 use Bga\Games\JohnCompany\Managers\AICards;
 use Bga\Games\JohnCompany\Managers\ArmyPieces;
 use Bga\Games\JohnCompany\Managers\Company;
+use Bga\Games\JohnCompany\Managers\CompanyFailureCards;
 use Bga\Games\JohnCompany\Managers\ControlTokens;
 use Bga\Games\JohnCompany\Managers\Crown;
 use Bga\Games\JohnCompany\Managers\Elephant;
@@ -419,6 +420,7 @@ class Game extends \Bga\GameFramework\Table
 
         Scenarios::setupNewGame($players, $options);
         ArmyPieces::setupNewGame();
+        CompanyFailureCards::setupNewGame();
         ControlTokens::setupNewGame();
         Elephant::setupNewGame();
         Enterprises::setupNewGame();
