@@ -48,6 +48,7 @@ use Bga\Games\JohnCompany\Managers\PowerMarkers;
 use Bga\Games\JohnCompany\Managers\Prizes;
 use Bga\Games\JohnCompany\Managers\PromiseCards;
 use Bga\Games\JohnCompany\Managers\Regions;
+use Bga\Games\JohnCompany\Managers\RemovedGovernors;
 use Bga\Games\JohnCompany\Managers\Scenarios;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 use Bga\Games\JohnCompany\Managers\Ships;
@@ -439,6 +440,7 @@ class Game extends \Bga\GameFramework\Table
         PromiseCards::setupNewGame();
         PowerMarkers::setupNewGame();
         Regions::setupNewGame();
+        RemovedGovernors::setupNewGame();
         SetupCards::setupNewGame();
         Ships::setupNewGame();
         if (Globals::getCrownInGame()) {

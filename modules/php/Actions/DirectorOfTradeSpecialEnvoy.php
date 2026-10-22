@@ -95,9 +95,7 @@ class DirectorOfTradeSpecialEnvoy extends \Bga\Games\JohnCompany\Models\AtomicAc
   public function actPassDirectorOfTradeSpecialEnvoy()
   {
     $playerId = $this->checkPlayer();
-    // $player = self::getPlayer();
-    // Stats::incPassActionCount($player->getId(), 1);
-    // Engine::resolve(PASS);
+    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
     $this->resolveAction(PASS, true);
   }
 

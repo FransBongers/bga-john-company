@@ -81,6 +81,11 @@ class Locations
     return 'shipConstruction_' . $regionId;
   }
 
+  public static function playedBlackmailCards(string $familyId)
+  {
+    return 'playedBlackmailCards_' . $familyId;
+  }
+
   public static function presidency(string $regionId)
   {
     return $regionId . 'Presidency';

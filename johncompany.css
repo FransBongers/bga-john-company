@@ -275,6 +275,7 @@
   font-size: 1.1em;
 }
 
+.tooltip.joco-card,
 .tooltip.joco-law-card {
   position: relative;
   outline: 1px solid black;
@@ -1072,6 +1073,16 @@ span[style*="color:#addb90"] {
 
 .joco-law-card[data-background=LawBack] {
   background-position-x: 100%;
+}
+
+#law-card-LawCard_40-front .joco-title,
+#law-card-LawCard_42-front .joco-title {
+  top: 60px;
+}
+#law-card-LawCard_40-front .fb-card-text,
+#law-card-LawCard_42-front .fb-card-text {
+  top: 145px;
+  height: 103px;
 }
 
 #law-card-LawCard_56-front .joco-title {

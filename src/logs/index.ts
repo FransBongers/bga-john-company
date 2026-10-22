@@ -31,6 +31,7 @@ const LOG_TOKEN_ITALIC_TEXT = 'italicText';
 const LOG_TOKEN_NEW_LINE = 'newLine';
 const LOG_TOKEN_PLAYER_NAME = 'playerName';
 // Game specific
+const LOG_TOKEN_BLACKMAIL_CARD = 'blackmailCard';
 const LOG_TOKEN_CLIMATE = 'climate';
 const LOG_TOKEN_POUND = 'pound';
 const LOG_TOKEN_ELEPHANT = 'elephant';
@@ -94,6 +95,15 @@ export const getTokenDiv = ({
       const [familyId, number] = value.split(':');
       return createFamilyMember(familyId, Number(number), [CLASS_LOG_TOKEN])
         .outerHTML;
+    case LOG_TOKEN_BLACKMAIL_CARD:
+      cardNameTooltipId = `tooltip_${game._last_tooltip_id}`;
+      game.tooltipsToMap.push([game._last_tooltip_id, value.split(':')[0]]);
+      game._last_tooltip_id++;
+      return tlpLogTokenText({
+        text: StaticData.get().cardTitle(value),
+        tooltipId: cardNameTooltipId,
+        bold: true,
+      });
     case LOG_TOKEN_LAW_CARD:
       cardNameTooltipId = `tooltip_${game._last_tooltip_id}`;
       game.tooltipsToMap.push([game._last_tooltip_id, value.split(':')[0]]);

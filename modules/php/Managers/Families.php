@@ -91,6 +91,15 @@ class Families extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     return $map;
   }
 
+  public static function getPlayerIdByFamilyId(string $familyId): int
+  {
+    $map = self::getFamilyIdPlayerIdMap();
+    if (!isset($map[$familyId])) {
+      throw new \Bga\GameFramework\VisibleSystemException("FAMILIES_001");
+    }
+    return $map[$familyId];
+  }
+
   public static function getChairmanFamily(): Family
   {
     $families = self::getAll()->toArray();

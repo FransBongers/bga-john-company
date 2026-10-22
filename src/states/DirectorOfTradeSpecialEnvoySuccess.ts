@@ -118,7 +118,7 @@ export class DirectorOfTradeSpecialEnvoySuccess implements GameState<OnEnteringD
       setSelected(India.getInstance().ui.orders[order.id]);
     }
 
-    addConfirmButton(() => this.performAction(order, true));
+    addConfirmButton(() => this.performAction(order, openTradeWithChina));
     addCancelButton();
   }
 

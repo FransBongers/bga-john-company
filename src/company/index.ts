@@ -1,5 +1,6 @@
 import { createFamilyMember } from '../templates';
 import {
+  BALANCE,
   CHAIRMAN,
   COURT_OF_DIRECTORS,
   DIRECTOR_OF_TRADE,
@@ -168,6 +169,15 @@ export class Company {
   // .##.....##.##........##.....##.#########....##....##..........##.....##..##.
   // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
   // ..#######..##........########..##.....##....##....########.....#######..####
+
+  public incCounters(changes: Record<string, number>) {
+    Object.entries(changes).forEach(([counterId, change]) => {
+      if (counterId === BALANCE) {
+        this.balance.incValue(change);
+      }
+      // TODO: handle other counters like DEBT, STANDING, SHARE_VALUE, etc.?
+    });
+  }
 
   public getDebtElt(debt: number): HTMLElement {
     return this.ui.debt[debt];

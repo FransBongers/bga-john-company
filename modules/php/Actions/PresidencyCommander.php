@@ -72,13 +72,6 @@ class PresidencyCommander extends \Bga\Games\JohnCompany\Models\AtomicAction
               ]
             ]
           ],
-          // 'stateDescription' => [
-          //   'descriptionmyturn' => clienttranslate('${you} must choose who will act next'),
-          //   'description' => clienttranslate('${actplayer} must choose who will act next'),
-          //   'args' => []
-          // ]
-          // 'activePlayerIds' => [$presidentOffice->getPlayerId()],
-          // 'officeId' => $presidentOffice->getId(),
         ]
       )
     );

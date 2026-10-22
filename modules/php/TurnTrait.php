@@ -13,6 +13,7 @@ use Bga\Games\JohnCompany\Managers\FamilyActions;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Parliament;
+use Bga\Games\JohnCompany\Managers\RemovedGovernors;
 use Bga\Games\JohnCompany\Managers\Scenarios;
 
 trait TurnTrait
@@ -81,6 +82,7 @@ trait TurnTrait
   {
     $currentTurn = Globals::getTurn();
     Notifications::turn($currentTurn);
+    RemovedGovernors::reset();
 
     $isFirstTurn = Scenarios::get()->getStartTurn() === $currentTurn;
 
@@ -316,6 +318,16 @@ trait TurnTrait
           'activePlayerIds' => [$playerId],
           'optional' => true,
         ],
+        [
+          'action' => TIMING_WINDOW_CHECK,
+          'args' => [
+            TIMING_WINDOW => AFTER_OFFICE_FINISHED_ACTING,
+            LAW_CARD => [BOARD_OF_CONTROL_ID],
+            TIMING_DATA => [
+              'officeId' => DIRECTOR_OF_TRADE
+            ],
+          ],
+        ]
       ],
     ];
 
@@ -340,6 +352,16 @@ trait TurnTrait
           'playerId' => 'some',
           'activePlayerIds' => [$office->getPlayerId()],
         ],
+        [
+          'action' => TIMING_WINDOW_CHECK,
+          'args' => [
+            TIMING_WINDOW => AFTER_OFFICE_FINISHED_ACTING,
+            LAW_CARD => [BOARD_OF_CONTROL_ID],
+            TIMING_DATA => [
+              'officeId' => MANAGER_OF_SHIPPING
+            ],
+          ],
+        ]
       ],
     ];
 
@@ -417,6 +439,16 @@ trait TurnTrait
             'presidencyId' => BENGAL_PRESIDENCY,
           ]
         ],
+        [
+          'action' => TIMING_WINDOW_CHECK,
+          'args' => [
+            TIMING_WINDOW => AFTER_OFFICE_FINISHED_ACTING,
+            LAW_CARD => [BOARD_OF_CONTROL_ID],
+            TIMING_DATA => [
+              'officeId' => MILITARY_AFFAIRS
+            ],
+          ],
+        ]
       ],
     ];
 
@@ -473,6 +505,16 @@ trait TurnTrait
           'optional' => true,
           'activePlayerIds' => [$office->getPlayerId()],
         ],
+        [
+          'action' => TIMING_WINDOW_CHECK,
+          'args' => [
+            TIMING_WINDOW => AFTER_OFFICE_FINISHED_ACTING,
+            LAW_CARD => [BOARD_OF_CONTROL_ID],
+            TIMING_DATA => [
+              'officeId' => SUPERINTENDENT_OF_TRADE_IN_CHINA
+            ],
+          ],
+        ]
       ],
     ];
 
@@ -520,6 +562,13 @@ trait TurnTrait
 
     $node = [
       'children' => [
+        [
+          'action' => TIMING_WINDOW_CHECK,
+          'args' => [
+            TIMING_WINDOW => START_OF_REVENUE_PHASE,
+            BLACKMAIL_CARD => [COMPANY_FRAUD_ID],
+          ],
+        ],
         [
           'action' => REVENUE_EXPENSES,
         ],
@@ -654,6 +703,13 @@ trait TurnTrait
 
     $node = [
       'children' => [
+        [
+          'action' => TIMING_WINDOW_CHECK,
+          'args' => [
+            TIMING_WINDOW => AFTER_OFFICE_FINISHED_ACTING,
+            BLACKMAIL_CARD => [SCANDAL_IN_INDIA_ID, SCANDAL_ON_LEADENHALL_STREET_ID],
+          ],
+        ],
         [
           'action' => PRE_TAX_AND_UPKEEP,
           'args' => [
@@ -823,14 +879,12 @@ trait TurnTrait
       $requiredChoiceCount++;
       $children[] =
         [
-          'action' => PRESIDENCY_TRADE,
+          'action' => PRESIDENCY_PRESIDENT,
           'playerId' => 'some',
-          'optional' => true,
           'activePlayerIds' => [$presidentPlayerId],
           'args' => [
             'officeId' => $presidentOffice->getId(),
             'presidencyId' => $presidencyId,
-            'first' => true,
             'presidentPlayerId' => $presidentPlayerId
 
           ],
@@ -856,14 +910,12 @@ trait TurnTrait
         continue;
       }
       $children[] = [
-        'action' => GOVERNOR_ADMINISTER,
+        'action' => PRESIDENCY_GOVERNOR,
         'playerId' => 'some',
         'activePlayerIds' => [$governorOffice->getPlayerId()],
-        'optional' => true,
         'args' => [
           'officeId' => $governorOffice->getId(),
           'presidencyId' => $presidencyId,
-          'first' => true,
         ],
       ];
       $requiredChoiceCount++;

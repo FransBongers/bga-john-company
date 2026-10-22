@@ -44,6 +44,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     'regionsLostThisTurn' => 'int',
     'transactionsEnabled' => 'bool',
     'endOfGame' => 'bool',
+    'removedGovernors' => 'obj'
   ];
 
   protected static $table = 'global_variables';

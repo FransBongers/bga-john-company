@@ -29,6 +29,7 @@ class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     'id' => ['card_id', 'str'],
     'location' => 'card_location',
     'state' => ['card_state', 'int'],
+    'used' => ['used', 'int'],
   ];
 
   protected $staticAttributes = [
@@ -54,6 +55,16 @@ class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   {
     // Notifications::log('getUiData card model', []);
     return $this->jsonSerialize(); // Static datas are already in js file
+  }
+
+  public function isInPlay(): bool
+  {
+    return $this->getLocation() === Locations::passedLaws();
+  }
+
+  public function hasBeenUsed(): bool
+  {
+    return $this->getUsed() === 1;
   }
 
   public function reveal(Player $player)
@@ -86,5 +97,31 @@ class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     $this->state = $state;
     $this->location = $location;
     Notifications::moveLaw($player, $this, $text, $textArgs);
+  }
+
+  /**
+   * Acting player for any effect of this law card
+   */
+  public function getActingPlayerId(): int
+  {
+    throw new \Bga\GameFramework\VisibleSystemException("LAW_CARD_001");
+  }
+
+  /**
+   * Whether the effect of this law card can be applied
+   * Only for effects with specific timing windows
+   */
+  public function effectCanBeApplied(array $timingData): array | null
+  {
+    throw new \Bga\GameFramework\VisibleSystemException("LAW_CARD_002");
+  }
+
+  /**
+   * Apply the effect of this law card
+   * Only for effects with specific timing windows
+   */
+  public function applyEffect($ctx, Player $player, array $timingData)
+  {
+    throw new \Bga\GameFramework\VisibleSystemException("LAW_CARD_003");
   }
 }

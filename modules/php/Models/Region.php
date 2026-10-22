@@ -51,6 +51,7 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
 
   protected $staticAttributes = [
     'loot',
+    'adjacentRegionsInClockwiseOrder',
     'adjacentRegionIds',
     'orderIds',
     'exportIcons',

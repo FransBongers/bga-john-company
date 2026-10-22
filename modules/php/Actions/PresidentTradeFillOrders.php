@@ -14,6 +14,7 @@ use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Orders;
 use Bga\Games\JohnCompany\Managers\Ships;
@@ -21,11 +22,11 @@ use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 use Bga\Games\JohnCompany\Models\Office;
 
-class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\PresidencyActions
+class PresidentTradeFillOrders extends \Bga\Games\JohnCompany\Actions\PresidencyActions
 {
   public function getState()
   {
-    return ST_PRESIDENCY_TRADE_FILL_ORDERS;
+    return ST_PRESIDENT_TRADE_FILL_ORDERS;
   }
 
   // ....###....########...######....######.
@@ -36,7 +37,7 @@ class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidenc
   // .##.....##.##....##..##....##..##....##
   // .##.....##.##.....##..######....######.
 
-  public function argsPresidencyTradeFillOrders()
+  public function argsPresidentTradeFillOrders()
   {
     $info = $this->ctx->getInfo();
     // $player = self::getPlayer();
@@ -73,7 +74,7 @@ class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidenc
   // .##.....##.##....##....##.....##..##.....##.##...###
   // .##.....##..######.....##....####..#######..##....##
 
-  public function actPassPresidencyTradeFillOrders()
+  public function actPassPresidentTradeFillOrders()
   {
     $player = self::getPlayer();
     // Stats::incPassActionCount($player->getId(), 1);
@@ -81,14 +82,14 @@ class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidenc
     $this->resolveAction(PASS, true);
   }
 
-  public function actPresidencyTradeFillOrders($args)
+  public function actPresidentTradeFillOrders($args)
   {
-    self::checkAction('actPresidencyTradeFillOrders');
+    self::checkAction('actPresidentTradeFillOrders');
     $playerId = $this->checkPlayer();
 
     $filledOrders = $args->filledOrders;
 
-    $stateArgs = $this->argsPresidencyTradeFillOrders();
+    $stateArgs = $this->argsPresidentTradeFillOrders();
     $orders = $stateArgs['orders'];
     $writers = $stateArgs['writers'];
 
@@ -101,9 +102,15 @@ class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidenc
 
     $player = Players::get($playerId);
 
-    $familyIncome = [
-      $player->getFamilyId() => count($filledOrders), // player performing the action is president
-    ];
+    $income = [];
+
+    $presidentBonus = count($filledOrders);
+    $tradeRegulationsInPlay = LawCards::isInPlay(TRADE_REGULATIONS_ID);
+    if ($tradeRegulationsInPlay) {
+      $income[COMPANY] = $presidentBonus;
+    } else {
+      $income[$player->getFamilyId()] = $presidentBonus; // player performing the action is president
+    }
 
     foreach ($filledOrders as $index => $data) {
       $orderId = $data->orderId;
@@ -132,10 +139,10 @@ class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidenc
         }
 
         $familyId = $familyMember->getFamilyId();
-        if (isset($familyIncome[$familyId])) {
-          $familyIncome[$familyId] += 1;
+        if (isset($income[$familyId])) {
+          $income[$familyId] += 1;
         } else {
-          $familyIncome[$familyId] = 1;
+          $income[$familyId] = 1;
         }
 
         // $familyMember->setLocation($orderId);
@@ -153,12 +160,20 @@ class PresidencyTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidenc
     $companyBalance = Company::incBalance($companyBalanceIncrease);
     Notifications::increaseCompanyBalance($player, $companyBalance, $companyBalanceIncrease);
 
-    foreach ($familyIncome as $familyId => $amount) {
-      $families[$familyId]->gainCash($amount);
+    foreach ($income as $familyId => $amount) {
+      if ($familyId === COMPANY) {
+        $balance = Company::incBalance($amount);
+        Notifications::increaseCompanyBalance(null, $balance, $amount);
+      } else {
+        $families[$familyId]->gainCash($amount);
+      }
     }
 
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
-    $this->resolveAction([], true);
+    $this->resolveAction([
+      'officeId' => $stateArgs[OFFICE_ID],
+      'officeHolderBonus' => $tradeRegulationsInPlay ? 0 : $presidentBonus
+    ], true);
   }
 
   //  .##.....##.########.####.##.......####.########.##....##

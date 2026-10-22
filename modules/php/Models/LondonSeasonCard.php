@@ -4,6 +4,8 @@ namespace Bga\Games\JohnCompany\Models;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
+use Bga\Games\JohnCompany\Managers\Families;
 
 class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
 {
@@ -90,5 +92,35 @@ class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Mod
   protected function resolveImmediateEffect(Player $player, object $ctx)
   {
     // Implement the logic for resolving the immediate effect of the London Season Card
+  }
+
+  /**
+   * Acting player for any effect of this london season card
+   */
+  public function getActingPlayerId(): int
+  {
+    $location = $this->getLocation();
+    if (!Utils::startsWith($location, 'londonSeasonCards_')) {
+      throw new \Bga\GameFramework\VisibleSystemException("LONDON_SEASON_CARD_001");
+    }
+    return Families::getPlayerIdByFamilyId(explode('_', $location)[1]);
+  }
+
+  /**
+   * Whether the effect of this london season card can be applied
+   * Only for effects with specific timing windows
+   */
+  public function effectCanBeApplied(array $timingData): array | null
+  {
+    throw new \Bga\GameFramework\VisibleSystemException("LONDON_SEASON_CARD_002");
+  }
+
+  /**
+   * Apply the effect of this london season card
+   * Only for effects with specific timing windows
+   */
+  public function applyEffect($ctx, Player $player, array $timingData)
+  {
+    throw new \Bga\GameFramework\VisibleSystemException("LONDON_SEASON_CARD_003");
   }
 }

@@ -53,6 +53,8 @@ class Player extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
       return $card->jsonSerialize();
     }, $this->getLondonSeasonCards());
 
+    $playedBlackmailCards = LondonSeasonCards::getInLocationOrdered(Locations::playedBlackmailCards($this->getFamilyId()))->toArray();
+
     return array_merge(
       $data,
       [
@@ -60,6 +62,9 @@ class Player extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
         'familyId' => $this->getFamilyId(),
         'setupCards' => $isCurrentPlayer ? $this->getSetupCards() : [],
         'londonSeasonCards' => $londonSeasonCards,
+        'playedBlackmailCards' => array_map(function ($card) {
+          return $card->jsonSerializePrivate();
+        }, $playedBlackmailCards),
       ],
     );
   }

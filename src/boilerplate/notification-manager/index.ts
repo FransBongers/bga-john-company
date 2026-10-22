@@ -34,6 +34,7 @@ import {
   PRESIDENCIES,
   PARLIAMENT_MEETS_START,
   PARLIAMENT_MEETS_VOTING_STARTS,
+  COMPANY,
 } from '../../constants';
 import { CrownClimate } from '../../crown/climate';
 import { India } from '../../india';
@@ -391,6 +392,8 @@ export class NotificationManager {
   ) {
     if (FAMILIES.includes(target)) {
       Families.getInstance().getFamily(target).incCounters(counterChanges);
+    } else if (target === COMPANY) {
+      Company.getInstance().incCounters(counterChanges);
     }
   }
 

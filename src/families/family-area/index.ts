@@ -124,7 +124,11 @@ export class FamilyArea {
         LondonSeasonCardsManager.getInstance(),
         document.getElementById(`joco-prestige-blackmail-${this.familyId}`)!,
       );
-
+    this.stocks[`playedBlackmailCards_${this.familyId}`] =
+      new BgaCards.LineStock<JocoLondonSeasonCard>(
+        LondonSeasonCardsManager.getInstance(),
+        document.getElementById(`joco-played-blackmail-${this.familyId}`)!,
+      );
     this.updateLondonSeasonCards(gamedatas);
   }
 

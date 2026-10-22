@@ -81,9 +81,8 @@ const ST_MANAGER_OF_SHIPPING = 44;
 const ST_DIRECTOR_OF_TRADE_SPECIAL_ENVOY_SUCCESS = 45;
 const ST_MILITARY_AFFAIRS_TRANSFERS = 46;
 const ST_MILITARY_AFFAIRS_ASSIGN = 47;
-// const ST_PRESIDENCY_DECIDE_ORDER = 49;
-const ST_PRESIDENCY_TRADE = 50;
-const ST_PRESIDENCY_TRADE_FILL_ORDERS = 51;
+const ST_PRESIDENT_TRADE = 50;
+const ST_PRESIDENT_TRADE_FILL_ORDERS = 51;
 const ST_PRESIDENCY_COMMANDER = 124;
 const ST_COMMANDER_PURCHASE_LOCAL_ALLIANCE = 125;
 const ST_COMMANDER_DEPLOY = 126;
@@ -151,8 +150,12 @@ const ST_HIRING_CHOOSE_CHAIRMAN = 159;
 const ST_CHECK_COMPANY_FAILURE = 160;
 const ST_TRADE_IN_CHINA = 165;
 const ST_RESOLVE_COMPANY_FAILURE_CARD = 169;
-const ST_CHECK_CARD_TIMING = 170;
-const ST_PLAY_BLACKMAIL_OR_PROMISE_CARD = 171;
+const ST_TIMING_WINDOW_CHECK = 170;
+const ST_TIMING_WINDOW_ACT = 171;
+const ST_PRESIDENCY_GOVERNOR = 172;
+const ST_PRESIDENCY_PRESIDENT = 173;
+const ST_VACATE_OFFICE_WITHOUT_RETIREMENT = 174;
+const ST_USE_MAN_ON_THE_INSIDE = 175;
 
 
 const BONUSES = 'Bonuses';
@@ -208,8 +211,8 @@ const SWAP_POWER_MARKERS = 'SwapPowerMarkers';
 // Company Operations
 const CHAIRMAN_DEBT_CONSENT = 'ChairmanDebtConsent';
 const CHECK_COMPANY_FAILURE = 'CheckCompanyFailure';
-const CHECK_CARD_TIMING = 'CheckCardTiming';
-const PLAY_BLACKMAIL_OR_PROMISE_CARD = 'PlayBlackmailOrPromiseCard';
+const TIMING_WINDOW_CHECK = 'TimingWindowCheck';
+const TIMING_WINDOW_ACT = 'TimingWindowAct';
 const CLEAR_CASCADE = 'ClearCascade';
 const RESOLVE_COMPANY_FAILURE_CARD = 'ResolveCompanyFailureCard';
 const DIRECTOR_OF_TRADE_SPECIAL_ENVOY = 'DirectorOfTradeSpecialEnvoy';
@@ -220,9 +223,13 @@ const MILITARY_AFFAIRS_ASSIGN = 'MilitaryAffairsAssign';
 const MILITARY_AFFAIRS_CHECK_COMMANDER = 'MilitaryAffairsCheckCommander';
 const MILITARY_AFFAIRS_ASSIGN_COMMANDER = 'MilitaryAffairsAssignCommander';
 // const PRESIDENCY_DECIDE_ORDER = 'PresidencyDecideOrder';
-const PRESIDENCY_TRADE = 'PresidencyTrade';
-const PRESIDENCY_TRADE_FILL_ORDERS = 'PresidencyTradeFillOrders';
+const PRESIDENT_TRADE = 'PresidentTrade';
+const PRESIDENT_TRADE_FILL_ORDERS = 'PresidentTradeFillOrders';
 const PRESIDENCY_COMMANDER = 'PresidencyCommander';
+const PRESIDENCY_GOVERNOR = 'PresidencyGovernor';
+const PRESIDENCY_PRESIDENT = 'PresidencyPresident';
+const VACATE_OFFICE_WITHOUT_RETIREMENT = 'VacateOfficeWithoutRetirement';
+const USE_MAN_ON_THE_INSIDE = 'UseManOnTheInside';
 const PARLIAMENT_MEETS_SELECT_LAW = 'ParliamentMeetsSelectLaw';
 const PARLIAMENT_MEETS_SELECT_POLICY = 'ParliamentMeetsSelectPolicy';
 const PARLIAMENT_MEETS_RESOLVE_POLICY = 'ParliamentMeetsResolvePolicy';
@@ -1005,10 +1012,36 @@ const PRIZES = [
 const CHECK_FOR_LOSSES = 'checkForLosses';
 const OFFICER_ROUT = 'officerRout';
 
-
+/**
+ * Timing window for checking card effects
+ */
+const PLAYER_ID = 'playerId';
+const OFFICE_ID = 'officeId';
+const CARD_ID = 'cardId';
+const CARD_TYPE = 'cardType';
+const LAW_CARD = 'lawCard';
+const BLACKMAIL_CARD = 'blackmailCard';
+const PROMISE_CARD = 'promiseCard';
+const TIMING_WINDOW = 'timingWindow';
+const TIMING_DATA = 'timingData';
+const AFTER_OFFICE_FINISHED_ACTING = 'afterOfficeFinishedActing';
+const WHEN_TAKEN_FROM_DISPLAY = 'whenTakenFromDisplay';
+const ANY_TIME_AFTER_REVENUE_PHASE = 'anyTimeAfterRevenuePhase';
+const START_OF_REVENUE_PHASE = 'startOfRevenuePhase';
+const WHEN_A_BLACKMAIL_CARD_IS_PLAYED = 'whenABlackmailCardIsPlayed';
+const WHEN_RETIRING = 'whenRetiring';
 
 
 const REMOVED = 'removed';
+
+/**
+ * BlackmailCardIds: specific card IDs that affect the game and
+ */
+const COMPANY_FRAUD_ID = 'CompanyFraud';
+const LETTERS_OF_INTRODUCTION_ID = 'LettersOfIntroduction';
+const MAN_ON_THE_INSIDE_ID = 'ManOnTheInside';
+const SCANDAL_IN_INDIA_ID = 'ScandalInIndia';
+const SCANDAL_ON_LEADENHALL_STREET_ID = 'ScandalOnLeadenhallStreet';
 
 /**
  * PrestigeCardIds: specific card IDs that affect the game and
@@ -1022,8 +1055,11 @@ const WILLIAM_COLLINS_ID = 'PrestigeCard_17';
  * LawCardIds: specific card IDs that affect the game and
  * are used in the code
  */
+const BOARD_OF_CONTROL_ID = 'LawCard_34';
 const MASSED_DEMAND_FRANCHISE_ID = 'LawCard_54';
+const TRADE_REGULATIONS_ID = 'LawCard_40';
 const ZAMINDAR_TAXES_ID = 'LawCard_41';
+
 
 /**
  * Foreign Invasion Event Tile ID

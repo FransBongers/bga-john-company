@@ -89,16 +89,31 @@ class LondonSeasonAttrition extends \Bga\Games\JohnCompany\Models\AtomicAction
       }
 
       if ($retiredAFamilyMember) {
-        $retireActions[] = [
-          'action' => LONDON_SEASON_RETIRE,
-          'playerId' => 'some',
-          'activePlayerIds' => [$playerId],
-          'optional' => true,
-          'args' => [
-            'familyId' => $player->getFamilyId(),
-            FINAL_RETIREMENT => $finalRetirement
-          ]
-        ];
+        $retireActions[] =
+          [
+            'children' => [
+              [
+                'action' => TIMING_WINDOW_CHECK,
+                'args' => [
+                  TIMING_WINDOW => WHEN_RETIRING,
+                  BLACKMAIL_CARD => [LETTERS_OF_INTRODUCTION_ID],
+                  TIMING_DATA => [
+                    PLAYER_ID => $playerId
+                  ]
+                ],
+              ],
+              [
+                'action' => LONDON_SEASON_RETIRE,
+                'playerId' => 'some',
+                'activePlayerIds' => [$playerId],
+                'optional' => true,
+                'args' => [
+                  'familyId' => $player->getFamilyId(),
+                  FINAL_RETIREMENT => $finalRetirement
+                ]
+              ]
+            ]
+          ];
       }
     }
 

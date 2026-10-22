@@ -78,6 +78,15 @@ export const COLOR_FAMILY_MAP = {
 };
 
 /**
+ * Company
+ */
+export const BALANCE = 'balance';
+export const DEBT = 'debt';
+export const STANDING = 'standing';
+export const COMPANY = 'company';
+export const SHARE_VALUE = 'shareValue';
+
+/**
  * Phases
  */
 export const SETUP = 'setup'; // Only used during start of game
@@ -459,3 +468,17 @@ export const CRISIS = 'Crisis';
 export const SHUFFLE = 'Shuffle';
 export const TURMOIL = 'Turmoil';
 export const WINDFALL = 'Windfall';
+
+/**
+ * Timing window for checking card effects
+ */
+export const PLAYER_ID = 'playerId';
+export const OFFICE_ID = 'officeId';
+export const CARD_ID = 'cardId';
+export const CARD_TYPE = 'cardType';
+export const LAW_CARD = 'lawCard';
+export const BLACKMAIL_CARD = 'blackmailCard';
+export const PROMISE_CARD = 'promiseCard';
+export const TIMING_WINDOW = 'timingWindow';
+export const TIMING_DATA = 'timingData';
+export const AFTER_OFFICE_FINISHED_ACTING = 'afterOfficeFinishedActing';

@@ -21,7 +21,7 @@ import type {
   GameAlias,
 } from '../types';
 
-interface OnEnteringPresidencyTradeFillOrdersArgs extends CommonStateArgs {
+interface OnEnteringPresidentTradeFillOrdersArgs extends CommonStateArgs {
   homePortOrderId: string;
   companyBalance: number;
   orders: Record<string, JoCoOrderBase>;
@@ -29,24 +29,24 @@ interface OnEnteringPresidencyTradeFillOrdersArgs extends CommonStateArgs {
   numberOfOrdersToFill: number;
 }
 
-export class PresidencyTradeFillOrders implements GameState<OnEnteringPresidencyTradeFillOrdersArgs> {
-  private static instance: PresidencyTradeFillOrders;
-  private args: OnEnteringPresidencyTradeFillOrdersArgs;
+export class PresidentTradeFillOrders implements GameState<OnEnteringPresidentTradeFillOrdersArgs> {
+  private static instance: PresidentTradeFillOrders;
+  private args: OnEnteringPresidentTradeFillOrdersArgs;
   private filledOrders: Array<{ orderId: string; filledBy: string }>; // orderId / familyMemberId or 'filled' if not available
   private balance: number;
 
   constructor(private game: GameAlias) {}
 
   public static create(game: GameAlias) {
-    PresidencyTradeFillOrders.instance = new PresidencyTradeFillOrders(game);
+    PresidentTradeFillOrders.instance = new PresidentTradeFillOrders(game);
   }
 
   public static getInstance() {
-    return PresidencyTradeFillOrders.instance;
+    return PresidentTradeFillOrders.instance;
   }
 
-  onEnteringState(args: OnEnteringPresidencyTradeFillOrdersArgs) {
-    debug('Entering PresidencyTradeFillOrders state');
+  onEnteringState(args: OnEnteringPresidentTradeFillOrdersArgs) {
+    debug('Entering PresidentTradeFillOrders state');
     this.args = args;
     this.filledOrders = [];
     this.balance = this.args.companyBalance;
@@ -55,12 +55,12 @@ export class PresidencyTradeFillOrders implements GameState<OnEnteringPresidency
   }
 
   onLeavingState() {
-    debug('Leaving PresidencyTradeFillOrders state');
+    debug('Leaving PresidentTradeFillOrders state');
   }
 
   setDescription(
     activePlayerIds: number,
-    args: OnEnteringPresidencyTradeFillOrdersArgs,
+    args: OnEnteringPresidentTradeFillOrdersArgs,
   ) {
     updatePageTitle(
       _('${tkn_playerName} must fill orders'),
@@ -232,7 +232,7 @@ export class PresidencyTradeFillOrders implements GameState<OnEnteringPresidency
   }
 
   private performAction(makeCheck: boolean = false) {
-    performAction('actPresidencyTradeFillOrders', {
+    performAction('actPresidentTradeFillOrders', {
       filledOrders: this.filledOrders,
       // makeCheck,
     });

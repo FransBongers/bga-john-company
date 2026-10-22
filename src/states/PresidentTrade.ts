@@ -20,7 +20,7 @@ import { Company } from '../company';
 import { StaticData } from '../static-data';
 import { JoCoOrderBase, JocoRegionBase, GameAlias } from '../types';
 
-interface OnEnteringPresidencyTradeArgs extends CommonStateArgs {
+interface OnEnteringPresidentTradeArgs extends CommonStateArgs {
   treasury: number;
   proposal: number | null;
   officeId: string;
@@ -32,24 +32,24 @@ interface OnEnteringPresidencyTradeArgs extends CommonStateArgs {
   };
 }
 
-export class PresidencyTrade implements GameState<OnEnteringPresidencyTradeArgs> {
-  private static instance: PresidencyTrade;
-  private args: OnEnteringPresidencyTradeArgs;
+export class PresidentTrade implements GameState<OnEnteringPresidentTradeArgs> {
+  private static instance: PresidentTrade;
+  private args: OnEnteringPresidentTradeArgs;
   private spend: number;
   private selectedRegionIds: string[];
 
   constructor(private game: GameAlias) {}
 
   public static create(game: GameAlias) {
-    PresidencyTrade.instance = new PresidencyTrade(game);
+    PresidentTrade.instance = new PresidentTrade(game);
   }
 
   public static getInstance() {
-    return PresidencyTrade.instance;
+    return PresidentTrade.instance;
   }
 
-  onEnteringState(args: OnEnteringPresidencyTradeArgs) {
-    debug('Entering PresidencyTrade state');
+  onEnteringState(args: OnEnteringPresidentTradeArgs) {
+    debug('Entering PresidentTrade state');
     this.args = args;
     this.spend = args.proposal || 0;
     this.selectedRegionIds = [this.args.options.homeRegionId];
@@ -58,10 +58,10 @@ export class PresidencyTrade implements GameState<OnEnteringPresidencyTradeArgs>
   }
 
   onLeavingState() {
-    debug('Leaving PresidencyTrade state');
+    debug('Leaving PresidentTrade state');
   }
 
-  setDescription(activePlayerIds: number, args: OnEnteringPresidencyTradeArgs) {
+  setDescription(activePlayerIds: number, args: OnEnteringPresidentTradeArgs) {
     updatePageTitle(
       _(
         '${tkn_playerName} must choose regions to trade with and spend ${tkn_pound} to make a check',
@@ -243,7 +243,7 @@ export class PresidencyTrade implements GameState<OnEnteringPresidencyTradeArgs>
   }
 
   private performAction(makeCheck: boolean = false) {
-    performAction('actPresidencyTrade', {
+    performAction('actPresidentTrade', {
       selectedRegionIds: this.selectedRegionIds,
       spend: this.spend,
       makeCheck,

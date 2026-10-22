@@ -17,7 +17,7 @@ export const tplLawCardTooltip = (
 export const tplLondonSeasonCardTooltip = (
   data: JocoLondonSeasonCardStatic,
 ) => `
-  <div class="joco-card" data-background="${data.background}">
+  <div class="joco-card tooltip" data-background="${data.background}">
     ${data.type === PRESTIGE ? tplLondonSeasonCardContent(data) : tplBlackmailCardContent(data)}
   </div>
 `;

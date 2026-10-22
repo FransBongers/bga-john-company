@@ -21,11 +21,11 @@ use Bga\Games\JohnCompany\Managers\SetupCards;
 use Bga\Games\JohnCompany\Models\Office;
 use Bga\Games\JohnCompany\Models\Player;
 
-class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
+class PresidentTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
 {
   public function getState()
   {
-    return ST_PRESIDENCY_TRADE;
+    return ST_PRESIDENT_TRADE;
   }
 
   // ..######..########....###....########.########
@@ -45,9 +45,9 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
   // .##.....##..######.....##....####..#######..##....##
 
 
-  public function stPresidencyTrade()
+  public function stPresidentTrade()
   {
-    $stateArgs = $this->argsPresidencyTrade();
+    $stateArgs = $this->argsPresidentTrade();
     $args = $this->ctx->getArgs();
     if ($stateArgs['skipOnEnteringState']) {
       if ($args['first'] ?? false) {
@@ -67,7 +67,7 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
   // .##.....##.##....##..##....##..##....##
   // .##.....##.##.....##..######....######.
 
-  public function argsPresidencyTrade()
+  public function argsPresidentTrade()
   {
     $args = $this->ctx->getArgs();
 
@@ -103,7 +103,7 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
   // .##.....##.##....##....##.....##..##.....##.##...###
   // .##.....##..######.....##....####..#######..##....##
 
-  public function actPassPresidencyTrade()
+  public function actPassPresidentTrade()
   {
     $playerId = $this->checkPlayer();
     // Stats::incPassActionCount($player->getId(), 1);
@@ -112,16 +112,16 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
     $this->resolveAction(PASS, true);
   }
 
-  public function actPresidencyTrade($args)
+  public function actPresidentTrade($args)
   {
-    self::checkAction('actPresidencyTrade');
+    self::checkAction('actPresidentTrade');
     $playerId = $this->checkPlayer();
 
     $selectedRegionIds = $args->selectedRegionIds;
     $spend = $args->spend;
     $makeCheck = $args->makeCheck; // TODO: use to differentiate between propose and act
 
-    $stageArgs = $this->argsPresidencyTrade();
+    $stageArgs = $this->argsPresidentTrade();
     $options = $stageArgs['options'];
     $officeId = $stageArgs['officeId'];
 
@@ -164,7 +164,7 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
 
     if ($checkResult === SUCCESS) {
       $action = [
-        'action' => PRESIDENCY_TRADE_FILL_ORDERS,
+        'action' => PRESIDENT_TRADE_FILL_ORDERS,
         'playerId' => 'some',
         'activePlayerIds' => [$playerId],
         'officeId' => $officeId,
@@ -226,7 +226,7 @@ class PresidencyTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
 
   public function isDoable(Player $player): bool
   {
-    $stateArgs = $this->argsPresidencyTrade();
+    $stateArgs = $this->argsPresidentTrade();
 
     return !$stateArgs['skipOnEnteringState'];
   }

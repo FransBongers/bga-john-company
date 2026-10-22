@@ -2,13 +2,13 @@
 
 namespace Bga\Games\JohnCompany\Actions;
 
-use Bga\Games\JohnCompany\Models\Player;
+use Bga\Games\JohnCompany\Managers\Offices;
 
-class CheckCardTiming extends \Bga\Games\JohnCompany\Models\AtomicAction
+class VacateOfficeWithoutRetirement extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
   public function getState()
   {
-    return \ST_CHECK_CARD_TIMING;
+    return ST_VACATE_OFFICE_WITHOUT_RETIREMENT;
   }
 
   // ..######..########....###....########.########
@@ -27,8 +27,15 @@ class CheckCardTiming extends \Bga\Games\JohnCompany\Models\AtomicAction
   // .##.....##.##....##....##.....##..##.....##.##...###
   // .##.....##..######.....##....####..#######..##....##
 
-  public function stCheckCardTiming()
+  public function stVacateOfficeWithoutRetirement()
   {
+    $args = $this->ctx->getArgs();
+    $office = Offices::get($args[OFFICE_ID]);
+    $actingPlayerId = $args['actingPlayerId'];
+    $currentOwner = $office->getFamily()->getPlayer();
+    $office->returnFamilyMemberToSupply();
+    $office->moveToVacantOffices($currentOwner);
+
     $this->resolveAction(['automatic' => true]);
   }
 
@@ -50,15 +57,17 @@ class CheckCardTiming extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   public function getDescription(): string|array
   {
-    return clienttranslate('CheckCardTiming');
+    $args = $this->ctx->getArgs();
+    $office = Offices::get($args[OFFICE_ID]);
+    return $office->getTitle();
   }
 
-  public function isDoable(Player $player): bool
+  public function isDoable(\Bga\Games\JohnCompany\Models\Player $player): bool
   {
     return true;
   }
 
-  public function isAutomatic(?Player $player = null): bool
+  public function isAutomatic(?\Bga\Games\JohnCompany\Models\Player $player = null): bool
   {
     return true;
   }

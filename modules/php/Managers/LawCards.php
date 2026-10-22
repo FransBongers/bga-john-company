@@ -14,7 +14,7 @@ class LawCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 {
   protected static $table = 'law_cards';
   protected static $prefix = 'card_';
-  protected static $customFields = [];
+  protected static $customFields = ['used'];
   protected static $autoremovePrefix = false;
   protected static $autoreshuffle = false;
   protected static $autoIncrement = false;

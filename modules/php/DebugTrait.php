@@ -94,7 +94,13 @@ trait DebugTrait
     EventTiles::get('EventTile_18')->resolveEvent(BENGAL, $ctx);
     Engine::save();
     Engine::proceed();
+  }
 
+  function debug_londonSeasonCard(string $familyId, string $cardId)
+  {
+    $card = LondonSeasonCards::get($cardId);
+    $card->setLocation(Locations::londonSeasonCards($familyId));
+    Notifications::moveLondonSeasonCard(Families::get($familyId)->getPlayer(), $card, null);
   }
 
   function debug_engineDisplay()

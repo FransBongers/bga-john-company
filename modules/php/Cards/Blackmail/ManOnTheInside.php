@@ -2,6 +2,9 @@
 
 namespace Bga\Games\JohnCompany\Cards\Blackmail;
 
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
+use Bga\Games\JohnCompany\Models\Player;
+
 class ManOnTheInside extends \Bga\Games\JohnCompany\Models\BlackmailCard
 {
   public function __construct($row)
@@ -18,5 +21,16 @@ class ManOnTheInside extends \Bga\Games\JohnCompany\Models\BlackmailCard
         ]
       ]
     ];
+  }
+
+  // Input player is the player playing a blackmail card
+  public function canBePlayed(Player $player): bool
+  {
+    // Has to be owned by a player
+    if (!Utils::startsWith($this->getLocation(), 'londonSeasonCards_')) {
+      return false;
+    }
+    // Player should not be asked to cancel their own card
+    return $this->getActingPlayerId() !== $player->getId();
   }
 }

@@ -314,6 +314,25 @@ class Notifications
     return $idNameMap[$locationId];
   }
 
+  public static function getOpportunityMarkerText(string | null $opportunityMarker)
+  {
+
+    $map = [
+      ENLIST_WRITER => clienttranslate('Enlist Writer'),
+      ENLIST_OFFICER =>  clienttranslate('Officer in Training'),
+      SEEK_SHARE => clienttranslate('Seek Share'),
+      PURCHASE_LUXURY => clienttranslate('Buy Luxury'),
+      PURCHASE_SHIPYARD => clienttranslate('Buy Shipyard'),
+      PURCHASE_WORKSHOP => clienttranslate('Buy Workshop'),
+      REMOVED => clienttranslate('Removed'),
+    ];
+
+    if ($opportunityMarker !== null && isset($map[$opportunityMarker])) {
+      return $map[$opportunityMarker];
+    }
+    return clienttranslate('Not placed');
+  }
+
   private static function getRegionNameForWriter($location)
   {
     $regionId = null;
@@ -883,14 +902,23 @@ class Notifications
     ], $textArgs));
   }
 
-  public static function increaseCompanyBalance($player, $companyBalance, $companyBalanceIncrease)
+  public static function increaseCompanyBalance(Player | null $player, int $companyBalance, int $companyBalanceIncrease)
   {
-    self::notifyAll('moveCompanyBalance', clienttranslate('${player_name} increases Company Balance by ${tkn_boldText_amount}'), [
+    $text = clienttranslate('${player_name} increases Company Balance by ${tkn_boldText_amount}');
+    $textArgs = [
+      'player' => $player,
+    ];
+    if ($player === null) {
+      $text = clienttranslate('Company Balance increases by ${tkn_boldText_amount}');
+      $textArgs = [];
+    }
+
+    self::notifyAll('moveCompanyBalance', $text, array_merge([
       'player' => $player,
       'tkn_boldText_amount' => '£' . $companyBalanceIncrease,
       'companyBalance' => $companyBalance,
       'i18n' => ['tkn_boldText_value'],
-    ]);
+    ], $textArgs));
   }
 
   public static function increaseCompanyDebt($player, $companyDebt, $companyBalance)
@@ -1224,6 +1252,14 @@ class Notifications
       'player' => $player,
       'familyMember' => $familyMember->jsonSerialize(),
       'tkn_familyMember' => self::tknFamilyMember($familyMember),
+    ]));
+  }
+
+  public static function moveBlackmailCard(Player $player, LondonSeasonCard $card, string $text = '', array $textArgs = [])
+  {
+    self::notifyAll('moveLondonSeasonCard', $text, array_merge($textArgs, [
+      'player' => $player,
+      'card' => $card->jsonSerializePrivate(),
     ]));
   }
 

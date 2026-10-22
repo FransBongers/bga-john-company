@@ -137,15 +137,15 @@ $machinestates = [
         ->transitions(['next' => ST_RESOLVE_STACK])
         ->build(),
 
-    ST_PLAY_BLACKMAIL_OR_PROMISE_CARD => GameStateBuilder::create()
-        ->name(PLAY_BLACKMAIL_OR_PROMISE_CARD)
+    ST_TIMING_WINDOW_ACT => GameStateBuilder::create()
+        ->name(TIMING_WINDOW_ACT)
         ->description('${actplayer}')
         ->descriptionmyturn('${you}')
         ->type(StateType::MULTIPLE_ACTIVE_PLAYER)
         ->args('argsAtomicAction')
         ->action('stAtomicAction')
         ->possibleactions([
-            'act' . PLAY_BLACKMAIL_OR_PROMISE_CARD,
+            'act' . TIMING_WINDOW_ACT,
             'actPass',
             'actPassOptionalAction',
             'actTakeAtomicAction',
@@ -508,25 +508,25 @@ $machinestates = [
     //     'transitions' => ['next' => ST_RESOLVE_STACK, BONUSES],
     // ],
 
-    ST_PRESIDENCY_TRADE => [
-        'name' => PRESIDENCY_TRADE,
+    ST_PRESIDENT_TRADE => [
+        'name' => PRESIDENT_TRADE,
         'type' => 'multipleactiveplayer',
         'description' => clienttranslate('${actplayer}'),
         'descriptionmyturn' => clienttranslate('${you}'),
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
-        'possibleactions' => ['act' . PRESIDENCY_TRADE, 'actTakeAtomicAction'],
+        'possibleactions' => ['act' . PRESIDENT_TRADE, 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
-    ST_PRESIDENCY_TRADE_FILL_ORDERS => [
-        'name' => PRESIDENCY_TRADE_FILL_ORDERS,
+    ST_PRESIDENT_TRADE_FILL_ORDERS => [
+        'name' => PRESIDENT_TRADE_FILL_ORDERS,
         'type' => 'multipleactiveplayer',
         'description' => '${actplayer}',
         'descriptionmyturn' => '${you}',
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
-        'possibleactions' => ['act' . PRESIDENCY_TRADE_FILL_ORDERS, 'actTakeAtomicAction'],
+        'possibleactions' => ['act' . PRESIDENT_TRADE_FILL_ORDERS, 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
@@ -637,6 +637,41 @@ $machinestates = [
         'type' => 'game',
         'action' => 'stAtomicAction',
         'transitions' => [],
+    ],
+
+    ST_PRESIDENCY_GOVERNOR => [
+        'name' => PRESIDENCY_GOVERNOR,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_PRESIDENCY_PRESIDENT => [
+        'name' => PRESIDENCY_PRESIDENT,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_VACATE_OFFICE_WITHOUT_RETIREMENT => [
+        'name' => VACATE_OFFICE_WITHOUT_RETIREMENT,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_USE_MAN_ON_THE_INSIDE => [
+        'name' => USE_MAN_ON_THE_INSIDE,
+        'type' => 'multipleactiveplayer',
+        'description' => '${actplayer}',
+        'descriptionmyturn' => '${you}',
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . USE_MAN_ON_THE_INSIDE, 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
     ST_COMMANDER_PURCHASE_LOCAL_ALLIANCE => [
@@ -809,8 +844,8 @@ $machinestates = [
         'transitions' => [],
     ],
 
-    ST_CHECK_CARD_TIMING => [
-        'name' => CHECK_CARD_TIMING,
+    ST_TIMING_WINDOW_CHECK => [
+        'name' => TIMING_WINDOW_CHECK,
         'description' => '',
         'type' => 'game',
         'action' => 'stAtomicAction',

@@ -2,6 +2,7 @@
 
 namespace Bga\Games\JohnCompany\Managers;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 
@@ -10,6 +11,17 @@ class FamilyActions
   public static function getFamilyActionsNode(int $playerId)
   {
     $familyId = Players::get($playerId)->getFamilyId();
+    $family = Families::get($familyId);
+    $opportunityMarker = $family->getOpportunityMarker();
+
+    clienttranslate('${you} must select a family action (your opportunity marker is on ${opportunityMarker})');
+    $opportunityMarkerLog = [
+      'log' => in_array($opportunityMarker, [REMOVED, null]) ? clienttranslate('(your opportunity marker is ${status})') : clienttranslate('(your opportunity marker is on ${status})'),
+      'args' => [
+        'status' => Notifications::getOpportunityMarkerText($opportunityMarker)
+      ]
+    ];
+    $opportunityMarker ? " (your opportunity marker is on ${opportunityMarker})" : '';
 
     return [
       'type' => NODE_XOR,
@@ -23,9 +35,11 @@ class FamilyActions
       ],
       'playerId' => $playerId,
       'stateDescription' => [
-        'descriptionmyturn' => clienttranslate('${you} must select a family action'),
+        'descriptionmyturn' => clienttranslate('${you} must select a family action ${opportunityMarkerLog}'),
         'description' => clienttranslate('${actplayer} must select a family action'),
-        'args' => []
+        'args' => [
+          'opportunityMarkerLog' => $opportunityMarkerLog,
+        ]
       ],
       'args' => [
         'buttonType' => SECONDARY

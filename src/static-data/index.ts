@@ -48,6 +48,16 @@ export class StaticData {
     return card;
   }
 
+  public cardTitle(id: string): string {
+    if (id.startsWith('LawCard_')) {
+      return this.lawCard(id).title;
+    } else if (id.startsWith('PC')) {
+      return this.promiseCard(id).title;
+    } else {
+      return this.londonSeasonCard(id).title;
+    }
+  }
+
   public enterpriseCard(id: string): JocoEnterpriseCardStatic {
     const card =
       this.staticData.enterpriseCards[id] ?? ({} as JocoEnterpriseCardStatic);
@@ -100,8 +110,7 @@ export class StaticData {
   }
 
   public promiseCard(id: string): JocoPromiseCardStatic {
-    const card =
-      this.staticData.promiseCards[id];
+    const card = this.staticData.promiseCards[id];
     if (!card) {
       throw new Error('STATIC_DATA_ERROR_007');
     }

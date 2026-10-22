@@ -70,7 +70,7 @@ class Company
     return (int) Globals::getCompany()[SHARE_VALUE];
   }
 
-  public static function incBalance($value)
+  public static function incBalance(int $value)
   {
     return self::inc(BALANCE, $value);
   }

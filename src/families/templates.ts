@@ -27,6 +27,10 @@ export const tplPlayerArea = (player: JocoPlayer) => {
                 <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Promise cards').toLocaleUpperCase()}</span>
                 <div id="joco-promise-cards-${player.familyId}" class="joco-promise-cards"></div>
               </div>
+              <div class="joco-container">
+                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Played Blackmail cards').toLocaleUpperCase()}</span>
+                <div id="joco-played-blackmail-${player.familyId}" class="joco-prestige-blackmail"></div>
+              </div>
             </div>
           </div>
         </div>

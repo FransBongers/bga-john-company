@@ -24,6 +24,9 @@ import {
   SYKES,
   WALSH,
   CROWN,
+  LAW_CARD,
+  PROMISE_CARD,
+  BLACKMAIL_CARD,
 } from './constants';
 import { tknShipValue } from './logs/templates';
 import { PlayerManager } from './player-manager';
@@ -55,6 +58,19 @@ export const getArmyNameForPresidency = (presidencyId: string) => {
       return _('Army of Bombay');
     case MADRAS_PRESIDENCY:
       return _('Army of Madras');
+    default:
+      return '';
+  }
+};
+
+export const getCardTypeText = (cardType: string) => {
+  switch (cardType) {
+    case LAW_CARD:
+      return _('Law');
+    case BLACKMAIL_CARD:
+      return _('Blackmail card');
+    case PROMISE_CARD:
+      return _('Promise Card');
     default:
       return '';
   }
