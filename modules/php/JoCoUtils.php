@@ -2,6 +2,7 @@
 
 namespace Bga\Games\JohnCompany;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Models\FamilyMember;
 use Bga\Games\JohnCompany\Models\Player;
@@ -17,7 +18,7 @@ class JoCoUtils
     return bga_rand(1, 6);
   }
 
-  public static function makeCheck(Player $player, int $numberOfDice, FamilyMember $familyMember)
+  public static function makeCheck(Player $player, int $numberOfDice, FamilyMember $familyMember, bool $resolveCatastrophicFailure = true)
   {
     if ($numberOfDice === 0) {
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_010");
@@ -37,15 +38,28 @@ class JoCoUtils
     } else {
       $result = CATASTROPHIC_FAILURE;
     }
+
+    Globals::setLatestCheck([
+      'playerId' => $player->getId(),
+      'familyMemberId' => $familyMember->getId(),
+      'numberOfDice' => $numberOfDice,
+      'result' => $result,
+    ]);
+
     Notifications::makeCheck($player, $dieResults, $result);
-    if ($result === CATASTROPHIC_FAILURE) {
-      $office = $familyMember->getOffice();
-      $familyMember->returnToSupply();
-      if ($office !== null) {
-        $office->moveToVacantOffices($player);
-      }
+    if ($result === CATASTROPHIC_FAILURE && $resolveCatastrophicFailure) {
+      self::resolveCatastrophicFailure($player, $familyMember);
     }
     return $result;
+  }
+
+  public static function resolveCatastrophicFailure(Player $player, FamilyMember $familyMember)
+  {
+    $office = $familyMember->getOffice();
+    $familyMember->returnToSupply();
+    if ($office !== null) {
+      $office->moveToVacantOffices($player);
+    }
   }
 
   public static function getPolicyConsequenceTranslation(string $consequence)

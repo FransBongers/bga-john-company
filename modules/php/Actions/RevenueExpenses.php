@@ -9,6 +9,7 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Managers\ArmyPieces;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Ships;
 
@@ -45,9 +46,11 @@ class RevenueExpenses extends \Bga\Games\JohnCompany\Models\AtomicAction
     $debt = Company::getDebt();
     $totalExpenses += $debt;
 
+    $costPerRegiment = LawCards::isInPlay(SEPOY_RECRUITMENT_ID) ? 0 : 1;
+
     $regiments = ArmyPieces::getRegimentsInArmies();
     $numberOfRegiments = count($regiments);
-    $totalExpenses += $numberOfRegiments;
+    $totalExpenses += $numberOfRegiments * $costPerRegiment;
 
     $officers = FamilyMembers::getOfficers();
     $numberOfOfficers = count($officers);

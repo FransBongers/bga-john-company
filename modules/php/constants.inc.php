@@ -52,6 +52,7 @@ const OPTION_DRAFT_SETUP_CARDS_ENABLED = 1;
 const DECK = 'deck';
 const DISCARD = 'discard';
 const EXTRA_SETUP = 'extraSetup';
+const REMOVED_FROM_GAME = 'removedFromGame';
 
 const LONDON_SEASON_DISPLAY = 'LondonSeasonDisplay';
 const PASSED_LAWS = 'PassedLaws';
@@ -83,9 +84,11 @@ const ST_MILITARY_AFFAIRS_TRANSFERS = 46;
 const ST_MILITARY_AFFAIRS_ASSIGN = 47;
 const ST_PRESIDENT_TRADE = 50;
 const ST_PRESIDENT_TRADE_FILL_ORDERS = 51;
+const ST_PRESIDENT_TRADE_RESOLVE_CHECK = 176;
 const ST_PRESIDENCY_COMMANDER = 124;
 const ST_COMMANDER_PURCHASE_LOCAL_ALLIANCE = 125;
 const ST_COMMANDER_DEPLOY = 126;
+const ST_COMMANDER_DEPLOY_RESOLVE_CHECK = 177;
 const ST_COMMANDER_APPROVE_LOCAL_ALLIANCE = 127;
 const ST_UPKEEP_CHECK_PRIZES = 128;
 const ST_REFRESH_BOARD = 129;
@@ -225,6 +228,7 @@ const MILITARY_AFFAIRS_ASSIGN_COMMANDER = 'MilitaryAffairsAssignCommander';
 // const PRESIDENCY_DECIDE_ORDER = 'PresidencyDecideOrder';
 const PRESIDENT_TRADE = 'PresidentTrade';
 const PRESIDENT_TRADE_FILL_ORDERS = 'PresidentTradeFillOrders';
+const PRESIDENT_TRADE_RESOLVE_CHECK = 'PresidentTradeResolveCheck';
 const PRESIDENCY_COMMANDER = 'PresidencyCommander';
 const PRESIDENCY_GOVERNOR = 'PresidencyGovernor';
 const PRESIDENCY_PRESIDENT = 'PresidencyPresident';
@@ -240,6 +244,7 @@ const PARLIAMENT_MEETS_COMMIT_TO_OPPOSITION = 'ParliamentMeetsCommitToOpposition
 const PARLIAMENT_MEETS_CLEANUP = 'ParliamentMeetsCleanup';
 const COMMANDER_PURCHASE_LOCAL_ALLIANCE = 'CommanderPurchaseLocalAlliance';
 const COMMANDER_DEPLOY = 'CommanderDeploy';
+const COMMANDER_DEPLOY_RESOLVE_CHECK = 'CommanderDeployResolveCheck';
 const COMMANDER_APPROVE_LOCAL_ALLIANCE = 'CommanderApproveLocalAlliance';
 // Crown states
 const CROWN_CHAIRMAN_SEEK_DEBT = 'CrownChairmanSeekDebt';
@@ -1024,6 +1029,8 @@ const BLACKMAIL_CARD = 'blackmailCard';
 const PROMISE_CARD = 'promiseCard';
 const TIMING_WINDOW = 'timingWindow';
 const TIMING_DATA = 'timingData';
+const AFTER_PRESIDENT_OR_FIRM_CHECK = 'afterPresidentOrFirmCheck';
+const AFTER_COMMANDER_DEPLOY_CHECK = 'afterCommanderDeployCheck';
 const AFTER_OFFICE_FINISHED_ACTING = 'afterOfficeFinishedActing';
 const WHEN_TAKEN_FROM_DISPLAY = 'whenTakenFromDisplay';
 const ANY_TIME_AFTER_REVENUE_PHASE = 'anyTimeAfterRevenuePhase';
@@ -1038,8 +1045,10 @@ const REMOVED = 'removed';
  * BlackmailCardIds: specific card IDs that affect the game and
  */
 const COMPANY_FRAUD_ID = 'CompanyFraud';
+const DIPLOMATIC_CONNECTION_ID = 'DiplomaticConnection';
 const LETTERS_OF_INTRODUCTION_ID = 'LettersOfIntroduction';
 const MAN_ON_THE_INSIDE_ID = 'ManOnTheInside';
+const MERCANTILE_CONNECTION_ID = 'MercantileConnection';
 const SCANDAL_IN_INDIA_ID = 'ScandalInIndia';
 const SCANDAL_ON_LEADENHALL_STREET_ID = 'ScandalOnLeadenhallStreet';
 
@@ -1047,7 +1056,9 @@ const SCANDAL_ON_LEADENHALL_STREET_ID = 'ScandalOnLeadenhallStreet';
  * PrestigeCardIds: specific card IDs that affect the game and
  * are used in the code
  */
+const LADY_NEWCOME_ID = 'PrestigeCard_20';
 const MR_ROCHESTER_ID = 'PrestigeCard_11';
+const SHIPBUILDERS_ID = 'PrestigeCard_21';
 const STOCK_BROKER_ID = 'PrestigeCard_25';
 const WILLIAM_COLLINS_ID = 'PrestigeCard_17';
 
@@ -1057,6 +1068,7 @@ const WILLIAM_COLLINS_ID = 'PrestigeCard_17';
  */
 const BOARD_OF_CONTROL_ID = 'LawCard_34';
 const MASSED_DEMAND_FRANCHISE_ID = 'LawCard_54';
+const SEPOY_RECRUITMENT_ID = 'LawCard_38';
 const TRADE_REGULATIONS_ID = 'LawCard_40';
 const ZAMINDAR_TAXES_ID = 'LawCard_41';
 

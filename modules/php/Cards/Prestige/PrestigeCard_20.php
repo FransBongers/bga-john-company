@@ -2,6 +2,10 @@
 
 namespace Bga\Games\JohnCompany\Cards\Prestige;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Managers\PromiseCards;
+use Bga\Games\JohnCompany\Models\Player;
+
 class PrestigeCard_20 extends \Bga\Games\JohnCompany\Models\PrestigeCard
 {
   public function __construct($row)
@@ -14,5 +18,12 @@ class PrestigeCard_20 extends \Bga\Games\JohnCompany\Models\PrestigeCard
     $this->text = [clienttranslate('Act as if your enterprises no longer have vote icons. Remove your “Vote with my Enterprises” promise from the game, even if it is owned by another player. Any enterprises you transfer to another player cannot be used to vote with that turn.')];
     $this->victoryPoints = 3;
     $this->discount = 2;
+  }
+
+  protected function resolveImmediateEffect(Player $player, object $ctx)
+  {
+    $playerId = $player->getId();
+    $promiseCardId = implode('_', ['PC', $playerId, VOTE_WITH_MY_ENTERPRISES]);
+    PromiseCards::get($promiseCardId)->removeFromGame($player);
   }
 }

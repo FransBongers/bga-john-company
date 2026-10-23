@@ -530,6 +530,14 @@ $machinestates = [
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
+    ST_PRESIDENT_TRADE_RESOLVE_CHECK => [
+        'name' => PRESIDENT_TRADE_RESOLVE_CHECK,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
     ST_PARLIAMENT_MEETS_SELECT_LAW => [
         'name' => PARLIAMENT_MEETS_SELECT_LAW,
         'type' => 'multipleactiveplayer',
@@ -705,6 +713,14 @@ $machinestates = [
         'action' => 'stAtomicAction',
         'possibleactions' => ['act' . COMMANDER_DEPLOY, 'actPassOptionalAction', 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_COMMANDER_DEPLOY_RESOLVE_CHECK => [
+        'name' => COMMANDER_DEPLOY_RESOLVE_CHECK,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
     ],
 
     ST_BONUSES => [

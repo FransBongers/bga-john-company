@@ -3441,6 +3441,8 @@ class FamilyArea {
     updateLondonSeasonCards(gamedatas) {
         const cards = gamedatas.players[this.player.id].londonSeasonCards;
         this.stocks[`londonSeasonCards_${this.familyId}`].addCards(cards.map(getLondonSeasonCard));
+        const playedBlackmailCards = gamedatas.players[this.player.id].playedBlackmailCards;
+        this.stocks[`playedBlackmailCards_${this.familyId}`].addCards(playedBlackmailCards.map(getLondonSeasonCard));
     }
     async addEnterprise(enterprise) {
         await this.enterprises.addCard(getEnterpriseCard(enterprise));
@@ -4561,6 +4563,10 @@ class NotificationManager {
             const element = document.getElementById(armyPiece.id);
             await this.game.animationManager.slideAndAttach(element, document.getElementById(armyPiece.location));
         }));
+    }
+    async notif_removeCardFromGame(notif) {
+        const { playerId, card } = notif;
+        await PromiseCardsManager.getInstance().removeCard(getPromiseCard(card));
     }
     async notif_returnFamilyMemberToSupply(notif) {
         const { familyMember, playerId } = notif;

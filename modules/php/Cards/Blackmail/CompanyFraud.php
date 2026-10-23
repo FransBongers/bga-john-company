@@ -4,6 +4,8 @@ namespace Bga\Games\JohnCompany\Cards\Blackmail;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
+use Bga\Games\JohnCompany\JoCoUtils;
+use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Offices;
 
 use Bga\Games\JohnCompany\Models\Player;
@@ -56,11 +58,27 @@ class CompanyFraud extends \Bga\Games\JohnCompany\Models\BlackmailCard
    * Apply the effect of this london season card
    * Only for effects with specific timing windows
    */
-  public function applyEffect($ctx, Player $player, array $timingData)
+  public function applyEffect(object $ctx, Player $player, array $timingData)
   {
-    Notifications::message(clienttranslate('${player_name} applies the effect of ${tkn_blackmailCard}'), [
-      'player_name' => $player->getName(),
-      'tkn_blackmailCard' => $this->getId()
+    $playerId = $player->getId();
+    $offices = Utils::filter(Offices::getAll()->toArray(), fn($office) => $office->getPlayerId() === $playerId);
+
+    $rolls = array_map(fn() => JoCoUtils::rollDie(), $offices);
+    $highestRoll = max($rolls);
+
+    Notifications::message(clienttranslate('${player_name} rolls ${tkn_boldText_rolls}'), [
+      'player' => $player,
+      'tkn_boldText_rolls' => implode(' ', $rolls),
     ]);
+
+    $amount = min(2 * $highestRoll, Company::getBalance());
+    $balance = Company::incBalance(-$amount);
+
+    Notifications::updateCompanyBalance($balance, clienttranslate('${player_name} lowers the Company Balance by ${tkn_boldText_amount}'), [
+      'player' => $player,
+      'tkn_boldText_amount' => '£' . $amount,
+    ]);
+
+    $player->getFamily()->gainCash($amount);
   }
 }

@@ -6,6 +6,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Collection;
 use Bga\Games\JohnCompany\Managers\Elephant;
+use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Models\Player;
 use Bga\Games\JohnCompany\Models\Region;
@@ -182,7 +183,7 @@ class EventsInIndiaResolveCrisis extends \Bga\Games\JohnCompany\Models\AtomicAct
     $attacker = $regions[$attackerId];
     $defender = $regions[$defenderId];
 
-    $attackStrength = $attacker->getStrength() + $eventTileStrength + $defender->getUnrest();
+    $attackStrength = $attacker->getStrength() + $eventTileStrength + ($defender->getUnrest() * $this->getUnrestStrength());
     // Add all tower levels in the attacking empire
     foreach ($regions as $region) {
       if ($region->getControl() === $attackerId) {
@@ -223,7 +224,7 @@ class EventsInIndiaResolveCrisis extends \Bga\Games\JohnCompany\Models\AtomicAct
   {
     $regions = Regions::getAll();
     $attacker = $regions[$attackerId];
-    $attackStrength = $attacker->getUnrest() + $eventTileStrength;
+    $attackStrength = ($attacker->getUnrest() * $this->getUnrestStrength()) + $eventTileStrength;
 
     Notifications::message(clienttranslate('${tkn_boldText_attacker} rebels against the ${tkn_boldText_company} with a strength of ${tkn_boldText_attackStrength}'), [
       'tkn_boldText_attacker' => $regions[$attackerId]->getName(),
@@ -316,7 +317,7 @@ class EventsInIndiaResolveCrisis extends \Bga\Games\JohnCompany\Models\AtomicAct
     $defender = $regions[$defenderId];
 
     $dieRoll = bga_rand(1, 6);
-    $unrest = $defender->getUnrest();
+    $unrest = $defender->getUnrest() * $this->getUnrestStrength();
     Notifications::foreignInvasion($defender->getName(), $dieRoll, $unrest);
     $attackStrength = $dieRoll + $unrest;
 
@@ -333,6 +334,11 @@ class EventsInIndiaResolveCrisis extends \Bga\Games\JohnCompany\Models\AtomicAct
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private function getUnrestStrength(): int
+  {
+    return LawCards::isInPlay(SEPOY_RECRUITMENT_ID) ? 2 : 1;
+  }
 
   private function handleSuccessfulInvasion(Region $attacker, Region $defender)
   {

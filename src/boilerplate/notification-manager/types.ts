@@ -15,6 +15,7 @@ import {
   JocoLondonSeasonCardBase,
   JocoOfficeBase,
   JoCoOrderBase,
+  JocoPromiseCardBase,
   JocoRegionBase,
   JocoShipBase,
 } from '../../types';
@@ -207,6 +208,10 @@ export interface NotifRetireFamilyMember extends NotifWithPlayerArgs {
 export interface NotifRefreshArmies {
   armyPieces: JocoArmyPieceBase[];
   officers: JocoFamilyMember[];
+}
+
+export interface NotifRemoveCardFromGame extends NotifWithPlayerArgs {
+  card: JocoPromiseCardBase;
 }
 
 export interface NotifReturnFamilyMemberToSupply extends NotifWithPlayerArgs {

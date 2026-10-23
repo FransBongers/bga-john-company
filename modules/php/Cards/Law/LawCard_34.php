@@ -53,7 +53,7 @@ class LawCard_34 extends \Bga\Games\JohnCompany\Models\LawCard
     ];
   }
 
-  public function applyEffect($ctx, Player $player, array $timingData)
+  public function applyEffect(object $ctx, Player $player, array $timingData)
   {
     Notifications::message(clienttranslate('${player_name} uses ${tkn_lawCard}'), [
       'player' => $player,

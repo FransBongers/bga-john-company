@@ -160,18 +160,23 @@ class PresidentTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
 
     $office->pay($player, $spend);
 
-    $checkResult = JoCoUtils::makeCheck($player, $numberOfDice, $office->getFamilyMember());
+    JoCoUtils::makeCheck($player, $numberOfDice, $office->getFamilyMember(), false);
 
-    if ($checkResult === SUCCESS) {
-      $action = [
-        'action' => PRESIDENT_TRADE_FILL_ORDERS,
-        'playerId' => 'some',
-        'activePlayerIds' => [$playerId],
+    $this->ctx->insertAsBrother(Engine::buildTree([
+      'action' => PRESIDENT_TRADE_RESOLVE_CHECK,
+      'args' => [
         'officeId' => $officeId,
-        'regionIds' => $selectedRegionIds,
-      ];
-      $this->ctx->insertAsBrother(Engine::buildTree($action));
-    }
+        'regionIds' => $selectedRegionIds
+      ]
+    ]));
+
+    $this->ctx->insertAsBrother(Engine::buildTree([
+      'action' => TIMING_WINDOW_CHECK,
+      'args' => [
+        TIMING_WINDOW => AFTER_PRESIDENT_OR_FIRM_CHECK,
+        BLACKMAIL_CARD => [MERCANTILE_CONNECTION_ID],
+      ],
+    ]));
 
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
     $this->resolveAction([], true);

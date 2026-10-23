@@ -211,15 +211,13 @@ export class FamilyArea {
     this.stocks[`londonSeasonCards_${this.familyId}`].addCards(
       cards.map(getLondonSeasonCard),
     );
-    // .forEach((card) => {
-    //   if (card.location !== this.familyId) {
-    //     return;
-    //   }
 
-    //   this.stocks[`londonSeasonCards-${this.familyId}`].addCard(
-    //     getLondonSeasonCard(card),
-    //   );
-    // });
+    const playedBlackmailCards =
+      gamedatas.players[this.player.id].playedBlackmailCards;
+
+    this.stocks[`playedBlackmailCards_${this.familyId}`].addCards(
+      playedBlackmailCards.map(getLondonSeasonCard),
+    );
   }
 
   // .##.....##.########.####.##.......####.########.##....##

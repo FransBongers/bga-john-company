@@ -175,7 +175,8 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  private function voteInFavor(int $totalVotes) {
+  private function voteInFavor(int $totalVotes)
+  {
     Parliament::incSupport($totalVotes);
   }
 
@@ -226,6 +227,7 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
 
   private function getVotes(Family $family)
   {
+    $familyHasLadyNewcome = $family->hasPrestigeCard(LADY_NEWCOME_ID);
 
     $policyTarget = PRIME_MINISTER_DIAL[Parliament::getDialPosition()][TARGET];
 
@@ -236,6 +238,12 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
       'londonSeasonCards' => [],
     ];
 
+    if ($familyHasLadyNewcome) {
+      // Early return because all other cards are enterprises 
+      // and cannot be used when Lady Newcome is in play
+      return $options;
+    }
+
     foreach ($family->getEnterprises() as $enterprise) {
       $votes = $enterprise->getVotes();
       if ($votes > 0 && $enterprise->getUsed() === 0) {
@@ -245,6 +253,7 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
         ];
       }
     }
+
 
     $policyTargets = [
       'PrestigeCard_23' => [WORKSHOP, SHIPYARD],

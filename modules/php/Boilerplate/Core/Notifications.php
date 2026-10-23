@@ -24,6 +24,7 @@ use Bga\Games\JohnCompany\Models\LondonSeasonCard;
 use Bga\Games\JohnCompany\Models\Office;
 use Bga\Games\JohnCompany\Models\Order;
 use Bga\Games\JohnCompany\Models\Player;
+use Bga\Games\JohnCompany\Models\PromiseCard;
 use Bga\Games\JohnCompany\Models\Region;
 use Bga\Games\JohnCompany\Models\Ship;
 
@@ -141,6 +142,16 @@ class Notifications
       $args['playerId'] = $args['player']->getId();
       unset($args['player']);
     }
+  }
+
+  public static function getCheckResultTranslation(string $checkResult)
+  {
+    $translatedResultMap = [
+      SUCCESS => clienttranslate('success'),
+      FAILURE => clienttranslate('failure'),
+      CATASTROPHIC_FAILURE => clienttranslate('catastrophic failure')
+    ];
+    return $translatedResultMap[$checkResult];
   }
 
   public static function tknPound()
@@ -793,16 +804,27 @@ class Notifications
     ]);
   }
 
-  public static function updateFamilyTreasury(Player $player, int $cash)
+  public static function updateFamilyTreasury(Player $player, int $cash, string | null $source = null)
   {
-    $text = $cash <= 0 ? clienttranslate('${player_name} pays ${tkn_boldText_amount}') : clienttranslate('${player_name} gains ${tkn_boldText_amount}');
-
+    $playerNeedsToPay = $cash <= 0;
+    $text = '';
+    if ($playerNeedsToPay && $source === null) {
+      $text = clienttranslate('${player_name} pays ${tkn_boldText_amount}');
+    } else if ($playerNeedsToPay && $source !== null) {
+      $text = clienttranslate('${player_name} pays ${tkn_boldText_amount} (${source})');
+    } else if (!$playerNeedsToPay && $source === null) {
+      $text = clienttranslate('${player_name} gains ${tkn_boldText_amount}');
+    } else if (!$playerNeedsToPay && $source !== null) {
+      $text = clienttranslate('${player_name} gains ${tkn_boldText_amount} (${source})');
+    }
 
     self::notifyAll('updateFamilyTreasury', $text, [
       'player' => $player,
       'amount' => $cash,
+      'source' => $source,
       'tkn_boldText_amount' => '£' . abs($cash),
-      'tkn_pound' => clienttranslate('Pounds')
+      'tkn_pound' => clienttranslate('Pounds'),
+      'i18n' => ['source']
     ]);
   }
 
@@ -904,24 +926,42 @@ class Notifications
 
   public static function increaseCompanyBalance(Player | null $player, int $companyBalance, int $companyBalanceIncrease)
   {
-    $text = clienttranslate('${player_name} increases Company Balance by ${tkn_boldText_amount}');
-    $textArgs = [
-      'player' => $player,
-    ];
     if ($player === null) {
-      $text = clienttranslate('Company Balance increases by ${tkn_boldText_amount}');
-      $textArgs = [];
+      self::updateCompanyBalance($companyBalance, clienttranslate('Company Balance increases by ${tkn_boldText_amount}'), [
+        'tkn_boldText_amount' => '£' . $companyBalanceIncrease,
+      ]);
+      return;
+    } else {
+      self::updateCompanyBalance($companyBalance, clienttranslate('${player_name} increases Company Balance by ${tkn_boldText_amount}'), [
+        'player' => $player,
+        'tkn_boldText_amount' => '£' . $companyBalanceIncrease,
+      ]);
     }
+    // $text = clienttranslate('${player_name} increases Company Balance by ${tkn_boldText_amount}');
+    // $textArgs = [
+    //   'player' => $player,
+    // ];
+    // if ($player === null) {
+    //   $text = clienttranslate('Company Balance increases by ${tkn_boldText_amount}');
+    //   $textArgs = [];
+    // }
 
+    // self::notifyAll('moveCompanyBalance', $text, array_merge([
+    //   'player' => $player,
+    //   'tkn_boldText_amount' => '£' . $companyBalanceIncrease,
+    //   'companyBalance' => $companyBalance,
+    //   'i18n' => ['tkn_boldText_value'],
+    // ], $textArgs));
+  }
+
+  public static function updateCompanyBalance(int $companyBalance, $text = '', $textArgs = [])
+  {
     self::notifyAll('moveCompanyBalance', $text, array_merge([
-      'player' => $player,
-      'tkn_boldText_amount' => '£' . $companyBalanceIncrease,
       'companyBalance' => $companyBalance,
-      'i18n' => ['tkn_boldText_value'],
     ], $textArgs));
   }
 
-  public static function increaseCompanyDebt($player, $companyDebt, $companyBalance)
+  public static function increaseCompanyDebt(Player $player, int $companyDebt, int $companyBalance)
   {
     self::notifyAll('moveCompanyDebt', clienttranslate('${player_name} increases Company Debt to ${tkn_boldText_value}'), [
       'player' => $player,
@@ -1176,6 +1216,15 @@ class Notifications
     ]);
   }
 
+  public static function removeCardFromGame(Player $player, PromiseCard $promiseCard)
+  {
+    self::notifyAll('removeCardFromGame', clienttranslate('${player_name} removes their ${tkn_promiseCard} from the game'), [
+      'player' => $player,
+      'card' => $promiseCard->jsonSerialize(),
+      'tkn_promiseCard' => $promiseCard->getId(),
+    ]);
+  }
+
   public static function regionBecomesSovereign(Region $region)
   {
     self::updateRegion($region, clienttranslate('${tkn_boldText_region} becomes sovereign'), [
@@ -1200,14 +1249,8 @@ class Notifications
     ]);
   }
 
-  public static function makeCheck($player, $diceResults, $checkResult)
+  public static function makeCheck(Player $player, array $diceResults, string $checkResult)
   {
-    $translatedResultMap = [
-      SUCCESS => clienttranslate('success'),
-      FAILURE => clienttranslate('failure'),
-      CATASTROPHIC_FAILURE => clienttranslate('catastrophic failure')
-    ];
-
     $args = [];
     $log = '';
 
@@ -1225,7 +1268,7 @@ class Notifications
         'args' => $args,
       ],
       // 'result' => $checkResult,
-      'tkn_boldText_checkResult' => $translatedResultMap[$checkResult],
+      'tkn_boldText_checkResult' => self::getCheckResultTranslation($checkResult),
       'i18n' => ['tkn_boldText_checkResult']
     ]);
   }

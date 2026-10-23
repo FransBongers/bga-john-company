@@ -12,6 +12,7 @@ use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Ships;
 use Bga\Games\JohnCompany\Managers\Players;
@@ -106,7 +107,7 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
     $playerShipCount = 0;
     $totalPayment = 0;
     // Place player ships
-    foreach($playerShips as $shipId => $seaZone) {
+    foreach ($playerShips as $shipId => $seaZone) {
       $ship = Utils::array_find($stateArgs['playerShips'], function ($playerShip) use ($shipId) {
         return $shipId === $playerShip->getId();
       });
@@ -118,28 +119,39 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
       $totalPayment += 3;
     }
 
+    $totalCompanyAndExtraShips = 0;
+
     // Place company ships
-    foreach($companyShips as $shipId => $seaZone) {
+    foreach ($companyShips as $shipId => $seaZone) {
       if ($playerShipCount < count($stateArgs['playerShips'])) {
         throw new \Bga\GameFramework\VisibleSystemException("ERROR_015");
       }
       $this->placeOtherShip($stateArgs, $player, $shipId, $seaZone, COMPANY_SHIP);
       $totalPayment += 5;
+      $totalCompanyAndExtraShips++;
     }
 
     // Place extra ships
-    foreach($extraShips as $shipId => $seaZone) {
+    foreach ($extraShips as $shipId => $seaZone) {
       $this->placeOtherShip($stateArgs, $player, $shipId, $seaZone, EXTRA_SHIP);
       $totalPayment += 2;
+      $totalCompanyAndExtraShips++;
     }
     $office->incTreasury(-$totalPayment);
     $treasury = $office->getTreasury();
-    
+
     if ($treasury < 0 || $treasury > 2) {
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_016");
     }
 
     Notifications::payFromTreasury($player, $office, $totalPayment, $treasury);
+
+    $ownerFamily = LondonSeasonCards::getOwnerFamily(SHIPBUILDERS_ID);
+
+    if ($ownerFamily !== null && $totalCompanyAndExtraShips > 0) {
+      $ownerFamily->gainCash($totalCompanyAndExtraShips, LondonSeasonCards::get(SHIPBUILDERS_ID)->getTitle());
+    }
+
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
 
     $this->resolveAction([], true);
@@ -153,7 +165,8 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  private function placeOtherShip($stateArgs, $player, $shipId, $seaZone, $type) {
+  private function placeOtherShip($stateArgs, $player, $shipId, $seaZone, $type)
+  {
     $ship = Utils::array_find($stateArgs['otherShips'], function ($otherShip) use ($shipId) {
       return $shipId === $otherShip->getId();
     });

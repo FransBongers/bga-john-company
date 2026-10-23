@@ -202,6 +202,7 @@ interface JohnCompanyPlayerData extends Player {
   familyId: string;
   setupCards: JoCoSetupCard[];
   londonSeasonCards: JocoLondonSeasonCardBase[];
+  playedBlackmailCards: JocoLondonSeasonCardBase[];
 }
 
 /**

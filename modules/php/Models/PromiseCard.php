@@ -2,6 +2,7 @@
 
 namespace Bga\Games\JohnCompany\Models;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Managers\Families;
 
 class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
@@ -27,6 +28,12 @@ class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   protected $staticAttributes = [
     'title'
   ];
+
+  public function removeFromGame(Player $player)
+  {
+    $this->setLocation(REMOVED_FROM_GAME);
+    Notifications::removeCardFromGame($player, $this);
+  }
 
   /**
    * Acting player for any effect of this promise card
@@ -54,7 +61,7 @@ class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
    * Apply the effect of this promise card
    * Only for effects with specific timing windows
    */
-  public function applyEffect($ctx, Player $player, array $timingData)
+  public function applyEffect(object $ctx, Player $player, array $timingData)
   {
     throw new \Bga\GameFramework\VisibleSystemException("PROMISE_CARD_003");
   }

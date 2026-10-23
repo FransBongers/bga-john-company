@@ -9,7 +9,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\Families;
-
+use Bga\Games\JohnCompany\Models\Family;
 
 class LondonSeasonCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 {
@@ -133,4 +133,25 @@ class LondonSeasonCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Piece
     $newCards = self::pickForLocation(3, DECK, LONDON_SEASON_DISPLAY)->toArray();
     self::shuffle(LONDON_SEASON_DISPLAY);
     Notifications::newLondonSeasonDisplay($newCards);
-  }}
+  }
+
+  // .##.....##.########.####.##.......####.########.##....##
+  // .##.....##....##.....##..##........##.....##.....##..##.
+  // .##.....##....##.....##..##........##.....##......####..
+  // .##.....##....##.....##..##........##.....##.......##...
+  // .##.....##....##.....##..##........##.....##.......##...
+  // .##.....##....##.....##..##........##.....##.......##...
+  // ..#######.....##....####.########.####....##.......##...
+
+
+  public static function getOwnerFamily(string $cardId): Family | null
+  {
+    $card = self::get($cardId);
+
+    $location = $card->getLocation();
+    if (!Utils::startsWith($location, 'londonSeasonCards_')) {
+      return null;
+    }
+    return Families::get(explode('_', $location)[1]);
+  }
+}

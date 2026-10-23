@@ -76,7 +76,7 @@ class ScandalInIndia extends \Bga\Games\JohnCompany\Models\BlackmailCard
    * Apply the effect of this london season card
    * Only for effects with specific timing windows
    */
-  public function applyEffect($ctx, Player $player, array $timingData)
+  public function applyEffect(object $ctx, Player $player, array $timingData)
   {
     // Notifications::message(clienttranslate('${player_name} plays ${tkn_londonSeasonCard}'), [
     //   'player' => $player,

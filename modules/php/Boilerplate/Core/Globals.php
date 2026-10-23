@@ -44,7 +44,8 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     'regionsLostThisTurn' => 'int',
     'transactionsEnabled' => 'bool',
     'endOfGame' => 'bool',
-    'removedGovernors' => 'obj'
+    'removedGovernors' => 'obj',
+    'latestCheck' => 'obj'
   ];
 
   protected static $table = 'global_variables';
@@ -188,6 +189,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     self::setRegionsLostThisTurn(0);
     self::setEndOfGame(false);
     self::setTransactionsEnabled(false);
+    self::setLatestCheck([]);
     // self::setScenarioId(THE_1710_SCENARIO);
     
   }

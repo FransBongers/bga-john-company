@@ -51,6 +51,7 @@ import {
   getEnterpriseCard,
   getLawCard,
   getLondonSeasonCard,
+  getPromiseCard,
 } from '../../utility';
 import { Interaction } from '../interaction';
 import { createHtmlElement, debug, parentHasChildWithId } from '../utility';
@@ -111,6 +112,7 @@ import {
   NotifUpdateCompanyDebt,
   NotifFlipShip,
   NotifDrawEventTile,
+  NotifRemoveCardFromGame,
 } from './types';
 import { tplArmyPiece } from '../../india/army/templates';
 import { Parliament } from '../../parliament';
@@ -118,6 +120,7 @@ import { DECK, DISCARD, USED } from '../constants';
 import { LawCardsManager } from '../../cards/law-cards';
 import { ControlTokensManager } from '../../token-managers/control-tokens';
 import { EventTiles } from '../../india/event-tiles';
+import { PromiseCardsManager } from '../../cards/promise-cards';
 
 //  .##.....##....###....##....##....###.....######...########.########.
 //  .###...###...##.##...###...##...##.##...##....##..##.......##.....##
@@ -864,6 +867,12 @@ export class NotificationManager {
         );
       }),
     );
+  }
+
+  async notif_removeCardFromGame(notif: NotifRemoveCardFromGame) {
+    const { playerId, card } = notif;
+
+    await PromiseCardsManager.getInstance().removeCard(getPromiseCard(card));
   }
 
   async notif_returnFamilyMemberToSupply(

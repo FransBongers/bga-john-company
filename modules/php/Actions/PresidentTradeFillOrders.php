@@ -163,7 +163,9 @@ class PresidentTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidency
     foreach ($income as $familyId => $amount) {
       if ($familyId === COMPANY) {
         $balance = Company::incBalance($amount);
-        Notifications::increaseCompanyBalance(null, $balance, $amount);
+        Notifications::updateCompanyBalance($balance, clienttranslate('President\'s bonus: Company Balance increases by ${tkn_boldText_amount}'), [
+          'tkn_boldText_amount' => '£' . $amount,
+        ]);
       } else {
         $families[$familyId]->gainCash($amount);
       }
