@@ -53,6 +53,7 @@ const DECK = 'deck';
 const DISCARD = 'discard';
 const EXTRA_SETUP = 'extraSetup';
 const REMOVED_FROM_GAME = 'removedFromGame';
+const DRAWN_COMPANY_FAILURE_CARD = 'drawnCompanyFailureCard';
 
 const LONDON_SEASON_DISPLAY = 'LondonSeasonDisplay';
 const PASSED_LAWS = 'PassedLaws';
@@ -1077,3 +1078,10 @@ const ZAMINDAR_TAXES_ID = 'LawCard_41';
  * Foreign Invasion Event Tile ID
  */
 const FOREIGN_INVASION_EVENT_TILE_ID = 'EventTile_18';
+
+
+/**
+ * Company Failure Card IDs: specific card IDs that affect the game and
+ */
+const COURT_OF_DIRECTORS_BLAMELESS_ID = 'CompanyFailureCard_01';
+const INDUSTRYS_GREED_CONDEMNED_ID = 'CompanyFailureCard_03';

@@ -4297,6 +4297,9 @@ class NotificationManager {
             await this.game.animationManager.slideAndAttach(document.getElementById(cardId), document.getElementById('joco_chosen_cards'));
         }));
     }
+    async notif_drawCompanyFailureCard(notif) {
+        const { card } = notif;
+    }
     async notif_drawEventTile(notif) {
         const { eventTile, topOfDeck } = notif;
         await EventTiles.getInstance().drawEventTile(eventTile, topOfDeck);

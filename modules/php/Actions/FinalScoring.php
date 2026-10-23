@@ -10,6 +10,7 @@ use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\JoCoUtils;
+use Bga\Games\JohnCompany\Managers\CompanyFailureCards;
 use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Models\Player;
 
@@ -119,6 +120,9 @@ class FinalScoring extends \Bga\Games\JohnCompany\Models\AtomicAction
     $enterprises = Enterprises::getAll()->toArray();
     $players = Players::getAll();
 
+    $courtOfDirectorsBlameless = CompanyFailureCards::get(COURT_OF_DIRECTORS_BLAMELESS_ID)->hasBeenDrawn();
+    $industrysGreedCondemned = CompanyFailureCards::get(INDUSTRYS_GREED_CONDEMNED_ID)->hasBeenDrawn();
+
     $primeMinisterOrder = Players::getTurnOrder(Parliament::getPrimeMinisterPlayerId());
     foreach ($primeMinisterOrder as $playerId) {
       $player = $players[$playerId];
@@ -130,7 +134,7 @@ class FinalScoring extends \Bga\Games\JohnCompany\Models\AtomicAction
 
       if ($shares > 0) {
         $points = $shares * $shareValue;
-        if ($companySurvived) {
+        if ($companySurvived || $courtOfDirectorsBlameless) {
           Notifications::message(clienttranslate('${player_name} gains ${tkn_boldText_value} victory point(s) for their ${tkn_boldText_shares} ${tkn_icon}'), [
             'player' => $player,
             'tkn_boldText_value' => $points,
@@ -151,7 +155,7 @@ class FinalScoring extends \Bga\Games\JohnCompany\Models\AtomicAction
         }
       }
 
-      if ($workshops > 0 && $companySurvived) {
+      if ($workshops > 0 && !$companySurvived && !$industrysGreedCondemned) {
         Notifications::message(clienttranslate('${player_name} gains ${tkn_boldText_value} victory point(s) for their ${tkn_boldText_workshops} ${tkn_icon}'), [
           'player' => $player,
           'tkn_boldText_value' => $workshops,

@@ -5,6 +5,7 @@ namespace Bga\Games\JohnCompany;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Managers\CompanyFailureCards;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\AICards;
 use Bga\Games\JohnCompany\Managers\ArmyPieces;
@@ -38,6 +39,8 @@ trait DebugTrait
 
   function debug_test()
   {
+    CompanyFailureCards::get('CompanyFailureCard_02')->resolveEffect();
+
     // Company::setShareValue(1);
     // EventTiles::insertOnTop('EventTile_18', DISCARD);
 
@@ -45,7 +48,7 @@ trait DebugTrait
 
     // $topOfDeck = EventTiles::getTopOf(DECK);
     // $regionName = $topOfDeck !== null ? Regions::get($topOfDeck->getRegionId())->getName() : null;
-    Notifications::log('debug', Company::get());
+    // Notifications::log('debug', Company::get());
 
 
     // AtomicActions::get(EVENTS_IN_INDIA_STORMS)->rollForShips(ONE_ALL);

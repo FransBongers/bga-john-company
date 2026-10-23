@@ -240,6 +240,21 @@ interface JocoFamilyMember {
 }
 
 /**
+ * Company Failure Cards
+ */
+export interface JocoCompanyFailureCardBase extends GamePiece {
+
+}
+ 
+export interface JocoCompanyFailureCardStatic {
+  id: string;
+  title: string;
+  text: Array<string | Log>;
+}
+
+export type JocoCompanyFailureCard = JocoCompanyFailureCardBase & JocoCompanyFailureCardStatic;
+
+/**
  * Control Tokens
  */
 export interface JocoControlToken extends GamePiece {

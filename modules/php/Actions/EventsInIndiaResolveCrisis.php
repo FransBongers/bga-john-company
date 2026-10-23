@@ -280,7 +280,7 @@ class EventsInIndiaResolveCrisis extends \Bga\Games\JohnCompany\Models\AtomicAct
     }
 
     $newTowerLevel = floor($attackStrength / 2);
-    $towerLevelChange = $newTowerLevel - $defender->getTowerLevel();
+    $towerLevelChange = $newTowerLevel - $defender->getStrength();
 
 
     $defender->incTowerLevel($towerLevelChange);

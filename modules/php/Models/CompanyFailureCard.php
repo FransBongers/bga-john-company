@@ -24,5 +24,12 @@ class CompanyFailureCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_M
     'text'
   ];
 
+  public function resolveEffect() {
+    
+  }
 
+  public function hasBeenDrawn(): bool
+  {
+    return $this->location === DRAWN_COMPANY_FAILURE_CARD;
+  }
 }

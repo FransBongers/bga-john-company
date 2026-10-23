@@ -113,6 +113,7 @@ import {
   NotifFlipShip,
   NotifDrawEventTile,
   NotifRemoveCardFromGame,
+  NotifDrawCompanyFailureCard,
 } from './types';
 import { tplArmyPiece } from '../../india/army/templates';
 import { Parliament } from '../../parliament';
@@ -460,6 +461,12 @@ export class NotificationManager {
         );
       }),
     );
+  }
+
+  async notif_drawCompanyFailureCard(notif: NotifDrawCompanyFailureCard) {
+    const { card } = notif;
+
+    // await CompanyFailureCardsManager.getInstance().drawCard(getCompanyFailureCard(card));
   }
 
   async notif_drawEventTile(notif: NotifDrawEventTile) {

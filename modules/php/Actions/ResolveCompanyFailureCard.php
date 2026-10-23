@@ -3,6 +3,7 @@
 namespace Bga\Games\JohnCompany\Actions;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Managers\CompanyFailureCards;
 
 class ResolveCompanyFailureCard extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
@@ -29,7 +30,11 @@ class ResolveCompanyFailureCard extends \Bga\Games\JohnCompany\Models\AtomicActi
 
   public function stResolveCompanyFailureCard()
   {
-    Notifications::message('TODO: Resolve Company Failure Card');
+    Notifications::nextPhase(clienttranslate('Consequence of Failure'));
+    $card = CompanyFailureCards::getTopOf(DECK);
+    $card->setLocation(DRAWN_COMPANY_FAILURE_CARD);
+
+    Notifications::drawCompanyFailureCard($card);
 
     $this->resolveAction(['automatic' => true]);
   }

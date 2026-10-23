@@ -15,6 +15,7 @@ use Bga\Games\JohnCompany\Managers\Prizes;
 use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Managers\Ships;
 use Bga\Games\JohnCompany\Models\ArmyPiece;
+use Bga\Games\JohnCompany\Models\CompanyFailureCard;
 use Bga\Games\JohnCompany\Models\Enterprise;
 use Bga\Games\JohnCompany\Models\EventTile;
 use Bga\Games\JohnCompany\Models\Family;
@@ -580,6 +581,14 @@ class Notifications
       'tkn_londonSeasonCard' => $card->getId(),
       'player' => $player,
     ], $args));
+  }
+
+  public static function drawCompanyFailureCard(CompanyFailureCard $card)
+  {
+    self::notifyAll('drawCompanyFailureCard', '${tkn_companyFailureCard} is drawn', [
+      'card' => $card->jsonSerialize(),
+      'tkn_companyFailureCard' => $card->getId(),
+    ]);
   }
 
   public static function newLondonSeasonDisplay(array $cards)

@@ -7,6 +7,7 @@ import { Climate } from '../../crown/climate';
 import {
   GamedatasAlias,
   JocoArmyPieceBase,
+  JocoCompanyFailureCardBase,
   JocoControlToken,
   JocoEnterpriseCardBase,
   JocoEventTileBase,
@@ -75,6 +76,10 @@ export interface NotifElephantMarch {
 
 export interface NotifDraftCardPrivateArgs extends NotifWithPlayerArgs {
   cardIds: string[];
+}
+
+export interface NotifDrawCompanyFailureCard {
+  card: JocoCompanyFailureCardBase;
 }
 
 export interface NotifDrawEventTile {
