@@ -46,10 +46,10 @@ const COLOR_FAMILY_MAP = {
     [PURPLE]: SYKES,
     [GREEN]: WALSH,
 };
-const BALANCE$1 = 'balance';
+const BALANCE = 'balance';
 const DEBT = 'debt';
 const STANDING = 'standing';
-const COMPANY$1 = 'company';
+const COMPANY = 'company';
 const SHARE_VALUE = 'shareValue';
 const SETUP = 'setup';
 const LONDON_SEASON = 'londonSeason';
@@ -87,14 +87,11 @@ const WORKSHOPS_COUNTER = 'workshops';
 const SHIPYARDS_COUNTER = 'shipyards';
 const LUXURIES_COUNTER = 'luxuries';
 const PROMISE_CUBES_COUNTER = 'promiseCubes';
+const POWER_COUNTER$1 = 'power';
 const COUNTERS = [
     FAMILY_MEMBERS_COUNTER,
     CASH_COUNTER,
-    SHIPS_COUNTER,
-    SHARES_COUNTER,
-    WORKSHOPS_COUNTER,
-    SHIPYARDS_COUNTER,
-    LUXURIES_COUNTER,
+    POWER_COUNTER$1,
 ];
 const CLOSED = 'closed';
 const FILLED = 'filled';
@@ -629,30 +626,20 @@ const tplPlayerCounters = ({ crownInGame, familyId, playerId, }) => {
     const elt = createFamilyMember(familyId, Math.floor(Math.random() * 18));
     elt.id = `joco-familyMembers-${playerId}`;
     return `
-<div id="joco-counters-${playerId}-row-1" class="joco-counters-row">
-  ${elt.outerHTML}
-  <div id="joco-cash-${playerId}" class="log-token joco_pound"></div>
-  <div id="joco-ships-${playerId}" class="joco-ship" data-type="playerOwnedShip"></div>
-  ${crownInGame
-        ? `<div id="joco-promiseCubes-${playerId}" class="joco-cube" data-type="promise"></div>`
-        : '<div></div>'}
-  <div class="joco-counter-container"><span id="joco-familyMembers-counter-${playerId}" class="joco-counter"></span></div>
-  <div class="joco-counter-container"><span id="joco-cash-counter-${playerId}" class="joco-counter"></span></div>
-  <div class="joco-counter-container"><span id="joco-ships-counter-${playerId}" class="joco-counter"></span></div>
-  ${crownInGame
-        ? `<div class="joco-counter-container"><span id="joco-promiseCubes-counter-${playerId}" class="joco-counter"></span></div>`
-        : '<div class="joco-counter-container"></div>'}
-</div>
-<div class="joco-counters-row">
-  <div id="joco-shares-${playerId}" class="joco-icon" data-icon="Share"></div>
-  <div id="joco-workshops-${playerId}" class="joco-icon" data-icon="Workshop"></div>
-  <div id="joco-shipyards-${playerId}" class="joco-icon" data-icon="Shipyard"></div>
-  <div id="joco-luxuries-${playerId}" class="joco-icon" data-icon="Luxury"></div>
-  <div class="joco-counter-container"><span id="joco-shares-counter-${playerId}" class="joco-counter"></span></div>
-  <div class="joco-counter-container"><span id="joco-workshops-counter-${playerId}" class="joco-counter"></span></div>
-  <div class="joco-counter-container"><span id="joco-shipyards-counter-${playerId}" class="joco-counter"></span></div>
-  <div class="joco-counter-container"><span id="joco-luxuries-counter-${playerId}" class="joco-counter"></span></div>
-</div>
+  <div class="joco-player-panel-item">
+    <div class="joco-treasury-counter-container">
+      <span class="fb-font-baskerville fb-font-16 fb-font-bold">£</span><span id="joco-cash-counter-${playerId}" class="fb-font-baskerville fb-font-bold fb-font-24"></span>
+    </div>
+  </div>
+  <div class="joco-player-panel-item">
+    ${elt.outerHTML}
+    <span id="joco-familyMembers-counter-${playerId}" class="joco-counter fb-font-baskerville fb-font-bold fb-font-20"></span>
+  </div>
+  <div class="joco-player-panel-item">
+    <div class="joco-icon" data-icon="Power">
+      <span id="joco-power-counter-${playerId}" class="fb-font-baskerville fb-font-bold fb-font-20">10</span>
+    </div>
+  </div>
 `;
 };
 
@@ -705,14 +692,9 @@ class JocoPlayer {
     updatePlayerPanel(gamedatas) {
         this.counters[CASH_COUNTER].setValue(gamedatas.families[this.familyId].treasury);
         this.counters[FAMILY_MEMBERS_COUNTER].setValue(Object.values(gamedatas.familyMembers).filter(({ familyId, location }) => familyId === this.familyId && location.startsWith('supply')).length);
-        this.counters[SHARES_COUNTER].setValue(Object.values(gamedatas.familyMembers).filter(({ familyId, location }) => familyId === this.familyId &&
-            (location === COURT_OF_DIRECTORS || location === CHAIRMAN)).length);
-        this.counters[SHIPYARDS_COUNTER].setValue(Object.values(gamedatas.enterprises).filter(({ type, location }) => type === SHIPYARD && location === this.familyId).length);
-        this.counters[LUXURIES_COUNTER].setValue(Object.values(gamedatas.enterprises).filter(({ type, location }) => type === LUXURY && location === this.familyId).length);
-        this.counters[WORKSHOPS_COUNTER].setValue(Object.values(gamedatas.enterprises).filter(({ type, location }) => type === WORKSHOP && location === this.familyId).length);
-        if (this.game.gameOptions.crownEnabled) {
-            this.counters[PROMISE_CUBES_COUNTER].setValue(gamedatas.families[this.familyId].crownPromiseCubes);
-        }
+        const power = gamedatas.power[this.playerId].total ??
+            gamedatas.power[this.playerId].totalVisible;
+        this.counters[POWER_COUNTER$1].setValue(power);
     }
     getColor() {
         return this.playerColor;
@@ -2246,7 +2228,7 @@ class Company {
     }
     incCounters(changes) {
         Object.entries(changes).forEach(([counterId, change]) => {
-            if (counterId === BALANCE$1) {
+            if (counterId === BALANCE) {
                 this.balance.incValue(change);
             }
         });
@@ -4469,9 +4451,6 @@ class NotificationManager {
             document.getElementById(location)?.appendChild(elt);
             player.counters[FAMILY_MEMBERS_COUNTER].incValue(-1);
             await this.game.animationManager.slideIn(elt, fromElement);
-            if (location === COURT_OF_DIRECTORS || location === CHAIRMAN) {
-                player.counters[SHARES_COUNTER].incValue(1);
-            }
         });
         await Promise.all(promises);
     }
@@ -4488,7 +4467,7 @@ class NotificationManager {
         if (FAMILIES.includes(target)) {
             Families.getInstance().getFamily(target).incCounters(counterChanges);
         }
-        else if (target === COMPANY$1) {
+        else if (target === COMPANY) {
             Company.getInstance().incCounters(counterChanges);
         }
     }
@@ -4715,7 +4694,6 @@ class NotificationManager {
         const player = this.getPlayer(playerId);
         await this.moveFamilyMember(familyMember);
         Company.getInstance().updateCompanyDebt(debt);
-        player.counters[SHARES_COUNTER].incValue(1);
     }
     async notif_nextPhase(notif) {
         const { phase } = notif;
@@ -4777,12 +4755,10 @@ class NotificationManager {
         const { playerId, enterprise, type, amount, ship, familyId } = notif;
         await this.pay(playerId, amount);
         const player = this.getPlayer(playerId);
-        player.counters[this.getEnterpriseCounter(type)].incValue(1);
         await Families.getInstance()
             .getFamily(familyId)
             .addEnterprise(getEnterpriseCard(enterprise));
         if (type === SHIPYARD && ship) {
-            player.counters[SHIPS_COUNTER].incValue(1);
             EnterpriseCardsManager.getInstance().shipStocks[ship.id].addCard(ship);
         }
     }
@@ -4929,6 +4905,19 @@ class NotificationManager {
         const { familyId, familyAction } = notif;
         const family = Families.getInstance().getFamily(familyId);
         family.opportunityMarker.update(familyAction);
+    }
+    async notif_updatePower(notif) {
+        const { power, _private } = notif;
+        const currentPlayerId = this.game.getPlayerId();
+        Object.entries(power).forEach(([playerId, powerData]) => {
+            const playerTotal = currentPlayerId === Number(playerId) && _private.total
+                ? _private.total
+                : powerData.totalVisible;
+            const counter = this.getPlayer(Number(playerId)).counters[POWER_COUNTER$1];
+            if (counter.getValue() !== playerTotal) {
+                counter.toValue(playerTotal);
+            }
+        });
     }
     async notif_updateRegion(notif) {
         const { region: data, controlToken } = notif;

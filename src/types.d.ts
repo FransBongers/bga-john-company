@@ -158,6 +158,18 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   };
   passedLaws: JocoLawCardBase[];
   phase: string;
+  power: Record<
+    number,
+    {
+      cards: number;
+      cardsHidden?: number;
+      powerTrack: number;
+      primeMinisterAndLaws: number;
+      total?: number;
+      totalVisible: number;
+      trophies: number;
+    }
+  >;
   powerMarkers: Record<string, string>;
   promiseCards: Record<string, JocoPromiseCardBase>;
   regions: Record<string, JocoRegionBase>;

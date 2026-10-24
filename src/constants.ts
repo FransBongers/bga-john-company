@@ -135,15 +135,17 @@ export const WORKSHOPS_COUNTER = 'workshops';
 export const SHIPYARDS_COUNTER = 'shipyards';
 export const LUXURIES_COUNTER = 'luxuries';
 export const PROMISE_CUBES_COUNTER = 'promiseCubes';
+export const POWER_COUNTER = 'power';
 
 export const COUNTERS = [
   FAMILY_MEMBERS_COUNTER,
   CASH_COUNTER,
-  SHIPS_COUNTER,
-  SHARES_COUNTER,
-  WORKSHOPS_COUNTER,
-  SHIPYARDS_COUNTER,
-  LUXURIES_COUNTER,
+  POWER_COUNTER,
+  // SHIPS_COUNTER,
+  // SHARES_COUNTER,
+  // WORKSHOPS_COUNTER,
+  // SHIPYARDS_COUNTER,
+  // LUXURIES_COUNTER,
 ];
 
 /**

@@ -298,6 +298,18 @@ export interface NotifUpdateLondonSeasonOrder {
   cashSpent: Record<number, number>;
 }
 
+export interface NotifUpdatePower {
+  power: Record<
+    number,
+    {
+      totalVisible: number;
+    }
+  >;
+  _private?: {
+    total: number;
+  };
+}
+
 export interface NotifUpdateOpportunityMarker {
   familyId: string;
   familyAction: string | null;

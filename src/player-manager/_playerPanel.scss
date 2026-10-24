@@ -1,46 +1,61 @@
 .player-board-game-specific-content {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  // justify-content: space-evenly;
   gap: 8px;
+  padding-top: 8px;
+
+  .joco-player-panel-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    // background-color: yellow;/
+    // gap: 8px;
+  }
 
   .joco-family-member {
-    --tokenScale: 1.043;
-    position: relative;
-    margin: 0px auto;
+    margin-right: 4px;
+    //   position: relative;
+    //   margin: 0px auto;
   }
 
-  .joco-cube {
-    --iconScale: 1;
-    position: relative;
-    margin: 0px auto;
+  .joco-icon[data-icon="Power"] {
+    height: 46px;
   }
 
-  .joco_pound {
-    --tokenScale: 0.96;
-  }
+  // .joco-cube {
+  //   --iconScale: 1;
+  //   position: relative;
+  //   margin: 0px auto;
+  // }
 
-  .joco-ship {
-    --tokenScale: 1.2;
-    position: relative;
-    margin-top: auto;
-  }
+  // .joco_pound {
+  //   --tokenScale: 0.96;
+  // }
 
-  .joco-counter-container {
-    display: flex;
-  }
+  // .joco-ship {
+  //   --tokenScale: 1.2;
+  //   position: relative;
+  //   margin-top: auto;
+  // }
 
-  .joco-counter {
-    // position: relative;
-    margin: 0px auto;
-    font-weight: 700;
-    font-size: larger;
-  }
+  // .joco-counter-container {
+  //   display: flex;
+  // }
+
+  // .joco-counter {
+  //   // position: relative;
+  //   margin: 0px auto;
+  //   font-weight: 700;
+  //   font-size: larger;
+  // }
 }
 
-.joco-counters-row {
-  width: 100%;
-  display: grid;
-  grid-template: 48px auto / repeat(4, 48px);
-  justify-content: space-evenly;
-  gap: 4px;
-}
+// .joco-counters-row {
+//   width: 100%;
+//   display: grid;
+//   grid-template: repeat(3, 1fr);
+//   // justify-content: space-evenly;
+//   gap: 4px;
+// }

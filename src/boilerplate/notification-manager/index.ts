@@ -36,6 +36,7 @@ import {
   PARLIAMENT_MEETS_VOTING_STARTS,
   COMPANY,
   SEA_ZONES,
+  POWER_COUNTER,
 } from '../../constants';
 import { CrownClimate } from '../../crown/climate';
 import { India } from '../../india';
@@ -115,6 +116,7 @@ import {
   NotifDrawEventTile,
   NotifRemoveCardFromGame,
   NotifDrawCompanyFailureCard,
+  NotifUpdatePower,
 } from './types';
 import { tplArmyPiece } from '../../india/army/templates';
 import { Parliament } from '../../parliament';
@@ -369,9 +371,9 @@ export class NotificationManager {
       //     fromRect,
       //   }),
       // );
-      if (location === COURT_OF_DIRECTORS || location === CHAIRMAN) {
-        player.counters[SHARES_COUNTER].incValue(1);
-      }
+      // if (location === COURT_OF_DIRECTORS || location === CHAIRMAN) {
+      //   player.counters[SHARES_COUNTER].incValue(1);
+      // }
     });
     await Promise.all(promises);
   }
@@ -576,7 +578,7 @@ export class NotificationManager {
 
   async notif_gainEnterprise(notif: NotifGainEnterprise) {
     const { playerId, type, enterprise, ship } = notif;
-    
+
     const player = this.getPlayer(playerId);
     const familyId = player.familyId;
     // player.counters[this.getEnterpriseCounter(type)].incValue(1);
@@ -778,7 +780,7 @@ export class NotificationManager {
     await this.moveFamilyMember(familyMember);
 
     Company.getInstance().updateCompanyDebt(debt);
-    player.counters[SHARES_COUNTER].incValue(1);
+    // player.counters[SHARES_COUNTER].incValue(1);
   }
 
   async notif_nextPhase(notif: NotifNextPhase) {
@@ -855,12 +857,12 @@ export class NotificationManager {
     await this.pay(playerId, amount);
 
     const player = this.getPlayer(playerId);
-    player.counters[this.getEnterpriseCounter(type)].incValue(1);
+    // player.counters[this.getEnterpriseCounter(type)].incValue(1);
     await Families.getInstance()
       .getFamily(familyId)
       .addEnterprise(getEnterpriseCard(enterprise));
     if (type === SHIPYARD && ship) {
-      player.counters[SHIPS_COUNTER].incValue(1);
+      // player.counters[SHIPS_COUNTER].incValue(1);
       EnterpriseCardsManager.getInstance().shipStocks[ship.id].addCard(ship);
     }
   }
@@ -1092,6 +1094,21 @@ export class NotificationManager {
     const { familyId, familyAction } = notif;
     const family = Families.getInstance().getFamily(familyId);
     family.opportunityMarker.update(familyAction);
+  }
+
+  async notif_updatePower(notif: NotifUpdatePower) {
+    const { power, _private } = notif;
+    const currentPlayerId = this.game.getPlayerId();
+    Object.entries(power).forEach(([playerId, powerData]) => {
+      const playerTotal =
+        currentPlayerId === Number(playerId) && _private.total
+          ? _private.total
+          : powerData.totalVisible;
+      const counter = this.getPlayer(Number(playerId)).counters[POWER_COUNTER];
+      if (counter.getValue() !== playerTotal) {
+        counter.toValue(playerTotal);
+      }
+    });
   }
 
   async notif_updateRegion(notif: NotifUpdateRegion) {

@@ -25,33 +25,31 @@ export const tplPlayerCounters = ({
   elt.id = `joco-familyMembers-${playerId}`;
 
   return `
-<div id="joco-counters-${playerId}-row-1" class="joco-counters-row">
-  ${elt.outerHTML}
-  <div id="joco-cash-${playerId}" class="log-token joco_pound"></div>
-  <div id="joco-ships-${playerId}" class="joco-ship" data-type="playerOwnedShip"></div>
-  ${
-    crownInGame
-      ? `<div id="joco-promiseCubes-${playerId}" class="joco-cube" data-type="promise"></div>`
-      : '<div></div>'
-  }
-  <div class="joco-counter-container"><span id="joco-familyMembers-counter-${playerId}" class="joco-counter"></span></div>
-  <div class="joco-counter-container"><span id="joco-cash-counter-${playerId}" class="joco-counter"></span></div>
-  <div class="joco-counter-container"><span id="joco-ships-counter-${playerId}" class="joco-counter"></span></div>
-  ${
-    crownInGame
-      ? `<div class="joco-counter-container"><span id="joco-promiseCubes-counter-${playerId}" class="joco-counter"></span></div>`
-      : '<div class="joco-counter-container"></div>'
-  }
-</div>
-<div class="joco-counters-row">
-  <div id="joco-shares-${playerId}" class="joco-icon" data-icon="Share"></div>
-  <div id="joco-workshops-${playerId}" class="joco-icon" data-icon="Workshop"></div>
-  <div id="joco-shipyards-${playerId}" class="joco-icon" data-icon="Shipyard"></div>
-  <div id="joco-luxuries-${playerId}" class="joco-icon" data-icon="Luxury"></div>
-  <div class="joco-counter-container"><span id="joco-shares-counter-${playerId}" class="joco-counter"></span></div>
-  <div class="joco-counter-container"><span id="joco-workshops-counter-${playerId}" class="joco-counter"></span></div>
-  <div class="joco-counter-container"><span id="joco-shipyards-counter-${playerId}" class="joco-counter"></span></div>
-  <div class="joco-counter-container"><span id="joco-luxuries-counter-${playerId}" class="joco-counter"></span></div>
-</div>
+  <div class="joco-player-panel-item">
+    <div class="joco-treasury-counter-container">
+      <span class="fb-font-baskerville fb-font-16 fb-font-bold">£</span><span id="joco-cash-counter-${playerId}" class="fb-font-baskerville fb-font-bold fb-font-24"></span>
+    </div>
+  </div>
+  <div class="joco-player-panel-item">
+    ${elt.outerHTML}
+    <span id="joco-familyMembers-counter-${playerId}" class="joco-counter fb-font-baskerville fb-font-bold fb-font-20"></span>
+  </div>
+  <div class="joco-player-panel-item">
+    <div class="joco-icon" data-icon="Power">
+      <span id="joco-power-counter-${playerId}" class="fb-font-baskerville fb-font-bold fb-font-20">10</span>
+    </div>
+  </div>
 `;
 };
+
+  // ${
+  //   crownInGame
+  //     ? `<div id="joco-promiseCubes-${playerId}" class="joco-cube" data-type="promise"></div>`
+  //     : '<div></div>'
+  // }
+
+  //   ${
+  //   crownInGame
+  //     ? `<div class="joco-counter-container"><span id="joco-promiseCubes-counter-${playerId}" class="joco-counter"></span></div>`
+  //     : '<div class="joco-counter-container"></div>'
+  // }

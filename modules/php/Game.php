@@ -400,7 +400,8 @@ class Game extends \Bga\GameFramework\Table
                 'regions' => Regions::getStaticUiData(),
                 'setupCards' => SetupCards::getStaticUiData(),
                 'promiseCards' => PromiseCards::getStaticUiData(),
-            ]
+            ],
+            'power' => JoCoUtils::getPowerUiData($playerId),
         ];
 
         if (Globals::getCrownInGame()) {

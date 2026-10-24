@@ -7,6 +7,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Models\FamilyMember;
 use Bga\Games\JohnCompany\Models\Player;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\PowerMarkers;
@@ -115,8 +116,17 @@ class JoCoUtils
 
       $primeMinisterAndLaws = $family->getPassedLawTokens() + ($playerId === $primeMinisterPlayerId ? 2 : 0);
 
+      $playedBlackmailCards = LondonSeasonCards::getInLocation(Locations::playedBlackmailCards($player->getFamilyId()))->toArray();
       $cardsPower = 0;
+      $cardsHidden = 0;
       foreach ($cards as $card) {
+        if ($card->getType() === BLACKMAIL) {
+          $cardsHidden += $card->getPower() ?? 0;
+        } else {
+          $cardsPower += $card->getPower() ?? 0;
+        }
+      }
+      foreach ($playedBlackmailCards as $card) {
         $cardsPower += $card->getPower() ?? 0;
       }
 
@@ -126,11 +136,25 @@ class JoCoUtils
         'powerTrack' => $powerTrack,
         'primeMinisterAndLaws' => $primeMinisterAndLaws,
         'cards' => $cardsPower,
+        'cardsHidden' => $cardsHidden,
         'trophies' => $trophies,
-        'total' => $powerTrack + $primeMinisterAndLaws + $cardsPower + $trophies,
+        'totalVisible' => $powerTrack + $primeMinisterAndLaws + $cardsPower + $trophies,
+        'total' => $powerTrack + $primeMinisterAndLaws + $cardsPower + $cardsHidden + $trophies,
       ];
     }
 
     return $result;
+  }
+
+  public static function getPowerUiData(int $playerId)
+  {
+    $data = self::calculateTotalPower();
+    foreach ($data as $id => $powerData) {
+      if ($id !== $playerId) {
+        unset($data[$id]['total']);
+        unset($data[$id]['cardsHidden']);
+      }
+    }
+    return $data;
   }
 }

@@ -14,15 +14,7 @@ import {
   PROMISE_CUBES_COUNTER,
   CASH_COUNTER,
   FAMILY_MEMBERS_COUNTER,
-  SHARES_COUNTER,
-  COURT_OF_DIRECTORS,
-  CHAIRMAN,
-  SHIPYARDS_COUNTER,
-  SHIPYARD,
-  LUXURIES_COUNTER,
-  LUXURY,
-  WORKSHOPS_COUNTER,
-  WORKSHOP,
+  POWER_COUNTER,
 } from '../constants';
 import { GameAlias, JohnCompanyPlayerData, GamedatasAlias } from '../types';
 import { tplPlayerCounters } from './templates';
@@ -135,33 +127,40 @@ export class JocoPlayer {
           familyId === this.familyId && location.startsWith('supply'),
       ).length,
     );
-    this.counters[SHARES_COUNTER].setValue(
-      Object.values(gamedatas.familyMembers).filter(
-        ({ familyId, location }) =>
-          familyId === this.familyId &&
-          (location === COURT_OF_DIRECTORS || location === CHAIRMAN),
-      ).length,
-    );
-    this.counters[SHIPYARDS_COUNTER].setValue(
-      Object.values(gamedatas.enterprises).filter(
-        ({ type, location }) => type === SHIPYARD && location === this.familyId,
-      ).length,
-    );
-    this.counters[LUXURIES_COUNTER].setValue(
-      Object.values(gamedatas.enterprises).filter(
-        ({ type, location }) => type === LUXURY && location === this.familyId,
-      ).length,
-    );
-    this.counters[WORKSHOPS_COUNTER].setValue(
-      Object.values(gamedatas.enterprises).filter(
-        ({ type, location }) => type === WORKSHOP && location === this.familyId,
-      ).length,
-    );
-    if (this.game.gameOptions.crownEnabled) {
-      this.counters[PROMISE_CUBES_COUNTER].setValue(
-        gamedatas.families[this.familyId].crownPromiseCubes,
-      );
-    }
+
+    const power =
+      gamedatas.power[this.playerId].total ??
+      gamedatas.power[this.playerId].totalVisible;
+
+    this.counters[POWER_COUNTER].setValue(power);
+
+    // this.counters[SHARES_COUNTER].setValue(
+    //   Object.values(gamedatas.familyMembers).filter(
+    //     ({ familyId, location }) =>
+    //       familyId === this.familyId &&
+    //       (location === COURT_OF_DIRECTORS || location === CHAIRMAN),
+    //   ).length,
+    // );
+    // this.counters[SHIPYARDS_COUNTER].setValue(
+    //   Object.values(gamedatas.enterprises).filter(
+    //     ({ type, location }) => type === SHIPYARD && location === this.familyId,
+    //   ).length,
+    // );
+    // this.counters[LUXURIES_COUNTER].setValue(
+    //   Object.values(gamedatas.enterprises).filter(
+    //     ({ type, location }) => type === LUXURY && location === this.familyId,
+    //   ).length,
+    // );
+    // this.counters[WORKSHOPS_COUNTER].setValue(
+    //   Object.values(gamedatas.enterprises).filter(
+    //     ({ type, location }) => type === WORKSHOP && location === this.familyId,
+    //   ).length,
+    // );
+    // if (this.game.gameOptions.crownEnabled) {
+    //   this.counters[PROMISE_CUBES_COUNTER].setValue(
+    //     gamedatas.families[this.familyId].crownPromiseCubes,
+    //   );
+    // }
   }
 
   // ..######...########.########.########.########.########...######.

@@ -591,9 +591,9 @@ class Notifications
     ]);
   }
 
-  public static function newLondonSeasonDisplay(array $cards)
+  public static function newLondonSeasonDisplay(array $cards, bool $isSetup = false)
   {
-    self::notifyAll('newLondonSeasonDisplay', clienttranslate('The London Season display is refilled'), [
+    self::notifyAll('newLondonSeasonDisplay', $isSetup ? clienttranslate('The London Season display is filled') : clienttranslate('The London Season display is refilled'), [
       'cards' => array_map(fn($card) => $card->jsonSerialize(), $cards),
       'tkn_boldText_nbr' => count($cards),
     ]);
@@ -1576,11 +1576,10 @@ class Notifications
 
   public static function seekShare(Player $player, FamilyMember $familyMember, int $amount)
   {
-    self::notifyAll('seekShare', clienttranslate('${player_name} pays ${amount} ${tkn_pound} to seek a ${tkn_icon}'), [
+    self::notifyAll('seekShare', clienttranslate('${player_name} pays ${tkn_boldText_amount} to seek a share ${tkn_icon}'), [
       'player' => $player,
       'tkn_icon' => SHARE,
-      'tkn_pound' => self::tknPound(),
-      'amount' => $amount,
+      'tkn_boldText_amount' => '£' . $amount,
       'familyMember' => $familyMember,
     ]);
   }
@@ -1693,6 +1692,30 @@ class Notifications
     self::updateRegion($region, $text, [
       'tkn_boldText_region' => $region->getName(),
       'i18n' => ['tkn_boldText_region']
+    ]);
+  }
+
+  public static function updatePower()
+  {
+    $private = [];
+    $data = JocoUtils::calculateTotalPower();
+    foreach ($data as $playerId => $powerData) {
+      $private[$playerId] = new NotificationMessage(
+        '',
+        [
+          'total' => $data[$playerId]['total'],
+          'cardsHidden' => $data[$playerId]['cardsHidden']
+
+        ]
+      );
+
+      unset($data[$playerId]['total']);
+      unset($data[$playerId]['cardsHidden']);
+    }
+
+    Game::get()->notify->all('updatePower', '', [
+      'power' => $data,
+      '_private' => $private
     ]);
   }
 

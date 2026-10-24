@@ -4,6 +4,7 @@ namespace Bga\Games\JohnCompany\Cards\Blackmail;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
+use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Managers\Offices;
@@ -104,6 +105,10 @@ class ScandalInIndia extends \Bga\Games\JohnCompany\Models\BlackmailCard
 
   protected function resolveImmediateEffect(Player $player, object $ctx)
   {
+    if(Globals::getPhase() === SETUP) {
+      return;
+    }
+
     $ctx->insertAsBrother(new LeafNode([
       'action' => TIMING_WINDOW_CHECK,
       'args' => [

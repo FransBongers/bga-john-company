@@ -9,6 +9,7 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Parliament;
@@ -136,12 +137,16 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
           $ship->place($player, $item['value']);
         }
       }
-      // Random Blackmail card
+      for ($i = 0; $i < $randomBlackMailCards; $i++) {
+        $card = LondonSeasonCards::getTopOf(Locations::londonSeasonPool(BLACKMAIL));
+        $card->take($player, $this->ctx);
+      }
 
     }
 
     Notifications::setupDone();
     Globals::setTransactionsEnabled(true);
+    $this->setupLondonSeasonDisplay();
 
     $this->resolveAction(['automatic' => true]);
   }
@@ -155,5 +160,9 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-
+  private function setupLondonSeasonDisplay()
+  {
+    LondonSeasonCards::setupLondonSeasonDisplay();
+    Notifications::newLondonSeasonDisplay(LondonSeasonCards::getInLocationOrdered(Locations::londonSeasonDisplay())->toArray(), true);
+  }
 }

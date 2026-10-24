@@ -1974,8 +1974,8 @@ span[style*="color:#addb90"] {
 }
 
 .joco-icon {
-  background-image: url("img/icons.png");
-  background-size: 500% 400%;
+  background-image: url("img/icons.webp");
+  background-size: 700% 300%;
   height: 24px;
   aspect-ratio: 1/1;
 }
@@ -2012,82 +2012,82 @@ span[style*="color:#addb90"] {
 }
 
 .joco-icon[data-icon=Workshop] {
-  background-position-x: 25%;
+  background-position-x: 16.6666666667%;
   background-position-y: 0%;
 }
 
 .joco-icon[data-icon=Shipyard] {
-  background-position-x: 50%;
+  background-position-x: 33.3333333333%;
   background-position-y: 0%;
 }
 
 .joco-icon[data-icon=OfficerInTraining] {
-  background-position-x: 75%;
+  background-position-x: 50%;
   background-position-y: 0%;
 }
 
 .joco-icon[data-icon=Share] {
-  background-position-x: 100%;
+  background-position-x: 66.6666666667%;
   background-position-y: 0%;
 }
 
 .joco-icon[data-icon=Writer] {
-  background-position-x: 0%;
-  background-position-y: 33.3333333333%;
+  background-position-x: 83.3333333333%;
+  background-position-y: 0%;
 }
 
 .joco-icon[data-icon=Regiment] {
-  background-position-x: 25%;
-  background-position-y: 33.3333333333%;
+  background-position-x: 100%;
+  background-position-y: 0%;
 }
 
 .joco-icon[data-icon=Vote] {
-  background-position-x: 50%;
-  background-position-y: 33.3333333333%;
+  background-position-x: 0%;
+  background-position-y: 50%;
 }
 
 .joco-icon[data-icon=Window] {
-  background-position-x: 75%;
-  background-position-y: 33.3333333333%;
+  background-position-x: 16.6666666667%;
+  background-position-y: 50%;
 }
 
 .joco-icon[data-icon=Power1] {
-  background-position-x: 100%;
-  background-position-y: 33.3333333333%;
+  background-position-x: 33.3333333333%;
+  background-position-y: 50%;
 }
 
 .joco-icon[data-icon=Power2] {
-  background-position-x: 0%;
-  background-position-y: 66.6666666667%;
+  background-position-x: 50%;
+  background-position-y: 50%;
 }
 
 .joco-icon[data-icon=Power3] {
-  background-position-x: 25%;
-  background-position-y: 66.6666666667%;
+  background-position-x: 66.6666666667%;
+  background-position-y: 50%;
 }
 
 .joco-icon[data-icon=Discount1] {
-  background-position-x: 50%;
-  background-position-y: 66.6666666667%;
+  background-position-x: 83.3333333333%;
+  background-position-y: 50%;
 }
 
 .joco-icon[data-icon=Discount2] {
-  background-position-x: 75%;
-  background-position-y: 66.6666666667%;
+  background-position-x: 100%;
+  background-position-y: 50%;
 }
 
 .joco-icon[data-icon=VictoryPoints2] {
-  background-position-x: 100%;
-  background-position-y: 66.6666666667%;
-}
-
-.joco-icon[data-icon=VictoryPoints3] {
   background-position-x: 0%;
   background-position-y: 100%;
 }
 
+.joco-icon[data-icon=VictoryPoints3] {
+  background-position-x: 16.6666666667%;
+  background-position-y: 100%;
+}
+
 .joco-icon[data-icon=VoteClear] {
-  background-position-x: 25%;
+  background-position-x: 33.3333333333%;
   background-position-y: 100%;
 }
 
@@ -2097,11 +2097,16 @@ span[style*="color:#addb90"] {
 }
 
 .joco-icon[data-icon=CircleDark] {
-  background-position-x: 75%;
+  background-position-x: 66.6666666667%;
   background-position-y: 100%;
 }
 
 .joco-icon[data-icon=VictoryPoints] {
+  background-position-x: 83.3333333333%;
+  background-position-y: 100%;
+}
+
+.joco-icon[data-icon=Power] {
   background-position-x: 100%;
   background-position-y: 100%;
 }
@@ -2796,43 +2801,22 @@ span[style*="color:#addb90"] {
 }
 
 .player-board-game-specific-content {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
+  padding-top: 8px;
+}
+.player-board-game-specific-content .joco-player-panel-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 .player-board-game-specific-content .joco-family-member {
-  --tokenScale: 1.043;
-  position: relative;
-  margin: 0px auto;
+  margin-right: 4px;
 }
-.player-board-game-specific-content .joco-cube {
-  --iconScale: 1;
-  position: relative;
-  margin: 0px auto;
-}
-.player-board-game-specific-content .joco_pound {
-  --tokenScale: 0.96;
-}
-.player-board-game-specific-content .joco-ship {
-  --tokenScale: 1.2;
-  position: relative;
-  margin-top: auto;
-}
-.player-board-game-specific-content .joco-counter-container {
-  display: flex;
-}
-.player-board-game-specific-content .joco-counter {
-  margin: 0px auto;
-  font-weight: 700;
-  font-size: larger;
-}
-
-.joco-counters-row {
-  width: 100%;
-  display: grid;
-  grid-template: 48px auto/repeat(4, 48px);
-  justify-content: space-evenly;
-  gap: 4px;
+.player-board-game-specific-content .joco-icon[data-icon=Power] {
+  height: 46px;
 }
 
 /*

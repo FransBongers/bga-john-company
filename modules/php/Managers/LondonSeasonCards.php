@@ -107,7 +107,6 @@ class LondonSeasonCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Piece
   {
     self::setupLoadBlackmailCards();
     self::setupLoadPrestigeCards();
-    self::setupLondonSeasonDisplay();
   }
 
   // TODO: do after draft
