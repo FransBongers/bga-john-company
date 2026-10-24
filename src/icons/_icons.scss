@@ -7,6 +7,7 @@
   height: 24px;
   aspect-ratio: 1 / 1;
 
+  &[data-icon='CircleLight'],
   &[data-icon='VictoryPoints'],
   &[data-icon='Power'] {
     display: flex;
@@ -44,7 +45,6 @@
   background-size: 200% 100%;
   height: 48px;
   aspect-ratio: 41 / 48;
-  
 
   &[data-type='promise'] {
     background-position-x: 0%;
@@ -226,5 +226,38 @@ $rows: 2;
     width: 40px;
     height: 8px;
     font-size: 6px;
+  }
+}
+
+.joco-office-icon {
+  background-image: url('img/office_icons.webp');
+  background-size: 600% 100%;
+  height: 24px;
+  aspect-ratio: 200 / 202;
+}
+
+$officeIcons: (
+  1: 'Chairman',
+  2: 'Commander',
+  3: 'Crown',
+  4: 'MilitaryAffairs',
+  5: 'ManagerOfShipping',
+  6: 'DirectorOfTrade',
+);
+
+$cols: 6;
+$rows: 1;
+
+@for $i from 1 through 6 {
+  $index: $i - 1;
+  $col: $index % $cols;
+  $row: math.floor(math.div($index, $cols));
+
+  .joco-office-icon[data-office-icon='#{map.get($officeIcons,$i)}'] {
+    // For a sprite sheet with $cols columns and $rows rows where
+    // background-size is ($cols * 100%) by ($rows * 100%),
+    // positions run from 0% to 100% inclusive so the step is 100% / ($cols - 1) or ($rows - 1).
+    background-position-x: math.div($col * 100%, $cols - 1);
+    // background-position-y: math.div($row * 100%, $rows - 1);
   }
 }

@@ -35,6 +35,7 @@ import {
   PARLIAMENT_MEETS_START,
   PARLIAMENT_MEETS_VOTING_STARTS,
   COMPANY,
+  SEA_ZONES,
 } from '../../constants';
 import { CrownClimate } from '../../crown/climate';
 import { India } from '../../india';
@@ -43,7 +44,6 @@ import { PhaseTracker } from '../../phase-tracker';
 import { Families } from '../../families';
 import { PlayerManager } from '../../player-manager';
 import { JocoPlayer } from '../../player-manager/player';
-import { SetupArea } from '../../setup-area';
 import { createFamilyMember } from '../../templates';
 import { ShipsManager } from '../../token-managers/ship-tokens';
 import { GameAlias, JocoFamilyMember, OtherShipType } from '../../types';
@@ -52,6 +52,7 @@ import {
   getLawCard,
   getLondonSeasonCard,
   getPromiseCard,
+  getSetupCard,
 } from '../../utility';
 import { Interaction } from '../interaction';
 import { createHtmlElement, debug, parentHasChildWithId } from '../utility';
@@ -59,8 +60,8 @@ import {
   NotifAllocateBalanceToOffice,
   NotifChangeOrderStatus,
   NotifCompanyOperationChairman,
-  NotifDraftCardPrivateArgs,
-  NotifDraftNewCardsPrivateArgs,
+  NotifDraftCardArgs,
+  NotifDraftNewCardsArgs,
   NotifElephantMarch,
   NotifEnlistFamilyMember,
   NotifFillOrder,
@@ -122,6 +123,8 @@ import { LawCardsManager } from '../../cards/law-cards';
 import { ControlTokensManager } from '../../token-managers/control-tokens';
 import { EventTiles } from '../../india/event-tiles';
 import { PromiseCardsManager } from '../../cards/promise-cards';
+import { Draft } from '../../draft';
+import { Bar } from '../../bar';
 
 //  .##.....##....###....##....##....###.....######...########.########.
 //  .###...###...##.##...###...##...##.##...##....##..##.......##.....##
@@ -449,18 +452,21 @@ export class NotificationManager {
   }
 
   // TODO: make private notif
-  async notif_draftCardPrivate(notif: NotifDraftCardPrivateArgs) {
-    const { cardIds } = notif;
+  async notif_draftCard(notif: NotifDraftCardArgs) {
+    const { _private } = notif;
 
-    await Promise.all(
-      cardIds.map(async (cardId, index) => {
-        // await Interaction.use().wait(index * 100);
-        await this.game.animationManager.slideAndAttach(
-          document.getElementById(cardId),
-          document.getElementById('joco_chosen_cards'),
-        );
-      }),
-    );
+    if (!_private) return;
+
+    await Draft.getInstance().chosen.addCards(_private.cards.map(getSetupCard));
+    // await Promise.all(
+    //   cardIds.map(async (cardId, index) => {
+    //     // await Interaction.use().wait(index * 100);
+    //     await this.game.animationManager.slideAndAttach(
+    //       document.getElementById(cardId),
+    //       document.getElementById('joco_chosen_cards'),
+    //     );
+    //   }),
+    // );
   }
 
   async notif_drawCompanyFailureCard(notif: NotifDrawCompanyFailureCard) {
@@ -524,10 +530,15 @@ export class NotificationManager {
     Parliament.getInstance().getPrimeMinisterDial().updatePlayerName(playerId);
   }
 
-  async notif_draftNewCardsPrivate(notif: NotifDraftNewCardsPrivateArgs) {
-    const { cardIds, lastCard } = notif;
+  async notif_draftNewCards(notif: NotifDraftNewCardsArgs) {
+    const { _private } = notif;
 
-    SetupArea.getInstance().newCards(cardIds, lastCard);
+    const { cards } = _private ?? {};
+
+    if (!cards?.length) return;
+
+    Draft.getInstance().newCards(cards);
+    // SetupArea.getInstance().newCards(cardIds, lastCard);
   }
 
   async notif_elephantMarch(notif: NotifElephantMarch) {
@@ -564,12 +575,16 @@ export class NotificationManager {
   }
 
   async notif_gainEnterprise(notif: NotifGainEnterprise) {
-    const { playerId, type } = notif;
-
+    const { playerId, type, enterprise, ship } = notif;
+    
     const player = this.getPlayer(playerId);
-    player.counters[this.getEnterpriseCounter(type)].incValue(1);
-    if (type === SHIPYARD) {
-      player.counters[SHIPS_COUNTER].incValue(1);
+    const familyId = player.familyId;
+    // player.counters[this.getEnterpriseCounter(type)].incValue(1);
+    await Families.getInstance()
+      .getFamily(familyId)
+      .addEnterprise(getEnterpriseCard(enterprise));
+    if (type === SHIPYARD && ship && !SEA_ZONES.includes(ship.location)) {
+      EnterpriseCardsManager.getInstance().shipStocks[ship.id].addCard(ship);
     }
   }
 
@@ -1004,7 +1019,11 @@ export class NotificationManager {
   }
 
   async notif_setupDone(notif: unknown) {
-    SetupArea.getInstance().hide();
+    const bar = Bar.getInstance();
+    if (bar.getActiveTabId() === 'joco-draft') {
+      bar.goTo('joco-india');
+    }
+    bar.removeTabWithId('joco-draft');
   }
 
   async notif_setupFamilyMembers(notif: NotifSetupFamilyMembers) {

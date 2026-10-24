@@ -145,6 +145,12 @@ span[style*='color:#c0c0c0'] {
       height: 24px !important;
     }
   }
+
+  &.joco-setup-card {
+    display: inline-block;
+    zoom: 0.75;
+    border: 1px solid black;
+  }
 }
 
 #customActions {

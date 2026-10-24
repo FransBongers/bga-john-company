@@ -1,5 +1,6 @@
 /* ------- DEFAULT LOG TOKENS ------- */
 
+import { tplSetupCardContent } from '../cards/setup-cards/templates';
 import {
   EXTRA_SHIP,
   FATIGUED,
@@ -63,8 +64,13 @@ export const tplLogTokenTrophy = () => tplTrophyIcon('log-token');
 // export const tplLogTokenIcon = (type: string) =>
 //   `<div class="log-token joco-icon" data-icon="${type}"></div>`;
 
-export const tplLogTokenSetupCard = (id: string) =>
-  `<div class="log-token joco-setup-card" data-card-id="${id}"></div>`;
+export const tplLogTokenSetupCard = (id: string) => {
+  const staticData = StaticData.get().setupCard(id);
+  const scenario = staticData.scenarioSetup;
+  const itemCount = staticData.items.length;
+  return `<div class="log-token joco-setup-card" data-card-id="${id}" data-background="Setup${scenario}_${itemCount}" data-item-count="${itemCount}">
+    ${tplSetupCardContent(staticData)}
+  </div>`};
 
 export const tplLogTokenPlayerName = ({
   name,

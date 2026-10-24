@@ -579,6 +579,17 @@ namespace Bga\GameFramework {
         public function get(int $optionId): ?int {
             return 0;
         }
+
+        /**
+         * Set the value of a table option.
+         *
+         * Call this only for Random options, to update the table with the selected value.
+         *
+         * @param int $optionId the option id as in the gameoptions.json file
+         * @param int $value the value to set the option to
+         */
+        public function set(int $optionId, int $value): void {
+        }
     
         /**
          * Indicates if the table is Turn-based.
@@ -673,6 +684,12 @@ namespace Bga\GameFramework {
 
     abstract class PlayerStats {
         /**
+         * Set whether player arguments use player numbers (true) or player IDs (false).
+         */
+        public function setUseNo(bool $useNo): void {
+        }
+
+        /**
          * Create a statistic entry with a default value.
          *
          * @param string|array $nameOrNames Statistic identifier(s) defined in `stats.json`.
@@ -687,9 +704,9 @@ namespace Bga\GameFramework {
          *
          * @param string $name Statistic identifier defined in `stats.json`.
          * @param int|float|bool $value Value to persist.
-         * @param int $player_id Target player id.
+         * @param int $playerIdOrNo Target player ID, or player number when useNo is true.
          */
-        public function set(string $name, int|float|bool $value, int $player_id): void {
+        public function set(string $name, int|float|bool $value, int $playerIdOrNo): void {
         }
 
         /**
@@ -706,10 +723,10 @@ namespace Bga\GameFramework {
          *
          * @param string $name Statistic identifier defined in `stats.json`.
          * @param int|float $delta Signed difference to apply.
-         * @param int $player_id Target player id.
+         * @param int $playerIdOrNo Target player ID, or player number when useNo is true.
          * @param bool $updateTableStat if there is a table stat of the same name to update at the same time (for example, for a turnNumber counter that would store the turns played by each player but also the total of turns for the table)
          */
-        public function inc(string $name, int|float $delta, int $player_id, bool $updateTableStat = false): void {
+        public function inc(string $name, int|float $delta, int $playerIdOrNo, bool $updateTableStat = false): void {
         }
 
         /**
@@ -725,20 +742,20 @@ namespace Bga\GameFramework {
          * Fetch a player statistic.
          *
          * @param string $name Statistic identifier defined in `stats.json`.
-         * @param int $player_id Target player id.
+         * @param int $playerIdOrNo Target player ID, or player number when useNo is true.
          *
          * @return int|float|bool The statistic value.
          */
-        public function get(string $name, int $player_id): int|float|bool {
+        public function get(string $name, int $playerIdOrNo): int|float|bool {
             return 0;
         }
 
         /**
-         * Retrieve the statistic for all players, keyed by player id.
+         * Retrieve the statistic for all players, keyed by player ID or player number.
          *
          * @param string $name Statistic identifier defined in `stats.json`.
          *
-         * @return array<int, int|float|bool> Player id keyed map of the statistic values.
+         * @return array<int, int|float|bool> Statistic values keyed by player number when useNo is true, or player ID otherwise.
          */
         public function getAll(string $name): array {
             return [];

@@ -47,6 +47,8 @@ import {
   JocoPromiseCard,
   JocoPromiseCardBase,
   JocoRegionBase,
+  JocoSetupCard,
+  JocoSetupCardBase,
   JocoShipBase,
 } from './types';
 
@@ -219,6 +221,15 @@ export const getOffice = (office: JocoOfficeBase): JocoOffice => {
 export const getPromiseCard = (card: JocoPromiseCardBase): JocoPromiseCard => {
   const staticData = StaticData.get();
   const cardStatic = staticData.promiseCard(card.id);
+  return {
+    ...card,
+    ...cardStatic,
+  };
+};
+
+export const getSetupCard = (card: JocoSetupCardBase): JocoSetupCard => {
+  const staticData = StaticData.get();
+  const cardStatic = staticData.setupCard(card.id);
   return {
     ...card,
     ...cardStatic,

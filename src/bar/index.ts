@@ -1,3 +1,4 @@
+import { SETUP } from '../constants';
 import { GameAlias, GamedatasAlias } from '../types';
 import { tplTabButton } from './templates';
 
@@ -65,6 +66,16 @@ export class Bar {
   // Setup functions
   setup(gamedatas: GamedatasAlias) {
     const bar = document.getElementById('joco-bar');
+    if (
+      !this.game.bga.players.isCurrentPlayerSpectator() &&
+      gamedatas.phase === SETUP
+    ) {
+      this.config.push({
+        id: 'joco-draft',
+        text: _('Draft'),
+      });
+    }
+
     this.config.forEach(({ id, text }, index) => {
       bar.insertAdjacentHTML('beforeend', tplTabButton(text, index));
       this.ui.barButtons.push(
@@ -117,5 +128,30 @@ export class Bar {
     this.updateActive();
     this.active = index;
     this.updateActive();
+  }
+
+  public getActiveTabId() {
+    return this.config[this.active].id;
+  }
+
+  public removeTabWithId(id: string) {
+    const index = this.config.findIndex((tab) => tab.id === id);
+    if (index === -1) {
+      return;
+    }
+    this.config.splice(index, 1);
+    const tab = this.ui.tabs[id];
+    if (tab) {
+      tab.remove();
+      delete this.ui.tabs[id];
+    }
+    const button = this.ui.barButtons[index];
+    if (button) {
+      button.remove();
+      this.ui.barButtons.splice(index, 1);
+    }
+    if (this.active >= this.config.length) {
+      this.active = this.config.length - 1;
+    }
   }
 }

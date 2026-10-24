@@ -1,99 +1,3 @@
-const tplTabButton = (text, index) => `
-<div id="joco-bar-item-${index}" class="joco-bar-item">${text}</div>
-`;
-
-class Bar {
-    constructor(game) {
-        this.ui = {
-            tabs: {},
-            barButtons: [],
-        };
-        this.active = 0;
-        this.config = [
-            {
-                id: 'joco-families',
-                text: _('Families'),
-            },
-            {
-                id: 'joco-india',
-                text: _('India'),
-            },
-            {
-                id: 'joco-parliament',
-                text: _('Parliament'),
-            },
-            {
-                id: 'joco-london',
-                text: _('London'),
-            },
-            {
-                id: 'joco-company',
-                text: _('Company'),
-            },
-            {
-                id: 'joco-negotiation',
-                text: _('Negotiation'),
-            },
-        ];
-        this.game = game;
-        this.setup(game.gamedatas);
-    }
-    static create(game) {
-        Bar.instance = new Bar(game);
-    }
-    static getInstance() {
-        return Bar.instance;
-    }
-    setup(gamedatas) {
-        const bar = document.getElementById('joco-bar');
-        this.config.forEach(({ id, text }, index) => {
-            bar.insertAdjacentHTML('beforeend', tplTabButton(text, index));
-            this.ui.barButtons.push(document.getElementById(`joco-bar-item-${index}`));
-            this.ui.tabs[id] = document.getElementById(id);
-            if (index === this.active) {
-                this.ui.barButtons[index].classList.add('joco-bar-item-active');
-                this.ui.tabs[id].classList.add('joco-tab-visible');
-            }
-            else {
-                this.ui.tabs[id].classList.add('joco-tab-hidden');
-            }
-        });
-        bar.addEventListener('click', (event) => this.onIconClick(event));
-    }
-    onIconClick(event) {
-        const target = event.target;
-        if (!target.classList.contains('joco-bar-item')) {
-            return;
-        }
-        const index = Number(target.id.split('-')[3]);
-        this.updateActive();
-        this.active = index;
-        this.updateActive();
-    }
-    updateActive() {
-        const tab = this.ui.tabs[this.config[this.active].id];
-        tab.classList.toggle('joco-tab-visible');
-        tab.classList.toggle('joco-tab-hidden');
-        this.ui.barButtons[this.active].classList.toggle('joco-bar-item-active');
-    }
-    goTo(id) {
-        const index = this.config.findIndex((tab) => tab.id === id);
-        this.updateActive();
-        this.active = index;
-        this.updateActive();
-    }
-}
-
-const DISABLED = 'disabled';
-const SELECTABLE = 'selectable';
-const SELECTED = 'selected';
-const USED = 'used';
-const HIDDEN = 'hidden';
-const PRIMARY = 'primary';
-const SECONDARY = 'secondary';
-const DECK = 'deck';
-const DISCARD = 'discard';
-
 const BOARD_SCALE = 'boardScale';
 const PLUS = 'plus';
 const MINUS = 'minus';
@@ -438,6 +342,132 @@ const PROMISE_CARD = 'promiseCard';
 const TIMING_WINDOW = 'timingWindow';
 const TIMING_DATA = 'timingData';
 const AFTER_OFFICE_FINISHED_ACTING = 'afterOfficeFinishedActing';
+
+const tplTabButton = (text, index) => `
+<div id="joco-bar-item-${index}" class="joco-bar-item">${text}</div>
+`;
+
+class Bar {
+    constructor(game) {
+        this.ui = {
+            tabs: {},
+            barButtons: [],
+        };
+        this.active = 0;
+        this.config = [
+            {
+                id: 'joco-families',
+                text: _('Families'),
+            },
+            {
+                id: 'joco-india',
+                text: _('India'),
+            },
+            {
+                id: 'joco-parliament',
+                text: _('Parliament'),
+            },
+            {
+                id: 'joco-london',
+                text: _('London'),
+            },
+            {
+                id: 'joco-company',
+                text: _('Company'),
+            },
+            {
+                id: 'joco-negotiation',
+                text: _('Negotiation'),
+            },
+        ];
+        this.game = game;
+        this.setup(game.gamedatas);
+    }
+    static create(game) {
+        Bar.instance = new Bar(game);
+    }
+    static getInstance() {
+        return Bar.instance;
+    }
+    setup(gamedatas) {
+        const bar = document.getElementById('joco-bar');
+        if (!this.game.bga.players.isCurrentPlayerSpectator() &&
+            gamedatas.phase === SETUP) {
+            this.config.push({
+                id: 'joco-draft',
+                text: _('Draft'),
+            });
+        }
+        this.config.forEach(({ id, text }, index) => {
+            bar.insertAdjacentHTML('beforeend', tplTabButton(text, index));
+            this.ui.barButtons.push(document.getElementById(`joco-bar-item-${index}`));
+            this.ui.tabs[id] = document.getElementById(id);
+            if (index === this.active) {
+                this.ui.barButtons[index].classList.add('joco-bar-item-active');
+                this.ui.tabs[id].classList.add('joco-tab-visible');
+            }
+            else {
+                this.ui.tabs[id].classList.add('joco-tab-hidden');
+            }
+        });
+        bar.addEventListener('click', (event) => this.onIconClick(event));
+    }
+    onIconClick(event) {
+        const target = event.target;
+        if (!target.classList.contains('joco-bar-item')) {
+            return;
+        }
+        const index = Number(target.id.split('-')[3]);
+        this.updateActive();
+        this.active = index;
+        this.updateActive();
+    }
+    updateActive() {
+        const tab = this.ui.tabs[this.config[this.active].id];
+        tab.classList.toggle('joco-tab-visible');
+        tab.classList.toggle('joco-tab-hidden');
+        this.ui.barButtons[this.active].classList.toggle('joco-bar-item-active');
+    }
+    goTo(id) {
+        const index = this.config.findIndex((tab) => tab.id === id);
+        this.updateActive();
+        this.active = index;
+        this.updateActive();
+    }
+    getActiveTabId() {
+        return this.config[this.active].id;
+    }
+    removeTabWithId(id) {
+        const index = this.config.findIndex((tab) => tab.id === id);
+        if (index === -1) {
+            return;
+        }
+        this.config.splice(index, 1);
+        const tab = this.ui.tabs[id];
+        if (tab) {
+            tab.remove();
+            delete this.ui.tabs[id];
+        }
+        const button = this.ui.barButtons[index];
+        if (button) {
+            button.remove();
+            this.ui.barButtons.splice(index, 1);
+        }
+        if (this.active >= this.config.length) {
+            this.active = this.config.length - 1;
+        }
+    }
+}
+
+const DISABLED = 'disabled';
+const SELECTABLE = 'selectable';
+const SELECTED = 'selected';
+const USED = 'used';
+const HIDDEN = 'hidden';
+const PRIMARY = 'primary';
+const SECONDARY = 'secondary';
+const DECK = 'deck';
+const DISCARD = 'discard';
 
 const tplCube = (type, extraClasses = '') => `
   <div class="joco-cube ${extraClasses}" data-type="${type}"></div>
@@ -1202,6 +1232,7 @@ const tplPassedLawTokenIcon = (extraClasses = '') => `<div class="joco-passed-la
       <span class="fb-font-baskerville fb-font-italic">${_('Passed Law').toLocaleUpperCase()}</span>
     </div>
   </div>`;
+const tplMoneyIcon = (value, extraClasses = '') => `<div class="joco-icon ${extraClasses ?? ''}" data-icon="CircleLight">${tplAmount(value, true)}</div>`;
 
 const tplCardText = (text, { containerClass = 'fb-card-text', textClass = 'fb-font-12 fb-font-baskerville', }) => {
     return `
@@ -1326,6 +1357,133 @@ class LondonSeasonCardsManager extends BgaCards$1.Manager {
     }
 }
 
+const tplSetupCardItemContainer = (htmnl, index) => `
+  <div class="setup-card-item" data-index="${index}">${htmnl}</div>
+`;
+const tplIconWithText = (iconHtml, text, extraClass = '') => `
+  <div class="joco-icon-with-text ${extraClass}">
+    ${iconHtml}
+    <div class="joco-text fb-font-baskerville fb-font-italic fb-font-12 bga-autofit">${text}</div>
+  </div>`;
+const tplOfficeIcon = (officeId) => {
+    switch (officeId) {
+        case CHAIRMAN:
+        case DIRECTOR_OF_TRADE:
+        case MANAGER_OF_SHIPPING:
+        case MILITARY_AFFAIRS:
+            return `<div class="joco-office-icon" data-office-icon="${officeId}"></div>`;
+        case PRESIDENT_OF_BOMBAY:
+        case PRESIDENT_OF_MADRAS:
+        case PRESIDENT_OF_BENGAL:
+            return `<div class="joco-office-icon" data-office-icon="Crown"></div><div class="joco-region-icon" data-region='${officeId.replace('PresidentOf', '')}'></div>`;
+        default:
+            return '';
+    }
+};
+const tplOfficeIconWrapper = (officeId) => `
+  <div class="joco-office-icon-wrapper">
+    <div class="joco-office-icon-wrapper-inner">
+      ${tplOfficeIcon(officeId)}
+    </div>
+  </div>`;
+const tplWriter = (presidency) => {
+    switch (presidency) {
+        case BENGAL_PRESIDENCY:
+            return tplIconWithText(tplIcon(WRITER), _('in Bengal Presidency'));
+        case BOMBAY_PRESIDENCY:
+            return tplIconWithText(tplIcon(WRITER), _('in Bombay Presidency'));
+        case MADRAS_PRESIDENCY:
+            return tplIconWithText(tplIcon(WRITER), _('in Madras Presidency'));
+    }
+};
+const tplCommander = (presidency) => {
+    switch (presidency) {
+        case BENGAL_PRESIDENCY:
+            return tplIconWithText('<div class="joco-office-icon" data-office-icon="Commander"></div>', _('Commander of the Army of Bengal'));
+        case BOMBAY_PRESIDENCY:
+            return tplIconWithText('<div class="joco-office-icon" data-office-icon="Commander"></div>', _('Commander of the Army of Bombay'));
+        case MADRAS_PRESIDENCY:
+            return tplIconWithText('<div class="joco-office-icon" data-office-icon="Commander"></div>', _('Commander of the Army of Madras'));
+    }
+};
+const tplShipyard = (seaZone) => {
+    switch (seaZone) {
+        case WEST_INDIAN:
+            return tplIconWithText(tplIcon(SHIPYARD), _('& place ship in West Indian'));
+        case SOUTH_INDIAN:
+            return tplIconWithText(tplIcon(SHIPYARD), _('& place ship in South Indian'));
+        case EAST_INDIAN:
+            return tplIconWithText(tplIcon(SHIPYARD), _('& place ship in East Indian'));
+        case UNFITTED:
+            return tplIcon(SHIPYARD);
+    }
+};
+const tplOffice = (officeId) => {
+    switch (officeId) {
+        case CHAIRMAN:
+            return tplIconWithText(tplOfficeIconWrapper(CHAIRMAN), _('Chairman').toLocaleUpperCase(), 'joco-setup-office');
+        case DIRECTOR_OF_TRADE:
+            return tplIconWithText(tplOfficeIconWrapper(DIRECTOR_OF_TRADE), _('Director of Trade').toLocaleUpperCase(), 'joco-setup-office');
+        case MANAGER_OF_SHIPPING:
+            return tplIconWithText(tplOfficeIconWrapper(MANAGER_OF_SHIPPING), _('Manager of Shipping').toLocaleUpperCase(), 'joco-setup-office');
+        case MILITARY_AFFAIRS:
+            return tplIconWithText(tplOfficeIconWrapper(MILITARY_AFFAIRS), _('Military Affairs').toLocaleUpperCase(), 'joco-setup-office');
+        case PRESIDENT_OF_BOMBAY:
+            return tplIconWithText(tplOfficeIconWrapper(PRESIDENT_OF_BOMBAY), _('President of Bombay').toLocaleUpperCase(), 'joco-setup-office');
+        case PRESIDENT_OF_MADRAS:
+            return tplIconWithText(tplOfficeIconWrapper(PRESIDENT_OF_MADRAS), _('President of Madras').toLocaleUpperCase(), 'joco-setup-office');
+        case PRESIDENT_OF_BENGAL:
+            return tplIconWithText(tplOfficeIconWrapper(PRESIDENT_OF_BENGAL), _('President of Bengal').toLocaleUpperCase(), 'joco-setup-office');
+        case GOVERNOR_GENERAL:
+            return tplIconWithText(tplOfficeIconWrapper(GOVERNOR_GENERAL), _('Governor General').toLocaleUpperCase(), 'joco-setup-office');
+    }
+};
+const tplSetupCardItem = ({ type, value }) => {
+    switch (type) {
+        case CASH:
+            return tplMoneyIcon(value);
+        case OFFICE:
+            return tplOffice(value);
+        case COMMANDER:
+            return tplCommander(value);
+        case COMPANY_SHARE:
+            return tplIcon(SHARE);
+        case LUXURY:
+            return tplIcon(LUXURY);
+        case OFFICER_IN_TRAINING:
+            return tplIcon(OFFICER_IN_TRAINING);
+        case PRIME_MINISTER:
+            return `<div class="joco-text fb-font-baskerville fb-font-12 bga-autofit">${_('Prime Minister').toLocaleUpperCase()}</div>`;
+        case RANDOM_BLACKMAIL_CARD:
+            return `<div class="joco-text fb-font-baskerville fb-font-12 bga-autofit">${_('Random Blackmail Card').toLocaleUpperCase()}</div>`;
+        case SHIPYARD:
+            return tplShipyard(value);
+        case WRITER:
+            return tplWriter(value);
+        default:
+            return ``;
+    }
+};
+const getSetupCardSubtitle = (year) => {
+    switch (year) {
+        case 1710:
+            return _('Early Company').toLocaleUpperCase();
+        case 1758:
+            return _('Company Under Siege').toLocaleUpperCase();
+        case 1813:
+            return _('Post Monopoly').toLocaleUpperCase();
+        default:
+            return '';
+    }
+};
+const tplSetupCardContent = (card) => `<div class="joco-setup-card-subtitle bga-autofit fb-font-baskerville fb-font-italic fb-font-8">${getSetupCardSubtitle(card.scenarioSetup)}</div>
+  ${card.extra ? `<div class="joco-setup-card-extra bga-autofit fb-font-baskerville fb-font-italic fb-font-8">${_('Extra')}</div>` : ''}
+  ${card.items
+    .map((item, index) => tplSetupCardItemContainer(tplSetupCardItem(item), index))
+    .join('')}
+    ${card.id === 'Setup1710_14' ? `<div class="joco-setup-card-unfitted bga-autofit fb-font-baskerville fb-font-italic fb-font-8">${_('(both unfitted)')}</div>` : ''}
+  `;
+
 const tplRegiment = ({ id, extraClasses = '', }) => {
     return `
     <div id="${id ?? ''}" class="joco-regiment ${extraClasses}"></div>
@@ -1367,7 +1525,14 @@ const tplLogTokenPound = () => `<div class="log-token joco_pound"></div>`;
 const tplLogTokenCube = (type) => tplCube(type, 'log-token');
 const tplLogTokenStormDie = (side) => `<div class="log-token joco-storm-die" data-side="${side}"></div>`;
 const tplLogTokenTrophy = () => tplTrophyIcon('log-token');
-const tplLogTokenSetupCard = (id) => `<div class="log-token joco-setup-card" data-card-id="${id}"></div>`;
+const tplLogTokenSetupCard = (id) => {
+    const staticData = StaticData$1.get().setupCard(id);
+    const scenario = staticData.scenarioSetup;
+    const itemCount = staticData.items.length;
+    return `<div class="log-token joco-setup-card" data-card-id="${id}" data-background="Setup${scenario}_${itemCount}" data-item-count="${itemCount}">
+    ${tplSetupCardContent(staticData)}
+  </div>`;
+};
 const tplLogTokenPlayerName = ({ name, color, }) => `<span class="playername" style="color:#${color};">${name}</span>`;
 const tplLogTokenShip = ({ name, side, }) => `<div class="log-token joco-ship" data-side="${side}">
   ${tplShipContent({ name, side, type: [FULL, FATIGUED].includes(side) ? PLAYER_OWNED_SHIP : OTHER_SHIP }, side === FATIGUED || side === EXTRA_SHIP)}
@@ -1394,7 +1559,7 @@ const getArmyNameForPresidency = (presidencyId) => {
             return '';
     }
 };
-const getCardTypeText$1 = (cardType) => {
+const getCardTypeText = (cardType) => {
     switch (cardType) {
         case LAW_CARD:
             return _('Law');
@@ -1536,6 +1701,14 @@ const getPromiseCard = (card) => {
         ...cardStatic,
     };
 };
+const getSetupCard = (card) => {
+    const staticData = StaticData$1.get();
+    const cardStatic = staticData.setupCard(card.id);
+    return {
+        ...card,
+        ...cardStatic,
+    };
+};
 
 const tplOfficeCard = (data) => {
     const office = getOffice(data);
@@ -1605,7 +1778,7 @@ const tplVacantOffices = () => `
 const tplOfficeHeader = (familyMemberLocation, name) => `
   <div class="joco-header joco-office-header">${tplFamilyMemberSpot(familyMemberLocation)}<span class="fb-font-baskerville fb-font-16">${name.toLocaleUpperCase()}</span></div>
 `;
-const tplOffice = (id, familyMemberLocation, name) => {
+const tplOffice$1 = (id, familyMemberLocation, name) => {
     return `
       <div id="${id}Office" class="joco-office joco-container">
         ${tplOfficeHeader(familyMemberLocation, name)}
@@ -1982,8 +2155,8 @@ const tplCompany = () => `
     <div class="joco-row">
       <div class="joco-column">
         ${tplCourtOfDirectors()}
-        ${tplOffice(DIRECTOR_OF_TRADE, DIRECTOR_OF_TRADE, getPhaseName(DIRECTOR_OF_TRADE))}
-        ${tplOffice(MANAGER_OF_SHIPPING, MANAGER_OF_SHIPPING, getPhaseName(MANAGER_OF_SHIPPING))}
+        ${tplOffice$1(DIRECTOR_OF_TRADE, DIRECTOR_OF_TRADE, getPhaseName(DIRECTOR_OF_TRADE))}
+        ${tplOffice$1(MANAGER_OF_SHIPPING, MANAGER_OF_SHIPPING, getPhaseName(MANAGER_OF_SHIPPING))}
       </div>
       <div class="joco-column">
         ${tplCompanyBalance()}
@@ -3542,60 +3715,6 @@ class Families {
     }
 }
 
-class SetupArea {
-    constructor(game) {
-        this.cards = {};
-        this.game = game;
-        this.playerId = game.getPlayerId();
-        this.setup(game.gamedatas);
-    }
-    static create(game) {
-        SetupArea.instance = new SetupArea(game);
-    }
-    static getInstance() {
-        return SetupArea.instance;
-    }
-    setup(gamedatas) {
-        document
-            .getElementById('game_play_area')
-            .insertAdjacentHTML('afterbegin', tplSetupArea());
-        this.ui = {
-            setupArea: document.getElementById('joco_setup_area'),
-            chosenCards: document.getElementById('joco_chosen_cards'),
-            draft: document.getElementById('joco_draft_cards'),
-        };
-        StaticData$1.get()
-            .setupCards()
-            .forEach((card) => {
-            const elt = (this.cards[card.id] = document.createElement('div'));
-            elt.id = card.id;
-            elt.classList.add('joco-setup-card');
-            elt.setAttribute('data-card-id', card.id);
-        });
-        const players = gamedatas.players;
-        gamedatas.players[this.playerId].draft.forEach(({ id }) => {
-            this.ui.draft.appendChild(this.cards[id]);
-        });
-        gamedatas.players[this.playerId].setupCards.forEach(({ id }) => {
-            this.ui.chosenCards.appendChild(this.cards[id]);
-        });
-    }
-    newCards(cardIds, lastCard) {
-        this.ui.draft.replaceChildren();
-        cardIds.forEach((cardId) => {
-            if (lastCard) {
-                this.ui.chosenCards.appendChild(this.cards[cardId]);
-            }
-            else {
-                this.ui.draft.appendChild(this.cards[cardId]);
-            }
-        });
-    }
-    hide() {
-        this.ui.setupArea.style.display = 'none';
-    }
-}
-
 const PRIME_MINISTER_DIAL = [
     {
         position: {
@@ -3787,6 +3906,9 @@ class PrimeMinisterDial {
     `;
     }
     updatePlayerName(playerId) {
+        if (playerId === null) {
+            return;
+        }
         this.ui.playerName.replaceChildren();
         this.ui.playerName.insertAdjacentHTML('beforeend', formatStringRecursive('${tkn_playerName}', {
             tkn_playerName: getPlayerName$1(playerId),
@@ -4199,6 +4321,110 @@ class EventTiles {
     }
 }
 
+class SetupCardsManager extends BgaCards$1.Manager {
+    static create(game) {
+        SetupCardsManager.instance = new SetupCardsManager(game);
+    }
+    static getInstance() {
+        return SetupCardsManager.instance;
+    }
+    constructor(game) {
+        super({
+            getId: (card) => card.id,
+            setupDiv: (card, div) => this.setupDiv(card, div),
+            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
+            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
+            isCardVisible: (card) => this.isCardVisible(card),
+            animationManager: game.animationManager,
+            cardHeight: 228.75,
+            cardWidth: 150,
+            type: 'setup-card',
+        });
+        this.game = game;
+    }
+    clearInterface() { }
+    setupDiv(card, div) {
+        div.classList.add('joco-setup-card-container');
+    }
+    setupFrontDiv(card, div) {
+        div.classList.add('joco-setup-card');
+        const itemCount = card.items.length;
+        div.setAttribute('data-background', `Setup${card.scenarioSetup}_${itemCount}`);
+        div.setAttribute('data-card-id', card.id);
+        div.setAttribute('data-item-count', `${itemCount}`);
+        if (div.children.length) {
+            return;
+        }
+        div.insertAdjacentHTML('beforeend', tplSetupCardContent(card));
+    }
+    setupBackDiv(card, div) {
+        div.setAttribute('data-background', 'SetupBack');
+        div.classList.add('joco-setup-card');
+    }
+    isCardVisible(card) {
+        return true;
+    }
+}
+
+const tplDraft = () => `
+<div id="joco-draft">
+  <div class="joco-container">
+    <div class="joco-header"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Current Hand').toLocaleUpperCase()}</span></div>
+    <div id="joco-setup-hand"></div>
+  </div>
+  <div class="joco-container">
+    <div class="joco-header"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Your chosen setup cards').toLocaleUpperCase()}</span></div>
+    <div id="joco-chosen-setup-cards"></div>
+  </div>
+</div`;
+
+class Draft {
+    constructor(game) {
+        this.game = game;
+        this.playerId = game.getPlayerId();
+        this.setup(game.gamedatas);
+    }
+    static create(game) {
+        Draft.instance = new Draft(game);
+    }
+    static getInstance() {
+        return Draft.instance;
+    }
+    setup(gamedatas) {
+        document
+            .getElementById('joco')
+            .insertAdjacentHTML('afterbegin', tplDraft());
+        this.ui = {
+            container: document.getElementById('joco-draft'),
+            chosen: document.getElementById('joco-chosen-setup-cards'),
+            hand: document.getElementById('joco-setup-hand'),
+        };
+        this.setupStocks(gamedatas);
+    }
+    setupStocks(gamedatas) {
+        this.hand = new BgaCards$1.LineStock(SetupCardsManager.getInstance(), this.ui.hand, {
+            gap: '12px',
+        });
+        this.chosen = new BgaCards$1.LineStock(SetupCardsManager.getInstance(), this.ui.chosen, {
+            gap: '12px',
+        });
+        this.hand.addCards(gamedatas.players[this.playerId].setupDraftHand.map(getSetupCard));
+        this.chosen.addCards(gamedatas.players[this.playerId].setupCardsChosen.map(getSetupCard));
+    }
+    async newCards(cards) {
+        this.hand.removeAll();
+        if (cards[0].location.startsWith('setupCards_')) {
+            await this.chosen.addCards(cards.map(getSetupCard));
+        }
+        else {
+            await this.hand.addCards(cards.map(getSetupCard));
+        }
+    }
+    hide() {
+        this.ui.container.style.display = 'none';
+    }
+}
+
 const MIN_NOTIFICATION_MS = 1200;
 class NotificationManager {
     constructor(game) {
@@ -4291,11 +4517,11 @@ class NotificationManager {
     }
     async notif_companyFailure(notif) {
     }
-    async notif_draftCardPrivate(notif) {
-        const { cardIds } = notif;
-        await Promise.all(cardIds.map(async (cardId, index) => {
-            await this.game.animationManager.slideAndAttach(document.getElementById(cardId), document.getElementById('joco_chosen_cards'));
-        }));
+    async notif_draftCard(notif) {
+        const { _private } = notif;
+        if (!_private)
+            return;
+        await Draft.getInstance().chosen.addCards(_private.cards.map(getSetupCard));
     }
     async notif_drawCompanyFailureCard(notif) {
         const { card } = notif;
@@ -4335,9 +4561,12 @@ class NotificationManager {
         const { playerId } = notif;
         Parliament.getInstance().getPrimeMinisterDial().updatePlayerName(playerId);
     }
-    async notif_draftNewCardsPrivate(notif) {
-        const { cardIds, lastCard } = notif;
-        SetupArea.getInstance().newCards(cardIds, lastCard);
+    async notif_draftNewCards(notif) {
+        const { _private } = notif;
+        const { cards } = _private ?? {};
+        if (!cards?.length)
+            return;
+        Draft.getInstance().newCards(cards);
     }
     async notif_elephantMarch(notif) {
         India.getInstance().updateElephant(notif);
@@ -4363,11 +4592,14 @@ class NotificationManager {
         ShipsManager.getInstance().updateCardInformations(ship);
     }
     async notif_gainEnterprise(notif) {
-        const { playerId, type } = notif;
+        const { playerId, type, enterprise, ship } = notif;
         const player = this.getPlayer(playerId);
-        player.counters[this.getEnterpriseCounter(type)].incValue(1);
-        if (type === SHIPYARD) {
-            player.counters[SHIPS_COUNTER].incValue(1);
+        const familyId = player.familyId;
+        await Families.getInstance()
+            .getFamily(familyId)
+            .addEnterprise(getEnterpriseCard(enterprise));
+        if (type === SHIPYARD && ship && !SEA_ZONES.includes(ship.location)) {
+            EnterpriseCardsManager.getInstance().shipStocks[ship.id].addCard(ship);
         }
     }
     async notif_updateFamilyTreasury(notif) {
@@ -4646,7 +4878,11 @@ class NotificationManager {
         CrownClimate.getInstance().updateClimate(climate);
     }
     async notif_setupDone(notif) {
-        SetupArea.getInstance().hide();
+        const bar = Bar.getInstance();
+        if (bar.getActiveTabId() === 'joco-draft') {
+            bar.goTo('joco-india');
+        }
+        bar.removeTabWithId('joco-draft');
     }
     async notif_setupFamilyMembers(notif) {
         const { familyMembers, playerId } = notif;
@@ -6417,6 +6653,7 @@ class DraftCard {
         this.args = args;
         this.selectedCards = [];
         this.updateInterfaceInitialStep();
+        Bar.getInstance().goTo('joco-draft');
     }
     onLeavingState() {
         debug('Leaving DraftCard state');
@@ -6438,9 +6675,7 @@ class DraftCard {
         }
         this.setSelected();
         this.args._private.options.forEach((option) => {
-            const node = document.getElementById(option.id);
-            node.classList.add(SELECTABLE);
-            onClick(node, () => this.handleClick(option.id));
+            onClick(`setup-card-${option.id}`, () => this.handleClick(option.id));
         });
         if (this.selectedCards.length > 0) {
             addCancelButton$1();
@@ -6464,7 +6699,7 @@ class DraftCard {
         addCancelButton$1();
     }
     setSelected() {
-        this.selectedCards.forEach((cardId) => setSelected$1(cardId));
+        this.selectedCards.forEach((cardId) => setSelected$1(`setup-card-${cardId}`));
     }
     handleClick(cardId) {
         if (this.selectedCards.includes(cardId)) {
@@ -8036,7 +8271,7 @@ class TimingWindowAct {
         const text = '${cardTitle} (${cardType})';
         return formatStringRecursive(text, {
             cardTitle: _(StaticData$1.get().cardTitle(cardId)),
-            cardType: getCardTypeText$1(cardType),
+            cardType: getCardTypeText(cardType),
         });
     }
     addButton(cardId, cardType, index) {
@@ -8807,7 +9042,7 @@ class UseManOnTheInside {
         const text = '${cardTitle} (${cardType})';
         return formatStringRecursive(text, {
             cardTitle: _(StaticData$1.get().cardTitle(cardId)),
-            cardType: getCardTypeText$1(cardType),
+            cardType: getCardTypeText(cardType),
         });
     }
     updateInterfaceConfirm(play) {
@@ -9017,6 +9252,7 @@ class Game {
         LawCardsManager.create(this);
         LondonSeasonCardsManager.create(this);
         PromiseCardsManager.create(this);
+        SetupCardsManager.create(this);
         ShipsManager.create(this);
         ControlTokensManager.create(this);
         Interaction.create(this);
@@ -9033,11 +9269,11 @@ class Game {
         Parliament.create(this);
         India.create(this);
         EventTiles.create(this);
-        Bar.create(this);
         if (this.playerOrder.includes(this.getPlayerId()) &&
             gamedatas.phase === SETUP) {
-            SetupArea.create(this);
+            Draft.create(this);
         }
+        Bar.create(this);
         this.notificationManager.setupNotifications();
         debug('Ending game setup');
     }

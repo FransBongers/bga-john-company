@@ -15,6 +15,7 @@
 @use './cards/cards';
 @use './company/company';
 @use './crown/crown';
+@use './draft/draft';
 @use './dice';
 @use './icons/icons';
 @use './london/london';
@@ -23,7 +24,6 @@
 @use './pieces';
 @use './families/families';
 @use './player-manager/playerPanel';
-@use './setup-area/setup-area';
 @use './token-managers/tokensManaged';
 @use './ui-components/ui-components';
 @use './logs/logs';

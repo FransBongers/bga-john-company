@@ -1,0 +1,299 @@
+@use '../../base';
+@use 'sass:math';
+@use 'sass:map';
+
+$setupCards: (
+  1: 'Setup1710_1',
+  2: 'Setup1710_2',
+  3: 'Setup1710_3',
+  4: 'Setup1758_1',
+  5: 'Setup1758_2',
+  6: 'Setup1758_3',
+  7: 'Setup1758_4',
+  8: 'Setup1813_1',
+  9: 'Setup1813_2',
+  10: 'Setup1813_3',
+  11: 'Setup1813_4',
+);
+
+$cols: 6;
+$rows: 4;
+
+@for $i from 1 through 25 {
+  $index: $i - 1;
+  $col: $index % $cols;
+  $row: math.floor(math.div($index, $cols));
+
+  .joco-setup-card[data-background='#{map.get($setupCards,$i)}'] {
+    // For a sprite sheet with $cols columns and $rows rows where
+    // background-size is ($cols * 100%) by ($rows * 100%),
+    // positions run from 0% to 100% inclusive so the step is 100% / ($cols - 1) or ($rows - 1).
+    background-position-x: math.div($col * 100%, $cols - 1);
+    background-position-y: math.div($row * 100%, $rows - 1);
+  }
+}
+
+.joco-setup-card {
+  width: 150px;
+  aspect-ratio: 150 / 228.75;
+  background-image: url('img/small_cards_vertical.jpg');
+  background-size: 600% 400%;
+
+  .joco-setup-card-subtitle {
+    position: absolute;
+    top: 36px;
+    left: 10px;
+    width: 130px;
+    height: 12px;
+    // background-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .joco-setup-card-extra {
+    position: absolute;
+    top: 10px;
+    right: 0px;
+    width: 35px;
+    height: 12px;
+    // background-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .setup-card-item {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: 17px;
+    width: 116px;
+
+    .joco-text {
+      text-align: center;
+      height: 60px;
+      width: 100px;
+      // background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .joco-icon {
+      height: 40px;
+
+      &[data-icon='CircleLight'] {
+        .joco-amount-pound {
+          font-size: 12px;
+        }
+
+        .joco-amount-value {
+          font-size: 20px;
+        }
+      }
+    }
+
+    .joco-icon-with-text {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      .joco-text {
+        text-align: center;
+        height: 50px;
+        width: 60px;
+        // background-color: rgba(255, 255, 255, 0.5);
+      }
+    }
+
+    .joco-setup-office.joco-icon-with-text {
+      .joco-text {
+        width: 70px;
+        font-size: 10px;
+        height: 40px;
+      }
+    }
+
+    .joco-office-icon[data-office-icon='Commander'] {
+      height: 40px;
+    }
+    // &[data-index='0'] {
+    //   background-color: rgba(yellow, 0.5);
+    // }
+
+    // &[data-index='1'] {
+    //   background-color: rgba(blue, 0.5);
+    // }
+
+    // &[data-index='2'] {
+    //   background-color: rgba(red, 0.5);
+    // }
+
+    // &[data-index='3'] {
+    //   background-color: rgba(green, 0.5);
+    // }
+  }
+
+  &[data-item-count='1'] {
+    .setup-card-item {
+      &[data-index='0'] {
+        top: 55px;
+        height: 162px;
+      }
+    }
+  }
+
+  &[data-item-count='2'] {
+    .setup-card-item {
+      height: 80px;
+      &[data-index='0'] {
+        top: 55px;
+      }
+
+      &[data-index='1'] {
+        top: 137px;
+      }
+    }
+  }
+
+  &[data-item-count='3'] {
+    .setup-card-item {
+      height: 53px;
+
+      &[data-index='0'] {
+        top: 59px;
+        height: 49px;
+      }
+
+      &[data-index='1'] {
+        top: 110px;
+      }
+
+      &[data-index='2'] {
+        top: 164px;
+      }
+    }
+  }
+
+  &[data-item-count='4'] {
+    .setup-card-item {
+      width: 58px;
+      height: 81px;
+
+      &[data-index='0'] {
+        top: 55px;
+      }
+
+      &[data-index='1'] {
+        top: 55px;
+        left: 75px;
+      }
+
+      &[data-index='2'] {
+        top: 136px;
+      }
+
+      &[data-index='3'] {
+        top: 136px;
+        left: 75px;
+      }
+    }
+  }
+
+  &[data-card-id='Setup1710_14'] {
+    background-position-x: 0%;
+
+    .setup-card-item {
+      // top: 86px;
+      width: 40px;
+      height: 58px;
+
+      &[data-index='0'] {
+        top: 86px;
+        left: 34px;
+        width: 40px;
+        height: 58px;
+      }
+
+      &[data-index='1'] {
+        top: 86px;
+        left: 76px;
+        width: 40px;
+        height: 58px;
+      }
+    }
+
+    .joco-setup-card-unfitted {
+      position: absolute;
+      top: 144px;
+      left: 17px;
+      width: 116px;
+      height: 12px;
+    }
+  }
+
+  &[data-card-id='Setup1710_13'] {
+    background-position-x: 20%;
+
+    .setup-card-item {
+      width: 44px;
+      height: 44px;
+      // background-color: rgba(yellow, 0.5);
+
+      &[data-index='0'] {
+        top: 55px;
+        left: 54px;
+      }
+
+      &[data-index='1'] {
+        top: 90px;
+        left: 30px;
+      }
+
+      &[data-index='2'] {
+        top: 90px;
+        left: 76px;
+      }
+    }
+
+    .setup-card-item {
+      &[data-index='3'] {
+        top: 137px;
+        left: 17px;
+        height: 80px;
+        width: 116px;
+      }
+    }
+  }
+}
+
+.joco-office-icon-wrapper {
+  box-sizing: border-box;
+  height: 40px;
+  aspect-ratio: 36 / 42;
+  border: 2px solid base.$joco-red;
+  outline: 1px solid base.$joco-white;
+  background-color: base.$joco-white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .joco-office-icon-wrapper-inner {
+    box-sizing: border-box;
+    border-radius: 50%;
+    height: 34px;
+    aspect-ratio: 35 / 42;
+    border: 1px solid base.$joco-red;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+
+    .joco-office-icon {
+      height: 22px;
+
+      &[data-office-icon='Crown'] {
+        height: 12px;
+      }
+    }
+
+    .joco-region-icon {
+      width: 16px;
+    }
+  }
+}

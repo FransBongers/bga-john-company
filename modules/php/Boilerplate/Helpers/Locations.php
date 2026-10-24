@@ -25,9 +25,9 @@ class Locations
     return 'Commander_' . $presidencyId;
   }
 
-  public static function draft(string $familyId)
+  public static function hand(string $familyId)
   {
-    return 'draft_' . $familyId;
+    return 'hand_' . $familyId;
   }
 
   public static function familyMemberSupply(string $familyId)

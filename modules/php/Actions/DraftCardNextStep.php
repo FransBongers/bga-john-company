@@ -42,34 +42,37 @@ class DraftCardNextStep extends \Bga\Games\JohnCompany\Models\AtomicAction
       $familyId = $players[$playerId]->getFamilyId();
       $nextPlayerInTurnOrder = $this->getNextPlayerId($turnOrder, $playerId);
 
-      $currentCardsIds = Utils::returnIds(Utils::filter($setupCards, function ($card) use ($familyId) {
-        return $card->getLocation() === Locations::draft($familyId);
-      }));
+      $currentCards = Utils::filter($setupCards, function ($card) use ($familyId) {
+        return $card->getLocation() === Locations::hand($familyId);
+      });
 
-      $newCardsPerPlayer[$nextPlayerInTurnOrder] = $currentCardsIds;
+      $newCardsPerPlayer[$nextPlayerInTurnOrder] = $currentCards;
     }
 
     $lastCard = count(array_values($newCardsPerPlayer)[0]) === 1;
 
     // Move cards
-    foreach($newCardsPerPlayer as $playerId => $cards) {
-      $familyId = $players[$playerId]->getFamilyId();      
-
-      SetupCards::move($cards, $lastCard ? Locations::setupCards($familyId) : Locations::draft($familyId));
-      Notifications::draftNewCards($players[$playerId], $cards, $lastCard);
+    foreach ($newCardsPerPlayer as $playerId => $cards) {
+      $familyId = $players[$playerId]->getFamilyId();
+      foreach ($cards as $card) {
+        $card->setLocation($lastCard ? Locations::setupCards($familyId) : Locations::hand($familyId));
+        // SetupCards::move($cardIds, $lastCard ? Locations::setupCards($familyId) : Locations::hand($familyId));
+      }
+      
     }
+    Notifications::draftNewCards($newCardsPerPlayer);
   }
 
   private function crownDraft($players, $setupCards)
   {
-    foreach($players as $playerId => $player) {
-      $familyId = $players[$playerId]->getFamilyId();      
+    foreach ($players as $playerId => $player) {
+      $familyId = $players[$playerId]->getFamilyId();
       // Move remaining cards to the crown
-      $crownCards = Utils::itemsInLocation($setupCards, Locations::draft($familyId));
+      $crownCards = Utils::itemsInLocation($setupCards, Locations::hand($familyId));
       SetupCards::move(Utils::returnIds($crownCards), Locations::setupCards(CROWN));
       // Draw new cards for player
-      $newCards = Utils::returnIds(SetupCards::pickForLocation(3, DECK, Locations::draft($familyId))->toArray());
-      Notifications::draftNewCards($player, $newCards, false);
+      $newCards = Utils::returnIds(SetupCards::pickForLocation(3, DECK, Locations::hand($familyId))->toArray());
+      // Notifications::draftNewCards($player, $newCards, false);
     }
   }
 
@@ -78,7 +81,7 @@ class DraftCardNextStep extends \Bga\Games\JohnCompany\Models\AtomicAction
     // Get data
     $setupCards = SetupCards::getAll()->toArray();
     $players = Players::getAll();
-    
+
     if (count($players) >= 3) {
       $this->playerDraft($players, $setupCards);
     } else {

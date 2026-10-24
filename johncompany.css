@@ -1138,6 +1138,330 @@ span[style*="color:#addb90"] {
   width: 155px;
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
+.joco-setup-card[data-background=Setup1710_1] {
+  background-position-x: 0%;
+  background-position-y: 0%;
+}
+
+.joco-setup-card[data-background=Setup1710_2] {
+  background-position-x: 20%;
+  background-position-y: 0%;
+}
+
+.joco-setup-card[data-background=Setup1710_3] {
+  background-position-x: 40%;
+  background-position-y: 0%;
+}
+
+.joco-setup-card[data-background=Setup1758_1] {
+  background-position-x: 60%;
+  background-position-y: 0%;
+}
+
+.joco-setup-card[data-background=Setup1758_2] {
+  background-position-x: 80%;
+  background-position-y: 0%;
+}
+
+.joco-setup-card[data-background=Setup1758_3] {
+  background-position-x: 100%;
+  background-position-y: 0%;
+}
+
+.joco-setup-card[data-background=Setup1758_4] {
+  background-position-x: 0%;
+  background-position-y: 33.3333333333%;
+}
+
+.joco-setup-card[data-background=Setup1813_1] {
+  background-position-x: 20%;
+  background-position-y: 33.3333333333%;
+}
+
+.joco-setup-card[data-background=Setup1813_2] {
+  background-position-x: 40%;
+  background-position-y: 33.3333333333%;
+}
+
+.joco-setup-card[data-background=Setup1813_3] {
+  background-position-x: 60%;
+  background-position-y: 33.3333333333%;
+}
+
+.joco-setup-card[data-background=Setup1813_4] {
+  background-position-x: 80%;
+  background-position-y: 33.3333333333%;
+}
+
+.joco-setup-card[data-background=""] {
+  background-position-x: 100%;
+  background-position-y: 33.3333333333%;
+}
+
+.joco-setup-card[data-background=""] {
+  background-position-x: 0%;
+  background-position-y: 66.6666666667%;
+}
+
+.joco-setup-card[data-background=""] {
+  background-position-x: 20%;
+  background-position-y: 66.6666666667%;
+}
+
+.joco-setup-card[data-background=""] {
+  background-position-x: 40%;
+  background-position-y: 66.6666666667%;
+}
+
+.joco-setup-card[data-background=""] {
+  background-position-x: 60%;
+  background-position-y: 66.6666666667%;
+}
+
+.joco-setup-card[data-background=""] {
+  background-position-x: 80%;
+  background-position-y: 66.6666666667%;
+}
+
+.joco-setup-card[data-background=""] {
+  background-position-x: 100%;
+  background-position-y: 66.6666666667%;
+}
+
+.joco-setup-card[data-background=""] {
+  background-position-x: 0%;
+  background-position-y: 100%;
+}
+
+.joco-setup-card[data-background=""] {
+  background-position-x: 20%;
+  background-position-y: 100%;
+}
+
+.joco-setup-card[data-background=""] {
+  background-position-x: 40%;
+  background-position-y: 100%;
+}
+
+.joco-setup-card[data-background=""] {
+  background-position-x: 60%;
+  background-position-y: 100%;
+}
+
+.joco-setup-card[data-background=""] {
+  background-position-x: 80%;
+  background-position-y: 100%;
+}
+
+.joco-setup-card[data-background=""] {
+  background-position-x: 100%;
+  background-position-y: 100%;
+}
+
+.joco-setup-card[data-background=""] {
+  background-position-x: 0%;
+  background-position-y: 133.3333333333%;
+}
+
+.joco-setup-card {
+  width: 150px;
+  aspect-ratio: 150/228.75;
+  background-image: url("img/small_cards_vertical.jpg");
+  background-size: 600% 400%;
+}
+.joco-setup-card .joco-setup-card-subtitle {
+  position: absolute;
+  top: 36px;
+  left: 10px;
+  width: 130px;
+  height: 12px;
+}
+.joco-setup-card .joco-setup-card-extra {
+  position: absolute;
+  top: 10px;
+  right: 0px;
+  width: 35px;
+  height: 12px;
+}
+.joco-setup-card .setup-card-item {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: 17px;
+  width: 116px;
+}
+.joco-setup-card .setup-card-item .joco-text {
+  text-align: center;
+  height: 60px;
+  width: 100px;
+}
+.joco-setup-card .setup-card-item .joco-icon {
+  height: 40px;
+}
+.joco-setup-card .setup-card-item .joco-icon[data-icon=CircleLight] .joco-amount-pound {
+  font-size: 12px;
+}
+.joco-setup-card .setup-card-item .joco-icon[data-icon=CircleLight] .joco-amount-value {
+  font-size: 20px;
+}
+.joco-setup-card .setup-card-item .joco-icon-with-text {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.joco-setup-card .setup-card-item .joco-icon-with-text .joco-text {
+  text-align: center;
+  height: 50px;
+  width: 60px;
+}
+.joco-setup-card .setup-card-item .joco-setup-office.joco-icon-with-text .joco-text {
+  width: 70px;
+  font-size: 10px;
+  height: 40px;
+}
+.joco-setup-card .setup-card-item .joco-office-icon[data-office-icon=Commander] {
+  height: 40px;
+}
+.joco-setup-card[data-item-count="1"] .setup-card-item[data-index="0"] {
+  top: 55px;
+  height: 162px;
+}
+.joco-setup-card[data-item-count="2"] .setup-card-item {
+  height: 80px;
+}
+.joco-setup-card[data-item-count="2"] .setup-card-item[data-index="0"] {
+  top: 55px;
+}
+.joco-setup-card[data-item-count="2"] .setup-card-item[data-index="1"] {
+  top: 137px;
+}
+.joco-setup-card[data-item-count="3"] .setup-card-item {
+  height: 53px;
+}
+.joco-setup-card[data-item-count="3"] .setup-card-item[data-index="0"] {
+  top: 59px;
+  height: 49px;
+}
+.joco-setup-card[data-item-count="3"] .setup-card-item[data-index="1"] {
+  top: 110px;
+}
+.joco-setup-card[data-item-count="3"] .setup-card-item[data-index="2"] {
+  top: 164px;
+}
+.joco-setup-card[data-item-count="4"] .setup-card-item {
+  width: 58px;
+  height: 81px;
+}
+.joco-setup-card[data-item-count="4"] .setup-card-item[data-index="0"] {
+  top: 55px;
+}
+.joco-setup-card[data-item-count="4"] .setup-card-item[data-index="1"] {
+  top: 55px;
+  left: 75px;
+}
+.joco-setup-card[data-item-count="4"] .setup-card-item[data-index="2"] {
+  top: 136px;
+}
+.joco-setup-card[data-item-count="4"] .setup-card-item[data-index="3"] {
+  top: 136px;
+  left: 75px;
+}
+.joco-setup-card[data-card-id=Setup1710_14] {
+  background-position-x: 0%;
+}
+.joco-setup-card[data-card-id=Setup1710_14] .setup-card-item {
+  width: 40px;
+  height: 58px;
+}
+.joco-setup-card[data-card-id=Setup1710_14] .setup-card-item[data-index="0"] {
+  top: 86px;
+  left: 34px;
+  width: 40px;
+  height: 58px;
+}
+.joco-setup-card[data-card-id=Setup1710_14] .setup-card-item[data-index="1"] {
+  top: 86px;
+  left: 76px;
+  width: 40px;
+  height: 58px;
+}
+.joco-setup-card[data-card-id=Setup1710_14] .joco-setup-card-unfitted {
+  position: absolute;
+  top: 144px;
+  left: 17px;
+  width: 116px;
+  height: 12px;
+}
+.joco-setup-card[data-card-id=Setup1710_13] {
+  background-position-x: 20%;
+}
+.joco-setup-card[data-card-id=Setup1710_13] .setup-card-item {
+  width: 44px;
+  height: 44px;
+}
+.joco-setup-card[data-card-id=Setup1710_13] .setup-card-item[data-index="0"] {
+  top: 55px;
+  left: 54px;
+}
+.joco-setup-card[data-card-id=Setup1710_13] .setup-card-item[data-index="1"] {
+  top: 90px;
+  left: 30px;
+}
+.joco-setup-card[data-card-id=Setup1710_13] .setup-card-item[data-index="2"] {
+  top: 90px;
+  left: 76px;
+}
+.joco-setup-card[data-card-id=Setup1710_13] .setup-card-item[data-index="3"] {
+  top: 137px;
+  left: 17px;
+  height: 80px;
+  width: 116px;
+}
+
+.joco-office-icon-wrapper {
+  box-sizing: border-box;
+  height: 40px;
+  aspect-ratio: 36/42;
+  border: 2px solid rgb(183, 98, 85);
+  outline: 1px solid rgb(245, 237, 224);
+  background-color: rgb(245, 237, 224);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.joco-office-icon-wrapper .joco-office-icon-wrapper-inner {
+  box-sizing: border-box;
+  border-radius: 50%;
+  height: 34px;
+  aspect-ratio: 35/42;
+  border: 1px solid rgb(183, 98, 85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+}
+.joco-office-icon-wrapper .joco-office-icon-wrapper-inner .joco-office-icon {
+  height: 22px;
+}
+.joco-office-icon-wrapper .joco-office-icon-wrapper-inner .joco-office-icon[data-office-icon=Crown] {
+  height: 12px;
+}
+.joco-office-icon-wrapper .joco-office-icon-wrapper-inner .joco-region-icon {
+  width: 16px;
+}
+
 .joco-card-text {
   position: absolute;
   text-align: center;
@@ -1574,6 +1898,54 @@ span[style*="color:#addb90"] {
   visibility: visible;
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
+#joco-draft {
+  width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#joco-draft #joco-setup-hand,
+#joco-draft #joco-chosen-setup-cards {
+  min-height: 228px;
+}
+
+#joco_setup_area {
+  --cardScale: 1;
+  display: flex;
+  flex-flow: row wrap;
+  gap: 24px;
+}
+#joco_setup_area .joco_container {
+  display: flex;
+  flex-flow: column;
+  padding: 8px;
+  min-width: 460px;
+  background-color: rgba(255, 250, 250, 0.4);
+}
+#joco_setup_area .joco_container .joco_label {
+  /* height: 20px; */
+  font-weight: bold;
+  font-size: large;
+  margin-bottom: 8px;
+}
+#joco_setup_area .joco_container #joco_chosen_cards,
+#joco_setup_area .joco_container #joco_draft_cards {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .joco-storm-die {
   background-image: url("img/storm_die.png");
   background-size: 500% 100%;
@@ -1607,7 +1979,7 @@ span[style*="color:#addb90"] {
   height: 24px;
   aspect-ratio: 1/1;
 }
-.joco-icon[data-icon=VictoryPoints], .joco-icon[data-icon=Power] {
+.joco-icon[data-icon=CircleLight], .joco-icon[data-icon=VictoryPoints], .joco-icon[data-icon=Power] {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1867,6 +2239,37 @@ span[style*="color:#addb90"] {
   font-size: 6px;
 }
 
+.joco-office-icon {
+  background-image: url("img/office_icons.webp");
+  background-size: 600% 100%;
+  height: 24px;
+  aspect-ratio: 200/202;
+}
+
+.joco-office-icon[data-office-icon=Chairman] {
+  background-position-x: 0%;
+}
+
+.joco-office-icon[data-office-icon=Commander] {
+  background-position-x: 20%;
+}
+
+.joco-office-icon[data-office-icon=Crown] {
+  background-position-x: 40%;
+}
+
+.joco-office-icon[data-office-icon=MilitaryAffairs] {
+  background-position-x: 60%;
+}
+
+.joco-office-icon[data-office-icon=ManagerOfShipping] {
+  background-position-x: 80%;
+}
+
+.joco-office-icon[data-office-icon=DirectorOfTrade] {
+  background-position-x: 100%;
+}
+
 /*
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -1879,9 +2282,6 @@ span[style*="color:#addb90"] {
 #joco-london {
   width: 1000px;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
   display: flex;
   flex-direction: row;
   gap: 8px;
@@ -2319,7 +2719,7 @@ span[style*="color:#addb90"] {
 #joco-families .tab-container .tab-title[data-active=false][data-family-id=Hastings] {
   background-color: rgba(153, 218, 233, 0.6);
 }
-#joco-families .tab-container .tab-title[data-active=false][data-family-id=Larkings] {
+#joco-families .tab-container .tab-title[data-active=false][data-family-id=Larkins] {
   background-color: rgba(249, 224, 141, 0.6);
 }
 #joco-families .tab-container .tab-title[data-active=false][data-family-id=Paxton] {
@@ -2339,8 +2739,8 @@ span[style*="color:#addb90"] {
 #joco-families .tab-container .tab-title[data-active=true][data-family-id=Hastings] {
   background-color: #99dae9;
 }
-#joco-families .tab-container .tab-title:hover[data-family-id=Larkings],
-#joco-families .tab-container .tab-title[data-active=true][data-family-id=Larkings] {
+#joco-families .tab-container .tab-title:hover[data-family-id=Larkins],
+#joco-families .tab-container .tab-title[data-active=true][data-family-id=Larkins] {
   background-color: #f9e08d;
 }
 #joco-families .tab-container .tab-title:hover[data-family-id=Paxton],
@@ -2433,187 +2833,6 @@ span[style*="color:#addb90"] {
   grid-template: 48px auto/repeat(4, 48px);
   justify-content: space-evenly;
   gap: 4px;
-}
-
-/*
- *------
- * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
- * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
- *
- * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
- * See http://en.boardgamearena.com/#!doc/Studio for more information.
- * -----
- */
-.joco-setup-card {
-  height: calc(var(--cardScale) * 228px);
-  width: calc(var(--cardScale) * 150px);
-  display: inline-block;
-  border: 1px solid black;
-  border-radius: 5px;
-}
-
-.joco-setup-card.selectable {
-  cursor: pointer;
-  outline: 4px solid yellow;
-}
-
-.joco-setup-card.selected,
-.joco-setup-card.selectable:hover {
-  cursor: pointer;
-  outline: 4px solid blue;
-}
-
-#joco_setup_area {
-  --cardScale: 1;
-  display: flex;
-  flex-flow: row wrap;
-  gap: 24px;
-}
-#joco_setup_area .joco_container {
-  display: flex;
-  flex-flow: column;
-  padding: 8px;
-  min-width: 460px;
-  background-color: rgba(255, 250, 250, 0.4);
-}
-#joco_setup_area .joco_container .joco_label {
-  /* height: 20px; */
-  font-weight: bold;
-  font-size: large;
-  margin-bottom: 8px;
-}
-#joco_setup_area .joco_container #joco_chosen_cards,
-#joco_setup_area .joco_container #joco_draft_cards {
-  display: flex;
-  flex-direction: row;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.joco-setup-card[data-card-id=Setup1710_01] {
-  background-image: url("img/1710_1.jpg");
-  background-position-x: 0%;
-  background-position-y: 0%;
-  background-size: 400% 200%;
-}
-
-.joco-setup-card[data-card-id=Setup1710_02] {
-  background-image: url("img/1710_1.jpg");
-  background-position-x: 33.3333333333%;
-  background-position-y: 0%;
-  background-size: 400% 200%;
-}
-
-.joco-setup-card[data-card-id=Setup1710_03] {
-  background-image: url("img/1710_1.jpg");
-  background-position-x: 66.6666666667%;
-  background-position-y: 0%;
-  background-size: 400% 200%;
-}
-
-.joco-setup-card[data-card-id=Setup1710_04] {
-  background-image: url("img/1710_1.jpg");
-  background-position-x: 100%;
-  background-position-y: 0%;
-  background-size: 400% 200%;
-}
-
-.joco-setup-card[data-card-id=Setup1710_05] {
-  background-image: url("img/1710_1.jpg");
-  background-position-x: 0%;
-  background-position-y: 100%;
-  background-size: 400% 200%;
-}
-
-.joco-setup-card[data-card-id=Setup1710_06] {
-  background-image: url("img/1710_1.jpg");
-  background-position-x: 33.3333333333%;
-  background-position-y: 100%;
-  background-size: 400% 200%;
-}
-
-.joco-setup-card[data-card-id=Setup1710_07] {
-  background-image: url("img/1710_1.jpg");
-  background-position-x: 66.6666666667%;
-  background-position-y: 100%;
-  background-size: 400% 200%;
-}
-
-.joco-setup-card[data-card-id=Setup1710_08] {
-  background-image: url("img/1710_1.jpg");
-  background-position-x: 100%;
-  background-position-y: 100%;
-  background-size: 400% 200%;
-}
-
-.joco-setup-card[data-card-id=Setup1710_09] {
-  background-image: url("img/1710_2.jpg");
-  background-position-x: 0%;
-  background-position-y: 0%;
-  background-size: 400% 300%;
-}
-
-.joco-setup-card[data-card-id=Setup1710_10] {
-  background-image: url("img/1710_2.jpg");
-  background-position-x: 33.3333333333%;
-  background-position-y: 0%;
-  background-size: 400% 300%;
-}
-
-.joco-setup-card[data-card-id=Setup1710_11] {
-  background-image: url("img/1710_2.jpg");
-  background-position-x: 66.6666666667%;
-  background-position-y: 0%;
-  background-size: 400% 300%;
-}
-
-.joco-setup-card[data-card-id=Setup1710_12] {
-  background-image: url("img/1710_2.jpg");
-  background-position-x: 100%;
-  background-position-y: 0%;
-  background-size: 400% 300%;
-}
-
-.joco-setup-card[data-card-id=Setup1710_13] {
-  background-image: url("img/1710_2.jpg");
-  background-position-x: 0%;
-  background-position-y: 50%;
-  background-size: 400% 300%;
-}
-
-.joco-setup-card[data-card-id=Setup1710_14] {
-  background-image: url("img/1710_2.jpg");
-  background-position-x: 33.3333333333%;
-  background-position-y: 50%;
-  background-size: 400% 300%;
-}
-
-.joco-setup-card[data-card-id=Setup1710_15] {
-  background-image: url("img/1710_2.jpg");
-  background-position-x: 66.6666666667%;
-  background-position-y: 50%;
-  background-size: 400% 300%;
-}
-
-.joco-setup-card[data-card-id=Setup1710_16] {
-  background-image: url("img/1710_2.jpg");
-  background-position-x: 100%;
-  background-position-y: 50%;
-  background-size: 400% 300%;
-}
-
-.joco-setup-card[data-card-id=Setup1710_17] {
-  background-image: url("img/1710_2.jpg");
-  background-position-x: 0%;
-  background-position-y: 100%;
-  background-size: 400% 300%;
-}
-
-.joco-setup-card[data-card-id=Setup1710_18] {
-  background-image: url("img/1710_2.jpg");
-  background-position-x: 33.3333333333%;
-  background-position-y: 100%;
-  background-size: 400% 300%;
 }
 
 /*
@@ -2987,6 +3206,11 @@ span[style*="color:#c0c0c0"] {
 }
 .log-token.joco-power-marker .joco-icon {
   height: 24px !important;
+}
+.log-token.joco-setup-card {
+  display: inline-block;
+  zoom: 0.75;
+  border: 1px solid black;
 }
 
 #customActions {

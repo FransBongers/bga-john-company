@@ -1,4 +1,5 @@
 import { DISCOUNT, POWER, BONUS, TAX, VICTORY_POINTS } from '../constants';
+import { tplAmount } from '../templates';
 
 export const tplIcon = (type: string, extraClasses: string = '') =>
   `<div class="joco-icon ${extraClasses ?? ''}" data-icon="${type}"></div>`;
@@ -36,9 +37,6 @@ export const tplVictoryPointsIcon = (
           <span class="fb-font-baskerville fb-font-semi-bold fb-font-20">${value}</span>
         </div>`;
 };
-  
-
-
 
 export const tplDiscountIcon = (
   value: string | number,
@@ -46,9 +44,7 @@ export const tplDiscountIcon = (
 ) =>
   `<div class="joco-icon ${extraClasses ?? ''}" data-icon="${DISCOUNT}${value}"></div>`;
 
-export const tplTrophyIcon = (
-  extraClasses: string = '',
-) =>
+export const tplTrophyIcon = (extraClasses: string = '') =>
   `<div class="joco-trophy ${extraClasses ?? ''}">
     ${tplPowerIcon(1)}
     <div class="joco-title bga-autofit">
@@ -56,12 +52,15 @@ export const tplTrophyIcon = (
     </div>
   </div>`;
 
-export const tplPassedLawTokenIcon = (
-  extraClasses: string = '',
-) =>
+export const tplPassedLawTokenIcon = (extraClasses: string = '') =>
   `<div class="joco-passed-law-token ${extraClasses ?? ''}">
     ${tplPowerIcon(1)}
     <div class="joco-title bga-autofit">
       <span class="fb-font-baskerville fb-font-italic">${_('Passed Law').toLocaleUpperCase()}</span>
     </div>
   </div>`;
+
+export const tplMoneyIcon = (
+  value: string | number,
+  extraClasses: string = '',
+) => `<div class="joco-icon ${extraClasses ?? ''}" data-icon="CircleLight">${tplAmount(value, true)}</div>`;

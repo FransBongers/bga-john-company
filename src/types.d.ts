@@ -144,8 +144,8 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   parliament: {
     selectingLaw: boolean;
     primeMinister: {
-      playerId: number;
-      familyId: string;
+      playerId: number | null;
+      familyId: string | null;
     };
     revealedLaws: JocoLawCardBase[];
     selectedLaw: JocoLawCardBase | null;
@@ -183,24 +183,10 @@ type BombayPresidency = 'PresidencyBombay';
 type MadrasPresidency = 'PresidencyMadras';
 type JoCoPresidency = BengalPresidency | BombayPresidency | MadrasPresidency;
 
-type JoCoSetupCard = JoCoSetupCardBase & JocoSetupCardStatic;
-
-interface JoCoSetupCardBase {
-  id: string;
-  location: string;
-}
-
-type JocoSetupCardStatic = {
-  id: string;
-  extra: boolean;
-  scenarioSetup: number;
-  items: Array<{ type: string; value?: string }>;
-};
-
 interface JohnCompanyPlayerData extends Player {
-  draft: JoCoSetupCard[];
+  setupDraftHand: JocoSetupCardBase[];
   familyId: string;
-  setupCards: JoCoSetupCard[];
+  setupCardsChosen: JocoSetupCardBase[];
   londonSeasonCards: JocoLondonSeasonCardBase[];
   playedBlackmailCards: JocoLondonSeasonCardBase[];
 }
@@ -242,17 +228,16 @@ interface JocoFamilyMember {
 /**
  * Company Failure Cards
  */
-export interface JocoCompanyFailureCardBase extends GamePiece {
+export interface JocoCompanyFailureCardBase extends GamePiece {}
 
-}
- 
 export interface JocoCompanyFailureCardStatic {
   id: string;
   title: string;
   text: Array<string | Log>;
 }
 
-export type JocoCompanyFailureCard = JocoCompanyFailureCardBase & JocoCompanyFailureCardStatic;
+export type JocoCompanyFailureCard = JocoCompanyFailureCardBase &
+  JocoCompanyFailureCardStatic;
 
 /**
  * Control Tokens
@@ -345,7 +330,7 @@ export type JocoEnterpriseCard = JocoEnterpriseCardBase &
 /**
  * Family
  */
-interface JocoFamily {
+export interface JocoFamily {
   id: string;
   crownPromiseCubes: number;
   hasChairmanMarker: number;
@@ -361,13 +346,13 @@ interface JocoFamily {
 /**
  * Orders
  */
-interface JoCoOrderBase {
+export interface JoCoOrderBase {
   id: string;
   location: string;
   status: 'open' | 'closed' | 'filled' | 'filledByWriter';
 }
 
-interface JoCoOrderStatic {
+export interface JoCoOrderStatic {
   connectedOrders: string[];
   filledValue: number;
   homePort: string | null;
@@ -379,7 +364,7 @@ interface JoCoOrderStatic {
 /**
  * Regions
  */
-interface JocoRegionBase {
+export interface JocoRegionBase {
   id: string;
   control: string | null;
   looted: boolean;
@@ -388,7 +373,7 @@ interface JocoRegionBase {
   isCapital: boolean;
 }
 
-interface JocoRegionStatic {
+export interface JocoRegionStatic {
   name: string;
   loot: number;
 }
@@ -396,12 +381,12 @@ interface JocoRegionStatic {
 /**
  * Offices
  */
-interface JocoOfficeBase extends GamePiece {
+export interface JocoOfficeBase extends GamePiece {
   familyMemberId: string | null;
   treasury: number;
 }
 
-interface JocoOfficeStatic {
+export interface JocoOfficeStatic {
   hirePriority: number;
   title: string;
 }
@@ -411,7 +396,7 @@ export type JocoOffice = JocoOfficeBase & JocoOfficeStatic;
 /**
  * Prizes
  */
-interface JocoPrize {
+export interface JocoPrize {
   id: string;
   VictoryPoints: number;
   cost: number;
@@ -422,24 +407,43 @@ interface JocoPrize {
 /**
  * Promise Cards
  */
-interface JocoPromiseCardBase extends GamePiece {
+export interface JocoPromiseCardBase extends GamePiece {
   ownerPlayerId: number;
   familyId: string;
 }
 
-interface JocoPromiseCardStatic {
+export interface JocoPromiseCardStatic {
   title: string;
 }
 
 export type JocoPromiseCard = JocoPromiseCardBase & JocoPromiseCardStatic;
- 
+
+/**
+ * Setup Cards
+ */
+
+export interface JocoSetupCardBase extends GamePiece {}
+
+export interface JocoSetupCardItem {
+  type: string;
+  value?: string;
+}
+
+export type JocoSetupCardStatic = {
+  id: string;
+  extra: boolean;
+  scenarioSetup: number;
+  items: JocoSetupCardItem[];
+};
+
+export type JocoSetupCard = JocoSetupCardBase & JocoSetupCardStatic;
 
 /**
  * Ships
  */
-type OtherShipType = 'ExtraShip' | 'CompanyShip';
+export type OtherShipType = 'ExtraShip' | 'CompanyShip';
 
-interface JocoShipBase extends GamePiece {
+export interface JocoShipBase extends GamePiece {
   type: string;
   side: string;
   name: string;

@@ -58,7 +58,8 @@ class Player extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     return array_merge(
       $data,
       [
-        'draft' => $isCurrentPlayer ? $this->getDraft() : [],
+        'setupDraftHand' => $isCurrentPlayer ? $this->getHandForDraft() : [],
+        'setupCardsChosen' => $isCurrentPlayer ? $this->getSetupCards() : [],
         'familyId' => $this->getFamilyId(),
         'setupCards' => $isCurrentPlayer ? $this->getSetupCards() : [],
         'londonSeasonCards' => $londonSeasonCards,
@@ -93,9 +94,9 @@ class Player extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     }
   }
 
-  public function getDraft()
+  public function getHandForDraft()
   {
-    return SetupCards::getInLocation(Locations::draft($this->getFamilyId()))->toArray();
+    return SetupCards::getInLocation(Locations::hand($this->getFamilyId()))->toArray();
   }
 
   public function getSetupCards()

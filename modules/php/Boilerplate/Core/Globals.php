@@ -182,8 +182,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     // Game options - Note game option values are always a string
     // self::setScenarioId(SCENARIO_OPTION_SCENARIO_ID_MAP[intval($options[OPTION_SCENARIO])]);
     self::setScenarioId(THE_1710_SCENARIO);
-    // self::setDraftSetup(intval($options[OPTION_DRAFT_SETUP_CARDS]) === OPTION_DRAFT_SETUP_CARDS_ENABLED);
-    self::setDraftSetup(false);
+    self::setDraftSetup(intval($options[OPTION_DRAFT_SETUP_CARDS]) === OPTION_DRAFT_SETUP_CARDS_ENABLED);
     self::setOptions($options);
     self::setRetirementMoney([]);
     self::setRegionsLostThisTurn(0);

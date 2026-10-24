@@ -18,6 +18,7 @@ import {
   JoCoOrderBase,
   JocoPromiseCardBase,
   JocoRegionBase,
+  JocoSetupCardBase,
   JocoShipBase,
 } from '../../types';
 
@@ -64,18 +65,24 @@ export interface NotifCompanyOperationChairman extends NotifWithPlayerArgs {
   treasuries: Record<string, number>;
 }
 
-export interface NotifDraftNewCardsPrivateArgs {
-  cardIds: string[];
-  lastCard: boolean;
+export interface NotifDraftNewCardsArgs {
+  _private?: {
+    playerId: number;
+    cards: JocoSetupCardBase[];
+  };
+  // lastCard: boolean;
+}
+
+export interface NotifDraftCardArgs extends NotifWithPlayerArgs {
+  _private?: {
+    playerId: number;
+    cards: JocoSetupCardBase[];
+  };
 }
 
 export interface NotifElephantMarch {
   location: string;
   facing: string;
-}
-
-export interface NotifDraftCardPrivateArgs extends NotifWithPlayerArgs {
-  cardIds: string[];
 }
 
 export interface NotifDrawCompanyFailureCard {
@@ -108,6 +115,8 @@ export interface NotifUpdateFamilyTreasury extends NotifWithPlayerArgs {
 
 export interface NotifGainEnterprise extends NotifWithPlayerArgs {
   type: string;
+  enterprise: JocoEnterpriseCardBase;
+  ship: JocoShipBase | null;
 }
 
 export interface NotifMakeCheck extends NotifWithPlayerArgs {

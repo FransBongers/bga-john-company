@@ -599,24 +599,66 @@ class Notifications
     ]);
   }
 
-  public static function draftCard($player, $cards)
-  {
-    self::notify($player, 'draftCardPrivate', clienttranslate('You draft a card'), [
-      'player' => $player,
-      'cardIds' => Utils::returnIds($cards),
-    ]);
+  // public static function moveLondonSeasonCard(Player $player, LondonSeasonCard $card, string | null $from)
+  // {
+  //   $fromLondonSeasonDisplay = $from === Locations::londonSeasonDisplay();
+  //   $text = clienttranslate('${player_name} takes ${tkn_londonSeasonCard}');
 
-    self::notifyAll('draftCard', clienttranslate('${player_name} drafts a card'), [
-      'player' => $player,
-      'preserve' => ['playerId']
+  //   $playerId = $player->getId();
+
+  //   Game::get()->notify->all('moveLondonSeasonCard', $text, [
+  //     'player_name' => $player->getName(),
+  //     'playerId' => $playerId,
+  //     'card' => $card->jsonSerialize(),
+  //     'tkn_londonSeasonCard' => $card->getType() === BLACKMAIL ? $card->getPublicId() : $card->getId(),
+  //     '_private' => [
+  //       $playerId => new NotificationMessage(
+  //         clienttranslate('${player_name} takes ${tkn_londonSeasonCard}'),
+  //         [
+  //           'player_name' => $player->getName(),
+  //           'playerId' => $playerId,
+  //           'card' => $card->getType() === BLACKMAIL ? $card->jsonSerializePrivate() : $card->jsonSerialize(),
+  //           'tkn_londonSeasonCard' => $card->getType() === BLACKMAIL ? $card->getPublicId() : $card->getId(),
+  //         ]
+  //       ),
+  //     ]
+  //   ]);
+  // }
+
+  public static function draftCard(Player $player, array $cards)
+  {
+    $playerId = $player->getId();
+    $playerName = $player->getName();
+
+    Game::get()->notify->all('draftCard', clienttranslate('${player_name} drafts a card'), [
+      'player_name' => $playerName,
+      '_private' => [
+        $playerId => new NotificationMessage(
+          clienttranslate('${player_name} drafts a card'),
+          [
+            'player_name' => $playerName,
+            'playerId' => $playerId,
+            'cards' => $cards,
+          ]
+        ),
+      ]
     ]);
   }
 
-  public static function draftNewCards($player, $cardIds, $lastCard)
+  public static function draftNewCards(array $newCardsPerPlayer)
   {
-    self::notify($player, 'draftNewCardsPrivate', '', [
-      'cardIds' => $cardIds,
-      'lastCard' => $lastCard,
+    $private = [];
+    foreach ($newCardsPerPlayer as $playerId => $cards) {
+      $private[$playerId] = new NotificationMessage(
+        '',
+        [
+          'cards' => $cards,
+        ]
+      );
+    }
+
+    Game::get()->notify->all('draftNewCards', '', [
+      '_private' => $private
     ]);
   }
 
@@ -750,11 +792,13 @@ class Notifications
     ]);
   }
 
-  public static function gainEnterprise($player, $enterprise)
+  public static function gainEnterprise(Player $player, Enterprise $enterprise)
   {
     // Notifications::message(clienttranslate('${player_name} gains a ${enterprise}'), ['player' => $player, 'enterprise' => $type]);
     self::notifyAll('gainEnterprise', clienttranslate('${player_name} gains a ${tkn_boldText_enterprise} ${tkn_enterpriseIcon}'), [
       'player' => $player,
+      'enterprise' => $enterprise->jsonSerialize(),
+      'ship' => $enterprise->getType() === SHIPYARD ? Ships::get($enterprise->getShipId()) : null,
       'tkn_boldText_enterprise' => $enterprise->getName(),
       'tkn_enterpriseIcon' => $enterprise->getType(),
       'type' => $enterprise->getType(),

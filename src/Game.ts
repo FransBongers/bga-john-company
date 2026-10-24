@@ -39,7 +39,7 @@ import { Negotiation } from './negotiation';
 import { PhaseTracker } from './phase-tracker';
 import { Families } from './families';
 import { PlayerManager } from './player-manager';
-import { SetupArea } from './setup-area';
+import { Draft } from './draft';
 import {
   Chairman,
   ChairmanDebtConsent,
@@ -96,6 +96,7 @@ import { Parliament } from './parliament';
 import { EventTiles } from './india/event-tiles';
 import { EventTilesManager } from './cards/event-tiles';
 import { PromiseCardsManager } from './cards/promise-cards';
+import { SetupCardsManager } from './cards/setup-cards';
 
 // declare const define; // TODO: check if we comment here or in bga-animations module?
 // declare const ebg;
@@ -421,6 +422,7 @@ export class Game {
     LawCardsManager.create(this);
     LondonSeasonCardsManager.create(this);
     PromiseCardsManager.create(this);
+    SetupCardsManager.create(this);
     ShipsManager.create(this);
     ControlTokensManager.create(this);
 
@@ -443,14 +445,15 @@ export class Game {
     Parliament.create(this);
     India.create(this);
     EventTiles.create(this);
-    Bar.create(this);
+    
 
     if (
       this.playerOrder.includes(this.getPlayerId()) &&
       gamedatas.phase === SETUP
     ) {
-      SetupArea.create(this);
+      Draft.create(this);
     }
+    Bar.create(this);
 
     this.notificationManager.setupNotifications();
 

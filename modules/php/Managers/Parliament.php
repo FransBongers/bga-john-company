@@ -20,7 +20,7 @@ class Parliament
     });
 
     Globals::setParliament([
-      PRIME_MINISTER => '',
+      PRIME_MINISTER => null,
       DIAL => $position,
       OPPOSITION => [
         'votes' => [], // array of $playerId => votes
@@ -149,12 +149,16 @@ class Parliament
 
   public static function getPrimeMinisterPlayerId()
   {
-    return self::getPrimeMinisterPlayer()->getId();
+    $primeMinisterPlayer = self::getPrimeMinisterPlayer();
+    return $primeMinisterPlayer ? $primeMinisterPlayer->getId() : null;
   }
 
   public static function getPrimeMinisterPlayer()
   {
     $familyId = Globals::getParliament()[PRIME_MINISTER];
+    if ($familyId === null) {
+      return null;
+    }
     return Players::getPlayerForFamily($familyId);
   }
 

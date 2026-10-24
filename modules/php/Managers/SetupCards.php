@@ -104,7 +104,7 @@ class SetupCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
       if ($familyId === CROWN) {
         continue;
       }
-      $location = $draftEnabled ? Locations::draft($familyId) : Locations::setupCards($familyId);
+      $location = $draftEnabled ? Locations::hand($familyId) : Locations::setupCards($familyId);
       self::pickForLocation($numberOfCards, DECK, $location);
     }
 

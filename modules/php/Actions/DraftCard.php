@@ -39,7 +39,7 @@ class DraftCard extends \Bga\Games\JohnCompany\Models\AtomicAction
       $familyId = $player->getFamilyId();
       
       $cardsToSelectFrom = Utils::filter($cards, function ($card) use ($familyId) {
-        return $card->getLocation() === Locations::draft($familyId);
+        return $card->getLocation() === Locations::hand($familyId);
       });
 
       $privateData[$playerId] = [

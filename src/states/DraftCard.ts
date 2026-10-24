@@ -1,3 +1,4 @@
+import { Bar } from '../bar';
 import {
   addCancelButton,
   addConfirmButton,
@@ -40,6 +41,7 @@ export class DraftCard implements GameState<OnEnteringDraftCardArgs> {
     this.args = args;
     this.selectedCards = [];
     this.updateInterfaceInitialStep();
+    Bar.getInstance().goTo('joco-draft');
   }
 
   onLeavingState() {
@@ -85,9 +87,9 @@ export class DraftCard implements GameState<OnEnteringDraftCardArgs> {
     this.setSelected();
 
     this.args._private.options.forEach((option) => {
-      const node = document.getElementById(option.id);
-      node.classList.add(SELECTABLE);
-      onClick(node, () => this.handleClick(option.id));
+      // const node = document.getElementById(option.id);
+      // node.classList.add(SELECTABLE);
+      onClick(`setup-card-${option.id}`, () => this.handleClick(option.id));
     });
     if (this.selectedCards.length > 0) {
       addCancelButton();
@@ -122,7 +124,7 @@ export class DraftCard implements GameState<OnEnteringDraftCardArgs> {
   //  ..#######.....##....####.########.####....##.......##...
 
   private setSelected() {
-    this.selectedCards.forEach((cardId) => setSelected(cardId));
+    this.selectedCards.forEach((cardId) => setSelected(`setup-card-${cardId}`));
   }
 
   //  ..######..##.......####..######..##....##
