@@ -106,7 +106,7 @@ export class TooltipManager {
     imageOnly?: boolean;
   }) {
     const card = StaticData.get().londonSeasonCard(cardId);
-    const html = tplLondonSeasonCardTooltip(card);
+    const html = tplLondonSeasonCardTooltip({id: cardId, ...card});
     // this.addCustomTooltip(nodeId, html, { forceRecreate: true });
 
     this.game.bga.gameui.addTooltipHtml(nodeId, html, 400);

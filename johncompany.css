@@ -679,13 +679,6 @@ span[style*="color:#addb90"] {
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  * -----
  */
-.joco-card {
-  width: 225px;
-  aspect-ratio: 150/234;
-  background-image: url("img/bridge_cards.jpg");
-  background-size: 500% 500%;
-}
-
 .joco-card[data-background=Blackmail] {
   background-position-x: 0%;
   background-position-y: 0%;
@@ -811,119 +804,12 @@ span[style*="color:#addb90"] {
   background-position-y: 100%;
 }
 
-.joco-card-container .joco-enterprise-icon,
-.joco-card-container .fb-card-text-note,
-.joco-card-container .fb-card-text,
-.joco-card-container .joco-card-title,
-.joco-card-container .joco-card-subtitle,
-.joco-card-container .joco-card-name {
-  position: absolute;
-  text-align: center;
+.joco-card {
+  width: 225px;
+  aspect-ratio: 150/234;
+  background-image: url("img/bridge_cards.jpg");
+  background-size: 500% 500%;
 }
-.joco-card-container[data-subtype=Enterprise] .joco-card-name {
-  left: 2px;
-  top: 18px;
-  width: 161px;
-  height: 20px;
-}
-.joco-card-container[data-subtype=Enterprise] .fb-card-text {
-  left: 5%;
-  width: 90%;
-  top: 225px;
-  height: 115px;
-}
-.joco-card-container[data-subtype=Enterprise] .joco-enterprise-icon {
-  left: 169px;
-  top: 22px;
-}
-.joco-card-container[data-subtype=Enterprise] .joco-enterprise-icon .joco-icon {
-  height: 40px;
-}
-.joco-card-container[data-subtype=Enterprise] .joco-card[data-background=LabourNewspaper] .fb-card-text .joco-policy-icon,
-.joco-card-container[data-subtype=Enterprise] .joco-card[data-background=LabourNewspaper] .fb-card-text .joco-icon, .joco-card-container[data-subtype=Enterprise] .joco-card[data-background=SocialMagazine] .fb-card-text .joco-policy-icon,
-.joco-card-container[data-subtype=Enterprise] .joco-card[data-background=SocialMagazine] .fb-card-text .joco-icon, .joco-card-container[data-subtype=Enterprise] .joco-card[data-background=RottenBorough] .fb-card-text .joco-policy-icon,
-.joco-card-container[data-subtype=Enterprise] .joco-card[data-background=RottenBorough] .fb-card-text .joco-icon {
-  height: 40px;
-}
-.joco-card-container[data-subtype=Enterprise] .joco-card[data-background=ScottishCastle] .joco-icon {
-  position: absolute;
-  height: 40px;
-}
-.joco-card-container[data-subtype=Enterprise] .joco-card[data-background=ScottishCastle] .joco-icon[data-icon=Power3] {
-  top: 262px;
-  left: 40px;
-}
-.joco-card-container[data-subtype=Enterprise] .joco-card[data-background=ScottishCastle] .joco-window-1 {
-  top: 235px;
-  left: 100px;
-}
-.joco-card-container[data-subtype=Enterprise] .joco-card[data-background=ScottishCastle] .joco-window-2 {
-  top: 280px;
-  left: 150px;
-}
-.joco-card-container[data-subtype=Spouse] .joco-card-title {
-  left: 5%;
-  width: 90%;
-  top: 4px;
-  height: 20px;
-}
-.joco-card-container[data-subtype=Spouse] .joco-card-subtitle {
-  left: 5%;
-  width: 90%;
-  top: 20px;
-  height: 16px;
-}
-.joco-card-container[data-subtype=Spouse] .joco-card-name {
-  left: 5%;
-  width: 90%;
-  top: 215px;
-  height: 34px;
-}
-.joco-card-container[data-subtype=Spouse] .joco-card-name .bga-autofit__inner {
-  overflow: visible !important;
-}
-.joco-card-container[data-subtype=Spouse] .fb-card-text {
-  left: 5%;
-  width: 90%;
-  top: 250px;
-  height: 90px;
-}
-.joco-card-container[data-subtype=Spouse] .joco-icon[data-icon^=Discount] {
-  position: absolute;
-  height: 40px;
-  left: 166px;
-  top: 95px;
-}
-.joco-card-container[data-subtype=Spouse] .joco-icon[data-icon^=Power] {
-  position: absolute;
-  height: 40px;
-  left: 166px;
-  top: 50px;
-}
-.joco-card-container[data-subtype=Spouse] .joco-icon[data-icon^=VictoryPoints] {
-  position: absolute;
-  height: 40px;
-  left: 166px;
-  top: 50px;
-}
-.joco-card-container[data-subtype=Spouse][data-has-text-note=true] .fb-card-text {
-  height: 60px;
-}
-.joco-card-container[data-subtype=Spouse][data-has-text-note=true] .fb-card-text-note {
-  left: 5%;
-  width: 90%;
-  top: 310px;
-  height: 35px;
-}
-.joco-card-container.selectable .joco-card {
-  cursor: pointer;
-  outline: 4px solid yellow;
-}
-.joco-card-container.selectable:hover .joco-card, .joco-card-container.selected .joco-card {
-  cursor: pointer;
-  outline: 4px solid blue;
-}
-
 .joco-card .joco-enterprise-icon,
 .joco-card .fb-card-text-note,
 .joco-card .fb-card-text,
@@ -932,6 +818,101 @@ span[style*="color:#addb90"] {
 .joco-card .joco-card-name {
   position: absolute;
   text-align: center;
+}
+.joco-card[data-subtype=Enterprise] .joco-card-name {
+  left: 2px;
+  top: 18px;
+  width: 161px;
+  height: 20px;
+}
+.joco-card[data-subtype=Enterprise] .fb-card-text {
+  left: 5%;
+  width: 90%;
+  top: 225px;
+  height: 115px;
+}
+.joco-card[data-subtype=Enterprise] .joco-enterprise-icon {
+  left: 169px;
+  top: 22px;
+}
+.joco-card[data-subtype=Enterprise] .joco-enterprise-icon .joco-icon {
+  height: 40px;
+}
+.joco-card[data-subtype=Enterprise][data-background=LabourNewspaper] .fb-card-text .joco-policy-icon,
+.joco-card[data-subtype=Enterprise][data-background=LabourNewspaper] .fb-card-text .joco-icon, .joco-card[data-subtype=Enterprise][data-background=SocialMagazine] .fb-card-text .joco-policy-icon,
+.joco-card[data-subtype=Enterprise][data-background=SocialMagazine] .fb-card-text .joco-icon, .joco-card[data-subtype=Enterprise][data-background=RottenBorough] .fb-card-text .joco-policy-icon,
+.joco-card[data-subtype=Enterprise][data-background=RottenBorough] .fb-card-text .joco-icon {
+  height: 40px;
+}
+.joco-card[data-subtype=Enterprise][data-background=ScottishCastle] .joco-icon {
+  position: absolute;
+  height: 40px;
+}
+.joco-card[data-subtype=Enterprise][data-background=ScottishCastle] .joco-icon[data-icon=Power3] {
+  top: 262px;
+  left: 40px;
+}
+.joco-card[data-subtype=Enterprise][data-background=ScottishCastle] .joco-window-1 {
+  top: 235px;
+  left: 100px;
+}
+.joco-card[data-subtype=Enterprise][data-background=ScottishCastle] .joco-window-2 {
+  top: 280px;
+  left: 150px;
+}
+.joco-card[data-subtype=Spouse] .joco-card-title {
+  left: 5%;
+  width: 90%;
+  top: 4px;
+  height: 20px;
+}
+.joco-card[data-subtype=Spouse] .joco-card-subtitle {
+  left: 5%;
+  width: 90%;
+  top: 20px;
+  height: 16px;
+}
+.joco-card[data-subtype=Spouse] .joco-card-name {
+  left: 5%;
+  width: 90%;
+  top: 215px;
+  height: 34px;
+}
+.joco-card[data-subtype=Spouse] .joco-card-name .bga-autofit__inner {
+  overflow: visible !important;
+}
+.joco-card[data-subtype=Spouse] .fb-card-text {
+  left: 5%;
+  width: 90%;
+  top: 250px;
+  height: 90px;
+}
+.joco-card[data-subtype=Spouse] .joco-icon[data-icon^=Discount] {
+  position: absolute;
+  height: 40px;
+  left: 166px;
+  top: 95px;
+}
+.joco-card[data-subtype=Spouse] .joco-icon[data-icon^=Power] {
+  position: absolute;
+  height: 40px;
+  left: 166px;
+  top: 50px;
+}
+.joco-card[data-subtype=Spouse] .joco-icon[data-icon^=VictoryPoints] {
+  position: absolute;
+  height: 40px;
+  left: 166px;
+  top: 50px;
+}
+.joco-card[data-subtype=Spouse][data-has-text-note=true] .fb-card-text {
+  height: 60px;
+}
+.joco-card[data-subtype=Spouse][data-has-text-note=true] .fb-card-text-note {
+  left: 5%;
+  width: 90%;
+  top: 310px;
+  height: 35px;
 }
 .joco-card[data-background=Blackmail] .joco-card-name {
   left: 45px;
@@ -955,8 +936,7 @@ span[style*="color:#addb90"] {
   left: 20px;
   top: 265px;
 }
-
-#game-card-PrestigeCard_25 .game-card-front .joco-card-name {
+.joco-card[data-card-id=PrestigeCard_25] .joco-card-name {
   left: 24px;
   top: 18px;
   width: 140px;

@@ -1307,11 +1307,15 @@ class LondonSeasonCardsManager extends BgaCards$1.Manager {
         if (card.type === PRESTIGE) {
             div.setAttribute('data-subtype', card.subtype);
         }
-        div.setAttribute('data-has-text-note', card.textNote ? 'true' : 'false');
     }
     setupFrontDiv(card, div) {
         div.classList.add('joco-card');
         div.setAttribute('data-background', card.type === BLACKMAIL ? 'Blackmail' : card.background);
+        div.setAttribute('data-has-text-note', card.textNote ? 'true' : 'false');
+        div.setAttribute('data-card-id', card.id);
+        if (card.type === PRESTIGE) {
+            div.setAttribute('data-subtype', card.subtype);
+        }
         if (card.type === BLACKMAIL && !card.hiddenId && div.children.length) {
             div.replaceChildren();
             return;
@@ -5068,11 +5072,15 @@ const tplLawCardTooltip = (data) => `
     ${tplLawCardContent$1(data)}
   </div>
 `;
-const tplLondonSeasonCardTooltip = (data) => `
-  <div class="joco-card tooltip" data-background="${data.background}">
+const tplLondonSeasonCardTooltip = (data) => {
+    const subtype = data.type === PRESTIGE ? data.subtype : '';
+    const hasTextNote = data.textNote ? 'true' : 'false';
+    return `
+  <div class="joco-card tooltip" data-background="${data.background}" data-card-id="${data.id}" data-has-text-note="${hasTextNote}"${subtype ? ` data-subtype="${subtype}"` : ''}>
     ${data.type === PRESTIGE ? tplLondonSeasonCardContent(data) : tplBlackmailCardContent(data)}
   </div>
 `;
+};
 
 class TooltipManager {
     constructor(game) {
@@ -5100,7 +5108,7 @@ class TooltipManager {
     }
     addLondonSeasonCardTooltip({ nodeId, cardId, imageOnly = false, }) {
         const card = StaticData$1.get().londonSeasonCard(cardId);
-        const html = tplLondonSeasonCardTooltip(card);
+        const html = tplLondonSeasonCardTooltip({ id: cardId, ...card });
         this.game.bga.gameui.addTooltipHtml(nodeId, html, 400);
     }
     addBlackmailBackTooltip(nodeId) {
@@ -8086,6 +8094,7 @@ class ParliamentMeetsAdditionalRoundOrResolve {
         debug('Entering ParliamentMeetsAdditionalRoundOrResolve state');
         this.args = args;
         this.updateInterfaceInitialStep();
+        Bar.getInstance().goTo('joco-parliament');
     }
     onLeavingState() {
         debug('Leaving ParliamentMeetsAdditionalRoundOrResolve state');

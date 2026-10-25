@@ -39,7 +39,6 @@ export class LondonSeasonCardsManager extends BgaCards.Manager<JocoLondonSeasonC
     if (card.type === PRESTIGE) {
       div.setAttribute('data-subtype', card.subtype);
     }
-    div.setAttribute('data-has-text-note', card.textNote ? 'true' : 'false');
   }
 
   setupFrontDiv(card: JocoLondonSeasonCard, div: HTMLElement) {
@@ -48,6 +47,11 @@ export class LondonSeasonCardsManager extends BgaCards.Manager<JocoLondonSeasonC
       'data-background',
       card.type === BLACKMAIL ? 'Blackmail' : card.background,
     );
+    div.setAttribute('data-has-text-note', card.textNote ? 'true' : 'false');
+    div.setAttribute('data-card-id', card.id);
+    if (card.type === PRESTIGE) {
+      div.setAttribute('data-subtype', card.subtype);
+    }
 
     if (card.type === BLACKMAIL && !card.hiddenId && div.children.length) {
       div.replaceChildren();

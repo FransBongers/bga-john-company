@@ -1,3 +1,4 @@
+import { Bar } from '../bar';
 import {
   addCancelButton,
   addConfirmButton,
@@ -34,6 +35,7 @@ export class ParliamentMeetsAdditionalRoundOrResolve implements GameState<OnEnte
     debug('Entering ParliamentMeetsAdditionalRoundOrResolve state');
     this.args = args;
     this.updateInterfaceInitialStep();
+    Bar.getInstance().goTo('joco-parliament');
   }
 
   onLeavingState() {

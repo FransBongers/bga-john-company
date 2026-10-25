@@ -143,6 +143,7 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
       }
 
     }
+    Notifications::updatePower();
 
     Notifications::setupDone();
     Globals::setTransactionsEnabled(true);

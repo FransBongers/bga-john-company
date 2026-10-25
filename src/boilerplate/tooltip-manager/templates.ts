@@ -15,9 +15,12 @@ export const tplLawCardTooltip = (
 `;
 
 export const tplLondonSeasonCardTooltip = (
-  data: JocoLondonSeasonCardStatic,
-) => `
-  <div class="joco-card tooltip" data-background="${data.background}">
+  data: JocoLondonSeasonCardStatic & { id: string },
+) => {
+  const subtype = data.type === PRESTIGE ? data.subtype : '';
+  const hasTextNote = data.textNote ? 'true' : 'false';
+  return `
+  <div class="joco-card tooltip" data-background="${data.background}" data-card-id="${data.id}" data-has-text-note="${hasTextNote}"${subtype ? ` data-subtype="${subtype}"` : ''}>
     ${data.type === PRESTIGE ? tplLondonSeasonCardContent(data) : tplBlackmailCardContent(data)}
   </div>
-`;
+`};

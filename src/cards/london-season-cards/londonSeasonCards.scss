@@ -2,13 +2,6 @@
 @use 'sass:math';
 @use 'sass:map';
 
-.joco-card {
-  width: 225px;
-  aspect-ratio: 150 / 234;
-  background-image: url('img/bridge_cards.jpg');
-  background-size: 500% 500%;
-}
-
 $bridgeCards: (
   1: 'Blackmail',
   2: 'MrRochester',
@@ -54,7 +47,12 @@ $rows: 5;
   }
 }
 
-.joco-card-container {
+.joco-card {
+  width: 225px;
+  aspect-ratio: 150 / 234;
+  background-image: url('img/bridge_cards.jpg');
+  background-size: 500% 500%;
+
   .joco-enterprise-icon,
   .fb-card-text-note,
   .fb-card-text,
@@ -93,38 +91,36 @@ $rows: 5;
       }
     }
 
-    .joco-card {
-      &[data-background='LabourNewspaper'],
-      &[data-background='SocialMagazine'],
-      &[data-background='RottenBorough'] {
-        .fb-card-text {
-          .joco-policy-icon,
-          .joco-icon {
-            height: 40px;
-          }
+    &[data-background='LabourNewspaper'],
+    &[data-background='SocialMagazine'],
+    &[data-background='RottenBorough'] {
+      .fb-card-text {
+        .joco-policy-icon,
+        .joco-icon {
+          height: 40px;
+        }
+      }
+    }
+
+    &[data-background='ScottishCastle'] {
+      .joco-icon {
+        position: absolute;
+        height: 40px;
+
+        &[data-icon='Power3'] {
+          top: 262px;
+          left: 40px;
         }
       }
 
-      &[data-background='ScottishCastle'] {
-        .joco-icon {
-          position: absolute;
-          height: 40px;
+      .joco-window-1 {
+        top: 235px;
+        left: 100px;
+      }
 
-          &[data-icon='Power3'] {
-            top: 262px;
-            left: 40px;
-          }
-        }
-
-        .joco-window-1 {
-          top: 235px;
-          left: 100px;
-        }
-
-        .joco-window-2 {
-          top: 280px;
-          left: 150px;
-        }
+      .joco-window-2 {
+        top: 280px;
+        left: 150px;
       }
     }
   }
@@ -199,33 +195,6 @@ $rows: 5;
     }
   }
 
-  &.selectable {
-    .joco-card {
-      cursor: pointer;
-      outline: 4px solid base.$selectable-color;
-    }
-  }
-
-  &.selectable:hover,
-  &.selected {
-    .joco-card {
-      cursor: pointer;
-      outline: 4px solid base.$selected-color;
-    }
-  }
-}
-
-.joco-card {
-  .joco-enterprise-icon,
-  .fb-card-text-note,
-  .fb-card-text,
-  .joco-card-title,
-  .joco-card-subtitle,
-  .joco-card-name {
-    position: absolute;
-    text-align: center;
-  }
-
   &[data-background='Blackmail'] {
     .joco-card-name {
       left: 45px;
@@ -255,10 +224,8 @@ $rows: 5;
       top: 265px;
     }
   }
-}
 
-#game-card-PrestigeCard_25 {
-  .game-card-front {
+  &[data-card-id='PrestigeCard_25'] {
     .joco-card-name {
       left: 24px;
       top: 18px;
@@ -269,3 +236,219 @@ $rows: 5;
     }
   }
 }
+
+// .joco-card-container {
+// .joco-enterprise-icon,
+// .fb-card-text-note,
+// .fb-card-text,
+// .joco-card-title,
+// .joco-card-subtitle,
+// .joco-card-name {
+//   position: absolute;
+//   text-align: center;
+// }
+
+// &[data-subtype='Enterprise'] {
+//   .joco-card-name {
+//     left: 2px;
+//     top: 18px;
+//     // background-color: yellow;
+//     width: 161px;
+//     height: 20px;
+//     // letter-spacing: 0.5px;
+//   }
+
+//   .fb-card-text {
+//     left: 5%;
+//     width: 90%;
+//     top: 225px;
+//     height: 115px;
+//     // background-color: yellow;
+//   }
+
+//   .joco-enterprise-icon {
+//     left: 169px;
+//     top: 22px;
+
+//     .joco-icon {
+//       height: 40px;
+//       // background-color: yellow;
+//     }
+//   }
+
+//   .joco-card {
+//     &[data-background='LabourNewspaper'],
+//     &[data-background='SocialMagazine'],
+//     &[data-background='RottenBorough'] {
+//       .fb-card-text {
+//         .joco-policy-icon,
+//         .joco-icon {
+//           height: 40px;
+//         }
+//       }
+//     }
+
+//     &[data-background='ScottishCastle'] {
+//       .joco-icon {
+//         position: absolute;
+//         height: 40px;
+
+//         &[data-icon='Power3'] {
+//           top: 262px;
+//           left: 40px;
+//         }
+//       }
+
+//       .joco-window-1 {
+//         top: 235px;
+//         left: 100px;
+//       }
+
+//       .joco-window-2 {
+//         top: 280px;
+//         left: 150px;
+//       }
+//     }
+//   }
+// }
+
+// &[data-subtype='Spouse'] {
+//   .joco-card-title {
+//     left: 5%;
+//     width: 90%;
+//     top: 4px;
+//     height: 20px;
+//     // background-color: yellow;
+//   }
+
+//   .joco-card-subtitle {
+//     left: 5%;
+//     width: 90%;
+//     top: 20px;
+//     height: 16px;
+//     // background-color: yellow;
+//   }
+
+//   .joco-card-name {
+//     left: 5%;
+//     width: 90%;
+//     top: 215px;
+//     height: 34px;
+
+//     .bga-autofit__inner {
+//       overflow: visible !important;
+//     }
+//   }
+
+//   .fb-card-text {
+//     left: 5%;
+//     width: 90%;
+//     top: 250px;
+//     height: 90px;
+//   }
+
+//   .joco-icon[data-icon^='Discount'] {
+//     position: absolute;
+//     height: 40px;
+//     left: 166px;
+//     top: 95px;
+//   }
+//   .joco-icon[data-icon^='Power'] {
+//     position: absolute;
+//     height: 40px;
+//     left: 166px;
+//     top: 50px;
+//   }
+//   .joco-icon[data-icon^='VictoryPoints'] {
+//     position: absolute;
+//     height: 40px;
+//     left: 166px;
+//     top: 50px;
+//   }
+
+//   &[data-has-text-note='true'] {
+//     .fb-card-text {
+//       height: 60px;
+//       // background-color: grey;
+//     }
+
+//     .fb-card-text-note {
+//       left: 5%;
+//       width: 90%;
+//       top: 310px;
+//       height: 35px;
+//       // background-color: yellow;
+//     }
+//   }
+// }
+
+// &.selectable {
+//   .joco-card {
+//     cursor: pointer;
+//     outline: 4px solid base.$selectable-color;
+//   }
+// }
+
+// &.selectable:hover,
+// &.selected {
+//   .joco-card {
+//     cursor: pointer;
+//     outline: 4px solid base.$selected-color;
+//   }
+// }
+// }
+
+// .joco-card {
+// .joco-enterprise-icon,
+// .fb-card-text-note,
+// .fb-card-text,
+// .joco-card-title,
+// .joco-card-subtitle,
+// .joco-card-name {
+//   position: absolute;
+//   text-align: center;
+// }
+
+// &[data-background='Blackmail'] {
+//   .joco-card-name {
+//     left: 45px;
+//     top: 90px;
+//     // background-color: blue;
+//     width: 135px;
+//     height: 48px;
+//     line-height: 24px;
+//     // letter-spacing: 0.5px;
+//     .bga-autofit__inner {
+//       overflow: visible !important;
+//     }
+//   }
+
+//   .fb-card-text {
+//     top: 138px;
+//     left: 40px;
+//     width: 145px;
+//     height: 110px;
+//     // background-color: yellow;
+//   }
+
+//   .joco-icon[data-icon^='Power'] {
+//     position: absolute;
+//     height: 40px;
+//     left: 20px;
+//     top: 265px;
+//   }
+// }
+// }
+
+// #game-card-PrestigeCard_25 {
+//   .game-card-front {
+//     .joco-card-name {
+//       left: 24px;
+//       top: 18px;
+//       // background-color: yellow;
+//       width: 140px;
+//       height: 20px;
+//       // letter-spacing: 0.5px;
+//     }
+//   }
+// }

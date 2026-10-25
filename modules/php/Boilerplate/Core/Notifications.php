@@ -1580,6 +1580,7 @@ class Notifications
       'player' => $player,
       'tkn_icon' => SHARE,
       'tkn_boldText_amount' => '£' . $amount,
+      'amount' => $amount,
       'familyMember' => $familyMember,
     ]);
   }
