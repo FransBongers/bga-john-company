@@ -119,6 +119,7 @@ class Ship extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implement
     if ($shipyard === null) {
       throw new \Bga\GameFramework\VisibleSystemException("SHIP_002");
     }
+    $this->setSide(FULL);
     $from = $this->getLocation();
     $this->setLocation($shipyard->getId());
     Notifications::moveShip($player, $this, $from);

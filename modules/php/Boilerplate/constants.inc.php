@@ -11,6 +11,9 @@ const NODE_LEAF = "leaf";
 const ZOMBIE = 98;
 const PASS = 99;
 
+const YES = 'yes';
+const NO = 'no';
+
 
 const ST_GAME_SETUP = 1;
 const ST_GAME_SETUP_NAME = 'gameSetup';

@@ -12,6 +12,7 @@ use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Ships;
@@ -61,6 +62,7 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
       'otherShips' => $otherShips,
       'treasury' => Offices::get(MANAGER_OF_SHIPPING)->getTreasury(),
       'superintendentOfTradeInChinaInPlay' => Offices::get(SUPERINTENDENT_OF_TRADE_IN_CHINA)->isInPlay(),
+      'playerShipPrice' => $this->getPlayerShipPrice(),
     ];
 
     return $data;
@@ -103,6 +105,7 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
     $player = Players::get($playerId);
 
     $stateArgs = $this->argsManagerOfShipping();
+    $playerShipPrice = $stateArgs['playerShipPrice'];
 
     $playerShipCount = 0;
     $totalPayment = 0;
@@ -116,7 +119,7 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
       }
       $playerShipCount++;
       $ship->place($ship->getOwner(), $seaZone);
-      $totalPayment += 3;
+      $totalPayment += $playerShipPrice;
     }
 
     $totalCompanyAndExtraShips = 0;
@@ -164,6 +167,14 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private function getPlayerShipPrice()
+  {
+    if (LawCards::isInPlay(SHIP_SUBSIDY_ID)) {
+      return 2;
+    }
+    return 3;
+  }
 
   private function placeOtherShip($stateArgs, $player, $shipId, $seaZone, $type)
   {

@@ -173,7 +173,7 @@ class PresidentTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
     $this->ctx->insertAsBrother(Engine::buildTree([
       'action' => TIMING_WINDOW_CHECK,
       'args' => [
-        TIMING_WINDOW => AFTER_PRESIDENT_OR_FIRM_CHECK,
+        TIMING_WINDOW => [AFTER_PRESIDENT_OR_FIRM_CHECK],
         BLACKMAIL_CARD => [MERCANTILE_CONNECTION_ID],
       ],
     ]));

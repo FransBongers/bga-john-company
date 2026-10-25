@@ -777,6 +777,14 @@ $machinestates = [
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
+    ST_USE_ROYAL_PROTECTION => [
+        'name' => USE_ROYAL_PROTECTION,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
     ST_EVENTS_IN_INDIA_STORMS => [
         'name' => EVENTS_IN_INDIA_STORMS,
         'description' => '',

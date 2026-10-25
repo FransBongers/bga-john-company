@@ -263,6 +263,11 @@ class Players extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
   // .##.....##.##..........##....##.....##.##.....##.##.....##.##....##
   // .##.....##.########....##....##.....##..#######..########...######.
 
+  public static function getChairmanPlayerId()
+  {
+    return Families::getChairmanFamily()->getPlayerId();
+  }
+
   public static function getPlayerForFamily($familyId)
   {
     if ($familyId === CROWN) {

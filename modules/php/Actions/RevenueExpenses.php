@@ -72,13 +72,9 @@ class RevenueExpenses extends \Bga\Games\JohnCompany\Models\AtomicAction
     ]);
     Notifications::payCompanyExpenses($companyBalanceAfterExpenses);
 
-    if ($totalExpenses > $companyBalance) {
-      // TODO: check royal pardon
-      $action = [
-        'action' => REVENUE_EMERGENCY_LOANS,
-        'remainingExpenses' => $totalExpenses - $companyBalance,
-      ];
-      $this->ctx->insertAsBrother(Engine::buildTree($action));
+    $remainingExpenses = $totalExpenses - $companyBalance;
+    if ($remainingExpenses > 0) {
+      $this->handleEmergencyLoans($remainingExpenses);
     }
 
     $this->resolveAction(['automatic' => true]);
@@ -93,4 +89,41 @@ class RevenueExpenses extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
+  private function handleEmergencyLoans(int $remainingExpenses)
+  {
+
+    $action = [
+      'action' => REVENUE_EMERGENCY_LOANS,
+      'remainingExpenses' => $remainingExpenses,
+    ];
+    if (LawCards::isInPlay(ROYAL_PROTECTION_ID)) {
+      $playerId = Players::getChairmanPlayerId();
+
+      $action = [
+        'type' => NODE_XOR,
+        'playerId' => $playerId,
+        'stateDescription' => [
+          'descriptionmyturn' => clienttranslate('${you} may discard Royal Protection to avoid emergency loans and cancel remaining expenses'),
+          'description' => clienttranslate('${actplayer} may discard Royal Protection to avoid emergency loans and cancel remaining expenses'),
+          'args' => []
+        ],
+        'children' => [
+          [
+            'action' => USE_ROYAL_PROTECTION,
+            'args' => [
+              'option' => YES,
+            ],
+          ],
+          [
+            'action' => USE_ROYAL_PROTECTION,
+            'args' => [
+              'option' => NO,
+            ],
+          ],
+        ],
+      ];
+    }
+
+    $this->ctx->insertAsBrother(Engine::buildTree($action));
+  }
 }

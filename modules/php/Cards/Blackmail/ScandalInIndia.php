@@ -112,7 +112,7 @@ class ScandalInIndia extends \Bga\Games\JohnCompany\Models\BlackmailCard
     $ctx->insertAsBrother(new LeafNode([
       'action' => TIMING_WINDOW_CHECK,
       'args' => [
-        TIMING_WINDOW => WHEN_TAKEN_FROM_DISPLAY,
+        TIMING_WINDOW => [WHEN_TAKEN_FROM_DISPLAY],
         BLACKMAIL_CARD => [$this->getId()],
       ],
     ]));

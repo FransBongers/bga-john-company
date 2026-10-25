@@ -174,7 +174,7 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
     $this->ctx->insertAsBrother(Engine::buildTree([
       'action' => TIMING_WINDOW_CHECK,
       'args' => [
-        TIMING_WINDOW => AFTER_COMMANDER_DEPLOY_CHECK,
+        TIMING_WINDOW => [AFTER_COMMANDER_DEPLOY_CHECK],
         BLACKMAIL_CARD => [DIPLOMATIC_CONNECTION_ID],
       ],
     ]));

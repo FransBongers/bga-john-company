@@ -121,6 +121,13 @@ trait TurnTrait
         ],
         [
           'action' => LONDON_SEASON_CLEANUP,
+        ],
+        [
+          'action' => TIMING_WINDOW_CHECK,
+          'args' => [
+            TIMING_WINDOW => [BEFORE_THE_FAMILY_PHASE],
+            BLACKMAIL_CARD => [THE_PRIME_MINISTERS_EAR_ID],
+          ],
         ]
       ],
     ];
@@ -321,7 +328,7 @@ trait TurnTrait
         [
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
-            TIMING_WINDOW => AFTER_OFFICE_FINISHED_ACTING,
+            TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
             LAW_CARD => [BOARD_OF_CONTROL_ID],
             TIMING_DATA => [
               'officeId' => DIRECTOR_OF_TRADE
@@ -355,7 +362,7 @@ trait TurnTrait
         [
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
-            TIMING_WINDOW => AFTER_OFFICE_FINISHED_ACTING,
+            TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
             LAW_CARD => [BOARD_OF_CONTROL_ID],
             TIMING_DATA => [
               'officeId' => MANAGER_OF_SHIPPING
@@ -442,8 +449,9 @@ trait TurnTrait
         [
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
-            TIMING_WINDOW => AFTER_OFFICE_FINISHED_ACTING,
+            TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING, BEFORE_BOMBAY_PRESIDENCY_OPERATIONS],
             LAW_CARD => [BOARD_OF_CONTROL_ID],
+            BLACKMAIL_CARD => [ENVOY_TO_THE_MUGHALS_ID],
             TIMING_DATA => [
               'officeId' => MILITARY_AFFAIRS
             ],
@@ -508,7 +516,7 @@ trait TurnTrait
         [
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
-            TIMING_WINDOW => AFTER_OFFICE_FINISHED_ACTING,
+            TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
             LAW_CARD => [BOARD_OF_CONTROL_ID],
             TIMING_DATA => [
               'officeId' => SUPERINTENDENT_OF_TRADE_IN_CHINA
@@ -565,7 +573,7 @@ trait TurnTrait
         [
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
-            TIMING_WINDOW => START_OF_REVENUE_PHASE,
+            TIMING_WINDOW => [START_OF_REVENUE_PHASE],
             BLACKMAIL_CARD => [COMPANY_FRAUD_ID],
           ],
         ],
@@ -583,6 +591,13 @@ trait TurnTrait
           'playerId' => 'some',
           'activePlayerIds' => [Offices::get(CHAIRMAN)->getPlayerId()],
         ],
+        [
+          'action' => TIMING_WINDOW_CHECK,
+          'args' => [
+            TIMING_WINDOW => [BEFORE_EVENTS_IN_INDIA_PHASE],
+            BLACKMAIL_CARD => [ENVOY_TO_THE_MUGHALS_ID],
+          ],
+        ]
       ],
     ];
 
@@ -706,7 +721,7 @@ trait TurnTrait
         [
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
-            TIMING_WINDOW => AFTER_OFFICE_FINISHED_ACTING,
+            TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
             BLACKMAIL_CARD => [SCANDAL_IN_INDIA_ID, SCANDAL_ON_LEADENHALL_STREET_ID],
           ],
         ],

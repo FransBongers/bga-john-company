@@ -32,7 +32,7 @@ class ScandalOnLeadenhallStreet extends \Bga\Games\JohnCompany\Models\BlackmailC
     $ctx->insertAsBrother(new LeafNode([
       'action' => TIMING_WINDOW_CHECK,
       'args' => [
-        TIMING_WINDOW => WHEN_TAKEN_FROM_DISPLAY,
+        TIMING_WINDOW => [WHEN_TAKEN_FROM_DISPLAY],
         BLACKMAIL_CARD => [$this->getId()],
       ],
     ]));

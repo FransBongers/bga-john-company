@@ -160,6 +160,7 @@ const ST_PRESIDENCY_GOVERNOR = 172;
 const ST_PRESIDENCY_PRESIDENT = 173;
 const ST_VACATE_OFFICE_WITHOUT_RETIREMENT = 174;
 const ST_USE_MAN_ON_THE_INSIDE = 175;
+const ST_USE_ROYAL_PROTECTION = 178;
 
 
 const BONUSES = 'Bonuses';
@@ -201,6 +202,7 @@ const REVENUE_EXPENSES = 'RevenueExpenses';
 const REVENUE_CHECK_EXPECTATIONS = 'RevenueCheckExpectations';
 const REVENUE_ROYAL_PARDON = 'RevenueRoyalPardon';
 const REVENUE_PAY_DIVIDENDS = 'RevenuePayDividends';
+const USE_ROYAL_PROTECTION = 'UseRoyalProtection';
 const REFRESH_BOARD = 'RefreshBoard';
 const UPKEEP_CHECK_PRIZES = 'UpkeepCheckPrizes';
 // Family Actions
@@ -1038,6 +1040,9 @@ const ANY_TIME_AFTER_REVENUE_PHASE = 'anyTimeAfterRevenuePhase';
 const START_OF_REVENUE_PHASE = 'startOfRevenuePhase';
 const WHEN_A_BLACKMAIL_CARD_IS_PLAYED = 'whenABlackmailCardIsPlayed';
 const WHEN_RETIRING = 'whenRetiring';
+const BEFORE_THE_FAMILY_PHASE = 'beforeTheFamilyPhase';
+const BEFORE_EVENTS_IN_INDIA_PHASE = 'beforeEventsInIndiaPhase';
+const BEFORE_BOMBAY_PRESIDENCY_OPERATIONS = 'beforeBombayPresidencyOperations';
 
 
 const REMOVED = 'removed';
@@ -1047,11 +1052,13 @@ const REMOVED = 'removed';
  */
 const COMPANY_FRAUD_ID = 'CompanyFraud';
 const DIPLOMATIC_CONNECTION_ID = 'DiplomaticConnection';
+const ENVOY_TO_THE_MUGHALS_ID = 'EnvoyToTheMughals';
 const LETTERS_OF_INTRODUCTION_ID = 'LettersOfIntroduction';
 const MAN_ON_THE_INSIDE_ID = 'ManOnTheInside';
 const MERCANTILE_CONNECTION_ID = 'MercantileConnection';
 const SCANDAL_IN_INDIA_ID = 'ScandalInIndia';
 const SCANDAL_ON_LEADENHALL_STREET_ID = 'ScandalOnLeadenhallStreet';
+const THE_PRIME_MINISTERS_EAR_ID = 'ThePrimeMinistersEar';
 
 /**
  * PrestigeCardIds: specific card IDs that affect the game and
@@ -1069,7 +1076,9 @@ const WILLIAM_COLLINS_ID = 'PrestigeCard_17';
  */
 const BOARD_OF_CONTROL_ID = 'LawCard_34';
 const MASSED_DEMAND_FRANCHISE_ID = 'LawCard_54';
+const ROYAL_PROTECTION_ID = 'LawCard_50';
 const SEPOY_RECRUITMENT_ID = 'LawCard_38';
+const SHIP_SUBSIDY_ID = 'LawCard_39';
 const TRADE_REGULATIONS_ID = 'LawCard_40';
 const ZAMINDAR_TAXES_ID = 'LawCard_41';
 

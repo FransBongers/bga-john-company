@@ -37,6 +37,7 @@ interface OnEnteringManagerOfShippingArgs extends CommonStateArgs {
   otherShips: JocoShipBase[];
   treasury: number;
   superintendentOfTradeInChinaInPlay: boolean;
+  playerShipPrice: number;
 }
 
 export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingArgs> {
@@ -135,7 +136,7 @@ export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingA
 
     this.args.playerShips.forEach((ship) => {
       const { id, type, name, owner: playerId } = ship;
-      if (this.placedPlayerShips[ship.id] || this.treasury < 3) {
+      if (this.placedPlayerShips[ship.id] || this.treasury < this.args.playerShipPrice) {
         return;
       }
       playerShipsAvailable = true;
@@ -258,7 +259,7 @@ export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingA
       // const player = PlayerManager.getInstance().getPlayer(playerId);
       // player.counters[SHIPS_COUNTER].incValue(-1);
       // fromElt = player.ui[SHIPS_COUNTER];
-      this.pay(3);
+      this.pay(this.args.playerShipPrice);
     } else if (ship.type === EXTRA_SHIP) {
       // ship = board.updateOtherShip(ship, EXTRA_SHIP);
       ship.side = EXTRA_SHIP;

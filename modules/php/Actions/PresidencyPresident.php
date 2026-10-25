@@ -61,7 +61,7 @@ class PresidencyPresident extends \Bga\Games\JohnCompany\Models\AtomicAction
             [
               'action' => TIMING_WINDOW_CHECK,
               'args' => [
-                TIMING_WINDOW => AFTER_OFFICE_FINISHED_ACTING,
+                TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
                 LAW_CARD => [BOARD_OF_CONTROL_ID],
                 TIMING_DATA => [
                   'officeId' => $office->getId()

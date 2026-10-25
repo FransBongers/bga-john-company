@@ -7402,7 +7402,7 @@ class ManagerOfShipping {
         let playerShipsAvailable = false;
         this.args.playerShips.forEach((ship) => {
             const { id, type, name, owner: playerId } = ship;
-            if (this.placedPlayerShips[ship.id] || this.treasury < 3) {
+            if (this.placedPlayerShips[ship.id] || this.treasury < this.args.playerShipPrice) {
                 return;
             }
             playerShipsAvailable = true;
@@ -7484,7 +7484,7 @@ class ManagerOfShipping {
         clearPossible();
         if (playerId) {
             this.placedPlayerShips[ship.id] = { ship, seaZone };
-            this.pay(3);
+            this.pay(this.args.playerShipPrice);
         }
         else if (ship.type === EXTRA_SHIP) {
             ship.side = EXTRA_SHIP;
