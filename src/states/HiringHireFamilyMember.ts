@@ -81,8 +81,9 @@ export class HiringHireFamilyMember implements GameState<OnEnteringHiringHireFam
   private updateInterfaceInitialStep() {
     clearPossible();
     updatePageTitle(
-      _('${you} must choose a family member to hire as ${officeTitle}'),
+      _('${you} must choose a family member to hire as ${officeTitle} (${number} candidate(s))'),
       {
+        number: this.args.options.length,
         officeTitle: _(getOffice(this.args.office).title),
       },
     );

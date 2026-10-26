@@ -2,6 +2,13 @@
 
 namespace Bga\Games\JohnCompany\Cards\Prestige;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
+use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
+use Bga\Games\JohnCompany\Models\Player;
+
 class PrestigeCard_12 extends \Bga\Games\JohnCompany\Models\PrestigeCard
 {
   public function __construct($row)
@@ -14,5 +21,33 @@ class PrestigeCard_12 extends \Bga\Games\JohnCompany\Models\PrestigeCard
     $this->text = [clienttranslate('You may no longer take or own blackmail cards. Any you currently have facedown must be traded or discarded. Faceup blackmail cards must be discarded.')];
     $this->victoryPoints = 2;
     $this->discount = 1;
+  }
+
+  protected function resolveImmediateEffect(Player $player, object $ctx)
+  {
+
+    // If chairman, move back into court of directors
+    $playedBlackmailCards = LondonSeasonCards::getInLocationOrdered(Locations::playedBlackmailCards($player->getFamilyId()))->toArray();
+
+    if (count($playedBlackmailCards) > 0) {
+      foreach ($playedBlackmailCards as $card) {
+        $card->discard($player, true);
+      }
+      Notifications::updatePower();
+    }
+
+    $unplayedBlackmailCards  = Utils::filter($player->getLondonSeasonCards(), fn($card) => $card->getType() === BLACKMAIL);
+
+    if (count($unplayedBlackmailCards) > 0) {
+      $ctx->insertAsBrother(new LeafNode([
+        'action' => TRADE_OR_DISCARD_ITEMS,
+        'playerId' => 'some',
+        'activePlayerIds' => [$player->getId()],
+        'args' => [
+          SOURCE => $this->getId(),
+          'type' => BLACKMAIL
+        ]
+      ]));
+    }
   }
 }

@@ -64,12 +64,11 @@ export class PresidentTrade implements GameState<OnEnteringPresidentTradeArgs> {
   setDescription(activePlayerIds: number, args: OnEnteringPresidentTradeArgs) {
     updatePageTitle(
       _(
-        '${tkn_playerName} must choose regions to trade with and spend ${tkn_pound} to make a check',
+        '${tkn_playerName} may Trade',
       ),
       {
         tkn_playerName: getPlayerName(activePlayerIds[0]),
         amount: args.proposal,
-        tkn_pound: 'pound',
       },
     );
   }

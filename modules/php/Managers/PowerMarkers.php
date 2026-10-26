@@ -78,6 +78,7 @@ class PowerMarkers
       Globals::setPowerMarkers($powerMarkers);
 
       Notifications::swapPowerMarkers($player, $type, $changes[$position], $changes);
+      Notifications::updatePower();
     } else {
       Notifications::message(clienttranslate('${tkn_powerMarker} is already in the highest position'), [
         'tkn_powerMarker' => $type,

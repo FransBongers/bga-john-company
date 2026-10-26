@@ -41,7 +41,7 @@ const POLICY_TARGET_ICON_MAP = {
   [POWER]: 'Power',
   [TAX]: 'Tax',
   [WORKSHOP]: 'Manufacturing',
-  [SHARE]: 'CompanyShare',
+  [SHARE]: 'CompanyShares',
   [SHIPYARD]: 'Shipping',
   [LUXURY]: 'Social',
 };

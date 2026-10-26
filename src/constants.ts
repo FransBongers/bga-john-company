@@ -27,6 +27,11 @@ export const PASSED_LAW_TOKENS = 'passedLawTokens';
 export const TROPHIES = 'trophies';
 
 /**
+ * Locations
+ */
+export const REVEALED_LAWS = 'RevealedLaws';
+
+/**
  * Families
  */
 export const BENYON = 'Benyon';
@@ -484,3 +489,9 @@ export const PROMISE_CARD = 'promiseCard';
 export const TIMING_WINDOW = 'timingWindow';
 export const TIMING_DATA = 'timingData';
 export const AFTER_OFFICE_FINISHED_ACTING = 'afterOfficeFinishedActing';
+
+/**
+ * LawCardIds: specific card IDs that affect the game and
+ * are used in the code
+ */
+export const OLD_IDEAS_MADE_NEW_ID = 'LawCard_52';

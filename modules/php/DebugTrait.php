@@ -29,6 +29,7 @@ use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\ControlTokens;
 use Bga\Games\JohnCompany\Managers\Elephant;
 use Bga\Games\JohnCompany\Managers\EventTiles;
+use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\ResolveCrisis;
 use Bga\Games\JohnCompany\Utils\TradeRoutes;
@@ -39,7 +40,8 @@ trait DebugTrait
 
   function debug_test()
   {
-    CompanyFailureCards::get('CompanyFailureCard_02')->resolveEffect();
+    LawCards::get(DEREGULATION_ID)->setLocation(DEREGULATION_AVAILABLE);
+    // CompanyFailureCards::get('CompanyFailureCard_02')->resolveEffect();
 
     // Company::setShareValue(1);
     // EventTiles::insertOnTop('EventTile_18', DISCARD);

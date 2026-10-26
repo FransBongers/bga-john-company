@@ -577,7 +577,7 @@ class Notifications
     }
 
     self::notifyAll('discardLondonSeasonCard', $text, array_merge([
-      'card' => $card->getType() === BLACKMAIL ? $card->jsonSerializePrivate() : $card->jsonSerialize(),
+      'card' => $card->getType() === BLACKMAIL && !Utils::startsWith($card->getLocation(), 'playedBlackmailCards_') ? $card->jsonSerializePrivate() : $card->jsonSerialize(),
       'tkn_londonSeasonCard' => $card->getId(),
       'player' => $player,
     ], $args));
@@ -806,15 +806,15 @@ class Notifications
     ]);
   }
 
-  public static function moveLaw(Player $player, LawCard $law, string | null $text, array | null $textArgs)
+  public static function moveLaws(Player $player, array $law, string | null $text, array | null $textArgs)
   {
 
     $text = $text ?? '';
     $textArgs = $textArgs ?? [];
 
-    self::notifyAll('moveLaw', $text, array_merge($textArgs, [
+    self::notifyAll('moveLaws', $text, array_merge($textArgs, [
       'player' => $player,
-      'law' => $law->jsonSerialize(),
+      'laws' => array_map(fn($l) => $l->jsonSerialize(), $law),
     ]));
   }
 
@@ -1044,7 +1044,7 @@ class Notifications
     ]);
   }
 
-  public static function newCompanyShare($player, $familyMember, $debt)
+  public static function newCompanyShare(Player $player, FamilyMember $familyMember, int $debt)
   {
     self::notifyAll('newCompanyShare', clienttranslate('${player_name} adds a family member to the ${tkn_boldText_court}'), [
       'player' => $player,
@@ -1503,16 +1503,6 @@ class Notifications
     self::updateRegion($region, clienttranslate('All unrest in ${tkn_boldText_region} is removed'), [
       'tkn_boldText_region' => $region->getName(),
       'i18n' => ['tkn_boldText_region']
-    ]);
-  }
-
-  public static function revealLaw(Player $player, LawCard $law)
-  {
-
-    self::notifyAll('revealLaw', clienttranslate('${player_name} draw and reveals ${tkn_lawCard}'), [
-      'player' => $player,
-      'law' => $law->jsonSerialize(),
-      'tkn_lawCard' => $law->getId(),
     ]);
   }
 

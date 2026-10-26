@@ -2,6 +2,8 @@
 
 namespace Bga\Games\JohnCompany\Actions;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\PowerMarkers;
@@ -27,16 +29,10 @@ class SwapPowerMarkers extends \Bga\Games\JohnCompany\Models\AtomicAction
     $args = $this->ctx->getArgs();
     $notSwappable = $args['notSwappable'] ?? [];
 
-    $powerMarkers = PowerMarkers::get();
-    $same = null;
-    foreach ($powerMarkers as $location => $marker) {
-      if (in_array($marker, $notSwappable)) {
-        unset($powerMarkers[$location]);
-      }
-    }
+    $options = $this->getOptions($notSwappable);
 
     $data = [
-      'options' => $powerMarkers,
+      'options' => $options,
     ];
 
     return $data;
@@ -72,17 +68,15 @@ class SwapPowerMarkers extends \Bga\Games\JohnCompany\Models\AtomicAction
     $markers = $args->selectedPowerMarkers;
     $options = $this->argsSwapPowerMarkers()['options'];
 
-    foreach ($markers as $marker) {
-      $optionValues = array_values($options);
-      if (!in_array($marker, $optionValues)) {
-        throw new \Bga\GameFramework\VisibleSystemException("ERROR_068");
-      }
+    if (count($markers) !== 2 || !in_array($markers[1], $options[$markers[0]] ?? [])) {
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_068");
     }
 
     PowerMarkers::swap(Players::get($playerId), $markers);
+    Notifications::updatePower();
 
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
-    $this->resolveAction([]);
+    $this->resolveAction([], true);
   }
 
   //  .##.....##.########.####.##.......####.########.##....##
@@ -92,6 +86,36 @@ class SwapPowerMarkers extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private function getOptions(array $notSwappable): array
+  {
+    $powerMarkers = PowerMarkers::get();
+    $p = fn(int $n) => Locations::powerTokenPosition($n);
+    $adjacent = [
+      $p(1) => [$p(2)],
+      $p(2) => [$p(1), $p(3), $p(4)],
+      $p(3) => [$p(2), $p(4)],
+      $p(4) => [$p(2), $p(3)],
+    ];
+
+    $options = [];
+    foreach ($powerMarkers as $location => $marker) {
+      if (in_array($marker, $notSwappable)) {
+        continue;
+      }
+      $targets = [];
+      foreach ($adjacent[$location] as $adjacentLocation) {
+        $other = $powerMarkers[$adjacentLocation];
+        if (!in_array($other, $notSwappable)) {
+          $targets[] = $other;
+        }
+      }
+      if (!empty($targets)) {
+        $options[$marker] = $targets;
+      }
+    }
+    return $options;
+  }
 
   // .########.##....##..######...####.##....##.########
   // .##.......###...##.##....##...##..###...##.##......

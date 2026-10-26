@@ -51,9 +51,11 @@ const OPTION_DRAFT_SETUP_CARDS_ENABLED = 1;
  */
 const DECK = 'deck';
 const DISCARD = 'discard';
+const TEMPORARY_DISCARD = 'temporaryDiscard';
 const EXTRA_SETUP = 'extraSetup';
 const REMOVED_FROM_GAME = 'removedFromGame';
 const DRAWN_COMPANY_FAILURE_CARD = 'drawnCompanyFailureCard';
+const DEREGULATION_AVAILABLE = 'DeregulationAvailable';
 
 const LONDON_SEASON_DISPLAY = 'LondonSeasonDisplay';
 const PASSED_LAWS = 'PassedLaws';
@@ -158,9 +160,10 @@ const ST_TIMING_WINDOW_CHECK = 170;
 const ST_TIMING_WINDOW_ACT = 171;
 const ST_PRESIDENCY_GOVERNOR = 172;
 const ST_PRESIDENCY_PRESIDENT = 173;
-const ST_VACATE_OFFICE_WITHOUT_RETIREMENT = 174;
+const ST_SELECT_OFFICE_HOLDER = 174;
 const ST_USE_MAN_ON_THE_INSIDE = 175;
 const ST_USE_ROYAL_PROTECTION = 178;
+const ST_TRADE_OR_DISCARD_ITEMS = 179;
 
 
 const BONUSES = 'Bonuses';
@@ -235,8 +238,9 @@ const PRESIDENT_TRADE_RESOLVE_CHECK = 'PresidentTradeResolveCheck';
 const PRESIDENCY_COMMANDER = 'PresidencyCommander';
 const PRESIDENCY_GOVERNOR = 'PresidencyGovernor';
 const PRESIDENCY_PRESIDENT = 'PresidencyPresident';
-const VACATE_OFFICE_WITHOUT_RETIREMENT = 'VacateOfficeWithoutRetirement';
+const SELECT_OFFICE_HOLDER = 'SelectOfficeHolder';
 const USE_MAN_ON_THE_INSIDE = 'UseManOnTheInside';
+const TRADE_OR_DISCARD_ITEMS = 'TradeOrDiscardItems';
 const PARLIAMENT_MEETS_SELECT_LAW = 'ParliamentMeetsSelectLaw';
 const PARLIAMENT_MEETS_SELECT_POLICY = 'ParliamentMeetsSelectPolicy';
 const PARLIAMENT_MEETS_RESOLVE_POLICY = 'ParliamentMeetsResolvePolicy';
@@ -1064,7 +1068,10 @@ const THE_PRIME_MINISTERS_EAR_ID = 'ThePrimeMinistersEar';
  * PrestigeCardIds: specific card IDs that affect the game and
  * are used in the code
  */
+const ESTER_SUMMERSON_ID = 'PrestigeCard_12';
+const JOSEPH_SEDLEY_ID = 'PrestigeCard_15';
 const LADY_NEWCOME_ID = 'PrestigeCard_20';
+const LORD_HIGHGATE_ID = 'PrestigeCard_19';
 const MR_ROCHESTER_ID = 'PrestigeCard_11';
 const SHIPBUILDERS_ID = 'PrestigeCard_21';
 const STOCK_BROKER_ID = 'PrestigeCard_25';
@@ -1075,7 +1082,11 @@ const WILLIAM_COLLINS_ID = 'PrestigeCard_17';
  * are used in the code
  */
 const BOARD_OF_CONTROL_ID = 'LawCard_34';
+const DEREGULATION_ID = 'LawCard_56';
+const INCLOSURE_ACTS_ID = 'LawCard_36';
 const MASSED_DEMAND_FRANCHISE_ID = 'LawCard_54';
+const OLD_IDEAS_MADE_NEW_ID = 'LawCard_52';
+const PUBLIC_DEMANDS_IMPEACHMENT_ID = 'LawCard_51';
 const ROYAL_PROTECTION_ID = 'LawCard_50';
 const SEPOY_RECRUITMENT_ID = 'LawCard_38';
 const SHIP_SUBSIDY_ID = 'LawCard_39';

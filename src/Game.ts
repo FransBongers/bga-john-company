@@ -81,6 +81,7 @@ import {
   TaxAndUpkeep,
   TimingWindowAct,
   TradeInChina,
+  TradeOrDiscardItems,
   UseManOnTheInside,
   ParliamentMeetsSelectPolicy,
   ParliamentMeetsCastVotes,
@@ -192,6 +193,7 @@ export class Game {
     TaxAndUpkeep,
     TimingWindowAct,
     TradeInChina,
+    TradeOrDiscardItems,
     UseManOnTheInside,
   };
   public bga: Bga;

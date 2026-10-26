@@ -22,6 +22,7 @@ interface OnEnteringLondonSeasonRetireArgs extends CommonStateArgs {
   familyMembers: JocoFamilyMember[];
   treasury: number;
   discount: number;
+  prizeFilter: string[] | null
 }
 
 export class LondonSeasonRetire implements GameState<OnEnteringLondonSeasonRetireArgs> {
@@ -132,6 +133,9 @@ export class LondonSeasonRetire implements GameState<OnEnteringLondonSeasonRetir
     setSelected(familyMember.id);
 
     Object.values(PRIZES).forEach((prize) => {
+      if (this.args.prizeFilter && !this.args.prizeFilter.includes(prize.id)) {
+        return;
+      }
       if (prize.cost > remainingMoneyIncludingDiscount) {
         return;
       }

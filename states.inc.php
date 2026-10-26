@@ -154,6 +154,23 @@ $machinestates = [
         ->transitions(['next' => ST_RESOLVE_STACK])
         ->build(),
 
+    ST_TRADE_OR_DISCARD_ITEMS => GameStateBuilder::create()
+        ->name(TRADE_OR_DISCARD_ITEMS)
+        ->description('${actplayer}')
+        ->descriptionmyturn('${you}')
+        ->type(StateType::MULTIPLE_ACTIVE_PLAYER)
+        ->args('argsAtomicAction')
+        ->action('stAtomicAction')
+        ->possibleactions([
+            'act' . TRADE_OR_DISCARD_ITEMS,
+            'actPass',
+            'actPassOptionalAction',
+            'actTakeAtomicAction',
+            'actUndoToStep',
+        ])
+        ->transitions(['next' => ST_RESOLVE_STACK])
+        ->build(),
+
     // .########.##....##.########......#######..########
     // .##.......###...##.##.....##....##.....##.##......
     // .##.......####..##.##.....##....##.....##.##......
@@ -663,8 +680,8 @@ $machinestates = [
         'transitions' => [],
     ],
 
-    ST_VACATE_OFFICE_WITHOUT_RETIREMENT => [
-        'name' => VACATE_OFFICE_WITHOUT_RETIREMENT,
+    ST_SELECT_OFFICE_HOLDER => [
+        'name' => SELECT_OFFICE_HOLDER,
         'description' => '',
         'type' => 'game',
         'action' => 'stAtomicAction',

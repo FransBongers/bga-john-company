@@ -141,8 +141,8 @@ export interface NotifMoveFamilyMember {
   from: string;
 }
 
-export interface NotifMoveLaw {
-  law: JocoLawCardBase;
+export interface NotifMoveLaws {
+  laws: JocoLawCardBase[];
 }
 
 export interface NotifMoveFamilyMembers {
@@ -238,10 +238,6 @@ export interface NotifReturnShipsToSupply {
 
 export interface NotifReturnWritersToPresidencies {
   writers: JocoFamilyMember[];
-}
-
-export interface NotifRevealLaw extends NotifWithPlayerArgs {
-  law: JocoLawCardBase;
 }
 
 export interface NotifSelectLaw extends NotifWithPlayerArgs {

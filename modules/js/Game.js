@@ -10,6 +10,7 @@ const IN_FAVOR = 'inFavor';
 const AGAINST = 'against';
 const PASSED_LAW_TOKENS = 'passedLawTokens';
 const TROPHIES = 'trophies';
+const REVEALED_LAWS = 'RevealedLaws';
 const BENYON = 'Benyon';
 const HASTINGS = 'Hastings';
 const LARKINS = 'Larkins';
@@ -19,7 +20,7 @@ const WALSH = 'Walsh';
 const FAMILIES = [BENYON, HASTINGS, LARKINS, PAXTON, SYKES, WALSH];
 const CROWN = 'Crown';
 const CROWN_PLAYER_ID = 1;
-const BLACKMAIL = 'Blackmail';
+const BLACKMAIL$1 = 'Blackmail';
 const PRESTIGE = 'Prestige';
 const ENTERPRISE = 'Enterprise';
 const SPOUSE = 'Spouse';
@@ -87,11 +88,11 @@ const WORKSHOPS_COUNTER = 'workshops';
 const SHIPYARDS_COUNTER = 'shipyards';
 const LUXURIES_COUNTER = 'luxuries';
 const PROMISE_CUBES_COUNTER = 'promiseCubes';
-const POWER_COUNTER$1 = 'power';
+const POWER_COUNTER = 'power';
 const COUNTERS = [
     FAMILY_MEMBERS_COUNTER,
     CASH_COUNTER,
-    POWER_COUNTER$1,
+    POWER_COUNTER,
 ];
 const CLOSED = 'closed';
 const FILLED = 'filled';
@@ -339,6 +340,7 @@ const PROMISE_CARD = 'promiseCard';
 const TIMING_WINDOW = 'timingWindow';
 const TIMING_DATA = 'timingData';
 const AFTER_OFFICE_FINISHED_ACTING = 'afterOfficeFinishedActing';
+const OLD_IDEAS_MADE_NEW_ID = 'LawCard_52';
 
 const tplTabButton = (text, index) => `
 <div id="joco-bar-item-${index}" class="joco-bar-item">${text}</div>
@@ -465,6 +467,7 @@ const PRIMARY = 'primary';
 const SECONDARY = 'secondary';
 const DECK = 'deck';
 const DISCARD = 'discard';
+const TEMPORARY_DISCARD$1 = 'temporaryDiscard';
 
 const tplCube = (type, extraClasses = '') => `
   <div class="joco-cube ${extraClasses}" data-type="${type}"></div>
@@ -694,7 +697,7 @@ class JocoPlayer {
         this.counters[FAMILY_MEMBERS_COUNTER].setValue(Object.values(gamedatas.familyMembers).filter(({ familyId, location }) => familyId === this.familyId && location.startsWith('supply')).length);
         const power = gamedatas.power[this.playerId].total ??
             gamedatas.power[this.playerId].totalVisible;
-        this.counters[POWER_COUNTER$1].setValue(power);
+        this.counters[POWER_COUNTER].setValue(power);
     }
     getColor() {
         return this.playerColor;
@@ -1310,21 +1313,21 @@ class LondonSeasonCardsManager extends BgaCards$1.Manager {
     }
     setupFrontDiv(card, div) {
         div.classList.add('joco-card');
-        div.setAttribute('data-background', card.type === BLACKMAIL ? 'Blackmail' : card.background);
+        div.setAttribute('data-background', card.type === BLACKMAIL$1 ? 'Blackmail' : card.background);
         div.setAttribute('data-has-text-note', card.textNote ? 'true' : 'false');
         div.setAttribute('data-card-id', card.id);
         if (card.type === PRESTIGE) {
             div.setAttribute('data-subtype', card.subtype);
         }
-        if (card.type === BLACKMAIL && !card.hiddenId && div.children.length) {
+        if (card.type === BLACKMAIL$1 && !card.hiddenId && div.children.length) {
             div.replaceChildren();
             return;
         }
-        if (div.children.length || (card.type === BLACKMAIL && !card.hiddenId)) {
+        if (div.children.length || (card.type === BLACKMAIL$1 && !card.hiddenId)) {
             return;
         }
         let cardContent = '';
-        if (card.type === BLACKMAIL && card.hiddenId) {
+        if (card.type === BLACKMAIL$1 && card.hiddenId) {
             cardContent = tplBlackmailCardContent(card);
         }
         else if (card.type === PRESTIGE) {
@@ -1339,7 +1342,7 @@ class LondonSeasonCardsManager extends BgaCards$1.Manager {
         div.setAttribute('data-background', card.type === PRESTIGE ? 'PrestigeBack' : 'BlackmailBack');
     }
     isCardVisible(card) {
-        return (card.type !== BLACKMAIL || (card.type === BLACKMAIL && !!card.hiddenId));
+        return (card.type !== BLACKMAIL$1 || (card.type === BLACKMAIL$1 && !!card.hiddenId));
     }
 }
 
@@ -3023,7 +3026,7 @@ const POLICY_TARGET_ICON_MAP = {
     [POWER]: 'Power',
     [TAX]: 'Tax',
     [WORKSHOP]: 'Manufacturing',
-    [SHARE]: 'CompanyShare',
+    [SHARE]: 'CompanyShares',
     [SHIPYARD]: 'Shipping',
     [LUXURY]: 'Social',
 };
@@ -3040,7 +3043,7 @@ const tplDeregulation = () => `
   <div class="joco-deregulation-2 fb-font-baskerville fb-font-8 fb-font-italic bga-autofit">${_('The initial support of the law depends on the status of Standing and Debt:')}</div>
   
 `;
-const tplLawCardContent$1 = (card) => `
+const tplLawCardContent = (card) => `
   <div class="joco-card-header fb-font-baskerville  fb-font-16 fb-font-italic bga-autofit">${lawCardHeaderText(card.header)}</div>
   <div class="joco-title fb-font-bebas-neue fb-font-40 bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
   ${tplCardText(card.text, { textClass: 'fb-font-16 fb-font-baskerville' })}
@@ -3083,7 +3086,7 @@ class LawCardsManager extends BgaCards$1.Manager {
         if (div.children.length) {
             return;
         }
-        div.insertAdjacentHTML('beforeend', tplLawCardContent$1(card));
+        div.insertAdjacentHTML('beforeend', tplLawCardContent(card));
     }
     setupBackDiv(card, div) {
         div.setAttribute('data-background', 'LawBack');
@@ -4622,15 +4625,22 @@ class NotificationManager {
             await this.moveFamilyMember(familyMember);
         }));
     }
-    async notif_moveLaw(notif) {
-        const { law } = notif;
-        const card = getLawCard(law);
-        if (law.location === DISCARD) {
-            await Parliament.getInstance().discardCard(card);
-        }
-        else {
-            await London.getInstance().addLawCard(card);
-        }
+    async notif_moveLaws(notif) {
+        const { laws } = notif;
+        const cards = laws.map(getLawCard);
+        const parliament = Parliament.getInstance();
+        await Promise.all(cards.map(async (card, index) => {
+            await Interaction.use().wait(index * 200);
+            if (card.location === REVEALED_LAWS) {
+                await parliament.revealLaw(card);
+            }
+            else if ([DECK, DISCARD, TEMPORARY_DISCARD$1].includes(card.location)) {
+                await parliament.discardCard(card);
+            }
+            else {
+                await London.getInstance().addLawCard(card);
+            }
+        }));
     }
     async notif_retireFamilyMember(notif) {
         const { familyMember, cost, playerId } = notif;
@@ -4803,10 +4813,6 @@ class NotificationManager {
             await this.moveFamilyMember(writer);
         }));
     }
-    async notif_revealLaw(notif) {
-        const { playerId, law } = notif;
-        Parliament.getInstance().revealLaw(law);
-    }
     async notif_selectLaw(notif) {
         const { playerId, law } = notif;
         Parliament.getInstance().selectLaw(law);
@@ -4917,7 +4923,7 @@ class NotificationManager {
             const playerTotal = currentPlayerId === Number(playerId) && _private.total
                 ? _private.total
                 : powerData.totalVisible;
-            const counter = this.getPlayer(Number(playerId)).counters[POWER_COUNTER$1];
+            const counter = this.getPlayer(Number(playerId)).counters[POWER_COUNTER];
             if (counter.getValue() !== playerTotal) {
                 counter.toValue(playerTotal);
             }
@@ -5069,7 +5075,7 @@ class ResolveChoice {
 
 const tplLawCardTooltip = (data) => `
   <div class="joco-law-card tooltip" data-background="${data.background}">
-    ${tplLawCardContent$1(data)}
+    ${tplLawCardContent(data)}
   </div>
 `;
 const tplLondonSeasonCardTooltip = (data) => {
@@ -7116,7 +7122,8 @@ class HiringHireFamilyMember {
     }
     updateInterfaceInitialStep() {
         clearPossible();
-        updatePageTitle(_('${you} must choose a family member to hire as ${officeTitle}'), {
+        updatePageTitle(_('${you} must choose a family member to hire as ${officeTitle} (${number} candidate(s))'), {
+            number: this.args.options.length,
             officeTitle: _(getOffice(this.args.office).title),
         });
         this.args.options.forEach((option) => {
@@ -7216,7 +7223,7 @@ class LondonSeasonChooseCard {
             id: 'take-btn',
             text: _('Take'),
             callback: () => performAction$1('actLondonSeasonChooseCard', {
-                cardId: card.type === BLACKMAIL ? card.hiddenId : card.id,
+                cardId: card.type === BLACKMAIL$1 ? card.hiddenId : card.id,
                 take: true,
             }),
         });
@@ -7224,7 +7231,7 @@ class LondonSeasonChooseCard {
             id: 'discard-btn',
             text: _('Discard'),
             callback: () => performAction$1('actLondonSeasonChooseCard', {
-                cardId: card.type === BLACKMAIL ? card.hiddenId : card.id,
+                cardId: card.type === BLACKMAIL$1 ? card.hiddenId : card.id,
                 take: false,
             }),
         });
@@ -7295,6 +7302,9 @@ class LondonSeasonRetire {
         });
         setSelected$1(familyMember.id);
         Object.values(PRIZES).forEach((prize) => {
+            if (this.args.prizeFilter && !this.args.prizeFilter.includes(prize.id)) {
+                return;
+            }
             if (prize.cost > remainingMoneyIncludingDiscount) {
                 return;
             }
@@ -7837,6 +7847,7 @@ class ParliamentMeetsSelectPolicy {
         this.primeMinisterDial.updateRightArmPosition(this.args.right);
         this.primeMinisterDial.showConsequenceOptions(true);
         this.updateInterfaceInitialStep();
+        Bar.getInstance().goTo('joco-parliament');
     }
     onLeavingState() {
         debug('Leaving ParliamentMeetsSelectPolicy state');
@@ -8307,10 +8318,9 @@ class PresidentTrade {
         debug('Leaving PresidentTrade state');
     }
     setDescription(activePlayerIds, args) {
-        updatePageTitle(_('${tkn_playerName} must choose regions to trade with and spend ${tkn_pound} to make a check'), {
+        updatePageTitle(_('${tkn_playerName} may Trade'), {
             tkn_playerName: getPlayerName$1(activePlayerIds[0]),
             amount: args.proposal,
-            tkn_pound: 'pound',
         });
     }
     updateInterfaceInitialStep() {
@@ -8587,8 +8597,11 @@ class ParliamentMeetsSelectLaw {
     }
     setDescription(activePlayerIds, args) {
         this.args = args;
-        const numberOfRevealedLaws = args.revealedLaws.length;
+        let numberOfRevealedLaws = args.revealedLaws.length;
         const playerName = getPlayerName$1(activePlayerIds[0]);
+        if (args.mustSelect) {
+            numberOfRevealedLaws = 3;
+        }
         switch (numberOfRevealedLaws) {
             case 0:
                 updatePageTitle(_('${tkn_playerName} must draw and reveal a law'), {
@@ -8610,12 +8623,15 @@ class ParliamentMeetsSelectLaw {
         const numberOfRevealedLaws = this.args.revealedLaws.length;
         this.updatePageTitle(numberOfRevealedLaws);
         this.args.revealedLaws.forEach((law) => {
+            if (law.id === OLD_IDEAS_MADE_NEW_ID) {
+                return;
+            }
             onClick(`law-card-${law.id}`, () => {
                 this.updateInterfaceConfirm('select', law);
             });
             this.addHover(law);
         });
-        if (numberOfRevealedLaws < 3) {
+        if (numberOfRevealedLaws < 3 && !this.args.mustSelect) {
             addPrimaryActionButton({
                 id: 'draw-btn',
                 text: _('Draw and reveal a law'),
@@ -8664,6 +8680,9 @@ class ParliamentMeetsSelectLaw {
         addCancelButton$1();
     }
     updatePageTitle(numberOfRevealedLaws) {
+        if (this.args.mustSelect) {
+            numberOfRevealedLaws = 3;
+        }
         switch (numberOfRevealedLaws) {
             case 0:
                 updatePageTitle(_('${you} must draw and reveal a law'), {});
@@ -8869,6 +8888,7 @@ class SwapPowerMarkers {
         this.args = args;
         this.selected = [];
         this.updateInterfaceInitialStep();
+        Bar.getInstance().goTo('joco-parliament');
     }
     onLeavingState() {
         debug('Leaving SwapPowerMarkers state');
@@ -8884,7 +8904,10 @@ class SwapPowerMarkers {
         this.selected.forEach((marker) => {
             setSelected$1(`joco-power-marker-${marker}`);
         });
-        Object.entries(this.args.options).forEach(([location, marker]) => {
+        const selectable = this.selected.length === 1
+            ? [this.selected[0], ...(this.args.options[this.selected[0]] ?? [])]
+            : Object.keys(this.args.options);
+        selectable.forEach((marker) => {
             onClick(`joco-power-marker-${marker}`, () => {
                 if (this.selected.includes(marker)) {
                     this.selected = this.selected.filter((m) => m !== marker);
@@ -8985,6 +9008,85 @@ class TradeInChina {
             },
         });
         addPassButton$1(this.args.optionalAction, _('Do not trade in China'));
+    }
+}
+
+class TradeOrDiscardItems {
+    constructor(game) {
+        this.game = game;
+    }
+    static create(game) {
+        TradeOrDiscardItems.instance = new TradeOrDiscardItems(game);
+    }
+    static getInstance() {
+        return TradeOrDiscardItems.instance;
+    }
+    onEnteringState(args) {
+        debug('Entering TradeOrDiscardItems state');
+        this.args = args;
+        this.updateInterfaceInitialStep();
+        const bar = Bar.getInstance();
+        if (this.args.type === SHARE) {
+            bar.goTo('joco-company');
+        }
+    }
+    onLeavingState() {
+        debug('Leaving TradeOrDiscardItems state');
+    }
+    setDescription(activePlayerIds, args) {
+        updatePageTitle(args.type === SHARE
+            ? _('${source}: ${actplayer} must trade or remove their ${type}')
+            : _('${source}: ${actplayer} must trade or discard their ${type}'), {
+            type: this.getTypeText(args.type),
+            source: _(args.source),
+        });
+    }
+    updateInterfaceInitialStep() {
+        clearPossible();
+        this.args._private[this.args.type].forEach((item) => {
+            setSelected$1(item.id);
+        });
+        updatePageTitle(this.args.type === SHARE
+            ? _('${source}: ${you} must trade or remove your ${type}')
+            : _('${source}: ${you} must trade or discard your ${type}'), {
+            type: this.getTypeText(this.args.type),
+            source: _(this.args.source),
+        });
+        addPrimaryActionButton({
+            id: 'done-btn',
+            text: _('Done'),
+            callback: () => {
+                this.updateInterfaceConfirm();
+            },
+        });
+    }
+    updateInterfaceConfirm() {
+        clearPossible();
+        const remainingItems = this.args._private[this.args.type].length;
+        if (remainingItems === 0) {
+            performAction$1('actTradeOrDiscardItems', {});
+            return;
+        }
+        updatePageTitle(this.args.type === SHARE
+            ? _('Remove remaining ${number} Company share(s)?')
+            : _('Discard remaining ${number} ${type}?'), {
+            type: this.getTypeText(this.args.type),
+            number: remainingItems,
+        });
+        addConfirmButton$1(() => {
+            performAction$1('actTradeOrDiscardItems', {});
+        });
+        addCancelButton$1();
+    }
+    getTypeText(type) {
+        switch (type) {
+            case SHARE:
+                return _('Company share(s)');
+            case BLACKMAIL$1:
+                return _('Blackmail card(s)');
+            default:
+                return type;
+        }
     }
 }
 
@@ -9128,6 +9230,7 @@ class Game {
             TaxAndUpkeep,
             TimingWindowAct,
             TradeInChina,
+            TradeOrDiscardItems,
             UseManOnTheInside,
         };
         this.bga = bga;

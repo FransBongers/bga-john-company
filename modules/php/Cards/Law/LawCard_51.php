@@ -2,6 +2,11 @@
 
 namespace Bga\Games\JohnCompany\Cards\Law;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
+use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
+use Bga\Games\JohnCompany\Managers\Offices;
+use Bga\Games\JohnCompany\Managers\Company;
+
 class LawCard_51 extends \Bga\Games\JohnCompany\Models\LawCard
 {
   public function __construct($row)
@@ -32,5 +37,21 @@ class LawCard_51 extends \Bga\Games\JohnCompany\Models\LawCard
         ],
       ],
     ];
+  }
+
+  public function resolveImmediateEffects(object $ctx, bool $passed = true)
+  {
+    if ($passed) {
+      $officeId = Globals::getSelectedOffice();
+      $office = Offices::get($officeId);
+      $currentOwner = $office->getFamily()->getPlayer();
+      $office->returnFamilyMemberToSupply();
+      $office->moveToVacantOffices($currentOwner);
+    } else {
+      Company::adjustStanding(-1);
+      $ctx->insertAsBrother(new LeafNode([
+        'action' => CHECK_COMPANY_FAILURE,
+      ]));
+    }
   }
 }

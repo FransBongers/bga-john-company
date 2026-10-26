@@ -69,11 +69,11 @@ class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Mod
     return $this->jsonSerialize(); // Static datas are already in js file
   }
 
-  public function discard($player = null)
+  public function discard($player = null, $skipFrom = false)
   {
     $from = $this->getLocation();
     $this->setLocation(DISCARD);
-    Notifications::discardLondonSeasonCard($this, $player, $from);
+    Notifications::discardLondonSeasonCard($this, $player, $skipFrom ? null : $from);
   }
 
   public function take(Player $player, object $ctx)
@@ -83,6 +83,9 @@ class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Mod
     Notifications::moveLondonSeasonCard($player, $this, $from);
     if ($this->getVictoryPoints() !== null) {
       $player->incScore($this->getVictoryPoints());
+    }
+    if ($this->getPower() > 0) {
+      Notifications::updatePower();
     }
 
     // Resolve the immediate effect of the card after it is taken

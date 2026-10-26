@@ -54,7 +54,7 @@ class CompanyFraud extends \Bga\Games\JohnCompany\Models\BlackmailCard
     ];
   }
 
-    /**
+  /**
    * Apply the effect of this london season card
    * Only for effects with specific timing windows
    */

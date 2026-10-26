@@ -79,19 +79,15 @@ class ScandalInIndia extends \Bga\Games\JohnCompany\Models\BlackmailCard
    */
   public function applyEffect(object $ctx, Player $player, array $timingData)
   {
-    // Notifications::message(clienttranslate('${player_name} plays ${tkn_londonSeasonCard}'), [
-    //   'player' => $player,
-    //   'tkn_londonSeasonCard' => $this->getId(),
-    // ]);
-
     $ctx->insertAsBrother(Engine::buildTree([
       'type' => NODE_XOR,
       'children' => array_map(function ($office) use ($player) {
         return [
-          'action' => VACATE_OFFICE_WITHOUT_RETIREMENT,
+          'action' => SELECT_OFFICE_HOLDER,
           'args' => [
             'officeId' => $office->getId(),
-            'actingPlayerId' => $player->getId()
+            'actingPlayerId' => $player->getId(),
+            'source' => $this->getId()
           ]
         ];
       }, $this->getAffectedOffices()),

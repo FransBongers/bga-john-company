@@ -43,4 +43,5 @@ export * from './SeekShare';
 export * from './SwapPowerMarkers';
 export * from './TaxAndUpkeep';
 export * from './TradeInChina';
+export * from './TradeOrDiscardItems';
 export * from './UseManOnTheInside';

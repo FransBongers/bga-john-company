@@ -1,3 +1,4 @@
+import { Bar } from '../bar';
 import {
   addCancelButton,
   addConfirmButton,
@@ -11,7 +12,7 @@ import {
 import { CommonStateArgs, GameAlias, GameState } from '../types';
 
 interface OnEnteringSwapPowerMarkersArgs extends CommonStateArgs {
-  options: Record<string, string>;
+  options: Record<string, string[]>;
 }
 
 export class SwapPowerMarkers implements GameState<OnEnteringSwapPowerMarkersArgs> {
@@ -34,6 +35,7 @@ export class SwapPowerMarkers implements GameState<OnEnteringSwapPowerMarkersArg
     this.args = args;
     this.selected = [];
     this.updateInterfaceInitialStep();
+    Bar.getInstance().goTo('joco-parliament');
   }
 
   onLeavingState() {
@@ -73,7 +75,12 @@ export class SwapPowerMarkers implements GameState<OnEnteringSwapPowerMarkersArg
       setSelected(`joco-power-marker-${marker}`);
     });
 
-    Object.entries(this.args.options).forEach(([location, marker]) => {
+    const selectable =
+      this.selected.length === 1
+        ? [this.selected[0], ...(this.args.options[this.selected[0]] ?? [])]
+        : Object.keys(this.args.options);
+
+    selectable.forEach((marker) => {
       onClick(`joco-power-marker-${marker}`, () => {
         if (this.selected.includes(marker)) {
           this.selected = this.selected.filter((m) => m !== marker);

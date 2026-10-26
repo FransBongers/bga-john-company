@@ -72,7 +72,10 @@ class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     $state = LawCards::insertOnTop($this->getId(), Locations::revealedLaws());
     $this->state = $state;
     $this->location = Locations::revealedLaws();
-    Notifications::revealLaw($player, $this);
+    
+    Notifications::moveLaws($player, [$this], clienttranslate('${player_name} draw and reveals ${tkn_lawCard}'), [
+      'tkn_lawCard' => $this->getId(),
+    ]);
   }
 
   public function select(Player $player)
@@ -86,7 +89,7 @@ class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     return $this->header === 'dilemma';
   }
 
-  public function resolveImmediateEffects($ctx, $passed = true)
+  public function resolveImmediateEffects(object $ctx, bool $passed = true)
   {
     // Resolve any immediate effects of the law
   }
@@ -96,7 +99,7 @@ class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     $state = LawCards::insertOnTop($this->getId(), $location);
     $this->state = $state;
     $this->location = $location;
-    Notifications::moveLaw($player, $this, $text, $textArgs);
+    Notifications::moveLaws($player, [$this], $text, $textArgs);
   }
 
   /**
@@ -123,5 +126,14 @@ class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   public function applyEffect(object $ctx, Player $player, array $timingData)
   {
     throw new \Bga\GameFramework\VisibleSystemException("LAW_CARD_003");
+  }
+
+  public function returnToDeck(Player $player)
+  {
+    $this->setLocation(DECK);
+    LawCards::shuffle(DECK);
+    Notifications::moveLaws($player, [$this], clienttranslate('${player_name} shuffles ${tkn_lawCard} back into the deck'), [
+      'tkn_lawCard' => $this->getId(),
+    ]);
   }
 }

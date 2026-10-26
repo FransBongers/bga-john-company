@@ -51,7 +51,7 @@ export class ParliamentMeetsSelectPolicy implements GameState<OnEnteringParliame
     this.primeMinisterDial.updateRightArmPosition(this.args.right);
     this.primeMinisterDial.showConsequenceOptions(true);
     this.updateInterfaceInitialStep();
-    // Bar.getInstance().goTo('joco-parliament');
+    Bar.getInstance().goTo('joco-parliament');
   }
 
   onLeavingState() {

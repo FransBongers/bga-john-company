@@ -2,9 +2,12 @@
 
 namespace Bga\Games\JohnCompany\Actions;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Models\Player;
 use Bga\Games\JohnCompany\Managers\Parliament;
 
@@ -51,6 +54,15 @@ class ParliamentMeetsCleanup extends \Bga\Games\JohnCompany\Models\AtomicAction
         $usedEnterpriseCards[] = $card;
       }
     }
+
+    if (Globals::getOldIdeasMadeNew()) {
+      LawCards::moveAllInLocation(DISCARD, DECK);
+      LawCards::moveAllInLocation(TEMPORARY_DISCARD, DECK);
+      LawCards::shuffle(DECK);
+      Globals::setOldIdeasMadeNew(false);
+    }
+
+    Globals::setSelectedOffice('');
     Notifications::parliamentMeetsCleanup($data, $usedLondonSeasonCards, $usedEnterpriseCards);
 
     $this->resolveAction(['automatic' => true]);

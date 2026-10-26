@@ -35,11 +35,14 @@ class LondonSeasonRetire extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $family = Families::get($familyId);
 
+    $family->hasPrestigeCard(STOCK_BROKER_ID);
+
     $data = [
       'familyMembers' => Utils::filter(FamilyMembers::getInLocation(Locations::pensioners())->toArray(), fn($fm) => $fm->getFamilyId() === $familyId),
       'treasury' => $family->getTreasury(),
       'discount' => $family->getRetirementDiscount(),
-      FINAL_RETIREMENT => $args[FINAL_RETIREMENT] ?? false
+      FINAL_RETIREMENT => $args[FINAL_RETIREMENT] ?? false,
+      'prizeFilter' => $family->hasPrestigeCard(LORD_HIGHGATE_ID) ? [PRIZE_8, PRIZE_12] : null
     ];
 
     return $data;
@@ -79,10 +82,12 @@ class LondonSeasonRetire extends \Bga\Games\JohnCompany\Models\AtomicAction
     $stateArgs = $this->argsLondonSeasonRetire();
     $familyMembers = $stateArgs['familyMembers'];
     $familyMemberIds = array_map(fn($familyMember) => $familyMember->getId(), $familyMembers);
+    $prizeFilter = $stateArgs['prizeFilter'];
 
     $totalCost = 0;
     $totalVictoryPoints = 0;
     $remainingDiscount = $stateArgs['discount'];
+
 
     $initialTreasury = $family->getTreasury();
     foreach ($selectedPrizes as $familyMemberId => $prizeId) {
@@ -94,6 +99,9 @@ class LondonSeasonRetire extends \Bga\Games\JohnCompany\Models\AtomicAction
 
       if ($prize === null) {
         throw new \Bga\GameFramework\VisibleSystemException("ERROR_054");
+      }
+      if ($prizeFilter !== null && !in_array($prizeId, $prizeFilter)) {
+        throw new \Bga\GameFramework\VisibleSystemException("ERROR_077");
       }
 
       $prizeCost = $prize[COST];

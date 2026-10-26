@@ -45,7 +45,9 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     'transactionsEnabled' => 'bool',
     'endOfGame' => 'bool',
     'removedGovernors' => 'obj',
-    'latestCheck' => 'obj'
+    'latestCheck' => 'obj',
+    'oldIdeasMadeNew' => 'bool',
+    'selectedOffice' => 'str'
   ];
 
   protected static $table = 'global_variables';
@@ -183,6 +185,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     // self::setScenarioId(SCENARIO_OPTION_SCENARIO_ID_MAP[intval($options[OPTION_SCENARIO])]);
     self::setScenarioId(THE_1710_SCENARIO);
     self::setDraftSetup(intval($options[OPTION_DRAFT_SETUP_CARDS]) === OPTION_DRAFT_SETUP_CARDS_ENABLED);
+    self::setOldIdeasMadeNew(false);
     self::setOptions($options);
     self::setRetirementMoney([]);
     self::setRegionsLostThisTurn(0);

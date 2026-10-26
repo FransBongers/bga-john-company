@@ -12,3 +12,4 @@ export const SECONDARY = 'secondary';
 
 export const DECK = 'deck';
 export const DISCARD = 'discard';
+export const TEMPORARY_DISCARD = 'temporaryDiscard';

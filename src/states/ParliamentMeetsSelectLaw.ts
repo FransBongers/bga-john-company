@@ -14,6 +14,7 @@ import {
   setSelected,
   updatePageTitle,
 } from '../boilerplate';
+import { OLD_IDEAS_MADE_NEW_ID } from '../constants';
 import { Parliament } from '../parliament';
 import { PrimeMinisterDial } from '../parliament/prime-minister-dial';
 import { GameAlias, JocoLawCardBase } from '../types';
@@ -23,6 +24,7 @@ interface OnEnteringParliamentMeetsSelectLawArgs extends CommonStateArgs {
   revealedLaws: JocoLawCardBase[];
   dial: number;
   policyOptions: Record<string, { left: number; right: number }>;
+  mustSelect: boolean;
 }
 
 export class ParliamentMeetsSelectLaw implements GameState<OnEnteringParliamentMeetsSelectLawArgs> {
@@ -69,8 +71,13 @@ export class ParliamentMeetsSelectLaw implements GameState<OnEnteringParliamentM
     args: OnEnteringParliamentMeetsSelectLawArgs,
   ) {
     this.args = args;
-    const numberOfRevealedLaws = args.revealedLaws.length;
+    let numberOfRevealedLaws = args.revealedLaws.length;
     const playerName = getPlayerName(activePlayerIds[0]);
+
+    if (args.mustSelect) {
+      numberOfRevealedLaws = 3;
+    }
+
     switch (numberOfRevealedLaws) {
       case 0:
         updatePageTitle(_('${tkn_playerName} must draw and reveal a law'), {
@@ -113,13 +120,16 @@ export class ParliamentMeetsSelectLaw implements GameState<OnEnteringParliamentM
     this.updatePageTitle(numberOfRevealedLaws);
 
     this.args.revealedLaws.forEach((law) => {
+      if (law.id === OLD_IDEAS_MADE_NEW_ID) {
+        return;
+      }
       onClick(`law-card-${law.id}`, () => {
         this.updateInterfaceConfirm('select', law);
       });
       this.addHover(law);
     });
 
-    if (numberOfRevealedLaws < 3) {
+    if (numberOfRevealedLaws < 3 && !this.args.mustSelect) {
       addPrimaryActionButton({
         id: 'draw-btn',
         text: _('Draw and reveal a law'),
@@ -190,6 +200,9 @@ export class ParliamentMeetsSelectLaw implements GameState<OnEnteringParliamentM
   //  ..#######.....##....####.########.####....##.......##...
 
   private updatePageTitle(numberOfRevealedLaws: number) {
+    if (this.args.mustSelect) {
+      numberOfRevealedLaws = 3;
+    }
     switch (numberOfRevealedLaws) {
       case 0:
         updatePageTitle(_('${you} must draw and reveal a law'), {});

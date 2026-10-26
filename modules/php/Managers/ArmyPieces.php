@@ -107,9 +107,11 @@ class ArmyPieces extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   {
     $regiments = self::getRegiments()->toArray();
 
-    $armyLocations = array_map(function ($presidencyId) {
-      return Locations::armyOfReady($presidencyId);
-    }, PRESIDENCIES);
+    $armyLocations = [];
+    foreach (PRESIDENCIES as $presidencyId) {
+      $armyLocations[] = Locations::armyOfReady($presidencyId);
+      $armyLocations[] = Locations::armyOfExhausted($presidencyId);
+    }
 
     return Utils::filter($regiments, function ($regiment) use ($armyLocations) {
       return in_array($regiment->getLocation(), $armyLocations);

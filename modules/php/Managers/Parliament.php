@@ -139,6 +139,7 @@ class Parliament
     $player = Players::getPlayerForFamily($familyId);
     self::set(PRIME_MINISTER, $familyId);
     Notifications::changePrimeMinister($player, $familyId);
+    Notifications::updatePower();
   }
 
   public static function getLeaderOfOpposition()

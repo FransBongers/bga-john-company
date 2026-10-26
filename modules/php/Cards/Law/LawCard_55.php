@@ -34,7 +34,7 @@ class LawCard_55 extends \Bga\Games\JohnCompany\Models\LawCard
     ];
   }
 
-  public function resolveImmediateEffects($ctx, $passed = true)
+  public function resolveImmediateEffects(object $ctx, bool $passed = true)
   {
     if (!$passed) {
       // Trigger Foreign Invasion event in the home region(s) associated with any sea zone shown

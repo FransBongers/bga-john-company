@@ -67,7 +67,7 @@ class LawCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     foreach ($lawCardIds as $index => $cId) {
       $cards[$cId] = [
         'id' => $cId,
-        'location' => DECK,
+        'location' => $cId === DEREGULATION_ID ? DEREGULATION_AVAILABLE : DECK,
       ];
     }
 

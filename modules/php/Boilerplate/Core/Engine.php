@@ -224,6 +224,7 @@ class Engine
 
     if ($nodeId == PASS) {
       self::resolve(PASS);
+      self::checkpoint();
       self::proceed();
       return;
     }

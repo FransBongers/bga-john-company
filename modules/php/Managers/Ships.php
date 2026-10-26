@@ -83,7 +83,7 @@ class Ships extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   // .##....##..##..........##.......##....##.......##....##..##....##
   // ..######...########....##.......##....########.##.....##..######.
 
-  public static function getOtherShipFromSupply($shipType)
+  public static function getOtherShipFromSupply(string $shipType)
   {
     $ship = self::getTopOf(Locations::supplyOtherShips());
     if ($ship === null) {
@@ -93,10 +93,12 @@ class Ships extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     return $ship;
   }
 
+  // Includes the three sea zones anc Chine for Superintendent of Trade
   public static function getShipsInSeaZones()
   {
-    return Utils::filter(self::getAll()->toArray(), function ($ship) {
-      return in_array($ship->getLocation(), SEA_ZONES);
+    $shipLocations = array_merge(SEA_ZONES, [SUPERINTENDENT_OF_TRADE_IN_CHINA]);
+    return Utils::filter(self::getAll()->toArray(), function ($ship) use ($shipLocations) {
+      return in_array($ship->getLocation(), $shipLocations);
     });
   }
 }

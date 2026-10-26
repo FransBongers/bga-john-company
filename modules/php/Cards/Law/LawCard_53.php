@@ -35,7 +35,7 @@ class LawCard_53 extends \Bga\Games\JohnCompany\Models\LawCard
     ];
   }
 
-  public function resolveImmediateEffects($ctx, $passed = true)
+  public function resolveImmediateEffects(object $ctx, bool $passed = true)
   {
     if ($passed) {
       $ctx->insertAsBrother(new LeafNode([

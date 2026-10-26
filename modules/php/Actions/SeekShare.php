@@ -242,6 +242,6 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
     $familyId = $args['familyId'];
     $family = Families::get($familyId);
 
-    return count($this->getOptions($family)) > 0;
+    return count($this->getOptions($family)) > 0 && !$family->hasPrestigeCard(JOSEPH_SEDLEY_ID);
   }
 }

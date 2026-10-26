@@ -37,6 +37,7 @@ import {
   COMPANY,
   SEA_ZONES,
   POWER_COUNTER,
+  REVEALED_LAWS,
 } from '../../constants';
 import { CrownClimate } from '../../crown/climate';
 import { India } from '../../india';
@@ -100,13 +101,11 @@ import {
   NotifNewLondonSeasonDisplay,
   NotifUpdateOpportunityMarker,
   NotifPlaceRegiment,
-  NotifRevealLaw,
   NotifSelectLaw,
   NotifSelectPolicy,
   NotifCastVotes,
   NotifCommitToOpposition,
   NotifFrontendTrigger,
-  NotifMoveLaw,
   NotifWithPlayerArgs,
   NotifSwapPowerMarkers,
   NotifParliamentMeetsCleanup,
@@ -117,10 +116,11 @@ import {
   NotifRemoveCardFromGame,
   NotifDrawCompanyFailureCard,
   NotifUpdatePower,
+  NotifMoveLaws,
 } from './types';
 import { tplArmyPiece } from '../../india/army/templates';
 import { Parliament } from '../../parliament';
-import { DECK, DISCARD, USED } from '../constants';
+import { DECK, DISCARD, TEMPORARY_DISCARD, USED } from '../constants';
 import { LawCardsManager } from '../../cards/law-cards';
 import { ControlTokensManager } from '../../token-managers/control-tokens';
 import { EventTiles } from '../../india/event-tiles';
@@ -673,16 +673,26 @@ export class NotificationManager {
     );
   }
 
-  async notif_moveLaw(notif: NotifMoveLaw) {
-    const { law } = notif;
+  async notif_moveLaws(notif: NotifMoveLaws) {
+    const { laws } = notif;
 
-    const card = getLawCard(law);
-    if (law.location === DISCARD) {
-      await Parliament.getInstance().discardCard(card);
-    } else {
-      // Currently only else case
-      await London.getInstance().addLawCard(card);
-    }
+    const cards = laws.map(getLawCard);
+
+    const parliament = Parliament.getInstance();
+
+    await Promise.all(
+      cards.map(async (card, index) => {
+        await Interaction.use().wait(index * 200);
+        if (card.location === REVEALED_LAWS) {
+          await parliament.revealLaw(card);
+        } else if ([DECK, DISCARD, TEMPORARY_DISCARD].includes(card.location)) {
+          await parliament.discardCard(card);
+        } else {
+          // Currently only else case
+          await London.getInstance().addLawCard(card);
+        }
+      }),
+    );
   }
 
   async notif_retireFamilyMember(notif: NotifRetireFamilyMember) {
@@ -937,12 +947,6 @@ export class NotificationManager {
         await this.moveFamilyMember(writer);
       }),
     );
-  }
-
-  async notif_revealLaw(notif: NotifRevealLaw) {
-    const { playerId, law } = notif;
-
-    Parliament.getInstance().revealLaw(law);
   }
 
   async notif_selectLaw(notif: NotifSelectLaw) {

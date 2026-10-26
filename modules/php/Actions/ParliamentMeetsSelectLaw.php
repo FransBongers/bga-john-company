@@ -9,6 +9,7 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\LawCards;
+use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Models\LawCard;
@@ -33,12 +34,14 @@ class ParliamentMeetsSelectLaw extends \Bga\Games\JohnCompany\Models\AtomicActio
   {
     $args = $this->ctx->getArgs();
 
+    $mustSelect = $args['mustSelect'] ?? false;
     $revealedLaws = LawCards::getInLocationOrdered(Locations::revealedLaws())->toArray();
 
     $data = [
       'revealedLaws' => $revealedLaws,
       'policyOptions' => $this->getPolicyOptionsForRevealedLaws($revealedLaws),
-      DIAL => Parliament::getDialPosition()
+      DIAL => Parliament::getDialPosition(),
+      'mustSelect' => $mustSelect
     ];
 
     return $data;
@@ -77,7 +80,9 @@ class ParliamentMeetsSelectLaw extends \Bga\Games\JohnCompany\Models\AtomicActio
     $stateArgs = $this->argsParliamentMeetsSelectLaw();
     $player = Players::get($playerId);
 
-    if ($draw && count($stateArgs['revealedLaws']) >= 3) {
+    if ($draw && $stateArgs['mustSelect']) {
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_075");
+    } else if ($draw && count($stateArgs['revealedLaws']) >= 3) {
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_058");
     } else if ($draw) {
       $this->drawAndRevealLaw($player);
@@ -120,7 +125,15 @@ class ParliamentMeetsSelectLaw extends \Bga\Games\JohnCompany\Models\AtomicActio
     $law = LawCards::getTopOf(DECK);
     $law->reveal($player);
 
-    if ($law->isDilemma()) {
+    if ($law->getId() === OLD_IDEAS_MADE_NEW_ID && LawCards::countInLocation(DISCARD) === 0) {
+      Notifications::message(clienttranslate('No cards in the discard pile'));
+      $law->returnToDeck($player);
+      $this->drawAndRevealLaw($player);
+      return;
+    } else if ($law->getId() === OLD_IDEAS_MADE_NEW_ID) {
+      $law->resolveImmediateEffects($this->ctx, true);
+      return;
+    } else if ($law->isDilemma()) {
       $this->selectLaw($player, $law);
       return;
     }
@@ -139,6 +152,37 @@ class ParliamentMeetsSelectLaw extends \Bga\Games\JohnCompany\Models\AtomicActio
     LawCards::moveAllInLocation(Locations::revealedLaws(), DISCARD);
     Parliament::setSupport($law->getInitialSupport());
     Parliament::setSelectingLaw(false);
+
+    if ($law->getId() === PUBLIC_DEMANDS_IMPEACHMENT_ID) {
+      $this->insertSelectOfficeHolderNode();
+    }
+  }
+
+  private function insertSelectOfficeHolderNode()
+  {
+    $offices = Utils::filter(Offices::getAll()->toArray(), function ($office) {
+      return $office->isInPlay();
+    });
+
+    $playerId = Parliament::getPrimeMinisterPlayerId();
+    $this->ctx->insertAsBrother(Engine::buildTree([
+      'type' => NODE_XOR,
+      'children' => array_map(function ($office) use ($playerId) {
+        return [
+          'action' => SELECT_OFFICE_HOLDER,
+          'args' => [
+            'officeId' => $office->getId(),
+            'actingPlayerId' => $playerId,
+            'source' => PUBLIC_DEMANDS_IMPEACHMENT_ID
+          ]
+        ];
+      }, $offices),
+      'playerId' => $playerId,
+      'stateDescription' => [
+        'descriptionmyturn' => clienttranslate('Public Demands Impeachment!: ${you} must select an Office'),
+        'description' => clienttranslate('Public Demands Impeachment!: ${actplayer} must select an Office'),
+      ],
+    ]));
   }
 
   // .########.##....##..######...####.##....##.########
