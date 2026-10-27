@@ -30,6 +30,7 @@ export const TROPHIES = 'trophies';
  * Locations
  */
 export const REVEALED_LAWS = 'RevealedLaws';
+export const SUPPLY_REGIMENTS = 'supply_regiments';
 
 /**
  * Families
@@ -276,6 +277,8 @@ export const MADRAS = 'Madras';
 export const MARATHA = 'Maratha';
 export const MYSORE = 'Mysore';
 export const PUNJAB = 'Punjab';
+
+export const EMPIRE_COLOR_MAP = ['gold', 'silver', 'bronze'];
 
 /**
  * Presidencies

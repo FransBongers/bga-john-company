@@ -84,6 +84,10 @@ class TradeOrDiscardItems extends \Bga\Games\JohnCompany\Models\AtomicAction
           case BLACKMAIL:
             $item->discard($player, true);
             break;
+          case WORKSHOP:
+          case SHIPYARD:
+            $item->returnToSupply($player);
+            break;
         }
       }
     }
@@ -110,6 +114,10 @@ class TradeOrDiscardItems extends \Bga\Games\JohnCompany\Models\AtomicAction
         break;
       case BLACKMAIL:
         $items[BLACKMAIL] = Utils::filter(Players::get($playerId)->getLondonSeasonCards(), fn($card) => $card->getType() === BLACKMAIL);
+        break;
+      case SHIPYARD:
+      case WORKSHOP:
+        $items[$type] = Players::get($playerId)->getFamily()->getEnterprises($type);
         break;
     }
 

@@ -40,7 +40,14 @@ trait DebugTrait
 
   function debug_test()
   {
-    LawCards::get(DEREGULATION_ID)->setLocation(DEREGULATION_AVAILABLE);
+    LondonSeasonCards::moveAllInLocation(Locations::londonSeasonDisplay(), DECK);
+
+    foreach (['PrestigeCard_13', 'PrestigeCard_14', 'PrestigeCard_16'] as $cardId) {
+      LondonSeasonCards::get($cardId)->setLocation(Locations::londonSeasonDisplay());
+    }
+    LondonSeasonCards::shuffle(DECK);
+
+    // LawCards::get(DEREGULATION_ID)->setLocation(DEREGULATION_AVAILABLE);
     // CompanyFailureCards::get('CompanyFailureCard_02')->resolveEffect();
 
     // Company::setShareValue(1);
@@ -94,7 +101,8 @@ trait DebugTrait
 
   }
 
-  function debug_eventInIndia() {
+  function debug_eventInIndia()
+  {
     $ctx = Engine::getNextUnresolved();
     EventTiles::get('EventTile_18')->resolveEvent(BENGAL, $ctx);
     Engine::save();
@@ -106,6 +114,13 @@ trait DebugTrait
     $card = LondonSeasonCards::get($cardId);
     $card->setLocation(Locations::londonSeasonCards($familyId));
     Notifications::moveLondonSeasonCard(Families::get($familyId)->getPlayer(), $card, null);
+  }
+
+  function debug_putLawInPlay(string $lawId)
+  {
+    $law = LawCards::get($lawId);
+    $law->setLocation(Locations::passedLaws());
+    Notifications::moveLaws(Parliament::getPrimeMinisterPlayer(), [$law], null, null);
   }
 
   function debug_engineDisplay()

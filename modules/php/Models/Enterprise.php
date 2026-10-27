@@ -2,6 +2,9 @@
 
 namespace Bga\Games\JohnCompany\Models;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+
 class Enterprise extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
 {
   protected $id;
@@ -64,7 +67,12 @@ class Enterprise extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model imp
     return $this->income;
   }
 
-  public function changeOwner($familyId) {
+  public function changeOwner(string $familyId) {
     $this->setLocation($familyId);
+  }
+
+  public function returnToSupply(Player $player) {
+    $this->setLocation(Locations::supplyEnterprises($this->getType()));
+    Notifications::discardEnterprise($player, $this);
   }
 }

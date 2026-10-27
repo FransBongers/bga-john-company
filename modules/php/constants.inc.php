@@ -164,6 +164,7 @@ const ST_SELECT_OFFICE_HOLDER = 174;
 const ST_USE_MAN_ON_THE_INSIDE = 175;
 const ST_USE_ROYAL_PROTECTION = 178;
 const ST_TRADE_OR_DISCARD_ITEMS = 179;
+const ST_WAR_AGAINST_FRANCE = 180;
 
 
 const BONUSES = 'Bonuses';
@@ -241,6 +242,7 @@ const PRESIDENCY_PRESIDENT = 'PresidencyPresident';
 const SELECT_OFFICE_HOLDER = 'SelectOfficeHolder';
 const USE_MAN_ON_THE_INSIDE = 'UseManOnTheInside';
 const TRADE_OR_DISCARD_ITEMS = 'TradeOrDiscardItems';
+const WAR_AGAINST_FRANCE = 'WarAgainstFrance';
 const PARLIAMENT_MEETS_SELECT_LAW = 'ParliamentMeetsSelectLaw';
 const PARLIAMENT_MEETS_SELECT_POLICY = 'ParliamentMeetsSelectPolicy';
 const PARLIAMENT_MEETS_RESOLVE_POLICY = 'ParliamentMeetsResolvePolicy';
@@ -1069,12 +1071,15 @@ const THE_PRIME_MINISTERS_EAR_ID = 'ThePrimeMinistersEar';
  * are used in the code
  */
 const ESTER_SUMMERSON_ID = 'PrestigeCard_12';
+const FOUNDRY_CARD_ID = 'PrestigeCard_24';
+const JOHN_THORPE_ID = 'PrestigeCard_13';
 const JOSEPH_SEDLEY_ID = 'PrestigeCard_15';
 const LADY_NEWCOME_ID = 'PrestigeCard_20';
 const LORD_HIGHGATE_ID = 'PrestigeCard_19';
 const MR_ROCHESTER_ID = 'PrestigeCard_11';
 const SHIPBUILDERS_ID = 'PrestigeCard_21';
 const STOCK_BROKER_ID = 'PrestigeCard_25';
+const VIOLET_EFFINGHAM_ID = 'PrestigeCard_14';
 const WILLIAM_COLLINS_ID = 'PrestigeCard_17';
 
 /**
@@ -1083,6 +1088,7 @@ const WILLIAM_COLLINS_ID = 'PrestigeCard_17';
  */
 const BOARD_OF_CONTROL_ID = 'LawCard_34';
 const DEREGULATION_ID = 'LawCard_56';
+const ENVOY_TO_CHINA_ID = 'LawCard_32';
 const INCLOSURE_ACTS_ID = 'LawCard_36';
 const MASSED_DEMAND_FRANCHISE_ID = 'LawCard_54';
 const OLD_IDEAS_MADE_NEW_ID = 'LawCard_52';
@@ -1090,7 +1096,12 @@ const PUBLIC_DEMANDS_IMPEACHMENT_ID = 'LawCard_51';
 const ROYAL_PROTECTION_ID = 'LawCard_50';
 const SEPOY_RECRUITMENT_ID = 'LawCard_38';
 const SHIP_SUBSIDY_ID = 'LawCard_39';
+const TENURE_LIMITS_ID = 'LawCard_37';
 const TRADE_REGULATIONS_ID = 'LawCard_40';
+const TREASURE_REFORM_ID = 'LawCard_42';
+const WINDOW_TAX_REPEAL_ID = 'LawCard_46';
+const WRITER_GRAFT_REFORM_ID = 'LawCard_48';
+const WRITER_PRIVILEGES_ID = 'LawCard_45';
 const ZAMINDAR_TAXES_ID = 'LawCard_41';
 
 

@@ -8,7 +8,11 @@
 
 import { StaticData } from '../../static-data';
 import { GameAlias } from '../../types';
-import { tplLawCardTooltip, tplLondonSeasonCardTooltip } from './templates';
+import {
+  tplEnterpriseCardTooltip,
+  tplLawCardTooltip,
+  tplLondonSeasonCardTooltip,
+} from './templates';
 export * from './templates';
 
 //  .##.....##....###....##....##....###.....######...########.########.
@@ -78,6 +82,27 @@ export class TooltipManager {
 
   public setupTooltips() {}
 
+  public addEnterpriseCardTooltip({
+    nodeId,
+    cardId,
+    imageOnly = false,
+    invested,
+    shipId,
+  }: {
+    nodeId: string;
+    cardId: string;
+    invested: boolean;
+    shipId: string | null;
+    imageOnly?: boolean;
+  }) {
+    const type = cardId.split('_')[0];
+    const card = StaticData.get().enterpriseCard(cardId);
+    const html = tplEnterpriseCardTooltip({ id: cardId, ...card, type, invested, shipId });
+    // this.addCustomTooltip(nodeId, html, { forceRecreate: true });
+
+    this.game.bga.gameui.addTooltipHtml(nodeId, html, 400);
+  }
+
   public addLawCardTooltip({
     nodeId,
     cardId,
@@ -106,7 +131,7 @@ export class TooltipManager {
     imageOnly?: boolean;
   }) {
     const card = StaticData.get().londonSeasonCard(cardId);
-    const html = tplLondonSeasonCardTooltip({id: cardId, ...card});
+    const html = tplLondonSeasonCardTooltip({ id: cardId, ...card });
     // this.addCustomTooltip(nodeId, html, { forceRecreate: true });
 
     this.game.bga.gameui.addTooltipHtml(nodeId, html, 400);

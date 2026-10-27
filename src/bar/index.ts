@@ -17,12 +17,12 @@ export class Bar {
 
   private config = [
     {
-      id: 'joco-families',
-      text: _('Families'),
-    },
-    {
       id: 'joco-india',
       text: _('India'),
+    },
+    {
+      id: 'joco-families',
+      text: _('Families'),
     },
     {
       id: 'joco-parliament',

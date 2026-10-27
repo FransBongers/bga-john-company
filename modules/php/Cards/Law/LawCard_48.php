@@ -2,6 +2,9 @@
 
 namespace Bga\Games\JohnCompany\Cards\Law;
 
+use Bga\Games\JohnCompany\Managers\LawCards;
+use Bga\Games\JohnCompany\Managers\Parliament;
+
 class LawCard_48 extends \Bga\Games\JohnCompany\Models\LawCard
 {
   public function __construct($row)
@@ -23,5 +26,14 @@ class LawCard_48 extends \Bga\Games\JohnCompany\Models\LawCard
       '<br>',
       clienttranslate('If the Writer Privileges law is in effect, discard it.'),
     ];
+  }
+
+  public function resolveImmediateEffects(object $ctx, bool $passed = true)
+  {
+    $primeMinister = Parliament::getPrimeMinisterPlayer();
+    $writerPrivilegesLaw = LawCards::get(WRITER_PRIVILEGES_ID);
+    if ($writerPrivilegesLaw->isInPlay()) {
+      $writerPrivilegesLaw->discard($primeMinister);
+    }
   }
 }

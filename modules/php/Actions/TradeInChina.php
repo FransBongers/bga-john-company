@@ -6,6 +6,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Managers\Company;
+use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Regions;
@@ -74,9 +75,11 @@ class TradeInChina extends \Bga\Games\JohnCompany\Models\AtomicAction
     $office = Offices::get(SUPERINTENDENT_OF_TRADE_IN_CHINA);
     $checkResult = JoCoUtils::makeCheck($player, $numberOfDice, $office->getFamilyMember());
 
+    $exportIconValue = LawCards::isInPlay(ENVOY_TO_CHINA_ID) ? 5 : 4;
+
     if ($checkResult === SUCCESS) {
       $numberOfExportIcons = $this->getExportIcons();
-      $amount = $numberOfExportIcons * 4;
+      $amount = $numberOfExportIcons * $exportIconValue;
       $balance = Company::incBalance($amount);
       Notifications::addCashToCompanyBalance($player, $amount, $balance);
 

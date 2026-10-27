@@ -155,6 +155,18 @@ class Notifications
     return $translatedResultMap[$checkResult];
   }
 
+  public static function tknEnterpriseCard(Enterprise $enterprise)
+  {
+    $type = $enterprise->getType();
+    $data = '';
+    if ($type == WORKSHOP) {
+      $data = $enterprise->getInvested() === 1 ? 'invested' : 'not_invested';
+    } elseif ($type == SHIPYARD) {
+      $data = $enterprise->getShipId();
+    }
+    return implode(':', [$enterprise->getId(), $data]);
+  }
+
   public static function tknPound()
   {
     return clienttranslate('Pounds');
@@ -234,17 +246,17 @@ class Notifications
 
   private static function getEnterpriseLog(array $enterprises)
   {
-    $log = '';
+    $log = [];
     $args = [];
 
     foreach ($enterprises as $index => $enterprise) {
       $key = 'tkn_enterpriseCard_' . $index;
-      $log = $log . '${' . $key . '}';
-      $args[$key] = $enterprise->getId();
+      $log[] = '${' . $key . '}';
+      $args[$key] = self::tknEnterpriseCard($enterprise);
     }
 
     return [
-      'log' => $log,
+      'log' => implode(', ', $log),
       'args' => $args,
     ];
   }
@@ -305,6 +317,7 @@ class Notifications
       BENGAL_PRESIDENCY => clienttranslate('Bengal'),
       BOMBAY_PRESIDENCY => clienttranslate('Bombay'),
       MADRAS_PRESIDENCY => clienttranslate('Madras'),
+      SUPPLY_REGIMENTS => clienttranslate('Supply'),
     ];
     return $idNameMap[$regionId];
   }
@@ -555,6 +568,17 @@ class Notifications
       'piecesLog' => self::createPiecesLog($selectedPieces),
       'tkn_boldText_region' => Regions::getAll()[$regionId]->getName(),
       'i18n' => ['tkn_boldText_region'],
+    ]);
+  }
+
+  public static function discardEnterprise(Player $player, Enterprise $enterprise)
+  {
+    self::notifyAll('discardEnterprise', clienttranslate('${player_name} discards a ${tkn_enterpriseCard} ${tkn_enterpriseIcon}'), [
+      'player' => $player,
+      'enterprise' => $enterprise->jsonSerialize(),
+      'tkn_enterpriseCard' => self::tknEnterpriseCard($enterprise),
+      'tkn_enterpriseIcon' => $enterprise->getType(),
+      'i18n' => [],
     ]);
   }
 
@@ -1236,9 +1260,9 @@ class Notifications
 
   public static function purchaseEnterprise(Player $player, Enterprise $enterprise, int $amount, string $familyId)
   {
-    self::notifyAll('purchaseEnterprise', clienttranslate('${player_name} pays ${tkn_boldText_amount} to purchase a ${tkn_boldText_enterprise} ${tkn_enterpriseIcon}'), [
+    self::notifyAll('purchaseEnterprise', clienttranslate('${player_name} pays ${tkn_boldText_amount} to purchase a ${tkn_enterpriseCard} ${tkn_enterpriseIcon}'), [
       'player' => $player,
-      'tkn_boldText_enterprise' => $enterprise->getName(),
+      'tkn_enterpriseCard' => self::tknEnterpriseCard($enterprise),
       'tkn_enterpriseIcon' => $enterprise->getType(),
       'tkn_boldText_amount' => '£' .  $amount,
       'amount' => $amount,
@@ -1247,7 +1271,6 @@ class Notifications
       'ship' => $enterprise->getType() === SHIPYARD ? Ships::get($enterprise->getShipId()) : null,
       'type' => $enterprise->getType(),
       'tkn_pound' => clienttranslate('Pounds'),
-      'i18n' => ['tkn_boldText_enterprise'],
     ]);
   }
 
@@ -1399,16 +1422,31 @@ class Notifications
     ]);
   }
 
-  public static function moveRegiment($player, $armyPiece, $from)
+  public static function moveRegiment(Player $player, ArmyPiece $armyPiece, string $from)
   {
-    self::notifyAll('moveArmyPiece', clienttranslate('${player_name} moves ${tkn_regiment} from the army of ${tkn_boldText_from} to the army of ${tkn_boldText_to}'), [
+    $text = '';
+    $textArgs = [];
+
+    if ($armyPiece->getLocation() === Locations::supplyRegiments()) {
+      $text = clienttranslate('${player_name} returns ${tkn_regiment} from the army of ${tkn_boldText_from} to the supply');
+      $textArgs = [
+        'tkn_boldText_from' => self::getRegionNameForArmy($from),
+        'i18n' => ['tkn_boldText_from'],
+      ];
+    } else {
+      $text = clienttranslate('${player_name} moves ${tkn_regiment} from the army of ${tkn_boldText_from} to the army of ${tkn_boldText_to}');
+      $textArgs = [
+        'tkn_boldText_from' => self::getRegionNameForArmy($from),
+        'tkn_boldText_to' => self::getRegionNameForArmy($armyPiece->getLocation()),
+        'i18n' => ['tkn_boldText_from', 'tkn_boldText_to'],
+      ];
+    }
+
+    self::notifyAll('moveArmyPiece', $text, array_merge([
       'player' => $player,
       'armyPiece' => $armyPiece->jsonSerialize(),
       'tkn_regiment' => self::tknRegiment(),
-      'tkn_boldText_from' => self::getRegionNameForArmy($from),
-      'tkn_boldText_to' => self::getRegionNameForArmy($armyPiece->getLocation()),
-      'i18n' => ['tkn_boldText_from', 'tkn_boldText_to'],
-    ]);
+    ], $textArgs));
   }
 
   public static function moveShip(Player $player, Ship $ship, string $from)
@@ -1714,7 +1752,8 @@ class Notifications
   {
     self::notifyAll('updateRegion', $text, array_merge($textArgs, [
       'region' => $region->jsonSerialize(),
-      'controlToken' => ControlTokens::getByRegion($region->getId())->jsonSerialize()
+      'controlToken' => ControlTokens::getByRegion($region->getId())->jsonSerialize(),
+      'empires' => Globals::getEmpires(),
     ]));
   }
 

@@ -2,8 +2,8 @@
 
 namespace Bga\Games\JohnCompany\Cards\Law;
 
-use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
-use Bga\Games\JohnCompany\Managers\Ships;
+use Bga\Games\JohnCompany\Managers\Offices;
+use Bga\Games\JohnCompany\Managers\Parliament;
 
 class LawCard_32 extends \Bga\Games\JohnCompany\Models\LawCard
 {
@@ -21,5 +21,13 @@ class LawCard_32 extends \Bga\Games\JohnCompany\Models\LawCard
       '<br>',
       clienttranslate('If the oﬃce has not been created, create the Superintendent of Trade in China oﬃce.'),
     ];
+  }
+
+  public function resolveImmediateEffects(object $ctx, bool $passed = true)
+  {
+    $office = Offices::get(SUPERINTENDENT_OF_TRADE_IN_CHINA);
+    if (!$office->isInPlay()) {
+      $office->createOffice(Parliament::getPrimeMinisterPlayer(), $ctx);
+    }
   }
 }

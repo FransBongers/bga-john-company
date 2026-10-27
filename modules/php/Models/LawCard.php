@@ -94,6 +94,13 @@ class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     // Resolve any immediate effects of the law
   }
 
+  public function discard(Player $player)
+  {
+   $this->move($player, DISCARD, clienttranslate('${player_name} discards ${tkn_lawCard}'), [
+     'tkn_lawCard' => $this->getId(),
+   ]);
+  }
+
   public function move(Player $player, string $location, $text = null, $textArgs = null)
   {
     $state = LawCards::insertOnTop($this->getId(), $location);

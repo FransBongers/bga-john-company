@@ -275,6 +275,7 @@
   font-size: 1.1em;
 }
 
+.tooltip.joco-enterprise-card,
 .tooltip.joco-card,
 .tooltip.joco-law-card {
   position: relative;
@@ -3648,56 +3649,34 @@ span[style*="color:#c0c0c0"] {
 }
 
 .joco-tower-flag {
+  background-image: url("img/flags.webp");
+  background-size: 200% 300%;
   position: absolute;
   box-sizing: border-box;
-  border: 2px solid black;
-  width: 15px;
-  height: 20px;
-  top: -10px;
-  left: 35px;
-  background-color: whitesmoke;
-  display: flex;
-  justify-content: center;
+  width: 26px;
+  aspect-ratio: 202/245;
+  top: -23px;
+  left: 38px;
 }
 
 .joco-tower-top[data-empire=false] .joco-tower-flag {
   display: none;
 }
 
-.joco-tower-top[data-capital=false] .joco-tower-flag span {
-  display: none;
+.joco-tower-top[data-empire-id=gold] .joco-tower-flag {
+  background-position-y: 50%;
 }
 
-.joco-tower-top[data-empire-id=Bengal] .joco-tower-flag {
-  background-color: #b47860;
+.joco-tower-top[data-empire-id=silver] .joco-tower-flag {
+  background-position-y: 100%;
 }
 
-.joco-tower-top[data-empire-id=Bombay] .joco-tower-flag {
-  background-color: #a1b4ab;
+.joco-tower-top[data-empire-id=bronze] .joco-tower-flag {
+  background-position-y: 0%;
 }
 
-.joco-tower-top[data-empire-id=Delhi] .joco-tower-flag {
-  background-color: #8e867c;
-}
-
-.joco-tower-top[data-empire-id=Hyderabad] .joco-tower-flag {
-  background-color: #a4a576;
-}
-
-.joco-tower-top[data-empire-id=Madras] .joco-tower-flag {
-  background-color: #e9ca92;
-}
-
-.joco-tower-top[data-empire-id=Maratha] .joco-tower-flag {
-  background-color: #cd9f6b;
-}
-
-.joco-tower-top[data-empire-id=Mysore] .joco-tower-flag {
-  background-color: #c9bda5;
-}
-
-.joco-tower-top[data-empire-id=Punjab] .joco-tower-flag {
-  background-color: #8a8e99;
+.joco-tower-top[data-capital=true] .joco-tower-flag {
+  background-position-x: 100%;
 }
 
 .joco-governor-overlay-container {
@@ -4019,8 +3998,10 @@ span[style*="color:#c0c0c0"] {
   border-color: #f1e8e4 #f1e8e4 #cfaea0 #cfaea0;
 }
 .joco-order-token[data-type=closed] {
-  background-color: black;
+  background-image: url("img/closed_order.png");
+  background-size: 100% 100%;
   color: white;
+  border-color: #6a6b6f #6a6b6f #38393b #38393b;
 }
 .joco-order-token[data-type=closed] .joco-text {
   top: 40%;

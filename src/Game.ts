@@ -29,7 +29,7 @@ import { EnterpriseCardsManager } from './cards/enterprise-cards';
 import { LawCardsManager } from './cards/law-cards';
 import { LondonSeasonCardsManager } from './cards/london-season-cards';
 import { Company } from './company';
-import { CROWN_PLAYER_ID, SETUP } from './constants';
+import { CROWN_PLAYER_ID, SETUP, SHIPYARD, WORKSHOP } from './constants';
 import { CrownClimate } from './crown/climate';
 import { India } from './india';
 import { BgaAnimations, BgaAutofit } from './libs';
@@ -83,6 +83,7 @@ import {
   TradeInChina,
   TradeOrDiscardItems,
   UseManOnTheInside,
+  WarAgainstFrance,
   ParliamentMeetsSelectPolicy,
   ParliamentMeetsCastVotes,
   ParliamentMeetsAdditionalRoundOrResolve,
@@ -195,6 +196,7 @@ export class Game {
     TradeInChina,
     TradeOrDiscardItems,
     UseManOnTheInside,
+    WarAgainstFrance,
   };
   public bga: Bga;
 
@@ -914,8 +916,9 @@ export class Game {
     }
   }
 
-  addLogTooltip({ tooltipId, cardId }: { tooltipId: number; cardId: string }) {
+  addLogTooltip({ tooltipId, cardId: inputCardId }: { tooltipId: number; cardId: string }) {
     const tooltipManager = TooltipManager.getInstance();
+    const [cardId, data] = inputCardId.split(':');
     if (cardId.startsWith('BlackmailCard')) {
       tooltipManager.addBlackmailBackTooltip(`tooltip_${tooltipId}`);
     } else if (this.gamedatas.staticData.lawCards[cardId]) {
@@ -927,6 +930,13 @@ export class Game {
       tooltipManager.addLondonSeasonCardTooltip({
         nodeId: `tooltip_${tooltipId}`,
         cardId,
+      });
+    } else if (this.gamedatas.staticData.enterpriseCards[cardId]) {
+      tooltipManager.addEnterpriseCardTooltip({
+        nodeId: `tooltip_${tooltipId}`,
+        cardId,
+        invested: cardId.startsWith(WORKSHOP) && data === 'invested',
+        shipId: cardId.startsWith(SHIPYARD) ? data : null,
       });
     }
   }

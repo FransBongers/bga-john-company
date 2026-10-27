@@ -11,6 +11,7 @@ use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Models\Family;
 use Bga\Games\JohnCompany\Models\Player;
 
@@ -100,6 +101,11 @@ class PurchaseEnterprise extends \Bga\Games\JohnCompany\Models\AtomicAction
     if ($victoryPoints > 0) {
       Game::get()->bga->playerScore->inc($playerId, $victoryPoints);
     }
+
+    $ownerFamily = LondonSeasonCards::getOwnerFamily(FOUNDRY_CARD_ID);
+    if ($ownerFamily !== null) {
+      $ownerFamily->gainCash(1, LondonSeasonCards::get(FOUNDRY_CARD_ID)->getTitle());
+    }
   }
 
   private function checkExtraActionOpportunityMarker(Family $family, int $playerId, string $enterpriseType)
@@ -148,6 +154,13 @@ class PurchaseEnterprise extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   public function canBePerformedBy(Family $family, string $enterpriseType)
   {
+    if ($enterpriseType === WORKSHOP && $family->hasPrestigeCard(JOHN_THORPE_ID)) {
+      return false;
+    }
+    if ($enterpriseType === SHIPYARD && $family->hasPrestigeCard(VIOLET_EFFINGHAM_ID)) {
+      return false;
+    }
+
     $treasury = $family->getTreasury();
 
     return $treasury >= $this->enterprisePrice[$enterpriseType] && Enterprises::countInLocation(Locations::supplyEnterprises($enterpriseType)) > 0;

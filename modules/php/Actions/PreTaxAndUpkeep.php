@@ -44,7 +44,7 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
       $this->resolveUpkeep();
     }
     if ($type === TAX) {
-      $this->resolveTax($args['target'], $args['windowTax']);
+      $this->resolveTax($args['target'], $args['windowTaxMultiplier']);
     }
 
     $data = [];
@@ -102,7 +102,7 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
     }
   }
 
-  private function resolveTax(string $target, bool $windowTax)
+  private function resolveTax(string $target, int $windowTaxMultiplier)
   {
     $playersThatCannotPayTaxes = [];
 
@@ -129,9 +129,9 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
 
       $totalTaxes = $count;
       $windows = 0;
-      if ($windowTax) {
+      if ($windowTaxMultiplier > 0) {
         $windows = $family->getWindowCount();
-        $totalTaxes += $windows;
+        $totalTaxes += $windows * $windowTaxMultiplier;
       }
 
       if ($totalTaxes > $family->getTreasury()) {
@@ -144,7 +144,7 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
         Notifications::payTax($player, $count, $target);
       }
 
-      if ($windowTax && $windows > 0) {
+      if ($windowTaxMultiplier > 0 && $windows > 0) {
         $family->pay($windows);
         Notifications::payWindowTax($player, $windows);
       }
@@ -158,7 +158,7 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
         'args' => [
           'type' => TAX,
           'target' => $target,
-          'windowTax' => $windowTax,
+          'windowTaxMultiplier' => $windowTaxMultiplier,
         ],
       ]));
     }

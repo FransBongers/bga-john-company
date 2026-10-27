@@ -6,6 +6,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\JoCoUtils;
+use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Models\Player;
@@ -48,6 +49,8 @@ class LondonSeasonAttrition extends \Bga\Games\JohnCompany\Models\AtomicAction
     $allOffices = Offices::getAll()->toArray();
     $players = Players::getAll();
 
+    $tenureLimitsInPlay = LawCards::isInPlay(TENURE_LIMITS_ID);
+
     $retireActions = [];
 
     foreach ($playerIds as $playerId) {
@@ -56,23 +59,39 @@ class LondonSeasonAttrition extends \Bga\Games\JohnCompany\Models\AtomicAction
         return $office->getPlayerId() === $playerId;
       });
 
+      usort($offices, function ($a, $b) {
+        return $a->getHirePriority() <=> $b->getHirePriority();
+      });
+
       $retiredAFamilyMember = false;
 
       foreach ($offices as $office) {
+        $result = 0;
         $familyMember = $office->getFamilyMember();
-        $fatigue = $office->getFatigue();
-        $modifier = $fatigue + ($office->getId() === CHAIRMAN ? 1 : 0);
+        if ($tenureLimitsInPlay && $office->getId() === CHAIRMAN) {
+          Notifications::message(clienttranslate('The ${tkn_boldText_office} retires (${source})'), [
+            'source' => LawCards::get(TENURE_LIMITS_ID)->getTitle(),
+            'tkn_boldText_office' => $office->getTitle(),
+            'i18n' => ['tkn_boldText_office', 'source'],
+          ]);
+          $result = 6;
+        } else {
+          $fatigue = $office->getFatigue();
+          $modifier = $fatigue + ($office->getId() === CHAIRMAN ? 1 : 0);
 
-        $dieResult = JoCoUtils::rollDie();
-        $result = $dieResult + $modifier;
+          $dieResult = JoCoUtils::rollDie();
+          $result = $dieResult + $modifier;
 
-        Notifications::message(clienttranslate('${player_name} rolls ${tkn_boldText_dieResult} (+${tkn_boldText_modifier}) for ${tkn_boldText_office}'), [
-          'player' => $player,
-          'tkn_boldText_dieResult' => $dieResult,
-          'tkn_boldText_modifier' => $modifier,
-          'tkn_boldText_office' => $office->getTitle(),
-          'i18n' => ['tkn_boldText_office'],
-        ]);
+          Notifications::message(clienttranslate('${player_name} rolls ${tkn_boldText_dieResult} (+${tkn_boldText_modifier}) for ${tkn_boldText_office}'), [
+            'player' => $player,
+            'tkn_boldText_dieResult' => $dieResult,
+            'tkn_boldText_modifier' => $modifier,
+            'tkn_boldText_office' => $office->getTitle(),
+            'i18n' => ['tkn_boldText_office'],
+          ]);
+        }
+
+
 
         if ($result <= 2) {
           // Nothing happens

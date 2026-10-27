@@ -60,12 +60,12 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     return $this->hasChairmanMarker === 1;
   }
 
-  public function getEnterprises()
+  public function getEnterprises($type = null)
   {
     $enterprises = Enterprises::getAll()->toArray();
     $familyId = $this->getId();
-    return Utils::filter($enterprises, function ($enterprise) use ($familyId) {
-      return $enterprise->getLocation() === $familyId;
+    return Utils::filter($enterprises, function ($enterprise) use ($familyId, $type) {
+      return $enterprise->getLocation() === $familyId && ($type === null || $enterprise->getType() === $type);
     });
   }
 
@@ -126,6 +126,9 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
 
   public function gainCash(int $amount, string | null $source = null)
   {
+    if ($amount === 0) {
+      return;
+    }
     $this->incTreasury($amount);
     Notifications::updateFamilyTreasury($this->getPlayer(), $amount, $source);
   }

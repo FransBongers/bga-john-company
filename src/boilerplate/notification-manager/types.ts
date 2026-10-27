@@ -50,6 +50,10 @@ export interface NotifChangeOrderStatus extends NotifWithPlayerArgs {
   order: JoCoOrderBase;
 }
 
+export interface NotifDiscardEnterprise extends NotifWithPlayerArgs {
+  enterprise: JocoEnterpriseCardBase;
+}
+
 export interface NotifDiscardLondonSeasonCard {
   card: JocoLondonSeasonCardBase;
 }
@@ -314,4 +318,5 @@ export interface NotifUpdateOpportunityMarker {
 export interface NotifUpdateRegion {
   controlToken: JocoControlToken;
   region: JocoRegionBase;
+  empires: Array<string | null>;
 }

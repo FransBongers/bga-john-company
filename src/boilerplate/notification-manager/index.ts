@@ -38,6 +38,7 @@ import {
   SEA_ZONES,
   POWER_COUNTER,
   REVEALED_LAWS,
+  SUPPLY_REGIMENTS,
 } from '../../constants';
 import { CrownClimate } from '../../crown/climate';
 import { India } from '../../india';
@@ -117,6 +118,7 @@ import {
   NotifDrawCompanyFailureCard,
   NotifUpdatePower,
   NotifMoveLaws,
+  NotifDiscardEnterprise,
 } from './types';
 import { tplArmyPiece } from '../../india/army/templates';
 import { Parliament } from '../../parliament';
@@ -510,6 +512,14 @@ export class NotificationManager {
     company.updateCompanyDebt(companyDebt);
   }
 
+  async notif_discardEnterprise(notif: NotifDiscardEnterprise) {
+    const { playerId, enterprise } = notif;
+
+    await EnterpriseCardsManager.getInstance().removeCard(
+      getEnterpriseCard(enterprise),
+    );
+  }
+
   async notif_discardLondonSeasonCard(notif: NotifDiscardLondonSeasonCard) {
     const { card } = notif;
 
@@ -710,10 +720,16 @@ export class NotificationManager {
   async notif_moveArmyPiece(notif: NotifMoveArmyPiece) {
     const { armyPiece } = notif;
 
+    const element = document.getElementById(armyPiece.id);
+    if (armyPiece.location === SUPPLY_REGIMENTS) {
+      element.remove();
+      return;
+    }
+
     if (parentHasChildWithId(armyPiece.location, armyPiece.id)) {
       return;
     }
-    const element = document.getElementById(armyPiece.id);
+
     await this.game.animationManager.slideAndAttach(
       element,
       document.getElementById(armyPiece.location),
@@ -1116,10 +1132,10 @@ export class NotificationManager {
   }
 
   async notif_updateRegion(notif: NotifUpdateRegion) {
-    const { region: data, controlToken } = notif;
+    const { region: data, controlToken, empires } = notif;
     const india = India.getInstance();
     const region = india.getRegion(data.id);
-    region.update(data);
+    region.update(data, empires);
 
     const regionHasControlToken = region.hasControlToken(controlToken);
     if (PRESIDENCIES.includes(data.control) && regionHasControlToken) {

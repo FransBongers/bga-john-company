@@ -109,7 +109,6 @@
       flex-grow: 1;
     }
   }
-  
 }
 
 .joco-order-token {
@@ -141,8 +140,10 @@
     border-color: #f1e8e4 #f1e8e4 #cfaea0 #cfaea0;
   }
   &[data-type='closed'] {
-    background-color: black;
+    background-image: url('img/closed_order.png');
+    background-size: 100% 100%;
     color: white;
+    border-color: #6a6b6f #6a6b6f #38393b #38393b;
 
     .joco-text {
       top: 40%;

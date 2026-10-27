@@ -11,7 +11,7 @@ import {
   setSelected,
   updatePageTitle,
 } from '../boilerplate';
-import { BLACKMAIL, SHARE } from '../constants';
+import { BLACKMAIL, SHARE, SHIPYARD, WORKSHOP } from '../constants';
 import { GameAlias, JocoFamilyMember } from '../types';
 
 interface OnEnteringTradeOrDiscardItemsArgs extends CommonStateArgs {
@@ -147,6 +147,10 @@ export class TradeOrDiscardItems implements GameState<OnEnteringTradeOrDiscardIt
         return _('Company share(s)');
       case BLACKMAIL:
         return _('Blackmail card(s)');
+      case WORKSHOP:
+        return _('workshop(s)');
+      case SHIPYARD:
+        return _('shipyard(s)');
       default:
         return type;
     }

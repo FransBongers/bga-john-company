@@ -2,7 +2,9 @@
 
 namespace Bga\Games\JohnCompany\Cards\Law;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Managers\EventTiles;
+use Bga\Games\JohnCompany\Managers\Parliament;
 
 class LawCard_55 extends \Bga\Games\JohnCompany\Models\LawCard
 {
@@ -41,5 +43,11 @@ class LawCard_55 extends \Bga\Games\JohnCompany\Models\LawCard
       EventTiles::get(FOREIGN_INVASION_EVENT_TILE_ID)->resolveForeignInvastion($ctx, null, true);
       return;
     }
+
+    $ctx->insertAsBrother(new LeafNode([
+      'action' => WAR_AGAINST_FRANCE,
+      'playerId' => 'some',
+      'activePlayerIds' => [Parliament::getPrimeMinisterPlayerId()]
+    ]));
   }
 }

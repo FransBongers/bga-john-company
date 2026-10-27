@@ -81,9 +81,14 @@ export const getTokenDiv = ({
     case LOG_TOKEN_CLIMATE:
       return tplLogTokenClimate(value);
     case LOG_TOKEN_ENTERPRISE_CARD:
-      return tlpLogTokenText({
-        text: StaticData.get().enterpriseCard(value).name,
-      });
+      return tplTextWithTooltip(
+        game,
+        value,
+        StaticData.get().enterpriseCard(value.split(':')[0]).name,
+      );
+    // return tlpLogTokenText({
+    //   text: StaticData.get().enterpriseCard(value).name,
+    // });
     case LOG_TOKEN_ICON:
     case LOG_TOKEN_ENTERPRISE_ICON:
       return tplIcon(value, 'log-token');

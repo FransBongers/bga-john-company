@@ -2,6 +2,9 @@
 
 namespace Bga\Games\JohnCompany\Cards\Law;
 
+use Bga\Games\JohnCompany\Managers\LawCards;
+use Bga\Games\JohnCompany\Managers\Parliament;
+
 class LawCard_45 extends \Bga\Games\JohnCompany\Models\LawCard
 {
   public function __construct($row)
@@ -23,5 +26,14 @@ class LawCard_45 extends \Bga\Games\JohnCompany\Models\LawCard
         ],
       ],
     ];
+  }
+
+  public function resolveImmediateEffects(object $ctx, bool $passed = true)
+  {
+    $primeMinister = Parliament::getPrimeMinisterPlayer();
+    $writerGraftReformLaw = LawCards::get(WRITER_GRAFT_REFORM_ID);
+    if ($writerGraftReformLaw->isInPlay()) {
+      $writerGraftReformLaw->discard($primeMinister);
+    }
   }
 }

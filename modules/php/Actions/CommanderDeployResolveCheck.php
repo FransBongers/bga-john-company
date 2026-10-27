@@ -8,10 +8,12 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Managers\ArmyPieces;
+use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\ControlTokens;
 use Bga\Games\JohnCompany\Managers\Elephant;
 use Bga\Games\JohnCompany\Models\Player;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Models\Region;
@@ -170,6 +172,16 @@ class CommanderDeployResolveCheck extends \Bga\Games\JohnCompany\Models\AtomicAc
 
     if (!$wasLooted) {
       $controlToken->setLooted(1);
+    }
+
+    if (LawCards::isInPlay(TREASURE_REFORM_ID)) {
+      $balance = Company::incBalance($loot);
+      Notifications::updateCompanyBalance($balance, clienttranslate('Company Balance increases by ${tkn_boldText_amount} (${sourceLog})'), [
+        'tkn_boldText_amount' => '£' . $loot,
+        'sourceLog' => LawCards::get(TREASURE_REFORM_ID)->getTitle(),
+        'i18n' => ['sourceLog']
+      ]);
+      return;
     }
 
     $officerCountByPlayerId = [];

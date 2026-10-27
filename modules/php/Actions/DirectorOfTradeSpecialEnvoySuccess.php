@@ -159,23 +159,7 @@ class DirectorOfTradeSpecialEnvoySuccess extends \Bga\Games\JohnCompany\Models\A
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_072");
     }
 
-    Notifications::openTradeWithChina($player);
-
-    $office = Offices::get(SUPERINTENDENT_OF_TRADE_IN_CHINA);
-    $office->moveToVacantOffices($player);
-
-    if (count($office->getCandidatesForHiring()) > 0) {
-      $chairmanPlayerId = Families::getChairmanFamily()->getPlayerId();
-      $this->ctx->insertAsBrother(new LeafNode([
-        'action' => HIRING_HIRE_FAMILY_MEMBER,
-        'playerId' => 'some',
-        'activePlayerIds' => [$chairmanPlayerId],
-        'args' => [
-          'officeId' => $office->getId(),
-          'hirerPlayerId' => $chairmanPlayerId,
-        ],
-      ]));
-    }
+    Offices::get(SUPERINTENDENT_OF_TRADE_IN_CHINA)->createOffice($player, $this->ctx);
   }
 
   private function getClosedOrders()

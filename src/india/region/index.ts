@@ -1,6 +1,6 @@
 import { India } from '..';
 import { createHtmlElement } from '../../boilerplate';
-import { PRESIDENCIES } from '../../constants';
+import { EMPIRE_COLOR_MAP, PRESIDENCIES } from '../../constants';
 import { BgaCards } from '../../libs';
 import { createFamilyMember, tplCube } from '../../templates';
 import { ControlTokensManager } from '../../token-managers/control-tokens';
@@ -93,10 +93,11 @@ export class Region {
 
     this.setupShipStock(game.gamedatas);
 
+    const empires = game.gamedatas.empires;
     this.updateControlToken(game.gamedatas);
     this.updateStrength(data.strength);
-    this.updateCapital(data.isCapital);
-    this.updateEmpire(data.isCapital, data.control);
+    this.updateCapital(data.isCapital, empires);
+    this.updateEmpire(data.isCapital, data.control, empires);
     this.updateCompanyControl(data);
     this.updateFamilyMembers(Object.values(game.gamedatas.familyMembers));
     this.updateUnrest(data.unrest);
@@ -124,7 +125,7 @@ export class Region {
   // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
   // ..#######..##........########..##.....##....##....########.....#######..####
 
-  public update(region: JocoRegionBase) {
+  public update(region: JocoRegionBase, empires: Array<string | null>) {
     if (this.data.unrest !== region.unrest) {
       this.updateUnrest(region.unrest);
     }
@@ -132,15 +133,15 @@ export class Region {
       this.updateStrength(region.strength);
     }
     if (this.data.isCapital !== region.isCapital) {
-      this.updateCapital(region.isCapital);
+      this.updateCapital(region.isCapital, empires);
     }
     if (this.data.control !== region.control) {
-      this.updateEmpire(region.isCapital, region.control);
+      this.updateEmpire(region.isCapital, region.control, empires);
     }
     this.updateCompanyControl(region);
   }
 
-  public updateCapital(isCapital: boolean) {
+  public updateCapital(isCapital: boolean, empires: Array<string | null>) {
     this.data.isCapital = isCapital;
 
     this.tower.children[0].setAttribute(
@@ -149,7 +150,7 @@ export class Region {
     );
 
     if (isCapital) {
-      this.updateEmpire(isCapital, null);
+      this.updateEmpire(isCapital, null, empires);
     }
   }
 
@@ -161,7 +162,7 @@ export class Region {
     this.controlTokenStock.addCard(token);
   }
 
-  public updateEmpire(isCapital: boolean, control: string | null) {
+  public updateEmpire(isCapital: boolean, control: string | null, empires: Array<string | null>) {
     this.data.control = control;
 
     const isPartOfEmpire =
@@ -172,9 +173,12 @@ export class Region {
       isPartOfEmpire ? 'true' : 'false',
     );
     if (isPartOfEmpire) {
+      const empireIndex = empires.indexOf(isCapital ? this.id : control);
+      const empireColor = EMPIRE_COLOR_MAP[empireIndex % EMPIRE_COLOR_MAP.length];
+
       this.tower.children[0].setAttribute(
         'data-empire-id',
-        isCapital ? this.id : control,
+        empireColor,
       );
     }
   }

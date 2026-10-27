@@ -1,3 +1,4 @@
+import { Bar } from '../bar';
 import {
   addDangerActionButton,
   addPassButton,
@@ -56,6 +57,7 @@ export class ParliamentMeetsCastVotes implements GameState<OnEnteringParliamentM
     this.selectedEnterpriseCardIds = [];
     this.selectedLondonSeasonCardIds = [];
     this.updateInterfaceInitialStep();
+    Bar.getInstance().goTo('joco-parliament');
   }
 
   onLeavingState() {

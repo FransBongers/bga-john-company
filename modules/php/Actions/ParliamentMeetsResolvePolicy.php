@@ -105,7 +105,7 @@ class ParliamentMeetsResolvePolicy extends \Bga\Games\JohnCompany\Models\AtomicA
       'action' => PRE_TAX_AND_UPKEEP,
       'args' => [
         'target' => $target,
-        'windowTax' => $windowTax,
+        'windowTaxMultiplier' => $windowTax ? 1 : 0,
         'type' => TAX,
       ]
     ]));

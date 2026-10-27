@@ -365,6 +365,7 @@ class Game extends \Bga\GameFramework\Table
             'company' => Company::get(),
             'controlTokens' => ControlTokens::getAll(),
             'elephant' => Elephant::get(),
+            'empires' => Globals::getEmpires(),
             'enterprises' => Enterprises::getAll(),
             'eventTiles' => [
                 'deck' => EventTiles::getTopOf(DECK),

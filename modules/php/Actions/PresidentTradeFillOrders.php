@@ -105,6 +105,8 @@ class PresidentTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidency
     $income = [];
 
     $presidentBonus = count($filledOrders);
+
+    $writerGraftReformInPlay = LawCards::isInPlay(WRITER_GRAFT_REFORM_ID);
     $tradeRegulationsInPlay = LawCards::isInPlay(TRADE_REGULATIONS_ID);
     if ($tradeRegulationsInPlay) {
       $income[COMPANY] = $presidentBonus;
@@ -112,6 +114,7 @@ class PresidentTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidency
       $income[$player->getFamilyId()] = $presidentBonus; // player performing the action is president
     }
 
+    $writerBonus = $this->getWriterBonus();
     foreach ($filledOrders as $index => $data) {
       $orderId = $data->orderId;
       $filledBy = $data->filledBy;
@@ -138,12 +141,13 @@ class PresidentTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidency
           throw new \Bga\GameFramework\VisibleSystemException("ERROR_031");
         }
 
-        $familyId = $familyMember->getFamilyId();
-        if (isset($income[$familyId])) {
-          $income[$familyId] += 1;
-        } else {
-          $income[$familyId] = 1;
+        $bonusReceiver = $writerGraftReformInPlay ? COMPANY : $familyMember->getFamilyId();
+        if (!isset($income[$bonusReceiver])) {
+          $income[$bonusReceiver] = 0;
         }
+
+        $income[$bonusReceiver] += $writerBonus;
+
 
         // $familyMember->setLocation($orderId);
         // Return writer from available writers array
@@ -154,18 +158,16 @@ class PresidentTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidency
 
       $companyBalanceIncrease += $order->getValue();
       $order->fill($player, $familyMember);
-      $families = Families::getAll();
     }
+
+    $families = Families::getAll();
 
     $companyBalance = Company::incBalance($companyBalanceIncrease);
     Notifications::increaseCompanyBalance($player, $companyBalance, $companyBalanceIncrease);
 
     foreach ($income as $familyId => $amount) {
       if ($familyId === COMPANY) {
-        $balance = Company::incBalance($amount);
-        Notifications::updateCompanyBalance($balance, clienttranslate('President\'s bonus: Company Balance increases by ${tkn_boldText_amount}'), [
-          'tkn_boldText_amount' => '£' . $amount,
-        ]);
+        $this->increaseCompanyBalance($amount, $tradeRegulationsInPlay, $writerGraftReformInPlay);
       } else {
         $families[$familyId]->gainCash($amount);
       }
@@ -185,6 +187,42 @@ class PresidentTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidency
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private function increaseCompanyBalance(int $amount, bool $tradeRegulationsInPlay, bool $writerGraftReformInPlay)
+  {
+    $balance = Company::incBalance($amount);
+    $lawIds = [];
+    if ($tradeRegulationsInPlay) {
+      $lawIds[] = TRADE_REGULATIONS_ID;
+    }
+    if ($writerGraftReformInPlay) {
+      $lawIds[] = WRITER_GRAFT_REFORM_ID;
+    }
+
+    $args = [
+      'i18n' => []
+    ];
+    $log = [];
+    foreach ($lawIds as $lawId) {
+      $key = $lawId;
+      $args[$lawId] = LawCards::get($lawId)->getTitle();
+      $args['i18n'][] = $key;
+      $log[] = clienttranslate('${' . $key . '}');
+    }
+
+    Notifications::updateCompanyBalance($balance, clienttranslate('Company Balance increases by ${tkn_boldText_amount} (${sourceLog})'), [
+      'tkn_boldText_amount' => '£' . $amount,
+      'sourceLog' => [
+        'log' => implode(' & ', $log),
+        'args' => $args
+      ]
+    ]);
+  }
+
+  private function getWriterBonus()
+  {
+    return LawCards::isInPlay(WRITER_PRIVILEGES_ID) ? 2 : 1;
+  }
 
   /**
    * There need to be ships

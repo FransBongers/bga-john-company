@@ -126,6 +126,7 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
     location: string;
     facing: string;
   };
+  empires: Array<string | null>;
   enterprises: Record<string, JocoEnterpriseCardBase>;
   eventTiles: {
     deck: JocoEventTileBase | null;

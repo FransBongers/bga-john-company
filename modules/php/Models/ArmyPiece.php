@@ -4,6 +4,7 @@ namespace Bga\Games\JohnCompany\Models;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 
 class ArmyPiece extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
 {
@@ -55,5 +56,18 @@ class ArmyPiece extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impl
   {
     $this->setLocation(Locations::armyOfReady($presidencyId));
     Notifications::placeRegiment($player, $this, $presidencyId);
+
+    $ownerFamily = LondonSeasonCards::getOwnerFamily(FOUNDRY_CARD_ID);
+    if ($ownerFamily !== null) {
+      $ownerFamily->gainCash(1, LondonSeasonCards::get(FOUNDRY_CARD_ID)->getTitle());
+    }
+  }
+
+  public function returnToSupply(Player $player)
+  {
+    // Only regiments are returned to the supply
+    $from = $this->getLocation();
+    $this->setLocation(Locations::supplyRegiments());
+    Notifications::moveRegiment($player, $this, $from); 
   }
 }
