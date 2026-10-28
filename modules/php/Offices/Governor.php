@@ -2,6 +2,7 @@
 
 namespace Bga\Games\JohnCompany\Offices;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
@@ -71,6 +72,9 @@ class Governor extends \Bga\Games\JohnCompany\Models\Office
     $familyMember = $this->getFamilyMember();
     if ($familyMember !== null) {
       $familyMember->returnToSupply();
+      $removedGovernors = Globals::getRemovedGovernors();
+      $removedGovernors[] = $this->getId();
+      Globals::setRemovedGovernors($removedGovernors);
     }
     $this->removeCompanyShip();
     $this->returnToSupply();

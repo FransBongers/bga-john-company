@@ -84,7 +84,7 @@ class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Mod
     if ($this->getVictoryPoints() !== null) {
       $player->incScore($this->getVictoryPoints());
     }
-    if ($this->getPower() > 0) {
+    if ($this->getPower() > 0 || $this->getEnterpriseType() !== null) {
       Notifications::updatePower();
     }
 

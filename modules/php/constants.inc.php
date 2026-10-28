@@ -165,6 +165,7 @@ const ST_USE_MAN_ON_THE_INSIDE = 175;
 const ST_USE_ROYAL_PROTECTION = 178;
 const ST_TRADE_OR_DISCARD_ITEMS = 179;
 const ST_WAR_AGAINST_FRANCE = 180;
+const ST_MOVE_ELEPHANT = 181;
 
 
 const BONUSES = 'Bonuses';
@@ -232,6 +233,7 @@ const MILITARY_AFFAIRS_TRANSFERS = 'MilitaryAffairsTransfers';
 const MILITARY_AFFAIRS_ASSIGN = 'MilitaryAffairsAssign';
 const MILITARY_AFFAIRS_CHECK_COMMANDER = 'MilitaryAffairsCheckCommander';
 const MILITARY_AFFAIRS_ASSIGN_COMMANDER = 'MilitaryAffairsAssignCommander';
+const MOVE_ELEPHANT = 'MoveElephant';
 // const PRESIDENCY_DECIDE_ORDER = 'PresidencyDecideOrder';
 const PRESIDENT_TRADE = 'PresidentTrade';
 const PRESIDENT_TRADE_FILL_ORDERS = 'PresidentTradeFillOrders';
@@ -1035,6 +1037,7 @@ const CARD_ID = 'cardId';
 const CARD_TYPE = 'cardType';
 const LAW_CARD = 'lawCard';
 const BLACKMAIL_CARD = 'blackmailCard';
+const DURING_HIRING_IF_YOU_ARE_A_CANDIDATE = 'duringHiringIfYouAreACandidate';
 const PROMISE_CARD = 'promiseCard';
 const TIMING_WINDOW = 'timingWindow';
 const TIMING_DATA = 'timingData';
@@ -1059,6 +1062,7 @@ const REMOVED = 'removed';
 const COMPANY_FRAUD_ID = 'CompanyFraud';
 const DIPLOMATIC_CONNECTION_ID = 'DiplomaticConnection';
 const ENVOY_TO_THE_MUGHALS_ID = 'EnvoyToTheMughals';
+const HIRING_PREFERENCE_ID = 'HiringPreference';
 const LETTERS_OF_INTRODUCTION_ID = 'LettersOfIntroduction';
 const MAN_ON_THE_INSIDE_ID = 'ManOnTheInside';
 const MERCANTILE_CONNECTION_ID = 'MercantileConnection';
@@ -1087,9 +1091,11 @@ const WILLIAM_COLLINS_ID = 'PrestigeCard_17';
  * are used in the code
  */
 const BOARD_OF_CONTROL_ID = 'LawCard_34';
+const COMPANY_AIDS_GOVERNMENT_ID = 'LawCard_49';
 const DEREGULATION_ID = 'LawCard_56';
 const ENVOY_TO_CHINA_ID = 'LawCard_32';
 const INCLOSURE_ACTS_ID = 'LawCard_36';
+const INDUSTRY_SUBSIDY_ID = 'LawCard_44';
 const MASSED_DEMAND_FRANCHISE_ID = 'LawCard_54';
 const OLD_IDEAS_MADE_NEW_ID = 'LawCard_52';
 const PUBLIC_DEMANDS_IMPEACHMENT_ID = 'LawCard_51';

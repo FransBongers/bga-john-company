@@ -119,6 +119,7 @@ import {
   NotifUpdatePower,
   NotifMoveLaws,
   NotifDiscardEnterprise,
+  NotifUpdateShareValue,
 } from './types';
 import { tplArmyPiece } from '../../india/army/templates';
 import { Parliament } from '../../parliament';
@@ -1145,5 +1146,10 @@ export class NotificationManager {
         .getRegion(controlToken.location)
         .addControlToken(controlToken);
     }
+  }
+
+  async notif_updateShareValue(notif: NotifUpdateShareValue) {
+    const { value } = notif;
+    // Implement the logic to update the share value in the UI
   }
 }

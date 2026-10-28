@@ -131,6 +131,15 @@ class Elephant
     Notifications::elephantMarch(self::get());
   }
 
+  public static function move(string $borderOrRegionId, string | null $facing)
+  {
+    Globals::setElephant([
+      LOCATION => $borderOrRegionId,
+      FACING => $facing ?? '',
+    ]);
+    Notifications::elephantMarch(self::get());
+  }
+
   public static function isOnBorder()
   {
     return in_array(self::getLocation(), BORDERS);

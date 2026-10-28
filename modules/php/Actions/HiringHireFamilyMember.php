@@ -37,8 +37,14 @@ class HiringHireFamilyMember extends Hiring
     $office = Offices::get($officeId);
     $hiringPlayerId = $office->getHiringPlayerId();
     $familyId = Players::get($hiringPlayerId)->getFamilyId();
+    $familyIdFilter = $args['familyIdFilter'] ?? null;
 
     $options = $office->getCandidatesForHiring();
+    if ($familyIdFilter !== null) {
+      $options = array_filter($options, function ($candidate) use ($familyIdFilter) {
+        return in_array($candidate->getFamilyId(), $familyIdFilter);
+      });
+    }
 
     $data = [
       'office' => $office,

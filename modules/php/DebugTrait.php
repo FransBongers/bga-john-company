@@ -40,12 +40,58 @@ trait DebugTrait
 
   function debug_test()
   {
-    LondonSeasonCards::moveAllInLocation(Locations::londonSeasonDisplay(), DECK);
+    // LondonSeasonCards::moveAllInLocation(Locations::londonSeasonDisplay(), DECK);
 
-    foreach (['PrestigeCard_13', 'PrestigeCard_14', 'PrestigeCard_16'] as $cardId) {
-      LondonSeasonCards::get($cardId)->setLocation(Locations::londonSeasonDisplay());
+    // foreach (['PrestigeCard_13', 'PrestigeCard_14', 'PrestigeCard_16'] as $cardId) {
+    //   LondonSeasonCards::get($cardId)->setLocation(Locations::londonSeasonDisplay());
+    // }
+    // LondonSeasonCards::shuffle(DECK);
+
+
+
+    $location = Elephant::getLocation();
+    Notifications::log('location', $location);
+    $regions = Regions::getAll();
+    $legalOptions = [];
+    // foreach ($regions as $region) {
+    //   $regionId = $region->getId();
+    //   if ($regionId === $location || !$region->isCompanyControlled()) {
+    //     continue;
+    //   }
+    //   $legalOptions[$regionId] = [];
+    // }
+
+    foreach (BORDERS as $borderId) {
+      Notifications::log('borderId', $borderId);
+      if ($borderId === $location) {
+        Notifications::log('case: border is location', []);
+        continue;
+      }
+      list($regionAId, $regionBId) = explode('_', $borderId);
+      $regionA = $regions[$regionAId];
+      $regionB = $regions[$regionBId];
+
+      if ($regionA->isCompanyControlled() && $regionB->isCompanyControlled()) {
+        Notifications::log('case: both company controlled', []);
+        continue;
+      }
+
+      if ($regionA->getControl() === $regionB) {
+        $legalOptions[$borderId] = [$regionB];
+      } else if ($regionB->getControl() === $regionA) {
+        $legalOptions[$borderId] = [$regionA];
+      } else if ($regionA->isCompanyControlled()) {
+        $legalOptions[$borderId] = [$regionA];
+      } else if ($regionB->isCompanyControlled()) {
+        $legalOptions[$borderId] = [$regionB];
+      } else {
+        $legalOptions[$borderId] = [$regionA, $regionB];
+      }
     }
-    LondonSeasonCards::shuffle(DECK);
+    Notifications::log('debug', $legalOptions);
+
+
+
 
     // LawCards::get(DEREGULATION_ID)->setLocation(DEREGULATION_AVAILABLE);
     // CompanyFailureCards::get('CompanyFailureCard_02')->resolveEffect();

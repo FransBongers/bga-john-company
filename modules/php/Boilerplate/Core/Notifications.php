@@ -1757,6 +1757,15 @@ class Notifications
     ]));
   }
 
+  public static function updateShareValue(int $value, int $change)
+  {
+    $text = $change > 0 ? clienttranslate('Company share value advances to +${value}/-${value}') : clienttranslate('Company share value drops to +${value}/-${value}');
+    self::notifyAll('updateShareValue', $text, [
+      'value' => $value,
+      'i18n' => ['value']
+    ]);
+  }
+
   public static function removeTower(Player $player, Region $region)
   {
     self::updateRegion($region, clienttranslate('${player_name} removes the tower from ${tkn_boldText_region}'), [

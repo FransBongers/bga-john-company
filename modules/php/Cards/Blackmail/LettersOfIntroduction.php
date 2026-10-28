@@ -2,6 +2,7 @@
 
 namespace Bga\Games\JohnCompany\Cards\Blackmail;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Models\Player;
 
@@ -50,7 +51,17 @@ class LettersOfIntroduction extends \Bga\Games\JohnCompany\Models\BlackmailCard
    * Apply the effect of this london season card
    * Only for effects with specific timing windows
    */
-  public function applyEffect(object $ctx, Player $player, array $timingData) {
-    
+  public function applyEffect(object $ctx, Player $player, array $timingData)
+  {
+    $retireNodes = $ctx->getParent()->getUnresolvedActions([LONDON_SEASON_RETIRE]);
+    // Separate sequence node for hiring family member actions, so there should only be one unresolved action at this point
+    if (count($retireNodes) !== 1) {
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_082");
+    }
+    $node = $retireNodes[0];
+    $args = $node->getArgs();
+    $args[LETTERS_OF_INTRODUCTION_ID] = true;
+    $node->updateInfo('args', $args);
+    Engine::save();
   }
 }

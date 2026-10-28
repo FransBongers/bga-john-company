@@ -40,8 +40,8 @@ class RevenueEmergencyLoans extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   public function stRevenueEmergencyLoans()
   {
-    $info = $this->ctx->getInfo();
-    $remainingExpenses = $info['remainingExpenses'];
+    $args = $this->ctx->getArgs();
+    $remainingExpenses = $args['remainingExpenses'];
     $numberOfEmergencyLoans = ceil($remainingExpenses / 5);
 
     $companyDebt = Company::getDebt();

@@ -11,6 +11,7 @@ use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Models\Family;
 use Bga\Games\JohnCompany\Models\Player;
@@ -57,13 +58,13 @@ class PurchaseEnterprise extends \Bga\Games\JohnCompany\Models\AtomicAction
     $type = $args['type'];
     $source = $args[SOURCE];
 
-    $this->purchaseEnterprise($playerId, $type);
+    $this->purchaseEnterprise($playerId, $type, $source);
 
     if ($source === FAMILY_ACTION) {
 
       $family = Families::get($args['familyId']);
 
-      $this->checkExtraActionOpportunityMarker($family, $playerId, $type);
+      $this->checkExtraActionOpportunityMarker($family, $playerId, $type, $source);
 
       $family->updateOpportunityMarker($this->enterpriseTypeOpportunityMarkerMap[$type]);
     }
@@ -81,7 +82,7 @@ class PurchaseEnterprise extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  public function purchaseEnterprise(int $playerId, string $enterpriseType)
+  public function purchaseEnterprise(int $playerId, string $enterpriseType, string | null $source = null)
   {
     $player = Players::get($playerId);
     $family = $player->getFamily();
@@ -90,7 +91,7 @@ class PurchaseEnterprise extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $enterprise->changeOwner($family->getId());
 
-    $amount = $this->enterprisePrice[$enterpriseType];
+    $amount = $this->getEnterprisePrice($family, $enterpriseType, $source);
     $family->incTreasury(-$amount);
 
     // Notifications::pay($player, $amount);
@@ -108,14 +109,14 @@ class PurchaseEnterprise extends \Bga\Games\JohnCompany\Models\AtomicAction
     }
   }
 
-  private function checkExtraActionOpportunityMarker(Family $family, int $playerId, string $enterpriseType)
+  private function checkExtraActionOpportunityMarker(Family $family, int $playerId, string $enterpriseType, string | null $source = null)
   {
     $opportunityMarker = $family->getOpportunityMarker();
     if ($opportunityMarker !== $this->enterpriseTypeOpportunityMarkerMap[$enterpriseType]) {
       return;
     }
 
-    $isDoable = $this->canBePerformedBy($family, $enterpriseType);
+    $isDoable = $this->canBePerformedBy($family, $enterpriseType, $source);
     if (!$isDoable) {
       Notifications::message(clienttranslate('${player_name} cannot buy another ${enterpriseName}'), [
         'enterpriseName' => Notifications::getEnterpriseName($enterpriseType),
@@ -152,7 +153,7 @@ class PurchaseEnterprise extends \Bga\Games\JohnCompany\Models\AtomicAction
     ));
   }
 
-  public function canBePerformedBy(Family $family, string $enterpriseType)
+  public function canBePerformedBy(Family $family, string $enterpriseType, string | null $source = null)
   {
     if ($enterpriseType === WORKSHOP && $family->hasPrestigeCard(JOHN_THORPE_ID)) {
       return false;
@@ -162,8 +163,18 @@ class PurchaseEnterprise extends \Bga\Games\JohnCompany\Models\AtomicAction
     }
 
     $treasury = $family->getTreasury();
+    $price = $this->getEnterprisePrice($family, $enterpriseType);
 
-    return $treasury >= $this->enterprisePrice[$enterpriseType] && Enterprises::countInLocation(Locations::supplyEnterprises($enterpriseType)) > 0;
+    return $treasury >= $this->getEnterprisePrice($family, $enterpriseType, $source) && Enterprises::countInLocation(Locations::supplyEnterprises($enterpriseType)) > 0;
+  }
+
+  public function getEnterprisePrice(Family $family, string $enterpriseType, $source = null): int
+  {
+    if ($source === FAMILY_ACTION && $enterpriseType === WORKSHOP && LawCards::isInPlay(INDUSTRY_SUBSIDY_ID) && $family->getOpportunityMarker() !== $this->enterpriseTypeOpportunityMarkerMap[$enterpriseType]) {
+      return 3;
+    }
+
+    return $this->enterprisePrice[$enterpriseType];
   }
 
   // ..######..########...#######..##......##.##....##
@@ -200,15 +211,17 @@ class PurchaseEnterprise extends \Bga\Games\JohnCompany\Models\AtomicAction
   public function getDescription(): string|array
   {
     $args = $this->ctx->getArgs();
-    // $familyId = $args['familyId'] ?? null;
     $type = $args['type'];
+    $familyId = $args['familyId'];
+    $family = Families::get($familyId);
+    $source = $args['source'] ?? null;
 
     return [
       'log' => clienttranslate('Buy ${enterpriseName} ${tkn_icon} for ${tkn_boldText_price}'),
       'args' => [
         'enterpriseName' => Notifications::getEnterpriseName($type),
         'tkn_icon' => $type,
-        'tkn_boldText_price' => '£' . $this->enterprisePrice[$type],
+        'tkn_boldText_price' => '£' . $this->getEnterprisePrice($family, $type, $source),
       ],
     ];
   }
@@ -219,8 +232,9 @@ class PurchaseEnterprise extends \Bga\Games\JohnCompany\Models\AtomicAction
     $type = $args['type'];
     $familyId = $args['familyId'];
     $family = Families::get($familyId);
+    $source = $args['source'] ?? null;
 
-    return $this->canBePerformedBy($family, $type);
+    return $this->canBePerformedBy($family, $type, $source);
   }
 
   public function isAutomatic(?Player $player = null): bool

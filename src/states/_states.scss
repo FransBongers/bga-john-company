@@ -1,0 +1,21 @@
+@use '../base';
+
+.joco-move-elephant-select {
+  box-sizing: border-box;
+  position: absolute;
+  width: 48px;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  
+
+  &.selectable {
+    cursor: pointer;
+    outline: 4px solid base.$selectable-color;
+  }
+
+  &.selectable:hover,
+  &.selected {
+    cursor: pointer;
+    outline: 4px solid base.$selected-color;
+  }
+}

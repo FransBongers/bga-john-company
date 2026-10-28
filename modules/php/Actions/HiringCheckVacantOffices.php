@@ -84,14 +84,30 @@ class HiringCheckVacantOffices extends \Bga\Games\JohnCompany\Models\AtomicActio
         ]));
       } else {
         $hirer = $office->getHiringPlayerId();
-        $this->ctx->insertAsBrother(new LeafNode([
-          'action' => HIRING_HIRE_FAMILY_MEMBER,
-          'playerId' => 'some',
-          'activePlayerIds' => [$hirer],
-          'args' => [
-            'officeId' => $office->getId(),
-            'hirerPlayerId' => $hirer,
-          ],
+
+        $this->ctx->insertAsBrother(Engine::buildTree([
+          'children' => [
+            [
+              'action' => TIMING_WINDOW_CHECK,
+              'args' => [
+                TIMING_WINDOW => [DURING_HIRING_IF_YOU_ARE_A_CANDIDATE],
+                BLACKMAIL_CARD => [HIRING_PREFERENCE_ID],
+                TIMING_DATA => [
+                  'officeId' => $office->getId()
+                ],
+              ],
+            ],
+            [
+
+              'action' => HIRING_HIRE_FAMILY_MEMBER,
+              'playerId' => 'some',
+              'activePlayerIds' => [$hirer],
+              'args' => [
+                'officeId' => $office->getId(),
+                'hirerPlayerId' => $hirer,
+              ],
+            ]
+          ]
         ]));
       }
 

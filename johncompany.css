@@ -4209,6 +4209,31 @@ span[style*="color:#c0c0c0"] {
   flex-grow: 1;
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
+.joco-move-elephant-select {
+  box-sizing: border-box;
+  position: absolute;
+  width: 48px;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+}
+.joco-move-elephant-select.selectable {
+  cursor: pointer;
+  outline: 4px solid yellow;
+}
+.joco-move-elephant-select.selectable:hover, .joco-move-elephant-select.selected {
+  cursor: pointer;
+  outline: 4px solid blue;
+}
+
 html {
   background-image: url("img/background.jpg");
   background-attachment: fixed;

@@ -202,9 +202,14 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     });
   }
 
-  public function getRetirementDiscount()
+  public function getRetirementDiscount(bool $applyLettersOfIntroduction = false)
   {
-    $prestigeCards = LondonSeasonCards::getInLocation(Locations::londonSeasonCards($this->getId()))->toArray();
+
+    $prestigeCards = $applyLettersOfIntroduction ?
+      Utils::filter(LondonSeasonCards::getAll()->toArray(), function ($card) {
+        return Utils::startsWith($card->getLocation(), 'londonSeasonCards_');
+      })
+      : LondonSeasonCards::getInLocation(Locations::londonSeasonCards($this->getId()))->toArray();
     $discount = 0;
     foreach ($prestigeCards as $card) {
       if ($card->getType() === PRESTIGE) {

@@ -451,7 +451,6 @@ trait TurnTrait
           'args' => [
             TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING, BEFORE_BOMBAY_PRESIDENCY_OPERATIONS],
             LAW_CARD => [BOARD_OF_CONTROL_ID],
-            BLACKMAIL_CARD => [ENVOY_TO_THE_MUGHALS_ID],
             TIMING_DATA => [
               'officeId' => MILITARY_AFFAIRS
             ],

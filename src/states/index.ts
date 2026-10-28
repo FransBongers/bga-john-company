@@ -25,6 +25,7 @@ export * from './HiringHireFamilyMember';
 export * from './LondonSeasonChooseCard';
 export * from './LondonSeasonRetire';
 export * from './ManagerOfShipping';
+export * from './MoveElephant';
 export * from './MilitaryAffairsAssign';
 export * from './MilitaryAffairsAssignCommander';
 export * from './MilitaryAffairsTransfers';

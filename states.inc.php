@@ -188,6 +188,23 @@ $machinestates = [
         ->transitions(['next' => ST_RESOLVE_STACK])
         ->build(),
 
+    ST_MOVE_ELEPHANT => GameStateBuilder::create()
+        ->name(MOVE_ELEPHANT)
+        ->description('${actplayer}')
+        ->descriptionmyturn('${you}')
+        ->type(StateType::MULTIPLE_ACTIVE_PLAYER)
+        ->args('argsAtomicAction')
+        ->action('stAtomicAction')
+        ->possibleactions([
+            'act' . MOVE_ELEPHANT,
+            'actPass',
+            'actPassOptionalAction',
+            'actTakeAtomicAction',
+            'actUndoToStep',
+        ])
+        ->transitions(['next' => ST_RESOLVE_STACK])
+        ->build(),
+
     // .########.##....##.########......#######..########
     // .##.......###...##.##.....##....##.....##.##......
     // .##.......####..##.##.....##....##.....##.##......

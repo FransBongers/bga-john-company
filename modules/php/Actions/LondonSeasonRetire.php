@@ -32,6 +32,7 @@ class LondonSeasonRetire extends \Bga\Games\JohnCompany\Models\AtomicAction
   {
     $args = $this->ctx->getArgs();
     $familyId = $args['familyId'];
+    $applyLettersOfIntroduction = $args[LETTERS_OF_INTRODUCTION_ID] ?? false;
 
     $family = Families::get($familyId);
 
@@ -40,7 +41,7 @@ class LondonSeasonRetire extends \Bga\Games\JohnCompany\Models\AtomicAction
     $data = [
       'familyMembers' => Utils::filter(FamilyMembers::getInLocation(Locations::pensioners())->toArray(), fn($fm) => $fm->getFamilyId() === $familyId),
       'treasury' => $family->getTreasury(),
-      'discount' => $family->getRetirementDiscount(),
+      'discount' => $family->getRetirementDiscount($applyLettersOfIntroduction),
       FINAL_RETIREMENT => $args[FINAL_RETIREMENT] ?? false,
       'prizeFilter' => $family->hasPrestigeCard(LORD_HIGHGATE_ID) ? [PRIZE_8, PRIZE_12] : null
     ];

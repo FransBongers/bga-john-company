@@ -2,6 +2,8 @@
 
 namespace Bga\Games\JohnCompany\Cards\Law;
 
+use Bga\Games\JohnCompany\Managers\Company;
+
 class LawCard_49 extends \Bga\Games\JohnCompany\Models\LawCard
 {
   public function __construct($row)
@@ -23,5 +25,10 @@ class LawCard_49 extends \Bga\Games\JohnCompany\Models\LawCard
       '<br>',
       clienttranslate('Each Company Debt now costs £2 during Expenses.'),
     ];
+  }
+
+  public function resolveImmediateEffects(object $ctx, bool $passed = true)
+  {
+    Company::incShareValue(1);
   }
 }

@@ -320,3 +320,7 @@ export interface NotifUpdateRegion {
   region: JocoRegionBase;
   empires: Array<string | null>;
 }
+
+export interface NotifUpdateShareValue {
+  value: number;
+}

@@ -65,6 +65,16 @@ class Company
     self::set(SHARE_VALUE, $value);
   }
 
+  public static function incShareValue(int $amount)
+  {
+    $currentValue = self::getShareValue();
+    $newValue = min(0,max(3, $currentValue + $amount));
+    if ($newValue !== $currentValue) {
+      self::setShareValue($newValue);
+      Notifications::updateShareValue($newValue, $newValue - $currentValue);
+    }
+  }
+
   public static function getShareValue(): int
   {
     return (int) Globals::getCompany()[SHARE_VALUE];

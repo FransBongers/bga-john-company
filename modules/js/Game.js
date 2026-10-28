@@ -182,6 +182,21 @@ const HYDERABAD_MADRAS_BORDER = 'Hyderabad_Madras_border';
 const HYDERABAD_MARATHA_BORDER = 'Hyderabad_Maratha_border';
 const HYDERABAD_MYSORE_BORDER = 'Hyderabad_Mysore_border';
 const MADRAS_MYSORE_BORDER = 'Madras_Mysore_border';
+const BORDERS = [
+    BENGAL_DELHI_BORDER,
+    BENGAL_MARATHA_BORDER,
+    BOMBAY_DELHI_BORDER,
+    BOMBAY_HYDERABAD_BORDER,
+    BOMBAY_MARATHA_BORDER,
+    BOMBAY_MYSORE_BORDER,
+    BOMBAY_PUNJAB_BORDER,
+    DELHI_MARATHA_BORDER,
+    DELHI_PUNJAB_BORDER,
+    HYDERABAD_MADRAS_BORDER,
+    HYDERABAD_MARATHA_BORDER,
+    HYDERABAD_MYSORE_BORDER,
+    MADRAS_MYSORE_BORDER,
+];
 const BENGAL = 'Bengal';
 const BOMBAY = 'Bombay';
 const DELHI = 'Delhi';
@@ -4956,6 +4971,9 @@ class NotificationManager {
                 .addControlToken(controlToken);
         }
     }
+    async notif_updateShareValue(notif) {
+        const { value } = notif;
+    }
 }
 
 class ConfirmPartialTurn {
@@ -7584,6 +7602,139 @@ class ManagerOfShipping {
     }
 }
 
+const config = {
+    [BENGAL]: { top: 119, left: 773 },
+    [BOMBAY]: { top: 252, left: 171 },
+    [DELHI]: { top: 58, left: 340 },
+    [HYDERABAD]: { top: 428, left: 468 },
+    [MADRAS]: { top: 608, left: 495 },
+    [MARATHA]: { top: 276, left: 567 },
+    [MYSORE]: { top: 700, left: 386 },
+    [PUNJAB]: { top: 4, left: 142 },
+    [BENGAL_DELHI_BORDER]: { top: 79, left: 696 },
+    [BENGAL_MARATHA_BORDER]: { top: 237, left: 682 },
+    [BOMBAY_DELHI_BORDER]: { top: 116, left: 297 },
+    [BOMBAY_HYDERABAD_BORDER]: { top: 378, left: 316 },
+    [BOMBAY_MARATHA_BORDER]: { top: 231, left: 339 },
+    [BOMBAY_MYSORE_BORDER]: { top: 523, left: 305 },
+    [BOMBAY_PUNJAB_BORDER]: { top: 134, left: 174 },
+    [DELHI_MARATHA_BORDER]: { top: 125, left: 528 },
+    [DELHI_PUNJAB_BORDER]: { top: 22, left: 282 },
+    [HYDERABAD_MADRAS_BORDER]: { top: 546, left: 482 },
+    [HYDERABAD_MARATHA_BORDER]: { top: 364, left: 506 },
+    [HYDERABAD_MYSORE_BORDER]: { top: 530, left: 395 },
+    [MADRAS_MYSORE_BORDER]: { top: 736, left: 442 },
+};
+class MoveElephant {
+    constructor(game) {
+        this.game = game;
+    }
+    static create(game) {
+        MoveElephant.instance = new MoveElephant(game);
+    }
+    static getInstance() {
+        return MoveElephant.instance;
+    }
+    onEnteringState(args) {
+        debug('Entering MoveElephant state');
+        this.args = args;
+        this.createSelectBoxes();
+        this.updateInterfaceInitialStep();
+    }
+    onLeavingState() {
+        this.removeSelectBoxes();
+        debug('Leaving MoveElephant state');
+    }
+    setDescription(activePlayerIds, args) {
+        updatePageTitle(_('${tkn_playerName} must move the ${tkn_elephant}'), {
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
+            tkn_elephant: '',
+        });
+    }
+    updateInterfaceInitialStep() {
+        this.game.clearPossible();
+        updatePageTitle(_('${you} must select a position to move ${tkn_elephant} to'), {
+            tkn_elephant: '',
+        });
+        Object.entries(this.args.options).forEach(([key, values]) => {
+            onClick(`move-elephant-${key}`, () => {
+                if (BORDERS.includes(key)) {
+                    this.updateInterfaceSelectFacing(key, values);
+                }
+                else {
+                    this.updateInterfaceConfirm(key);
+                }
+            });
+        });
+    }
+    updateInterfaceSelectFacing(key, facing) {
+        if (facing.length === 1) {
+            this.updateInterfaceConfirm(key, facing[0]);
+            return;
+        }
+        clearPossible();
+        setSelected$1(`move-elephant-${key}`);
+        updatePageTitle(_('${you} must select the region the ${tkn_elephant} will point towards'), {
+            tkn_elephant: '',
+        });
+        facing.forEach((regionId) => {
+            console.log('facing', regionId);
+            addPrimaryActionButton({
+                id: `${regionId}-btn`,
+                text: getRegionName(regionId),
+                callback: () => {
+                    this.updateInterfaceConfirm(key, regionId);
+                },
+            });
+        });
+        addCancelButton$1();
+    }
+    updateInterfaceConfirm(key, facing) {
+        clearPossible();
+        setSelected$1(`move-elephant-${key}`);
+        this.updateConfirmPageTitle(key, facing);
+        addConfirmButton$1(() => {
+            performAction$1('actMoveElephant', {
+                locationId: key,
+                facing: facing ?? null
+            });
+        });
+        addCancelButton$1();
+    }
+    updateConfirmPageTitle(key, facing) {
+        if (!BORDERS.includes(key)) {
+            updatePageTitle(_('Move the ${tkn_elephant} to ${regionName}'), {
+                tkn_elephant: '',
+                regionName: getRegionName(key),
+            });
+            return;
+        }
+        const [regionAId, regionBId] = key.split('_');
+        updatePageTitle(_('Move the ${tkn_elephant} to the border between ${region1} and ${region2} pointing towards ${region3}?'), {
+            tkn_elephant: '',
+            region1: getRegionName(regionAId),
+            region2: getRegionName(regionBId),
+            region3: getRegionName(facing ?? ''),
+        });
+    }
+    createSelectBoxes() {
+        const mapElt = document.getElementById('joco-india-map');
+        Object.entries(config).forEach(([key, value]) => {
+            mapElt.insertAdjacentHTML('beforeend', `<div id="move-elephant-${key}" class="joco-move-elephant-select" style="top:${value.top}px; left:${value.left}px;">
+          
+        </div>`);
+        });
+    }
+    removeSelectBoxes() {
+        Object.keys(config).forEach((key) => {
+            const selectBox = document.getElementById(`move-elephant-${key}`);
+            if (selectBox) {
+                selectBox.remove();
+            }
+        });
+    }
+}
+
 class MilitaryAffairsAssign {
     constructor(game) {
         this.game = game;
@@ -9328,6 +9479,7 @@ class Game {
             LondonSeasonChooseCard,
             LondonSeasonRetire,
             ManagerOfShipping,
+            MoveElephant,
             MilitaryAffairsAssign,
             MilitaryAffairsAssignCommander,
             MilitaryAffairsTransfers,

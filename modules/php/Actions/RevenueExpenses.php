@@ -44,7 +44,8 @@ class RevenueExpenses extends \Bga\Games\JohnCompany\Models\AtomicAction
     $totalExpenses = 0;
 
     $debt = Company::getDebt();
-    $totalExpenses += $debt;
+    $debtMultuplier = LawCards::isInPlay(COMPANY_AIDS_GOVERNMENT_ID) ? 2 : 1;
+    $totalExpenses += $debt * $debtMultuplier;
 
     $costPerRegiment = LawCards::isInPlay(SEPOY_RECRUITMENT_ID) ? 0 : 1;
 
@@ -92,10 +93,7 @@ class RevenueExpenses extends \Bga\Games\JohnCompany\Models\AtomicAction
   private function handleEmergencyLoans(int $remainingExpenses)
   {
 
-    $action = [
-      'action' => REVENUE_EMERGENCY_LOANS,
-      'remainingExpenses' => $remainingExpenses,
-    ];
+    $action = [];
     if (LawCards::isInPlay(ROYAL_PROTECTION_ID)) {
       $playerId = Players::getChairmanPlayerId();
 
@@ -103,24 +101,35 @@ class RevenueExpenses extends \Bga\Games\JohnCompany\Models\AtomicAction
         'type' => NODE_XOR,
         'playerId' => $playerId,
         'stateDescription' => [
-          'descriptionmyturn' => clienttranslate('${you} may discard Royal Protection to avoid emergency loans and cancel remaining expenses'),
-          'description' => clienttranslate('${actplayer} may discard Royal Protection to avoid emergency loans and cancel remaining expenses'),
-          'args' => []
+          'descriptionmyturn' => clienttranslate('Royal Protection: ${you} may avoid emergency loans and cancel remaining expenses of ${amount}'),
+          'description' => clienttranslate('Royal Protection: ${actplayer} may avoid emergency loans and cancel remaining expenses of ${amount}'),
+          'args' => [
+            'amount' => '£' . $remainingExpenses,
+          ]
         ],
         'children' => [
           [
             'action' => USE_ROYAL_PROTECTION,
             'args' => [
               'option' => YES,
+              'remainingExpenses' => $remainingExpenses,
             ],
           ],
           [
             'action' => USE_ROYAL_PROTECTION,
             'args' => [
               'option' => NO,
+              'remainingExpenses' => $remainingExpenses,
             ],
           ],
         ],
+      ];
+    } else {
+      $action = [
+        'action' => REVENUE_EMERGENCY_LOANS,
+        'args' => [
+          'remainingExpenses' => $remainingExpenses,
+        ]
       ];
     }
 
