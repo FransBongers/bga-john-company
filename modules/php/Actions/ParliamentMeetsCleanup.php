@@ -63,6 +63,7 @@ class ParliamentMeetsCleanup extends \Bga\Games\JohnCompany\Models\AtomicAction
     }
 
     Globals::setSelectedOffice('');
+    Globals::setAdditionalWindowTax(false);
     Notifications::parliamentMeetsCleanup($data, $usedLondonSeasonCards, $usedEnterpriseCards);
 
     $this->resolveAction(['automatic' => true]);

@@ -166,6 +166,7 @@ const ST_USE_ROYAL_PROTECTION = 178;
 const ST_TRADE_OR_DISCARD_ITEMS = 179;
 const ST_WAR_AGAINST_FRANCE = 180;
 const ST_MOVE_ELEPHANT = 181;
+const ST_USE_TAX_COLLECTORS = 182;
 
 
 const BONUSES = 'Bonuses';
@@ -243,6 +244,7 @@ const PRESIDENCY_GOVERNOR = 'PresidencyGovernor';
 const PRESIDENCY_PRESIDENT = 'PresidencyPresident';
 const SELECT_OFFICE_HOLDER = 'SelectOfficeHolder';
 const USE_MAN_ON_THE_INSIDE = 'UseManOnTheInside';
+const USE_TAX_COLLECTORS = 'UseTaxCollectors';
 const TRADE_OR_DISCARD_ITEMS = 'TradeOrDiscardItems';
 const WAR_AGAINST_FRANCE = 'WarAgainstFrance';
 const PARLIAMENT_MEETS_SELECT_LAW = 'ParliamentMeetsSelectLaw';
@@ -1085,12 +1087,14 @@ const SHIPBUILDERS_ID = 'PrestigeCard_21';
 const STOCK_BROKER_ID = 'PrestigeCard_25';
 const VIOLET_EFFINGHAM_ID = 'PrestigeCard_14';
 const WILLIAM_COLLINS_ID = 'PrestigeCard_17';
+const TAX_COLLECTORS_ID = 'PrestigeCard_22';
 
 /**
  * LawCardIds: specific card IDs that affect the game and
  * are used in the code
  */
 const BOARD_OF_CONTROL_ID = 'LawCard_34';
+const CALICO_ACTS_ID = 'LawCard_31';
 const COMPANY_AIDS_GOVERNMENT_ID = 'LawCard_49';
 const DEREGULATION_ID = 'LawCard_56';
 const ENVOY_TO_CHINA_ID = 'LawCard_32';

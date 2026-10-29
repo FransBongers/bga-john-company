@@ -37,15 +37,34 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
   {
     $args = $this->ctx->getArgs();
     $type = $args['type'];
+    $target = $args['target'] ?? null;
 
     Notifications::log('stPreTaxAndUpkeep', ['type' => $type]);
 
-    if ($type === UPKEEP) {
-      $this->resolveUpkeep();
+    $primeMinisterPlayerId = Parliament::getPrimeMinisterPlayerId();
+    $playerIdsInTurnOrder = Players::getTurnOrder($primeMinisterPlayerId);
+    $players = Players::getAll();
+    $playersInPrimeMinisterOrder = [];
+    foreach ($playerIdsInTurnOrder as $playerId) {
+      $playersInPrimeMinisterOrder[] = $players[$playerId];
     }
-    if ($type === TAX) {
-      $this->resolveTax($args['target'], $args['windowTaxMultiplier']);
+
+    switch ($type) {
+      case WINDOW_TAX:
+        Notifications::nextPhase(clienttranslate('Window Tax'));
+        $this->resolveTaxOrUpkeep($this->getWindowCount($playersInPrimeMinisterOrder), WINDOW_TAX, $target);
+        break;
+      case UPKEEP:
+        $this->resolveTaxOrUpkeep($this->getUpkeep($playersInPrimeMinisterOrder), UPKEEP, $target);
+        break;
+      case TAX:
+        Notifications::nextPhase(clienttranslate('Tax ${tkn_icon}'), [
+          'tkn_icon' => $target,
+        ]);
+        $this->resolveTaxOrUpkeep($this->getTax($playersInPrimeMinisterOrder, $target), TAX, $target);
+        break;
     }
+
 
     $data = [];
 
@@ -60,109 +79,111 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  private function resolveUpkeep()
+  private function getWindowCount(array $players)
   {
-    $playersThatCannotPayUpkeep = [];
-
-    $primeMinisterPlayerId = Parliament::getPrimeMinisterPlayerId();
-    foreach (Players::getTurnOrder($primeMinisterPlayerId) as $playerId) {
-      $player = Players::get($playerId);
+    $result = [];
+    foreach ($players as $player) {
       $family = $player->getFamily();
-      $familyId = $family->getId();
+      $windows = $family->getWindowCount();
+      $result[] = [
+        'player' => $player,
+        'amount' => $windows,
+        'family' => $family,
+      ];
+    }
+    return $result;
+  }
+
+  private function getUpkeep(array $players)
+  {
+    $result = [];
+    foreach ($players as $player) {
+      $family = $player->getFamily();
 
       $upkeep = 0;
-      foreach (FamilyMembers::getAllFor($familyId) as $familyMember) {
+      foreach (FamilyMembers::getAllFor($family->getId()) as $familyMember) {
         $location = $familyMember->getLocation();
         if (array_key_exists($location, PRIZES)) {
           $upkeep += PRIZES[$location][UPKEEP];
         }
       }
 
-      if ($upkeep === 0) {
-        continue;
-      }
-
-      if ($family->getTreasury() < $upkeep) {
-        $playersThatCannotPayUpkeep[] = $playerId;
-        continue;
-      }
-
-      $family->pay($upkeep, false);
+      $result[] = [
+        'player' => $player,
+        'amount' => $upkeep,
+        'family' => $family,
+      ];
     }
-
-    if (count($playersThatCannotPayUpkeep) > 0) {
-      $this->ctx->insertAsBrother(new LeafNode([
-        'action' => TAX_AND_UPKEEP,
-        'playerId' => 'some',
-        'activePlayerIds' => $playersThatCannotPayUpkeep,
-        'args' => [
-          'type' => UPKEEP
-        ],
-      ]));
-    }
+    return $result;
   }
 
-  private function resolveTax(string $target, int $windowTaxMultiplier)
+  private function getTax(array $players, string $target)
   {
-    $playersThatCannotPayTaxes = [];
-
-    $primeMinisterPlayerId = Parliament::getPrimeMinisterPlayerId();
-    foreach (Players::getTurnOrder($primeMinisterPlayerId) as $playerId) {
-      $player = Players::get($playerId);
+    $result = [];
+    foreach ($players as $player) {
       $family = $player->getFamily();
 
+      $amount = 0;
+
       if ($target === SHARE) {
-        $count = $family->getShareCount();
+        $amount = $family->getShareCount();
       } else {
-        $count = 0;
+        $amount = 0;
         foreach ($family->getEnterprises() as $enterprise) {
           if ($enterprise->getType() === $target) {
-            $count++;
+            $amount++;
           }
         }
         foreach ($player->getLondonSeasonCards() as $card) {
           if ($card->getEnterpriseType() === $target) {
-            $count++;
+            $amount++;
           }
         }
       }
 
-      $totalTaxes = $count;
-      $windows = 0;
-      if ($windowTaxMultiplier > 0) {
-        $windows = $family->getWindowCount();
-        $totalTaxes += $windows * $windowTaxMultiplier;
-      }
+      $result[] = [
+        'player' => $player,
+        'amount' => $amount,
+        'family' => $family,
+      ];
+    }
+    return $result;
+  }
 
-      if ($totalTaxes > $family->getTreasury()) {
-        $playersThatCannotPayTaxes[] = $playerId;
+  private function resolveTaxOrUpkeep(array $dataPerPlayer, string $type, string | null $target)
+  {
+    $playersThatCannotPay = [];
+
+    foreach ($dataPerPlayer as $data) {
+      $player = $data['player'];
+      $amount = $data['amount'];
+      $family = $data['family'];
+
+      if ($amount === 0) {
         continue;
       }
 
-      if ($count > 0) {
-        $family->pay($count);
-        Notifications::payTax($player, $count, $target);
+      if ($family->getTreasury() < $amount) {
+        $playersThatCannotPay[] = $player->getId();
+        continue;
       }
 
-      if ($windowTaxMultiplier > 0 && $windows > 0) {
-        $family->pay($windows);
-        Notifications::payWindowTax($player, $windows);
-      }
+      $family->pay($amount, false);
     }
 
-    if (count($playersThatCannotPayTaxes) > 0) {
+    if (count($playersThatCannotPay) > 0) {
       $this->ctx->insertAsBrother(new LeafNode([
         'action' => TAX_AND_UPKEEP,
         'playerId' => 'some',
-        'activePlayerIds' => $playersThatCannotPayTaxes,
+        'activePlayerIds' => $playersThatCannotPay,
         'args' => [
-          'type' => TAX,
-          'target' => $target,
-          'windowTaxMultiplier' => $windowTaxMultiplier,
+          'type' => $type,
+          'target' => $target
         ],
       ]));
     }
   }
+
 
   // .########.##....##..######...####.##....##.########
   // .##.......###...##.##....##...##..###...##.##......

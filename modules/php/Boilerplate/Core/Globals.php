@@ -47,7 +47,8 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     'removedGovernors' => 'obj',
     'latestCheck' => 'obj',
     'oldIdeasMadeNew' => 'bool',
-    'selectedOffice' => 'str'
+    'selectedOffice' => 'str',
+    'additionalWindowTax' => 'bool'
   ];
 
   protected static $table = 'global_variables';
@@ -192,6 +193,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     self::setEndOfGame(false);
     self::setTransactionsEnabled(false);
     self::setLatestCheck([]);
+    self::setAdditionalWindowTax(false);
     // self::setScenarioId(THE_1710_SCENARIO);
     
   }

@@ -2,12 +2,14 @@
 
 namespace Bga\Games\JohnCompany\Actions;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Models\Player;
 use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\LawCards;
+use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\Players;
 
@@ -78,6 +80,14 @@ class ParliamentMeetsSelectPolicy extends \Bga\Games\JohnCompany\Models\AtomicAc
       $this->ctx->insertAsBrother(new LeafNode([
         'action' => PARLIAMENT_MEETS_RESOLVE_POLICY
       ]));
+
+      // Allow additional window tax if Leader of the opposition owns Tax Collectors
+      $taxCollectordsFamily = LondonSeasonCards::getOwnerFamily(TAX_COLLECTORS_ID);
+      if ($taxCollectordsFamily !== null && $taxCollectordsFamily->getPlayerId() === $playerId) {
+        $this->ctx->insertAsBrother(Engine::buildTree(
+          LondonSeasonCards::get(TAX_COLLECTORS_ID)->getTaxCollectorsAction($taxCollectordsFamily->getPlayerId())
+        ));
+      }
     }
 
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');

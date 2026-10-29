@@ -722,6 +722,14 @@ $machinestates = [
         'transitions' => [],
     ],
 
+    ST_USE_TAX_COLLECTORS => [
+        'name' => USE_TAX_COLLECTORS,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
     ST_USE_MAN_ON_THE_INSIDE => [
         'name' => USE_MAN_ON_THE_INSIDE,
         'type' => 'multipleactiveplayer',

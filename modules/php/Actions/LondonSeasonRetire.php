@@ -138,7 +138,7 @@ class LondonSeasonRetire extends \Bga\Games\JohnCompany\Models\AtomicAction
     }
 
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
-    $this->resolveAction([]);
+    $this->resolveAction([], true);
   }
 
   //  .##.....##.########.####.##.......####.########.##....##

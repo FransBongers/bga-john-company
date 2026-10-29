@@ -874,11 +874,11 @@ class Notifications
     return $text;
   }
 
-  public static function nextPhase(string $phase)
+  public static function nextPhase(string $phase, array $textArgs = [])
   {
-    self::notifyAll('nextPhase', self::getPhaseName($phase), [
+    self::notifyAll('nextPhase', self::getPhaseName($phase), array_merge($textArgs, [
       'phase' => $phase,
-    ]);
+    ]));
   }
 
   public static function updateFamilyTreasury(Player $player, int $cash, string | null $source = null)

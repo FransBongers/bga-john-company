@@ -3,8 +3,10 @@
 namespace Bga\Games\JohnCompany\Actions;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
+use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Managers\Company;
+use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\PowerMarkers;
@@ -38,6 +40,8 @@ class ParliamentMeetsResolvePolicy extends \Bga\Games\JohnCompany\Models\AtomicA
     $dial = Parliament::getDialPosition();
     $policy = PRIME_MINISTER_DIAL[$dial];
 
+    $this->checkAdditionalWindowTax();
+
     switch ($policy[CONSEQUENCE]) {
       case BONUS:
         $this->resolveBonus($policy[TARGET]);
@@ -60,6 +64,14 @@ class ParliamentMeetsResolvePolicy extends \Bga\Games\JohnCompany\Models\AtomicA
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private function checkAdditionalWindowTax()
+  {
+    if (!Globals::getAdditionalWindowTax()) {
+      return;
+    }
+    $this->insertWindowTax();
+  }
 
   private function resolveBonus(string $target)
   {
@@ -99,13 +111,26 @@ class ParliamentMeetsResolvePolicy extends \Bga\Games\JohnCompany\Models\AtomicA
     }
   }
 
-  private function resolveTax(string $target, bool $windowTax)
+  private function insertWindowTax()
   {
     $this->ctx->insertAsBrother(new LeafNode([
       'action' => PRE_TAX_AND_UPKEEP,
       'args' => [
+        'type' => WINDOW_TAX,
+      ]
+    ]));
+  }
+
+  private function resolveTax(string $target, bool $windowTax)
+  {
+    if ($windowTax && !LawCards::isInPlay(WINDOW_TAX_REPEAL_ID)) {
+      $this->insertWindowTax();
+    }
+
+    $this->ctx->insertAsBrother(new LeafNode([
+      'action' => PRE_TAX_AND_UPKEEP,
+      'args' => [
         'target' => $target,
-        'windowTaxMultiplier' => $windowTax ? 1 : 0,
         'type' => TAX,
       ]
     ]));

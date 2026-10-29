@@ -13,8 +13,6 @@ use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Ships;
 
-use Bga\Games\JohnCompany\Models\SetupCard;
-
 class RevenueExpenses extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
   public function getState()
@@ -41,6 +39,10 @@ class RevenueExpenses extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   public function stRevenueExpenses()
   {
+    if (LawCards::isInPlay(CALICO_ACTS_ID)) {
+      $this->lowerCompanyBalance();
+    }
+
     $totalExpenses = 0;
 
     $debt = Company::getDebt();
@@ -89,6 +91,21 @@ class RevenueExpenses extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private function lowerCompanyBalance()
+  {
+    $balance = Company::getBalance();
+    $amount = (int) floor($balance / 7);
+
+    $newBalance = Company::incBalance(-$amount);
+    if ($balance === $newBalance) {
+      return;
+    }
+    Notifications::updateCompanyBalance($newBalance, clienttranslate('${tkn_boldText_source}: Company Balance is lowered by £${tkn_boldText_amount}'), [
+      'tkn_boldText_source' => clienttranslate('Calico Acts'),
+      'tkn_boldText_amount' => '£' . $amount,
+    ]);
+  }
 
   private function handleEmergencyLoans(int $remainingExpenses)
   {

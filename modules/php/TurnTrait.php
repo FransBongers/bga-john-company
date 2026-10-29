@@ -10,6 +10,8 @@ use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Crown;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyActions;
+use Bga\Games\JohnCompany\Managers\LawCards;
+use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Parliament;
@@ -83,6 +85,7 @@ trait TurnTrait
     $currentTurn = Globals::getTurn();
     Notifications::turn($currentTurn);
     RemovedGovernors::reset();
+    Globals::setRegionsLostThisTurn(0);
 
     $isFirstTurn = Scenarios::get()->getStartTurn() === $currentTurn;
 
@@ -666,30 +669,43 @@ trait TurnTrait
 
     Parliament::setSelectingLaw(true);
 
-    $node = [
-      'children' => [
-        [
-          'action' => FRONTEND_TRIGGER,
-          'args' => [
-            TRIGGER => PARLIAMENT_MEETS_START,
-          ],
+
+    $children = [
+      [
+        'action' => FRONTEND_TRIGGER,
+        'args' => [
+          TRIGGER => PARLIAMENT_MEETS_START,
         ],
-        [
-          'action' => PARLIAMENT_MEETS_SELECT_LAW,
-          'playerId' => 'some',
-          'activePlayerIds' => [$primeMinisterPlayerId],
-        ],
-        [
-          'action' => PARLIAMENT_MEETS_SELECT_POLICY,
-          'playerId' => 'some',
-          'activePlayerIds' => [$primeMinisterPlayerId],
-        ],
-        Parliament::getRoundOfVotingNodes(),
-        [
-          'action' => PARLIAMENT_MEETS_CLEANUP,
-        ]
+      ],
+      [
+        'action' => PARLIAMENT_MEETS_SELECT_LAW,
+        'playerId' => 'some',
+        'activePlayerIds' => [$primeMinisterPlayerId],
+      ],
+      [
+        'action' => PARLIAMENT_MEETS_SELECT_POLICY,
+        'playerId' => 'some',
+        'activePlayerIds' => [$primeMinisterPlayerId],
       ],
     ];
+
+    $taxCollectordsFamily = LondonSeasonCards::getOwnerFamily(TAX_COLLECTORS_ID);
+    if ($taxCollectordsFamily !== null) {
+      $children[] = LondonSeasonCards::get(TAX_COLLECTORS_ID)->getTaxCollectorsAction($taxCollectordsFamily->getPlayerId());
+    }
+
+    $children = array_merge($children, [
+      Parliament::getRoundOfVotingNodes(),
+      [
+        'action' => PARLIAMENT_MEETS_CLEANUP,
+      ]
+    ]);
+
+
+    $node = [
+      'children' => $children,
+    ];
+
 
     Engine::setup($node, ['method' => 'stSetupUpkeepAndRefresh']);
     Engine::proceed();

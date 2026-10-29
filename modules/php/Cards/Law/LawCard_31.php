@@ -3,6 +3,8 @@
 namespace Bga\Games\JohnCompany\Cards\Law;
 
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
+use Bga\Games\JohnCompany\Managers\Parliament;
+use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Ships;
 
 class LawCard_31 extends \Bga\Games\JohnCompany\Models\LawCard
@@ -30,5 +32,31 @@ class LawCard_31 extends \Bga\Games\JohnCompany\Models\LawCard
     $this->extraActionText = [
       clienttranslate('After taking any family action(s), you may buy a workshop.'),
     ];
+  }
+
+  public function resolveImmediateEffects(object $ctx, bool $passed = true)
+  {
+    if (!$passed) {
+      return;
+    }
+
+    foreach (Players::getTurnOrder(Parliament::getPrimeMinisterPlayerId()) as $playerId) {
+      $player = Players::get($playerId);
+      $family = $player->getFamily();
+
+      $count = 0;
+      foreach ($family->getEnterprises() as $enterprise) {
+        if ($enterprise->getType() === WORKSHOP) {
+          $count++;
+        }
+      }
+      foreach ($player->getLondonSeasonCards() as $card) {
+        if ($card->getEnterpriseType() === WORKSHOP) {
+          $count++;
+        }
+      }
+
+      $family->gainCash(2 * $count, $this->getTitle());
+    }
   }
 }

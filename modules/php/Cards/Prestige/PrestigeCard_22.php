@@ -18,4 +18,30 @@ class PrestigeCard_22 extends \Bga\Games\JohnCompany\Models\PrestigeCard
     ];
     $this->enterpriseType = WORKSHOP;
   }
+
+  public function getTaxCollectorsAction(int $playerId)
+  {
+    return [
+      'type' => NODE_XOR,
+      'children' => [
+        [
+          'action' => USE_TAX_COLLECTORS,
+          'args' => [
+            'option' => YES
+          ]
+        ],
+        [
+          'action' => USE_TAX_COLLECTORS,
+          'args' => [
+            'option' => NO
+          ]
+        ]
+      ],
+      'playerId' => $playerId,
+      'stateDescription' => [
+        'descriptionmyturn' => clienttranslate('Tax Collectors: ${you} may add an additional window tax to the proposed policy (with Prime Minister\'s consent)'),
+        'description' => clienttranslate('Tax Collectors: ${actplayer} may add an additional window tax to the proposed policy (with Prime Minister\'s consent)'),
+      ],
+    ];
+  }
 }
