@@ -137,6 +137,13 @@ const ST_GOVERNOR_ADMINISTER = 140;
 const ST_GOVERNOR_BUILD_COMPANY_SHIP = 141;
 const ST_GOVERNOR_COMMISSION_REGIMENT = 142;
 const ST_GOVERNOR_TAX = 143;
+const ST_GOVERNOR_GENERAL_MAKE_CHECK = 183;
+const ST_GOVERNOR_GENERAL_SHIPBUILDING = 184;
+const ST_GOVERNOR_GENERAL_COMMISSION_REGIMENT = 185;
+const ST_GOVERNOR_GENERAL_TAX = 186;
+const ST_PLACE_SHIP_IN_SEA_ZONE = 187;
+const ST_PLACE_REGIMENT_IN_ARMY = 188;
+const ST_PLACE_UNREST_IN_REGION = 189;
 const ST_ADD_CASH = 144;
 const ST_ADD_UNREST = 145;
 const ST_PARLIAMENT_MEETS_SELECT_LAW = 146;
@@ -186,6 +193,10 @@ const ADD_UNREST = 'AddUnrest';
 const GOVERNOR_ADMINISTER = 'GovernorAdminister';
 const GOVERNOR_BUILD_COMPANY_SHIP = 'GovernorBuildCompanyShip';
 const GOVERNOR_COMMISSION_REGIMENT = 'GovernorCommissionRegiment';
+const GOVERNOR_GENERAL_MAKE_CHECK = 'GovernorGeneralMakeCheck';
+const GOVERNOR_GENERAL_COMMISSION_REGIMENT = 'GovernorGeneralCommissionRegiment';
+const GOVERNOR_GENERAL_SHIPBUILDING = 'GovernorGeneralShipbuilding';
+const GOVERNOR_GENERAL_TAX = 'GovernorGeneralTax';
 const GOVERNOR_TAX = 'GovernorTax';
 const HIRING_CHECK_VACANT_OFFICES = 'HiringCheckVacantOffices';
 const HIRING_CHAIRMAN = 'HiringChairman';
@@ -199,6 +210,8 @@ const LONDON_SEASON_ORDER = 'LondonSeasonOrder';
 const LONDON_SEASON_CLEANUP = 'LondonSeasonCleanup';
 const NEW_COMPANY_SHARES = 'NewCompanyShares';
 const PERFORM_SETUP = 'PerformSetup';
+const PLACE_REGIMENT_IN_ARMY = 'PlaceRegimentInArmy';
+const PLACE_UNREST_IN_REGION = 'PlaceUnrestInRegion';
 const PRE_END_OF_GAME = 'PreEndOfGame';
 const PRE_TAX_AND_UPKEEP = 'PreTaxAndUpkeep';
 const TAX_AND_UPKEEP = 'TaxAndUpkeep';
@@ -236,6 +249,7 @@ const MILITARY_AFFAIRS_CHECK_COMMANDER = 'MilitaryAffairsCheckCommander';
 const MILITARY_AFFAIRS_ASSIGN_COMMANDER = 'MilitaryAffairsAssignCommander';
 const MOVE_ELEPHANT = 'MoveElephant';
 // const PRESIDENCY_DECIDE_ORDER = 'PresidencyDecideOrder';
+const PLACE_SHIP_IN_SEA_ZONE = 'PlaceShipInSeaZone';
 const PRESIDENT_TRADE = 'PresidentTrade';
 const PRESIDENT_TRADE_FILL_ORDERS = 'PresidentTradeFillOrders';
 const PRESIDENT_TRADE_RESOLVE_CHECK = 'PresidentTradeResolveCheck';
@@ -484,6 +498,7 @@ const OFFICES = [
 // TODO: check how to handle director of trade and governor general
 const OFFICES_WITH_TREASURY = [
   DIRECTOR_OF_TRADE,
+  GOVERNOR_GENERAL,
   MANAGER_OF_SHIPPING,
   PRESIDENT_OF_BOMBAY,
   PRESIDENT_OF_MADRAS,
@@ -1076,6 +1091,7 @@ const THE_PRIME_MINISTERS_EAR_ID = 'ThePrimeMinistersEar';
  * PrestigeCardIds: specific card IDs that affect the game and
  * are used in the code
  */
+const BECKY_SHARP_ID = 'PrestigeCard_16';
 const ESTER_SUMMERSON_ID = 'PrestigeCard_12';
 const FOUNDRY_CARD_ID = 'PrestigeCard_24';
 const JOHN_THORPE_ID = 'PrestigeCard_13';
@@ -1098,6 +1114,7 @@ const CALICO_ACTS_ID = 'LawCard_31';
 const COMPANY_AIDS_GOVERNMENT_ID = 'LawCard_49';
 const DEREGULATION_ID = 'LawCard_56';
 const ENVOY_TO_CHINA_ID = 'LawCard_32';
+const GOVERNOR_GENERAL_LAW_ID = 'LawCard_43';
 const INCLOSURE_ACTS_ID = 'LawCard_36';
 const INDUSTRY_SUBSIDY_ID = 'LawCard_44';
 const MASSED_DEMAND_FRANCHISE_ID = 'LawCard_54';

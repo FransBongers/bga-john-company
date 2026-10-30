@@ -78,18 +78,14 @@ class AddCash extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     if ($targetType === BALANCE) {
       return [
-        'log' => clienttranslate('Add £${amount} to the Company Balance'),
+        'log' => clienttranslate('Company Balance'),
         'args' => [
           'amount' => $amount,
         ],
       ];
-    } else if ($targetType === OFFICE && $targetArg !== null && in_array($targetArg, [
-      PRESIDENT_OF_BOMBAY,
-      PRESIDENT_OF_MADRAS,
-      PRESIDENT_OF_BENGAL,
-    ])) {
+    } else if ($targetType === OFFICE && $targetArg !== null) {
       return [
-        'log' => clienttranslate('Add £${amount} to the President\'s treasury'),
+        'log' => Offices::get($targetArg)->getTitle(),
         'args' => [
           'amount' => $amount,
         ],

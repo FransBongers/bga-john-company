@@ -8,6 +8,7 @@ import {
   BENGAL_PRESIDENCY,
   MADRAS_PRESIDENCY,
   SUPERINTENDENT_OF_TRADE_IN_CHINA,
+  GOVERNOR_GENERAL,
 } from '../constants';
 import { createFamilyMember } from '../templates';
 import { GameAlias, GamedatasAlias, JocoRegionBase } from '../types';
@@ -102,6 +103,7 @@ export class India {
     this.setupRegions(gamedatas);
     this.setupShipZones(gamedatas);
 
+    this.updateGovernorGeneralActive(gamedatas.offices[GOVERNOR_GENERAL].location !== DECK);
     this.updateElephant(gamedatas.elephant);
     this.updateSuperintendentOfTradeInChina(gamedatas.offices[SUPERINTENDENT_OF_TRADE_IN_CHINA].location !== DECK);
     this.updateMilitaryAffairsOfficeAndSuperintendent(gamedatas);
@@ -176,6 +178,10 @@ export class India {
   // .##.....##.##........##.....##.#########....##....##..........##.....##..##.
   // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
   // ..#######..##........########..##.....##....##....########.....#######..####
+
+  updateGovernorGeneralActive(visible: boolean) {
+    this.ui.map.setAttribute('data-governor-general-active', visible ? 'true' : 'false');
+  }
 
   updateSuperintendentOfTradeInChina(visible: boolean) {
     const elt = this.ui.superintendentOfTradeInChinaContainer;

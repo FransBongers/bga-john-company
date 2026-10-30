@@ -73,7 +73,7 @@ class TradeInChina extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $player = Players::get($playerId);
     $office = Offices::get(SUPERINTENDENT_OF_TRADE_IN_CHINA);
-    $checkResult = JoCoUtils::makeCheck($player, $numberOfDice, $office->getFamilyMember());
+    list($checkResult) = JoCoUtils::makeCheck($player, $numberOfDice, $office->getFamilyMember());
 
     $exportIconValue = LawCards::isInPlay(ENVOY_TO_CHINA_ID) ? 5 : 4;
 

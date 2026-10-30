@@ -377,7 +377,7 @@ class EventsInIndiaCrisisDefense extends ExhaustArmyPieces
 
     // Governor position is eliminated
     $governorOffice = Offices::get($region->getGovernorOfficeId());
-    if ($governorOffice->isInPlay()) {
+    if ($governorOffice->isInPlay() && !Offices::get(GOVERNOR_GENERAL)->isInPlay()) {
       $governorOffice->eliminate();
     }
     $region->setControl(null);

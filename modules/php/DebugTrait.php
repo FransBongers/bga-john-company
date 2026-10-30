@@ -40,59 +40,15 @@ trait DebugTrait
 
   function debug_test()
   {
-    // LondonSeasonCards::moveAllInLocation(Locations::londonSeasonDisplay(), DECK);
+    Offices::get(GOVERNOR_OF_BENGAL)->setFamilyMemberId(null);
 
-    // foreach (['PrestigeCard_13', 'PrestigeCard_14', 'PrestigeCard_16'] as $cardId) {
-    //   LondonSeasonCards::get($cardId)->setLocation(Locations::londonSeasonDisplay());
-    // }
-    // LondonSeasonCards::shuffle(DECK);
+    // LawCards::insertOnTop(GOVERNOR_GENERAL_LAW_ID, DECK);
+    // $ship = Ships::getTopOf(Locations::supplyOtherShips());
+    // $ship->place(Players::get(2371052), Locations::shipUnderConstruction(MADRAS), COMPANY_SHIP);
+    // $familyMember = FamilyMembers::getTopOf(Locations::familyMemberSupply(HASTINGS));
+    // $familyMember->setLocation(GOVERNOR_OF_BENGAL);
 
-
-
-    $location = Elephant::getLocation();
-    Notifications::log('location', $location);
-    $regions = Regions::getAll();
-    $legalOptions = [];
-    // foreach ($regions as $region) {
-    //   $regionId = $region->getId();
-    //   if ($regionId === $location || !$region->isCompanyControlled()) {
-    //     continue;
-    //   }
-    //   $legalOptions[$regionId] = [];
-    // }
-
-    foreach (BORDERS as $borderId) {
-      Notifications::log('borderId', $borderId);
-      if ($borderId === $location) {
-        Notifications::log('case: border is location', []);
-        continue;
-      }
-      list($regionAId, $regionBId) = explode('_', $borderId);
-      $regionA = $regions[$regionAId];
-      $regionB = $regions[$regionBId];
-
-      if ($regionA->isCompanyControlled() && $regionB->isCompanyControlled()) {
-        Notifications::log('case: both company controlled', []);
-        continue;
-      }
-
-      if ($regionA->getControl() === $regionB) {
-        $legalOptions[$borderId] = [$regionB];
-      } else if ($regionB->getControl() === $regionA) {
-        $legalOptions[$borderId] = [$regionA];
-      } else if ($regionA->isCompanyControlled()) {
-        $legalOptions[$borderId] = [$regionA];
-      } else if ($regionB->isCompanyControlled()) {
-        $legalOptions[$borderId] = [$regionB];
-      } else {
-        $legalOptions[$borderId] = [$regionA, $regionB];
-      }
-    }
-    Notifications::log('debug', $legalOptions);
-
-
-
-
+    // Offices::get(GOVERNOR_GENERAL)->setFamilyMemberId('familyMember_Hastings_11');
     // LawCards::get(DEREGULATION_ID)->setLocation(DEREGULATION_AVAILABLE);
     // CompanyFailureCards::get('CompanyFailureCard_02')->resolveEffect();
 
@@ -145,6 +101,13 @@ trait DebugTrait
 
     // Notifications::log('homePorts', Orders::getHomePorts());
 
+  }
+
+  function debug_addRegiment(string $presidencyId)
+  {
+    $regiment = ArmyPieces::getTopOf(Locations::supplyRegiments());
+
+    $regiment->placeInArmy(Players::get(2371052), $presidencyId);
   }
 
   function debug_eventInIndia()

@@ -1,5 +1,12 @@
 import { createFamilyMember, tplFamilyMemberSpot } from '../../templates';
-import { BENGAL, BENGAL_PRESIDENCY, BOMBAY, BOMBAY_PRESIDENCY, MADRAS, MADRAS_PRESIDENCY } from '../../constants';
+import {
+  BENGAL,
+  BENGAL_PRESIDENCY,
+  BOMBAY,
+  BOMBAY_PRESIDENCY,
+  MADRAS,
+  MADRAS_PRESIDENCY,
+} from '../../constants';
 import {
   GamedatasAlias,
   JocoControlToken,
@@ -60,9 +67,7 @@ export class Presidency {
     this.ui = {
       parent: parentElement,
       writers: document.getElementById(`Writers_${this.id}`) as HTMLElement,
-      president: document.getElementById(
-        this.getPresidentId(),
-      ) as HTMLElement,
+      president: document.getElementById(this.getPresidentId()) as HTMLElement,
       tokensAndTreasury: document.getElementById(
         `joco-control-tokens-and-treasury-${this.id}`,
       ) as HTMLElement,
@@ -97,7 +102,7 @@ export class Presidency {
 
     company.treasuries[this.getPresidentId()] = new Treasury({
       parent: this.ui.tokensAndTreasury,
-      gamedatas,
+      initialValue: gamedatas.offices[this.getPresidentId()].treasury,
       office: this.getPresidentId(),
     });
   }

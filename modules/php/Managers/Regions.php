@@ -97,5 +97,20 @@ class Regions extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   // .##.....##....##.....##..##........##.....##.......##...
   // ..#######.....##....####.########.####....##.......##...
 
+  public static function getCompanyControlledRegions()
+  {
+    $regions = Regions::getAll();
+    $companyControlledRegions = [];
+    foreach ($regions as $region) {
+      if ($region->isCompanyControlled()) {
+        $companyControlledRegions[] = $region;
+      }
+    }
+    return $companyControlledRegions;
+  }
 
+  public static function getCompanyControlledRegionCount()
+  {
+    return count(self::getCompanyControlledRegions());
+  }
 }

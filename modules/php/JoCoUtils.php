@@ -51,7 +51,7 @@ class JoCoUtils
     if ($result === CATASTROPHIC_FAILURE && $resolveCatastrophicFailure) {
       self::resolveCatastrophicFailure($player, $familyMember);
     }
-    return $result;
+    return [$result, $dieResults];
   }
 
   public static function resolveCatastrophicFailure(Player $player, FamilyMember $familyMember)

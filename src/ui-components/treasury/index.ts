@@ -6,7 +6,7 @@ import { tplTreasury } from './templates';
 
 export interface TreasuryProps {
   parent: HTMLElement;
-  gamedatas: GamedatasAlias;
+  initialValue: number
   office: string;
 }
 
@@ -22,7 +22,7 @@ export class Treasury {
     this.setup(props);
   }
 
-  private setup({ parent, gamedatas, office }: TreasuryProps) {
+  private setup({ parent, initialValue, office }: TreasuryProps) {
     parent.insertAdjacentHTML('beforeend', tplTreasury(office));
 
     this.element = document.getElementById(`joco-treasury-${office}`);
@@ -35,7 +35,7 @@ export class Treasury {
 
     this.counter = new ebg.counter();
     this.counter.create(`joco-treasury-${office}-counter`);
-    this.counter.setValue(gamedatas.offices[office].treasury);
+    this.counter.setValue(initialValue);
 
     // // this.element.addEventListener('click', (event: PointerEvent) => this.handleClick(event));
     // this.setInactive();

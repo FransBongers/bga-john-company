@@ -1,11 +1,13 @@
 import { Bar } from '../bar';
 import {
   addCancelButton,
+  addConfirmButton,
   addPrimaryActionButton,
   addSecondaryActionButton,
   clearPossible,
   CommonStateArgs,
   debug,
+  formatStringRecursive,
   GameState,
   onClick,
   performAction,
@@ -20,6 +22,8 @@ import { getLondonSeasonCard } from '../utility';
 interface OnEnteringLondonSeasonChooseCardArgs extends CommonStateArgs {
   prestigeCards: JocoLondonSeasonCardBase[];
   _private: JocoLondonSeasonCardBase[];
+  canUseBeckySharp: boolean;
+  topOfDeckType: string;
 }
 
 export class LondonSeasonChooseCard implements GameState<OnEnteringLondonSeasonChooseCardArgs> {
@@ -90,10 +94,32 @@ export class LondonSeasonChooseCard implements GameState<OnEnteringLondonSeasonC
   private updateInterfaceInitialStep() {
     clearPossible();
     updatePageTitle(
-      _(
-        '${you} must choose a card from the London Season Display to take or discard',
-      ),
+      this.args.canUseBeckySharp
+        ? _(
+            '${you} must choose a card from the London Season Display to take or discard. You may take the top card of the deck instead',
+          )
+        : _(
+            '${you} must choose a card from the London Season Display to take or discard',
+          ),
+      {
+        cardType:
+          this.args.topOfDeckType === BLACKMAIL
+            ? _('Blackmail')
+            : _('Prestige'),
+      },
     );
+    if (this.args.canUseBeckySharp) {
+      addPrimaryActionButton({
+        id: 'becky-sharp-btn',
+        text: formatStringRecursive(_('Take top card (${cardType} card)'), {
+          cardType:
+            this.args.topOfDeckType === BLACKMAIL
+              ? _('Blackmail')
+              : _('Prestige'),
+        }),
+        callback: () => this.updateInterfaceConfirmBeckySharp(),
+      });
+    }
 
     this.args.prestigeCards.forEach((card) =>
       onClick(`game-card-${card.id}`, () => this.updateInterfaceConfirm(card)),
@@ -101,6 +127,25 @@ export class LondonSeasonChooseCard implements GameState<OnEnteringLondonSeasonC
     this.args._private.forEach((card) =>
       onClick(`game-card-${card.id}`, () => this.updateInterfaceConfirm(card)),
     );
+  }
+
+  private updateInterfaceConfirmBeckySharp() {
+    clearPossible();
+
+    updatePageTitle(_('Take top card of the deck (${cardType} card)?'), {
+      cardType:
+        this.args.topOfDeckType === BLACKMAIL ? _('Blackmail') : _('Prestige'),
+    });
+
+    addConfirmButton(() =>
+      performAction('actLondonSeasonChooseCard', {
+        cardId: null,
+        take: true,
+        useBeckySharp: true,
+      }),
+    );
+
+    addCancelButton();
   }
 
   private updateInterfaceConfirm(card: JocoLondonSeasonCardBase) {

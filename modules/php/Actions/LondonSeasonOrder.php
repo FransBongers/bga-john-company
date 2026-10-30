@@ -31,7 +31,7 @@ class LondonSeasonOrder extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   public function stLondonSeasonOrder()
   {
-    $playerIds = array_slice(Prizes::getLondonSeasonOrder(), 0, 3);
+    $playerIds = Prizes::getLondonSeasonOrder();
 
     $chooseCardActions = [];
     foreach ($playerIds as $playerId) {

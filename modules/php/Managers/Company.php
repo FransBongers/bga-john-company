@@ -127,8 +127,12 @@ class Company
 
   public static function getOfficesWithTreasury()
   {
-    // TODO: Governor General
-    $officesWithTreasury = [DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING, PRESIDENT_OF_BENGAL, PRESIDENT_OF_BOMBAY, PRESIDENT_OF_MADRAS];
+    $officesWithTreasury = [MANAGER_OF_SHIPPING, PRESIDENT_OF_BENGAL, PRESIDENT_OF_BOMBAY, PRESIDENT_OF_MADRAS];
+    if (Offices::get(GOVERNOR_GENERAL)->isInPlay()) {
+      $officesWithTreasury[] = GOVERNOR_GENERAL;
+    } else {
+      $officesWithTreasury[] = DIRECTOR_OF_TRADE;
+    }
     return Offices::getMany($officesWithTreasury);
   }
 

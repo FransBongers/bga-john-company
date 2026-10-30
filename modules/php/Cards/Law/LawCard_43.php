@@ -2,6 +2,8 @@
 
 namespace Bga\Games\JohnCompany\Cards\Law;
 
+use Bga\Games\JohnCompany\Managers\Offices;
+
 class LawCard_43 extends \Bga\Games\JohnCompany\Models\LawCard
 {
   public function __construct($row)
@@ -20,5 +22,13 @@ class LawCard_43 extends \Bga\Games\JohnCompany\Models\LawCard
         ],
       ]
     ];
+  }
+
+  public function resolveImmediateEffects(object $ctx, bool $passed = true)
+  {
+    if (!$passed) {
+      return;
+    }
+    Offices::get(GOVERNOR_GENERAL)->create($ctx);
   }
 }

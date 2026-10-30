@@ -232,6 +232,11 @@ export interface NotifRemoveCardFromGame extends NotifWithPlayerArgs {
   card: JocoPromiseCardBase;
 }
 
+export interface NotifReplaceDirectorOfTrade extends NotifWithPlayerArgs {
+  familyMember: JocoFamilyMember | null;
+  governorGeneral: JocoOfficeBase;
+}
+
 export interface NotifReturnFamilyMemberToSupply extends NotifWithPlayerArgs {
   familyMember: JocoFamilyMember;
 }

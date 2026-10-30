@@ -141,6 +141,23 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     ]);
   }
 
+  public function removeFromGame(Player | null $player = null)
+  {
+    $this->setLocation(DECK);
+    $text = clienttranslate('${tkn_boldText_title} is removed from the game');
+    $textArgs = [];
+    if ($player === null) {
+      $text = clienttranslate('${player_name} removes ${tkn_boldText_title} from the game');
+      $textArgs['player'] = $player;
+    }
+
+    Notifications::moveOfficeCard($this, $text, array_merge([
+      'player' => $player,
+      'tkn_boldText_title' => $this->getTitle(),
+      'i18n' => ['tkn_boldText_title'],
+    ], $textArgs));
+  }
+
 
   protected function getOfficeholderCandidates(array $excludedOfficeIds = [], bool $excludeGovernors = false): array
   {

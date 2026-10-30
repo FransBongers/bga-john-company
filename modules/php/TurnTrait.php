@@ -280,7 +280,7 @@ trait TurnTrait
     ];
 
     // TODO: Governor General or Director of Trade callback
-    Engine::setup($node, ['method' => 'stSetupDirectorOfTrade']);
+    Engine::setup($node, ['method' => 'stCheckDirectorOfTradeOrGovernorGeneral']);
     Engine::proceed();
   }
 
@@ -305,7 +305,41 @@ trait TurnTrait
     ];
 
     // TODO: Governor General or Director of Trade callback
-    Engine::setup($node, ['method' => 'stSetupDirectorOfTrade']);
+    Engine::setup($node, ['method' => 'stCheckDirectorOfTradeOrGovernorGeneral']);
+    Engine::proceed();
+  }
+
+  function stCheckDirectorOfTradeOrGovernorGeneral()
+  {
+    $governorGeneralInPlay = Offices::get(GOVERNOR_GENERAL)->getLocation() !== DECK;
+
+    if ($governorGeneralInPlay) {
+      $this->stSetupGovernorGeneral();
+    } else {
+      $this->stSetupDirectorOfTrade();
+    }
+  }
+
+  function stSetupGovernorGeneral()
+  {
+    $this->updatePhase(GOVERNOR_GENERAL);
+    $office = Offices::get(GOVERNOR_GENERAL);
+    $playerId = $office->getPlayerId();
+
+    $office->increaseCompanyBalance($playerId);
+
+    $node = [
+      'children' => [
+        [
+          'action' => GOVERNOR_GENERAL_MAKE_CHECK,
+          'playerId' => 'some',
+          'activePlayerIds' => [$playerId],
+          'optional' => true,
+        ],
+      ],
+    ];
+
+    Engine::setup($node, ['method' => 'stSetupManagerOfShipping']);
     Engine::proceed();
   }
 

@@ -56,7 +56,7 @@ export class DirectorOfTradeSpecialEnvoy implements GameState<OnEnteringDirector
     if (args.proposal > 0) {
       updatePageTitle(
         _(
-          'Special Envoy: ${tkn_playerName} proposes to spend ${amount} ${tkn_pound} to make a check',
+          'Special Envoy: ${tkn_playerName} proposes to spend £${amount} to make a check',
         ),
         {
           tkn_playerName: getPlayerName(activePlayerIds[0]),
@@ -99,13 +99,9 @@ export class DirectorOfTradeSpecialEnvoy implements GameState<OnEnteringDirector
 
     const available = this.args.treasury - this.spend;
 
-    updatePageTitle(
-      _('Special Envoy: ${you} may spend 1 ${tkn_pound} per die'),
-      {
-        available,
-        tkn_pound: 'pound',
-      },
-    );
+    updatePageTitle(_('Special Envoy: ${you} may spend £1 per die'), {
+      available,
+    });
 
     addSecondaryActionButton({
       id: 'minus_btn',

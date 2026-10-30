@@ -311,3 +311,9 @@
     left: 145px;
   }
 }
+
+#joco-india-map[data-governor-general-active='true'] {
+  .joco-governor-overlay-container {
+    display: none;
+  }
+}

@@ -5,7 +5,6 @@ namespace Bga\Games\JohnCompany\Actions;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
-use Bga\Games\JohnCompany\Boilerplate\Helpers\UserException;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\Families;
@@ -43,7 +42,7 @@ class LondonSeasonRetire extends \Bga\Games\JohnCompany\Models\AtomicAction
       'treasury' => $family->getTreasury(),
       'discount' => $family->getRetirementDiscount($applyLettersOfIntroduction),
       FINAL_RETIREMENT => $args[FINAL_RETIREMENT] ?? false,
-      'prizeFilter' => $family->hasPrestigeCard(LORD_HIGHGATE_ID) ? [PRIZE_8, PRIZE_12] : null
+      'prizeFilter' => $family->hasPrestigeCard(LORD_HIGHGATE_ID) ? [PRIZE_8, PRIZE_12] : null,
     ];
 
     return $data;

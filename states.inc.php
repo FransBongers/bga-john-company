@@ -205,6 +205,27 @@ $machinestates = [
         ->transitions(['next' => ST_RESOLVE_STACK])
         ->build(),
 
+    ST_PLACE_SHIP_IN_SEA_ZONE => GameStateBuilder::create()
+        ->name(PLACE_SHIP_IN_SEA_ZONE)
+        ->description('')
+        ->type(StateType::GAME)
+        ->action('stAtomicAction')
+        ->build(),
+
+    ST_PLACE_REGIMENT_IN_ARMY => GameStateBuilder::create()
+        ->name(PLACE_REGIMENT_IN_ARMY)
+        ->description('')
+        ->type(StateType::GAME)
+        ->action('stAtomicAction')
+        ->build(),
+
+    ST_PLACE_UNREST_IN_REGION => GameStateBuilder::create()
+        ->name(PLACE_UNREST_IN_REGION)
+        ->description('')
+        ->type(StateType::GAME)
+        ->action('stAtomicAction')
+        ->build(),
+
     // .########.##....##.########......#######..########
     // .##.......###...##.##.....##....##.....##.##......
     // .##.......####..##.##.....##....##.....##.##......
@@ -537,6 +558,17 @@ $machinestates = [
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
         'possibleactions' => ['act' . GOVERNOR_ADMINISTER, 'actPassOptionalAction', 'actTakeAtomicAction'],
+        'transitions' => ['next' => ST_RESOLVE_STACK],
+    ],
+
+    ST_GOVERNOR_GENERAL_MAKE_CHECK => [
+        'name' => GOVERNOR_GENERAL_MAKE_CHECK,
+        'type' => 'multipleactiveplayer',
+        'description' => '${actplayer}',
+        'descriptionmyturn' => '${you}',
+        'args' => 'argsAtomicAction',
+        'action' => 'stAtomicAction',
+        'possibleactions' => ['act' . GOVERNOR_GENERAL_MAKE_CHECK, 'actTakeAtomicAction'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 
@@ -1008,6 +1040,30 @@ $machinestates = [
 
     ST_GOVERNOR_BUILD_COMPANY_SHIP => [
         'name' => GOVERNOR_BUILD_COMPANY_SHIP,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_GOVERNOR_GENERAL_SHIPBUILDING => [
+        'name' => GOVERNOR_GENERAL_SHIPBUILDING,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_GOVERNOR_GENERAL_COMMISSION_REGIMENT => [
+        'name' => GOVERNOR_GENERAL_COMMISSION_REGIMENT,
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stAtomicAction',
+        'transitions' => [],
+    ],
+
+    ST_GOVERNOR_GENERAL_TAX => [
+        'name' => GOVERNOR_GENERAL_TAX,
         'description' => '',
         'type' => 'game',
         'action' => 'stAtomicAction',

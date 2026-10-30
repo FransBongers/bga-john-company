@@ -22,11 +22,11 @@ export const tplVacantOffices = () => `
     <div><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Vacant Offices').toLocaleUpperCase()}</span></div>
     <div id="VacantOffices"></div>
   </div>
-`
+`;
 
 export const tplOfficeHeader = (familyMemberLocation: string, name: string) => `
   <div class="joco-header joco-office-header">${tplFamilyMemberSpot(familyMemberLocation)}<span class="fb-font-baskerville fb-font-16">${name.toLocaleUpperCase()}</span></div>
-`
+`;
 
 export const tplOffice = (
   id: string,
@@ -41,12 +41,12 @@ export const tplOffice = (
     `;
 };
 
-        // <div class="joco-treasury-container">
-        //   <div><span class="fb-font-baskerville fb-font-12">${_('Treasury').toLocaleUpperCase()}</span></div>
-        //   <div class="joco-treasury-counter-container">
-        //     <span class="fb-font-baskerville fb-font-12">£</span><span id="${id}-treasury" class="fb-font-baskerville fb-font-20"></span>
-        //   </div>
-        // </div>
+// <div class="joco-treasury-container">
+//   <div><span class="fb-font-baskerville fb-font-12">${_('Treasury').toLocaleUpperCase()}</span></div>
+//   <div class="joco-treasury-counter-container">
+//     <span class="fb-font-baskerville fb-font-12">£</span><span id="${id}-treasury" class="fb-font-baskerville fb-font-20"></span>
+//   </div>
+// </div>
 
 export const tplCourtOfDirectors = () => `
   <div class="joco-court-of-directors-container joco-container">

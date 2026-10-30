@@ -332,7 +332,7 @@ class Region extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     $this->removeUnrest();
 
     // Form Governorship
-    if ($previousControl !== $presidencyId) {
+    if ($previousControl !== $presidencyId && !Offices::get(GOVERNOR_GENERAL)->isInPlay()) {
       Offices::get($this->getGovernorOfficeId())->moveToVacantOffices($player);
     }
   }

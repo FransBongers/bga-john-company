@@ -4,6 +4,7 @@ import {
   CHAIRMAN,
   COURT_OF_DIRECTORS,
   DIRECTOR_OF_TRADE,
+  GOVERNOR_GENERAL,
   MANAGER_OF_SHIPPING,
   STOCK_EXCHANGE_POSITIONS,
   VACANT_OFFICES,
@@ -23,13 +24,14 @@ import {
 import { getPhaseName } from '../phase-tracker/translations';
 import { Treasury } from '../ui-components';
 import { tplOfficeCard } from '../cards/office-cards';
+import { DECK } from '../boilerplate';
 
-const tplCompany = () => `
+const tplCompany = (governorGeneralInPlay: boolean) => `
   <div id="joco-company" class="joco-tab">
     <div class="joco-row">
       <div class="joco-column">
         ${tplCourtOfDirectors()}
-        ${tplOffice(DIRECTOR_OF_TRADE, DIRECTOR_OF_TRADE, getPhaseName(DIRECTOR_OF_TRADE))}
+        ${governorGeneralInPlay ? tplOffice(GOVERNOR_GENERAL, GOVERNOR_GENERAL, getPhaseName(GOVERNOR_GENERAL)) : tplOffice(DIRECTOR_OF_TRADE, DIRECTOR_OF_TRADE, getPhaseName(DIRECTOR_OF_TRADE))}
         ${tplOffice(MANAGER_OF_SHIPPING, MANAGER_OF_SHIPPING, getPhaseName(MANAGER_OF_SHIPPING))}
       </div>
       <div class="joco-column">
@@ -111,11 +113,11 @@ export class Company {
     this.updateCompanyDebt(gamedatas.company.debt);
   }
 
-  private setupTreasury(gamedatas: GamedatasAlias, id: string) {
+  public setupTreasury(initialValue: number, id: string) {
     const parent = document.getElementById(`${id}Office`)!;
     this.treasuries[id] = new Treasury({
       parent,
-      gamedatas,
+      initialValue,
       office: id,
     });
 
@@ -136,9 +138,11 @@ export class Company {
   }
 
   setup(gamedatas: GamedatasAlias) {
+    const governorGeneralInPlay =
+      gamedatas.offices[DIRECTOR_OF_TRADE].location === DECK;
     document
       .getElementById('joco')
-      .insertAdjacentHTML('afterbegin', tplCompany());
+      .insertAdjacentHTML('afterbegin', tplCompany(governorGeneralInPlay));
 
     this.ui = {
       stockExchange: {},
@@ -148,7 +152,7 @@ export class Company {
       vacantOffices: document.getElementById(VACANT_OFFICES)!,
     };
 
-    [CHAIRMAN, DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING].forEach((officeId) => {
+    [CHAIRMAN, DIRECTOR_OF_TRADE, GOVERNOR_GENERAL, MANAGER_OF_SHIPPING].forEach((officeId) => {
       this.ui.offices[officeId] = document.getElementById(officeId)!;
     });
 
@@ -156,8 +160,21 @@ export class Company {
     this.setupCompanyBalance(gamedatas);
     this.setupCompanyStanding(gamedatas);
     this.setupCompanyDebt(gamedatas);
-    this.setupTreasury(gamedatas, DIRECTOR_OF_TRADE);
-    this.setupTreasury(gamedatas, MANAGER_OF_SHIPPING);
+    if (governorGeneralInPlay) {
+      this.setupTreasury(
+        gamedatas.offices[GOVERNOR_GENERAL].treasury,
+        GOVERNOR_GENERAL,
+      );
+    } else {
+      this.setupTreasury(
+        gamedatas.offices[DIRECTOR_OF_TRADE].treasury,
+        DIRECTOR_OF_TRADE,
+      );
+    }
+    this.setupTreasury(
+      gamedatas.offices[MANAGER_OF_SHIPPING].treasury,
+      MANAGER_OF_SHIPPING,
+    );
     this.updateFamilyMembers(gamedatas);
     this.setupVacantOffices(gamedatas);
   }
@@ -184,7 +201,7 @@ export class Company {
   }
 
   public updateFamilyMembers(gamedatas: GamedatasAlias) {
-    const offices = [CHAIRMAN, DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING];
+    const offices = [CHAIRMAN, DIRECTOR_OF_TRADE, GOVERNOR_GENERAL, MANAGER_OF_SHIPPING];
     Object.values(gamedatas.familyMembers).forEach((member) => {
       if (offices.includes(member.location)) {
         const officeId = member.location;

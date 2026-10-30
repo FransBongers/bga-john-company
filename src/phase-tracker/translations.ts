@@ -16,6 +16,7 @@ import {
   PARLIAMENT_MEETS,
   UPKEEP_AND_REFRESH,
   FINAL_SCORING,
+  GOVERNOR_GENERAL,
 } from '../constants';
 
 export const getPhaseName = (phase: string) => {
@@ -32,6 +33,8 @@ export const getPhaseName = (phase: string) => {
       return _('Chairman');
     case DIRECTOR_OF_TRADE:
       return _('Director of Trade');
+    case GOVERNOR_GENERAL:
+      return _('Governor General');   
     case MANAGER_OF_SHIPPING:
       return _('Manager of Shipping');
     case MILITARY_AFFAIRS:

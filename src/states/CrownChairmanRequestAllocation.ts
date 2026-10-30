@@ -10,7 +10,6 @@ import {
   performAction,
   updatePageTitle,
 } from '../boilerplate/utility';
-import { OFFICES_WITH_TREASURY } from '../constants';
 import { tknPromiseCubes, tknPound } from '../logs/templates';
 import { PlayerManager } from '../player-manager';
 import { StaticData } from '../static-data';

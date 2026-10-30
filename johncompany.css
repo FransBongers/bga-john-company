@@ -3861,6 +3861,10 @@ span[style*="color:#c0c0c0"] {
   left: 145px;
 }
 
+#joco-india-map[data-governor-general-active=true] .joco-governor-overlay-container {
+  display: none;
+}
+
 .joco-sea-zone {
   display: flex;
   flex-direction: column;
@@ -3908,10 +3912,10 @@ span[style*="color:#c0c0c0"] {
 }
 #joco-india #joco-india-map {
   position: relative;
-  background-image: url("img/india.jpg");
+  background-image: url("img/india.webp");
   background-size: 100% 100%;
   width: 1000px;
-  aspect-ratio: 1700/1590;
+  aspect-ratio: 4000/3800;
   outline: 3px double black;
   border-radius: 5px;
 }

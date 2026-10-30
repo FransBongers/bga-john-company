@@ -132,7 +132,7 @@ class DirectorOfTradeSpecialEnvoy extends \Bga\Games\JohnCompany\Models\AtomicAc
     $office = Offices::get(DIRECTOR_OF_TRADE);
     $office->pay($player, $spend);
     
-    $checkResult = JoCoUtils::makeCheck($player, $spend, $office->getFamilyMember());
+    list($checkResult) = JoCoUtils::makeCheck($player, $spend, $office->getFamilyMember());
     if ($checkResult !== CATASTROPHIC_FAILURE && $office->getTreasury() > 0) {
       $action = [
         'action' => DIRECTOR_OF_TRADE_SPECIAL_ENVOY,

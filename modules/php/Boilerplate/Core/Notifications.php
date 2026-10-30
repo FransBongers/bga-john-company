@@ -322,7 +322,7 @@ class Notifications
     return $idNameMap[$regionId];
   }
 
-  private static function getSeaName(string $locationId)
+  public static function getSeaName(string $locationId)
   {
     if (Utils::startsWith($locationId, 'shipConstruction_')) {
       $regionId = explode('_', $locationId)[1];
@@ -869,6 +869,7 @@ class Notifications
       PARLIAMENT_MEETS => clienttranslate('Parliament Meets'),
       UPKEEP_AND_REFRESH => clienttranslate('Upkeep & Refresh'),
       FINAL_SCORING => clienttranslate('Final Scoring'),
+      GOVERNOR_GENERAL => clienttranslate('Governor General')
     ];
     $text = isset($phaseNameMap[$phase]) ? $phaseNameMap[$phase] : $phase;
     return $text;
@@ -1521,10 +1522,10 @@ class Notifications
 
   public static function addUnrest(Player | null $player, Region $region, int $change)
   {
-    $text = clienttranslate('${tkn_boldText_change}${tkn_unrest} is added to ${tkn_boldText_region}');
+    $text = clienttranslate('${tkn_boldText_change}${tkn_unrest} is placed in ${tkn_boldText_region}');
     $textArgs = [];
     if ($player !== null) {
-      $text = clienttranslate('Adds ${tkn_boldText_change}${tkn_unrest} to ${tkn_boldText_region}');
+      $text = clienttranslate('${player_name} places ${tkn_boldText_change}${tkn_unrest} in ${tkn_boldText_region}');
       $textArgs['player'] = $player;
     }
 
@@ -1599,6 +1600,19 @@ class Notifications
       'votes' => $votes,
       'player_name2' => $votingPlayer->getName(),
       'opposition' => $opposition,
+    ]);
+  }
+
+  public static function replaceDirectorOfTrade(Office $governorGeneral, Office $directorOfTrade, FamilyMember $familyMember)
+  {
+
+
+    self::notifyAll('replaceDirectorOfTrade', clienttranslate('The ${tkn_boldText_directorOfTrade} is replaced with the ${tkn_boldText_governorGeneral}'), [
+      'governorGeneral' => $governorGeneral->jsonSerialize(),
+      'tkn_boldText_directorOfTrade' => $directorOfTrade->getTitle(),
+      'tkn_boldText_governorGeneral' => $governorGeneral->getTitle(),
+      'familyMember' => $familyMember->jsonSerialize(),
+      'i18n' => ['tkn_boldText_directorOfTrade', 'tkn_boldText_governorGeneral'],
     ]);
   }
 

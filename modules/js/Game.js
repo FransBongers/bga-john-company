@@ -142,7 +142,7 @@ const MILITARY_AFFAIRS = 'MilitaryAffairs';
 const PRESIDENT_OF_BOMBAY = 'PresidentOfBombay';
 const PRESIDENT_OF_MADRAS = 'PresidentOfMadras';
 const PRESIDENT_OF_BENGAL = 'PresidentOfBengal';
-const GOVERNOR_GENERAL = 'GovernorGeneral';
+const GOVERNOR_GENERAL$1 = 'GovernorGeneral';
 const SUPERINTENDENT_OF_TRADE_IN_CHINA = 'SuperintendentOfTradeInChina';
 const GOVERNOR_OF_BOMBAY = 'GovernorOfBombay';
 const GOVERNOR_OF_MADRAS = 'GovernorOfMadras';
@@ -475,14 +475,14 @@ class Bar {
     }
 }
 
-const DISABLED = 'disabled';
+const DISABLED$1 = 'disabled';
 const SELECTABLE = 'selectable';
 const SELECTED = 'selected';
 const USED = 'used';
 const HIDDEN = 'hidden';
 const PRIMARY = 'primary';
 const SECONDARY = 'secondary';
-const DECK = 'deck';
+const DECK$1 = 'deck';
 const DISCARD = 'discard';
 const TEMPORARY_DISCARD$1 = 'temporaryDiscard';
 
@@ -796,7 +796,7 @@ const clearPossible = () => {
     Interaction.use().clearPossible();
 };
 const updatePageTitle = (text, args = {}) => Interaction.use().clientUpdatePageTitle(text, args);
-const formatStringRecursive = (log, args) => {
+const formatStringRecursive$1 = (log, args) => {
     return Interaction.use().formatStringRecursive(log, args);
 };
 const setAbsolutePosition = (elt, scaleVarName, { top, left }) => {
@@ -1245,7 +1245,7 @@ const tplCardText = (text, { containerClass = 'fb-card-text', textClass = 'fb-fo
             return `<span class="${textClass}">${item}</span>`;
         }
         else {
-            return `<span class="${textClass}">${formatStringRecursive(_(item.log), item.args)}</span>`;
+            return `<span class="${textClass}">${formatStringRecursive$1(_(item.log), item.args)}</span>`;
         }
     })
         .join('')}
@@ -1440,8 +1440,8 @@ const tplOffice = (officeId) => {
             return tplIconWithText(tplOfficeIconWrapper(PRESIDENT_OF_MADRAS), _('President of Madras').toLocaleUpperCase(), 'joco-setup-office');
         case PRESIDENT_OF_BENGAL:
             return tplIconWithText(tplOfficeIconWrapper(PRESIDENT_OF_BENGAL), _('President of Bengal').toLocaleUpperCase(), 'joco-setup-office');
-        case GOVERNOR_GENERAL:
-            return tplIconWithText(tplOfficeIconWrapper(GOVERNOR_GENERAL), _('Governor General').toLocaleUpperCase(), 'joco-setup-office');
+        case GOVERNOR_GENERAL$1:
+            return tplIconWithText(tplOfficeIconWrapper(GOVERNOR_GENERAL$1), _('Governor General').toLocaleUpperCase(), 'joco-setup-office');
     }
 };
 const tplSetupCardItem = ({ type, value }) => {
@@ -1741,6 +1741,8 @@ const getPhaseName = (phase) => {
             return _('Chairman');
         case DIRECTOR_OF_TRADE:
             return _('Director of Trade');
+        case GOVERNOR_GENERAL$1:
+            return _('Governor General');
         case MANAGER_OF_SHIPPING:
             return _('Manager of Shipping');
         case MILITARY_AFFAIRS:
@@ -2111,14 +2113,14 @@ class Treasury {
     constructor(props) {
         this.setup(props);
     }
-    setup({ parent, gamedatas, office }) {
+    setup({ parent, initialValue, office }) {
         parent.insertAdjacentHTML('beforeend', tplTreasury(office));
         this.element = document.getElementById(`joco-treasury-${office}`);
         this.minusButton = document.getElementById(`joco-treasury-${office}-minus-btn`);
         this.plusButton = document.getElementById(`joco-treasury-${office}-plus-btn`);
         this.counter = new ebg.counter();
         this.counter.create(`joco-treasury-${office}-counter`);
-        this.counter.setValue(gamedatas.offices[office].treasury);
+        this.counter.setValue(initialValue);
     }
     getButtonElement(type) {
         return type === PLUS ? this.plusButton : this.minusButton;
@@ -2148,20 +2150,20 @@ class Treasury {
     }
     disableButton(type) {
         const elt = type === 'minus' ? this.minusButton : this.plusButton;
-        elt.classList.add(DISABLED);
+        elt.classList.add(DISABLED$1);
     }
     enableButton(type) {
         const elt = type === 'minus' ? this.minusButton : this.plusButton;
-        elt.classList.remove(DISABLED);
+        elt.classList.remove(DISABLED$1);
     }
 }
 
-const tplCompany = () => `
+const tplCompany = (governorGeneralInPlay) => `
   <div id="joco-company" class="joco-tab">
     <div class="joco-row">
       <div class="joco-column">
         ${tplCourtOfDirectors()}
-        ${tplOffice$1(DIRECTOR_OF_TRADE, DIRECTOR_OF_TRADE, getPhaseName(DIRECTOR_OF_TRADE))}
+        ${governorGeneralInPlay ? tplOffice$1(GOVERNOR_GENERAL$1, GOVERNOR_GENERAL$1, getPhaseName(GOVERNOR_GENERAL$1)) : tplOffice$1(DIRECTOR_OF_TRADE, DIRECTOR_OF_TRADE, getPhaseName(DIRECTOR_OF_TRADE))}
         ${tplOffice$1(MANAGER_OF_SHIPPING, MANAGER_OF_SHIPPING, getPhaseName(MANAGER_OF_SHIPPING))}
       </div>
       <div class="joco-column">
@@ -2212,11 +2214,11 @@ class Company {
         });
         this.updateCompanyDebt(gamedatas.company.debt);
     }
-    setupTreasury(gamedatas, id) {
+    setupTreasury(initialValue, id) {
         const parent = document.getElementById(`${id}Office`);
         this.treasuries[id] = new Treasury({
             parent,
-            gamedatas,
+            initialValue,
             office: id,
         });
     }
@@ -2228,9 +2230,10 @@ class Company {
         });
     }
     setup(gamedatas) {
+        const governorGeneralInPlay = gamedatas.offices[DIRECTOR_OF_TRADE].location === DECK$1;
         document
             .getElementById('joco')
-            .insertAdjacentHTML('afterbegin', tplCompany());
+            .insertAdjacentHTML('afterbegin', tplCompany(governorGeneralInPlay));
         this.ui = {
             stockExchange: {},
             standing: {},
@@ -2238,15 +2241,20 @@ class Company {
             offices: {},
             vacantOffices: document.getElementById(VACANT_OFFICES),
         };
-        [CHAIRMAN, DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING].forEach((officeId) => {
+        [CHAIRMAN, DIRECTOR_OF_TRADE, GOVERNOR_GENERAL$1, MANAGER_OF_SHIPPING].forEach((officeId) => {
             this.ui.offices[officeId] = document.getElementById(officeId);
         });
         this.setupCourtOfDirectors(gamedatas);
         this.setupCompanyBalance(gamedatas);
         this.setupCompanyStanding(gamedatas);
         this.setupCompanyDebt(gamedatas);
-        this.setupTreasury(gamedatas, DIRECTOR_OF_TRADE);
-        this.setupTreasury(gamedatas, MANAGER_OF_SHIPPING);
+        if (governorGeneralInPlay) {
+            this.setupTreasury(gamedatas.offices[GOVERNOR_GENERAL$1].treasury, GOVERNOR_GENERAL$1);
+        }
+        else {
+            this.setupTreasury(gamedatas.offices[DIRECTOR_OF_TRADE].treasury, DIRECTOR_OF_TRADE);
+        }
+        this.setupTreasury(gamedatas.offices[MANAGER_OF_SHIPPING].treasury, MANAGER_OF_SHIPPING);
         this.updateFamilyMembers(gamedatas);
         this.setupVacantOffices(gamedatas);
     }
@@ -2261,7 +2269,7 @@ class Company {
         return this.ui.debt[debt];
     }
     updateFamilyMembers(gamedatas) {
-        const offices = [CHAIRMAN, DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING];
+        const offices = [CHAIRMAN, DIRECTOR_OF_TRADE, GOVERNOR_GENERAL$1, MANAGER_OF_SHIPPING];
         Object.values(gamedatas.familyMembers).forEach((member) => {
             if (offices.includes(member.location)) {
                 const officeId = member.location;
@@ -2438,23 +2446,23 @@ class Army {
 }
 
 const ORDERS_CONFIG = {
-    [ORDER_PUNJAB_1]: { top: 40, left: 212 },
-    [ORDER_DELHI_1]: { top: 28, left: 425 },
-    [ORDER_DELHI_2]: { top: 79, left: 565 },
-    [ORDER_DELHI_3]: { top: 102, left: 377 },
-    [ORDER_BENGAL_1]: { top: 182, left: 749 },
-    [ORDER_BENGAL_2]: { top: 273, left: 902 },
-    [ORDER_BOMBAY_1]: { top: 145, left: 246 },
-    [ORDER_BOMBAY_2]: { top: 275, left: 312 },
-    [ORDER_BOMBAY_3]: { top: 370, left: 225 },
-    [ORDER_MARATHA_1]: { top: 176, left: 584 },
-    [ORDER_MARATHA_2]: { top: 281, left: 431 },
-    [ORDER_MARATHA_3]: { top: 348, left: 665 },
-    [ORDER_HYDERABAD_1]: { top: 476, left: 526 },
-    [ORDER_MYSORE_1]: { top: 544, left: 345 },
-    [ORDER_MYSORE_2]: { top: 632, left: 403 },
-    [ORDER_MADRAS_1]: { top: 629, left: 550 },
-    [ORDER_MADRAS_2]: { top: 706, left: 502 },
+    [ORDER_PUNJAB_1]: { top: 43, left: 195 },
+    [ORDER_DELHI_1]: { top: 31, left: 408 },
+    [ORDER_DELHI_2]: { top: 82, left: 548 },
+    [ORDER_DELHI_3]: { top: 105, left: 360 },
+    [ORDER_BENGAL_1]: { top: 185, left: 732 },
+    [ORDER_BENGAL_2]: { top: 276, left: 885 },
+    [ORDER_BOMBAY_1]: { top: 148, left: 229 },
+    [ORDER_BOMBAY_2]: { top: 278, left: 295 },
+    [ORDER_BOMBAY_3]: { top: 373, left: 208 },
+    [ORDER_MARATHA_1]: { top: 179, left: 567 },
+    [ORDER_MARATHA_2]: { top: 284, left: 414 },
+    [ORDER_MARATHA_3]: { top: 351, left: 648 },
+    [ORDER_HYDERABAD_1]: { top: 479, left: 509 },
+    [ORDER_MYSORE_1]: { top: 547, left: 328 },
+    [ORDER_MYSORE_2]: { top: 635, left: 387 },
+    [ORDER_MADRAS_1]: { top: 632, left: 533 },
+    [ORDER_MADRAS_2]: { top: 709, left: 485 },
 };
 
 const tplControlTokenContent = (token, back = false) => {
@@ -2549,7 +2557,7 @@ class Presidency {
         const company = Company.getInstance();
         company.treasuries[this.getPresidentId()] = new Treasury({
             parent: this.ui.tokensAndTreasury,
-            gamedatas,
+            initialValue: gamedatas.offices[this.getPresidentId()].treasury,
             office: this.getPresidentId(),
         });
     }
@@ -2818,7 +2826,7 @@ class ShipZone {
     updateCount(modifier = 0) {
         this.ui.count.replaceChildren();
         const count = this.stock.getCards().length + modifier;
-        let textContent = formatStringRecursive(count === 1 ? _('${count} Ship') : _('${count} Ships'), {
+        let textContent = formatStringRecursive$1(count === 1 ? _('${count} Ship') : _('${count} Ships'), {
             count,
         });
         if (this.id === SUPERINTENDENT_OF_TRADE_IN_CHINA) {
@@ -2845,8 +2853,6 @@ class ShipZone {
 const tplOrder = (orderId, { top, left }) => {
     const staticData = StaticData$1.get().order(orderId);
     return `<div id="${orderId}" class="joco-order" style="top: ${top}px; left: ${left}px;" data-is-home-port="${staticData.homePort !== null}">
-          <div class="joco-order-value">${tplAmount(staticData.value)}</div>
-          <div class="joco-filled-order-value">${tplAmount(staticData.filledValue, true)}</div>
         </div>`;
 };
 const tplOrderToken = (type) => `
@@ -2866,7 +2872,7 @@ const tplMilitaryAffairs = () => `
         </div>
       </div>
 `;
-const tplSuperintendentOfTradeInChina$1 = () => `
+const tplSuperintendentOfTradeInChina = () => `
   <div id="${SUPERINTENDENT_OF_TRADE_IN_CHINA}Office" class="joco-office joco-container">
     ${tplOfficeHeader(SUPERINTENDENT_OF_TRADE_IN_CHINA, getPhaseName(SUPERINTENDENT_OF_TRADE_IN_CHINA))}
   </div>
@@ -2879,7 +2885,7 @@ const tplIndia = () => `
     </div>
     <div class="joco-row" style="align-self: stretch; gap: 12px;">
       ${tplMilitaryAffairs()}
-      ${tplSuperintendentOfTradeInChina$1()}
+      ${tplSuperintendentOfTradeInChina()}
     </div>
     <div id="joco-presidencies-and-armies">
       
@@ -2921,8 +2927,9 @@ class India {
         this.setupOrders(gamedatas);
         this.setupRegions(gamedatas);
         this.setupShipZones(gamedatas);
+        this.updateGovernorGeneralActive(gamedatas.offices[GOVERNOR_GENERAL$1].location !== DECK$1);
         this.updateElephant(gamedatas.elephant);
-        this.updateSuperintendentOfTradeInChina(gamedatas.offices[SUPERINTENDENT_OF_TRADE_IN_CHINA].location !== DECK);
+        this.updateSuperintendentOfTradeInChina(gamedatas.offices[SUPERINTENDENT_OF_TRADE_IN_CHINA].location !== DECK$1);
         this.updateMilitaryAffairsOfficeAndSuperintendent(gamedatas);
     }
     setupArmies(gamedatas) {
@@ -2968,6 +2975,9 @@ class India {
             this.seaZones[seaZone] = new ShipZone(seaZone, gamedatas);
         });
         this.seaZones[SUPERINTENDENT_OF_TRADE_IN_CHINA] = new ShipZone(SUPERINTENDENT_OF_TRADE_IN_CHINA, gamedatas);
+    }
+    updateGovernorGeneralActive(visible) {
+        this.ui.map.setAttribute('data-governor-general-active', visible ? 'true' : 'false');
     }
     updateSuperintendentOfTradeInChina(visible) {
         const elt = this.ui.superintendentOfTradeInChinaContainer;
@@ -3134,7 +3144,7 @@ const tplLondonSeasonOrder = ({ order, cashSpent, }) => {
     });
     return `
     <span class="fb-font-baskerville fb-font-12">
-      ${formatStringRecursive(_('Order for choosing cards from the London Season Display: ${playerLog}'), {
+      ${formatStringRecursive$1(_('Order for choosing cards from the London Season Display: ${playerLog}'), {
         playerLog: {
             log: playerLog,
             args: playerArgs,
@@ -3464,7 +3474,7 @@ class OpportunityMarker {
         };
         if (familyAction && map[familyAction]) {
             const { text, icon } = map[familyAction];
-            return formatStringRecursive(text, { tkn_icon: icon });
+            return formatStringRecursive$1(text, { tkn_icon: icon });
         }
         return _('Not placed');
     }
@@ -3482,7 +3492,7 @@ class OpportunityMarker {
 
 const tplPromiseCardContent = (card) => `
   <div class="joco-title joco-card-text fb-font-baskerville fb-font-16 bga-autofit">${card.title}</div>
-  <div class="joco-signature joco-card-text fb-font-parisienne fb-font-20 bga-autofit">${formatStringRecursive(_('${familyName} Family'), {
+  <div class="joco-signature joco-card-text fb-font-parisienne fb-font-20 bga-autofit">${formatStringRecursive$1(_('${familyName} Family'), {
     familyName: getFamilyName(card.familyId),
 })}</div>
 `;
@@ -3918,7 +3928,7 @@ class PrimeMinisterDial {
             return;
         }
         this.ui.playerName.replaceChildren();
-        this.ui.playerName.insertAdjacentHTML('beforeend', formatStringRecursive('${tkn_playerName}', {
+        this.ui.playerName.insertAdjacentHTML('beforeend', formatStringRecursive$1('${tkn_playerName}', {
             tkn_playerName: getPlayerName$1(playerId),
         }));
     }
@@ -3961,7 +3971,7 @@ const tplLeaderOfTheOpposition = (leaderName) => {
     return `
   <div class="joco-leader-of-the-opposition">
     <span class="fb-font-baskerville fb-font-16 fb-font-bold">Leader:</span>
-    <span class="fb-font-baskerville fb-font-16">${formatStringRecursive('${tkn_playerName}', {
+    <span class="fb-font-baskerville fb-font-16">${formatStringRecursive$1('${tkn_playerName}', {
         tkn_playerName: leaderName,
     })}</span>
   </div>
@@ -3998,7 +4008,7 @@ const tplOppositionContent = (opposition) => {
         ? tplLeaderOfTheOpposition(getPlayerName$1(opposition.leader))
         : ''}
         <span class="fb-font-baskerville fb-font-16">
-          ${formatStringRecursive('${playerLog}', {
+          ${formatStringRecursive$1('${playerLog}', {
         playerLog: {
             log: playerLog,
             args: playerArgs,
@@ -4505,6 +4515,9 @@ class NotificationManager {
                 break;
             case PARLIAMENT_MEETS_VOTING_STARTS:
                 break;
+            case GOVERNOR_GENERAL$1:
+                India.getInstance().updateGovernorGeneralActive(true);
+                break;
             default:
                 throw new Error('UNHANDLED_TRIGGER: ' + trigger);
         }
@@ -4657,7 +4670,7 @@ class NotificationManager {
             if (card.location === REVEALED_LAWS) {
                 await parliament.revealLaw(card);
             }
-            else if ([DECK, DISCARD, TEMPORARY_DISCARD$1].includes(card.location)) {
+            else if ([DECK$1, DISCARD, TEMPORARY_DISCARD$1].includes(card.location)) {
                 await parliament.discardCard(card);
             }
             else {
@@ -4699,7 +4712,7 @@ class NotificationManager {
         if (!element) {
             element = createHtmlElement(tplOfficeCard(office));
         }
-        if (office.location === DECK) {
+        if (office.location === DECK$1) {
             element.remove();
         }
         else {
@@ -4820,11 +4833,28 @@ class NotificationManager {
         const { playerId, card } = notif;
         await PromiseCardsManager.getInstance().removeCard(getPromiseCard(card));
     }
+    async notif_replaceDirectorOfTrade(notif) {
+        const { governorGeneral, familyMember } = notif;
+        const directorOfTradeOffice = document.getElementById(`${DIRECTOR_OF_TRADE}Office`);
+        directorOfTradeOffice.insertAdjacentHTML('afterend', tplOffice$1(GOVERNOR_GENERAL$1, GOVERNOR_GENERAL$1, getPhaseName(GOVERNOR_GENERAL$1)));
+        if (familyMember) {
+            document
+                .getElementById(familyMember.location)
+                .appendChild(document.getElementById(familyMember.id));
+        }
+        Company.getInstance().setupTreasury(governorGeneral.treasury, GOVERNOR_GENERAL$1);
+        directorOfTradeOffice.remove();
+        const directorOfTradeOfficeCard = document.getElementById('OfficeCard_DirectorOfTrade');
+        directorOfTradeOfficeCard.insertAdjacentHTML('afterend', tplOfficeCard(governorGeneral));
+        directorOfTradeOfficeCard.remove();
+    }
     async notif_returnFamilyMemberToSupply(notif) {
         const { familyMember, playerId } = notif;
         const toElement = document.getElementById(`joco-familyMembers-${playerId}`);
         const familyMemberElt = document.getElementById(familyMember.id);
-        familyMemberElt.remove();
+        if (familyMemberElt) {
+            familyMemberElt.remove();
+        }
         this.getPlayer(playerId).counters[FAMILY_MEMBERS_COUNTER].incValue(1);
     }
     async notif_returnShipsToSupply(notif) {
@@ -5389,7 +5419,7 @@ class Chairman {
             id: 'commit_btn',
             text: _('Commit'),
             callback: () => this.performAction(false),
-            extraClasses: this.companyBalance > 0 ? DISABLED : '',
+            extraClasses: this.companyBalance > 0 ? DISABLED$1 : '',
         });
     }
     udpateInterfaceConfirmVote(value) {
@@ -5764,7 +5794,7 @@ class CommanderDeploy extends ExhaustArmyPieces {
                 this.updateInterfaceConfirm();
             },
             extraClasses: this.getTotalStrength() <= this.args.options[this.targetId]
-                ? DISABLED
+                ? DISABLED$1
                 : undefined,
         });
         this.addCancelButton();
@@ -5872,7 +5902,7 @@ class CrownChairmanRequestAllocation {
         this.setOfficesSelectable();
         addSecondaryActionButton$1({
             id: 'pay_btn',
-            text: formatStringRecursive(_('Pay 1 ${tkn_promiseCube}'), {
+            text: formatStringRecursive$1(_('Pay 1 ${tkn_promiseCube}'), {
                 tkn_promiseCube: tknPromiseCubes(),
             }),
             callback: () => this.updateInterfaceSelectOffice(),
@@ -5897,7 +5927,7 @@ class CrownChairmanRequestAllocation {
         for (let i = 1; i <= this.args.maxAmount; i++) {
             addSecondaryActionButton$1({
                 id: `amount_${i}_btn`,
-                text: formatStringRecursive(_('${amount} ${tkn_pound}'), {
+                text: formatStringRecursive$1(_('${amount} ${tkn_pound}'), {
                     amount: i,
                     tkn_pound: tknPound(),
                 }),
@@ -5957,12 +5987,12 @@ class CrownChairmanRequestDebtAdvancement {
         if (this.args.oneLessAdvancement.possible) {
             addSecondaryActionButton$1({
                 id: 'one_less_btn',
-                text: formatStringRecursive(_('Pay ${amount} ${tkn_promiseCube} for -1 Debt'), {
+                text: formatStringRecursive$1(_('Pay ${amount} ${tkn_promiseCube} for -1 Debt'), {
                     amount: this.args.oneLessAdvancement.cost,
                     tkn_promiseCube: tknPromiseCubes(),
                 }),
                 extraClasses: !this.args.oneLessAdvancement.playerCanPay[playerId]
-                    ? DISABLED
+                    ? DISABLED$1
                     : '',
                 callback: () => performAction$1('actCrownChairmanRequestDebtAdvancement', {
                     continue: false,
@@ -5974,12 +6004,12 @@ class CrownChairmanRequestDebtAdvancement {
         if (this.args.additionalAdvancement.possible) {
             addSecondaryActionButton$1({
                 id: 'additional_btn',
-                text: formatStringRecursive(_('Pay ${amount} ${tkn_promiseCube} for +1 Debt'), {
+                text: formatStringRecursive$1(_('Pay ${amount} ${tkn_promiseCube} for +1 Debt'), {
                     amount: this.args.additionalAdvancement.cost,
                     tkn_promiseCube: tknPromiseCubes(),
                 }),
                 extraClasses: !this.args.additionalAdvancement.playerCanPay[playerId]
-                    ? DISABLED
+                    ? DISABLED$1
                     : '',
                 callback: () => performAction$1('actCrownChairmanRequestDebtAdvancement', {
                     continue: false,
@@ -6054,7 +6084,7 @@ class CrownManagerOfShippingBuyCompanyShips {
                 case BUY_COMPANY_SHIP:
                     addSecondaryActionButton$1({
                         id: 'buy_ship_btn',
-                        text: formatStringRecursive(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to buy ${tkn_ship}'), {
+                        text: formatStringRecursive$1(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to buy ${tkn_ship}'), {
                             amount: option.promiseCubeCost,
                             tkn_playerName_crown: getCrownPlayerName(),
                             tkn_promiseCube: tknPromiseCubes(),
@@ -6071,7 +6101,7 @@ class CrownManagerOfShippingBuyCompanyShips {
                 case DO_NOT_BUY_COMPANY_SHIP:
                     addSecondaryActionButton$1({
                         id: 'do_not_buy_ship_btn',
-                        text: formatStringRecursive(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to not buy ${tkn_ship}'), {
+                        text: formatStringRecursive$1(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to not buy ${tkn_ship}'), {
                             amount: option.promiseCubeCost,
                             tkn_playerName_crown: getCrownPlayerName(),
                             tkn_promiseCube: tknPromiseCubes(),
@@ -6226,7 +6256,7 @@ class CrownManagerOfShippingLeaseExtraShips {
         if (optionToLeaveTwoUnspent) {
             addSecondaryActionButton$1({
                 id: 'buy_ship_btn',
-                text: formatStringRecursive(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to leave 2 ${tkn_pound} unspent'), {
+                text: formatStringRecursive$1(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to leave 2 ${tkn_pound} unspent'), {
                     amount: 1,
                     tkn_playerName_crown: getCrownPlayerName(),
                     tkn_promiseCube: tknPromiseCubes(),
@@ -6411,7 +6441,7 @@ class DirectorOfTradeSpecialEnvoy {
     }
     setDescription(activePlayerIds, args) {
         if (args.proposal > 0) {
-            updatePageTitle(_('Special Envoy: ${tkn_playerName} proposes to spend ${amount} ${tkn_pound} to make a check'), {
+            updatePageTitle(_('Special Envoy: ${tkn_playerName} proposes to spend £${amount} to make a check'), {
                 tkn_playerName: getPlayerName$1(activePlayerIds[0]),
                 amount: args.proposal,
                 tkn_pound: 'pound',
@@ -6431,9 +6461,8 @@ class DirectorOfTradeSpecialEnvoy {
     updateInterfaceInitialStep() {
         this.game.clearPossible();
         const available = this.args.treasury - this.spend;
-        updatePageTitle(_('Special Envoy: ${you} may spend 1 ${tkn_pound} per die'), {
+        updatePageTitle(_('Special Envoy: ${you} may spend £1 per die'), {
             available,
-            tkn_pound: 'pound',
         });
         addSecondaryActionButton$1({
             id: 'minus_btn',
@@ -6442,11 +6471,11 @@ class DirectorOfTradeSpecialEnvoy {
                 this.spend--;
                 this.updateInterfaceInitialStep();
             },
-            extraClasses: this.spend === 0 ? DISABLED : '',
+            extraClasses: this.spend === 0 ? DISABLED$1 : '',
         });
         addPrimaryActionButton({
             id: 'make_check_btn',
-            text: formatStringRecursive(_('Roll ${number} dice'), {
+            text: formatStringRecursive$1(_('Roll ${number} dice'), {
                 number: this.spend,
             }),
             callback: () => this.updateInterfaceConfirm(),
@@ -6458,7 +6487,7 @@ class DirectorOfTradeSpecialEnvoy {
                 this.spend++;
                 this.updateInterfaceInitialStep();
             },
-            extraClasses: available === 0 ? DISABLED : '',
+            extraClasses: available === 0 ? DISABLED$1 : '',
         });
         addPrimaryActionButton({
             id: 'propose_btn',
@@ -6937,7 +6966,7 @@ class FamilyAction {
         if (this.args.options[action]) {
             addSecondaryActionButton$1({
                 id: `${action}_btn`,
-                text: formatStringRecursive(text, {
+                text: formatStringRecursive$1(text, {
                     tkn_icon: icon,
                 }),
                 callback: () => this.updateInterfaceConfirm(action),
@@ -6978,7 +7007,7 @@ class GovernorAdminister {
         });
         addPrimaryActionButton({
             id: 'administer-btn',
-            text: formatStringRecursive(this.args.dicePool === 1
+            text: formatStringRecursive$1(this.args.dicePool === 1
                 ? _('Make a check with 1 die')
                 : _('Make a check with ${number} dice'), {
                 number: this.args.dicePool,
@@ -6988,6 +7017,79 @@ class GovernorAdminister {
             },
         });
         addPassButton$1(this.args.optionalAction, _('Stop'));
+    }
+}
+
+class GovernorGeneralMakeCheck {
+    constructor(game) {
+        this.game = game;
+    }
+    static create(game) {
+        GovernorGeneralMakeCheck.instance = new GovernorGeneralMakeCheck(game);
+    }
+    static getInstance() {
+        return GovernorGeneralMakeCheck.instance;
+    }
+    onEnteringState(args) {
+        debug('Entering GovernorGeneralMakeCheck state');
+        this.args = args;
+        this.spend = 0;
+        this.updateInterfaceInitialStep();
+    }
+    onLeavingState() {
+        debug('Leaving GovernorGeneralMakeCheck state');
+    }
+    setDescription(activePlayerIds, args) {
+        updatePageTitle(_('Governor General: ${tkn_playerName} may make a check'), {
+            tkn_playerName: getPlayerName$1(activePlayerIds[0]),
+        });
+    }
+    updateInterfaceInitialStep() {
+        this.game.clearPossible();
+        const available = this.args.treasury - this.spend;
+        updatePageTitle(_('Governor General: ${you} may spend £1 per die'), {
+            available,
+        });
+        addSecondaryActionButton$1({
+            id: 'minus_btn',
+            text: '-',
+            callback: () => {
+                this.spend--;
+                this.updateInterfaceInitialStep();
+            },
+            extraClasses: this.spend === 0 ? DISABLED$1 : '',
+        });
+        addPrimaryActionButton({
+            id: 'make_check_btn',
+            text: formatStringRecursive$1(_('Roll ${number} dice'), {
+                number: this.spend,
+            }),
+            callback: () => this.updateInterfaceConfirm(),
+        });
+        addSecondaryActionButton$1({
+            id: 'plus_btn',
+            text: '+',
+            callback: () => {
+                this.spend++;
+                this.updateInterfaceInitialStep();
+            },
+            extraClasses: available === 0 ? DISABLED$1 : '',
+        });
+        addPassButton$1(this.args.optionalAction);
+    }
+    updateInterfaceConfirm() {
+        clearPossible();
+        updatePageTitle(_('Governor General: make a check with ${number} dice?'), {
+            number: this.spend,
+        });
+        addConfirmButton$1(() => this.performAction(true));
+        addCancelButton$1();
+    }
+    performAction(makeCheck = false) {
+        performAction$1('actGovernorGeneralMakeCheck', {
+            spend: this.spend,
+            makeCheck,
+        });
     }
 }
 
@@ -7199,7 +7301,7 @@ class HiringHireFamilyMember {
         const bar = Bar.getInstance();
         switch (this.args.office.id) {
             case DIRECTOR_OF_TRADE:
-            case GOVERNOR_GENERAL:
+            case GOVERNOR_GENERAL$1:
                 bar.goTo('joco-company');
                 break;
             default:
@@ -7249,9 +7351,38 @@ class LondonSeasonChooseCard {
     setDescription(activePlayerIds, args) { }
     updateInterfaceInitialStep() {
         clearPossible();
-        updatePageTitle(_('${you} must choose a card from the London Season Display to take or discard'));
+        updatePageTitle(this.args.canUseBeckySharp
+            ? _('${you} must choose a card from the London Season Display to take or discard. You may take the top card of the deck instead')
+            : _('${you} must choose a card from the London Season Display to take or discard'), {
+            cardType: this.args.topOfDeckType === BLACKMAIL
+                ? _('Blackmail')
+                : _('Prestige'),
+        });
+        if (this.args.canUseBeckySharp) {
+            addPrimaryActionButton({
+                id: 'becky-sharp-btn',
+                text: formatStringRecursive$1(_('Take top card (${cardType} card)'), {
+                    cardType: this.args.topOfDeckType === BLACKMAIL
+                        ? _('Blackmail')
+                        : _('Prestige'),
+                }),
+                callback: () => this.updateInterfaceConfirmBeckySharp(),
+            });
+        }
         this.args.prestigeCards.forEach((card) => onClick(`game-card-${card.id}`, () => this.updateInterfaceConfirm(card)));
         this.args._private.forEach((card) => onClick(`game-card-${card.id}`, () => this.updateInterfaceConfirm(card)));
+    }
+    updateInterfaceConfirmBeckySharp() {
+        clearPossible();
+        updatePageTitle(_('Take top card of the deck (${cardType} card)?'), {
+            cardType: this.args.topOfDeckType === BLACKMAIL ? _('Blackmail') : _('Prestige'),
+        });
+        addConfirmButton$1(() => performAction$1('actLondonSeasonChooseCard', {
+            cardId: null,
+            take: true,
+            useBeckySharp: true,
+        }));
+        addCancelButton$1();
     }
     updateInterfaceConfirm(card) {
         this.selectedCard = card.id;
@@ -7460,7 +7591,7 @@ class ManagerOfShipping {
             playerShipsAvailable = true;
             addPlayerButton({
                 id: `${ship.id}_btn`,
-                text: formatStringRecursive(_('Fit ${tkn_ship}'), {
+                text: formatStringRecursive$1(_('Fit ${tkn_ship}'), {
                     tkn_ship: tknShipValue({ side: FULL, name }),
                 }),
                 playerId,
@@ -7472,7 +7603,7 @@ class ManagerOfShipping {
         if (this.treasury >= 2) {
             addSecondaryActionButton$1({
                 id: 'extraShip_btn',
-                text: formatStringRecursive(_('Lease ${tkn_ship}'), {
+                text: formatStringRecursive$1(_('Lease ${tkn_ship}'), {
                     tkn_ship: tknShipValue({
                         side: EXTRA_SHIP,
                         name: _('Extra Ship'),
@@ -7488,7 +7619,7 @@ class ManagerOfShipping {
         if (!playerShipsAvailable && this.treasury >= 5) {
             addSecondaryActionButton$1({
                 id: 'companyShip_btn',
-                text: formatStringRecursive(_('Buy ${tkn_ship}'), {
+                text: formatStringRecursive$1(_('Buy ${tkn_ship}'), {
                     tkn_ship: tknShipValue({
                         side: COMPANY_SHIP,
                         name: _('Company Ship'),
@@ -8054,7 +8185,7 @@ class ParliamentMeetsSelectPolicy {
         addCancelButton$1();
     }
     getTextForPolicy(policy) {
-        return formatStringRecursive(policy.windowTax
+        return formatStringRecursive$1(policy.windowTax
             ? _('${consequence} ${tkn_icon} & WINDOW TAX')
             : '${consequence} ${tkn_icon}', {
             consequence: getPolicyConsequenceTranslation(policy.consequence).toLocaleUpperCase(),
@@ -8126,26 +8257,26 @@ class ParliamentMeetsCastVotes {
                 this.getCashCounter().incValue(this.args.votes.pricePerVote);
                 this.updateInterfaceInitialStep();
             },
-            extraClasses: this.spend === 0 ? DISABLED : '',
+            extraClasses: this.spend === 0 ? DISABLED$1 : '',
         });
         if (this.args.options.includes(IN_FAVOR)) {
             addPrimaryActionButton({
                 id: 'vote_in_favor_btn',
-                text: formatStringRecursive(_('Cast ${number} vote(s) in favor'), {
+                text: formatStringRecursive$1(_('Cast ${number} vote(s) in favor'), {
                     number: totalVotes,
                 }),
                 callback: () => this.updateInterfaceConfirm(IN_FAVOR),
-                extraClasses: totalVotes <= 0 ? DISABLED : '',
+                extraClasses: totalVotes <= 0 ? DISABLED$1 : '',
             });
         }
         if (this.args.options.includes(AGAINST)) {
             addDangerActionButton$1({
                 id: 'vote_against_btn',
-                text: formatStringRecursive(_('Cast ${number} vote(s) against'), {
+                text: formatStringRecursive$1(_('Cast ${number} vote(s) against'), {
                     number: totalVotes,
                 }),
                 callback: () => this.updateInterfaceSelectTarget(),
-                extraClasses: totalVotes <= 0 ? DISABLED : '',
+                extraClasses: totalVotes <= 0 ? DISABLED$1 : '',
             });
         }
         addSecondaryActionButton$1({
@@ -8157,7 +8288,7 @@ class ParliamentMeetsCastVotes {
                 this.getCashCounter().incValue(-this.args.votes.pricePerVote);
                 this.updateInterfaceInitialStep();
             },
-            extraClasses: this.treasury < this.args.votes.pricePerVote ? DISABLED : '',
+            extraClasses: this.treasury < this.args.votes.pricePerVote ? DISABLED$1 : '',
         });
         if (totalVotes <= 0) {
             addPassButton$1(this.args.optionalAction, _('Do not cast any votes'));
@@ -8177,7 +8308,7 @@ class ParliamentMeetsCastVotes {
             .forEach((player) => {
             addPrimaryActionButton({
                 id: `vote_for_${player.getPlayerId()}_btn`,
-                text: formatStringRecursive(_('${tkn_playerName}'), {
+                text: formatStringRecursive$1(_('${tkn_playerName}'), {
                     tkn_playerName: player.getName(),
                 }),
                 callback: () => this.updateInterfaceConfirm(AGAINST, player.getPlayerId()),
@@ -8454,7 +8585,7 @@ class TimingWindowAct {
     }
     getCardText(cardId, cardType) {
         const text = '${cardTitle} (${cardType})';
-        return formatStringRecursive(text, {
+        return formatStringRecursive$1(text, {
             cardTitle: _(StaticData$1.get().cardTitle(cardId)),
             cardType: getCardTypeText(cardType),
         });
@@ -8464,7 +8595,7 @@ class TimingWindowAct {
         const title = StaticData$1.get().cardTitle(cardId);
         addPrimaryActionButton({
             id: `use_card_${index}`,
-            text: formatStringRecursive(text, { cardTitle: title }),
+            text: formatStringRecursive$1(text, { cardTitle: title }),
             callback: () => {
                 this.updateInterfaceConfirm(true, index);
             },
@@ -8556,15 +8687,15 @@ class PresidentTrade {
                 treasury.incValue(1);
                 this.updateInterfaceMakeCheck();
             },
-            extraClasses: this.spend <= minSpend ? DISABLED : '',
+            extraClasses: this.spend <= minSpend ? DISABLED$1 : '',
         });
         addPrimaryActionButton({
             id: 'make_check_btn',
-            text: formatStringRecursive(_('Roll ${number} dice'), {
+            text: formatStringRecursive$1(_('Roll ${number} dice'), {
                 number: Math.max(this.spend - penalty, 0),
             }),
             callback: () => this.updateInterfaceConfirm(),
-            extraClasses: this.spend <= penalty ? DISABLED : '',
+            extraClasses: this.spend <= penalty ? DISABLED$1 : '',
         });
         addSecondaryActionButton$1({
             id: 'plus_btn',
@@ -8574,7 +8705,7 @@ class PresidentTrade {
                 treasury.incValue(-1);
                 this.updateInterfaceMakeCheck();
             },
-            extraClasses: available === 0 ? DISABLED : '',
+            extraClasses: available === 0 ? DISABLED$1 : '',
         });
         this.addCancelButton();
     }
@@ -8912,7 +9043,7 @@ class RevenuePayDividends {
                 this.selectedNumberOfDividends--;
                 this.updateInterfaceInitialStep();
             },
-            extraClasses: this.selectedNumberOfDividends === 0 ? DISABLED : '',
+            extraClasses: this.selectedNumberOfDividends === 0 ? DISABLED$1 : '',
         });
         addSecondaryActionButton$1({
             id: 'plus_btn',
@@ -8922,18 +9053,18 @@ class RevenuePayDividends {
                 this.updateInterfaceInitialStep();
             },
             extraClasses: this.selectedNumberOfDividends === this.args.maxNumberOfDividends
-                ? DISABLED
+                ? DISABLED$1
                 : '',
         });
         addPrimaryActionButton({
             id: 'make_check_btn',
-            text: formatStringRecursive(_('Pay ${number} dividend(s)'), {
+            text: formatStringRecursive$1(_('Pay ${number} dividend(s)'), {
                 number: this.selectedNumberOfDividends,
             }),
             callback: () => this.updateInterfaceConfirm(),
         });
         addCancelButton$1({
-            extraClasses: this.selectedNumberOfDividends === 0 ? DISABLED : '',
+            extraClasses: this.selectedNumberOfDividends === 0 ? DISABLED$1 : '',
         });
     }
     updateInterfaceConfirm() {
@@ -9174,7 +9305,7 @@ class TradeInChina {
         updatePageTitle(_('Trade in China: ${you} may make a check'), {});
         addPrimaryActionButton({
             id: 'trade-btn',
-            text: formatStringRecursive(this.args.numberOfDice === 1
+            text: formatStringRecursive$1(this.args.numberOfDice === 1
                 ? _('Make a check with 1 die')
                 : _('Make a check with ${number} dice'), {
                 number: this.args.numberOfDice,
@@ -9299,7 +9430,7 @@ class UseManOnTheInside {
         });
         addPrimaryActionButton({
             id: 'use_card',
-            text: formatStringRecursive(_('Play ${cardTitle}'), {
+            text: formatStringRecursive$1(_('Play ${cardTitle}'), {
                 cardTitle: _(StaticData$1.get().cardTitle('ManOnTheInside')),
             }),
             callback: () => {
@@ -9308,7 +9439,7 @@ class UseManOnTheInside {
         });
         addSecondaryActionButton$1({
             id: 'do_not_use_card',
-            text: formatStringRecursive(_('Do not play ${cardTitle}'), {
+            text: formatStringRecursive$1(_('Do not play ${cardTitle}'), {
                 cardTitle: _(StaticData$1.get().cardTitle('ManOnTheInside')),
             }),
             callback: () => {
@@ -9320,7 +9451,7 @@ class UseManOnTheInside {
         const cardId = 'ManOnTheInside';
         const cardType = BLACKMAIL_CARD;
         const text = '${cardTitle} (${cardType})';
-        return formatStringRecursive(text, {
+        return formatStringRecursive$1(text, {
             cardTitle: _(StaticData$1.get().cardTitle(cardId)),
             cardType: getCardTypeText(cardType),
         });
@@ -9472,6 +9603,7 @@ class Game {
             EventsInIndiaCrisisDefense,
             FamilyAction,
             GovernorAdminister,
+            GovernorGeneralMakeCheck,
             HiringChairman,
             HiringChooseChairman,
             HiringGiveConsentForNepotism,

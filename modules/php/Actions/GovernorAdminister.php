@@ -81,7 +81,7 @@ class GovernorAdminister extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $player = Players::get($playerId);
 
-    $checkResult = JoCoUtils::makeCheck($player, $numberOfDice, $stateArgs['governor']->getFamilyMember());
+    list($checkResult) = JoCoUtils::makeCheck($player, $numberOfDice, $stateArgs['governor']->getFamilyMember());
 
     $this->insertExtraAdministerAction($stateArgs['dicePoolModifier'],  $checkResult, $playerId, $stateArgs['governor']);
 

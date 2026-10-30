@@ -39,6 +39,8 @@ import {
   POWER_COUNTER,
   REVEALED_LAWS,
   SUPPLY_REGIMENTS,
+  DIRECTOR_OF_TRADE,
+  GOVERNOR_GENERAL,
 } from '../../constants';
 import { CrownClimate } from '../../crown/climate';
 import { India } from '../../india';
@@ -120,6 +122,7 @@ import {
   NotifMoveLaws,
   NotifDiscardEnterprise,
   NotifUpdateShareValue,
+  NotifReplaceDirectorOfTrade,
 } from './types';
 import { tplArmyPiece } from '../../india/army/templates';
 import { Parliament } from '../../parliament';
@@ -130,6 +133,8 @@ import { EventTiles } from '../../india/event-tiles';
 import { PromiseCardsManager } from '../../cards/promise-cards';
 import { Draft } from '../../draft';
 import { Bar } from '../../bar';
+import { tplOffice } from '../../company/templates';
+import { getPhaseName } from '../../phase-tracker/translations';
 
 //  .##.....##....###....##....##....###.....######...########.########.
 //  .###...###...##.##...###...##...##.##...##....##..##.......##.....##
@@ -425,6 +430,9 @@ export class NotificationManager {
         Parliament.getInstance().showRevealedLaws(true);
         break;
       case PARLIAMENT_MEETS_VOTING_STARTS:
+        break;
+      case GOVERNOR_GENERAL:
+        India.getInstance().updateGovernorGeneralActive(true);
         break;
       default:
         throw new Error('UNHANDLED_TRIGGER: ' + trigger);
@@ -926,6 +934,44 @@ export class NotificationManager {
     await PromiseCardsManager.getInstance().removeCard(getPromiseCard(card));
   }
 
+  async notif_replaceDirectorOfTrade(notif: NotifReplaceDirectorOfTrade) {
+    const { governorGeneral, familyMember } = notif;
+
+    // Replace Offifce in Company tab
+    const directorOfTradeOffice = document.getElementById(
+      `${DIRECTOR_OF_TRADE}Office`,
+    );
+    directorOfTradeOffice.insertAdjacentHTML(
+      'afterend',
+      tplOffice(
+        GOVERNOR_GENERAL,
+        GOVERNOR_GENERAL,
+        getPhaseName(GOVERNOR_GENERAL),
+      ),
+    );
+    if (familyMember) {
+      document
+        .getElementById(familyMember.location)
+        .appendChild(document.getElementById(familyMember.id)!);
+    }
+
+    Company.getInstance().setupTreasury(
+      governorGeneral.treasury,
+      GOVERNOR_GENERAL,
+    );
+
+    directorOfTradeOffice.remove();
+
+    const directorOfTradeOfficeCard = document.getElementById(
+      'OfficeCard_DirectorOfTrade',
+    );
+    directorOfTradeOfficeCard.insertAdjacentHTML(
+      'afterend',
+      tplOfficeCard(governorGeneral),
+    );
+    directorOfTradeOfficeCard.remove();
+  }
+
   async notif_returnFamilyMemberToSupply(
     notif: NotifReturnFamilyMemberToSupply,
   ) {
@@ -933,7 +979,10 @@ export class NotificationManager {
 
     const toElement = document.getElementById(`joco-familyMembers-${playerId}`);
     const familyMemberElt = document.getElementById(familyMember.id)!;
-    familyMemberElt.remove();
+    if (familyMemberElt) {
+      familyMemberElt.remove();
+    }
+
     // console.log('notif_returnFamilyMemberToSupply elts', familyMemberElt, toElement);
     // TODO: check animation
     // await this.game.animationManager.slideOutAndDestroy(
