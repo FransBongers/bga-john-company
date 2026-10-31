@@ -5,24 +5,27 @@ import {
   clearPossible,
   CommonStateArgs,
   debug,
+  formatStringRecursive,
   GameState,
   onClick,
   performAction,
   setSelected,
   updatePageTitle,
 } from '../boilerplate';
+import { Log } from '../boilerplate/notification-manager/types';
 import { DIRECTOR_OF_TRADE, GOVERNOR_GENERAL } from '../constants';
 import { tknFamilyMember } from '../logs/templates';
 import { PlayerManager } from '../player-manager';
 import { GameAlias, JocoFamilyMember, JocoOfficeBase } from '../types';
-import { getOffice } from '../utility';
 
 interface OnEnteringHiringHireFamilyMemberArgs extends CommonStateArgs {
-  office: JocoOfficeBase;
+  office: JocoOfficeBase | null;
+  title: string | Log;
   options: JocoFamilyMember[];
   hiringFamilyId: string;
   hiringPlayerId: number;
   consentForNepotismRequired: boolean;
+  appointingCommander: boolean;
 }
 
 export class HiringHireFamilyMember implements GameState<OnEnteringHiringHireFamilyMemberArgs> {
@@ -54,12 +57,18 @@ export class HiringHireFamilyMember implements GameState<OnEnteringHiringHireFam
     activePlayerIds: number[],
     args: OnEnteringHiringHireFamilyMemberArgs,
   ) {
-    updatePageTitle(_('${tkn_playerName} must hire the ${officeTitle}'), {
-      officeTitle: _(getOffice(args.office).title),
-      tkn_playerName: PlayerManager.getInstance()
-        .getPlayer(args.hiringPlayerId)
-        .getName(),
-    });
+    this.args = args;
+    updatePageTitle(
+      args.appointingCommander
+        ? _('${tkn_playerName} must appoint the ${officeTitle}')
+        : _('${tkn_playerName} must hire the ${officeTitle}'),
+      {
+        officeTitle: this.getTitle(),
+        tkn_playerName: PlayerManager.getInstance()
+          .getPlayer(args.hiringPlayerId)
+          .getName(),
+      },
+    );
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########
@@ -81,10 +90,16 @@ export class HiringHireFamilyMember implements GameState<OnEnteringHiringHireFam
   private updateInterfaceInitialStep() {
     clearPossible();
     updatePageTitle(
-      _('${you} must choose a family member to hire as ${officeTitle} (${number} candidate(s))'),
+      this.args.appointingCommander
+        ? _(
+            '${you} must appoint a family member as ${officeTitle} (${number} candidate(s))',
+          )
+        : _(
+            '${you} must choose a family member to hire as ${officeTitle} (${number} candidate(s))',
+          ),
       {
         number: this.args.options.length,
-        officeTitle: _(getOffice(this.args.office).title),
+        officeTitle: this.getTitle(),
       },
     );
 
@@ -102,19 +117,28 @@ export class HiringHireFamilyMember implements GameState<OnEnteringHiringHireFam
       option.familyId === this.args.hiringFamilyId
     ) {
       updatePageTitle(
-        _(
-          'Ask consent for nepotism to hire ${tkn_familyMember} as ${officeTitle}?',
-        ),
+        this.args.appointingCommander
+          ? _(
+              'Ask consent for nepotism to appoint ${tkn_familyMember} as ${officeTitle}?',
+            )
+          : _(
+              'Ask consent for nepotism to hire ${tkn_familyMember} as ${officeTitle}?',
+            ),
         {
           tkn_familyMember: tknFamilyMember(option),
-          officeTitle: _(getOffice(this.args.office).title),
+          officeTitle: this.getTitle(),
         },
       );
     } else {
-      updatePageTitle(_('Hire ${tkn_familyMember} as ${officeTitle}?'), {
-        tkn_familyMember: tknFamilyMember(option),
-        officeTitle: _(getOffice(this.args.office).title),
-      });
+      updatePageTitle(
+        this.args.appointingCommander
+          ? _('Appoint ${tkn_familyMember} as ${officeTitle}?')
+          : _('Hire ${tkn_familyMember} as ${officeTitle}?'),
+        {
+          tkn_familyMember: tknFamilyMember(option),
+          officeTitle: this.getTitle(),
+        },
+      );
     }
 
     addConfirmButton(() => {
@@ -133,9 +157,20 @@ export class HiringHireFamilyMember implements GameState<OnEnteringHiringHireFam
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
+  private getTitle(): string {
+    if (typeof this.args.title === 'string') {
+      return _(this.args.title);
+    } else {
+      return formatStringRecursive(
+        _(this.args.title.log),
+        this.args.title.args,
+      );
+    }
+  }
+
   private goToTab() {
     const bar = Bar.getInstance();
-    switch (this.args.office.id) {
+    switch (this.args.office?.id) {
       case DIRECTOR_OF_TRADE:
       case GOVERNOR_GENERAL:
         bar.goTo('joco-company');

@@ -7207,18 +7207,23 @@ class HiringGiveConsentForNepotism {
         debug('Leaving HiringGiveConsentForNepotism state');
     }
     setDescription(activePlayerIds, args) {
-        updatePageTitle(_('Consent for nepotism: ${tkn_playerName} wants to hire ${tkn_familyMember} as ${officeTitle}'), {
+        this.args = args;
+        updatePageTitle(args.appointingCommander
+            ? _('Consent for nepotism: ${tkn_playerName} wants to appoint ${tkn_familyMember} as ${officeTitle}')
+            : _('Consent for nepotism: ${tkn_playerName} wants to hire ${tkn_familyMember} as ${officeTitle}'), {
             tkn_playerName: getPlayerName$1(args.hiringPlayerId),
             tkn_familyMember: tknFamilyMember(args.familyMember),
-            officeTitle: getOffice(args.office).title,
+            officeTitle: this.getTitle(),
         });
     }
     updateInterfaceInitialStep() {
         clearPossible();
-        updatePageTitle(_('Consent for nepotism: ${tkn_playerName} wants to hire ${tkn_familyMember} as ${officeTitle} (currently ${currentPosition})'), {
+        updatePageTitle(this.args.appointingCommander
+            ? _('Consent for nepotism: ${tkn_playerName} wants to appoint ${tkn_familyMember} as ${officeTitle}')
+            : _('Consent for nepotism: ${tkn_playerName} wants to hire ${tkn_familyMember} as ${officeTitle} (currently ${currentPosition})'), {
             tkn_playerName: getPlayerName$1(this.args.hiringPlayerId),
             tkn_familyMember: tknFamilyMember(this.args.familyMember),
-            officeTitle: getOffice(this.args.office).title,
+            officeTitle: this.getTitle(),
             currentPosition: _(this.args.currentPosition),
         });
         addPrimaryActionButton({
@@ -7231,6 +7236,14 @@ class HiringGiveConsentForNepotism {
             text: _('Do not give consent'),
             callback: () => this.performAction(false),
         });
+    }
+    getTitle() {
+        if (typeof this.args.title === 'string') {
+            return _(this.args.title);
+        }
+        else {
+            return formatStringRecursive$1(_(this.args.title.log), this.args.title.args);
+        }
     }
     performAction(consent) {
         performAction$1('actHiringGiveConsentForNepotism', { consent });
@@ -7257,8 +7270,11 @@ class HiringHireFamilyMember {
         debug('Leaving HiringHireFamilyMember state');
     }
     setDescription(activePlayerIds, args) {
-        updatePageTitle(_('${tkn_playerName} must hire the ${officeTitle}'), {
-            officeTitle: _(getOffice(args.office).title),
+        this.args = args;
+        updatePageTitle(args.appointingCommander
+            ? _('${tkn_playerName} must appoint the ${officeTitle}')
+            : _('${tkn_playerName} must hire the ${officeTitle}'), {
+            officeTitle: this.getTitle(),
             tkn_playerName: PlayerManager$1.getInstance()
                 .getPlayer(args.hiringPlayerId)
                 .getName(),
@@ -7266,9 +7282,11 @@ class HiringHireFamilyMember {
     }
     updateInterfaceInitialStep() {
         clearPossible();
-        updatePageTitle(_('${you} must choose a family member to hire as ${officeTitle} (${number} candidate(s))'), {
+        updatePageTitle(this.args.appointingCommander
+            ? _('${you} must appoint a family member as ${officeTitle} (${number} candidate(s))')
+            : _('${you} must choose a family member to hire as ${officeTitle} (${number} candidate(s))'), {
             number: this.args.options.length,
-            officeTitle: _(getOffice(this.args.office).title),
+            officeTitle: this.getTitle(),
         });
         this.args.options.forEach((option) => {
             onClick(option.id, () => this.updateInterfaceConfirm(option));
@@ -7279,15 +7297,19 @@ class HiringHireFamilyMember {
         setSelected$1(option.id);
         if (this.args.consentForNepotismRequired &&
             option.familyId === this.args.hiringFamilyId) {
-            updatePageTitle(_('Ask consent for nepotism to hire ${tkn_familyMember} as ${officeTitle}?'), {
+            updatePageTitle(this.args.appointingCommander
+                ? _('Ask consent for nepotism to appoint ${tkn_familyMember} as ${officeTitle}?')
+                : _('Ask consent for nepotism to hire ${tkn_familyMember} as ${officeTitle}?'), {
                 tkn_familyMember: tknFamilyMember(option),
-                officeTitle: _(getOffice(this.args.office).title),
+                officeTitle: this.getTitle(),
             });
         }
         else {
-            updatePageTitle(_('Hire ${tkn_familyMember} as ${officeTitle}?'), {
+            updatePageTitle(this.args.appointingCommander
+                ? _('Appoint ${tkn_familyMember} as ${officeTitle}?')
+                : _('Hire ${tkn_familyMember} as ${officeTitle}?'), {
                 tkn_familyMember: tknFamilyMember(option),
-                officeTitle: _(getOffice(this.args.office).title),
+                officeTitle: this.getTitle(),
             });
         }
         addConfirmButton$1(() => {
@@ -7297,9 +7319,17 @@ class HiringHireFamilyMember {
         });
         addCancelButton$1();
     }
+    getTitle() {
+        if (typeof this.args.title === 'string') {
+            return _(this.args.title);
+        }
+        else {
+            return formatStringRecursive$1(_(this.args.title.log), this.args.title.args);
+        }
+    }
     goToTab() {
         const bar = Bar.getInstance();
-        switch (this.args.office.id) {
+        switch (this.args.office?.id) {
             case DIRECTOR_OF_TRADE:
             case GOVERNOR_GENERAL$1:
                 bar.goTo('joco-company');

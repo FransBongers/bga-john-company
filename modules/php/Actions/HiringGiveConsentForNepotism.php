@@ -3,6 +3,7 @@
 namespace Bga\Games\JohnCompany\Actions;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
@@ -29,19 +30,26 @@ class HiringGiveConsentForNepotism extends Hiring
   {
     $args = $this->ctx->getArgs();
 
-    //   'familyMemberId' => $familyMember->getId(),
-    // 'officeId' => $stateArgs['office']->getId(),
-    // 'hiringFamilyId' => $stateArgs['hiringFamilyId'],
-    // 'hiringPlayerId' => $stateArgs['hiringPlayerId'],
-
     $familyMember = FamilyMembers::get($args['familyMemberId']);
     $currentOffice = $familyMember->getOffice();
 
+    $appointingCommander = $args['appointingCommander'] ?? false;
+    $officeId = $args['officeId'];
+
+    $office = null;
+    if ($appointingCommander) {
+    } else {
+      $office = Offices::get($args['officeId']);
+    }
+
     $data = [
-      'office' => Offices::get($args['officeId']),
+      'title' => $this->getTitleArgs($officeId, $office),
+      'officeId' => $args['officeId'],
+      'office' => $office,
       'hiringPlayerId' => $args['hiringPlayerId'],
       'familyMember' => $familyMember,
       'currentPosition' => $currentOffice !== null ? $currentOffice->getTitle() : $this->getPreviousFunctionFromLocation($familyMember->getLocation()),
+      'appointingCommander' => $appointingCommander,
     ];
 
     return $data;
@@ -78,9 +86,7 @@ class HiringGiveConsentForNepotism extends Hiring
     $stateArgs = $this->argsHiringGiveConsentForNepotism();
 
     if (!$consent) {
-      Notifications::message(clienttranslate('${player_name} does not give their consent'), [
-        'player' => Players::get($playerId),
-      ]);
+      $this->onNoConsentGiven($playerId, $stateArgs);
       $this->setAllActivePlayerIdsNonMultiactive();
       $this->resolveAction([], true);
       return;
@@ -97,9 +103,9 @@ class HiringGiveConsentForNepotism extends Hiring
 
     Notifications::message(clienttranslate('All candidates have given their consent'));
 
-    $this->performAction($stateArgs['hiringPlayerId'], $stateArgs['familyMember'], $stateArgs['office']);
+    $this->performAction($stateArgs['hiringPlayerId'], $stateArgs['familyMember'], $stateArgs['officeId']);
 
-    $this->resolveAction([]);
+    $this->resolveAction([], true);
   }
 
   //  .##.....##.########.####.##.......####.########.##....##
@@ -109,6 +115,29 @@ class HiringGiveConsentForNepotism extends Hiring
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private function onNoConsentGiven(int $playerId, array $stateArgs)
+  {
+    Notifications::message(clienttranslate('${player_name} does not give their consent'), [
+      'player' => Players::get($playerId),
+    ]);
+
+    $hiringPlayerId = $stateArgs['hiringPlayerId'];
+    $officeId = $stateArgs['officeId'];
+    $appointingCommander = $stateArgs['appointingCommander'];
+
+    $this->ctx->insertAsBrother(new LeafNode([
+      'action' => HIRING_HIRE_FAMILY_MEMBER,
+      'playerId' => 'some',
+      'activePlayerIds' => [$hiringPlayerId],
+      'args' => [
+        'officeId' => $officeId,
+        'hiringPlayerId' => $hiringPlayerId,
+        'appointingCommander' => $appointingCommander,
+        'consentForNepotismRejected' => true
+      ],
+    ]));
+  }
 
   private function allConsentsGiven(): bool
   {

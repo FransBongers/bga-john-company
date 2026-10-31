@@ -4,6 +4,7 @@ namespace Bga\Games\JohnCompany\Models;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\Offices;
@@ -75,6 +76,11 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
       'text' => $text,
       'textArgs' => $textArgs,
     ]);
+  }
+
+  public function isCommander()
+  {
+    return Utils::startsWith($this->getLocation(), 'Commander_');
   }
 
   public function retireTo(Player $player, string $prize, int $cost)

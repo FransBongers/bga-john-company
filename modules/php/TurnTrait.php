@@ -486,6 +486,14 @@ trait TurnTrait
         [
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
+            TIMING_WINDOW => [IMMEDIATELY_AFTER_MILITARY_AFFAIRS_ACTS],
+            LAW_CARD => [MILITARY_OVERSIGHT_ID],
+
+          ],
+        ],
+        [
+          'action' => TIMING_WINDOW_CHECK,
+          'args' => [
             TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING, BEFORE_BOMBAY_PRESIDENCY_OPERATIONS],
             LAW_CARD => [BOARD_OF_CONTROL_ID],
             TIMING_DATA => [

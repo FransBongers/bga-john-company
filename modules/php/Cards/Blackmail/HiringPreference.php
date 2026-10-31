@@ -4,6 +4,7 @@ namespace Bga\Games\JohnCompany\Cards\Blackmail;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
+use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Models\Player;
 
@@ -34,9 +35,17 @@ class HiringPreference extends \Bga\Games\JohnCompany\Models\BlackmailCard
 
     $officeId = $timingData['officeId'];
 
-    $office = Offices::get($officeId);
-    $candidates = $office->getCandidatesForHiring();
 
+
+    $candidates = [];
+
+    if (Utils::startsWith($officeId, 'Commander_')) {
+      // Here $officeId is the location of the commander 'Commander_<presidencyId>'
+      $candidates = FamilyMembers::getOfficers(explode('_', $officeId)[1]);
+    } else {
+      $office = Offices::get($officeId);
+      $candidates = $office->getCandidatesForHiring();
+    }
     $playerIsCandidate = false;
     $otherCandidate = false;
 
@@ -63,7 +72,8 @@ class HiringPreference extends \Bga\Games\JohnCompany\Models\BlackmailCard
    * Apply the effect of this london season card
    * Only for effects with specific timing windows
    */
-  public function applyEffect(object $ctx, Player $player, array $timingData) {
+  public function applyEffect(object $ctx, Player $player, array $timingData)
+  {
     $hiringNodes = $ctx->getParent()->getUnresolvedActions([HIRING_HIRE_FAMILY_MEMBER]);
     // Separate sequence node for hiring family member actions, so there should only be one unresolved action at this point
     if (count($hiringNodes) !== 1) {

@@ -110,11 +110,13 @@ class FamilyMembers extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     });
   }
 
-  public static function getOfficers()
+  public static function getOfficers(string | null $presidencyId = null)
   {
     $allMembers = self::getAll()->toArray();
-    return Utils::filter($allMembers, function ($familyMember) {
-      return Utils::startsWith($familyMember->getLocation(), 'army_');
+
+    $filter = $presidencyId === null ? 'army_' : 'army_' . $presidencyId . '_';
+    return Utils::filter($allMembers, function ($familyMember) use ($filter) {
+      return Utils::startsWith($familyMember->getLocation(), $filter);
     });
   }
 

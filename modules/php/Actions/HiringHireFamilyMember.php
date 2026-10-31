@@ -9,6 +9,7 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
+use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Models\FamilyMember;
 use Bga\Games\JohnCompany\Models\Office;
@@ -32,28 +33,53 @@ class HiringHireFamilyMember extends Hiring
   public function argsHiringHireFamilyMember()
   {
     $args = $this->ctx->getArgs();
+    // Can also be location of the commander in case of Military Oversight
     $officeId = $args['officeId'];
+    $consentForNepotismRejected = $args['consentForNepotismRejected'] ?? false;
 
-    $office = Offices::get($officeId);
-    $hiringPlayerId = $office->getHiringPlayerId();
+    $options = [];
+    $hiringPlayerId = null;
+    $appointingCommander = false;
+    $office = null;
+    if (Utils::startsWith($officeId, 'Commander_')) {
+      // Here $officeId is the location of the commander 'Commander_<presidencyId>'
+      $presidencyId = explode('_', $officeId)[1];
+      $options = FamilyMembers::getOfficers($presidencyId);
+      $hiringPlayerId = Parliament::getPrimeMinisterPlayerId();
+      $appointingCommander = true;
+    } else {
+      $office = Offices::get($officeId);
+      $options = $office->getCandidatesForHiring();
+      $hiringPlayerId = $office->getHiringPlayerId();
+    }
+
     $familyId = Players::get($hiringPlayerId)->getFamilyId();
     $familyIdFilter = $args['familyIdFilter'] ?? null;
 
-    $options = $office->getCandidatesForHiring();
     if ($familyIdFilter !== null) {
-      $options = array_filter($options, function ($candidate) use ($familyIdFilter) {
+      $options = Utils::filter($options, function ($candidate) use ($familyIdFilter) {
         return in_array($candidate->getFamilyId(), $familyIdFilter);
       });
     }
 
+    if ($consentForNepotismRejected) {
+      $options = Utils::filter($options, function ($candidate) use ($familyId) {
+        return $candidate->getFamilyId() !== $familyId;
+      });
+    }
+
     $data = [
+      'title' => $this->getTitleArgs($officeId, $office),
       'office' => $office,
       'options' => $options,
+      'familyIdFilter' => $familyIdFilter,
+      'officeId' => $officeId,
       'hiringFamilyId' => $familyId,
       'hiringPlayerId' => $hiringPlayerId,
       'consentForNepotismRequired' => Utils::array_some($options, function ($familyMember) use ($familyId) {
         return $familyMember->getFamilyId() !== $familyId;
       }),
+      'appointingCommander' => $appointingCommander,
     ];
 
     return $data;
@@ -99,7 +125,7 @@ class HiringHireFamilyMember extends Hiring
     if ($familyMember->getPlayerId() === $stateArgs['hiringPlayerId'] && $stateArgs['consentForNepotismRequired']) {
       $this->handleConsentForNepotism($familyMember, $playerId, $stateArgs);
     } else {
-      $this->performAction($playerId, $familyMember, $stateArgs['office']);
+      $this->performAction($playerId, $familyMember, $stateArgs['officeId']);
     }
 
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
@@ -132,13 +158,22 @@ class HiringHireFamilyMember extends Hiring
   private function handleConsentForNepotism(FamilyMember $familyMember, int $playerId, array $stateArgs)
   {
     $previousOffice = $familyMember->getOffice();
-    Notifications::message(clienttranslate('${player_name} want to hire ${tkn_familyMember} as ${tkn_boldText_office} (previously ${previousFunction}) and needs consent for nepotism'), [
-      'player' => Players::get($playerId),
-      'previousFunction' => $previousOffice !== null ? $previousOffice->getTitle() : $this->getPreviousFunctionFromLocation($familyMember->getLocation()),
-      'tkn_boldText_office' => $stateArgs['office']->getTitle(),
-      'tkn_familyMember' => Notifications::tknFamilyMember($familyMember),
-      'i18n' => ['tkn_boldText_office', 'previousFunction'],
-    ]);
+    if ($stateArgs['appointingCommander']) {
+      Notifications::message(clienttranslate('${player_name} want to appoint ${tkn_familyMember} as Commander of the ${tkn_boldText_army} and needs consent for nepotism'), [
+        'player' => Players::get($playerId),
+        'tkn_boldText_army' => Notifications::getArmyNameForPresidency(explode('_', $stateArgs['officeId'])[1]),
+        'tkn_familyMember' => Notifications::tknFamilyMember($familyMember),
+        'i18n' => ['tkn_boldText_army'],
+      ]);
+    } else {
+      Notifications::message(clienttranslate('${player_name} want to hire ${tkn_familyMember} as ${tkn_boldText_office} (previously ${previousFunction}) and needs consent for nepotism'), [
+        'player' => Players::get($playerId),
+        'previousFunction' => $previousOffice !== null ? $previousOffice->getTitle() : $this->getPreviousFunctionFromLocation($familyMember->getLocation()),
+        'tkn_boldText_office' => $stateArgs['office']->getTitle(),
+        'tkn_familyMember' => Notifications::tknFamilyMember($familyMember),
+        'i18n' => ['tkn_boldText_office', 'previousFunction'],
+      ]);
+    }
 
     $this->ctx->insertAsBrother(new LeafNode([
       'action' => HIRING_GIVE_CONSENT_FOR_NEPOTISM,
@@ -146,9 +181,10 @@ class HiringHireFamilyMember extends Hiring
       'activePlayerIds' => $this->getPlayerIdsThatNeedToGiveConsentForNepotism($stateArgs['options'], $stateArgs['hiringPlayerId']),
       'args' => [
         'familyMemberId' => $familyMember->getId(),
-        'officeId' => $stateArgs['office']->getId(),
+        'officeId' => $stateArgs['officeId'],
         'hiringFamilyId' => $stateArgs['hiringFamilyId'],
         'hiringPlayerId' => $stateArgs['hiringPlayerId'],
+        'appointingCommander' => $stateArgs['appointingCommander'],
       ],
     ]));
   }

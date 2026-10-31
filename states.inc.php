@@ -226,6 +226,13 @@ $machinestates = [
         ->action('stAtomicAction')
         ->build(),
 
+    ST_CHOOSE_FAMILY_MEMBER => GameStateBuilder::create()
+        ->name(CHOOSE_FAMILY_MEMBER)
+        ->description('')
+        ->type(StateType::GAME)
+        ->action('stAtomicAction')
+        ->build(),
+
     // .########.##....##.########......#######..########
     // .##.......###...##.##.....##....##.....##.##......
     // .##.......####..##.##.....##....##.....##.##......

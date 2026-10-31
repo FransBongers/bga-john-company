@@ -44,7 +44,7 @@ class SuperintendentOfTradeInChina extends \Bga\Games\JohnCompany\Models\Office
         'activePlayerIds' => [$chairmanPlayerId],
         'args' => [
           'officeId' => $office->getId(),
-          'hirerPlayerId' => $chairmanPlayerId,
+          'hiringPlayerId' => $chairmanPlayerId,
         ],
       ]));
     }

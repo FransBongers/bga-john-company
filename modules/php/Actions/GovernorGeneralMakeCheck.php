@@ -6,6 +6,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\JoCoUtils;
+use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Models\Player;
 use Bga\Games\JohnCompany\Managers\Players;
@@ -77,8 +78,12 @@ class GovernorGeneralMakeCheck extends \Bga\Games\JohnCompany\Models\AtomicActio
 
     list($checkResult, $diceRolls) = JoCoUtils::makeCheck($player, $spend, $office->getFamilyMember());
 
-    $numberOfUnrestToAdd = count(Utils::filter($diceRolls, fn($roll) => $roll === 6)) + ($checkResult !== SUCCESS ? 1 : 0);
-    $this->addUnrestToCompanyControlledRegions($player, $numberOfUnrestToAdd);
+    $companyControlledRegions = Regions::getCompanyControlledRegions();
+    $zamindarTaxesInPlay = LawCards::isInPlay(ZAMINDAR_TAXES_ID);
+    $unrestToAddForFailedCheck = $zamindarTaxesInPlay ? 2 : 0;
+
+    $numberOfUnrestToAdd = count(Utils::filter($diceRolls, fn($roll) => $roll === 6)) + ($checkResult !== SUCCESS ? $unrestToAddForFailedCheck : 0);
+    $this->addUnrestToCompanyControlledRegions($player, $numberOfUnrestToAdd, $companyControlledRegions);
 
     if ($checkResult === FAILURE && $office->getTreasury() > 0) {
       $action = [
@@ -89,6 +94,7 @@ class GovernorGeneralMakeCheck extends \Bga\Games\JohnCompany\Models\AtomicActio
       ];
       $this->ctx->insertAsBrother(Engine::buildTree($action));
     } elseif ($checkResult === SUCCESS) {
+      $player->getFamily()->gainCash(count($companyControlledRegions) + ($zamindarTaxesInPlay ? 3 : 0));
       $this->insertGovernorGeneralActions($player, $playerId);
     }
 
@@ -104,17 +110,14 @@ class GovernorGeneralMakeCheck extends \Bga\Games\JohnCompany\Models\AtomicActio
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  private function addUnrestToCompanyControlledRegions(Player $player, int $amount)
+  private function addUnrestToCompanyControlledRegions(Player $player, int $amount, array $companyControlledRegions)
   {
     if ($amount === 0) {
       return;
     }
 
-    $regions = Regions::getAll();
-    foreach ($regions as $region) {
-      if ($region->isCompanyControlled()) {
-        $region->addUnrest($player, $amount);
-      }
+    foreach ($companyControlledRegions as $region) {
+      $region->addUnrest($player, $amount);
     }
   }
 

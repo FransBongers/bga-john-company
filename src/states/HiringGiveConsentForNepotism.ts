@@ -5,17 +5,22 @@ import {
   clearPossible,
   CommonStateArgs,
   debug,
+  formatStringRecursive,
   GameState,
   getPlayerName,
   performAction,
   updatePageTitle,
 } from '../boilerplate';
+import { Log } from '../boilerplate/notification-manager/types';
 import { tknFamilyMember } from '../logs/templates';
 import { GameAlias, JocoFamilyMember, JocoOffice } from '../types';
 import { getOffice } from '../utility';
 
 interface OnEnteringHiringGiveConsentForNepotismArgs extends CommonStateArgs {
-  office: JocoOffice;
+  // office: JocoOffice | null;
+  appointingCommander: boolean;
+  title: string | Log;
+  officeId: string;
   hiringPlayerId: number;
   familyMember: JocoFamilyMember;
   currentPosition: string;
@@ -51,14 +56,19 @@ export class HiringGiveConsentForNepotism implements GameState<OnEnteringHiringG
     activePlayerIds: number[],
     args: OnEnteringHiringGiveConsentForNepotismArgs,
   ) {
+    this.args = args;
     updatePageTitle(
-      _(
-        'Consent for nepotism: ${tkn_playerName} wants to hire ${tkn_familyMember} as ${officeTitle}',
-      ),
+      args.appointingCommander
+        ? _(
+            'Consent for nepotism: ${tkn_playerName} wants to appoint ${tkn_familyMember} as ${officeTitle}',
+          )
+        : _(
+            'Consent for nepotism: ${tkn_playerName} wants to hire ${tkn_familyMember} as ${officeTitle}',
+          ),
       {
         tkn_playerName: getPlayerName(args.hiringPlayerId),
         tkn_familyMember: tknFamilyMember(args.familyMember),
-        officeTitle: getOffice(args.office).title,
+        officeTitle: this.getTitle(),
       },
     );
   }
@@ -82,13 +92,17 @@ export class HiringGiveConsentForNepotism implements GameState<OnEnteringHiringG
   private updateInterfaceInitialStep() {
     clearPossible();
     updatePageTitle(
-      _(
-        'Consent for nepotism: ${tkn_playerName} wants to hire ${tkn_familyMember} as ${officeTitle} (currently ${currentPosition})',
-      ),
+      this.args.appointingCommander
+        ? _(
+            'Consent for nepotism: ${tkn_playerName} wants to appoint ${tkn_familyMember} as ${officeTitle}',
+          )
+        : _(
+            'Consent for nepotism: ${tkn_playerName} wants to hire ${tkn_familyMember} as ${officeTitle} (currently ${currentPosition})',
+          ),
       {
         tkn_playerName: getPlayerName(this.args.hiringPlayerId),
         tkn_familyMember: tknFamilyMember(this.args.familyMember),
-        officeTitle: getOffice(this.args.office).title,
+        officeTitle: this.getTitle(),
         currentPosition: _(this.args.currentPosition),
       },
     );
@@ -112,6 +126,17 @@ export class HiringGiveConsentForNepotism implements GameState<OnEnteringHiringG
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
+
+  private getTitle(): string {
+    if (typeof this.args.title === 'string') {
+      return _(this.args.title);
+    } else {
+      return formatStringRecursive(
+        _(this.args.title.log),
+        this.args.title.args,
+      );
+    }
+  }
 
   private performAction(consent: boolean) {
     performAction('actHiringGiveConsentForNepotism', { consent });

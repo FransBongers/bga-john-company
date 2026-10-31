@@ -21,7 +21,6 @@ class Locations
 
   public static function commander(string $presidencyId)
   {
-    // TODO: change to presidencyId
     return 'Commander_' . $presidencyId;
   }
 

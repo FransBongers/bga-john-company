@@ -34,6 +34,11 @@
     cursor: pointer;
     outline: calc(var(--boardScale) * 4px) solid base.$selected-color;
   }
+
+  .joco-order {
+    cursor: pointer;
+    outline: calc(var(--boardScale) * 4px) solid base.$selectable-color;
+  }
 }
 
 #joco-select-boxes,
@@ -198,8 +203,6 @@
 //     background-color: base.$punjab-color;
 //   }
 // }
-
-
 
 .joco-select-box {
   position: absolute;

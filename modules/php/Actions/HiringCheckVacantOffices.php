@@ -98,13 +98,12 @@ class HiringCheckVacantOffices extends \Bga\Games\JohnCompany\Models\AtomicActio
               ],
             ],
             [
-
               'action' => HIRING_HIRE_FAMILY_MEMBER,
               'playerId' => 'some',
               'activePlayerIds' => [$hirer],
               'args' => [
                 'officeId' => $office->getId(),
-                'hirerPlayerId' => $hirer,
+                'hiringPlayerId' => $hirer,
               ],
             ]
           ]

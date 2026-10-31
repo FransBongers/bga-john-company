@@ -159,7 +159,7 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   }
 
 
-  protected function getOfficeholderCandidates(array $excludedOfficeIds = [], bool $excludeGovernors = false): array
+  public function getOfficeholderCandidates(array $excludedOfficeIds = [], bool $excludeGovernors = false): array
   {
     $candidates = [];
     foreach (Offices::getAll() as $office) {

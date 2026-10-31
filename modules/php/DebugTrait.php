@@ -40,30 +40,11 @@ trait DebugTrait
 
   function debug_test()
   {
-    Offices::get(GOVERNOR_OF_BENGAL)->setFamilyMemberId(null);
-
-    // LawCards::insertOnTop(GOVERNOR_GENERAL_LAW_ID, DECK);
-    // $ship = Ships::getTopOf(Locations::supplyOtherShips());
-    // $ship->place(Players::get(2371052), Locations::shipUnderConstruction(MADRAS), COMPANY_SHIP);
-    // $familyMember = FamilyMembers::getTopOf(Locations::familyMemberSupply(HASTINGS));
-    // $familyMember->setLocation(GOVERNOR_OF_BENGAL);
-
-    // Offices::get(GOVERNOR_GENERAL)->setFamilyMemberId('familyMember_Hastings_11');
-    // LawCards::get(DEREGULATION_ID)->setLocation(DEREGULATION_AVAILABLE);
-    // CompanyFailureCards::get('CompanyFailureCard_02')->resolveEffect();
-
-    // Company::setShareValue(1);
-    // EventTiles::insertOnTop('EventTile_18', DISCARD);
-
-    // $familyMembers = FamilyMembers::getMany(["familyMember_Walsh_1", "familyMember_Sykes_3"])->toArray();
-
-    // $topOfDeck = EventTiles::getTopOf(DECK);
-    // $regionName = $topOfDeck !== null ? Regions::get($topOfDeck->getRegionId())->getName() : null;
-    // Notifications::log('debug', Company::get());
+    // FamilyMembers::get('familyMember_Walsh_1')->setLocation(Locations::armyOfReady(BOMBAY_PRESIDENCY));
 
 
     // AtomicActions::get(EVENTS_IN_INDIA_STORMS)->rollForShips(ONE_ALL);
-    // Offices::get(PRESIDENT_OF_MADRAS)->setLocation(Locations::vacantOffices());
+    Offices::get(GOVERNOR_OF_BENGAL)->setFamilyMemberId(null);
     // $parliament = Globals::getParliament();
     // $parliament[OPPOSITION] = [
     //   'votes' => $parliament[OPPOSITION], // array of $playerId => votes

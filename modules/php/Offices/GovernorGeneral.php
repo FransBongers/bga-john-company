@@ -23,7 +23,7 @@ class GovernorGeneral extends \Bga\Games\JohnCompany\Models\Office
 
   public function getCandidatesForHiring(): array
   {
-    $candidates = $this->getOfficeholderCandidates([CHAIRMAN]);
+    $candidates = $this->getOfficeholderCandidates([CHAIRMAN, GOVERNOR_GENERAL, DIRECTOR_OF_TRADE], true);
     return count($candidates) > 0 ? $candidates : FamilyMembers::getWriters();
   }
 
