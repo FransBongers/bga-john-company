@@ -1,3 +1,3 @@
-export const tplNegotiation = () => `<div id="joco-negotiation">
+export const tplNegotiation = () => `<div id="joco-deals">
   TODO
 </div>`

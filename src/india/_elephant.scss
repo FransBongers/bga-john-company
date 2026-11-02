@@ -8,58 +8,58 @@
   width: 70px;
   aspect-ratio: 60/51;
   z-index: 1;
-  transition:
-    transform 500ms ease-in-out,
-    top 500ms ease-in-out,
-    left 500ms ease-in-out;
+  // transition:
+  //   transform 500ms ease-in-out,
+  //   top 500ms ease-in-out,
+  //   left 500ms ease-in-out;
 }
 
 #joco-elephant[data-location='Bengal'] {
-  top: 105px;
+  top: 10px;
   left: 750px;
   transform: scaleX(-1);
 }
 
 #joco-elephant[data-location='Bombay'] {
-  top: 242px;
+  top: 223px;
   left: 156px;
 }
 
 #joco-elephant[data-location='Delhi'] {
   top: 58px;
-  left: 314px;
+  left: 297px;
 }
 
 #joco-elephant[data-location='Hyderabad'] {
-  top: 412px;
-  left: 461px;
+  top: 398px;
+  left: 357px;
   transform: scaleX(-1);
 }
 
 #joco-elephant[data-location='Madras'] {
-  top: 583px;
-  left: 479px;
+  top: 590px;
+  left: 465px;
 }
 
 #joco-elephant[data-location='Maratha'] {
-  top: 276px;
-  left: 567px;
+  top: 290px;
+  left: 623px;
   transform: scaleX(-1);
 }
 
 #joco-elephant[data-location='Mysore'] {
-  top: 721px;
-  left: 386px;
+  top: 747px;
+  left: 366px;
 }
 
 #joco-elephant[data-location='Punjab'] {
   top: 4px;
-  left: 142px;
+  left: 10px;
 }
 
 #joco-elephant[data-location='Bengal_Delhi_border'] {
-  top: 79px;
-  left: 696px;
+  top: 87px;
+  left: 679px;
 
   &[data-facing='Bengal'] {
     transform: rotate(7deg);
@@ -72,7 +72,7 @@
 
 #joco-elephant[data-location='Bengal_Maratha_border'] {
   top: 237px;
-  left: 682px;
+  left: 675px;
 
   &[data-facing='Bengal'] {
     transform: rotate(-56deg);
@@ -84,7 +84,7 @@
 }
 
 #joco-elephant[data-location='Bombay_Delhi_border'] {
-  top: 90px;
+  top: 110px;
   left: 276px;
 
   &[data-facing='Bombay'] {
@@ -97,8 +97,8 @@
 }
 
 #joco-elephant[data-location='Bombay_Hyderabad_border'] {
-  top: 349px;
-  left: 316px;
+  top: 411px;
+  left: 294px;
 
   &[data-facing='Bombay'] {
     transform: scaleX(-1) rotate(-24deg);
@@ -110,8 +110,8 @@
 }
 
 #joco-elephant[data-location='Bombay_Maratha_border'] {
-  top: 208px;
-  left: 332px;
+  top: 217px;
+  left: 315px;
 
   &[data-facing='Bombay'] {
     transform: scaleX(-1) rotate(-4deg);
@@ -123,8 +123,8 @@
 }
 
 #joco-elephant[data-location='Bombay_Mysore_border'] {
-  top: 528px;
-  left: 278px;
+  top: 535px;
+  left: 268px;
 
   &[data-facing='Bombay'] {
     transform: scaleX(-1) rotate(-77deg);
@@ -136,8 +136,8 @@
 }
 
 #joco-elephant[data-location='Bombay_Punjab_border'] {
-  top: 134px;
-  left: 174px;
+  top: 129px;
+  left: 134px;
 
   &[data-facing='Bombay'] {
     transform: rotate(45deg);
@@ -150,7 +150,7 @@
 
 #joco-elephant[data-location='Delhi_Maratha_border'] {
   top: 125px;
-  left: 528px;
+  left: 507px;
 
   &[data-facing='Delhi'] {
     transform: scaleX(-1) rotate(-75deg);
@@ -162,8 +162,8 @@
 }
 
 #joco-elephant[data-location='Delhi_Punjab_border'] {
-  top: 5px;
-  left: 282px;
+  top: 9px;
+  left: 261px;
 
   &[data-facing='Delhi'] {
     transform: rotate(9deg);
@@ -175,8 +175,8 @@
 }
 
 #joco-elephant[data-location='Hyderabad_Madras_border'] {
-  top: 546px;
-  left: 482px;
+  top: 548px;
+  left: 447px;
 
   &[data-facing='Hyderabad'] {
     transform: rotate(-78deg);
@@ -188,8 +188,8 @@
 }
 
 #joco-elephant[data-location='Hyderabad_Maratha_border'] {
-  top: 364px;
-  left: 506px;
+  top: 401px;
+  left: 539px;
 
   &[data-facing='Hyderabad'] {
     transform: scaleX(-1) rotate(23deg);
@@ -201,8 +201,8 @@
 }
 
 #joco-elephant[data-location='Hyderabad_Mysore_border'] {
-  top: 510px;
-  left: 404px;
+  top: 526px;
+  left: 378px;
   z-index: 10;
 
   &[data-facing='Hyderabad'] {
@@ -215,8 +215,8 @@
 }
 
 #joco-elephant[data-location='Madras_Mysore_border'] {
-  top: 736px;
-  left: 420px;
+  top: 743px;
+  left: 416px;
 
   &[data-facing='Mysore'] {
     transform: scaleX(-1);

@@ -42,9 +42,9 @@ trait DebugTrait
   {
     // FamilyMembers::get('familyMember_Walsh_1')->setLocation(Locations::armyOfReady(BOMBAY_PRESIDENCY));
 
-
+    Regions::get(PUNJAB)->setStrength(0);
     // AtomicActions::get(EVENTS_IN_INDIA_STORMS)->rollForShips(ONE_ALL);
-    Offices::get(GOVERNOR_OF_BENGAL)->setFamilyMemberId(null);
+    // Offices::get(GOVERNOR_OF_BENGAL)->setFamilyMemberId(null);
     // $parliament = Globals::getParliament();
     // $parliament[OPPOSITION] = [
     //   'votes' => $parliament[OPPOSITION], // array of $playerId => votes

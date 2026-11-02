@@ -2289,12 +2289,29 @@ span[style*="color:#addb90"] {
   min-height: 351px;
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
 .joco-prize {
+  box-sizing: border-box;
   padding: 8px;
+  width: 250px;
+  aspect-ratio: 600/395;
+  background-image: url("img/prizes.webp");
+  background-size: 500% 100%;
 }
 .joco-prize .joco-row {
   justify-content: space-between;
   align-items: center;
+}
+.joco-prize .joco-family-members-stock {
+  flex-grow: 1;
 }
 .joco-prize .joco-upkeep-container {
   position: relative;
@@ -2347,6 +2364,8 @@ span[style*="color:#addb90"] {
   display: flex;
   flex-direction: row;
   justify-content: center;
+  color: rgb(245, 237, 224);
+  text-shadow: 1px 0 0 black, 0 1px 0 black, -1px 0 0 black, 0 -1px 0 black, 1px 1px 0 black, -1px 1px 0 black, 1px -1px 0 black, -1px -1px 0 black !important;
 }
 .joco-prize.selectable {
   cursor: pointer;
@@ -2355,6 +2374,26 @@ span[style*="color:#addb90"] {
 .joco-prize.selectable:hover, .joco-prize.selected {
   cursor: pointer;
   outline: 4px solid blue !important;
+}
+
+.joco-prize[data-background=Prize_0] {
+  background-position-x: 0%;
+}
+
+.joco-prize[data-background=Prize_2] {
+  background-position-x: 25%;
+}
+
+.joco-prize[data-background=Prize_4] {
+  background-position-x: 50%;
+}
+
+.joco-prize[data-background=Prize_8] {
+  background-position-x: 75%;
+}
+
+.joco-prize[data-background=Prize_12] {
+  background-position-x: 100%;
 }
 
 #joco-trackers {
@@ -3326,55 +3365,54 @@ span[style*="color:#c0c0c0"] {
   width: 70px;
   aspect-ratio: 60/51;
   z-index: 1;
-  transition: transform 500ms ease-in-out, top 500ms ease-in-out, left 500ms ease-in-out;
 }
 
 #joco-elephant[data-location=Bengal] {
-  top: 105px;
+  top: 10px;
   left: 750px;
   transform: scaleX(-1);
 }
 
 #joco-elephant[data-location=Bombay] {
-  top: 242px;
+  top: 223px;
   left: 156px;
 }
 
 #joco-elephant[data-location=Delhi] {
   top: 58px;
-  left: 314px;
+  left: 297px;
 }
 
 #joco-elephant[data-location=Hyderabad] {
-  top: 412px;
-  left: 461px;
+  top: 398px;
+  left: 357px;
   transform: scaleX(-1);
 }
 
 #joco-elephant[data-location=Madras] {
-  top: 583px;
-  left: 479px;
+  top: 590px;
+  left: 465px;
 }
 
 #joco-elephant[data-location=Maratha] {
-  top: 276px;
-  left: 567px;
+  top: 290px;
+  left: 623px;
   transform: scaleX(-1);
 }
 
 #joco-elephant[data-location=Mysore] {
-  top: 721px;
-  left: 386px;
+  top: 747px;
+  left: 366px;
 }
 
 #joco-elephant[data-location=Punjab] {
   top: 4px;
-  left: 142px;
+  left: 10px;
 }
 
 #joco-elephant[data-location=Bengal_Delhi_border] {
-  top: 79px;
-  left: 696px;
+  top: 87px;
+  left: 679px;
 }
 #joco-elephant[data-location=Bengal_Delhi_border][data-facing=Bengal] {
   transform: rotate(7deg);
@@ -3385,7 +3423,7 @@ span[style*="color:#c0c0c0"] {
 
 #joco-elephant[data-location=Bengal_Maratha_border] {
   top: 237px;
-  left: 682px;
+  left: 675px;
 }
 #joco-elephant[data-location=Bengal_Maratha_border][data-facing=Bengal] {
   transform: rotate(-56deg);
@@ -3395,7 +3433,7 @@ span[style*="color:#c0c0c0"] {
 }
 
 #joco-elephant[data-location=Bombay_Delhi_border] {
-  top: 90px;
+  top: 110px;
   left: 276px;
 }
 #joco-elephant[data-location=Bombay_Delhi_border][data-facing=Bombay] {
@@ -3406,8 +3444,8 @@ span[style*="color:#c0c0c0"] {
 }
 
 #joco-elephant[data-location=Bombay_Hyderabad_border] {
-  top: 349px;
-  left: 316px;
+  top: 411px;
+  left: 294px;
 }
 #joco-elephant[data-location=Bombay_Hyderabad_border][data-facing=Bombay] {
   transform: scaleX(-1) rotate(-24deg);
@@ -3417,8 +3455,8 @@ span[style*="color:#c0c0c0"] {
 }
 
 #joco-elephant[data-location=Bombay_Maratha_border] {
-  top: 208px;
-  left: 332px;
+  top: 217px;
+  left: 315px;
 }
 #joco-elephant[data-location=Bombay_Maratha_border][data-facing=Bombay] {
   transform: scaleX(-1) rotate(-4deg);
@@ -3428,8 +3466,8 @@ span[style*="color:#c0c0c0"] {
 }
 
 #joco-elephant[data-location=Bombay_Mysore_border] {
-  top: 528px;
-  left: 278px;
+  top: 535px;
+  left: 268px;
 }
 #joco-elephant[data-location=Bombay_Mysore_border][data-facing=Bombay] {
   transform: scaleX(-1) rotate(-77deg);
@@ -3439,8 +3477,8 @@ span[style*="color:#c0c0c0"] {
 }
 
 #joco-elephant[data-location=Bombay_Punjab_border] {
-  top: 134px;
-  left: 174px;
+  top: 129px;
+  left: 134px;
 }
 #joco-elephant[data-location=Bombay_Punjab_border][data-facing=Bombay] {
   transform: rotate(45deg);
@@ -3451,7 +3489,7 @@ span[style*="color:#c0c0c0"] {
 
 #joco-elephant[data-location=Delhi_Maratha_border] {
   top: 125px;
-  left: 528px;
+  left: 507px;
 }
 #joco-elephant[data-location=Delhi_Maratha_border][data-facing=Delhi] {
   transform: scaleX(-1) rotate(-75deg);
@@ -3461,8 +3499,8 @@ span[style*="color:#c0c0c0"] {
 }
 
 #joco-elephant[data-location=Delhi_Punjab_border] {
-  top: 5px;
-  left: 282px;
+  top: 9px;
+  left: 261px;
 }
 #joco-elephant[data-location=Delhi_Punjab_border][data-facing=Delhi] {
   transform: rotate(9deg);
@@ -3472,8 +3510,8 @@ span[style*="color:#c0c0c0"] {
 }
 
 #joco-elephant[data-location=Hyderabad_Madras_border] {
-  top: 546px;
-  left: 482px;
+  top: 548px;
+  left: 447px;
 }
 #joco-elephant[data-location=Hyderabad_Madras_border][data-facing=Hyderabad] {
   transform: rotate(-78deg);
@@ -3483,8 +3521,8 @@ span[style*="color:#c0c0c0"] {
 }
 
 #joco-elephant[data-location=Hyderabad_Maratha_border] {
-  top: 364px;
-  left: 506px;
+  top: 401px;
+  left: 539px;
 }
 #joco-elephant[data-location=Hyderabad_Maratha_border][data-facing=Hyderabad] {
   transform: scaleX(-1) rotate(23deg);
@@ -3494,8 +3532,8 @@ span[style*="color:#c0c0c0"] {
 }
 
 #joco-elephant[data-location=Hyderabad_Mysore_border] {
-  top: 510px;
-  left: 404px;
+  top: 526px;
+  left: 378px;
   z-index: 10;
 }
 #joco-elephant[data-location=Hyderabad_Mysore_border][data-facing=Hyderabad] {
@@ -3506,8 +3544,8 @@ span[style*="color:#c0c0c0"] {
 }
 
 #joco-elephant[data-location=Madras_Mysore_border] {
-  top: 736px;
-  left: 420px;
+  top: 743px;
+  left: 416px;
 }
 #joco-elephant[data-location=Madras_Mysore_border][data-facing=Mysore] {
   transform: scaleX(-1);
@@ -3828,37 +3866,37 @@ span[style*="color:#c0c0c0"] {
   height: 32px;
 }
 .joco-unrest-container[data-region=Bengal] {
-  top: 50px;
+  top: 40px;
   left: 880px;
 }
 .joco-unrest-container[data-region=Bombay] {
-  top: 278px;
-  left: 153px;
+  top: 285px;
+  left: 131px;
 }
 .joco-unrest-container[data-region=Delhi] {
   top: 5px;
-  left: 542px;
+  left: 516px;
 }
 .joco-unrest-container[data-region=Hyderabad] {
-  top: 380px;
-  left: 360px;
+  top: 418px;
+  left: 448px;
 }
 .joco-unrest-container[data-region=Madras] {
-  top: 645px;
-  left: 488px;
+  top: 684px;
+  left: 474px;
   width: 66px;
 }
 .joco-unrest-container[data-region=Maratha] {
-  top: 200px;
-  left: 385px;
+  top: 275px;
+  left: 530px;
 }
 .joco-unrest-container[data-region=Mysore] {
-  top: 718px;
-  left: 373px;
+  top: 714px;
+  left: 357px;
 }
 .joco-unrest-container[data-region=Punjab] {
-  top: 5px;
-  left: 145px;
+  top: 2px;
+  left: 125px;
 }
 
 #joco-india-map[data-governor-general-active=true] .joco-governor-overlay-container {
@@ -3877,15 +3915,15 @@ span[style*="color:#c0c0c0"] {
   min-height: 45px;
 }
 .joco-sea-zone[data-zone=westIndian] {
-  top: 750px;
-  left: 125px;
+  bottom: 100px;
+  left: 35px;
 }
 .joco-sea-zone[data-zone=southIndian] {
-  top: 775px;
-  left: 665px;
+  bottom: 50px;
+  left: 630px;
 }
 .joco-sea-zone[data-zone=eastIndian] {
-  top: 565px;
+  bottom: 289px;
   left: 780px;
 }
 .joco-sea-zone[data-zone=SuperintendentOfTradeInChina] {

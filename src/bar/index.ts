@@ -17,6 +17,10 @@ export class Bar {
 
   private config = [
     {
+      id: 'joco-deals',
+      text: _('Deals'),
+    },
+    {
       id: 'joco-india',
       text: _('India'),
     },
@@ -35,10 +39,6 @@ export class Bar {
     {
       id: 'joco-company',
       text: _('Company'),
-    },
-    {
-      id: 'joco-negotiation',
-      text: _('Negotiation'),
     },
   ];
 

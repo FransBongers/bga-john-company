@@ -1,0 +1,130 @@
+@use '../base';
+@use 'sass:math';
+@use 'sass:map';
+
+.joco-prize {
+  box-sizing: border-box;
+  padding: 8px;
+  width: 250px;
+  aspect-ratio: 600 / 395;
+  background-image: url('img/prizes.webp');
+  background-size: 500% 100%;
+
+  .joco-row {
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .joco-family-members-stock {
+    flex-grow: 1;
+  }
+
+  .joco-upkeep-container {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    // gap: -2px;
+
+    .joco-upkeep {
+      box-sizing: border-box;
+      position: absolute;
+      left: 90%;
+      border-radius: 50%;
+      height: 24px;
+      width: 24px;
+      border: 1px solid black;
+      background-color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .joco-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &[data-icon='CircleDark'] {
+      color: white;
+      z-index: 1;
+      height: 48px;
+
+      .joco-amount-pound {
+        font-size: 12px;
+      }
+
+      .joco-amount-value {
+        font-size: 16px;
+      }
+    }
+
+    &[data-icon='VictoryPoints'] {
+      color: black;
+      height: 48px;
+    }
+  }
+
+  .joco-windows-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    .joco-icon {
+      height: 24px;
+    }
+  }
+
+  .joco-prize-description {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    color: base.$joco-white;
+    text-shadow:
+      1px 0 0 black,
+      0 1px 0 black,
+      -1px 0 0 black,
+      0 -1px 0 black,
+      1px 1px 0 black,
+      -1px 1px 0 black,
+      1px -1px 0 black,
+      -1px -1px 0 black !important;
+  }
+
+  &.selectable {
+    cursor: pointer;
+    outline: 4px solid base.$selectable-color !important;
+  }
+
+  &.selectable:hover,
+  &.selected {
+    cursor: pointer;
+    outline: 4px solid base.$selected-color !important;
+  }
+}
+
+$prizes: (
+  1: 'Prize_0',
+  2: 'Prize_2',
+  3: 'Prize_4',
+  4: 'Prize_8',
+  5: 'Prize_12',
+);
+
+$cols: 5;
+$rows: 1;
+
+@for $i from 1 through 5 {
+  $index: $i - 1;
+  $col: $index % $cols;
+  $row: math.floor(math.div($index, $cols));
+
+  .joco-prize[data-background='#{map.get($prizes,$i)}'] {
+    // For a sprite sheet with $cols columns and $rows rows where
+    // background-size is ($cols * 100%) by ($rows * 100%),
+    // positions run from 0% to 100% inclusive so the step is 100% / ($cols - 1) or ($rows - 1).
+    background-position-x: math.div($col * 100%, $cols - 1);
+    // background-position-y: math.div($row * 100%, $rows - 1);
+  }
+}

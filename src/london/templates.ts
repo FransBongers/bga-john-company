@@ -41,7 +41,7 @@ export const tplLondonSeasonOrder = ({
 
 export const tplPrize = (prize: JocoPrize) => {
   return `
-    <div id="${prize.id}-container" class="joco-container joco-column joco-prize">
+    <div id="${prize.id}-container" class="joco-container joco-column joco-prize" data-background="${prize.id}">
       <div class="joco-row">
         <div class="joco-upkeep-container">
           <div class="joco-icon" data-icon="CircleDark">

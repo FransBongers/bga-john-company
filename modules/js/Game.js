@@ -372,6 +372,10 @@ class Bar {
         this.active = 0;
         this.config = [
             {
+                id: 'joco-deals',
+                text: _('Deals'),
+            },
+            {
                 id: 'joco-india',
                 text: _('India'),
             },
@@ -390,10 +394,6 @@ class Bar {
             {
                 id: 'joco-company',
                 text: _('Company'),
-            },
-            {
-                id: 'joco-negotiation',
-                text: _('Negotiation'),
             },
         ];
         this.game = game;
@@ -2446,23 +2446,23 @@ class Army {
 }
 
 const ORDERS_CONFIG = {
-    [ORDER_PUNJAB_1]: { top: 43, left: 195 },
-    [ORDER_DELHI_1]: { top: 31, left: 408 },
-    [ORDER_DELHI_2]: { top: 82, left: 548 },
-    [ORDER_DELHI_3]: { top: 105, left: 360 },
-    [ORDER_BENGAL_1]: { top: 185, left: 732 },
-    [ORDER_BENGAL_2]: { top: 276, left: 885 },
+    [ORDER_PUNJAB_1]: { top: 42, left: 194 },
+    [ORDER_DELHI_1]: { top: 29, left: 410 },
+    [ORDER_DELHI_2]: { top: 81, left: 552 },
+    [ORDER_DELHI_3]: { top: 105, left: 361 },
+    [ORDER_BENGAL_1]: { top: 186, left: 739 },
+    [ORDER_BENGAL_2]: { top: 277.5, left: 893.5 },
     [ORDER_BOMBAY_1]: { top: 148, left: 229 },
-    [ORDER_BOMBAY_2]: { top: 278, left: 295 },
-    [ORDER_BOMBAY_3]: { top: 373, left: 208 },
-    [ORDER_MARATHA_1]: { top: 179, left: 567 },
-    [ORDER_MARATHA_2]: { top: 284, left: 414 },
-    [ORDER_MARATHA_3]: { top: 351, left: 648 },
-    [ORDER_HYDERABAD_1]: { top: 479, left: 509 },
-    [ORDER_MYSORE_1]: { top: 547, left: 328 },
-    [ORDER_MYSORE_2]: { top: 635, left: 387 },
-    [ORDER_MADRAS_1]: { top: 632, left: 533 },
-    [ORDER_MADRAS_2]: { top: 709, left: 485 },
+    [ORDER_BOMBAY_2]: { top: 280, left: 295 },
+    [ORDER_BOMBAY_3]: { top: 376.5, left: 207.5 },
+    [ORDER_MARATHA_1]: { top: 180, left: 572 },
+    [ORDER_MARATHA_2]: { top: 287, left: 416 },
+    [ORDER_MARATHA_3]: { top: 354.5, left: 653.5 },
+    [ORDER_HYDERABAD_1]: { top: 483, left: 512 },
+    [ORDER_MYSORE_1]: { top: 552, left: 329 },
+    [ORDER_MYSORE_2]: { top: 641.5, left: 387.5 },
+    [ORDER_MADRAS_1]: { top: 639, left: 537 },
+    [ORDER_MADRAS_2]: { top: 716, left: 488.5 },
 };
 
 const tplControlTokenContent = (token, back = false) => {
@@ -2614,24 +2614,24 @@ class Presidency {
 }
 
 const TOWER_CONFIG = {
-    [BENGAL]: { bottom: 697, left: 849 },
-    [BOMBAY]: { bottom: 409, left: 245 },
-    [DELHI]: { bottom: 838, left: 609 },
-    [HYDERABAD]: { bottom: 396, left: 378 },
-    [MADRAS]: { bottom: 82, left: 489 },
-    [MARATHA]: { bottom: 697, left: 466 },
-    [MYSORE]: { bottom: 207, left: 290 },
-    [PUNJAB]: { bottom: 815, left: 84 },
+    [BENGAL]: { bottom: 708, left: 839 },
+    [BOMBAY]: { bottom: 417, left: 228 },
+    [DELHI]: { bottom: 850, left: 596 },
+    [HYDERABAD]: { bottom: 402, left: 362 },
+    [MADRAS]: { bottom: 83, left: 474 },
+    [MARATHA]: { bottom: 709, left: 452 },
+    [MYSORE]: { bottom: 211, left: 274 },
+    [PUNJAB]: { bottom: 827, left: 64 },
 };
 const CONTROL_TOKEN_STOCK_CONFIG = {
-    [BENGAL]: { top: 110, left: 829 },
-    [BOMBAY]: { top: 366, left: 298 },
-    [DELHI]: { top: 6, left: 507 },
-    [HYDERABAD]: { top: 459, left: 493 },
+    [BENGAL]: { top: 110, left: 793 },
+    [BOMBAY]: { top: 366, left: 287 },
+    [DELHI]: { top: 6, left: 482 },
+    [HYDERABAD]: { top: 467, left: 478 },
     [MADRAS]: { top: 600, left: 505 },
-    [MARATHA]: { top: 273, left: 513 },
-    [MYSORE]: { top: 754, left: 399 },
-    [PUNJAB]: { top: 50, left: 173 },
+    [MARATHA]: { top: 273, left: 490 },
+    [MYSORE]: { top: 754, left: 389 },
+    [PUNJAB]: { top: 69, left: 154 },
 };
 
 const tplTowerLevel = () => `
@@ -3155,7 +3155,7 @@ const tplLondonSeasonOrder = ({ order, cashSpent, }) => {
 };
 const tplPrize = (prize) => {
     return `
-    <div id="${prize.id}-container" class="joco-container joco-column joco-prize">
+    <div id="${prize.id}-container" class="joco-container joco-column joco-prize" data-background="${prize.id}">
       <div class="joco-row">
         <div class="joco-upkeep-container">
           <div class="joco-icon" data-icon="CircleDark">
@@ -5337,7 +5337,7 @@ const tplTextWithTooltip = (game, cardId, text) => {
     });
 };
 
-const tplNegotiation = () => `<div id="joco-negotiation">
+const tplNegotiation = () => `<div id="joco-deals">
   TODO
 </div>`;
 
