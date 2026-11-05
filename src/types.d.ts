@@ -122,6 +122,7 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
     color: string;
     climate?: Climate;
   };
+  deals: Record<string, JocoDeal>;
   elephant: {
     location: string;
     facing: string;
@@ -257,6 +258,26 @@ export type JocoCompanyFailureCard = JocoCompanyFailureCardBase &
  */
 export interface JocoControlToken extends GamePiece {
   looted: boolean;
+}
+
+/**
+ * Deals
+ */
+export interface JocoDealAssets {
+  cash?: number;
+  share?: string[];
+  blackmail?: string[];
+  prestige?: string[];
+  enterprise?: string[];
+  promiseCard?: string[];
+}
+
+export interface JocoDeal extends GamePiece {
+  description: string;
+  familyId: string;
+  items: Record<string, JocoDealAssets>;
+  offeredByFamilyId: string;
+  status: string; // 'offer' | 'accepted' | 'rejected'
 }
 
 /**

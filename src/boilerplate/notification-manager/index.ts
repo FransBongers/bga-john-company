@@ -48,6 +48,7 @@ import { London } from '../../london';
 import { PhaseTracker } from '../../phase-tracker';
 import { Families } from '../../families';
 import { PlayerManager } from '../../player-manager';
+import { Deals } from '../../deals';
 import { JocoPlayer } from '../../player-manager/player';
 import { createFamilyMember } from '../../templates';
 import { ShipsManager } from '../../token-managers/ship-tokens';
@@ -80,6 +81,7 @@ import {
   NotifMoveArmyPiece,
   NotifMoveShipArgs,
   NotifNewCompanyShare,
+  NotifNewDeal,
   NotifNextPhase,
   NotifPayFromTreasury,
   NotifPlaceShip,
@@ -926,6 +928,10 @@ export class NotificationManager {
         );
       }),
     );
+  }
+
+  async notif_newDeal(notif: NotifNewDeal) {
+    Deals.getInstance().addDeal(notif.deal);
   }
 
   async notif_removeCardFromGame(notif: NotifRemoveCardFromGame) {

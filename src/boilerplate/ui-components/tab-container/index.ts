@@ -76,16 +76,16 @@ export class TabContainer {
 
     Object.entries(this.ui.tabs).forEach(([id, tab]) => {
       if (id === tabId) {
-        tab.setAttribute('data-active', 'true');
+        tab.classList.add('active');
       } else {
-        tab.setAttribute('data-active', 'false');
+        tab.classList.remove('active');
       }
     });
     Object.entries(this.ui.content).forEach(([id, tab]) => {
       if (id === tabId) {
-        tab.setAttribute('data-active', 'true');
+        tab.classList.add('active');
       } else {
-        tab.setAttribute('data-active', 'false');
+        tab.classList.remove('active');
       }
     });
   }

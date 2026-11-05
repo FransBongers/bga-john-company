@@ -13,7 +13,7 @@ import {
   JocoFamilyMember,
 } from '../../types';
 import { tplOfficeHeader } from '../../company/templates';
-import { Treasury } from '../../ui-components';
+import { CashCounter } from '../../ui-components';
 import { Company } from '../../company';
 import { BgaCards } from '../../libs';
 import { ControlTokensManager } from '../../token-managers/control-tokens';
@@ -100,10 +100,11 @@ export class Presidency {
   private setupTreasury(gamedatas: GamedatasAlias) {
     const company = Company.getInstance();
 
-    company.treasuries[this.getPresidentId()] = new Treasury({
+    company.treasuries[this.getPresidentId()] = new CashCounter({
       parent: this.ui.tokensAndTreasury,
       initialValue: gamedatas.offices[this.getPresidentId()].treasury,
-      office: this.getPresidentId(),
+      id: this.getPresidentId(),
+      label: _('Treasury'),
     });
   }
 

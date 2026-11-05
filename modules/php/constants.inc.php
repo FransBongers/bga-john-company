@@ -19,6 +19,11 @@ const FAILURE = 'failure';
 const CATASTROPHIC_FAILURE = 'catastrophicFailure';
 
 /**
+ * Deals
+ */
+const DEAL_STATUS_OFFER = 'offer';
+
+/**
  * ScenarioIds
  */
 const THE_1710_SCENARIO = 'The1710Scenario';
@@ -354,6 +359,8 @@ const BLACKMAIL = 'Blackmail';
 const PRESTIGE = 'Prestige';
 const ENTERPRISE = 'Enterprise';
 const SPOUSE = 'Spouse';
+
+
 
 /**
  * Ship locations

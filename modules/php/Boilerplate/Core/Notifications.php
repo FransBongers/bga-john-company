@@ -1302,6 +1302,14 @@ class Notifications
     ]);
   }
 
+  public static function newDeal(Player $player, $deal)
+  {
+    self::notifyAll('newDeal', clienttranslate('${player_name} makes a new offer'), [
+      'player' => $player,
+      'deal' => $deal->jsonSerialize(),
+    ]);
+  }
+
   public static function regionBecomesSovereign(Region $region)
   {
     self::updateRegion($region, clienttranslate('${tkn_boldText_region} becomes sovereign'), [

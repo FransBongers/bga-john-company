@@ -3,12 +3,14 @@ import {
   tplLondonSeasonCardContent,
   tplBlackmailCardContent,
 } from '../../cards/london-season-cards/templates';
+import { tplPromiseCardContent } from '../../cards/promise-cards/templates';
 import {
   JocoLawCardStatic,
   JocoLondonSeasonCardStatic,
   JocoEnterpriseCardStatic,
   JocoEnterpriseCardBase,
   JocoEnterpriseCard,
+  JocoPromiseCardStatic,
 } from '../../types';
 import { tplLawCardContent } from '../../cards/law-cards/templates';
 import { tplEnterpriseCardContent } from '../../cards/enterprise-cards/templates';
@@ -33,9 +35,19 @@ export const tplEnterpriseCardTooltip = (
   // div.setAttribute('data-background', card.type);
   return `
   <div class="joco-enterprise-card joco-small-card-horizontal tooltip" data-background="${type}" data-card-id="${data.id}">
-    ${ tplEnterpriseCardContent(data as JocoEnterpriseCard, false)}
+    ${tplEnterpriseCardContent(data as JocoEnterpriseCard, false)}
   </div>
 `;
+};
+
+export const tplPromiseCard = (
+  data: JocoPromiseCardStatic & { id: string; familyId: string },
+) => {
+  return `
+  <div class="joco-promise-card joco-small-card-horizontal tooltip" data-background="PromiseCard${data.familyId}">
+    ${tplPromiseCardContent(data)}
+  </div>
+  `;
 };
 
 export const tplLondonSeasonCardTooltip = (

@@ -2,7 +2,12 @@ import { EnterpriseCardsManager } from '../../cards/enterprise-cards';
 import { LondonSeasonCardsManager } from '../../cards/london-season-cards';
 import { tplOfficeCard } from '../../cards/office-cards';
 import { JocoPromiseCard } from '../../types';
-import { PASSED_LAW_TOKENS, SHIPYARD, TROPHIES } from '../../constants';
+import {
+  PASSED_LAW_TOKENS,
+  PRESTIGE,
+  SHIPYARD,
+  TROPHIES,
+} from '../../constants';
 import { BgaCards } from '../../libs';
 
 import {
@@ -239,5 +244,19 @@ export class FamilyArea {
       }
       this.counters[counterId].incValue(change);
     });
+  }
+
+  public getEnterprises(): JocoEnterpriseCard[] {
+    return this.enterprises.getCards();
+  }
+
+  public getPromiseCards(): JocoPromiseCard[] {
+    return this.promiseCards.getCards();
+  }
+
+  public getPrestigeCards(): JocoLondonSeasonCard[] {
+    return this.stocks[`londonSeasonCards_${this.familyId}`]
+      .getCards()
+      .filter((card) => card.type === PRESTIGE);
   }
 }

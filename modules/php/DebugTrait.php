@@ -27,6 +27,7 @@ use Bga\Games\JohnCompany\Models\FamilyMember;
 use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\ControlTokens;
+use Bga\Games\JohnCompany\Managers\Deals;
 use Bga\Games\JohnCompany\Managers\Elephant;
 use Bga\Games\JohnCompany\Managers\EventTiles;
 use Bga\Games\JohnCompany\Managers\LawCards;
@@ -40,9 +41,29 @@ trait DebugTrait
 
   function debug_test()
   {
+
+    // Deals::newDeal(HASTINGS, SYKES);
+    // $deal = Deals::newDeal(HASTINGS, SYKES);
+    $deal = Deals::get('1');
+    $deal->setDescription('Buy Shipyard');
+    // $deal->setItems(HASTINGS, [
+    //   BLACKMAIL => [],
+    //   ENTERPRISE => ['Shipyard_22'],
+    //   PRESTIGE => [],
+    //   CASH => 0
+    // ]);
+    // $deal->setItems(SYKES, [
+    //   SHARE => [],
+    //   ENTERPRISE => [],
+    //   PRESTIGE => [],
+    //   CASH => 5
+    // ]);
+
+    Notifications::log('debug', $deal);
+
     // FamilyMembers::get('familyMember_Walsh_1')->setLocation(Locations::armyOfReady(BOMBAY_PRESIDENCY));
 
-    Regions::get(PUNJAB)->setStrength(0);
+    // Regions::get(PUNJAB)->setStrength(0);
     // AtomicActions::get(EVENTS_IN_INDIA_STORMS)->rollForShips(ONE_ALL);
     // Offices::get(GOVERNOR_OF_BENGAL)->setFamilyMemberId(null);
     // $parliament = Globals::getParliament();

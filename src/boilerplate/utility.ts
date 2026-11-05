@@ -111,6 +111,10 @@ export const performAction = (
   Interaction.use().performAction(actionName, args);
 };
 
+export const getPlayer = (playerId: number) => {
+  return PlayerManager.getInstance().getPlayer(playerId);
+};
+
 export const getPlayerName = (playerId: number) => {
   return PlayerManager.getInstance().getPlayer(playerId).getName();
 };

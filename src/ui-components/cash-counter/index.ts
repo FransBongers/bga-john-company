@@ -1,16 +1,17 @@
 import { DISABLED } from '../../boilerplate/constants';
 
 import { PLUS } from '../../constants';
-import { GamedatasAlias } from '../../types';
-import { tplTreasury } from './templates';
+import { tplCashCounter } from './templates';
 
-export interface TreasuryProps {
+export interface CashCounterProps {
   parent: HTMLElement;
   initialValue: number
-  office: string;
+  id: string;
+  label?: string;
+  buttonStyle?: 'blue' | 'gray';
 }
 
-export class Treasury {
+export class CashCounter {
   private counter: Counter;
 
   private element: HTMLElement;
@@ -18,23 +19,23 @@ export class Treasury {
   private plusButton: HTMLElement;
   private active: boolean;
 
-  constructor(props: TreasuryProps) {
+  constructor(props: CashCounterProps) {
     this.setup(props);
   }
 
-  private setup({ parent, initialValue, office }: TreasuryProps) {
-    parent.insertAdjacentHTML('beforeend', tplTreasury(office));
+  private setup({ parent, initialValue, id, label, buttonStyle = 'blue' }: CashCounterProps) {
+    parent.insertAdjacentHTML('beforeend', tplCashCounter({id, label, buttonStyle}));
 
-    this.element = document.getElementById(`joco-treasury-${office}`);
+    this.element = document.getElementById(`joco-cash-counter-${id}`);
     this.minusButton = document.getElementById(
-      `joco-treasury-${office}-minus-btn`,
+      `joco-cash-counter-${id}-minus-btn`,
     );
     this.plusButton = document.getElementById(
-      `joco-treasury-${office}-plus-btn`,
+      `joco-cash-counter-${id}-plus-btn`,
     );
 
     this.counter = new ebg.counter();
-    this.counter.create(`joco-treasury-${office}-counter`);
+    this.counter.create(`joco-cash-counter-${id}-counter`);
     this.counter.setValue(initialValue);
 
     // // this.element.addEventListener('click', (event: PointerEvent) => this.handleClick(event));

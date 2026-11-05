@@ -22,7 +22,7 @@ import {
   tplVacantOffices,
 } from './templates';
 import { getPhaseName } from '../phase-tracker/translations';
-import { Treasury } from '../ui-components';
+import { CashCounter } from '../ui-components';
 import { tplOfficeCard } from '../cards/office-cards';
 import { DECK } from '../boilerplate';
 
@@ -57,7 +57,7 @@ export class Company {
     vacantOffices: HTMLElement;
   };
   public balance: Counter;
-  public treasuries: Record<string, Treasury> = {};
+  public treasuries: Record<string, CashCounter> = {};
 
   constructor(private game: GameAlias) {
     this.game = game;
@@ -115,10 +115,11 @@ export class Company {
 
   public setupTreasury(initialValue: number, id: string) {
     const parent = document.getElementById(`${id}Office`)!;
-    this.treasuries[id] = new Treasury({
+    this.treasuries[id] = new CashCounter({
       parent,
       initialValue,
-      office: id,
+      id,
+      label: _('Treasury'),
     });
 
     // this.treasuries[id] = new ebg.counter();

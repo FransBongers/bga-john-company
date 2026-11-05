@@ -99,21 +99,6 @@ export const getFamilyName = (familyId: string) => {
   }
 };
 
-export const getSeaName = (seaId: string) => {
-  switch (seaId) {
-    case EAST_INDIAN:
-      return _('East Indian');
-    case SOUTH_INDIAN:
-      return _('South Indian');
-    case WEST_INDIAN:
-      return _('West Indian');
-    case SUPERINTENDENT_OF_TRADE_IN_CHINA:
-      return _('China');
-    default:
-      return '';
-  }
-};
-
 export const getRegionName = (regionId: string) => {
   switch (regionId) {
     case BENGAL:
@@ -132,6 +117,21 @@ export const getRegionName = (regionId: string) => {
       return _('Mysore');
     case PUNJAB:
       return _('Punjab');
+    default:
+      return '';
+  }
+};
+
+export const getSeaName = (seaId: string) => {
+  switch (seaId) {
+    case EAST_INDIAN:
+      return _('East Indian');
+    case SOUTH_INDIAN:
+      return _('South Indian');
+    case WEST_INDIAN:
+      return _('West Indian');
+    case SUPERINTENDENT_OF_TRADE_IN_CHINA:
+      return _('China');
     default:
       return '';
   }

@@ -35,7 +35,6 @@ import { India } from './india';
 import { BgaAnimations, BgaAutofit } from './libs';
 import { getTokenDiv } from './logs';
 import { London } from './london';
-import { Negotiation } from './negotiation';
 import { PhaseTracker } from './phase-tracker';
 import { Families } from './families';
 import { PlayerManager } from './player-manager';
@@ -101,6 +100,7 @@ import { EventTiles } from './india/event-tiles';
 import { EventTilesManager } from './cards/event-tiles';
 import { PromiseCardsManager } from './cards/promise-cards';
 import { SetupCardsManager } from './cards/setup-cards';
+import { Deals } from './deals';
 
 // declare const define; // TODO: check if we comment here or in bga-animations module?
 // declare const ebg;
@@ -144,6 +144,7 @@ export class Game {
   private _notif_uid_to_mobile_log_id = {};
   private _selectableNodes = []; // TODO: use to keep track of selectable classed?
   public mobileVersion: boolean = false;
+  public isSpectator: boolean = false;
 
   private states = {
     // Boilerplate
@@ -372,6 +373,7 @@ export class Game {
   public setup(gamedatas: JohnCompanyGamedatas) {
     const body = document.getElementById('ebd-body');
     this.mobileVersion = body && body.classList.contains('mobile_version');
+    this.isSpectator = !gamedatas.playerOrder.includes(this.getPlayerId());
 
     // Create a new div for buttons to avoid BGA auto clearing it
     document
@@ -445,7 +447,7 @@ export class Game {
       CrownClimate.create(this);
     }
     this.notificationManager = new NotificationManager(this);
-    Negotiation.create(this);
+    Deals.create(this);
     Families.create(this);
     Company.create(this);
 

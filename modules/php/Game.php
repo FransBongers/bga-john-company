@@ -33,6 +33,7 @@ use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\CompanyFailureCards;
 use Bga\Games\JohnCompany\Managers\ControlTokens;
 use Bga\Games\JohnCompany\Managers\Crown;
+use Bga\Games\JohnCompany\Managers\Deals;
 use Bga\Games\JohnCompany\Managers\Elephant;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\EventTiles;
@@ -59,6 +60,7 @@ class Game extends \Bga\GameFramework\Table
     use \Bga\Games\JohnCompany\DebugTrait;
     use \Bga\Games\JohnCompany\EngineTrait;
     use \Bga\Games\JohnCompany\TurnTrait;
+    use \Bga\Games\JohnCompany\DealsTrait;
 
     public static $instance = null;
     public function __construct()
@@ -364,6 +366,7 @@ class Game extends \Bga\GameFramework\Table
             'armyPieces' => ArmyPieces::getAll(),
             'company' => Company::get(),
             'controlTokens' => ControlTokens::getAll(),
+            'deals' => Deals::getAll(),
             'elephant' => Elephant::get(),
             'empires' => Globals::getEmpires(),
             'enterprises' => Enterprises::getAll(),

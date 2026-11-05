@@ -1,0 +1,81 @@
+@use '../../base';
+
+.joco-new-offer-wrapper {
+  overflow: clip;
+  transition: height 0.5s ease-out;
+  // height: 500px;
+
+  &:not(.active) {
+    height: 0px;
+  }
+}
+
+.joco-new-offer-header {
+  background-color: base.$joco-red;
+  padding: 8px;
+  color: base.$joco-white;
+}
+
+.joco-new-offer {
+  min-width: 75%;
+  width: fit-content;
+  background-color: base.$joco-white;
+  border: 2px solid base.$joco-gray;
+  .joco-new-offer-block {
+    padding: 8px;
+
+    &:not(:last-child) {
+      border-bottom: 2px solid base.$joco-gray;
+    }
+  }
+}
+
+#joco-new-offer-description {
+  width: 100%;
+  max-width: 600px;
+  box-sizing: border-box;
+}
+
+.joco-new-offer-buttons {
+  gap: 8px;
+}
+
+.joco-assets-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px 24px;
+  padding: 8px 0px;
+}
+
+.joco-asset-section {
+  flex: 0 1 auto;
+  max-width: 100%;
+}
+
+.joco-asset-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0px;
+}
+
+.joco-asset-section:not(.joco-asset-section-share) .joco-asset-option {
+  zoom: 0.75;
+}
+
+.joco-asset-option.tooltip {
+  cursor: pointer;
+  outline: 4px solid base.$selectable-color;
+
+  &.selected,
+  &:hover {
+    outline: 4px solid base.$selected-color;
+  }
+}
+
+.joco-asset-selector-footer {
+  align-items: center;
+  gap: 8px;
+}

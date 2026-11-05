@@ -1,2 +1,2 @@
 export * from './counters';
-export * from './treasury';
+export * from './cash-counter';

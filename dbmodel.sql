@@ -150,6 +150,17 @@ CREATE TABLE IF NOT EXISTS `orders` (
   `status` varchar(32) NOT NULL,
   PRIMARY KEY (`order_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+CREATE TABLE IF NOT EXISTS `deals` (
+  `deal_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `deal_location` varchar(32) NOT NULL,
+  `deal_state` int(10) DEFAULT 0,
+  `description` TEXT NOT NULL,
+  `assets` JSON NULL,
+  `offered_by_family_id` varchar(16) NOT NULL,
+  `family_id` varchar(16) NOT NULL,
+  `status` varchar(32) NOT NULL,
+  PRIMARY KEY (`deal_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 CREATE TABLE IF NOT EXISTS `regions` (
   `region_id` varchar(32) NOT NULL,
   `region_location` varchar(32) NOT NULL,

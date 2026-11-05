@@ -138,6 +138,101 @@
   font-style: italic;
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
+.fb-modal-wrapper {
+  --gameScale: 1;
+  position: fixed;
+  z-index: 1060;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.fb-modal-wrapper[data-state=closed] {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+.fb-modal-wrapper[data-state=closed] .fb-modal {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: visibility 0.2s ease-out, opacity 0.2s linear;
+}
+.fb-modal-wrapper[data-state=open] {
+  visibility: visible;
+  pointer-events: auto;
+  opacity: 1;
+  transition: visibility 0s ease-out, opacity 0.5s linear;
+}
+.fb-modal-wrapper[data-state=open] .fb-modal {
+  opacity: 1;
+  transition: visibility 0s ease-out, opacity 0.3s linear;
+  visibility: visible;
+}
+.fb-modal-wrapper .fb-modal-underlay {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: 1060;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.fb-modal-wrapper .fb-modal {
+  --fontScale: calc(var(--gameScale));
+  display: flex;
+  flex-direction: column;
+  margin-top: 15vh;
+  width: 800px;
+  border: 2px solid rgb(130, 124, 112);
+  border-radius: 12px;
+  max-width: 95%;
+  max-height: 70vh;
+  overflow: hidden;
+  z-index: 1061;
+  background-color: rgb(245, 237, 224);
+}
+.fb-modal-wrapper .fb-modal .fb-modal-title-container {
+  padding: 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 2px solid rgb(130, 124, 112);
+  color: rgb(245, 237, 224);
+  background-color: rgb(183, 98, 85);
+}
+.fb-modal-wrapper .fb-modal .fb-modal-title-container .fb-modal-title {
+  flex-grow: 1;
+}
+.fb-modal-wrapper .fb-modal .fb-modal-title-container .fb-modal-close-icon {
+  width: 48px;
+  height: 48px;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.fb-modal-wrapper .fb-modal .fb-modal-content-container {
+  padding: 12px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
 .icon-counter-container {
   position: relative;
   height: 50px;
@@ -178,22 +273,18 @@
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  * -----
  */
-.tab-container {
-  border-radius: 14px;
-  border: 2px solid rgba(0, 0, 0, 0.6);
-}
 .tab-container .tabs {
   display: flex;
+  justify-content: center;
   flex-direction: row;
   height: 60px;
-  border-bottom: solid 2px rgba(0, 0, 0, 0.6);
 }
 .tab-container .tabs .tab-title {
-  flex-grow: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.1);
 }
 .tab-container .tabs-content {
   padding: 16px;
@@ -205,23 +296,23 @@
   grid-row: 1/2;
   width: 100%;
 }
-.tab-container .tab-content[data-active=false] {
+.tab-container .tab-content:not(.active) {
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
   transition: visibility 0.3s ease-out, opacity 0.3s linear;
 }
-.tab-container .tab-content[data-active=true] {
+.tab-container .tab-content.active {
   opacity: 1;
   transition: visibility 0s ease-out, opacity 0.5s linear;
   visibility: visible;
 }
-.tab-container .tab-title[data-active=true] {
+.tab-container .tab-title.active {
   font-weight: bold;
   border-bottom: solid 2px black;
   background-color: rgba(0, 0, 0, 0.1);
 }
-.tab-container .tab-title[data-active=false] span {
+.tab-container .tab-title:not(.active) span {
   color: black;
 }
 
@@ -275,6 +366,7 @@
   font-size: 1.1em;
 }
 
+.tooltip.joco-promise-card,
 .tooltip.joco-enterprise-card,
 .tooltip.joco-card,
 .tooltip.joco-law-card {
@@ -1609,7 +1701,7 @@ span[style*="color:#addb90"] {
  */
 .joco-container {
   position: relative;
-  border: 3px double #000;
+  border: 2px solid rgb(130, 124, 112);
   border-radius: 8px;
   padding: 16px;
   display: flex;
@@ -1877,6 +1969,168 @@ span[style*="color:#addb90"] {
 .joco-crown-climate-indicator-container.active .joco-crown-climate-indicator {
   opacity: 1;
   visibility: visible;
+}
+
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
+.joco-new-offer-wrapper {
+  overflow: clip;
+  transition: height 0.5s ease-out;
+}
+.joco-new-offer-wrapper:not(.active) {
+  height: 0px;
+}
+
+.joco-new-offer-header {
+  background-color: rgb(183, 98, 85);
+  padding: 8px;
+  color: rgb(245, 237, 224);
+}
+
+.joco-new-offer {
+  min-width: 75%;
+  width: fit-content;
+  background-color: rgb(245, 237, 224);
+  border: 2px solid rgb(130, 124, 112);
+}
+.joco-new-offer .joco-new-offer-block {
+  padding: 8px;
+}
+.joco-new-offer .joco-new-offer-block:not(:last-child) {
+  border-bottom: 2px solid rgb(130, 124, 112);
+}
+
+#joco-new-offer-description {
+  width: 100%;
+  max-width: 600px;
+  box-sizing: border-box;
+}
+
+.joco-new-offer-buttons {
+  gap: 8px;
+}
+
+.joco-assets-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px 24px;
+  padding: 8px 0px;
+}
+
+.joco-asset-section {
+  flex: 0 1 auto;
+  max-width: 100%;
+}
+
+.joco-asset-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0px;
+}
+
+.joco-asset-section:not(.joco-asset-section-share) .joco-asset-option {
+  zoom: 0.75;
+}
+
+.joco-asset-option.tooltip {
+  cursor: pointer;
+  outline: 4px solid yellow;
+}
+.joco-asset-option.tooltip.selected, .joco-asset-option.tooltip:hover {
+  outline: 4px solid blue;
+}
+
+.joco-asset-selector-footer {
+  align-items: center;
+  gap: 8px;
+}
+
+#joco-players-table {
+  display: grid;
+  grid-template-columns: fit-content(100px) fit-content(100px);
+  gap: 8px;
+  column-gap: 24px;
+  margin-top: 16px;
+}
+#joco-players-table .joco-players-table-row {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1/3;
+  align-items: center;
+}
+
+#joco-deals-tabs {
+  border: none;
+}
+#joco-deals-tabs .tabs {
+  width: 100%;
+  height: 48px;
+  gap: 0;
+  border-bottom: 2px solid rgb(130, 124, 112);
+}
+#joco-deals-tabs .tabs .tab-title {
+  flex: 1 1 0;
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  color: rgb(130, 124, 112);
+  transition: background-color 0.2s, color 0.2s;
+}
+#joco-deals-tabs .tabs .tab-title:hover {
+  background-color: rgba(183, 98, 85, 0.1);
+}
+#joco-deals-tabs .tabs .tab-title.active {
+  border: none;
+  border-bottom: 6px solid rgb(183, 98, 85);
+  background-color: transparent;
+  color: black;
+}
+#joco-deals-tabs .tabs .tab-title:not(.active) span {
+  color: inherit;
+}
+
+.joco-deals-table-outer {
+  min-height: 800px;
+  height: 800px;
+  overflow-y: auto;
+  background-color: rgb(245, 237, 224);
+  border: 2px solid rgb(130, 124, 112);
+}
+.joco-deals-table-outer .joco-table-header {
+  background-color: rgb(183, 98, 85);
+  color: rgb(245, 237, 224);
+}
+.joco-deals-table-outer .joco-deals-table-inner {
+  display: grid;
+  grid-template-columns: 200px 1fr 200px;
+  grid-template-rows: auto;
+}
+.joco-deals-table-outer .joco-deals-table-inner .joco-table-row {
+  padding: 8px;
+  border-bottom: 1px solid black;
+  display: grid;
+  grid-column: 1/4;
+  grid-template-columns: subgrid;
 }
 
 /*
@@ -3044,7 +3298,7 @@ span[style*="color:#addb90"] {
   right: 4px;
 }
 
-.joco-treasury-container {
+.joco-cash-counter-container {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -3052,40 +3306,15 @@ span[style*="color:#addb90"] {
   padding: 4px 8px;
   gap: 4px;
 }
-.joco-treasury-container .joco-row {
+.joco-cash-counter-container .joco-row {
   align-items: center;
   gap: 8px;
 }
-.joco-treasury-container .joco-button {
-  background-color: white;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  border: 1px solid #060606;
-  box-shadow: 0 0 0 #000;
-  color: #060606;
-  text-shadow: none;
-  border-radius: 6px;
-  padding: 4px;
-  cursor: pointer;
-}
-.joco-treasury-container .joco-button i {
-  pointer-events: none;
-}
-.joco-treasury-container .joco-button:hover {
-  background-color: #f0f0f0;
-}
-.joco-treasury-container .joco-button.disabled {
-  background: #787878;
-  pointer-events: none;
-}
-.joco-treasury-container .joco-treasury-counter-container {
+.joco-cash-counter-container .joco-cash-counter-counter-container {
   min-width: 36px;
   text-align: center;
 }
-.joco-treasury-container[data-active=false] .joco-button {
+.joco-cash-counter-container[data-active=false] .bgabutton {
   cursor: auto;
   visibility: hidden;
   pointer-events: none;
@@ -3298,6 +3527,15 @@ span[style*="color:#c0c0c0"] {
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  * -----
  */
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
 .joco-army {
   box-sizing: border-box;
   width: 100%;
@@ -3365,6 +3603,7 @@ span[style*="color:#c0c0c0"] {
   width: 70px;
   aspect-ratio: 60/51;
   z-index: 1;
+  transition: transform 500ms ease-in-out, top 500ms ease-in-out, left 500ms ease-in-out;
 }
 
 #joco-elephant[data-location=Bengal] {
@@ -3954,7 +4193,7 @@ span[style*="color:#c0c0c0"] {
   background-size: 100% 100%;
   width: 1000px;
   aspect-ratio: 4000/3800;
-  outline: 3px double black;
+  border: 2px solid rgb(130, 124, 112);
   border-radius: 5px;
 }
 #joco-india #joco-india-map .joco-family-member {

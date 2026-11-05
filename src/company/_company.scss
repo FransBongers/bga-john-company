@@ -2,7 +2,8 @@
 
 .joco-container {
   position: relative;
-  border: 3px double #000;
+  // border: 3px double #000;
+  border: 2px solid base.$joco-gray;
   // width: fit-content;
   border-radius: 8px;
   padding: 16px;
