@@ -137,11 +137,21 @@ export class NewOffer {
     };
   }
 
+  private hasAssets(): boolean {
+    return Object.values(this.getOfferAssets()).some(
+      (assets) =>
+        (assets.cash ?? 0) > 0 ||
+        Object.entries(assets).some(
+          ([type, items]) => type !== 'cash' && Array.isArray(items) && items.length > 0,
+        ),
+    );
+  }
+
   private onSubmit() {
     const description = this.description
       .trim()
       .slice(0, NEW_OFFER_DESCRIPTION_MAX_LENGTH);
-    if (description.length === 0) {
+    if (description.length === 0 && !this.hasAssets()) {
       return;
     }
     console.log('Submitting new offer with assets:', this.getOfferAssets());

@@ -14,6 +14,7 @@ class Deals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     'offered_by_family_id',
     'family_id',
     'status',
+    'deal_reports',
   ];
   protected static $autoremovePrefix = false;
   protected static $autoreshuffle = false;
@@ -57,7 +58,8 @@ class Deals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
       'location' => 'deals',
       'offered_by_family_id' => $offeredByFamilyId,
       'family_id' => $familyId,
-      'status' => DEAL_STATUS_OFFER
+      'status' => DEAL_STATUS_OFFER,
+      'deal_reports' => [],
     ]);
   }
 }

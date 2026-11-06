@@ -275,9 +275,10 @@ export interface JocoDealAssets {
 export interface JocoDeal extends GamePiece {
   description: string;
   familyId: string;
-  items: Record<string, JocoDealAssets>;
+  assets: Record<string, JocoDealAssets>;
   offeredByFamilyId: string;
-  status: string; // 'offer' | 'accepted' | 'rejected'
+  reports: Record<string, 'fulfilled' | 'violated'>;
+  status: string; // 'offer' | 'agreement' | 'rejected' | 'closed'
 }
 
 /**

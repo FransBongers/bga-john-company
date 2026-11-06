@@ -159,6 +159,7 @@ CREATE TABLE IF NOT EXISTS `deals` (
   `offered_by_family_id` varchar(16) NOT NULL,
   `family_id` varchar(16) NOT NULL,
   `status` varchar(32) NOT NULL,
+  `deal_reports` JSON NULL,
   PRIMARY KEY (`deal_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 CREATE TABLE IF NOT EXISTS `regions` (

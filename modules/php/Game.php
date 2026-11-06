@@ -328,6 +328,11 @@ class Game extends \Bga\GameFramework\Table
      */
     public function upgradeTableDb($from_version)
     {
+        if ($from_version <= 2026110500) {
+            $sql = "ALTER TABLE DBPREFIX_deals ADD `deal_reports` JSON NULL";
+            $this->applyDbUpgradeToAllDB($sql);
+        }
+
         //       if ($from_version <= 1404301345)
         //       {
         //            // ! important ! Use DBPREFIX_<table_name> for all tables

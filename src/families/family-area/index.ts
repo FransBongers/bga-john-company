@@ -237,6 +237,10 @@ export class FamilyArea {
     await this.enterprises.addCard(getEnterpriseCard(enterprise));
   }
 
+  public async addPromiseCard(card: JocoPromiseCard) {
+    await this.promiseCards.addCard(card);
+  }
+
   public incCounters(changes: Record<string, number>) {
     Object.entries(changes).forEach(([counterId, change]) => {
       if (!this.counters[counterId]) {

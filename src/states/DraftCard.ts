@@ -11,11 +11,11 @@ import {
   setSelected,
   updatePageTitle,
 } from '../boilerplate';
-import { CommonStateArgs, GameAlias, JoCoSetupCard } from '../types';
+import { CommonStateArgs, GameAlias, JocoSetupCardBase } from '../types';
 
 interface OnEnteringDraftCardArgs extends CommonStateArgs {
   _private?: {
-    options: JoCoSetupCard[];
+    options: JocoSetupCardBase[];
     selected: string[];
   };
   numberToSelect: number;

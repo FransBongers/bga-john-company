@@ -82,6 +82,8 @@ import {
   NotifMoveShipArgs,
   NotifNewCompanyShare,
   NotifNewDeal,
+  NotifDealUpdated,
+  NotifMovePromiseCard,
   NotifNextPhase,
   NotifPayFromTreasury,
   NotifPlaceShip,
@@ -932,6 +934,18 @@ export class NotificationManager {
 
   async notif_newDeal(notif: NotifNewDeal) {
     Deals.getInstance().addDeal(notif.deal);
+  }
+
+  async notif_dealUpdated(notif: NotifDealUpdated) {
+    Deals.getInstance().updateDeal(notif.deal);
+  }
+
+  async notif_movePromiseCard(notif: NotifMovePromiseCard) {
+    const { card } = notif;
+
+    await Families.getInstance()
+      .getFamily(card.location)
+      .addPromiseCard(getPromiseCard(card));
   }
 
   async notif_removeCardFromGame(notif: NotifRemoveCardFromGame) {

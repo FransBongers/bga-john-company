@@ -22,6 +22,11 @@ const CATASTROPHIC_FAILURE = 'catastrophicFailure';
  * Deals
  */
 const DEAL_STATUS_OFFER = 'offer';
+const DEAL_STATUS_AGREEMENT = 'agreement';
+const DEAL_STATUS_REJECTED = 'rejected';
+const DEAL_STATUS_CLOSED = 'closed';
+const DEAL_REPORT_FULFILLED = 'fulfilled';
+const DEAL_REPORT_VIOLATED = 'violated';
 
 /**
  * ScenarioIds

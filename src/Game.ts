@@ -145,6 +145,7 @@ export class Game {
   private _selectableNodes = []; // TODO: use to keep track of selectable classed?
   public mobileVersion: boolean = false;
   public isSpectator: boolean = false;
+  public activePlayerIds: number[] | undefined = undefined;
 
   private states = {
     // Boilerplate
@@ -507,6 +508,7 @@ export class Game {
   public onEnteringState(stateName: string, args: any) {
     console.log('Entering state: ' + stateName, args);
     const activePlayerIds: number[] | undefined = args.args?.activePlayerIds;
+    this.activePlayerIds = activePlayerIds;
     const playerIsActiveAndStateExists =
       this.bga.players.isCurrentPlayerActive() &&
       this.states[stateName as keyof typeof this.states];

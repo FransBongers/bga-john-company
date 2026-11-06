@@ -14,6 +14,7 @@ class Deal extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   protected $offeredByFamilyId;
   protected $familyId;
   protected $status;
+  protected $reports;
 
   protected $attributes = [
     'id' => ['deal_id', 'str'],
@@ -24,6 +25,7 @@ class Deal extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     'offeredByFamilyId' => ['offered_by_family_id', 'str'],
     'familyId' => ['family_id', 'str'],
     'status' => ['status', 'str'],
+    'reports' => ['deal_reports', 'obj'],
   ];
 
   protected $staticAttributes = [];

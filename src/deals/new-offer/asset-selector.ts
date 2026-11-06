@@ -2,6 +2,7 @@ import { CashCounter } from '../../ui-components';
 import { JocoDealAssets } from '../../types';
 import { AssetType, AvailableAssets } from './types';
 import { getAvailableAssets } from './utility';
+import { getAssetLabels } from '../labels';
 
 const SECTIONS: { type: AssetType; title: () => string }[] = [
   { type: 'share', title: () => _('Company Shares') },
@@ -64,27 +65,11 @@ export class AssetSelector {
   }
 
   public getLabels(): string[] {
-    const labels: string[] = [];
-    const cash = this.cash.getValue();
-    if (cash > 0) {
-      labels.push(`£${cash}`);
-    }
-    SECTIONS.forEach(({ type }) => {
-      if (type === 'share') {
-        const count = this.selected.share.length;
-        if (count > 0) {
-          labels.push(`${count} ${_('Company Share(s)')}`);
-        }
-        return;
-      }
-      this.selected[type].forEach((id) => {
-        const option = this.available?.options[type].find((o) => o.id === id);
-        if (option) {
-          labels.push(option.label);
-        }
-      });
-    });
-    return labels;
+    return getAssetLabels(
+      this.getAssets(),
+      (type, id) =>
+        this.available?.options[type].find((o) => o.id === id)?.label,
+    );
   }
 
   private changeCash(delta: number) {

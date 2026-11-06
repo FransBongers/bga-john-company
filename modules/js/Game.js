@@ -3711,6 +3711,9 @@ class FamilyArea {
     async addEnterprise(enterprise) {
         await this.enterprises.addCard(getEnterpriseCard(enterprise));
     }
+    async addPromiseCard(card) {
+        await this.promiseCards.addCard(card);
+    }
     incCounters(changes) {
         Object.entries(changes).forEach(([counterId, change]) => {
             if (!this.counters[counterId]) {
@@ -3934,6 +3937,38 @@ const getAvailableAssets = (playerId) => {
     };
 };
 
+const CARD_TYPES = ['enterprise', 'promiseCard', 'prestige'];
+const getStaticCardLabel = (type, id) => {
+    const staticData = StaticData$1.get();
+    switch (type) {
+        case 'enterprise':
+            return staticData.enterpriseCard(id).name;
+        case 'promiseCard':
+            return staticData.promiseCard(id).title;
+        case 'prestige':
+            return staticData.londonSeasonCard(id).title;
+    }
+};
+const getAssetLabels = (assets, getCardLabel) => {
+    const labels = [];
+    if ((assets.cash ?? 0) > 0) {
+        labels.push(`£${assets.cash}`);
+    }
+    const shareCount = assets.share?.length ?? 0;
+    if (shareCount > 0) {
+        labels.push(`${shareCount} ${_('Company Share(s)')}`);
+    }
+    CARD_TYPES.forEach((type) => {
+        (assets[type] ?? []).forEach((id) => {
+            const label = getCardLabel(type, id);
+            if (label) {
+                labels.push(label);
+            }
+        });
+    });
+    return labels;
+};
+
 const SECTIONS = [
     { type: 'share', title: () => _('Company Shares') },
     { type: 'enterprise', title: () => _('Enterprises') },
@@ -3982,27 +4017,7 @@ class AssetSelector {
         return { cash: this.cash.getValue(), ...this.selected };
     }
     getLabels() {
-        const labels = [];
-        const cash = this.cash.getValue();
-        if (cash > 0) {
-            labels.push(`£${cash}`);
-        }
-        SECTIONS.forEach(({ type }) => {
-            if (type === 'share') {
-                const count = this.selected.share.length;
-                if (count > 0) {
-                    labels.push(`${count} ${_('Company Share(s)')}`);
-                }
-                return;
-            }
-            this.selected[type].forEach((id) => {
-                const option = this.available?.options[type].find((o) => o.id === id);
-                if (option) {
-                    labels.push(option.label);
-                }
-            });
-        });
-        return labels;
+        return getAssetLabels(this.getAssets(), (type, id) => this.available?.options[type].find((o) => o.id === id)?.label);
     }
     changeCash(delta) {
         const max = this.available?.cash ?? 0;
@@ -4068,7 +4083,7 @@ const tplNewOffer = () => `
   </div>
   <div class="joco-new-offer">
     <div class="joco-new-order-form joco-new-offer-block">
-      <label for="joco-new-offer-description">${_('Description')}</label>
+      <label for="joco-new-offer-description">${_('Description (optional)')}</label>
       <input type="text" id="joco-new-offer-description" maxlength="${NEW_OFFER_DESCRIPTION_MAX_LENGTH}" autocomplete="off" />
       <div id="joco-new-offer-description-counter">0 / ${NEW_OFFER_DESCRIPTION_MAX_LENGTH}</div>
       <div class="joco-row joco-new-offer-buttons">
@@ -4181,11 +4196,15 @@ class NewOffer {
             [this.getPlayerId('opponent')]: this.selectors.opponent.getAssets(),
         };
     }
+    hasAssets() {
+        return Object.values(this.getOfferAssets()).some((assets) => (assets.cash ?? 0) > 0 ||
+            Object.entries(assets).some(([type, items]) => type !== 'cash' && Array.isArray(items) && items.length > 0));
+    }
     onSubmit() {
         const description = this.description
             .trim()
             .slice(0, NEW_OFFER_DESCRIPTION_MAX_LENGTH);
-        if (description.length === 0) {
+        if (description.length === 0 && !this.hasAssets()) {
             return;
         }
         console.log('Submitting new offer with assets:', this.getOfferAssets());
@@ -4208,7 +4227,7 @@ const tplDealsPlayers = (gamedatas, playerOrder) => {
   </div>`;
 };
 const tplDealsTableHeader = () => `<div class="joco-table-header joco-table-row fb-font-bold fb-font-baskerville fb-font24">
-  <div>${_('Family')}</div><div>${_('Description')}</div><div>${_('Offered By')}</div>
+  <div>${_('Family')}</div><div>${_('Description')}</div><div></div><div>${_('Offered By')}</div>
 </div>`;
 const tplDealsTableFamilyItem = (familyId) => {
     const player = PlayerManager$1.getInstance().getPlayerForFamily(familyId);
@@ -4218,8 +4237,82 @@ const tplDealsTableFamilyItem = (familyId) => {
     <div class="fb-font-bold">${getFamilyName(familyId)}</div>
   </div>`;
 };
-const tplDealsTableRow = (deal) => `<div class="joco-table-row fb-font-baskerville">
-  ${tplDealsTableFamilyItem(deal.familyId)}<div>${deal.description}</div>${tplDealsTableFamilyItem(deal.offeredByFamilyId)}
+const escapeHtml = (text) => text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+const tplDealAssetLines = (deal, currentFamilyId) => {
+    const assetLabels = [deal.offeredByFamilyId, deal.familyId].map((familyId) => ({
+        familyId,
+        labels: getAssetLabels(deal.assets?.[familyId] ?? {}, getStaticCardLabel),
+    }));
+    if (assetLabels.every(({ labels }) => labels.length === 0)) {
+        return '';
+    }
+    const isAgreement = deal.status === 'agreement';
+    return assetLabels
+        .map(({ familyId, labels }) => {
+        const giver = familyId === currentFamilyId
+            ? formatStringRecursive(isAgreement
+                ? _('${tkn_boldText_you} gave')
+                : _('${tkn_boldText_you} will give'), { tkn_boldText_you: _('You') })
+            : formatStringRecursive(isAgreement
+                ? _('${tkn_playerName} gave')
+                : _('${tkn_playerName} will give'), {
+                tkn_playerName: PlayerManager$1.getInstance()
+                    .getPlayerForFamily(familyId)
+                    .getName(),
+            });
+        return `<div class="joco-deal-assets">${giver}: ${labels.length ? labels.join(', ') : _('nothing')}</div>`;
+    })
+        .join('');
+};
+const tplDealButtons = (deal, currentFamilyId) => {
+    if (deal.status === 'agreement') {
+        const reports = deal.reports ?? {};
+        const report = currentFamilyId ? reports[currentFamilyId] : undefined;
+        const participants = [deal.familyId, deal.offeredByFamilyId];
+        const reportLine = (familyId) => {
+            const familyReport = reports[familyId];
+            const result = familyReport === 'fulfilled'
+                ? _('Fulfilled')
+                : familyReport === 'violated'
+                    ? _('Violated')
+                    : _('Pending');
+            return `<div>${getFamilyName(familyId)}: ${result}</div>`;
+        };
+        return `<div class="joco-deal-buttons">
+      <div>${participants.map(reportLine).join('')}</div>
+      ${currentFamilyId && participants.includes(currentFamilyId) && !report ? `<div class="joco-deal-buttons">
+        <div class="bgabutton bgabutton_blue" data-deal-action="fulfilled" data-deal-id="${deal.id}">${_('Fulfilled')}</div>
+        <div class="bgabutton bgabutton_red" data-deal-action="violated" data-deal-id="${deal.id}">${_('Violated')}</div>
+      </div>` : ''}
+    </div>`;
+    }
+    if (deal.status !== 'offer') {
+        return '';
+    }
+    if (currentFamilyId === deal.familyId) {
+        return `<div class="joco-deal-buttons">
+      <div class="bgabutton bgabutton_blue" data-deal-action="accept" data-deal-id="${deal.id}">${_('Accept')}</div>
+      <div class="bgabutton bgabutton_red" data-deal-action="reject" data-deal-id="${deal.id}">${_('Reject')}</div>
+    </div>`;
+    }
+    if (currentFamilyId === deal.offeredByFamilyId) {
+        return `<div class="joco-deal-buttons">
+      <div class="bgabutton bgabutton_red" data-deal-action="reject" data-deal-id="${deal.id}">${_('Cancel')}</div>
+    </div>`;
+    }
+    return '';
+};
+const tplDealsTableDescription = (deal, currentFamilyId) => `<div class="joco-deal-description">
+  <div>${escapeHtml(deal.description)}</div>
+  ${tplDealAssetLines(deal, currentFamilyId)}
+</div>`;
+const tplDealsTableActions = (deal, currentFamilyId) => `<div class="joco-deal-actions">${tplDealButtons(deal, currentFamilyId)}</div>`;
+const tplDealsTableRow = (deal, currentFamilyId) => `<div id="joco-deal-${deal.id}" class="joco-table-row fb-font-baskerville">
+  ${tplDealsTableFamilyItem(deal.familyId)}${tplDealsTableDescription(deal, currentFamilyId)}${tplDealsTableActions(deal, currentFamilyId)}${tplDealsTableFamilyItem(deal.offeredByFamilyId)}
 </div>`;
 const tplOffers = () => `<div id="joco-offers" class="joco-deals-table-outer">
   <div id="joco-offers-inner" class="joco-deals-table-inner">
@@ -4229,7 +4322,7 @@ const tplOffers = () => `<div id="joco-offers" class="joco-deals-table-outer">
   
 </div>`;
 const tplAgreements = () => `<div id="joco-agreements" class="joco-deals-table-outer">
-  <div id="joco-offers-inner" class="joco-deals-table-inner">
+  <div id="joco-agreements-inner" class="joco-deals-table-inner">
   ${tplDealsTableHeader()}
   </div>
 </div>`;
@@ -4344,20 +4437,52 @@ class Deals {
             offers: document.getElementById('joco-offers-inner'),
             agreements: document.getElementById('joco-agreements-inner'),
         };
+        container.addEventListener('click', (event) => this.onDealButtonClick(event));
         this.updateTable(gamedatas);
     }
+    getCurrentFamilyId() {
+        return (PlayerManager$1.getInstance().getPlayer(this.game.getPlayerId())?.familyId ??
+            null);
+    }
     updateTable(gamedatas) {
-        Object.values(gamedatas.deals).forEach((deal) => {
-            if (deal.status === 'offer') {
-                this.ui.offers.insertAdjacentHTML('beforeend', tplDealsTableRow(deal));
-            }
-            else if (deal.status === 'agreement') {
-                this.ui.agreements.insertAdjacentHTML('beforeend', tplDealsTableRow(deal));
-            }
-        });
+        Object.values(gamedatas.deals).forEach((deal) => this.addDeal(deal));
     }
     addDeal(deal) {
-        this.ui.offers.insertAdjacentHTML('beforeend', tplDealsTableRow(deal));
+        const target = deal.status === 'offer'
+            ? this.ui.offers
+            : deal.status === 'agreement'
+                ? this.ui.agreements
+                : null;
+        target?.insertAdjacentHTML('beforeend', tplDealsTableRow(deal, this.getCurrentFamilyId()));
+    }
+    updateDeal(deal) {
+        document.getElementById(`joco-deal-${deal.id}`)?.remove();
+        this.addDeal(deal);
+    }
+    async onDealButtonClick(event) {
+        const button = event.target.closest('[data-deal-action]');
+        if (!button) {
+            return;
+        }
+        const { dealAction, dealId } = button.dataset;
+        const isAccept = dealAction === 'accept';
+        const isReject = dealAction === 'reject';
+        const report = dealAction === 'fulfilled' ? 'fulfilled' : 'violated';
+        const confirmed = await this.game.bga.dialogs.confirmation(isAccept
+            ? _('Are you sure you want to accept this offer?')
+            : isReject
+                ? _('Are you sure you want to reject this offer?')
+                : report === 'fulfilled'
+                    ? _('Mark this agreement fulfilled?')
+                    : _('Mark this agreement violated?'));
+        if (!confirmed) {
+            return;
+        }
+        this.game.bga.actions.performAction(isAccept
+            ? 'actAcceptOffer'
+            : isReject
+                ? 'actRejectOffer'
+                : 'actMarkAgreement', isAccept || isReject ? { dealId } : { dealId, report }, { checkAction: false, checkPossibleActions: false });
     }
     startNewOffer(opponentId) {
         this.newOffer.startNewOffer(opponentId);
@@ -5465,6 +5590,15 @@ class NotificationManager {
     }
     async notif_newDeal(notif) {
         Deals.getInstance().addDeal(notif.deal);
+    }
+    async notif_dealUpdated(notif) {
+        Deals.getInstance().updateDeal(notif.deal);
+    }
+    async notif_movePromiseCard(notif) {
+        const { card } = notif;
+        await Families.getInstance()
+            .getFamily(card.location)
+            .addPromiseCard(getPromiseCard(card));
     }
     async notif_removeCardFromGame(notif) {
         const { playerId, card } = notif;
@@ -10160,6 +10294,7 @@ class Game {
         this._selectableNodes = [];
         this.mobileVersion = false;
         this.isSpectator = false;
+        this.activePlayerIds = undefined;
         this.states = {
             ConfirmPartialTurn,
             ConfirmTurn,
@@ -10375,6 +10510,7 @@ class Game {
     onEnteringState(stateName, args) {
         console.log('Entering state: ' + stateName, args);
         const activePlayerIds = args.args?.activePlayerIds;
+        this.activePlayerIds = activePlayerIds;
         const playerIsActiveAndStateExists = this.bga.players.isCurrentPlayerActive() &&
             this.states[stateName];
         const currentPlayerId = this.getPlayerId();

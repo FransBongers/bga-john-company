@@ -1310,6 +1310,24 @@ class Notifications
     ]);
   }
 
+  public static function dealUpdated(Player $player, $deal, string $text)
+  {
+    self::notifyAll('dealUpdated', $text, [
+      'player' => $player,
+      'deal' => $deal->jsonSerialize(),
+    ]);
+  }
+
+  public static function movePromiseCard(Player $player, $card)
+  {
+    self::notifyAll('movePromiseCard', clienttranslate('${player_name} receives promise card ${tkn_boldText_title}'), [
+      'player' => $player,
+      'card' => $card->jsonSerialize(),
+      'tkn_boldText_title' => $card->getTitle(),
+      'i18n' => ['tkn_boldText_title'],
+    ]);
+  }
+
   public static function regionBecomesSovereign(Region $region)
   {
     self::updateRegion($region, clienttranslate('${tkn_boldText_region} becomes sovereign'), [

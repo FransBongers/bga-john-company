@@ -10,6 +10,7 @@ import {
   JocoCompanyFailureCardBase,
   JocoControlToken,
   JocoDeal,
+  JocoEnterpriseCardBase,
   JocoEventTileBase,
   JocoFamilyMember,
   JocoLawCardBase,
@@ -230,6 +231,14 @@ export interface NotifRefreshArmies {
 
 export interface NotifNewDeal extends NotifWithPlayerArgs {
   deal: JocoDeal;
+}
+
+export interface NotifDealUpdated extends NotifWithPlayerArgs {
+  deal: JocoDeal;
+}
+
+export interface NotifMovePromiseCard extends NotifWithPlayerArgs {
+  card: JocoPromiseCardBase;
 }
 
 export interface NotifRemoveCardFromGame extends NotifWithPlayerArgs {

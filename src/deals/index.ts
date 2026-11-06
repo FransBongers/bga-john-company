@@ -83,6 +83,10 @@ export class Deals {
       agreements: document.getElementById('joco-agreements-inner'),
     };
 
+    container.addEventListener('click', (event) =>
+      this.onDealButtonClick(event),
+    );
+
     this.updateTable(gamedatas);
   }
 
@@ -94,21 +98,67 @@ export class Deals {
   // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
   // ..#######..##........########..##.....##....##....########.....#######..####
 
+  private getCurrentFamilyId(): string | null {
+    return (
+      PlayerManager.getInstance().getPlayer(this.game.getPlayerId())?.familyId ??
+      null
+    );
+  }
+
   private updateTable(gamedatas: GamedatasAlias) {
-    Object.values(gamedatas.deals).forEach((deal) => {
-      if (deal.status === 'offer') {
-        this.ui.offers.insertAdjacentHTML('beforeend', tplDealsTableRow(deal));
-      } else if (deal.status === 'agreement') {
-        this.ui.agreements.insertAdjacentHTML(
-          'beforeend',
-          tplDealsTableRow(deal),
-        );
-      }
-    });
+    Object.values(gamedatas.deals).forEach((deal) => this.addDeal(deal));
   }
 
   public addDeal(deal: JocoDeal) {
-    this.ui.offers.insertAdjacentHTML('beforeend', tplDealsTableRow(deal));
+    const target =
+      deal.status === 'offer'
+        ? this.ui.offers
+        : deal.status === 'agreement'
+          ? this.ui.agreements
+          : null;
+    target?.insertAdjacentHTML(
+      'beforeend',
+      tplDealsTableRow(deal, this.getCurrentFamilyId()),
+    );
+  }
+
+  public updateDeal(deal: JocoDeal) {
+    document.getElementById(`joco-deal-${deal.id}`)?.remove();
+    this.addDeal(deal);
+  }
+
+  private async onDealButtonClick(event: Event) {
+    const button = (event.target as HTMLElement).closest<HTMLElement>(
+      '[data-deal-action]',
+    );
+    if (!button) {
+      return;
+    }
+    const { dealAction, dealId } = button.dataset;
+    const isAccept = dealAction === 'accept';
+    const isReject = dealAction === 'reject';
+    const report = dealAction === 'fulfilled' ? 'fulfilled' : 'violated';
+    const confirmed = await this.game.bga.dialogs.confirmation(
+      isAccept
+        ? _('Are you sure you want to accept this offer?')
+        : isReject
+          ? _('Are you sure you want to reject this offer?')
+          : report === 'fulfilled'
+            ? _('Mark this agreement fulfilled?')
+            : _('Mark this agreement violated?'),
+    );
+    if (!confirmed) {
+      return;
+    }
+    this.game.bga.actions.performAction(
+      isAccept
+        ? 'actAcceptOffer'
+        : isReject
+          ? 'actRejectOffer'
+          : 'actMarkAgreement',
+      isAccept || isReject ? { dealId } : { dealId, report },
+      { checkAction: false, checkPossibleActions: false },
+    );
   }
 
   public startNewOffer(opponentId: number) {
