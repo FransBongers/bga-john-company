@@ -3,7 +3,10 @@
 namespace Bga\Games\JohnCompany\Models;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\Players;
 
 class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
 {
@@ -48,13 +51,25 @@ class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     return Families::getPlayerIdByFamilyId(explode('_', $location)[1]);
   }
 
+  public function getOwnerPlayerId(): int
+  {
+    return (int) explode('_', $this->getId())[1];
+  }
+
   /**
    * Whether the effect of this promise card can be applied
    * Only for effects with specific timing windows
    */
-  public function effectCanBeApplied(): array | null
+  public function effectCanBeApplied(array $timingData): array | null
   {
-    throw new \Bga\GameFramework\VisibleSystemException("PROMISE_CARD_002");
+    if (!($this->getActingPlayerId() !== $this->getOwnerPlayerId())) {
+      return null;
+    }
+    return [
+      PLAYER_ID => $this->getActingPlayerId(),
+      CARD_ID => $this->getId(),
+      CARD_TYPE => PROMISE_CARD,
+    ];
   }
 
   /**
@@ -64,5 +79,21 @@ class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   public function applyEffect(object $ctx, Player $player, array $timingData)
   {
     throw new \Bga\GameFramework\VisibleSystemException("PROMISE_CARD_003");
+  }
+
+  public function returnToOwner()
+  {
+    $actingPlayerId = $this->getActingPlayerId();
+    $ownerPlayerId = $this->getOwnerPlayerId();
+    if ($actingPlayerId === $ownerPlayerId) {
+      throw new \Bga\GameFramework\VisibleSystemException("PROMISE_CARD_004");
+    }
+    $players = Players::getAll();
+
+    $this->setLocation(Locations::promiseCards($players[$ownerPlayerId]->getFamilyId()));
+    Notifications::movePromiseCard($players[$actingPlayerId], $this, clienttranslate('${player_name} returns ${tkn_promiseCard} to ${player_name2}'), [
+      'player' => $players[$actingPlayerId],
+      'player_name2' => $players[$ownerPlayerId]->getName()
+    ]);
   }
 }

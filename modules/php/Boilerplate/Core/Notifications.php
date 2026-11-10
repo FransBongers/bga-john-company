@@ -1318,14 +1318,17 @@ class Notifications
     ]);
   }
 
-  public static function movePromiseCard(Player $player, $card)
+  public static function movePromiseCard(Player $player, PromiseCard $card, string | null $text = null, array | null $textArgs = null)
   {
-    self::notifyAll('movePromiseCard', clienttranslate('${player_name} receives promise card ${tkn_boldText_title}'), [
+    $text = $text ?? clienttranslate('${player_name} receives ${tkn_promiseCard}');
+    $textArgs = $textArgs ?? [
       'player' => $player,
+    ];
+
+    self::notifyAll('movePromiseCard', $text, array_merge($textArgs, [
       'card' => $card->jsonSerialize(),
-      'tkn_boldText_title' => $card->getTitle(),
-      'i18n' => ['tkn_boldText_title'],
-    ]);
+      'tkn_promiseCard' => $card->getId(),
+    ]));
   }
 
   public static function regionBecomesSovereign(Region $region)

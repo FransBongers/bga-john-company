@@ -4,6 +4,7 @@ namespace Bga\Games\JohnCompany\Actions;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Managers\Prizes;
+use Bga\Games\JohnCompany\Managers\PromiseCards;
 use Bga\Games\JohnCompany\Models\Player;
 
 class LondonSeasonOrder extends \Bga\Games\JohnCompany\Models\AtomicAction
@@ -36,9 +37,20 @@ class LondonSeasonOrder extends \Bga\Games\JohnCompany\Models\AtomicAction
     $chooseCardActions = [];
     foreach ($playerIds as $playerId) {
       $chooseCardActions[] = [
-        'action' => LONDON_SEASON_CHOOSE_CARD,
-        'playerId' => 'some',
-        'activePlayerIds' => [$playerId],
+        'children' => [
+          [
+            'action' => TIMING_WINDOW_CHECK,
+            'args' => [
+              TIMING_WINDOW => [START_OF_LONDON_SEASON_CHOOSE_CARD],
+              PROMISE_CARD => [PromiseCards::getPromiseCardId($playerId, TAKE_MY_LONDON_SEASON_CARD)],
+            ],
+          ],
+          [
+            'action' => LONDON_SEASON_CHOOSE_CARD,
+            'playerId' => 'some',
+            'activePlayerIds' => [$playerId],
+          ]
+        ]
       ];
     }
 

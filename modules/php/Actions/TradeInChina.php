@@ -2,6 +2,7 @@
 
 namespace Bga\Games\JohnCompany\Actions;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\JoCoUtils;
@@ -83,7 +84,9 @@ class TradeInChina extends \Bga\Games\JohnCompany\Models\AtomicAction
       $balance = Company::incBalance($amount);
       Notifications::addCashToCompanyBalance($player, $amount, $balance);
 
-      $player->getFamily()->gainCash($numberOfExportIcons);
+      $bonus = $numberOfExportIcons;
+      $player->getFamily()->gainCash($bonus);
+      Globals::setOfficeHolderBonus($bonus);
     }
 
     Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');

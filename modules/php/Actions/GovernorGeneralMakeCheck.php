@@ -3,6 +3,7 @@
 namespace Bga\Games\JohnCompany\Actions;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
+use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\JoCoUtils;
@@ -94,7 +95,9 @@ class GovernorGeneralMakeCheck extends \Bga\Games\JohnCompany\Models\AtomicActio
       ];
       $this->ctx->insertAsBrother(Engine::buildTree($action));
     } elseif ($checkResult === SUCCESS) {
-      $player->getFamily()->gainCash(count($companyControlledRegions) + ($zamindarTaxesInPlay ? 3 : 0));
+      $bonus = count($companyControlledRegions) + ($zamindarTaxesInPlay ? 3 : 0);
+      $player->getFamily()->gainCash($bonus);
+      Globals::setOfficeHolderBonus($bonus);
       $this->insertGovernorGeneralActions($player, $playerId);
     }
 

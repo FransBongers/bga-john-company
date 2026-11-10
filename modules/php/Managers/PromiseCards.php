@@ -44,6 +44,11 @@ class PromiseCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   // .##....##.##..........##....##.....##.##.......
   // ..######..########....##.....#######..##.......
 
+  public static function getPromiseCardId(int $playerId, string $type)
+  {
+    return implode('_', ['PC', $playerId, $type]);
+  }
+
   public static function setupNewGame($players = null, $options = null)
   {
     $cards = [];
@@ -53,7 +58,7 @@ class PromiseCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     foreach ($players as $playerId => $player) {
       $familyId = $player->getFamilyId();
       foreach (PROMISE_CARD_TYPES as $type) {
-        $cId = implode('_', ['PC', $player->getId(), $type]);
+        $cId = self::getPromiseCardId($player->getId(), $type);
         $cards[$cId] = [
           'id' => $cId,
           'location' => Locations::promiseCards($familyId),

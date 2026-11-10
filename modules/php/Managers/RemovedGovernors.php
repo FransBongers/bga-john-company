@@ -21,11 +21,15 @@ class RemovedGovernors
     }
   }
 
-  private static function set(string $key, string | int | array $value)
+  public static function add(string $familyMemberId, string $governorId, string $source)
   {
-    $item = Globals::getRemovedGovernors();
-    $item[$key] = $value;
-    Globals::setRemovedGovernors($item);
+    $removedGovernors = Globals::getRemovedGovernors();
+    $removedGovernors[] = [
+      'familyMemberId' => $familyMemberId,
+      'governorId' => $governorId,
+      'source' => $source, // CATASTROPHIC_FAILURE or REGION_LOSS
+    ];
+    Globals::setRemovedGovernors($removedGovernors);
   }
 
   public static function setupNewGame()
@@ -36,5 +40,16 @@ class RemovedGovernors
   public static function reset()
   {
     Globals::setRemovedGovernors([]);
+  }
+
+  public static function hasBeenRemoved(string $officeId, string | null $source = null): bool
+  {
+    $removedGovernors = Globals::getRemovedGovernors();
+    foreach ($removedGovernors as $removedGovernor) {
+      if ($removedGovernor['governorId'] === $officeId && ($source === null || $removedGovernor['source'] === $source)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

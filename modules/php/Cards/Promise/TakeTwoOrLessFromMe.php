@@ -2,11 +2,37 @@
 
 namespace Bga\Games\JohnCompany\Cards\Promise;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
+use Bga\Games\JohnCompany\Managers\Players;
+use Bga\Games\JohnCompany\Models\Player;
+
 class TakeTwoOrLessFromMe extends \Bga\Games\JohnCompany\Models\PromiseCard
 {
   public function __construct($row)
   {
     parent::__construct($row);
     $this->title = clienttranslate('Take £2 or less from me.');
+  }
+
+  public function applyEffect(object $ctx, Player $player, array $timingData)
+  {
+    $ownerPlayer = Players::get($this->getOwnerPlayerId());
+    $family = $ownerPlayer->getFamily();
+
+    $amount = min(2, $family->getTreasury());
+
+    $counterChanges = [
+      $player->getFamilyId() => [CASH_COUNTER => $amount],
+      $ownerPlayer->getFamilyId() => [CASH_COUNTER => -$amount],
+    ];
+
+    Notifications::updateCountersMultipleTargets($counterChanges, clienttranslate('${player_name} takes ${tkn_boldText_amount} from ${player_name2}'), [
+      'player' => $player,
+      'tkn_boldText_amount' => '£' . $amount,
+      'player_name2' => $ownerPlayer->getName(),
+    ]);
+
+    $this->returnToOwner();
   }
 }

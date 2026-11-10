@@ -48,7 +48,8 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     'latestCheck' => 'obj',
     'oldIdeasMadeNew' => 'bool',
     'selectedOffice' => 'str',
-    'additionalWindowTax' => 'bool'
+    'additionalWindowTax' => 'bool',
+    'officeHolderBonus' => 'int'
   ];
 
   protected static $table = 'global_variables';
@@ -195,7 +196,7 @@ class Globals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
     self::setLatestCheck([]);
     self::setAdditionalWindowTax(false);
     // self::setScenarioId(THE_1710_SCENARIO);
-    
+    self::setOfficeHolderBonus(0);
   }
 
 

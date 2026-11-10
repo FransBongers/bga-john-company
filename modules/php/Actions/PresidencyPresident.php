@@ -3,9 +3,11 @@
 namespace Bga\Games\JohnCompany\Actions;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
+use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\Offices;
+use Bga\Games\JohnCompany\Managers\PromiseCards;
 use Bga\Games\JohnCompany\Models\Player;
 
 class PresidencyPresident extends \Bga\Games\JohnCompany\Models\AtomicAction
@@ -41,6 +43,8 @@ class PresidencyPresident extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     Notifications::nextPhase($office->getTitle());
 
+    Globals::setOfficeHolderBonus(0);
+
     $this->ctx->insertAsBrother(
       Engine::buildTree(
         [
@@ -63,6 +67,7 @@ class PresidencyPresident extends \Bga\Games\JohnCompany\Models\AtomicAction
               'args' => [
                 TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
                 LAW_CARD => [BOARD_OF_CONTROL_ID],
+                PROMISE_CARD => [PromiseCards::getPromiseCardId($presidentPlayerId, TAKE_MY_OFFICE_HOLDER_BONUS)],
                 TIMING_DATA => [
                   'officeId' => $office->getId()
                 ],

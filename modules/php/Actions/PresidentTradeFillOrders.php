@@ -4,6 +4,7 @@ namespace Bga\Games\JohnCompany\Actions;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
+use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
@@ -112,6 +113,7 @@ class PresidentTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidency
       $income[COMPANY] = $presidentBonus;
     } else {
       $income[$player->getFamilyId()] = $presidentBonus; // player performing the action is president
+      Globals::setOfficeHolderBonus($presidentBonus);
     }
 
     $writerBonus = $this->getWriterBonus();

@@ -3,6 +3,7 @@
 namespace Bga\Games\JohnCompany\Cards\CompanyFailure;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
+use Bga\Games\JohnCompany\Managers\RemovedGovernors;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Parliament;
@@ -20,7 +21,7 @@ class CompanyFailureCard_06 extends \Bga\Games\JohnCompany\Models\CompanyFailure
 
   public function resolveEffect()
   {
-    $removedGovernors = Globals::getRemovedGovernors();
+    $removedGovernors = RemovedGovernors::get();
     $offices = Offices::getAll()->toArray();
     $governorOffices = [
       GOVERNOR_OF_BOMBAY,
@@ -50,7 +51,11 @@ class CompanyFailureCard_06 extends \Bga\Games\JohnCompany\Models\CompanyFailure
         }
       }
 
-      foreach ($removedGovernors as $familyMemberId) {
+      foreach ($removedGovernors as $data) {
+        if ($data['source'] !== REGION_LOSS) {
+          continue;
+        }
+        $familyMemberId = $data['familyMemberId'];
         if (explode('_', $familyMemberId)[1] === $familyId) {
           $penalty += 2;
         }

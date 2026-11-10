@@ -3,8 +3,10 @@
 namespace Bga\Games\JohnCompany\Actions;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
+use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Managers\Offices;
+use Bga\Games\JohnCompany\Managers\PromiseCards;
 use Bga\Games\JohnCompany\Models\Player;
 
 class PresidencyGovernor extends \Bga\Games\JohnCompany\Models\AtomicAction
@@ -39,6 +41,9 @@ class PresidencyGovernor extends \Bga\Games\JohnCompany\Models\AtomicAction
     $governorOffice = Offices::get($officeId);
 
     Notifications::nextPhase($governorOffice->getTitle());
+    $governorPlayerId = $governorOffice->getPlayerId();
+
+    Globals::setOfficeHolderBonus(0);
 
     $this->ctx->insertAsBrother(
       Engine::buildTree(
@@ -47,7 +52,7 @@ class PresidencyGovernor extends \Bga\Games\JohnCompany\Models\AtomicAction
             [
               'action' => GOVERNOR_ADMINISTER,
               'playerId' => 'some',
-              'activePlayerIds' => [$governorOffice->getPlayerId()],
+              'activePlayerIds' => [$governorPlayerId],
               'optional' => true,
               'args' => [
                 'officeId' => $governorOffice->getId(),
@@ -60,6 +65,7 @@ class PresidencyGovernor extends \Bga\Games\JohnCompany\Models\AtomicAction
               'args' => [
                 TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
                 LAW_CARD => [BOARD_OF_CONTROL_ID],
+                PROMISE_CARD => [PromiseCards::getPromiseCardId($governorPlayerId, TAKE_MY_OFFICE_HOLDER_BONUS)],
                 TIMING_DATA => [
                   'officeId' => $governorOffice->getId()
                 ],

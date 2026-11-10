@@ -8,6 +8,7 @@ use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Regions;
+use Bga\Games\JohnCompany\Managers\RemovedGovernors;
 use Bga\Games\JohnCompany\Managers\Ships;
 use Bga\Games\JohnCompany\Models\Region;
 
@@ -72,9 +73,8 @@ class Governor extends \Bga\Games\JohnCompany\Models\Office
     $familyMember = $this->getFamilyMember();
     if ($familyMember !== null) {
       $familyMember->returnToSupply();
-      $removedGovernors = Globals::getRemovedGovernors();
-      $removedGovernors[] = $this->getId();
-      Globals::setRemovedGovernors($removedGovernors);
+  
+      RemovedGovernors::add($familyMember->getId(), $this->getId(), REGION_LOSS);
     }
     $this->removeCompanyShip();
     $this->returnToSupply();

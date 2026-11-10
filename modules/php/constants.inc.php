@@ -18,6 +18,7 @@ const SUCCESS = 'success';
 const FAILURE = 'failure';
 const CATASTROPHIC_FAILURE = 'catastrophicFailure';
 
+const REGION_LOSS = 'regionLoss';
 /**
  * Deals
  */
@@ -319,6 +320,7 @@ const FINAL_RETIREMENT = 'finalRetirement';
 /**
  * Counters
  */
+const CASH_COUNTER = 'cash';
 const PASSED_LAW_TOKENS = 'passedLawTokens';
 const TROPHIES = 'trophies';
 
@@ -716,14 +718,14 @@ const OPEN = 'open';
  */
 const MY_CONSENT_FOR_NEPOTISM = 'MyConsentForNepotism';
 const TAKE_MY_LONDON_SEASON_CARD = 'TakeMyLondonSeasonCard';
-const TAKE_MY_OFFICE__HOLDER_BONUS = 'TakeMyOfficeHolderBonus';
+const TAKE_MY_OFFICE_HOLDER_BONUS = 'TakeMyOfficeHolderBonus';
 const TAKE_TWO_OR_LESS_FROM_ME = 'TakeTwoOrLessFromMe';
 const VOTE_WITH_MY_ENTERPRISES = 'VoteWithMyEnterprises';
 
 const PROMISE_CARD_TYPES = [
   MY_CONSENT_FOR_NEPOTISM,
   TAKE_MY_LONDON_SEASON_CARD,
-  TAKE_MY_OFFICE__HOLDER_BONUS,
+  TAKE_MY_OFFICE_HOLDER_BONUS,
   TAKE_TWO_OR_LESS_FROM_ME,
   VOTE_WITH_MY_ENTERPRISES,
 ];
@@ -1079,12 +1081,13 @@ const AFTER_OFFICE_FINISHED_ACTING = 'afterOfficeFinishedActing';
 const WHEN_TAKEN_FROM_DISPLAY = 'whenTakenFromDisplay';
 const ANY_TIME_AFTER_REVENUE_PHASE = 'anyTimeAfterRevenuePhase';
 const START_OF_REVENUE_PHASE = 'startOfRevenuePhase';
+const START_OF_LONDON_SEASON_CHOOSE_CARD = 'startOfLondonSeasonChooseCard';
 const WHEN_A_BLACKMAIL_CARD_IS_PLAYED = 'whenABlackmailCardIsPlayed';
 const WHEN_RETIRING = 'whenRetiring';
 const BEFORE_THE_FAMILY_PHASE = 'beforeTheFamilyPhase';
 const BEFORE_EVENTS_IN_INDIA_PHASE = 'beforeEventsInIndiaPhase';
 const BEFORE_BOMBAY_PRESIDENCY_OPERATIONS = 'beforeBombayPresidencyOperations';
-
+const BEFORE_ANY_VOTES_ARE_CAST = 'beforeAnyVotesAreCast';
 
 const REMOVED = 'removed';
 

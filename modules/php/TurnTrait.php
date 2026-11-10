@@ -15,6 +15,7 @@ use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Parliament;
+use Bga\Games\JohnCompany\Managers\PromiseCards;
 use Bga\Games\JohnCompany\Managers\RemovedGovernors;
 use Bga\Games\JohnCompany\Managers\Scenarios;
 
@@ -327,6 +328,7 @@ trait TurnTrait
     $playerId = $office->getPlayerId();
 
     $office->increaseCompanyBalance($playerId);
+    Globals::setOfficeHolderBonus(0);
 
     $node = [
       'children' => [
@@ -336,6 +338,17 @@ trait TurnTrait
           'activePlayerIds' => [$playerId],
           'optional' => true,
         ],
+        [
+          'action' => TIMING_WINDOW_CHECK,
+          'args' => [
+            TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
+            LAW_CARD => [BOARD_OF_CONTROL_ID],
+            PROMISE_CARD => [PromiseCards::getPromiseCardId($playerId, TAKE_MY_OFFICE_HOLDER_BONUS)],
+            TIMING_DATA => [
+              'officeId' => GOVERNOR_GENERAL
+            ],
+          ],
+        ]
       ],
     ];
 
@@ -548,6 +561,7 @@ trait TurnTrait
     }
 
     $this->updatePhase(SUPERINTENDENT_OF_TRADE_IN_CHINA);
+    Globals::setOfficeHolderBonus(0);
 
     $node = [
       'children' => [
@@ -562,6 +576,7 @@ trait TurnTrait
           'args' => [
             TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
             LAW_CARD => [BOARD_OF_CONTROL_ID],
+            PROMISE_CARD => [PromiseCards::getPromiseCardId($office->getPlayerId(), TAKE_MY_OFFICE_HOLDER_BONUS)],
             TIMING_DATA => [
               'officeId' => SUPERINTENDENT_OF_TRADE_IN_CHINA
             ],
@@ -736,7 +751,16 @@ trait TurnTrait
       $children[] = LondonSeasonCards::get(TAX_COLLECTORS_ID)->getTaxCollectorsAction($taxCollectordsFamily->getPlayerId());
     }
 
+    $playerIds = Players::getTurnOrder();
+
     $children = array_merge($children, [
+      [
+        'action' => TIMING_WINDOW_CHECK,
+        'args' => [
+          TIMING_WINDOW => [BEFORE_ANY_VOTES_ARE_CAST],
+          PROMISE_CARD => array_map(fn($playerId) => PromiseCards::getPromiseCardId($playerId, VOTE_WITH_MY_ENTERPRISES), $playerIds),
+        ],
+      ],
       Parliament::getRoundOfVotingNodes(),
       [
         'action' => PARLIAMENT_MEETS_CLEANUP,

@@ -30,6 +30,7 @@ class Parliament
       AGAINST => [], // array of $playerId
       SELECTING_LAW => false,
       SUPPORT => 0,
+      VOTE_WITH_MY_ENTERPRISES => [], // array of $playerId => PromiseCardId
     ]);
   }
 
@@ -48,6 +49,7 @@ class Parliament
       'votes' => [],
       'leader' => null,
     ];
+    $data[VOTE_WITH_MY_ENTERPRISES] = [];
     $data[SELECTING_LAW] = false;
     Globals::setParliament($data);
     return self::getUiData();
@@ -152,6 +154,16 @@ class Parliament
   {
     $primeMinisterPlayer = self::getPrimeMinisterPlayer();
     return $primeMinisterPlayer ? $primeMinisterPlayer->getId() : null;
+  }
+
+  public static function updateVoteWithMyEnterprises(int $playerId, int $votesForPlayerId)
+  {
+    $data = Globals::getParliament();
+    if (!isset($data[VOTE_WITH_MY_ENTERPRISES][$playerId])) {
+      $data[VOTE_WITH_MY_ENTERPRISES][$playerId] = [];
+    }
+    $data[VOTE_WITH_MY_ENTERPRISES][$playerId][] = $votesForPlayerId;
+    Globals::setParliament($data);
   }
 
   public static function getPrimeMinisterPlayer()

@@ -65,10 +65,10 @@ class MoveElephant extends \Bga\Games\JohnCompany\Models\AtomicAction
     $options = $this->getLegalOptions();
 
     if (!isset($options[$locationId])) {
-      throw new \Bga\GameFramework\VisibleSystemException("ERROR_084");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_085");
     }
     if (!empty($options[$locationId]) && !in_array($facing, $options[$locationId])) {
-      throw new \Bga\GameFramework\VisibleSystemException("ERROR_085");
+      throw new \Bga\GameFramework\VisibleSystemException("ERROR_086");
     }
 
     Elephant::move($locationId, $facing);

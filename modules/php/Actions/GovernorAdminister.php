@@ -4,6 +4,7 @@ namespace Bga\Games\JohnCompany\Actions;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
+use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\JoCoUtils;
@@ -87,7 +88,9 @@ class GovernorAdminister extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     if ($checkResult === SUCCESS) {
       $family = $player->getFamily();
-      $family->gainCash($stateArgs['previousRollNoSuccess'] ? 2 : 1);
+      $bonus = $stateArgs['previousRollNoSuccess'] ? 2 : 1;
+      $family->gainCash($bonus);
+      Globals::incOfficeHolderBonus($bonus);
       $this->insertAdministerSuccessChoice($playerId, $stateArgs['governor']->getId());
     } else {
       $region = $stateArgs['governor']->getRegion();
