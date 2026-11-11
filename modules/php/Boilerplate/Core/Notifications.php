@@ -9,6 +9,7 @@ use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Managers\ControlTokens;
 use Bga\Games\JohnCompany\Managers\EventTiles;
+use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Prizes;
@@ -16,6 +17,7 @@ use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Managers\Ships;
 use Bga\Games\JohnCompany\Models\ArmyPiece;
 use Bga\Games\JohnCompany\Models\CompanyFailureCard;
+use Bga\Games\JohnCompany\Models\Deal;
 use Bga\Games\JohnCompany\Models\Enterprise;
 use Bga\Games\JohnCompany\Models\EventTile;
 use Bga\Games\JohnCompany\Models\Family;
@@ -270,6 +272,70 @@ class Notifications
       $key = 'tkn_londonSeasonCard_' . $index;
       $log = $log . '${' . $key . '}';
       $args[$key] = $londonSeasonCard->getId();
+    }
+
+    return [
+      'log' => $log,
+      'args' => $args,
+    ];
+  }
+
+  /**
+   * Transferred assets structure:
+   * 'counters' => [],
+   * 'shares' => [],
+   * 'enterprises' => [],
+   * 'promiseCards' => [],
+   * 'prestigeCards' => [],
+   */
+  public static function createTransferredAssetsLog(array $transferredAssets)
+  {
+    $logItems = [];
+    $args = [];
+
+    foreach ($transferredAssets as $type => $assets) {
+      if ($type === 'counters') {
+        foreach ($assets as $counterChanges) {
+          foreach ($counterChanges as $amount) {
+            if ($amount <= 0) {
+              continue;
+            }
+
+            $key = 'tkn_boldText_amount_' . count($args);
+            $logItems[] = '${' . $key . '}';
+            $args[$key] = '£' . $amount;
+          }
+        }
+      } elseif ($type === 'shares') {
+        if (!empty($assets)) {
+          $logItems = array_merge($logItems, array_fill(0, count($assets), '${tkn_icon}'));
+          $args['tkn_icon'] = SHARE;
+        }
+      } elseif ($type === 'enterprises') {
+        foreach ($assets as $index => $enterprise) {
+          $key = 'tkn_enterpriseCard_' . $index;
+          $logItems[] = '${' . $key . '}';
+          $args[$key] = self::tknEnterpriseCard($enterprise);
+        }
+      } elseif ($type === 'promiseCards') {
+        foreach ($assets as $index => $card) {
+          $key = 'tkn_promiseCard_' . $index;
+          $logItems[] = '${' . $key . '}';
+          $args[$key] = $card->getId();
+        }
+      } elseif ($type === 'prestigeCards') {
+        foreach ($assets as $index => $card) {
+          $key = 'tkn_londonSeasonCard_' . $index;
+          $logItems[] = '${' . $key . '}';
+          $args[$key] = $card->getId();
+        }
+      }
+    }
+
+    $lastItem = array_pop($logItems);
+    $log = implode(', ', $logItems);
+    if ($lastItem !== null) {
+      $log .= $log === '' ? $lastItem : ' & ' . $lastItem;
     }
 
     return [
@@ -1302,20 +1368,34 @@ class Notifications
     ]);
   }
 
-  public static function newDeal(Player $player, $deal)
+  public static function newDeal(Player $player, Deal $deal)
   {
-    self::notifyAll('newDeal', clienttranslate('${player_name} makes a new offer'), [
+    self::notifyAll('newDeal', '', [
       'player' => $player,
       'deal' => $deal->jsonSerialize(),
     ]);
   }
 
-  public static function dealUpdated(Player $player, $deal, string $text)
+  public static function dealUpdated(Deal $deal, array $transferredAssets = [])
   {
-    self::notifyAll('dealUpdated', $text, [
-      'player' => $player,
+    $text = '';
+    $textArgs = [];
+    if (!empty($transferredAssets)) {
+      $offerer = Families::get($deal->getOfferedByFamilyId())->getPlayer();
+      $target = Families::get($deal->getFamilyId())->getPlayer();
+      $text = clienttranslate('${player_name} and ${player_name2} make a deal:<br>${player_name} gains: ${assetLog1}<br>${player_name2} gains: ${assetLog2}');
+      $textArgs = [
+        'player' => $offerer,
+        'player_name2' => $target->getName(),
+        'assetLog1' => self::createTransferredAssetsLog($transferredAssets[$offerer->getId()] ?? []),
+        'assetLog2' => self::createTransferredAssetsLog($transferredAssets[$target->getId()] ?? []),
+      ];
+    }
+
+    self::notifyAll('dealUpdated', $text, array_merge($textArgs, [
       'deal' => $deal->jsonSerialize(),
-    ]);
+      'transferredAssets' => $transferredAssets,
+    ]));
   }
 
   public static function movePromiseCard(Player $player, PromiseCard $card, string | null $text = null, array | null $textArgs = null)

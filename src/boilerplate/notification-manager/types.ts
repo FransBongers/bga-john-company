@@ -235,6 +235,19 @@ export interface NotifNewDeal extends NotifWithPlayerArgs {
 
 export interface NotifDealUpdated extends NotifWithPlayerArgs {
   deal: JocoDeal;
+  transferredAssets: Record<
+    string,
+    {
+      counters: Record<number, Record<string, number>>;
+      shares: Array<{
+        returned: JocoFamilyMember;
+        new: JocoFamilyMember;
+      }>;
+      enterprises: JocoEnterpriseCardBase[];
+      promiseCards: JocoPromiseCardBase[];
+      prestigeCards: JocoLondonSeasonCardBase[];
+    }
+  >;
 }
 
 export interface NotifMovePromiseCard extends NotifWithPlayerArgs {

@@ -3869,7 +3869,13 @@ class TooltipManager {
     addEnterpriseCardTooltip({ nodeId, cardId, imageOnly = false, invested, shipId, }) {
         const type = cardId.split('_')[0];
         const card = StaticData$1.get().enterpriseCard(cardId);
-        const html = tplEnterpriseCardTooltip({ id: cardId, ...card, type, invested, shipId });
+        const html = tplEnterpriseCardTooltip({
+            id: cardId,
+            ...card,
+            type,
+            invested,
+            shipId,
+        });
         this.game.bga.gameui.addTooltipHtml(nodeId, html, 400);
     }
     addLawCardTooltip({ nodeId, cardId, }) {
@@ -3883,6 +3889,11 @@ class TooltipManager {
     addLondonSeasonCardTooltip({ nodeId, cardId, imageOnly = false, }) {
         const card = StaticData$1.get().londonSeasonCard(cardId);
         const html = tplLondonSeasonCardTooltip({ id: cardId, ...card });
+        this.game.bga.gameui.addTooltipHtml(nodeId, html, 400);
+    }
+    addPromiseCardTooltip({ nodeId, cardId, }) {
+        const card = StaticData$1.get().promiseCard(cardId);
+        const html = tplPromiseCard({ id: cardId, ...card });
         this.game.bga.gameui.addTooltipHtml(nodeId, html, 400);
     }
     addBlackmailBackTooltip(nodeId) {
@@ -5215,7 +5226,7 @@ class NotificationManager {
             handlers: [this.game.notificationManager],
             logger: debug,
             onStart: (notifName, msg, args) => {
-                if (msg != '') {
+                if (msg != '' && notifName !== 'dealUpdated') {
                     $('gameaction_status').innerHTML = msg;
                     $('pagemaintitletext').innerHTML = msg;
                     $('generalactions').innerHTML = '';
@@ -5923,6 +5934,7 @@ const LOG_TOKEN_LONDON_SEASON_CARD = 'londonSeasonCard';
 const LOG_TOKEN_PASSED_LAW_TOKEN = 'passedLawToken';
 const LOG_TOKEN_POLICY_ICON = 'policyIcon';
 const LOG_TOKEN_POWER_MARKER = 'powerMarker';
+const LOG_TOKEN_PROMISE_CARD = 'promiseCard';
 const LOG_TOKEN_REGIMENT = 'regiment';
 const LOG_TOKEN_PROMISE_CUBE = 'promiseCube';
 const LOG_TOKEN_SETUP_CARD = 'setupCard';
@@ -6024,6 +6036,8 @@ const getTokenDiv = ({ key, value, game, }) => {
                     color: player.getColor(),
                 })
                 : value;
+        case LOG_TOKEN_PROMISE_CARD:
+            return tplTextWithTooltip(game, value, StaticData$1.get().promiseCard(value).title);
         case LOG_TOKEN_UNREST:
             return tplLogTokenCube('unrest');
         case LOG_TOKEN_VICTORY_POINTS:
@@ -10703,6 +10717,12 @@ class Game {
                 cardId,
                 invested: cardId.startsWith(WORKSHOP) && data === 'invested',
                 shipId: cardId.startsWith(SHIPYARD) ? data : null,
+            });
+        }
+        else if (this.gamedatas.staticData.promiseCards[cardId]) {
+            tooltipManager.addPromiseCardTooltip({
+                nodeId: `tooltip_${tooltipId}`,
+                cardId,
             });
         }
     }

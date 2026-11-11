@@ -45,6 +45,7 @@ const LOG_TOKEN_LONDON_SEASON_CARD = 'londonSeasonCard';
 const LOG_TOKEN_PASSED_LAW_TOKEN = 'passedLawToken';
 const LOG_TOKEN_POLICY_ICON = 'policyIcon';
 const LOG_TOKEN_POWER_MARKER = 'powerMarker';
+const LOG_TOKEN_PROMISE_CARD = 'promiseCard';
 const LOG_TOKEN_REGIMENT = 'regiment';
 const LOG_TOKEN_PROMISE_CUBE = 'promiseCube';
 const LOG_TOKEN_SETUP_CARD = 'setupCard';
@@ -165,6 +166,12 @@ export const getTokenDiv = ({
             color: player.getColor(),
           })
         : value;
+    case LOG_TOKEN_PROMISE_CARD:
+      return tplTextWithTooltip(
+        game,
+        value,
+        StaticData.get().promiseCard(value).title,
+      );
     case LOG_TOKEN_UNREST:
       return tplLogTokenCube('unrest');
     case LOG_TOKEN_VICTORY_POINTS:

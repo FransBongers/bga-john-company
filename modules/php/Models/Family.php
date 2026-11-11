@@ -124,13 +124,15 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   }
 
 
-  public function gainCash(int $amount, string | null $source = null)
+  public function gainCash(int $amount, string | null $source = null, bool $skipNotification = false)
   {
     if ($amount === 0) {
       return;
     }
     $this->incTreasury($amount);
-    Notifications::updateFamilyTreasury($this->getPlayer(), $amount, $source);
+    if (!$skipNotification) {
+      Notifications::updateFamilyTreasury($this->getPlayer(), $amount, $source);
+    }
   }
 
   public function gainTrophies(int $amount)

@@ -946,6 +946,11 @@ export class Game {
         invested: cardId.startsWith(WORKSHOP) && data === 'invested',
         shipId: cardId.startsWith(SHIPYARD) ? data : null,
       });
+    } else if (this.gamedatas.staticData.promiseCards[cardId]) {
+      tooltipManager.addPromiseCardTooltip({
+        nodeId: `tooltip_${tooltipId}`,
+        cardId,
+      });
     }
   }
 

@@ -38,6 +38,13 @@ class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     Notifications::removeCardFromGame($player, $this);
   }
 
+  public function getStaticData(): array
+  {
+    $data = parent::getStaticData();
+    $data['familyId'] = $this->getFamilyId();
+    return $data;
+  }
+
   /**
    * Acting player for any effect of this promise card
    */

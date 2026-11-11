@@ -41,7 +41,7 @@ export const tplEnterpriseCardTooltip = (
 };
 
 export const tplPromiseCard = (
-  data: JocoPromiseCardStatic & { id: string; familyId: string },
+  data: JocoPromiseCardStatic & { id: string },
 ) => {
   return `
   <div class="joco-promise-card joco-small-card-horizontal tooltip" data-background="PromiseCard${data.familyId}">

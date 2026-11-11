@@ -53,29 +53,34 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
     return $this->jsonSerialize(); // Static datas are already in js file
   }
 
-  public function returnToSupply()
+  public function returnToSupply($skipNotification = false)
   {
     $office = $this->getOffice();
     if ($office !== null) {
       $office->setFamilyMemberId(null);
     }
     $this->setLocation(Locations::familyMemberSupply($this->familyId));
-    Notifications::returnFamilyMemberToSupply(Players::getPlayerForFamily($this->familyId), $this);
+    if (!$skipNotification) {
+      Notifications::returnFamilyMemberToSupply(Players::getPlayerForFamily($this->familyId), $this);
+    }
   }
 
   public function moveTo(Player $player, string $to, array $options = [])
   {
     $skipFrom = $options['skipFrom'] ?? false;
+    $skipNotification = $options['skipNotification'] ?? false;
     $text = $options['text'] ?? null;
     $textArgs = $options['textArgs'] ?? null;
 
     $from = $skipFrom ? null : $this->getLocation();
     $this->setLocation($to);
-    Notifications::moveFamilyMember($player, $this, [
-      'from' => $from,
-      'text' => $text,
-      'textArgs' => $textArgs,
-    ]);
+    if (!$skipNotification) {
+      Notifications::moveFamilyMember($player, $this, [
+        'from' => $from,
+        'text' => $text,
+        'textArgs' => $textArgs,
+      ]);
+    }
   }
 
   public function isCommander()

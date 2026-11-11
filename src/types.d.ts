@@ -449,6 +449,7 @@ export interface JocoPromiseCardBase extends GamePiece {
 
 export interface JocoPromiseCardStatic {
   title: string;
+  familyId: string;
 }
 
 export type JocoPromiseCard = JocoPromiseCardBase & JocoPromiseCardStatic;

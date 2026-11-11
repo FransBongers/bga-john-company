@@ -12,6 +12,7 @@ import {
   tplEnterpriseCardTooltip,
   tplLawCardTooltip,
   tplLondonSeasonCardTooltip,
+  tplPromiseCard,
 } from './templates';
 export * from './templates';
 
@@ -97,7 +98,13 @@ export class TooltipManager {
   }) {
     const type = cardId.split('_')[0];
     const card = StaticData.get().enterpriseCard(cardId);
-    const html = tplEnterpriseCardTooltip({ id: cardId, ...card, type, invested, shipId });
+    const html = tplEnterpriseCardTooltip({
+      id: cardId,
+      ...card,
+      type,
+      invested,
+      shipId,
+    });
     // this.addCustomTooltip(nodeId, html, { forceRecreate: true });
 
     this.game.bga.gameui.addTooltipHtml(nodeId, html, 400);
@@ -134,6 +141,19 @@ export class TooltipManager {
     const html = tplLondonSeasonCardTooltip({ id: cardId, ...card });
     // this.addCustomTooltip(nodeId, html, { forceRecreate: true });
 
+    this.game.bga.gameui.addTooltipHtml(nodeId, html, 400);
+  }
+
+  public addPromiseCardTooltip({
+    nodeId,
+    cardId,
+  }: {
+    nodeId: string;
+    cardId: string;
+    imageOnly?: boolean;
+  }) {
+    const card = StaticData.get().promiseCard(cardId);
+    const html = tplPromiseCard({ id: cardId, ...card });
     this.game.bga.gameui.addTooltipHtml(nodeId, html, 400);
   }
 

@@ -185,7 +185,7 @@ export class NotificationManager {
       logger: debug, // show notif debug informations on console. Could be console.warn or any custom debug function (default null = no logs)
       // ignoreNotifications: ['updateAutoPlay'], // the notif_updateAutoPlay function will be ignored by bgaSetupPromiseNotifications. You'll need to subscribe to it manually
       onStart: (notifName: string, msg: string, args: any) => {
-        if (msg != '') {
+        if (msg != '' && notifName !== 'dealUpdated') {
           $('gameaction_status').innerHTML = msg;
           $('pagemaintitletext').innerHTML = msg;
           $('generalactions').innerHTML = '';

@@ -1251,7 +1251,9 @@ namespace Bga\GameFramework {
     
     abstract class Debug {
         /**
-         * @param callable(int):void $fn
+         * Play zombie moves automatically until the callback returns true.
+         *
+         * @param callable(int):bool $fn Receives the number of completed iterations, starting at 0.
          * @return void
          */
         public function playUntil(callable $fn): void {
@@ -1382,7 +1384,7 @@ namespace Bga\GameFramework {
          * Return the number of row affected by the last operation.
          *
          * @see mysql_affected_rows()
-         * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
+         * @see https://doc.studio.boardgamearena.com/framework-documentation/back-end/main-game-logic/database/
          */
         final public static function DbAffectedRow(): int
         {
@@ -1393,7 +1395,7 @@ namespace Bga\GameFramework {
          * Return the PRIMARY key of the last inserted row
          *
          * @see mysql_insert_id()
-         * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
+         * @see https://doc.studio.boardgamearena.com/framework-documentation/back-end/main-game-logic/database/
          */
         final public static function DbGetLastId(): int
         {
@@ -1403,7 +1405,7 @@ namespace Bga\GameFramework {
         /**
          * Performs a query on the database.
          *
-         * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
+         * @see https://doc.studio.boardgamearena.com/framework-documentation/back-end/main-game-logic/database/
          */
         final public static function DbQuery(string $sql): null|\mysqli_result|bool
         {
@@ -1419,7 +1421,7 @@ namespace Bga\GameFramework {
          * a response.
          *
          * @see mysql_real_escape_string()
-         * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
+         * @see https://doc.studio.boardgamearena.com/framework-documentation/back-end/main-game-logic/database/
          */
         final public static function escapeStringForDB(string $string): string
         {
@@ -1434,7 +1436,7 @@ namespace Bga\GameFramework {
          * array of values.
          *
          * @see Table::getCollectionFromDB
-         * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
+         * @see https://doc.studio.boardgamearena.com/framework-documentation/back-end/main-game-logic/database/
          */
         final public static function getObjectListFromDB(string $sql, bool $bUniqueValue = false): array
         {
@@ -1445,7 +1447,7 @@ namespace Bga\GameFramework {
          * Returns a unique value from the database, or `null` if no value is found.
          *
          * @throws \BgaSystemException Raise an exception if more than 1 row is returned.
-         * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
+         * @see https://doc.studio.boardgamearena.com/framework-documentation/back-end/main-game-logic/database/
          */
         final public static function getUniqueValueFromDB(string $sql): mixed
         {
@@ -1492,7 +1494,7 @@ namespace Bga\GameFramework {
          * In some games, this is useful to eliminate a player from the game in order he/she can start another game
          * without waiting for the current game end.
          *
-         * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Player_elimination
+         * @see https://doc.studio.boardgamearena.com/framework-documentation/back-end/main-game-logic/player-score/#players-leaving-elimination-and-concessions
          * 
          * @param int $player_id the player to eliminate
          * @return void
@@ -1547,7 +1549,7 @@ namespace Bga\GameFramework {
          * cannot use it to get list of values which may have duplicates (hence primary key requirement on first
          * column). If you need simple array use `getObjectListFromDB()` method.
          *
-         * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
+         * @see https://doc.studio.boardgamearena.com/framework-documentation/back-end/main-game-logic/database/
          */
         final public static function getCollectionFromDB(string $sql, bool $bSingleValue = false): array
         {
@@ -1562,7 +1564,7 @@ namespace Bga\GameFramework {
          *
          * NOTE: This is not necessarily the active player!
          *
-         * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#File-Structure
+         * @see https://doc.studio.boardgamearena.com/framework-documentation/back-end/main-game-logic/players/#accessing-player-information
          * 
          * @return string the current player id, typed as string
          */
@@ -1577,7 +1579,7 @@ namespace Bga\GameFramework {
          *
          * If `$bSingleValue = true`, keep only third column on result
          *
-         * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
+         * @see https://doc.studio.boardgamearena.com/framework-documentation/back-end/main-game-logic/database/
          */
         final public static function getDoubleKeyCollectionFromDB(string $sql, bool $bSingleValue = false): array
         {
@@ -1691,7 +1693,7 @@ namespace Bga\GameFramework {
          *
          * @throws \BgaSystemException if the collection is empty.
          * @see Table::getCollectionFromDB()
-         * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
+         * @see https://doc.studio.boardgamearena.com/framework-documentation/back-end/main-game-logic/database/
          */
         final public static function getNonEmptyCollectionFromDB(string $sql): array
         {
@@ -1704,7 +1706,7 @@ namespace Bga\GameFramework {
          *
          * @throws \BgaSystemException if the query return no row.
          * @see Table::getObjectFromDB()
-         * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
+         * @see https://doc.studio.boardgamearena.com/framework-documentation/back-end/main-game-logic/database/
          */
         final public static function getNonEmptyObjectFromDB(string $sql): array
         {
@@ -1716,11 +1718,11 @@ namespace Bga\GameFramework {
          * are keys mapped to values).
          *
          * @throws \BgaSystemException if the query return more than one row.
-         * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
+         * @see https://doc.studio.boardgamearena.com/framework-documentation/back-end/main-game-logic/database/
          */
-        final public static function getObjectFromDB(string $sql): array
+        final public static function getObjectFromDB(string $sql): ?array
         {
-            return [];
+            return null;
         }
 
         /**
@@ -2864,7 +2866,7 @@ namespace Bga\GameFramework\Components\ItemManager {
          * @param int $number The number of items to pick.
          * @return \Bga\GameFramework\Helpers\Collection<T>
          */
-        public function pickItems(int $number, Location|array|string|int $from, Location|array|string|int $to): \Bga\GameFramework\Helpers\Collection { return new class extends \Bga\GameFramework\Helpers\Collection{}; }
+        public function pickItems(int $number, Location|array|string|int $from, Location|array|string|int $to): \Bga\GameFramework\Helpers\Collection { return new \Bga\GameFramework\Helpers\Collection(); }
         /** Set the order of a managed item within its location. @param int|T $itemOrItemId */
         public function setItemOrder(object|int $itemOrItemId, int $order): void {}
         /** Move one managed item to a location. @param int|T $itemOrItemId */
@@ -2876,33 +2878,33 @@ namespace Bga\GameFramework\Components\ItemManager {
          * @param mixed $values A single value or an array of values.
          * @return \Bga\GameFramework\Helpers\Collection<T>
          */
-        public function getItemsByFieldName(string $fieldName, mixed $values, ?int $limit = null, ?string $sortByField = null, bool $reversed = false): \Bga\GameFramework\Helpers\Collection { return new class extends \Bga\GameFramework\Helpers\Collection{}; }
+        public function getItemsByFieldName(string $fieldName, mixed $values, ?int $limit = null, ?string $sortByField = null, bool $reversed = false): \Bga\GameFramework\Helpers\Collection { return new \Bga\GameFramework\Helpers\Collection(); }
         /**
          * Get a list of items matching multiple queries with AND.
          * @param array<string, mixed>|array<array{0: string, 1: mixed}> $filters
          * @return \Bga\GameFramework\Helpers\Collection<T>
          */
-        public function getItemsByFieldNames(array $filters, ?int $limit = null, ?string $sortByField = null, bool $reversed = false): \Bga\GameFramework\Helpers\Collection { return new class extends \Bga\GameFramework\Helpers\Collection{}; }
+        public function getItemsByFieldNames(array $filters, ?int $limit = null, ?string $sortByField = null, bool $reversed = false): \Bga\GameFramework\Helpers\Collection { return new \Bga\GameFramework\Helpers\Collection(); }
         /** See getItemsByFieldName. @param mixed $values A single value or an array of values. @return \Bga\GameFramework\Helpers\Collection<T> */
-        public function getItemsByField(ItemField $field, mixed $values, ?int $limit = null, ?string $sortByField = null, bool $reversed = false): \Bga\GameFramework\Helpers\Collection { return new class extends \Bga\GameFramework\Helpers\Collection{}; }
+        public function getItemsByField(ItemField $field, mixed $values, ?int $limit = null, ?string $sortByField = null, bool $reversed = false): \Bga\GameFramework\Helpers\Collection { return new \Bga\GameFramework\Helpers\Collection(); }
         /** See getItemsByFieldNames. @param array<array{0: ItemField, 1: mixed}> $filters @return \Bga\GameFramework\Helpers\Collection<T> */
-        public function getItemsByFields(array $filters, ?int $limit = null, ?string $sortByField = null, bool $reversed = false): \Bga\GameFramework\Helpers\Collection { return new class extends \Bga\GameFramework\Helpers\Collection{}; }
+        public function getItemsByFields(array $filters, ?int $limit = null, ?string $sortByField = null, bool $reversed = false): \Bga\GameFramework\Helpers\Collection { return new \Bga\GameFramework\Helpers\Collection(); }
         /** @return T|null An object of the managed class, or null if it does not exist. */
         public function getItemById(int $id): ?object { return null; }
         /** @param int[] $ids @return \Bga\GameFramework\Helpers\Collection<T> */
-        public function getItemsByIds(array $ids, ?string $sortByField = null, bool $reversed = false): \Bga\GameFramework\Helpers\Collection { return new class extends \Bga\GameFramework\Helpers\Collection{}; }
+        public function getItemsByIds(array $ids, ?string $sortByField = null, bool $reversed = false): \Bga\GameFramework\Helpers\Collection { return new \Bga\GameFramework\Helpers\Collection(); }
         /** Count the items in a location. Use null for a non-trailing location part as a wildcard filter. */
         public function countItemsInLocation(Location|array|string|int $location): int { return 0; }
         /** Get the highest order value currently used in a location. */
         public function getMaxOrderInLocation(Location|array|string|int $location): int { return 0; }
         /** @return \Bga\GameFramework\Helpers\Collection<T> Use null for a non-trailing location part as a wildcard filter. */
-        public function getItemsInLocation(Location|array|string|int $location, bool $reversed = false, ?int $limit = null, ?string $sortByField = null): \Bga\GameFramework\Helpers\Collection { return new class extends \Bga\GameFramework\Helpers\Collection{}; }
+        public function getItemsInLocation(Location|array|string|int $location, bool $reversed = false, ?int $limit = null, ?string $sortByField = null): \Bga\GameFramework\Helpers\Collection { return new \Bga\GameFramework\Helpers\Collection(); }
         /** @return \Bga\GameFramework\Helpers\Collection<T> A collection of managed items keyed by item id. */
-        public function getAllItems(?int $limit = null): \Bga\GameFramework\Helpers\Collection { return new class extends \Bga\GameFramework\Helpers\Collection{}; }
+        public function getAllItems(?int $limit = null): \Bga\GameFramework\Helpers\Collection { return new \Bga\GameFramework\Helpers\Collection(); }
         /** @return T|null An object on top of the location, or null if no item is present. */
         public function getItemOnTop(Location|array|string|int $location): ?object { return null; }
         /** @return \Bga\GameFramework\Helpers\Collection<T> Items on top of the location. */
-        public function getItemsOnTop(int $number, Location|array|string|int $location): \Bga\GameFramework\Helpers\Collection { return new class extends \Bga\GameFramework\Helpers\Collection{}; }
+        public function getItemsOnTop(int $number, Location|array|string|int $location): \Bga\GameFramework\Helpers\Collection { return new \Bga\GameFramework\Helpers\Collection(); }
         /** Update the DB value based on the Item fields; all fields are updated if null. */
         public function updateItem(object $item, array|string|null $fields = null): void {}
         /** @param T[]|\Bga\GameFramework\Helpers\Collection<T> $items Update DB values based on the Item fields. */
@@ -3292,7 +3294,7 @@ namespace Bga\GameFramework\Helpers {
        */
       public function add(mixed $obj, ?int $id = null): Collection
       {
-        return new class extends Collection{};
+        return new Collection();
       }
       /**
        * Check whether the collection contains an item for the given key.
@@ -3340,7 +3342,7 @@ namespace Bga\GameFramework\Helpers {
        */
       public function diff(Collection $remove, ?callable $compareFn = null): Collection
       {
-        return new class extends Collection{};
+        return new Collection();
       }
       /**
        * Return a new collection containing one property value extracted from each item.
@@ -3350,7 +3352,7 @@ namespace Bga\GameFramework\Helpers {
        */
       public function pluck(string $property): Collection
       {
-        return new class extends Collection{};
+        return new Collection();
       }
       /**
        * Return the first value matching the predicate, or null when none matches.
@@ -3411,7 +3413,7 @@ namespace Bga\GameFramework\Helpers {
        */
       public function map(callable $func): Collection
       {
-        return new class extends Collection{};
+        return new Collection();
       }
       /**
        * Return a new collection containing this collection plus keys not already present from another collection.
@@ -3421,7 +3423,7 @@ namespace Bga\GameFramework\Helpers {
        */
       public function merge(Collection $arr): Collection
       {
-        return new class extends Collection{};
+        return new Collection();
       }
       /**
        * Reduce the collection values to a single value.
@@ -3443,7 +3445,7 @@ namespace Bga\GameFramework\Helpers {
        */
       public function filter(callable $func): Collection
       {
-        return new class extends Collection{};
+        return new Collection();
       }
       /**
        * Return a new collection containing a key-preserving slice of this collection.
@@ -3454,7 +3456,7 @@ namespace Bga\GameFramework\Helpers {
        */
       public function slice(int $offset, ?int $length = null): Collection
       {
-        return new class extends Collection{};
+        return new Collection();
       }
       /**
        * Return a new collection containing the first N items.
@@ -3464,7 +3466,7 @@ namespace Bga\GameFramework\Helpers {
        */
       public function take(int $n): Collection
       {
-        return new class extends Collection{};
+        return new Collection();
       }
       /**
        * Check whether the collection contains the given object.
@@ -3484,7 +3486,7 @@ namespace Bga\GameFramework\Helpers {
        */
       public function sort(callable $callback): Collection
       {
-        return new class extends Collection{};
+        return new Collection();
       }
       /*****
        * Methods for collection of object
@@ -3502,7 +3504,7 @@ namespace Bga\GameFramework\Helpers {
        */
       public function where(string $field, mixed $value, bool $strict = true): Collection
       {
-        return new class extends Collection{};
+        return new Collection();
       }
       /**
        * Count items where a field matches a value.
@@ -3532,7 +3534,7 @@ namespace Bga\GameFramework\Helpers {
        */
       public function whereNot(string $field, mixed $value, bool $strict = true): Collection
       {
-        return new class extends Collection{};
+        return new Collection();
       }
       /**
        * Return a new collection containing items where a field is null.
@@ -3542,7 +3544,7 @@ namespace Bga\GameFramework\Helpers {
        */
       public function whereNull(string $field): Collection
       {
-        return new class extends Collection{};
+        return new Collection();
       }
       /**
        * Return a new collection sorted by a field value.
@@ -3553,7 +3555,7 @@ namespace Bga\GameFramework\Helpers {
        */
       public function sortBy(string $field, string $asc = 'ASC'): Collection
       {
-        return new class extends Collection{};
+        return new Collection();
       }
         /**
         * Group items by a field value or callback result.
@@ -3565,7 +3567,7 @@ namespace Bga\GameFramework\Helpers {
         */
         public function groupBy(string|callable $criteria): Collection
         {
-            return new class extends Collection{};
+            return new Collection();
         }
       /**
        * Return a new collection with each item's field updated on a cloned item.
@@ -3579,7 +3581,7 @@ namespace Bga\GameFramework\Helpers {
        */
       public function update(string $field, mixed $value): Collection
       {
-        return new class extends Collection{};
+        return new Collection();
       }
     }
 
