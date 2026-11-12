@@ -4048,7 +4048,7 @@ span[style*="color:#c0c0c0"] {
 }
 .joco-governor-overlay-container[data-region=Bengal] {
   top: 156px;
-  left: 845px;
+  left: 828px;
 }
 .joco-governor-overlay-container[data-region=Bengal] .joco-family-member-spot-wrapper {
   outline-color: #b47860;
@@ -4058,8 +4058,8 @@ span[style*="color:#c0c0c0"] {
   outline-color: #b47860;
 }
 .joco-governor-overlay-container[data-region=Bombay] {
-  top: 443px;
-  left: 236px;
+  top: 453px;
+  left: 216px;
 }
 .joco-governor-overlay-container[data-region=Bombay] .joco-family-member-spot-wrapper {
   outline-color: #a1b4ab;
@@ -4069,8 +4069,8 @@ span[style*="color:#c0c0c0"] {
   outline-color: #a1b4ab;
 }
 .joco-governor-overlay-container[data-region=Delhi] {
-  top: 10px;
-  left: 607px;
+  top: 5px;
+  left: 591px;
 }
 .joco-governor-overlay-container[data-region=Delhi] .joco-family-member-spot-wrapper {
   outline-color: #8e867c;
@@ -4084,7 +4084,7 @@ span[style*="color:#c0c0c0"] {
 }
 .joco-governor-overlay-container[data-region=Hyderabad] {
   top: 452px;
-  left: 374px;
+  left: 351px;
 }
 .joco-governor-overlay-container[data-region=Hyderabad] .joco-family-member-spot-wrapper {
   outline-color: #a4a576;
@@ -4094,8 +4094,8 @@ span[style*="color:#c0c0c0"] {
   outline-color: #a4a576;
 }
 .joco-governor-overlay-container[data-region=Madras] {
-  top: 774px;
-  left: 486px;
+  top: 793px;
+  left: 466px;
 }
 .joco-governor-overlay-container[data-region=Madras] .joco-family-member-spot-wrapper {
   outline-color: #e9ca92;
@@ -4108,8 +4108,8 @@ span[style*="color:#c0c0c0"] {
   margin-top: -4px;
 }
 .joco-governor-overlay-container[data-region=Maratha] {
-  top: 153px;
-  left: 462px;
+  top: 157px;
+  left: 444px;
 }
 .joco-governor-overlay-container[data-region=Maratha] .joco-family-member-spot-wrapper {
   outline-color: #cd9f6b;
@@ -4122,8 +4122,8 @@ span[style*="color:#c0c0c0"] {
   margin-top: 4px;
 }
 .joco-governor-overlay-container[data-region=Mysore] {
-  top: 647px;
-  left: 286px;
+  top: 660px;
+  left: 266px;
 }
 .joco-governor-overlay-container[data-region=Mysore] .joco-family-member-spot-wrapper {
   outline-color: #c9bda5;
@@ -4133,8 +4133,8 @@ span[style*="color:#c0c0c0"] {
   outline-color: #c9bda5;
 }
 .joco-governor-overlay-container[data-region=Punjab] {
-  top: 30px;
-  left: 80px;
+  top: 35px;
+  left: 57px;
 }
 .joco-governor-overlay-container[data-region=Punjab] .joco-family-member-spot-wrapper {
   outline-color: #8a8e99;
@@ -4715,3 +4715,5 @@ html {
 .player-button.yellow:hover {
   background-color: hsl(46, 90%, 86%);
 }
+
+/*# sourceMappingURL=johncompany.css.map */
