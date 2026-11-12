@@ -14,6 +14,7 @@
  */
 
 import { Bar } from './bar';
+import { AttentionManager } from './attention';
 import {
   NotificationManager,
   debug,
@@ -448,6 +449,7 @@ export class Game {
       CrownClimate.create(this);
     }
     this.notificationManager = new NotificationManager(this);
+    AttentionManager.create(this);
     Deals.create(this);
     Families.create(this);
     Company.create(this);

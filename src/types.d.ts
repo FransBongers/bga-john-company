@@ -103,9 +103,17 @@ interface GamePiece {
 
 // Used to define game in all core states
 
+export interface JocoAttention {
+  id: number;
+  kind: string;
+  itemType: string;
+  itemId: string;
+}
+
 export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   // Default
   canceledNotifIds: string[];
+  attention: JocoAttention[];
   gameOptions: {
     crownEnabled: boolean;
   };

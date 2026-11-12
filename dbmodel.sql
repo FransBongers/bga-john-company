@@ -36,6 +36,16 @@ CREATE TABLE IF NOT EXISTS `user_preferences` (
   `pref_value` int(10) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+CREATE TABLE IF NOT EXISTS `player_attention` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `player_id` int(10) NOT NULL,
+  `kind` varchar(32) NOT NULL,
+  `item_type` varchar(32) NOT NULL,
+  `item_id` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `player_id` (`player_id`),
+  KEY `item` (`item_type`, `item_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 CREATE TABLE IF NOT EXISTS `log` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `move_id` int(10) NOT NULL,

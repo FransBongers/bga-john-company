@@ -19,6 +19,7 @@
       margin-bottom: -2px;
       color: base.$joco-gray;
       transition: background-color 0.2s, color 0.2s;
+      gap: 8px;
 
       &:hover {
         background-color: rgba(base.$joco-red, 0.1);
@@ -36,6 +37,17 @@
       }
     }
   }
+}
+
+.joco-attention-count {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: 11px;
+  background: #8c2431;
+  color: #fff !important;
+  font: bold 14px/22px sans-serif;
+  text-align: center;
 }
 
 .joco-deals-table-outer {
@@ -63,6 +75,11 @@
       display: grid;
       grid-column: 1 / 5;
       grid-template-columns: subgrid;
+
+      &.joco-needs-attention {
+        background-color: #fff1c6;
+        box-shadow: inset 4px 0 #b66b14;
+      }
 
       .joco-deal-description {
         display: flex;

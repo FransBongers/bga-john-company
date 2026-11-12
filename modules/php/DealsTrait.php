@@ -6,6 +6,7 @@ use Bga\GameFramework\Actions\CheckAction;
 use Bga\GameFramework\Actions\Types\JsonParam;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Managers\Attention;
 use Bga\Games\JohnCompany\Managers\Deals;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
@@ -51,6 +52,7 @@ trait DealsTrait
     $deal = Deals::newDeal($opponent->getFamilyId(), $player->getFamilyId(), $description, $dealAssets);
 
     Notifications::newDeal($player, $deal);
+    Attention::create($opponentId, 'new_offer', 'deal', (string) $deal->getId());
   }
 
   #[CheckAction(false)]
@@ -87,6 +89,7 @@ trait DealsTrait
     $deal->setStatus(
       trim($deal->getDescription()) === '' ? DEAL_STATUS_CLOSED : DEAL_STATUS_AGREEMENT
     );
+    Attention::removeItem('deal', (string) $deal->getId());
     Notifications::dealUpdated($deal, $transferredAssets);
   }
 
@@ -137,6 +140,7 @@ trait DealsTrait
     }
 
     $deal->setStatus(DEAL_STATUS_REJECTED);
+    Attention::removeItem('deal', (string) $deal->getId());
     Notifications::dealUpdated($deal);
   }
 

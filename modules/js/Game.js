@@ -359,6 +359,66 @@ const TIMING_DATA = 'timingData';
 const AFTER_OFFICE_FINISHED_ACTING = 'afterOfficeFinishedActing';
 const OLD_IDEAS_MADE_NEW_ID = 'LawCard_52';
 
+class AttentionManager {
+    constructor(game) {
+        this.game = game;
+        this.entries = new Map();
+        this.listeners = [];
+        this.pending = new Set();
+        this.readOnly = game.isSpectator ||
+            (typeof g_archive_mode !== 'undefined' && g_archive_mode) ||
+            typeof g_replayFrom !== 'undefined';
+        if (!this.readOnly) {
+            game.gamedatas.attention.forEach((entry) => this.entries.set(entry.id, entry));
+        }
+    }
+    static create(game) {
+        AttentionManager.instance = new AttentionManager(game);
+    }
+    static getInstance() {
+        return AttentionManager.instance;
+    }
+    subscribe(listener) {
+        this.listeners.push(listener);
+    }
+    getEntries(kind, itemType, itemId) {
+        return [...this.entries.values()].filter((entry) => entry.kind === kind && entry.itemType === itemType &&
+            (itemId === undefined || entry.itemId === itemId));
+    }
+    add(entry) {
+        if (this.readOnly)
+            return;
+        this.entries.set(entry.id, entry);
+        this.changed();
+    }
+    remove(ids) {
+        ids.forEach((id) => this.entries.delete(id));
+        this.changed();
+    }
+    async acknowledge(entries) {
+        const ids = entries.map((entry) => entry.id).filter((id) => !this.pending.has(id));
+        if (!ids.length || this.readOnly)
+            return;
+        ids.forEach((id) => this.pending.add(id));
+        try {
+            const request = this.game.bga.actions.performAction('actAcknowledgeAttention', { ids: JSON.stringify(ids) }, { lock: false, checkAction: false, checkPossibleActions: false });
+            if (request) {
+                await request;
+                this.remove(ids);
+            }
+        }
+        catch (error) {
+            console.error('Unable to acknowledge attention', error);
+        }
+        finally {
+            ids.forEach((id) => this.pending.delete(id));
+        }
+    }
+    changed() {
+        this.listeners.forEach((listener) => listener());
+    }
+}
+
 const tplTabButton = (text, index) => `
 <div id="joco-bar-item-${index}" class="joco-bar-item">${text}</div>
 `;
@@ -427,6 +487,28 @@ class Bar {
             }
         });
         bar.addEventListener('click', (event) => this.onIconClick(event));
+        AttentionManager.getInstance().subscribe(() => this.updateDealAttention());
+        this.updateDealAttention();
+    }
+    updateDealAttention() {
+        const count = AttentionManager.getInstance().getEntries('new_offer', 'deal').length;
+        const button = this.ui.barButtons[this.config.findIndex((tab) => tab.id === 'joco-deals')];
+        if (!button)
+            return;
+        let badge = button.querySelector('.joco-attention-count');
+        if (count) {
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'joco-attention-count';
+                button.appendChild(badge);
+            }
+            badge.textContent = String(count);
+            badge.title = _('New offers');
+            badge.setAttribute('aria-label', `${_('New offers')}: ${count}`);
+        }
+        else {
+            badge?.remove();
+        }
     }
     onIconClick(event) {
         const target = event.target;
@@ -4449,7 +4531,14 @@ class Deals {
             agreements: document.getElementById('joco-agreements-inner'),
         };
         container.addEventListener('click', (event) => this.onDealButtonClick(event));
+        document.getElementById('joco-offers-tab').addEventListener('click', () => {
+            if (document.getElementById('joco-offers-tab').classList.contains('active')) {
+                this.acknowledgeVisibleOffers();
+            }
+        }, true);
+        AttentionManager.getInstance().subscribe(() => this.updateAttention());
         this.updateTable(gamedatas);
+        this.updateAttention();
     }
     getCurrentFamilyId() {
         return (PlayerManager$1.getInstance().getPlayer(this.game.getPlayerId())?.familyId ??
@@ -4465,12 +4554,58 @@ class Deals {
                 ? this.ui.agreements
                 : null;
         target?.insertAdjacentHTML('beforeend', tplDealsTableRow(deal, this.getCurrentFamilyId()));
+        this.updateAttention();
     }
     updateDeal(deal) {
         document.getElementById(`joco-deal-${deal.id}`)?.remove();
+        if (deal.status !== 'offer') {
+            const attention = AttentionManager.getInstance();
+            attention.remove(attention.getEntries('new_offer', 'deal', deal.id).map((entry) => entry.id));
+        }
         this.addDeal(deal);
     }
+    updateAttention() {
+        const entries = AttentionManager.getInstance().getEntries('new_offer', 'deal');
+        this.ui.offers.querySelectorAll('.joco-table-row[id^="joco-deal-"]').forEach((row) => {
+            row.classList.toggle('joco-needs-attention', entries.some((entry) => `joco-deal-${entry.itemId}` === row.id));
+        });
+        const tab = document.getElementById('joco-offers-tab');
+        let badge = tab.querySelector('.joco-attention-count');
+        if (entries.length) {
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'joco-attention-count';
+                tab.appendChild(badge);
+            }
+            badge.textContent = String(entries.length);
+            badge.title = _('New offers');
+            badge.setAttribute('aria-label', `${_('New offers')}: ${entries.length}`);
+        }
+        else {
+            badge?.remove();
+        }
+    }
+    acknowledgeVisibleOffers() {
+        const attention = AttentionManager.getInstance();
+        const container = this.ui.offers.parentElement.getBoundingClientRect();
+        const entries = attention.getEntries('new_offer', 'deal').filter((entry) => {
+            const row = document.getElementById(`joco-deal-${entry.itemId}`);
+            if (!row)
+                return false;
+            const rect = row.getBoundingClientRect();
+            return rect.bottom > Math.max(0, container.top) &&
+                rect.top < Math.min(window.innerHeight, container.bottom) &&
+                rect.right > Math.max(0, container.left) &&
+                rect.left < Math.min(window.innerWidth, container.right);
+        });
+        void attention.acknowledge(entries);
+    }
     async onDealButtonClick(event) {
+        const row = event.target.closest('.joco-table-row[id^="joco-deal-"]');
+        if (row && this.ui.offers.contains(row)) {
+            const attention = AttentionManager.getInstance();
+            await attention.acknowledge(attention.getEntries('new_offer', 'deal', row.id.slice('joco-deal-'.length)));
+        }
         const button = event.target.closest('[data-deal-action]');
         if (!button) {
             return;
@@ -5601,6 +5736,12 @@ class NotificationManager {
     }
     async notif_newDeal(notif) {
         Deals.getInstance().addDeal(notif.deal);
+    }
+    async notif_attentionAdded(notif) {
+        AttentionManager.getInstance().add(notif.attention);
+    }
+    async notif_attentionCleared(notif) {
+        AttentionManager.getInstance().remove(notif.ids);
     }
     async notif_dealUpdated(notif) {
         Deals.getInstance().updateDeal(notif.deal);
@@ -10494,6 +10635,7 @@ class Game {
             CrownClimate.create(this);
         }
         this.notificationManager = new NotificationManager(this);
+        AttentionManager.create(this);
         Deals.create(this);
         Families.create(this);
         Company.create(this);

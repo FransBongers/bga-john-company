@@ -1376,6 +1376,16 @@ class Notifications
     ]);
   }
 
+  public static function attentionAdded(int $playerId, array $attention)
+  {
+    self::notify($playerId, 'attentionAdded', '', ['attention' => $attention]);
+  }
+
+  public static function attentionCleared(int $playerId, array $ids)
+  {
+    self::notify($playerId, 'attentionCleared', '', ['ids' => $ids]);
+  }
+
   public static function dealUpdated(Deal $deal, array $transferredAssets = [])
   {
     $text = '';

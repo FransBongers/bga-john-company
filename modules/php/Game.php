@@ -28,6 +28,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Stats;
 use Bga\Games\JohnCompany\Managers\AICards;
+use Bga\Games\JohnCompany\Managers\Attention;
 use Bga\Games\JohnCompany\Managers\ArmyPieces;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\CompanyFailureCards;
@@ -54,6 +55,8 @@ use Bga\Games\JohnCompany\Managers\Scenarios;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 use Bga\Games\JohnCompany\Managers\Ships;
 use Bga\Games\JohnCompany\Models\Enterprise;
+use Bga\GameFramework\Actions\CheckAction;
+use Bga\GameFramework\Actions\Types\JsonParam;
 
 class Game extends \Bga\GameFramework\Table
 {
@@ -109,6 +112,16 @@ class Game extends \Bga\GameFramework\Table
     public static function get()
     {
         return self::$instance;
+    }
+
+    #[CheckAction(false)]
+    public function actAcknowledgeAttention(#[JsonParam(associative: true)] array $ids)
+    {
+        $playerId = (int) $this->getCurrentPlayerId();
+        if (!isset(Players::getAll()[$playerId])) {
+            throw new \BgaUserException(clienttranslate('Only players can acknowledge attention'));
+        }
+        Attention::acknowledge($playerId, $ids);
     }
 
     // Exposing protected method getCurrentPlayerId
@@ -328,6 +341,19 @@ class Game extends \Bga\GameFramework\Table
      */
     public function upgradeTableDb($from_version)
     {
+        if ($from_version <= 2026111200) {
+            $sql = "CREATE TABLE IF NOT EXISTS DBPREFIX_player_attention (
+                id int(10) unsigned NOT NULL AUTO_INCREMENT,
+                player_id int(10) NOT NULL,
+                kind varchar(32) NOT NULL,
+                item_type varchar(32) NOT NULL,
+                item_id varchar(100) NOT NULL,
+                PRIMARY KEY (id),
+                KEY player_id (player_id),
+                KEY item (item_type, item_id)
+            ) ENGINE = InnoDB DEFAULT CHARSET = utf8";
+            $this->applyDbUpgradeToAllDB($sql);
+        }
         if ($from_version <= 2026110500) {
             $sql = "ALTER TABLE DBPREFIX_deals ADD `deal_reports` JSON NULL";
             $this->applyDbUpgradeToAllDB($sql);
@@ -363,6 +389,7 @@ class Game extends \Bga\GameFramework\Table
         $playerId = $playerId ?? Players::getCurrentId();
 
         $data = [
+            'attention' => isset(Players::getAll()[$playerId]) ? Attention::forPlayer((int) $playerId) : [],
             'gameOptions' => [
                 'crownEnabled' => Globals::getCrownInGame(),
             ],

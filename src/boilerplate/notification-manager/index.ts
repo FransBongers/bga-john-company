@@ -7,6 +7,7 @@
 //  .##....##..#######.....##....####.##......
 
 import { EnterpriseCardsManager } from '../../cards/enterprise-cards';
+import { AttentionManager } from '../../attention';
 import { LondonSeasonCardsManager } from '../../cards/london-season-cards';
 import { tplOfficeCard } from '../../cards/office-cards';
 import { Company } from '../../company';
@@ -52,7 +53,7 @@ import { Deals } from '../../deals';
 import { JocoPlayer } from '../../player-manager/player';
 import { createFamilyMember } from '../../templates';
 import { ShipsManager } from '../../token-managers/ship-tokens';
-import { GameAlias, JocoFamilyMember, OtherShipType } from '../../types';
+import { GameAlias, JocoAttention, JocoFamilyMember, OtherShipType } from '../../types';
 import {
   getEnterpriseCard,
   getLawCard,
@@ -934,6 +935,14 @@ export class NotificationManager {
 
   async notif_newDeal(notif: NotifNewDeal) {
     Deals.getInstance().addDeal(notif.deal);
+  }
+
+  async notif_attentionAdded(notif: { attention: JocoAttention }) {
+    AttentionManager.getInstance().add(notif.attention);
+  }
+
+  async notif_attentionCleared(notif: { ids: number[] }) {
+    AttentionManager.getInstance().remove(notif.ids);
   }
 
   async notif_dealUpdated(notif: NotifDealUpdated) {

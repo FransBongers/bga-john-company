@@ -1,4 +1,5 @@
 import { SETUP } from '../constants';
+import { AttentionManager } from '../attention';
 import { GameAlias, GamedatasAlias } from '../types';
 import { tplTabButton } from './templates';
 
@@ -94,6 +95,27 @@ export class Bar {
     bar.addEventListener('click', (event: PointerEvent) =>
       this.onIconClick(event),
     );
+    AttentionManager.getInstance().subscribe(() => this.updateDealAttention());
+    this.updateDealAttention();
+  }
+
+  private updateDealAttention() {
+    const count = AttentionManager.getInstance().getEntries('new_offer', 'deal').length;
+    const button = this.ui.barButtons[this.config.findIndex((tab) => tab.id === 'joco-deals')];
+    if (!button) return;
+    let badge = button.querySelector<HTMLElement>('.joco-attention-count');
+    if (count) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'joco-attention-count';
+        button.appendChild(badge);
+      }
+      badge.textContent = String(count);
+      badge.title = _('New offers');
+      badge.setAttribute('aria-label', `${_('New offers')}: ${count}`);
+    } else {
+      badge?.remove();
+    }
   }
 
   // .##.....##.########..########.....###....########.########....##.....##.####
