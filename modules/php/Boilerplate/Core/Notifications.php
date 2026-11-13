@@ -66,6 +66,19 @@ class Notifications
     self::notifyAll('message', $txt, $args);
   }
 
+  public static function actionParticipantsChanged(array $info)
+  {
+    self::notifyAll('actionParticipantsChanged', '', [
+      'activePlayerIds' => $info['activePlayerIds'] ?? null,
+      'completedPlayerIds' => $info['completedPlayerIds'] ?? [],
+    ]);
+  }
+
+  public static function playerActivityChanged(int $playerId)
+  {
+    self::notify($playerId, 'playerActivityChanged', '', []);
+  }
+
   public static function messageTo($player, $txt, $args = [])
   {
     $playerId = is_int($player) ? $player : $player->getId();

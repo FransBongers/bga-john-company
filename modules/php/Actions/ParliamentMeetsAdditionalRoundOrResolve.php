@@ -86,7 +86,7 @@ class ParliamentMeetsAdditionalRoundOrResolve extends \Bga\Games\JohnCompany\Mod
   {
     $playerId = $this->checkPlayer();
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction(PASS, true);
   }
 
@@ -104,7 +104,7 @@ class ParliamentMeetsAdditionalRoundOrResolve extends \Bga\Games\JohnCompany\Mod
 
     Parliament::setVotesCastThisRound(0);
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

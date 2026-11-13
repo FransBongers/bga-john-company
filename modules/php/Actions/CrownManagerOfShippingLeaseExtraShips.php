@@ -144,7 +144,7 @@ class CrownManagerOfShippingLeaseExtraShips extends \Bga\Games\JohnCompany\Model
       ]);
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
 
     $this->resolveAction([], true);
   }

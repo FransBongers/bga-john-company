@@ -93,7 +93,7 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
       $family->updateOpportunityMarker(SEEK_SHARE);
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

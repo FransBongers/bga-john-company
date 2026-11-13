@@ -95,7 +95,7 @@ class DirectorOfTradeSpecialEnvoy extends \Bga\Games\JohnCompany\Models\AtomicAc
   public function actPassDirectorOfTradeSpecialEnvoy()
   {
     $playerId = $this->checkPlayer();
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction(PASS, true);
   }
 
@@ -151,7 +151,7 @@ class DirectorOfTradeSpecialEnvoy extends \Bga\Games\JohnCompany\Models\AtomicAc
       $this->ctx->insertAsBrother(Engine::buildTree($action));
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
 
     $this->resolveAction([], true);
   }

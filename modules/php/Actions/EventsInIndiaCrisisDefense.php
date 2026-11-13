@@ -67,7 +67,7 @@ class EventsInIndiaCrisisDefense extends ExhaustArmyPieces
     list($successful, $capitalRegionId) = $this->resolveCrisisDefense($args, 0);
 
 
-    Game::get()->gamestate->setPlayerNonMultiactive($args['actingCommanderId'], 'next');
+    $this->setPlayerActionCompleted($args['actingCommanderId']);
     $this->resolveAction([
       'automatic' => true,
       'successful' => $successful,
@@ -149,7 +149,7 @@ class EventsInIndiaCrisisDefense extends ExhaustArmyPieces
 
     list($successful, $capitalRegionId) = $this->resolveCrisisDefense($stateArgs, $selectedStrength);
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([
       'successful' => $successful,
       'capitalRegionId' => $capitalRegionId,

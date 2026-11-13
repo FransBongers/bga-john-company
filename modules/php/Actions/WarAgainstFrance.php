@@ -97,7 +97,7 @@ class WarAgainstFrance extends \Bga\Games\JohnCompany\Models\AtomicAction
       $this->returnShip($player, $stateArgs['ships'], $id);
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

@@ -128,7 +128,7 @@ class HiringHireFamilyMember extends Hiring
       $this->performAction($playerId, $familyMember, $stateArgs['officeId']);
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

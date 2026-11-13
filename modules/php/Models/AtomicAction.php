@@ -50,8 +50,7 @@ class AtomicAction
   }
 
   public function resolveAction($args = [], $checkpoint = false)
-  {
-    // $checkpoint = $checkpoint || Globals::getCheckpoint(); // Note: custom right now
+  {    // $checkpoint = $checkpoint || Globals::getCheckpoint(); // Note: custom right now
     // Globals::setCheckpoint(false);
     Engine::resolveAction($args, $checkpoint, $this->ctx);
     Engine::proceed();
@@ -89,11 +88,26 @@ class AtomicAction
   {
     $currentPlayerId = Players::getCurrentId();
 
-    $activePlayerIds = $this->ctx->getInfo()['activePlayerIds'];
-    if (!in_array($currentPlayerId, $activePlayerIds)) {
+    $info = $this->ctx->getInfo();
+    $activePlayerIds = $this->getActivePlayerIds();
+    $completedPlayerIds = $info['completedPlayerIds'] ?? [];
+    if (!in_array($currentPlayerId, $activePlayerIds) || in_array($currentPlayerId, $completedPlayerIds)) {
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_999");
     }
     return $currentPlayerId;
+  }
+
+  public function setPlayerActionCompleted(int $playerId)
+  {
+    $completedPlayerIds = $this->ctx->getInfo()['completedPlayerIds'] ?? [];
+    if (!in_array($playerId, $completedPlayerIds)) {
+      $completedPlayerIds[] = $playerId;
+      $this->ctx->updateInfo('completedPlayerIds', $completedPlayerIds);
+      Engine::save();
+      Notifications::actionParticipantsChanged($this->ctx->getInfo());
+    }
+    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    Notifications::playerActivityChanged($playerId);
   }
 
   public function getClassName()
@@ -120,7 +134,8 @@ class AtomicAction
     $game = Game::get();
     $activePlayerList = $game->gamestate->getActivePlayerList();
 
-    $activePlayerIds = $this->ctx->getInfo()['activePlayerIds'] ?? [];
+    $info = $this->ctx->getInfo();
+    $activePlayerIds = array_diff($this->getActivePlayerIds(), $info['completedPlayerIds'] ?? []);
     return Utils::filter($activePlayerIds, function ($playerId) use ($activePlayerList) {
       return in_array($playerId, $activePlayerList);
     });
@@ -128,6 +143,9 @@ class AtomicAction
 
   public function getActivePlayerIds()
   {
+    if ($this->ctx->getPlayerId() === 'all') {
+      return array_map('intval', array_keys(Players::getAll()->toArray()));
+    }
     $activePlayerIds = $this->ctx->getInfo()['activePlayerIds'] ?? [];
     return $activePlayerIds;
   }
@@ -136,7 +154,7 @@ class AtomicAction
   {
     $activePlayerIds = $this->getActivePlayerIdsCurrentlyMultiactive();
     foreach ($activePlayerIds as $playerId) {
-      Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+      $this->setPlayerActionCompleted($playerId);
     }
   }
 }

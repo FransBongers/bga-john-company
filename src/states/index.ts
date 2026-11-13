@@ -48,3 +48,4 @@ export * from './TradeInChina';
 export * from './TradeOrDiscardItems';
 export * from './UseManOnTheInside';
 export * from './WarAgainstFrance';
+export * from './WaitForOffer';

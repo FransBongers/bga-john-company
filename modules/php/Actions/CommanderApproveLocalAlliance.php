@@ -81,7 +81,7 @@ class CommanderApproveLocalAlliance extends \Bga\Games\JohnCompany\Models\Atomic
       ]);
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([]);
   }
 

@@ -69,7 +69,7 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Models\AtomicAction
   public function actPassTimingWindowAct()
   {
     $playerId = $this->checkPlayer();
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction(PASS, true);
   }
 
@@ -102,7 +102,7 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     if ($this->playerHasUsedOrSkippedAllEffects($playerId, $stateArgs['_private'][$playerId])) {
       // The current player has used or skipped all effects, but other players still need to complete their effects
-      Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+      $this->setPlayerActionCompleted($playerId);
       $this->resolveAction([]);
       return;
     }

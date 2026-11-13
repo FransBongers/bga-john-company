@@ -58,7 +58,7 @@ class GovernorGeneralMakeCheck extends \Bga\Games\JohnCompany\Models\AtomicActio
   public function actPassGovernorGeneralMakeCheck()
   {
     $playerId = $this->checkPlayer();
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction(PASS, true);
   }
 
@@ -101,7 +101,7 @@ class GovernorGeneralMakeCheck extends \Bga\Games\JohnCompany\Models\AtomicActio
       $this->insertGovernorGeneralActions($player, $playerId);
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

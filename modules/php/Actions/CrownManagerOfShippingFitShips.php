@@ -165,7 +165,7 @@ class CrownManagerOfShippingFitShips extends \Bga\Games\JohnCompany\Models\Atomi
       
     }
     // TODO: case where player pays crown to fit specific ships
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
 
     $this->resolveAction([], true);
   }

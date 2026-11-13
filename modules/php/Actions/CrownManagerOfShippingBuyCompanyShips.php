@@ -181,7 +181,7 @@ class CrownManagerOfShippingBuyCompanyShips extends \Bga\Games\JohnCompany\Model
         throw new \Bga\GameFramework\VisibleSystemException("ERROR_037");
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
 
     $this->resolveAction([], true);
   }

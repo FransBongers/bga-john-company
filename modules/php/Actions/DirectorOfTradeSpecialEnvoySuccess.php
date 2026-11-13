@@ -116,7 +116,7 @@ class DirectorOfTradeSpecialEnvoySuccess extends \Bga\Games\JohnCompany\Models\A
     }
 
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

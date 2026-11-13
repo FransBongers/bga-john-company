@@ -91,20 +91,18 @@ class HiringChairman extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     // Make the player inactive
     $game = Game::get();
-    $game->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
 
     $chairmanWasChosen = $this->checkRequiredSupport();
     if ($chairmanWasChosen) {
-      if (count($game->gamestate->getActivePlayerList()) > 0) {
-        $game->gamestate->setAllPlayersNonMultiactive('next');
-      }
+      $this->setAllActivePlayerIdsNonMultiactive();
 
       $this->resolveAction([], true);
       return; // Stop further execution if chairman was chosen
     }
 
 
-    if (count($game->gamestate->getActivePlayerList()) > 0) {
+    if (count($this->getActivePlayerIdsCurrentlyMultiactive()) > 0) {
       return;
     }
 

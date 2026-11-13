@@ -25,7 +25,7 @@ export const tplNewOffer = () => `
       <div id="joco-new-offer-description-counter">0 / ${NEW_OFFER_DESCRIPTION_MAX_LENGTH}</div>
       <div class="joco-row joco-new-offer-buttons">
         <div id="joco-new-offer-submit" class="bgabutton bgabutton_blue">${_('Submit')}</div>
-        <div id="joco-new-offer-submit-wake" class="bgabutton bgabutton_blue">${_('Submit and wake')}</div>
+        <div id="joco-new-offer-submit-wait" class="bgabutton bgabutton_blue" hidden>${_('Submit and wait')}</div>
       </div>
     </div>
     <div class="joco-new-offer-block">

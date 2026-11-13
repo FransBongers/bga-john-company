@@ -111,6 +111,7 @@ class AtomicActions
     USE_MAN_ON_THE_INSIDE => USE_MAN_ON_THE_INSIDE,
     USE_ROYAL_PROTECTION => USE_ROYAL_PROTECTION,
     USE_TAX_COLLECTORS => USE_TAX_COLLECTORS,
+    WAIT_FOR_OFFER => WAIT_FOR_OFFER,
     WAR_AGAINST_FRANCE => WAR_AGAINST_FRANCE,
     SELECT_OFFICE_HOLDER => SELECT_OFFICE_HOLDER,
   ];
@@ -175,6 +176,7 @@ class AtomicActions
     return array_merge($args, [
       'optionalAction' => $ctx->isOptional(),
       'activePlayerIds' => $ctx->getInfo()['activePlayerIds'] ?? null,
+      'completedPlayerIds' => $ctx->getInfo()['completedPlayerIds'] ?? [],
     ]);
   }
 

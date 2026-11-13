@@ -131,7 +131,7 @@ class FamilyAction extends \Bga\Games\JohnCompany\Models\AtomicAction
     } else {
       AtomicActions::get($familyAction)->performAction($playerId);
     }
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
 
     $this->resolveAction([], true);
   }

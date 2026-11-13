@@ -22,6 +22,7 @@ export class NewOffer {
     wrapper: HTMLElement;
     description: HTMLInputElement;
     descriptionCounter: HTMLElement;
+    waitButton: HTMLElement;
   };
 
   constructor(private game: GameAlias) {
@@ -59,6 +60,7 @@ export class NewOffer {
       descriptionCounter: document.getElementById(
         'joco-new-offer-description-counter',
       ),
+      waitButton: document.getElementById('joco-new-offer-submit-wait'),
     };
 
     this.ui.description.addEventListener('input', () => {
@@ -68,6 +70,7 @@ export class NewOffer {
     document
       .getElementById('joco-new-offer-submit')
       .addEventListener('click', () => this.onSubmit());
+    this.ui.waitButton.addEventListener('click', () => this.onSubmit(true));
     document
       .getElementById('cancel-new-offer')
       .addEventListener('click', () => this.cancelNewOffer());
@@ -121,12 +124,19 @@ export class NewOffer {
     SIDES.forEach((side) => this.selectors[side].load(this.getPlayerId(side)));
     this.updateTabTitles();
     this.updateSummary();
+    this.updateWaitButton();
 
     this.ui.wrapper.classList.add('active');
   }
 
   public cancelNewOffer() {
     this.ui.wrapper.classList.remove('active');
+  }
+
+  public updateWaitButton() {
+    const playerId = this.game.getPlayerId();
+    this.ui.waitButton.hidden = !this.game.activePlayerIds?.includes(playerId) ||
+      this.game.completedPlayerIds.includes(playerId);
   }
 
   /** Ids of the items each player gives, keyed by player id. */
@@ -147,7 +157,7 @@ export class NewOffer {
     );
   }
 
-  private onSubmit() {
+  private onSubmit(wait = false) {
     const description = this.description
       .trim()
       .slice(0, NEW_OFFER_DESCRIPTION_MAX_LENGTH);
@@ -161,6 +171,7 @@ export class NewOffer {
         description,
         opponentId: this.opponentId,
         assets: JSON.stringify(this.getOfferAssets()),
+        wait,
       },
       { checkAction: false, checkPossibleActions: false },
     );

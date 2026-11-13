@@ -2029,6 +2029,9 @@ span[style*="color:#addb90"] {
 .joco-new-offer-buttons {
   gap: 8px;
 }
+.joco-new-offer-buttons [hidden] {
+  display: none;
+}
 
 .joco-assets-container {
   display: flex;

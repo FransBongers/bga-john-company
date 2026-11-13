@@ -98,7 +98,7 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
       $family->updateOpportunityMarker(ENLIST_WRITER);
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

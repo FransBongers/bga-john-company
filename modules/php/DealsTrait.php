@@ -4,9 +4,11 @@ namespace Bga\Games\JohnCompany;
 
 use Bga\GameFramework\Actions\CheckAction;
 use Bga\GameFramework\Actions\Types\JsonParam;
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\Attention;
+use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\Deals;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
@@ -22,13 +24,19 @@ trait DealsTrait
    *                                     'promiseCard' => string[], 'prestige' => string[], 'blackmail' => string[]]
    */
   #[CheckAction(false)]
-  public function actNewOffer(string $description, int $opponentId, #[JsonParam(associative: true)] array $assets)
+  public function actNewOffer(string $description, int $opponentId, #[JsonParam(associative: true)] array $assets, bool $wait = false)
   {
     $playerId = (int) $this->getCurrentPlayerId();
     $players = Players::getAll();
 
     if ($opponentId === $playerId || !isset($players[$opponentId]) || !isset($players[$playerId])) {
       throw new \BgaUserException(clienttranslate('Invalid player for this offer'));
+    }
+
+    $node = Engine::getNextUnresolved();
+    $info = $node?->getInfo() ?? [];
+    if ($wait && (!$node || !in_array($playerId, $info['activePlayerIds'] ?? []) || in_array($playerId, $info['completedPlayerIds'] ?? []))) {
+      throw new \BgaUserException(clienttranslate('You cannot wait for an offer after completing your action'));
     }
 
     $description = trim($description);
@@ -53,6 +61,54 @@ trait DealsTrait
 
     Notifications::newDeal($player, $deal);
     Attention::create($opponentId, 'new_offer', 'deal', (string) $deal->getId());
+
+    if ($wait && $node->getAction() !== WAIT_FOR_OFFER) {
+      $node->insertBefore(Engine::buildTree([
+        'action' => WAIT_FOR_OFFER,
+        'playerId' => 'some',
+        'activePlayerIds' => [$opponentId],
+      ]));
+      Engine::save();
+      Engine::proceed();
+      return;
+    }
+
+    if ($wait) {
+      $node->updateInfo('activePlayerIds', array_values(array_unique(array_merge($info['activePlayerIds'], [$opponentId]))));
+      $node->updateInfo('completedPlayerIds', array_values(array_diff($info['completedPlayerIds'] ?? [], [$opponentId])));
+      Engine::save();
+      Notifications::actionParticipantsChanged($node->getInfo());
+    }
+    $this->gamestate->setPlayersMultiactive([$opponentId], 'next', false);
+    Notifications::playerActivityChanged($opponentId);
+  }
+
+  #[CheckAction(false)]
+  public function actMakeInactive()
+  {
+    $playerId = (int) $this->getCurrentPlayerId();
+    $node = Engine::getNextUnresolved();
+    $info = $node?->getInfo() ?? [];
+    $isWaiting = $node && $node->getAction() === WAIT_FOR_OFFER;
+    $isNodePlayer = in_array($playerId, $info['activePlayerIds'] ?? []);
+    $completed = in_array($playerId, $info['completedPlayerIds'] ?? []);
+
+    if (!in_array($playerId, $this->gamestate->getActivePlayerList()) || (!$isWaiting && $isNodePlayer && !$completed)) {
+      throw new \BgaUserException(clienttranslate('You must complete your current action first'));
+    }
+
+    if ($isWaiting && $isNodePlayer) {
+      $action = AtomicActions::get(WAIT_FOR_OFFER, $node);
+      $action->setPlayerActionCompleted($playerId);
+      $info = $node->getInfo();
+      if (count(array_diff($info['activePlayerIds'], $info['completedPlayerIds'] ?? [])) === 0) {
+        $action->resolveAction([], true);
+      }
+      return;
+    }
+
+    $this->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    Notifications::playerActivityChanged($playerId);
   }
 
   #[CheckAction(false)]

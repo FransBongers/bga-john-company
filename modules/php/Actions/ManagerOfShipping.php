@@ -155,7 +155,7 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
       $ownerFamily->gainCash($totalCompanyAndExtraShips, LondonSeasonCards::get(SHIPBUILDERS_ID)->getTitle());
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
 
     $this->resolveAction([], true);
   }

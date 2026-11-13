@@ -93,7 +93,7 @@ class HiringGiveConsentForNepotism extends Hiring
     }
 
     $this->updateConsent($playerId);
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
 
     if (! $this->allConsentsGiven()) {
       return;

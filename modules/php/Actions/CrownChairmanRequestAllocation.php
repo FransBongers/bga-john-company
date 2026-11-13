@@ -77,7 +77,7 @@ class CrownChairmanRequestAllocation extends \Bga\Games\JohnCompany\Models\Atomi
 
     $stateArgs = $this->argsCrownChairmanRequestAllocation();
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
 
     if ($continue) {
       $this->resolveAction([], true);

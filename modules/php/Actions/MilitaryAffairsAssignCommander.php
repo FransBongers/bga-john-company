@@ -92,7 +92,7 @@ class MilitaryAffairsAssignCommander extends \Bga\Games\JohnCompany\Models\Atomi
       ],
     ]);
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

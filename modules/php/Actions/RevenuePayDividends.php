@@ -53,7 +53,7 @@ class RevenuePayDividends extends \Bga\Games\JohnCompany\Actions\PresidencyActio
     // Notifications::log('numberOfShares',count($shares));
     if ($balance < count($shares)) {
       Notifications::message(clienttranslate('Not possible to pay dividends'), []);
-      Game::get()->gamestate->setAllPlayersNonMultiactive('next');
+      $this->setAllActivePlayerIdsNonMultiactive();
       $this->resolveAction(['automatic' => true]);
     }
   }
@@ -117,7 +117,7 @@ class RevenuePayDividends extends \Bga\Games\JohnCompany\Actions\PresidencyActio
 
     if ($numberOfDividends === 0) {
       Notifications::message(clienttranslate('${player_name} does not pay any dividends'), ['player' => $player]);
-      Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+      $this->setPlayerActionCompleted($playerId);
       $this->resolveAction([], true);
       return;
     }
@@ -161,7 +161,7 @@ class RevenuePayDividends extends \Bga\Games\JohnCompany\Actions\PresidencyActio
       Company::adjustStanding(1);
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

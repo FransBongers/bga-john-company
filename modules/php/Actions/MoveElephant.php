@@ -75,7 +75,7 @@ class MoveElephant extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $this->gainMoneyEqualToHighestOpenOrderInRegionWithTail($playerId, $locationId, $facing);
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

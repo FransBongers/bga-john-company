@@ -109,7 +109,10 @@ class Engine
     // Multi active node
     if ($playerId == 'all') {
       Game::get()->gamestate->jumpToState(ST_RESOLVE_STACK);
-      Game::get()->gamestate->setAllPlayersMultiactive();
+      $info = $node->getInfo();
+      $playerIds = array_map('intval', array_keys(Players::getAll()->toArray()));
+      $activePlayerIds = array_values(array_diff($playerIds, $info['completedPlayerIds'] ?? []));
+      Game::get()->gamestate->setPlayersMultiactive($activePlayerIds, 'next', true);
 
       // Ensure no undo
       Log::checkpoint();
@@ -122,7 +125,11 @@ class Engine
     // Multi active node with some players active
     if ($playerId == 'some') {
       Game::get()->gamestate->jumpToState(ST_RESOLVE_STACK);
-      $activePlayerIds = $node->getInfo()['activePlayerIds'];
+      $info = $node->getInfo();
+      $activePlayerIds = array_values(array_diff(
+        $info['activePlayerIds'],
+        $info['completedPlayerIds'] ?? []
+      ));
       Game::get()->gamestate->setPlayersMultiactive($activePlayerIds, 'next', false);
 
       // Ensure no undo

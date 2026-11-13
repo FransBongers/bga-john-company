@@ -175,7 +175,7 @@ class PresidentTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidency
       }
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([
       'officeId' => $stateArgs[OFFICE_ID],
       'officeHolderBonus' => $tradeRegulationsInPlay ? 0 : $presidentBonus

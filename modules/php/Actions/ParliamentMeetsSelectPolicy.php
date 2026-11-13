@@ -90,7 +90,7 @@ class ParliamentMeetsSelectPolicy extends \Bga\Games\JohnCompany\Models\AtomicAc
       }
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

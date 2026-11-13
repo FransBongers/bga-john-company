@@ -52,7 +52,7 @@ class CommanderPurchaseLocalAlliance extends \Bga\Games\JohnCompany\Models\Atomi
           'player' => Players::get($args['commanderPlayerId'])
         ]);
       }
-      Game::get()->gamestate->setPlayerNonMultiactive($args['commanderPlayerId'], 'next');
+      $this->setPlayerActionCompleted($args['commanderPlayerId']);
       $this->resolveAction(['automatic' => true]);
     }
   }
@@ -104,7 +104,7 @@ class CommanderPurchaseLocalAlliance extends \Bga\Games\JohnCompany\Models\Atomi
   public function actPassCommanderPurchaseLocalAlliance()
   {
     $playerId = $this->checkPlayer();
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction(PASS);
   }
 
@@ -146,7 +146,7 @@ class CommanderPurchaseLocalAlliance extends \Bga\Games\JohnCompany\Models\Atomi
       );
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([]);
   }
 

@@ -92,7 +92,7 @@ class TradeOrDiscardItems extends \Bga\Games\JohnCompany\Models\AtomicAction
       }
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

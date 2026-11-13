@@ -115,6 +115,7 @@ class AbstractNode
       $newParent = new \Bga\Games\JohnCompany\Boilerplate\Core\Engine\SeqNode([], []);
       $newParent = $this->parent->replaceAtPos($newParent, $index);
       $newParent->pushChild($this);
+      $index = $this->getIndex();
     }
 
     return $this->parent->insertChildAtPos($newNode, $index - 1);

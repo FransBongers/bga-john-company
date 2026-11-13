@@ -86,6 +86,7 @@ import {
   TradeOrDiscardItems,
   UseManOnTheInside,
   WarAgainstFrance,
+  WaitForOffer,
   ParliamentMeetsSelectPolicy,
   ParliamentMeetsCastVotes,
   ParliamentMeetsAdditionalRoundOrResolve,
@@ -147,6 +148,8 @@ export class Game {
   public mobileVersion: boolean = false;
   public isSpectator: boolean = false;
   public activePlayerIds: number[] | undefined = undefined;
+  public completedPlayerIds: number[] = [];
+  private currentStateName = '';
 
   private states = {
     // Boilerplate
@@ -204,6 +207,7 @@ export class Game {
     TradeOrDiscardItems,
     UseManOnTheInside,
     WarAgainstFrance,
+    WaitForOffer,
   };
   public bga: Bga;
 
@@ -511,6 +515,9 @@ export class Game {
     console.log('Entering state: ' + stateName, args);
     const activePlayerIds: number[] | undefined = args.args?.activePlayerIds;
     this.activePlayerIds = activePlayerIds;
+    this.completedPlayerIds = args.args?.completedPlayerIds ?? [];
+    this.currentStateName = stateName;
+    Deals.getInstance()?.updateWaitButton();
     const playerIsActiveAndStateExists =
       this.bga.players.isCurrentPlayerActive() &&
       this.states[stateName as keyof typeof this.states];
@@ -520,6 +527,7 @@ export class Game {
     if (
       playerIsActiveAndStateExists &&
       (!activePlayerIds || activePlayerIds.includes(currentPlayerId)) &&
+      !this.completedPlayerIds.includes(currentPlayerId) &&
       !args.args.skipOnEnteringState
     ) {
       this.states[stateName].getInstance().onEnteringState(args.args);
@@ -546,23 +554,24 @@ export class Game {
     // }
 
     // Undo last steps
-    if (args.args && args.args.previousSteps) {
-      args.args.previousSteps.forEach((stepId: number) => {
-        let logEntry = $('logs').querySelector(
-          `.log.notif_newUndoableStep[data-step="${stepId}"]`,
-        ) as HTMLElement;
-        if (logEntry) {
-          this.onClick(logEntry, () => this.undoToStep({ stepId }));
-        }
+    // if (args.args && args.args.previousSteps) {
+    //   args.args.previousSteps.forEach((stepId: number) => {
+    //     let logEntry = $('logs').querySelector(
+    //       `.log.notif_newUndoableStep[data-step="${stepId}"]`,
+    //     ) as HTMLElement;
+    //     if (logEntry) {
+    //       this.onClick(logEntry, () => this.undoToStep({ stepId }));
+    //     }
 
-        logEntry = document.querySelector(
-          `.chatwindowlogs_zone .log.notif_newUndoableStep[data-step="${stepId}"]`,
-        );
-        if (logEntry) {
-          this.onClick(logEntry, () => this.undoToStep({ stepId }));
-        }
-      });
-    }
+    //     logEntry = document.querySelector(
+    //       `.chatwindowlogs_zone .log.notif_newUndoableStep[data-step="${stepId}"]`,
+    //     );
+    //     if (logEntry) {
+    //       this.onClick(logEntry, () => this.undoToStep({ stepId }));
+    //     }
+    //   });
+    // }
+    this.updateMakeInactiveButton();
   }
 
   // onLeavingState: this method is called each time we are leaving a game state.
@@ -575,11 +584,34 @@ export class Game {
     this.clearPossible();
   }
 
-  // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
-  //                        action status bar (ie: the HTML links in the status bar).
-  //
-  public onUpdateActionButtons(stateName: string, args: any) {
-    // console.log('onUpdateActionButtons: ' + stateName);
+  public updateMakeInactiveButton() {
+    const playerId = this.getPlayerId();
+    const canMakeInactive = Array.isArray(this.activePlayerIds) && this.bga.players.isCurrentPlayerActive() && (
+      this.currentStateName === 'WaitForOffer' ||
+      !this.activePlayerIds?.includes(playerId) ||
+      this.completedPlayerIds.includes(playerId)
+    );
+    if (canMakeInactive) {
+      Interaction.use().addSecondaryActionButton({
+        id: 'make-inactive',
+        text: _('Make inactive'),
+        callback: () => this.bga.actions.performAction(
+          'actMakeInactive', {}, { checkAction: false, checkPossibleActions: false },
+        ),
+      });
+    } else {
+      document.getElementById('make-inactive')?.remove();
+    }
+  }
+
+  public updateActionParticipants(activePlayerIds: number[] | null, completedPlayerIds: number[]) {
+    this.activePlayerIds = activePlayerIds ?? undefined;
+    this.completedPlayerIds = completedPlayerIds;
+    if (completedPlayerIds.includes(this.getPlayerId())) {
+      this.clearPossible();
+    }
+    Deals.getInstance()?.updateWaitButton();
+    this.updateMakeInactiveButton();
   }
 
   // .##.....##.########.##.......########.....##.....##..#######..########..########

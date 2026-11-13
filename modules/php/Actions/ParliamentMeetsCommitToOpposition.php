@@ -81,7 +81,7 @@ class ParliamentMeetsCommitToOpposition extends \Bga\Games\JohnCompany\Models\At
       Parliament::getOpposition()
     );
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

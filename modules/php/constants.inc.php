@@ -186,6 +186,7 @@ const ST_TRADE_OR_DISCARD_ITEMS = 179;
 const ST_WAR_AGAINST_FRANCE = 180;
 const ST_MOVE_ELEPHANT = 181;
 const ST_USE_TAX_COLLECTORS = 182;
+const ST_WAIT_FOR_OFFER = 191;
 
 
 const BONUSES = 'Bonuses';
@@ -274,6 +275,7 @@ const USE_MAN_ON_THE_INSIDE = 'UseManOnTheInside';
 const USE_TAX_COLLECTORS = 'UseTaxCollectors';
 const TRADE_OR_DISCARD_ITEMS = 'TradeOrDiscardItems';
 const WAR_AGAINST_FRANCE = 'WarAgainstFrance';
+const WAIT_FOR_OFFER = 'WaitForOffer';
 const PARLIAMENT_MEETS_SELECT_LAW = 'ParliamentMeetsSelectLaw';
 const PARLIAMENT_MEETS_SELECT_POLICY = 'ParliamentMeetsSelectPolicy';
 const PARLIAMENT_MEETS_RESOLVE_POLICY = 'ParliamentMeetsResolvePolicy';

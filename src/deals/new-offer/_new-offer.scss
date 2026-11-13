@@ -38,6 +38,10 @@
 
 .joco-new-offer-buttons {
   gap: 8px;
+
+  [hidden] {
+    display: none;
+  }
 }
 
 .joco-assets-container {

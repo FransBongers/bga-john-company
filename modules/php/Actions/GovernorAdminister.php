@@ -68,7 +68,7 @@ class GovernorAdminister extends \Bga\Games\JohnCompany\Models\AtomicAction
   {
     $playerId = $this->checkPlayer();
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction(PASS, true);
   }
 
@@ -98,7 +98,7 @@ class GovernorAdminister extends \Bga\Games\JohnCompany\Models\AtomicAction
     }
 
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

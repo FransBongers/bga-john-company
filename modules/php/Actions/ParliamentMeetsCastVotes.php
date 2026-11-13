@@ -72,7 +72,7 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
       'player' => Players::get($playerId)
     ]);
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction(PASS, true);
   }
 
@@ -163,7 +163,7 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
       $this->handleCommitToOpposition($targetPlayerId, $playerId, $totalVotes);
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

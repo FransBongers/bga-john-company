@@ -136,7 +136,7 @@ class MilitaryAffairsTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
       $regiment->moveTo($player, $to);
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

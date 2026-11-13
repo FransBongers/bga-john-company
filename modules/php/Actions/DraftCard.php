@@ -110,8 +110,8 @@ class DraftCard extends \Bga\Games\JohnCompany\Models\AtomicAction
    
     // Make the player inactive
     $game = Game::get();
-    $game->gamestate->setPlayerNonMultiactive($player->getId(), 'next');
-    if (count($game->gamestate->getActivePlayerList()) > 0) {
+    $this->setPlayerActionCompleted($player->getId());
+    if (count($this->getActivePlayerIdsCurrentlyMultiactive()) > 0) {
       return;
     }
 

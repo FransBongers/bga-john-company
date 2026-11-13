@@ -161,6 +161,14 @@ export class NotificationManager {
     // this.subscriptions = [];
   }
 
+  async notif_actionParticipantsChanged(notif: { activePlayerIds: number[] | null; completedPlayerIds: number[] }) {
+    this.game.updateActionParticipants(notif.activePlayerIds, notif.completedPlayerIds);
+  }
+
+  async notif_playerActivityChanged() {
+    this.game.updateMakeInactiveButton();
+  }
+
   // public static create(game: GameAlias) {
   //   NotificationManager.instance = new NotificationManager(game);
   // }

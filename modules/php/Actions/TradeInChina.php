@@ -60,7 +60,7 @@ class TradeInChina extends \Bga\Games\JohnCompany\Models\AtomicAction
       'player' => Players::get($playerId),
     ]);
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction(PASS);
   }
 
@@ -89,7 +89,7 @@ class TradeInChina extends \Bga\Games\JohnCompany\Models\AtomicAction
       Globals::setOfficeHolderBonus($bonus);
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

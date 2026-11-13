@@ -4181,7 +4181,7 @@ const tplNewOffer = () => `
       <div id="joco-new-offer-description-counter">0 / ${NEW_OFFER_DESCRIPTION_MAX_LENGTH}</div>
       <div class="joco-row joco-new-offer-buttons">
         <div id="joco-new-offer-submit" class="bgabutton bgabutton_blue">${_('Submit')}</div>
-        <div id="joco-new-offer-submit-wake" class="bgabutton bgabutton_blue">${_('Submit and wake')}</div>
+        <div id="joco-new-offer-submit-wait" class="bgabutton bgabutton_blue" hidden>${_('Submit and wait')}</div>
       </div>
     </div>
     <div class="joco-new-offer-block">
@@ -4224,6 +4224,7 @@ class NewOffer {
             wrapper: document.querySelector('.joco-new-offer-wrapper'),
             description: document.getElementById('joco-new-offer-description'),
             descriptionCounter: document.getElementById('joco-new-offer-description-counter'),
+            waitButton: document.getElementById('joco-new-offer-submit-wait'),
         };
         this.ui.description.addEventListener('input', () => {
             this.description = this.ui.description.value;
@@ -4232,6 +4233,7 @@ class NewOffer {
         document
             .getElementById('joco-new-offer-submit')
             .addEventListener('click', () => this.onSubmit());
+        this.ui.waitButton.addEventListener('click', () => this.onSubmit(true));
         document
             .getElementById('cancel-new-offer')
             .addEventListener('click', () => this.cancelNewOffer());
@@ -4278,10 +4280,16 @@ class NewOffer {
         SIDES.forEach((side) => this.selectors[side].load(this.getPlayerId(side)));
         this.updateTabTitles();
         this.updateSummary();
+        this.updateWaitButton();
         this.ui.wrapper.classList.add('active');
     }
     cancelNewOffer() {
         this.ui.wrapper.classList.remove('active');
+    }
+    updateWaitButton() {
+        const playerId = this.game.getPlayerId();
+        this.ui.waitButton.hidden = !this.game.activePlayerIds?.includes(playerId) ||
+            this.game.completedPlayerIds.includes(playerId);
     }
     getOfferAssets() {
         return {
@@ -4293,7 +4301,7 @@ class NewOffer {
         return Object.values(this.getOfferAssets()).some((assets) => (assets.cash ?? 0) > 0 ||
             Object.entries(assets).some(([type, items]) => type !== 'cash' && Array.isArray(items) && items.length > 0));
     }
-    onSubmit() {
+    onSubmit(wait = false) {
         const description = this.description
             .trim()
             .slice(0, NEW_OFFER_DESCRIPTION_MAX_LENGTH);
@@ -4305,6 +4313,7 @@ class NewOffer {
             description,
             opponentId: this.opponentId,
             assets: JSON.stringify(this.getOfferAssets()),
+            wait,
         }, { checkAction: false, checkPossibleActions: false });
         this.cancelNewOffer();
     }
@@ -4632,6 +4641,9 @@ class Deals {
     }
     startNewOffer(opponentId) {
         this.newOffer.startNewOffer(opponentId);
+    }
+    updateWaitButton() {
+        this.newOffer.updateWaitButton();
     }
     cancelNewOffer() {
         this.newOffer.cancelNewOffer();
@@ -5352,6 +5364,12 @@ const MIN_NOTIFICATION_MS = 1200;
 class NotificationManager {
     constructor(game) {
         this.game = game;
+    }
+    async notif_actionParticipantsChanged(notif) {
+        this.game.updateActionParticipants(notif.activePlayerIds, notif.completedPlayerIds);
+    }
+    async notif_playerActivityChanged() {
+        this.game.updateMakeInactiveButton();
     }
     setupNotifications() {
         this.game.bga.notifications.setupPromiseNotifications({
@@ -10433,6 +10451,25 @@ class WarAgainstFrance {
     }
 }
 
+class WaitForOffer {
+    constructor(game) {
+        this.game = game;
+    }
+    static create(game) {
+        WaitForOffer.instance = new WaitForOffer(game);
+    }
+    static getInstance() {
+        return WaitForOffer.instance;
+    }
+    onEnteringState() {
+        updatePageTitle(_('${you} may respond to offers'), {});
+    }
+    onLeavingState() { }
+    setDescription() {
+        updatePageTitle(_('Players are considering offers'), {});
+    }
+}
+
 function sleep(ms) {
     return new Promise((r) => setTimeout(r, ms));
 }
@@ -10450,6 +10487,8 @@ class Game {
         this.mobileVersion = false;
         this.isSpectator = false;
         this.activePlayerIds = undefined;
+        this.completedPlayerIds = [];
+        this.currentStateName = '';
         this.states = {
             ConfirmPartialTurn,
             ConfirmTurn,
@@ -10503,6 +10542,7 @@ class Game {
             TradeOrDiscardItems,
             UseManOnTheInside,
             WarAgainstFrance,
+            WaitForOffer,
         };
         this.bga = bga;
         console.log('johncompany constructor');
@@ -10667,11 +10707,15 @@ class Game {
         console.log('Entering state: ' + stateName, args);
         const activePlayerIds = args.args?.activePlayerIds;
         this.activePlayerIds = activePlayerIds;
+        this.completedPlayerIds = args.args?.completedPlayerIds ?? [];
+        this.currentStateName = stateName;
+        Deals.getInstance()?.updateWaitButton();
         const playerIsActiveAndStateExists = this.bga.players.isCurrentPlayerActive() &&
             this.states[stateName];
         const currentPlayerId = this.getPlayerId();
         if (playerIsActiveAndStateExists &&
             (!activePlayerIds || activePlayerIds.includes(currentPlayerId)) &&
+            !this.completedPlayerIds.includes(currentPlayerId) &&
             !args.args.skipOnEnteringState) {
             this.states[stateName].getInstance().onEnteringState(args.args);
         }
@@ -10680,18 +10724,7 @@ class Game {
                 .getInstance()
                 .setDescription(activePlayerIds || Number(args.active_player), args.args);
         }
-        if (args.args && args.args.previousSteps) {
-            args.args.previousSteps.forEach((stepId) => {
-                let logEntry = $('logs').querySelector(`.log.notif_newUndoableStep[data-step="${stepId}"]`);
-                if (logEntry) {
-                    this.onClick(logEntry, () => this.undoToStep({ stepId }));
-                }
-                logEntry = document.querySelector(`.chatwindowlogs_zone .log.notif_newUndoableStep[data-step="${stepId}"]`);
-                if (logEntry) {
-                    this.onClick(logEntry, () => this.undoToStep({ stepId }));
-                }
-            });
-        }
+        this.updateMakeInactiveButton();
     }
     onLeavingState(stateName) {
         if (this.states[stateName]) {
@@ -10699,7 +10732,30 @@ class Game {
         }
         this.clearPossible();
     }
-    onUpdateActionButtons(stateName, args) {
+    updateMakeInactiveButton() {
+        const playerId = this.getPlayerId();
+        const canMakeInactive = Array.isArray(this.activePlayerIds) && this.bga.players.isCurrentPlayerActive() && (this.currentStateName === 'WaitForOffer' ||
+            !this.activePlayerIds?.includes(playerId) ||
+            this.completedPlayerIds.includes(playerId));
+        if (canMakeInactive) {
+            Interaction$1.use().addSecondaryActionButton({
+                id: 'make-inactive',
+                text: _('Make inactive'),
+                callback: () => this.bga.actions.performAction('actMakeInactive', {}, { checkAction: false, checkPossibleActions: false }),
+            });
+        }
+        else {
+            document.getElementById('make-inactive')?.remove();
+        }
+    }
+    updateActionParticipants(activePlayerIds, completedPlayerIds) {
+        this.activePlayerIds = activePlayerIds ?? undefined;
+        this.completedPlayerIds = completedPlayerIds;
+        if (completedPlayerIds.includes(this.getPlayerId())) {
+            this.clearPossible();
+        }
+        Deals.getInstance()?.updateWaitButton();
+        this.updateMakeInactiveButton();
     }
     onUserPrefChanged(prefId, prefValue) {
         switch (prefId) {

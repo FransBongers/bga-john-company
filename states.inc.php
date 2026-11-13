@@ -103,6 +103,16 @@ $machinestates = [
         ->transitions([])
         ->build(),
 
+    ST_WAIT_FOR_OFFER => GameStateBuilder::create()
+        ->name(WAIT_FOR_OFFER)
+        ->description(clienttranslate('Players are considering offers'))
+        ->descriptionmyturn(clienttranslate('${you} may respond to offers'))
+        ->type(StateType::MULTIPLE_ACTIVE_PLAYER)
+        ->args('argsAtomicAction')
+        ->possibleactions(['actMakeInactive'])
+        ->transitions(['next' => ST_RESOLVE_STACK])
+        ->build(),
+
     ST_HIRING_CHOOSE_CHAIRMAN => GameStateBuilder::create()
         ->name(HIRING_CHOOSE_CHAIRMAN)
         ->description('${actplayer}')

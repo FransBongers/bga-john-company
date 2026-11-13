@@ -221,6 +221,10 @@ export class Deals {
     this.newOffer.startNewOffer(opponentId);
   }
 
+  public updateWaitButton() {
+    this.newOffer.updateWaitButton();
+  }
+
   // public setAvailableItems(playerId: number, items: JocoDealAssets) {
   //   this.newOffer.setAvailableItems(playerId, items);
   // }

@@ -138,7 +138,7 @@ class DirectorOfTradeTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
   public function actPassDirectorOfTradeTransfers()
   {
     $playerId = $this->checkPlayer();
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction(PASS, true);
   }
 
@@ -177,7 +177,7 @@ class DirectorOfTradeTransfers extends \Bga\Games\JohnCompany\Models\AtomicActio
       $this->checkIfPlayerGainsPromiseCubeFromCrown($player);
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

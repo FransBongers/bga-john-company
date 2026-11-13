@@ -143,7 +143,7 @@ class CrownChairmanRequestDebtAdvancement extends \Bga\Games\JohnCompany\Models\
       Notifications::companyOperationChairman($crownPlayer, $newDebt, true, [], Company::getBalance());
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
 
     $this->resolveAction([], true);
   }

@@ -101,7 +101,7 @@ class MilitaryAffairsAssign extends \Bga\Games\JohnCompany\Models\AtomicAction
       $familyMember->moveTo($player, $to);
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

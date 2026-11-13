@@ -94,7 +94,7 @@ class ParliamentMeetsSelectLaw extends \Bga\Games\JohnCompany\Models\AtomicActio
       $this->selectLaw($player, $law);
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

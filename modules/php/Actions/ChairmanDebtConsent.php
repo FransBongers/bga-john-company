@@ -101,7 +101,7 @@ class ChairmanDebtConsent extends \Bga\Games\JohnCompany\Models\AtomicAction
     $next = $this->getNextStep($info);
 
     $game = Game::get();
-    $game->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
 
     if ($next === 'consent') {
       $this->courtOfDirectorsGivesConsent($info['debt']);

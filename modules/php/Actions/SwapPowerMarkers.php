@@ -75,7 +75,7 @@ class SwapPowerMarkers extends \Bga\Games\JohnCompany\Models\AtomicAction
     PowerMarkers::swap(Players::get($playerId), $markers);
     Notifications::updatePower();
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

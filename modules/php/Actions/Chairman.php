@@ -178,7 +178,7 @@ class Chairman extends \Bga\Games\JohnCompany\Models\AtomicAction
       Crown::drawCardAndSetClimate();
     }
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 

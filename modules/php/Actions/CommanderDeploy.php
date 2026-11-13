@@ -53,7 +53,7 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
           'player' => Players::get($args['commanderPlayerId'])
         ]);
       }
-      Game::get()->gamestate->setPlayerNonMultiactive($args['commanderPlayerId'], 'next');
+      $this->setPlayerActionCompleted($args['commanderPlayerId']);
       $this->resolveAction(['automatic' => true]);
     }
   }
@@ -106,7 +106,7 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
   public function actPassCommanderDeploy()
   {
     $playerId = $this->checkPlayer();
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction(PASS, true);
   }
 
@@ -187,7 +187,7 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     // $this->resolveCheck($player, $checkResult, $survivingPieces, $regionId, $stateArgs['presidencyId']);
 
-    Game::get()->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 
