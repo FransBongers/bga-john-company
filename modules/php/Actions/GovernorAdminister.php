@@ -163,8 +163,8 @@ class GovernorAdminister extends \Bga\Games\JohnCompany\Models\AtomicAction
             ],
           ]
         ],
-        'playerId' => $playerId,
-
+        'playerId' => 'some',
+        'activePlayerIds' => [$playerId],
       ]
     ));
   }

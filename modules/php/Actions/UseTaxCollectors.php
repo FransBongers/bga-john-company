@@ -113,7 +113,8 @@ class UseTaxCollectors extends \Bga\Games\JohnCompany\Models\AtomicAction
             ]
           ]
         ],
-        'playerId' => $primeMinisterPlayer->getId(),
+        'playerId' => 'some',
+        'activePlayerIds' => [$primeMinisterPlayer->getId()],
         'stateDescription' => [
           'descriptionmyturn' => clienttranslate('Tax Collectors: ${you} must give consent to add an additional window tax to the proposed policy'),
           'description' => clienttranslate('Tax Collectors: ${actplayer} must give consent to add an additional window tax to the proposed policy'),

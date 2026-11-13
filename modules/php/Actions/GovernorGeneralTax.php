@@ -79,7 +79,8 @@ class GovernorGeneralTax extends \Bga\Games\JohnCompany\Models\AtomicAction
           ]
         ];
       }, $targets),
-      'playerId' => $playerId,
+      'playerId' => 'some',
+      'activePlayerIds' => [$playerId],
       'stateDescription' => [
         'descriptionmyturn' => clienttranslate('Governor General: ${you} must add £2 to a treasury or to the Company Balance'),
         'description' => clienttranslate('Governor General: ${actplayer} must add £2 to a treasury or to the Company Balance'),
@@ -105,6 +106,8 @@ class GovernorGeneralTax extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     return [
       'type' => NODE_XOR,
+      'playerId' => 'some',
+      'activePlayerIds' => [$playerId],
       'children' => array_map(function ($region) use ($playerId) {
         return [
           'action' => PLACE_UNREST_IN_REGION,

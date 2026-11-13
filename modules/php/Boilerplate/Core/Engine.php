@@ -110,7 +110,7 @@ class Engine
     if ($playerId == 'all') {
       Game::get()->gamestate->jumpToState(ST_RESOLVE_STACK);
       $info = $node->getInfo();
-      $playerIds = array_map('intval', array_keys(Players::getAll()->toArray()));
+      $playerIds = array_map('intval', Players::getAll()->getIds());
       $activePlayerIds = array_values(array_diff($playerIds, $info['completedPlayerIds'] ?? []));
       Game::get()->gamestate->setPlayersMultiactive($activePlayerIds, 'next', true);
 
@@ -193,6 +193,9 @@ class Engine
   public static function proceedToState($node, $isUndo = false)
   {
     $state = $node->getState();
+    if ($state === null && in_array($node->getType(), [NODE_OR, NODE_XOR], true)) {
+      $state = ST_RESOLVE_CHOICE;
+    }
     // $args = $node->getArgs();
     $actionId = AtomicActions::getActionOfState($state, false);
     // Do some pre-action code if needed and if we are not undoing to an irreversible node

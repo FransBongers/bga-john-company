@@ -177,7 +177,8 @@ class ParliamentMeetsSelectLaw extends \Bga\Games\JohnCompany\Models\AtomicActio
           ]
         ];
       }, $offices),
-      'playerId' => $playerId,
+      'playerId' => 'some',
+      'activePlayerIds' => [$playerId],
       'stateDescription' => [
         'descriptionmyturn' => clienttranslate('Public Demands Impeachment!: ${you} must select an Office'),
         'description' => clienttranslate('Public Demands Impeachment!: ${actplayer} must select an Office'),

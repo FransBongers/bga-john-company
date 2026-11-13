@@ -141,7 +141,12 @@ trait EngineTrait
 
   function actChooseAction(int $choiceId)
   {
-    $player = Players::getActive();
+    $this->checkAction('actChooseAction');
+    $node = Engine::getNextUnresolved();
+    if (in_array($node->getPlayerId(), ['some', 'all'], true)) {
+      AtomicActions::get(RESOLVE_CHOICE, $node)->checkPlayer();
+    }
+    $player = Players::getCurrent();
     Engine::chooseNode($player, $choiceId);
   }
 }

@@ -144,7 +144,7 @@ class AtomicAction
   public function getActivePlayerIds()
   {
     if ($this->ctx->getPlayerId() === 'all') {
-      return array_map('intval', array_keys(Players::getAll()->toArray()));
+      return array_map('intval', Players::getAll()->getIds());
     }
     $activePlayerIds = $this->ctx->getInfo()['activePlayerIds'] ?? [];
     return $activePlayerIds;

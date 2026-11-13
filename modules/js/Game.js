@@ -10713,6 +10713,12 @@ class Game {
         const playerIsActiveAndStateExists = this.bga.players.isCurrentPlayerActive() &&
             this.states[stateName];
         const currentPlayerId = this.getPlayerId();
+        console.log('Current player ID: ' + currentPlayerId, {
+            playerIsActiveAndStateExists,
+            activePlayerIds: (!activePlayerIds || activePlayerIds.includes(currentPlayerId)),
+            completedPlayerIds: this.completedPlayerIds.includes(currentPlayerId),
+            skipOnEnteringState: args.args?.skipOnEnteringState
+        });
         if (playerIsActiveAndStateExists &&
             (!activePlayerIds || activePlayerIds.includes(currentPlayerId)) &&
             !this.completedPlayerIds.includes(currentPlayerId) &&
@@ -10720,6 +10726,7 @@ class Game {
             this.states[stateName].getInstance().onEnteringState(args.args);
         }
         else if (this.states[stateName] && !args.args.skipOnEnteringState) {
+            console.log('Player is not active or state exist');
             this.states[stateName]
                 .getInstance()
                 .setDescription(activePlayerIds || Number(args.active_player), args.args);

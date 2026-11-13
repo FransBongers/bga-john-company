@@ -49,7 +49,8 @@ class ScandalOnLeadenhallStreet extends \Bga\Games\JohnCompany\Models\BlackmailC
           ]
         ];
       }, $this->getAffectedOffices()),
-      'playerId' => $player->getId(),
+      'playerId' => 'some',
+      'activePlayerIds' => [$player->getId()],
       'stateDescription' => [
         'descriptionmyturn' => clienttranslate('Scandal on Leadenhall Street: ${you} must select an Office'),
         'description' => clienttranslate('Scandal on Leadenhall Street: ${actplayer} must select an Office'),

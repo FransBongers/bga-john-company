@@ -49,7 +49,8 @@ class GovernorGeneralCommissionRegiment extends \Bga\Games\JohnCompany\Models\At
           ]
         ];
       }, PRESIDENCIES),
-      'playerId' => $playerId,
+      'playerId' => 'some',
+      'activePlayerIds' => [$playerId],
       'stateDescription' => [
         'descriptionmyturn' => clienttranslate('Governor General: ${you} must choose an army to place a ${tkn_regiment} in'),
         'description' => clienttranslate('Governor General: ${actplayer} must choose an army to place a ${tkn_regiment} in'),

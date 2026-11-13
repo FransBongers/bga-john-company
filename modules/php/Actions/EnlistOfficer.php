@@ -89,7 +89,8 @@ class EnlistOfficer extends \Bga\Games\JohnCompany\Models\AtomicAction
     $this->ctx->insertAsBrother(Engine::buildTree(
       [
         'type' => NODE_XOR,
-        'playerId' => $playerId,
+        'playerId' => 'some',
+        'activePlayerIds' => [$playerId],
         'optional' => true,
         'stateDescription' => [
           'descriptionmyturn' => clienttranslate('${you} may enlist another officer'),

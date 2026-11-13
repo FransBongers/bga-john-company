@@ -1022,7 +1022,8 @@ trait TurnTrait
         [
           'type' => NODE_OR,
           'children' => $children,
-          'playerId' => $presidentPlayerId ?? Offices::get(CHAIRMAN)->getPlayerId(),
+          'playerId' => 'some',
+          'activePlayerIds' => [$presidentPlayerId ?? Offices::get(CHAIRMAN)->getPlayerId()],
           'requiredChoiceCount' => $requiredChoiceCount,
           'stateDescription' => [
             'descriptionmyturn' => clienttranslate('${presidency}: ${you} must choose who will act next'),

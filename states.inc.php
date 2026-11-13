@@ -96,7 +96,7 @@ $machinestates = [
         ->descriptionmyturn(clienttranslate('${you} must choose which effect to resolve'))
         // ->descriptionxor(clienttranslate('${actplayer} must choose exactly one effect'))
         // ->descriptionmyturnxor(clienttranslate('${you} must choose exactly one effect'))
-        ->type(StateType::ACTIVE_PLAYER)
+        ->type(StateType::MULTIPLE_ACTIVE_PLAYER)
         ->args('argsAtomicAction')
         ->action('stAtomicAction')
         ->possibleactions(['actChooseAction', 'actRestart', 'actUndoToStep',])

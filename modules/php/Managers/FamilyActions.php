@@ -14,7 +14,7 @@ class FamilyActions
     $family = Families::get($familyId);
     $opportunityMarker = $family->getOpportunityMarker();
 
-    clienttranslate('${you} must select a family action (your opportunity marker is on ${opportunityMarker})');
+    // clienttranslate('${you} must select a family action (your opportunity marker is on ${opportunityMarker})');
     $opportunityMarkerLog = [
       'log' => in_array($opportunityMarker, [REMOVED, null]) ? clienttranslate('(your opportunity marker is ${status})') : clienttranslate('(your opportunity marker is on ${status})'),
       'args' => [
@@ -33,7 +33,8 @@ class FamilyActions
         self::purchaseEnterprise($playerId, $familyId, WORKSHOP),
         self::seekShare($playerId, $familyId),
       ],
-      'playerId' => $playerId,
+      'playerId' => 'some',
+      'activePlayerIds' => [$playerId],
       'stateDescription' => [
         'descriptionmyturn' => clienttranslate('${you} must select a family action ${opportunityMarkerLog}'),
         'description' => clienttranslate('${actplayer} must select a family action'),
@@ -136,7 +137,8 @@ class FamilyActions
       'children' => [
         $node,
       ],
-      'playerId' => $playerId,
+      'playerId' => 'some',
+      'activePlayerIds' => [$playerId],
       'stateDescription' => [
         'descriptionmyturn' => clienttranslate('${you} may perform an extra family action'),
         'description' => clienttranslate('${actplayer} may perform an extra family action'),

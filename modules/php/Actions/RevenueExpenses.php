@@ -116,7 +116,8 @@ class RevenueExpenses extends \Bga\Games\JohnCompany\Models\AtomicAction
 
       $action = [
         'type' => NODE_XOR,
-        'playerId' => $playerId,
+        'playerId' => 'some',
+        'activePlayerIds' => [$playerId],
         'stateDescription' => [
           'descriptionmyturn' => clienttranslate('Royal Protection: ${you} may avoid emergency loans and cancel remaining expenses of ${amount}'),
           'description' => clienttranslate('Royal Protection: ${actplayer} may avoid emergency loans and cancel remaining expenses of ${amount}'),

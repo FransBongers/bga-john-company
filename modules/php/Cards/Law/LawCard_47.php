@@ -59,7 +59,7 @@ class LawCard_47 extends \Bga\Games\JohnCompany\Models\LawCard
   {
     $playerId = $player->getId();
     $commanders = $this->getCommanders();
-    
+
 
     $ctx->insertAsBrother(Engine::buildTree([
       'type' => NODE_XOR,
@@ -74,7 +74,8 @@ class LawCard_47 extends \Bga\Games\JohnCompany\Models\LawCard
           ]
         ];
       }, $commanders),
-      'playerId' => $playerId,
+      'playerId' => 'some',
+      'activePlayerIds' => [$playerId],
       'stateDescription' => [
         'descriptionmyturn' => clienttranslate('Military Oversight: ${you} may choose a Commander to demote'),
         'description' => clienttranslate('Military Oversight: ${actplayer} may choose a Commander to demote'),

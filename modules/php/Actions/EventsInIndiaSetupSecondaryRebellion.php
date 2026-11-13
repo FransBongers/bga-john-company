@@ -78,7 +78,8 @@ class EventsInIndiaSetupSecondaryRebellion extends \Bga\Games\JohnCompany\Models
 
       $nodes[] = [
         'type' => NODE_OR,
-        'playerId' => $regions[0]->getActingCommander()->getPlayerId(),
+        'playerId' => 'some',
+        'activePlayerIds' => [$regions[0]->getActingCommander()->getPlayerId()],
         'children' => $children,
         'requiredChoiceCount' => count($children),
         'stateDescription' => [

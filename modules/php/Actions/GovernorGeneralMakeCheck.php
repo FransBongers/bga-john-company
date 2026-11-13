@@ -155,7 +155,8 @@ class GovernorGeneralMakeCheck extends \Bga\Games\JohnCompany\Models\AtomicActio
       $nodes[] = [
         'type' => NODE_XOR,
         'children' => $children,
-        'playerId' => $player->getId(),
+        'playerId' => 'some',
+        'activePlayerIds' => [$player->getId()],
         'stateDescription' => [
           'descriptionmyturn' => clienttranslate('Governor General: ${you} must choose an option (${number} remaining)'),
           'description' => clienttranslate('Governor General: ${actplayer} must choose an option'),

@@ -523,6 +523,12 @@ export class Game {
       this.states[stateName as keyof typeof this.states];
 
     const currentPlayerId = this.getPlayerId();
+    console.log('Current player ID: ' + currentPlayerId, {
+      playerIsActiveAndStateExists,
+      activePlayerIds: (!activePlayerIds || activePlayerIds.includes(currentPlayerId)),
+      completedPlayerIds: this.completedPlayerIds.includes(currentPlayerId),
+      skipOnEnteringState: args.args?.skipOnEnteringState
+    });
     // UI changes for active player
     if (
       playerIsActiveAndStateExists &&
@@ -532,6 +538,7 @@ export class Game {
     ) {
       this.states[stateName].getInstance().onEnteringState(args.args);
     } else if (this.states[stateName] && !args.args.skipOnEnteringState) {
+      console.log('Player is not active or state exist');
       this.states[stateName]
         .getInstance()
         .setDescription(

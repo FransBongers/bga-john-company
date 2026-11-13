@@ -54,7 +54,8 @@ class GovernorTax extends \Bga\Games\JohnCompany\Models\AtomicAction
       'children' => [
         [
           'type' => NODE_XOR,
-          'playerId' => $playerId,
+          'playerId' => 'some',
+          'activePlayerIds' => [$playerId],
           'children' => [
             [
               'action' => ADD_CASH,

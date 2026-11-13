@@ -18,6 +18,19 @@ class ResolveChoice extends \Bga\Games\JohnCompany\Models\AtomicAction
     return ST_RESOLVE_CHOICE;
   }
 
+  public function getPlayer()
+  {
+    if (in_array($this->ctx->getPlayerId(), ['some', 'all'], true)) {
+      $playerIds = $this->getActivePlayerIds();
+      if (count($playerIds) !== 1) {
+        throw new \Bga\GameFramework\VisibleSystemException('A choice must have exactly one active player');
+      }
+      return Players::get(reset($playerIds));
+    }
+
+    return parent::getPlayer();
+  }
+
   // ..######..########....###....########.########
   // .##....##....##......##.##......##....##......
   // .##..........##.....##...##.....##....##......
@@ -62,11 +75,11 @@ class ResolveChoice extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   public function argsResolveChoice()
   {
-    $player = Players::getActive();
     $node = Engine::getNextUnresolved();
     if (is_null($node)) {
       return [];
     }
+    $player = $this->getPlayer();
 
     // $choices = $this->ctx->getChoices(self::getPlayer());
     // $numberOfChoices = count($choices);

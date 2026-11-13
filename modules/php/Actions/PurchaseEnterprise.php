@@ -127,7 +127,8 @@ class PurchaseEnterprise extends \Bga\Games\JohnCompany\Models\AtomicAction
     $this->ctx->insertAsBrother(Engine::buildTree(
       [
         'type' => NODE_OR,
-        'playerId' => $playerId,
+        'playerId' => 'some',
+        'activePlayerIds' => [$playerId],
         'optional' => true,
         'stateDescription' => [
           'descriptionmyturn' => clienttranslate('${you} may buy another enterprise'),

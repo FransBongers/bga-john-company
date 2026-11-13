@@ -55,7 +55,8 @@ class GovernorGeneralShipbuilding extends \Bga\Games\JohnCompany\Models\AtomicAc
           ]
         ];
       }, $seaZones),
-      'playerId' => $playerId,
+      'playerId' => 'some',
+      'activePlayerIds' => [$playerId],
       'stateDescription' => [
         'descriptionmyturn' => clienttranslate('Governor General: ${you} must choose a sea zone to place ${tkn_ship}'),
         'description' => clienttranslate('Governor General: ${actplayer} must choose a sea zone to place ${tkn_ship}'),

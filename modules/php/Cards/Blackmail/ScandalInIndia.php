@@ -91,7 +91,8 @@ class ScandalInIndia extends \Bga\Games\JohnCompany\Models\BlackmailCard
           ]
         ];
       }, $this->getAffectedOffices()),
-      'playerId' => $player->getId(),
+      'playerId' => 'some',
+      'activePlayerIds' => [$player->getId()],
       'stateDescription' => [
         'descriptionmyturn' => clienttranslate('Scandal in India: ${you} must select an Office'),
         'description' => clienttranslate('Scandal in India: ${actplayer} must select an Office'),
@@ -101,7 +102,7 @@ class ScandalInIndia extends \Bga\Games\JohnCompany\Models\BlackmailCard
 
   protected function resolveImmediateEffect(Player $player, object $ctx)
   {
-    if(Globals::getPhase() === SETUP) {
+    if (Globals::getPhase() === SETUP) {
       return;
     }
 
