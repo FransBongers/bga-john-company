@@ -3489,6 +3489,7 @@ class PhaseTracker {
     constructor(game) {
         this.game = game;
         this.game = game;
+        this.phase = game.gamedatas.phase;
         this.setup(game.gamedatas);
     }
     static create(game) {
@@ -3531,9 +3532,13 @@ class PhaseTracker {
         });
     }
     setPhase(phase) {
+        this.phase = phase;
         if (PHASES.includes(phase)) {
             document.getElementById('joco-current-phase-text').textContent = getPhaseName(phase).toLocaleUpperCase();
         }
+    }
+    getPhase() {
+        return this.phase;
     }
 }
 
@@ -3792,6 +3797,9 @@ class FamilyArea {
     }
     async addEnterprise(enterprise) {
         await this.enterprises.addCard(getEnterpriseCard(enterprise));
+    }
+    async addLondonSeasonCard(card) {
+        await this.stocks[`londonSeasonCards_${this.familyId}`].addCard(getLondonSeasonCard(card));
     }
     async addPromiseCard(card) {
         await this.promiseCards.addCard(card);
@@ -5401,7 +5409,9 @@ class NotificationManager {
     async pay(playerId, amount) {
         this.getPlayer(playerId).counters[CASH_COUNTER].incValue(-amount);
     }
-    async placeFamilyMembers(familyMembers, fromElement) {
+    async placeFamilyMembers(familyMembers) {
+        const player = PlayerManager$1.getInstance().getPlayerForFamily(familyMembers[0].familyId);
+        const fromElement = player.ui[FAMILY_MEMBERS_COUNTER];
         const promises = familyMembers.map(async (familyMember, index) => {
             const { id, familyId, location } = familyMember;
             const player = PlayerManager$1.getInstance().getPlayerForFamily(familyId);
@@ -5422,12 +5432,52 @@ class NotificationManager {
         }
         await this.game.animationManager.slideAndAttach(elt, locationElt);
     }
+    async returnFamilyMemberToSupply(familyMember) {
+        const playerId = PlayerManager$1.getInstance()
+            .getPlayerForFamily(familyMember.familyId)
+            .getPlayerId();
+        const toElement = document.getElementById(`joco-familyMembers-${playerId}`);
+        const familyMemberElt = document.getElementById(familyMember.id);
+        if (familyMemberElt) {
+            familyMemberElt.remove();
+        }
+        this.getPlayer(playerId).counters[FAMILY_MEMBERS_COUNTER].incValue(1);
+    }
     updateCountersForTarget(target, counterChanges) {
         if (FAMILIES.includes(target)) {
             Families.getInstance().getFamily(target).incCounters(counterChanges);
         }
         else if (target === COMPANY) {
             Company.getInstance().incCounters(counterChanges);
+        }
+    }
+    async transferAssets(assets) {
+        const { counters, shares, enterprises, promiseCards, prestigeCards } = assets;
+        Object.entries(counters).forEach(([playerId, counterChanges]) => {
+            PlayerManager$1.getInstance()
+                .getPlayer(Number(playerId))
+                .counters[CASH_COUNTER].incValue(counterChanges[CASH_COUNTER] || 0);
+        });
+        await Promise.all(enterprises.map(async (enterprise) => {
+            await Families.getInstance()
+                .getFamily(enterprise.location)
+                .addEnterprise(getEnterpriseCard(enterprise));
+        }));
+        await Promise.all(promiseCards.map(async (card) => {
+            await Families.getInstance()
+                .getFamily(card.location)
+                .addPromiseCard(getPromiseCard(card));
+        }));
+        await Promise.all(prestigeCards.map(async (card) => {
+            await Families.getInstance()
+                .getFamily(card.location)
+                .addLondonSeasonCard(getLondonSeasonCard(card));
+        }));
+        for (const { returned, new: newShare } of shares) {
+            await Promise.all([
+                this.returnFamilyMemberToSupply(returned),
+                this.placeFamilyMembers([newShare]),
+            ]);
         }
     }
     async notif_frontendTrigger(notif) {
@@ -5518,8 +5568,8 @@ class NotificationManager {
         await Interaction$1.use().wait(500);
     }
     async notif_enlistFamilyMember(notif) {
-        const { familyMember, playerId } = notif;
-        await this.placeFamilyMembers([familyMember], this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER]);
+        const { familyMember } = notif;
+        await this.placeFamilyMembers([familyMember]);
     }
     async notif_fillOrder(notif) {
         const { familyMember, order, from } = notif;
@@ -5627,7 +5677,7 @@ class NotificationManager {
         const familyId = cardToMove.location.split('_')[1];
         await Families.getInstance()
             .getFamily(familyId)
-            .stocks[cardToMove.location].addCard(getLondonSeasonCard(cardToMove));
+            .addLondonSeasonCard(getLondonSeasonCard(cardToMove));
     }
     async notif_moveOfficeCard(notif) {
         const { office } = notif;
@@ -5762,7 +5812,13 @@ class NotificationManager {
         AttentionManager.getInstance().remove(notif.ids);
     }
     async notif_dealUpdated(notif) {
+        const { deal, transferredAssets } = notif;
         Deals.getInstance().updateDeal(notif.deal);
+        const playerManager = PlayerManager$1.getInstance();
+        if (deal.status === 'closed') {
+            await this.transferAssets(transferredAssets[playerManager.getPlayerForFamily(deal.offeredByFamilyId).getPlayerId()]);
+            await this.transferAssets(transferredAssets[playerManager.getPlayerForFamily(deal.familyId).getPlayerId()]);
+        }
     }
     async notif_movePromiseCard(notif) {
         const { card } = notif;
@@ -5790,13 +5846,8 @@ class NotificationManager {
         directorOfTradeOfficeCard.remove();
     }
     async notif_returnFamilyMemberToSupply(notif) {
-        const { familyMember, playerId } = notif;
-        const toElement = document.getElementById(`joco-familyMembers-${playerId}`);
-        const familyMemberElt = document.getElementById(familyMember.id);
-        if (familyMemberElt) {
-            familyMemberElt.remove();
-        }
-        this.getPlayer(playerId).counters[FAMILY_MEMBERS_COUNTER].incValue(1);
+        const { familyMember } = notif;
+        await this.returnFamilyMemberToSupply(familyMember);
     }
     async notif_returnShipsToSupply(notif) {
         const { ships } = notif;
@@ -5817,15 +5868,8 @@ class NotificationManager {
     }
     async notif_seekShare(notif) {
         const { playerId, familyMember, amount } = notif;
-        const { familyId, location, id } = familyMember;
         await this.pay(playerId, amount);
-        const fromElement = this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER];
-        const toElement = document.getElementById(location);
-        const familyMemberElement = createFamilyMember(familyId === CROWN
-            ? COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[PlayerManager$1.getInstance().getPlayer(CROWN_PLAYER_ID).getColor()]]
-            : familyId, id);
-        toElement.insertAdjacentElement('beforeend', familyMemberElement);
-        await this.game.animationManager.slideIn(familyMemberElement, fromElement);
+        await this.placeFamilyMembers([familyMember]);
     }
     async notif_castVotes(notif) {
         const { playerId, money, support, enterpriseIds, londonSeasonCardIds, opposition, } = notif;
@@ -5869,8 +5913,8 @@ class NotificationManager {
         bar.removeTabWithId('joco-draft');
     }
     async notif_setupFamilyMembers(notif) {
-        const { familyMembers, playerId } = notif;
-        await this.placeFamilyMembers(familyMembers, this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER]);
+        const { familyMembers } = notif;
+        await this.placeFamilyMembers(familyMembers);
     }
     async notif_swapPowerMarkers(notif) {
         const { playerId, changes } = notif;
@@ -6014,6 +6058,9 @@ class ResolveChoice {
     onEnteringState(args) {
         this.args = args;
         this.updateInterfaceInitialStep();
+        if (this.args.tab) {
+            Bar.getInstance().goTo(this.args.tab);
+        }
     }
     onLeavingState() {
         debug('Leaving ResolveChoiceState');
@@ -6030,7 +6077,8 @@ class ResolveChoice {
     }
     updateInterfaceInitialStep() {
         this.game.clearPossible();
-        if (this.args.descriptionmyturn && typeof this.args.descriptionmyturn === 'string') {
+        if (this.args.descriptionmyturn &&
+            typeof this.args.descriptionmyturn === 'string') {
             updatePageTitle(_(this.args.descriptionmyturn), this.args.textArgs);
         }
         else if (this.args.description &&
@@ -10470,6 +10518,143 @@ class WaitForOffer {
     }
 }
 
+const phases = [
+    LONDON_SEASON, FAMILY, HIRING, CHAIRMAN, DIRECTOR_OF_TRADE,
+    MANAGER_OF_SHIPPING, MILITARY_AFFAIRS, BOMBAY_PRESIDENCY,
+    MADRAS_PRESIDENCY, BENGAL_PRESIDENCY, BONUSES, REVENUE,
+    EVENTS_IN_INDIA, PARLIAMENT_MEETS, UPKEEP_AND_REFRESH,
+];
+const indiaOffices = [
+    PRESIDENT_OF_BOMBAY, PRESIDENT_OF_MADRAS, PRESIDENT_OF_BENGAL,
+    GOVERNOR_GENERAL$1, GOVERNOR_OF_BOMBAY, GOVERNOR_OF_MADRAS,
+    GOVERNOR_OF_BENGAL, GOVERNOR_OF_PUNJAB, GOVERNOR_OF_DELHI,
+    GOVERNOR_OF_MARATHA, GOVERNOR_OF_HYDERABAD, GOVERNOR_OF_MYSORE,
+];
+const londonOffices = [
+    CHAIRMAN, DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING, MILITARY_AFFAIRS,
+    SUPERINTENDENT_OF_TRADE_IN_CHINA,
+];
+function getAnytimeCardIds(data) {
+    const phaseIndex = phases.indexOf(data.phase);
+    if (phaseIndex < 0)
+        return [];
+    const eligible = data.promiseCards.filter(({ id }) => {
+        const [prefix, owner, type] = id.split('_');
+        return prefix === 'PC' && type === 'TakeTwoOrLessFromMe' &&
+            Number(owner) !== data.playerId && (data.cashByPlayer[Number(owner)] ?? 0) > 0;
+    }).map(({ id }) => id);
+    const afterRevenue = phaseIndex > phases.indexOf(REVENUE);
+    const beforeEvents = phaseIndex < phases.indexOf(EVENTS_IN_INDIA);
+    data.blackmailCards.forEach((card) => {
+        if (card.type !== BLACKMAIL || !card.hiddenId)
+            return;
+        let canPlay = false;
+        switch (card.hiddenId) {
+            case 'EnvoyToTheMughals':
+                canPlay = beforeEvents;
+                break;
+            case 'ThePrimeMinistersEar':
+                canPlay = phaseIndex < phases.indexOf(FAMILY);
+                break;
+            case 'ScandalInIndia':
+                canPlay = afterRevenue && indiaOffices.some((office) => data.occupiedOffices.includes(office));
+                break;
+            case 'ScandalOnLeadenhallStreet':
+                canPlay = afterRevenue && londonOffices.some((office) => data.occupiedOffices.includes(office));
+                break;
+        }
+        if (canPlay)
+            eligible.push(card.id);
+    });
+    return eligible;
+}
+
+const ANYTIME_CARD_STATE = 'clientConfirmAnytimeCard';
+class AnytimeCards {
+    constructor(game) {
+        this.game = game;
+        this.listeners = [];
+        this.selectedTitle = '';
+    }
+    setup(stateName, args) {
+        this.clear();
+        if (this.game.isSpectator)
+            return;
+        const playerId = this.game.getPlayerId();
+        const players = PlayerManager$1.getInstance();
+        const player = players.getPlayer(playerId);
+        const family = player && Families.getInstance().getFamily(player.familyId);
+        if (!family)
+            return;
+        const promiseCards = family.getPromiseCards();
+        const blackmailCards = family.stocks[`londonSeasonCards_${player.familyId}`].getCards();
+        const occupiedOffices = Object.keys(this.game.gamedatas.offices).filter((officeId) => document.getElementById(`OfficeCard_${officeId}`) &&
+            document.getElementById(officeId)?.querySelector('.joco-family-member'));
+        const cashByPlayer = Object.fromEntries(players.getPlayerIds().map((id) => [
+            id, players.getPlayer(id).counters[CASH_COUNTER]?.getValue() ?? 0,
+        ]));
+        const eligibleIds = getAnytimeCardIds({
+            playerId,
+            phase: PhaseTracker.getInstance().getPhase(),
+            promiseCards,
+            blackmailCards,
+            cashByPlayer,
+            occupiedOffices,
+        });
+        const timingCardIds = stateName === 'TimingWindowAct'
+            ? (args?._private ?? []).map((option) => option.cardId)
+            : [];
+        promiseCards.forEach((card) => {
+            if (eligibleIds.includes(card.id) && !timingCardIds.includes(card.id)) {
+                this.makeSelectable(PromiseCardsManager.getInstance().getCardElement(card), card.title);
+            }
+        });
+        blackmailCards.forEach((card) => {
+            if (eligibleIds.includes(card.id) && !timingCardIds.includes(card.hiddenId)) {
+                this.makeSelectable(LondonSeasonCardsManager.getInstance().getCardElement(card), card.title);
+            }
+        });
+    }
+    makeSelectable(element, title) {
+        if (!element)
+            return;
+        const handler = (event) => {
+            if (element.classList.contains(SELECTABLE) || element.classList.contains(SELECTED) || this.game._helpMode)
+                return;
+            if (this.game.bga.actions.game.isInterfaceLocked())
+                return;
+            event.stopPropagation();
+            this.selectedTitle = title;
+            this.game.bga.states.setClientState(ANYTIME_CARD_STATE, {
+                descriptionmyturn: _('Play ${cardTitle}?'),
+                args: { cardTitle: _(title) },
+            });
+        };
+        element.classList.add('anytime-selectable');
+        element.addEventListener('click', handler, true);
+        this.listeners.push({ element, handler });
+    }
+    showConfirmation() {
+        this.clear();
+        this.game.clearPossible();
+        this.game.bga.statusBar.setTitle(_('Play ${cardTitle}?'), { cardTitle: _(this.selectedTitle) });
+        this.game.bga.statusBar.addActionButton(_('Confirm'), () => { }, {
+            id: 'confirm_anytime_card',
+            color: 'primary',
+            destination: document.getElementById('customActions'),
+            disabled: true,
+        });
+        Interaction$1.use().addCancelButton();
+    }
+    clear() {
+        this.listeners.forEach(({ element, handler }) => {
+            element.removeEventListener('click', handler, true);
+            element.classList.remove('anytime-selectable');
+        });
+        this.listeners = [];
+    }
+}
+
 function sleep(ms) {
     return new Promise((r) => setTimeout(r, ms));
 }
@@ -10489,6 +10674,7 @@ class Game {
         this.activePlayerIds = undefined;
         this.completedPlayerIds = [];
         this.currentStateName = '';
+        this.anytimeCards = new AnytimeCards(this);
         this.states = {
             ConfirmPartialTurn,
             ConfirmTurn,
@@ -10705,6 +10891,10 @@ class Game {
     setupDontPreloadImages() { }
     onEnteringState(stateName, args) {
         console.log('Entering state: ' + stateName, args);
+        if (stateName === ANYTIME_CARD_STATE) {
+            this.anytimeCards.showConfirmation();
+            return;
+        }
         const activePlayerIds = args.args?.activePlayerIds;
         this.activePlayerIds = activePlayerIds;
         this.completedPlayerIds = args.args?.completedPlayerIds ?? [];
@@ -10732,8 +10922,10 @@ class Game {
                 .setDescription(activePlayerIds || Number(args.active_player), args.args);
         }
         this.updateMakeInactiveButton();
+        this.anytimeCards.setup(stateName, args.args);
     }
     onLeavingState(stateName) {
+        this.anytimeCards.clear();
         if (this.states[stateName]) {
             this.states[stateName].getInstance().onLeavingState();
         }
@@ -10747,7 +10939,7 @@ class Game {
         if (canMakeInactive) {
             Interaction$1.use().addSecondaryActionButton({
                 id: 'make-inactive',
-                text: _('Make inactive'),
+                text: _('Become inactive'),
                 callback: () => this.bga.actions.performAction('actMakeInactive', {}, { checkAction: false, checkPossibleActions: false }),
             });
         }

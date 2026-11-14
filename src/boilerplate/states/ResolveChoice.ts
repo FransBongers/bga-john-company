@@ -10,6 +10,7 @@ import {
   updatePageTitle,
 } from '../utility';
 import { Log } from '../notification-manager/types';
+import { Bar } from '../../bar';
 
 interface ChoiceArgs {
   id: number;
@@ -32,6 +33,7 @@ interface OnEnteringResolveChoiceArgs extends CommonStateArgs {
   description?: string;
   descriptionmyturn?: string;
   textArgs: Record<string, unknown>;
+  tab?: string;
 }
 
 export class ResolveChoice implements GameState<OnEnteringResolveChoiceArgs> {
@@ -51,6 +53,9 @@ export class ResolveChoice implements GameState<OnEnteringResolveChoiceArgs> {
   onEnteringState(args: OnEnteringResolveChoiceArgs) {
     this.args = args;
     this.updateInterfaceInitialStep();
+    if (this.args.tab) {
+      Bar.getInstance().goTo(this.args.tab);
+    }
   }
 
   onLeavingState() {
@@ -96,7 +101,10 @@ export class ResolveChoice implements GameState<OnEnteringResolveChoiceArgs> {
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
 
-    if (this.args.descriptionmyturn && typeof this.args.descriptionmyturn === 'string') {
+    if (
+      this.args.descriptionmyturn &&
+      typeof this.args.descriptionmyturn === 'string'
+    ) {
       updatePageTitle(_(this.args.descriptionmyturn), this.args.textArgs);
     } else if (
       this.args.description &&

@@ -53,7 +53,12 @@ import { Deals } from '../../deals';
 import { JocoPlayer } from '../../player-manager/player';
 import { createFamilyMember } from '../../templates';
 import { ShipsManager } from '../../token-managers/ship-tokens';
-import { GameAlias, JocoAttention, JocoFamilyMember, OtherShipType } from '../../types';
+import {
+  GameAlias,
+  JocoAttention,
+  JocoFamilyMember,
+  OtherShipType,
+} from '../../types';
 import {
   getEnterpriseCard,
   getLawCard,
@@ -128,6 +133,7 @@ import {
   NotifDiscardEnterprise,
   NotifUpdateShareValue,
   NotifReplaceDirectorOfTrade,
+  NotifTransferredAssets,
 } from './types';
 import { tplArmyPiece } from '../../india/army/templates';
 import { Parliament } from '../../parliament';
@@ -161,8 +167,14 @@ export class NotificationManager {
     // this.subscriptions = [];
   }
 
-  async notif_actionParticipantsChanged(notif: { activePlayerIds: number[] | null; completedPlayerIds: number[] }) {
-    this.game.updateActionParticipants(notif.activePlayerIds, notif.completedPlayerIds);
+  async notif_actionParticipantsChanged(notif: {
+    activePlayerIds: number[] | null;
+    completedPlayerIds: number[];
+  }) {
+    this.game.updateActionParticipants(
+      notif.activePlayerIds,
+      notif.completedPlayerIds,
+    );
   }
 
   async notif_playerActivityChanged() {
@@ -371,10 +383,12 @@ export class NotificationManager {
     // await Promise.all(promises);
   }
 
-  async placeFamilyMembers(
-    familyMembers: JocoFamilyMember[],
-    fromElement: HTMLElement,
-  ) {
+  async placeFamilyMembers(familyMembers: JocoFamilyMember[]) {
+    const player = PlayerManager.getInstance().getPlayerForFamily(
+      familyMembers[0].familyId,
+    );
+    const fromElement = player.ui[FAMILY_MEMBERS_COUNTER];
+
     const promises = familyMembers.map(async (familyMember, index) => {
       const { id, familyId, location } = familyMember;
       const player = PlayerManager.getInstance().getPlayerForFamily(familyId);
@@ -416,6 +430,27 @@ export class NotificationManager {
     await this.game.animationManager.slideAndAttach(elt, locationElt);
   }
 
+  async returnFamilyMemberToSupply(familyMember: JocoFamilyMember) {
+    const playerId = PlayerManager.getInstance()
+      .getPlayerForFamily(familyMember.familyId)
+      .getPlayerId();
+
+    const toElement = document.getElementById(`joco-familyMembers-${playerId}`);
+    const familyMemberElt = document.getElementById(familyMember.id)!;
+    if (familyMemberElt) {
+      familyMemberElt.remove();
+    }
+
+    // console.log('notif_returnFamilyMemberToSupply elts', familyMemberElt, toElement);
+    // TODO: check animation
+    // await this.game.animationManager.slideOutAndDestroy(
+    //   familyMemberElt,
+    //   toElement,
+    // );
+
+    this.getPlayer(playerId).counters[FAMILY_MEMBERS_COUNTER].incValue(1);
+  }
+
   updateCountersForTarget(
     target: string,
     counterChanges: Record<string, number>,
@@ -424,6 +459,50 @@ export class NotificationManager {
       Families.getInstance().getFamily(target).incCounters(counterChanges);
     } else if (target === COMPANY) {
       Company.getInstance().incCounters(counterChanges);
+    }
+  }
+
+  async transferAssets(assets: NotifTransferredAssets) {
+    const { counters, shares, enterprises, promiseCards, prestigeCards } =
+      assets;
+
+    Object.entries(counters).forEach(([playerId, counterChanges]) => {
+      PlayerManager.getInstance()
+        .getPlayer(Number(playerId))
+        .counters[CASH_COUNTER].incValue(counterChanges[CASH_COUNTER] || 0);
+    });
+
+    await Promise.all(
+      enterprises.map(async (enterprise) => {
+        await Families.getInstance()
+          .getFamily(enterprise.location)
+          .addEnterprise(getEnterpriseCard(enterprise));
+      }),
+    );
+
+    await Promise.all(
+      promiseCards.map(async (card) => {
+        await Families.getInstance()
+          .getFamily(card.location)
+          .addPromiseCard(getPromiseCard(card));
+      }),
+    );
+
+    await Promise.all(
+      prestigeCards.map(async (card) => {
+        await Families.getInstance()
+          .getFamily(card.location)
+          .addLondonSeasonCard(getLondonSeasonCard(card));
+      }),
+    );
+
+    // Handle the transferred assets as needed
+    // For example, update counters, shares, enterprises, etc.
+    for (const { returned, new: newShare } of shares) {
+      await Promise.all([
+        this.returnFamilyMemberToSupply(returned),
+        this.placeFamilyMembers([newShare]),
+      ]);
     }
   }
 
@@ -581,12 +660,9 @@ export class NotificationManager {
   }
 
   async notif_enlistFamilyMember(notif: NotifEnlistFamilyMember) {
-    const { familyMember, playerId } = notif;
+    const { familyMember } = notif;
 
-    await this.placeFamilyMembers(
-      [familyMember],
-      this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER],
-    );
+    await this.placeFamilyMembers([familyMember]);
   }
 
   async notif_fillOrder(notif: NotifFillOrder) {
@@ -766,7 +842,7 @@ export class NotificationManager {
     const familyId = cardToMove.location.split('_')[1];
     await Families.getInstance()
       .getFamily(familyId)
-      .stocks[cardToMove.location].addCard(getLondonSeasonCard(cardToMove));
+      .addLondonSeasonCard(getLondonSeasonCard(cardToMove));
   }
 
   async notif_moveOfficeCard(notif: NotifMoveOfficeCard) {
@@ -954,7 +1030,22 @@ export class NotificationManager {
   }
 
   async notif_dealUpdated(notif: NotifDealUpdated) {
+    const { deal, transferredAssets } = notif;
     Deals.getInstance().updateDeal(notif.deal);
+    //  deal.offeredByFamilyId
+    const playerManager = PlayerManager.getInstance();
+    if (deal.status === 'closed') {
+      await this.transferAssets(
+        transferredAssets[
+          playerManager.getPlayerForFamily(deal.offeredByFamilyId).getPlayerId()
+        ],
+      );
+      await this.transferAssets(
+        transferredAssets[
+          playerManager.getPlayerForFamily(deal.familyId).getPlayerId()
+        ],
+      );
+    }
   }
 
   async notif_movePromiseCard(notif: NotifMovePromiseCard) {
@@ -1012,22 +1103,9 @@ export class NotificationManager {
   async notif_returnFamilyMemberToSupply(
     notif: NotifReturnFamilyMemberToSupply,
   ) {
-    const { familyMember, playerId } = notif;
+    const { familyMember } = notif;
 
-    const toElement = document.getElementById(`joco-familyMembers-${playerId}`);
-    const familyMemberElt = document.getElementById(familyMember.id)!;
-    if (familyMemberElt) {
-      familyMemberElt.remove();
-    }
-
-    // console.log('notif_returnFamilyMemberToSupply elts', familyMemberElt, toElement);
-    // TODO: check animation
-    // await this.game.animationManager.slideOutAndDestroy(
-    //   familyMemberElt,
-    //   toElement,
-    // );
-
-    this.getPlayer(playerId).counters[FAMILY_MEMBERS_COUNTER].incValue(1);
+    await this.returnFamilyMemberToSupply(familyMember);
   }
 
   async notif_returnShipsToSupply(notif: NotifReturnShipsToSupply) {
@@ -1060,25 +1138,27 @@ export class NotificationManager {
 
   async notif_seekShare(notif: NotifSeekShare) {
     const { playerId, familyMember, amount } = notif;
-    const { familyId, location, id } = familyMember;
+    // const { familyId, location, id } = familyMember;
     await this.pay(playerId, amount);
 
-    const fromElement = this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER];
-    const toElement = document.getElementById(location)!;
+    await this.placeFamilyMembers([familyMember]);
 
-    const familyMemberElement = createFamilyMember(
-      familyId === CROWN
-        ? COLOR_FAMILY_MAP[
-            HEX_COLOR_COLOR_MAP[
-              PlayerManager.getInstance().getPlayer(CROWN_PLAYER_ID).getColor()
-            ]
-          ]
-        : familyId,
-      id,
-    );
-    toElement.insertAdjacentElement('beforeend', familyMemberElement);
+    // const fromElement = this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER];
+    // const toElement = document.getElementById(location)!;
 
-    await this.game.animationManager.slideIn(familyMemberElement, fromElement);
+    // const familyMemberElement = createFamilyMember(
+    //   familyId === CROWN
+    //     ? COLOR_FAMILY_MAP[
+    //         HEX_COLOR_COLOR_MAP[
+    //           PlayerManager.getInstance().getPlayer(CROWN_PLAYER_ID).getColor()
+    //         ]
+    //       ]
+    //     : familyId,
+    //   id,
+    // );
+    // toElement.insertAdjacentElement('beforeend', familyMemberElement);
+
+    // await this.game.animationManager.slideIn(familyMemberElement, fromElement);
   }
 
   async notif_castVotes(notif: NotifCastVotes) {
@@ -1136,11 +1216,8 @@ export class NotificationManager {
   }
 
   async notif_setupFamilyMembers(notif: NotifSetupFamilyMembers) {
-    const { familyMembers, playerId } = notif;
-    await this.placeFamilyMembers(
-      familyMembers,
-      this.getPlayer(playerId).ui[FAMILY_MEMBERS_COUNTER],
-    );
+    const { familyMembers } = notif;
+    await this.placeFamilyMembers(familyMembers);
   }
 
   async notif_swapPowerMarkers(notif: NotifSwapPowerMarkers) {

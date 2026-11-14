@@ -1679,18 +1679,18 @@ span[style*="color:#addb90"] {
 .bga-cards_card.used {
   opacity: 0.5;
 }
-.bga-cards_card.selectable .bga-cards_card-side {
+.bga-cards_card.selectable .bga-cards_card-side, .bga-cards_card.anytime-selectable .bga-cards_card-side {
   cursor: pointer;
   outline: 4px solid yellow;
 }
-.bga-cards_card.selectable .bga-cards_card-side * {
+.bga-cards_card.selectable .bga-cards_card-side *, .bga-cards_card.anytime-selectable .bga-cards_card-side * {
   cursor: inherit;
 }
-.bga-cards_card.selectable:hover .bga-cards_card-side, .bga-cards_card.selected .bga-cards_card-side {
+.bga-cards_card.selectable:hover .bga-cards_card-side, .bga-cards_card.anytime-selectable:hover .bga-cards_card-side, .bga-cards_card.selected .bga-cards_card-side {
   cursor: pointer;
   outline: 4px solid blue;
 }
-.bga-cards_card.selectable:hover .bga-cards_card-side *, .bga-cards_card.selected .bga-cards_card-side * {
+.bga-cards_card.selectable:hover .bga-cards_card-side *, .bga-cards_card.anytime-selectable:hover .bga-cards_card-side *, .bga-cards_card.selected .bga-cards_card-side * {
   cursor: inherit;
 }
 
@@ -4718,5 +4718,3 @@ html {
 .player-button.yellow:hover {
   background-color: hsl(46, 90%, 86%);
 }
-
-/*# sourceMappingURL=johncompany.css.map */

@@ -105,10 +105,12 @@ class TimingWindowCheck extends \Bga\Games\JohnCompany\Models\AtomicAction
     return $effect !== null ? [$effect] : [];
   }
 
-  private function checkPromiseCard(string $promiseCardType, array $timingData): array
+  private function checkPromiseCard(string $promiseCardId, array $timingData): array
   {
-    // Implement the logic to check the effects of Promise Cards
-    return [];
+    $card = PromiseCards::get($promiseCardId);
+    $effect = $card->effectCanBeApplied($timingData);
+
+    return $effect !== null ? [$effect] : [];
   }
 
   private function getActingPlayerIds(array $options): array

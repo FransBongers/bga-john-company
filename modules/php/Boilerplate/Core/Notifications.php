@@ -473,6 +473,7 @@ class Notifications
       Locations::armyOfExhausted(MADRAS_PRESIDENCY) => clienttranslate('Army of Madras'),
       OFFICER_IN_TRAINING => clienttranslate('Officers-in-training'),
       PENSIONERS => clienttranslate('Pensioners'),
+      COURT_OF_DIRECTORS => clienttranslate('Court of Directors')
     ];
     if (!isset($locationNameMap[$location])) {
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_021: " . $location);

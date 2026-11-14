@@ -7,10 +7,12 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
+use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\Players;
+use Bga\Games\JohnCompany\Managers\PromiseCards;
 use Bga\Games\JohnCompany\Models\FamilyMember;
 use Bga\Games\JohnCompany\Models\Office;
 use Bga\Games\JohnCompany\Models\Player;
@@ -150,7 +152,15 @@ class HiringHireFamilyMember extends Hiring
         $playerIds[] = $candidatePlayerId;
       }
     }
-    // TODO: add $hiringPlayerId if they have promissory note of one or more of the playerIds
+
+    $promiseCards = PromiseCards::getInLocation(Locations::promiseCards($hiringPlayerId))->toArray();
+    if (Utils::array_some($promiseCards, function ($promiseCard) use ($playerIds, $hiringPlayerId) {
+      $ownerId = $promiseCard->getOwnerPlayerId();
+      return $ownerId !== $hiringPlayerId && in_array($ownerId, $playerIds);
+    })) {
+      $playerIds[] = $hiringPlayerId;
+    }
+
 
     return $playerIds;
   }

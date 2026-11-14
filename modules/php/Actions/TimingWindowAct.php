@@ -45,6 +45,7 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $data = [
       '_private' => $private,
+      'debug' => $this->ctx->getParent()->getUnresolvedActions([LONDON_SEASON_CHOOSE_CARD])
     ];
 
     return $data;

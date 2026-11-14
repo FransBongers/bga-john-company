@@ -233,6 +233,7 @@ class Engine
     }
 
     if ($nodeId == PASS) {
+      Game::get()->gamestate->setPlayerNonMultiactive($player->getId(), 'next');
       self::resolve(PASS);
       self::checkpoint();
       self::proceed();
@@ -243,6 +244,7 @@ class Engine
       throw new \Bga\GameFramework\VisibleSystemException('Node is already resolved');
     }
     $node->choose($nodeId, $auto);
+    Game::get()->gamestate->setPlayerNonMultiactive($player->getId(), 'next');
     self::checkpoint();
     self::save();
     self::proceed();

@@ -70,6 +70,8 @@ trait DealsTrait
       ]));
       Engine::save();
       Engine::proceed();
+      $this->gamestate->setPlayerNonMultiactive($playerId, 'next');
+      Notifications::playerActivityChanged($playerId);
       return;
     }
 
@@ -81,6 +83,9 @@ trait DealsTrait
     }
     $this->gamestate->setPlayersMultiactive([$opponentId], 'next', false);
     Notifications::playerActivityChanged($opponentId);
+    if ($wait) {
+      AtomicActions::get(WAIT_FOR_OFFER, $node)->setPlayerActionCompleted($playerId);
+    }
   }
 
   #[CheckAction(false)]

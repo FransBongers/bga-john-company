@@ -76,6 +76,7 @@ const tplTurnItem = (turn: number) => `
 
 export class PhaseTracker {
   private static instance: PhaseTracker;
+  private phase: string;
   private ui: {
     container: HTMLElement;
     phases: Record<string, HTMLElement>;
@@ -84,6 +85,7 @@ export class PhaseTracker {
 
   constructor(private game: GameAlias) {
     this.game = game;
+    this.phase = game.gamedatas.phase;
     this.setup(game.gamedatas);
   }
 
@@ -177,8 +179,13 @@ export class PhaseTracker {
   }
 
   public setPhase(phase: string) {
+    this.phase = phase;
     if (PHASES.includes(phase)) {
       document.getElementById('joco-current-phase-text')!.textContent = getPhaseName(phase).toLocaleUpperCase();
     }
+  }
+
+  public getPhase(): string {
+    return this.phase;
   }
 }

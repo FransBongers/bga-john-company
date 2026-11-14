@@ -1032,6 +1032,9 @@ trait TurnTrait
               'presidency' => Notifications::getPhaseName($presidencyId),
             ]
           ],
+          'args' => [
+            'tab' => 'joco-india'
+          ]
           // 'activePlayerIds' => [$presidentOffice->getPlayerId()],
           // 'officeId' => $presidentOffice->getId(),
         ],

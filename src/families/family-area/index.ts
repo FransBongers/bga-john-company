@@ -237,6 +237,10 @@ export class FamilyArea {
     await this.enterprises.addCard(getEnterpriseCard(enterprise));
   }
 
+  public async addLondonSeasonCard(card: JocoLondonSeasonCard) {
+    await this.stocks[`londonSeasonCards_${this.familyId}`].addCard(getLondonSeasonCard(card));
+  }
+
   public async addPromiseCard(card: JocoPromiseCard) {
     await this.promiseCards.addCard(card);
   }

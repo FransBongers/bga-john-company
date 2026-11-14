@@ -8,6 +8,6 @@ class QueenCharlotte extends \Bga\Games\JohnCompany\Models\Ship
   {
     parent::__construct($row);
     $this->id = QUEEN_CHARLOTTE;
-    $this->name = clienttranslate('QueenCharlotte');
+    $this->name = clienttranslate('Queen Charlotte');
   }
 }

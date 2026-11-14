@@ -41,11 +41,14 @@ trait DebugTrait
 
   function debug_test()
   {
+    $node = Engine::getNextUnresolved();
+
+    Notifications::log('debug', count($node->getParent()->getUnresolvedActions([LONDON_SEASON_CHOOSE_CARD])));
 
     // Deals::newDeal(HASTINGS, SYKES);
     // $deal = Deals::newDeal(HASTINGS, SYKES);
-    $deal = Deals::get('1');
-    $deal->setDescription('Buy Shipyard');
+    // $deal = Deals::get('1');
+    // $deal->setDescription('Buy Shipyard');
     // $deal->setItems(HASTINGS, [
     //   BLACKMAIL => [],
     //   ENTERPRISE => ['Shipyard_22'],
@@ -59,7 +62,7 @@ trait DebugTrait
     //   CASH => 5
     // ]);
 
-    Notifications::log('debug', $deal);
+    // Notifications::log('debug', $deal);
 
     // FamilyMembers::get('familyMember_Walsh_1')->setLocation(Locations::armyOfReady(BOMBAY_PRESIDENCY));
 

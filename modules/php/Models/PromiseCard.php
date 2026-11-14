@@ -55,7 +55,7 @@ class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
       throw new \Bga\GameFramework\VisibleSystemException("PROMISE_CARD_001");
     }
 
-    return Families::getPlayerIdByFamilyId(explode('_', $location)[1]);
+    return Families::getPlayerIdByFamilyId($location);
   }
 
   public function getOwnerPlayerId(): int
@@ -69,7 +69,7 @@ class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
    */
   public function effectCanBeApplied(array $timingData): array | null
   {
-    if (!($this->getActingPlayerId() !== $this->getOwnerPlayerId())) {
+    if ($this->getActingPlayerId() === $this->getOwnerPlayerId()) {
       return null;
     }
     return [

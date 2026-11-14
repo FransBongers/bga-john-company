@@ -100,7 +100,7 @@ $machinestates = [
         ->args('argsAtomicAction')
         ->action('stAtomicAction')
         ->possibleactions(['actChooseAction', 'actRestart', 'actUndoToStep',])
-        ->transitions([])
+        ->transitions(['next' => ST_RESOLVE_STACK])
         ->build(),
 
     ST_WAIT_FOR_OFFER => GameStateBuilder::create()

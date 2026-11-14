@@ -58,7 +58,8 @@ $rows: 2;
     opacity: 0.5;
   }
 
-  &.selectable {
+  &.selectable,
+  &.anytime-selectable {
     .bga-cards_card-side {
       cursor: pointer;
       outline: 4px solid base.$selectable-color;
@@ -71,6 +72,7 @@ $rows: 2;
   }
 
   &.selectable:hover,
+  &.anytime-selectable:hover,
   &.selected {
     .bga-cards_card-side {
       cursor: pointer;
