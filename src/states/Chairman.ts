@@ -118,14 +118,14 @@ export class Chairman implements GameState<OnEnteringChairmanArgs> {
       onClick(elt, () => this.handleDebtClick(value, true));
       elt.setAttribute('data-vote', 'true');
     });
+    // addPrimaryActionButton({
+    //   id: 'propose_btn',
+    //   text: _('Propose'),
+    //   callback: () => this.performAction(true),
+    // });
     addPrimaryActionButton({
-      id: 'propose_btn',
-      text: _('Propose'),
-      callback: () => this.performAction(true),
-    });
-    addPrimaryActionButton({
-      id: 'commit_btn',
-      text: _('Commit'),
+      id: 'done_btn',
+      text: _('Done'),
       callback: () => this.performAction(false),
       extraClasses: this.companyBalance > 0 ? DISABLED : '',
     });

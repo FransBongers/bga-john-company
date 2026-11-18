@@ -37,7 +37,6 @@ import { BgaAnimations, BgaAutofit } from './libs';
 import { getTokenDiv } from './logs';
 import { London } from './london';
 import { PhaseTracker } from './phase-tracker';
-import { Families } from './families';
 import { PlayerManager } from './player-manager';
 import { Draft } from './draft';
 import {
@@ -58,7 +57,7 @@ import {
   DraftCard,
   EnlistWriter,
   EventsInIndiaCrisisDefense,
-  FamilyAction,
+  // FamilyAction,
   GovernorAdminister,
   GovernorGeneralMakeCheck,
   HiringChairman,
@@ -177,7 +176,7 @@ export class Game {
     DraftCard,
     EnlistWriter,
     EventsInIndiaCrisisDefense,
-    FamilyAction,
+    // FamilyAction,
     GovernorAdminister,
     GovernorGeneralMakeCheck,
     HiringChairman,
@@ -421,11 +420,6 @@ export class Game {
     Object.values(this.states).forEach((state) => state.create(this));
 
     TooltipManager.create(this);
-    //  this.playerManager = new PlayerManager(this);
-    //  this.infoPanel = new InfoPanel(this);
-    //  this.settings = new Settings(this);
-    //  this.infoPanel.setupAddCardTooltips();
-    //  this.informationModal = new InformationModal(this);
 
     this.animationManager = new BgaAnimations.Manager({
       duration: 500,
@@ -444,9 +438,6 @@ export class Game {
     ShipsManager.create(this);
     ControlTokensManager.create(this);
 
-    //  this.gameMap = new GameMap(this);
-    //  this.cardArea = new CardArea(this);
-
     Interaction.create(this);
     PhaseTracker.create(this);
 
@@ -457,7 +448,6 @@ export class Game {
     this.notificationManager = new NotificationManager(this);
     AttentionManager.create(this);
     Deals.create(this);
-    Families.create(this);
     Company.create(this);
 
     London.create(this);
@@ -529,12 +519,7 @@ export class Game {
       this.states[stateName as keyof typeof this.states];
 
     const currentPlayerId = this.getPlayerId();
-    console.log('Current player ID: ' + currentPlayerId, {
-      playerIsActiveAndStateExists,
-      activePlayerIds: (!activePlayerIds || activePlayerIds.includes(currentPlayerId)),
-      completedPlayerIds: this.completedPlayerIds.includes(currentPlayerId),
-      skipOnEnteringState: args.args?.skipOnEnteringState
-    });
+
     // UI changes for active player
     if (
       playerIsActiveAndStateExists &&

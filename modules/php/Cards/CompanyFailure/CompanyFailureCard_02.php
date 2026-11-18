@@ -22,7 +22,7 @@ class CompanyFailureCard_02 extends \Bga\Games\JohnCompany\Models\CompanyFailure
       $player = Players::get($playerId);
 
       $count = 0;
-      foreach ($player->getFamily()->getEnterprises() as $enterprise) {
+      foreach ($player->getEnterprises() as $enterprise) {
         if ($enterprise->getType() === SHIPYARD) {
           $count++;
         }

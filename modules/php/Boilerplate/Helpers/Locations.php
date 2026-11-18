@@ -24,14 +24,14 @@ class Locations
     return 'Commander_' . $presidencyId;
   }
 
-  public static function hand(string $familyId)
+  public static function hand(string $playerId)
   {
-    return 'hand_' . $familyId;
+    return 'hand_' . $playerId;
   }
 
-  public static function familyMemberSupply(string $familyId)
+  public static function familyMemberSupply(string $playerId)
   {
-    return 'supply_' . $familyId;
+    return 'supply_' . $playerId;
   }
 
   // public static function officers($presidencyId)
@@ -80,9 +80,9 @@ class Locations
     return 'shipConstruction_' . $regionId;
   }
 
-  public static function playedBlackmailCards(string $familyId)
+  public static function playedBlackmailCards(string $playerId)
   {
-    return 'playedBlackmailCards_' . $familyId;
+    return 'playedBlackmailCards_' . $playerId;
   }
 
   public static function presidency(string $regionId)
@@ -90,9 +90,9 @@ class Locations
     return $regionId . 'Presidency';
   }
 
-  public static function setupCards(string $familyId)
+  public static function setupCards(string $playerId)
   {
-    return 'setupCards_' . $familyId;
+    return 'setupCards_' . $playerId;
   }
 
   public static function writers(string $presidencyId)
@@ -100,9 +100,9 @@ class Locations
     return 'Writers_' . $presidencyId;
   }
 
-  public static function londonSeasonCards(string $familyId)
+  public static function londonSeasonCards(string $playerId)
   {
-    return 'londonSeasonCards_' . $familyId;
+    return 'londonSeasonCards_' . $playerId;
   }
 
   public static function londonSeasonPool(string $type)
@@ -120,14 +120,14 @@ class Locations
     return VACANT_OFFICES;
   }
 
-  public static function familyOffices(string $familyId)
+  public static function familyOffices(string $playerId)
   {
-    return FAMILY_OFFICES . '_' . $familyId;
+    return FAMILY_OFFICES . '_' . $playerId;
   }
 
-  public static function promiseCards(string $familyId)
+  public static function promiseCards(string $playerId)
   {
-    return $familyId;
+    return $playerId;
   }
 
   public static function revealedLaws()

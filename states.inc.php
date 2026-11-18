@@ -327,16 +327,16 @@ $machinestates = [
         'transitions' => [],
     ],
 
-    ST_FAMILY_ACTION => [
-        'name' => FAMILY_ACTION,
-        'type' => 'multipleactiveplayer',
-        'description' => clienttranslate('${actplayer} must perform a family action'),
-        'descriptionmyturn' => clienttranslate('${you} must select a family action'),
-        'args' => 'argsAtomicAction',
-        'action' => 'stAtomicAction',
-        'possibleactions' => ['actFamilyAction', 'actTakeAtomicAction'],
-        'transitions' => ['next' => ST_RESOLVE_STACK],
-    ],
+    // ST_FAMILY_ACTION => [
+    //     'name' => FAMILY_ACTION,
+    //     'type' => 'multipleactiveplayer',
+    //     'description' => clienttranslate('${actplayer} must perform a family action'),
+    //     'descriptionmyturn' => clienttranslate('${you} must select a family action'),
+    //     'args' => 'argsAtomicAction',
+    //     'action' => 'stAtomicAction',
+    //     'possibleactions' => ['actFamilyAction', 'actTakeAtomicAction'],
+    //     'transitions' => ['next' => ST_RESOLVE_STACK],
+    // ],
 
 
     ST_PURCHASE_ENTERPRISE => [
@@ -995,8 +995,6 @@ $machinestates = [
     ST_HIRING_CHAIRMAN => [
         'name' => HIRING_CHAIRMAN,
         'type' => 'multipleactiveplayer',
-        'description' => clienttranslate('${actplayer} must complete the chairman hiring step'),
-        'descriptionmyturn' => clienttranslate('${you} must complete the chairman hiring step'),
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
         'possibleactions' => ['act' . HIRING_CHAIRMAN, 'actPassOptionalAction', 'actTakeAtomicAction'],

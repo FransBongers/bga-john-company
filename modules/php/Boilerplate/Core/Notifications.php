@@ -9,7 +9,7 @@ use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Managers\ControlTokens;
 use Bga\Games\JohnCompany\Managers\EventTiles;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Prizes;
@@ -20,13 +20,13 @@ use Bga\Games\JohnCompany\Models\CompanyFailureCard;
 use Bga\Games\JohnCompany\Models\Deal;
 use Bga\Games\JohnCompany\Models\Enterprise;
 use Bga\Games\JohnCompany\Models\EventTile;
-use Bga\Games\JohnCompany\Models\Family;
 use Bga\Games\JohnCompany\Models\FamilyMember;
 use Bga\Games\JohnCompany\Models\LawCard;
 use Bga\Games\JohnCompany\Models\LondonSeasonCard;
 use Bga\Games\JohnCompany\Models\Office;
 use Bga\Games\JohnCompany\Models\Order;
 use Bga\Games\JohnCompany\Models\Player;
+use Bga\Games\JohnCompany\Models\PlayerExtra;
 use Bga\Games\JohnCompany\Models\PromiseCard;
 use Bga\Games\JohnCompany\Models\Region;
 use Bga\Games\JohnCompany\Models\Ship;
@@ -434,7 +434,7 @@ class Notifications
     if ($opportunityMarker !== null && isset($map[$opportunityMarker])) {
       return $map[$opportunityMarker];
     }
-    return clienttranslate('Not placed');
+    return clienttranslate('not placed');
   }
 
   private static function getRegionNameForWriter($location)
@@ -545,12 +545,11 @@ class Notifications
     ]);
   }
 
-  public static function changePrimeMinister(Player $player, string $familyId)
+  public static function changePrimeMinister(Player $player)
   {
     self::notifyAll('changePrimeMinister', clienttranslate('${player_name} becomes ${tkn_boldText_primeMinister}'), [
       'player' => $player,
       'tkn_boldText_primeMinister' => clienttranslate('Prime Minister'),
-      'familyId' => $familyId,
       'i18n' => ['tkn_boldText_primeMinister'],
     ]);
   }
@@ -1019,7 +1018,7 @@ class Notifications
   public static function gainPassedLawTokens(Player $player, int $number)
   {
     $counterChanges = [
-      $player->getFamilyId() => [PASSED_LAW_TOKENS => $number],
+      $player->getId() => [PASSED_LAW_TOKENS => $number],
     ];
     self::updateCountersMultipleTargets($counterChanges, clienttranslate('${player_name} gains ${tkn_boldText_number} ${tkn_passedLawToken}'), [
       'player' => $player,
@@ -1039,7 +1038,7 @@ class Notifications
     }
 
     $counterChanges = [
-      $player->getFamilyId() => [TROPHIES => $amount],
+      $player->getId() => [TROPHIES => $amount],
     ];
     self::updateCountersMultipleTargets($counterChanges, clienttranslate('${player_name} takes ${tkn_boldText_amount} ${tkn_trophy}'), [
       'player' => $player,
@@ -1059,7 +1058,7 @@ class Notifications
     }
 
     $counterChanges = [
-      $player->getFamilyId() => [TROPHIES => -$number],
+      $player->getId() => [TROPHIES => -$number],
     ];
     self::updateCountersMultipleTargets($counterChanges, clienttranslate('${player_name} loses ${tkn_boldText_amount} ${tkn_trophy}'), [
       'player' => $player,
@@ -1339,7 +1338,7 @@ class Notifications
     ], $args));
   }
 
-  public static function purchaseEnterprise(Player $player, Enterprise $enterprise, int $amount, string $familyId)
+  public static function purchaseEnterprise(Player $player, Enterprise $enterprise, int $amount)
   {
     self::notifyAll('purchaseEnterprise', clienttranslate('${player_name} pays ${tkn_boldText_amount} to purchase a ${tkn_enterpriseCard} ${tkn_enterpriseIcon}'), [
       'player' => $player,
@@ -1348,7 +1347,6 @@ class Notifications
       'tkn_boldText_amount' => '£' .  $amount,
       'amount' => $amount,
       'enterprise' => $enterprise,
-      'familyId' => $familyId,
       'ship' => $enterprise->getType() === SHIPYARD ? Ships::get($enterprise->getShipId()) : null,
       'type' => $enterprise->getType(),
       'tkn_pound' => clienttranslate('Pounds'),
@@ -1405,8 +1403,8 @@ class Notifications
     $text = '';
     $textArgs = [];
     if (!empty($transferredAssets)) {
-      $offerer = Families::get($deal->getOfferedByFamilyId())->getPlayer();
-      $target = Families::get($deal->getFamilyId())->getPlayer();
+      $offerer = Players::get($deal->getOfferedByPlayerId());
+      $target = Players::get($deal->getPlayerId());
       $text = clienttranslate('${player_name} and ${player_name2} make a deal:<br>${player_name} gains: ${assetLog1}<br>${player_name2} gains: ${assetLog2}');
       $textArgs = [
         'player' => $offerer,
@@ -1846,10 +1844,10 @@ class Notifications
     ]);
   }
 
-  public static function updateOpportunityMarker(Family $family, string | null $familyAction)
+  public static function updateOpportunityMarker(PlayerExtra $family, string | null $familyAction)
   {
     self::notifyAll('updateOpportunityMarker', '', [
-      'familyId' => $family->getId(),
+      'playerId' => $family->getId(),
       'familyAction' => $familyAction,
     ]);
   }

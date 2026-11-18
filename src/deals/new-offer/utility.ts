@@ -5,16 +5,17 @@ import {
   tplPromiseCard,
 } from '../../boilerplate/tooltip-manager';
 import { CASH_COUNTER, SPOUSE } from '../../constants';
-import { Families } from '../../families';
+import { PlayerManager } from '../../player-manager';
 import { createFamilyMember } from '../../templates';
 import { AssetOption, AvailableAssets } from './types';
 
-const getCompanyShares = (familyId: string): AssetOption[] => {
+const getCompanyShares = (playerId: number): AssetOption[] => {
   const result: AssetOption[] = [];
+  const familyId = getPlayer(playerId).getFamilyId();
   const courtOfDirectors = document.getElementById('CourtOfDirectors');
   courtOfDirectors?.childNodes.forEach((child) => {
     const id = (child as HTMLElement).id;
-    if (id && id.includes(familyId)) {
+    if (id && id.includes(playerId.toString())) {
       result.push({
         id,
         label: `${_('Company share')} ${result.length + 1}`,
@@ -27,13 +28,12 @@ const getCompanyShares = (familyId: string): AssetOption[] => {
 
 export const getAvailableAssets = (playerId: number): AvailableAssets => {
   const player = getPlayer(playerId);
-  const familyId = player.familyId;
-  const family = Families.getInstance().getFamily(familyId);
+  const family = PlayerManager.getInstance().getPlayerArea(playerId);
 
   return {
     cash: player.counters[CASH_COUNTER].getValue(),
     options: {
-      share: getCompanyShares(familyId),
+      share: getCompanyShares(playerId),
       enterprise: family.getEnterprises().map((card) => ({
         id: card.id,
         label: card.name,

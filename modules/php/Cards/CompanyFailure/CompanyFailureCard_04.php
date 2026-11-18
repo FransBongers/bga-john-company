@@ -27,7 +27,7 @@ class CompanyFailureCard_04 extends \Bga\Games\JohnCompany\Models\CompanyFailure
     $primeMinisterPlayerId = Parliament::getPrimeMinisterPlayerId();
     foreach (Players::getTurnOrder($primeMinisterPlayerId) as $playerId) {
       $player = Players::get($playerId);
-      $count = $player->getFamily()->getPassedLawTokens();
+      $count = $player->getPassedLawTokens();
       if ($count === 0) {
         continue;
       }

@@ -9,14 +9,14 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Crown;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
-use Bga\Games\JohnCompany\Models\Family;
 use Bga\Games\JohnCompany\Models\Player;
+use Bga\Games\JohnCompany\Models\PlayerExtra;
 
 class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
@@ -85,15 +85,14 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
     }
 
     $player = Players::get($playerId);
-    $familyId = $player->getFamilyId();
 
-    $this->performAction($player, $familyId, $presidencyId);
+    $this->performAction($player, $presidencyId);
 
     if ($stateArgs[SOURCE] === FAMILY_ACTION) {
-      $family = Families::get($familyId);
+      $family = PlayersExtra::get($playerId);
 
-      $this->checkExtraActionOpportunityMarker($family, $playerId);
-      $this->checkExtraActionVacantOffices($familyId, $playerId);
+      $this->checkExtraActionOpportunityMarker($family);
+      $this->checkExtraActionVacantOffices($playerId);
 
       $family->updateOpportunityMarker(ENLIST_WRITER);
     }
@@ -102,9 +101,9 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
     $this->resolveAction([], true);
   }
 
-  public function performAction(Player $player, string $familyId, string $presidencyId)
+  public function performAction(Player $player, string $presidencyId)
   {
-    $familyMember = FamilyMembers::getMemberFor($familyId);
+    $familyMember = FamilyMembers::getMemberFor($player->getId());
     $familyMember->setLocation(Locations::writers($presidencyId));
     $familyMember->setPresidency($presidencyId);
 
@@ -120,23 +119,23 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  private function checkExtraActionVacantOffices(string $familyId, int $playerId)
+  private function checkExtraActionVacantOffices(int $playerId)
   {
     $vacantOffices = Offices::countInLocation(Locations::vacantOffices());
     if ($vacantOffices >= 4) {
-      $this->insertExtraActionNode($familyId, $playerId, VACANT_OFFICES);
+      $this->insertExtraActionNode($playerId, VACANT_OFFICES);
     }
   }
 
-  private function checkExtraActionOpportunityMarker(Family $family, int $playerId)
+  private function checkExtraActionOpportunityMarker(PlayerExtra $family)
   {
     $opportunityMarker = $family->getOpportunityMarker();
     if ($opportunityMarker === ENLIST_WRITER) {
-      $this->insertExtraActionNode($family->getId(), $playerId, OPPORTUNITY_MARKER);
+      $this->insertExtraActionNode($family->getPlayerId(), OPPORTUNITY_MARKER);
     }
   }
 
-  private function insertExtraActionNode(string $familyId, int $playerId, string $source)
+  private function insertExtraActionNode(int $playerId, string $source)
   {
     $this->ctx->insertAsBrother(new LeafNode([
       'action' => ENLIST_WRITER,
@@ -144,24 +143,17 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
       'optional' => true,
       'activePlayerIds' => [$playerId],
       'args' => [
-        'familyId' => $familyId,
         'playerId' => $playerId,
         'source' => $source,
       ]
     ]));
   }
 
-  public function canBePerformedBy($family)
-  {
-    return $family->canPlaceFamilyMembers();
-  }
-
-  public function getOptions($playerId)
+  public function getOptions(int $playerId)
   {
     $player = Players::get($playerId);
-    $family = $player->getFamily();
 
-    $canPlaceFamilyMembers = $family->canPlaceFamilyMembers();
+    $canPlaceFamilyMembers = $player->canPlaceFamilyMembers();
 
     if (!$canPlaceFamilyMembers) {
       return [];
@@ -211,7 +203,7 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     // 1. Crown presidencies
     $crownPresidencies = Utils::filter($presidencies, function ($office) {
-      return $office->getFamilyId() === CROWN;
+      return $office->getPlayerId() === CROWN_PLAYER_ID;
     });
     // Notifications::log('crownPresidencies', $crownPresidencies);
 
@@ -258,7 +250,6 @@ class EnlistWriter extends \Bga\Games\JohnCompany\Models\AtomicAction
   public function isDoable(Player $player): bool
   {
     $source = $this->ctx->getArgs()[SOURCE];
-    $family  = $player->getFamily();
-    return $source === EXTRA_ACTION || !$family->hasPrestigeCard(MR_ROCHESTER_ID);
+    return $source === EXTRA_ACTION || !$player->hasPrestigeCard(MR_ROCHESTER_ID);
   }
 }

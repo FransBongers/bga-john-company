@@ -119,7 +119,7 @@ export class JocoPlayer {
 
   updatePlayerPanel(gamedatas: GamedatasAlias) {
     this.counters[CASH_COUNTER].setValue(
-      gamedatas.families[this.familyId].treasury,
+      gamedatas.families[this.playerId].treasury,
     );
     this.counters[FAMILY_MEMBERS_COUNTER].setValue(
       Object.values(gamedatas.familyMembers).filter(
@@ -189,6 +189,10 @@ export class JocoPlayer {
 
   getPlayerId(): number {
     return this.playerId;
+  }
+
+  getFamilyId(): string {
+    return this.familyId;
   }
 
   //  .##.....##.########.####.##.......####.########.##....##

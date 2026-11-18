@@ -7,12 +7,12 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Game;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
-use Bga\Games\JohnCompany\Models\Family;
 use Bga\Games\JohnCompany\Models\Player;
+use Bga\Games\JohnCompany\Models\PlayerExtra;
 
 class EnlistOfficer extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
@@ -47,28 +47,25 @@ class EnlistOfficer extends \Bga\Games\JohnCompany\Models\AtomicAction
     $nodeArgs = $this->ctx->getArgs();
     if ($nodeArgs[SOURCE] === FAMILY_ACTION) {
 
-      $family = Families::get($nodeArgs['familyId']);
+      $playerExtraData = PlayersExtra::get($nodeArgs['playerId']);
 
-      $this->checkExtraActionOpportunityMarker($family, $playerId);
+      $this->checkExtraActionOpportunityMarker($playerExtraData, $playerId);
 
-      $family->updateOpportunityMarker(ENLIST_OFFICER);
+      $playerExtraData->updateOpportunityMarker(ENLIST_OFFICER);
     }
 
-
+    
     $this->resolveAction(['automatic' => true], true);
   }
 
 
-  public function performAction($playerId)
+  public function performAction(int $playerId)
   {
-    $player = Players::get($playerId);
-    $familyId = $player->getFamilyId();
-
-    $familyMember = FamilyMembers::getMemberFor($familyId);
+    $familyMember = FamilyMembers::getMemberFor($playerId);
 
     $familyMember->setLocation(Locations::officerInTraining());
 
-    Notifications::enlistOfficer($player, $familyMember);
+    Notifications::enlistOfficer(Players::get($playerId), $familyMember);
   }
 
   //  .##.....##.########.####.##.......####.########.##....##
@@ -79,9 +76,9 @@ class EnlistOfficer extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  private function checkExtraActionOpportunityMarker(Family $family, int $playerId)
+  private function checkExtraActionOpportunityMarker(PlayerExtra $playerExtraData, int $playerId)
   {
-    $opportunityMarker = $family->getOpportunityMarker();
+    $opportunityMarker = $playerExtraData->getOpportunityMarker();
     if ($opportunityMarker !== ENLIST_OFFICER) {
       return;
     }
@@ -107,7 +104,6 @@ class EnlistOfficer extends \Bga\Games\JohnCompany\Models\AtomicAction
             'activePlayerIds' => [$playerId],
             'optional' => true,
             'args' => [
-              'familyId' => $family->getId(),
               'playerId' => $playerId,
               SOURCE => OPPORTUNITY_MARKER,
             ]
@@ -116,12 +112,6 @@ class EnlistOfficer extends \Bga\Games\JohnCompany\Models\AtomicAction
 
       ]
     ));
-  }
-
-
-  public function canBePerformedBy($family)
-  {
-    return $family->canPlaceFamilyMembers();
   }
 
   // ..######..########...#######..##......##.##....##
@@ -166,8 +156,7 @@ class EnlistOfficer extends \Bga\Games\JohnCompany\Models\AtomicAction
   public function isDoable(Player $player): bool
   {
     $source = $this->ctx->getArgs()[SOURCE];
-    $family  = $player->getFamily();
-    return $source === EXTRA_ACTION || !$family->hasPrestigeCard(WILLIAM_COLLINS_ID);
+    return $source === EXTRA_ACTION || !$player->hasPrestigeCard(WILLIAM_COLLINS_ID);
   }
 
   public function isAutomatic(?Player $player = null): bool

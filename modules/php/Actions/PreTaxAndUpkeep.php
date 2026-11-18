@@ -83,12 +83,10 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
   {
     $result = [];
     foreach ($players as $player) {
-      $family = $player->getFamily();
-      $windows = $family->getWindowCount();
+      $windows = $player->getWindowCount();
       $result[] = [
         'player' => $player,
         'amount' => $windows,
-        'family' => $family,
       ];
     }
     return $result;
@@ -98,10 +96,8 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
   {
     $result = [];
     foreach ($players as $player) {
-      $family = $player->getFamily();
-
       $upkeep = 0;
-      foreach (FamilyMembers::getAllFor($family->getId()) as $familyMember) {
+      foreach (FamilyMembers::getAllFor($player->getId()) as $familyMember) {
         $location = $familyMember->getLocation();
         if (array_key_exists($location, PRIZES)) {
           $upkeep += PRIZES[$location][UPKEEP];
@@ -111,7 +107,6 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
       $result[] = [
         'player' => $player,
         'amount' => $upkeep,
-        'family' => $family,
       ];
     }
     return $result;
@@ -121,15 +116,13 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
   {
     $result = [];
     foreach ($players as $player) {
-      $family = $player->getFamily();
-
       $amount = 0;
 
       if ($target === SHARE) {
-        $amount = $family->getShareCount();
+        $amount = $player->getShareCount();
       } else {
         $amount = 0;
-        foreach ($family->getEnterprises() as $enterprise) {
+        foreach ($player->getEnterprises() as $enterprise) {
           if ($enterprise->getType() === $target) {
             $amount++;
           }
@@ -144,7 +137,6 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
       $result[] = [
         'player' => $player,
         'amount' => $amount,
-        'family' => $family,
       ];
     }
     return $result;
@@ -157,18 +149,18 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
     foreach ($dataPerPlayer as $data) {
       $player = $data['player'];
       $amount = $data['amount'];
-      $family = $data['family'];
+      $playerExtra = $player->getPlayerExtra();
 
       if ($amount === 0) {
         continue;
       }
 
-      if ($family->getTreasury() < $amount) {
+      if ($playerExtra->getTreasury() < $amount) {
         $playersThatCannotPay[] = $player->getId();
         continue;
       }
 
-      $family->pay($amount, false);
+      $playerExtra->pay($amount, false);
     }
 
     if (count($playersThatCannotPay) > 0) {

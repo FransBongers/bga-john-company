@@ -22,17 +22,16 @@ class CompanyFailureCard_05 extends \Bga\Games\JohnCompany\Models\CompanyFailure
   {
     foreach (Players::getTurnOrder(Parliament::getPrimeMinisterPlayerId()) as $playerId) {
       $player = Players::get($playerId);
-      $family = $player->getFamily();
-      $militaryPieces = 0;
+        $militaryPieces = 0;
 
-      foreach (FamilyMembers::getAllFor($family->getId()) as $familyMember) {
+      foreach (FamilyMembers::getAllFor($player->getId()) as $familyMember) {
         $location = $familyMember->getLocation();
         if (Utils::startsWith($location, 'army_') || Utils::startsWith($location, 'Commander_')) {
           $militaryPieces++;
         }
       }
 
-      $penalty = intdiv($militaryPieces + $family->getTrophies(), 2);
+      $penalty = intdiv($militaryPieces + $player->getTrophies(), 2);
       if ($penalty === 0) {
         continue;
       }

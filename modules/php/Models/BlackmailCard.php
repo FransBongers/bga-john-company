@@ -29,8 +29,7 @@ class BlackmailCard extends \Bga\Games\JohnCompany\Models\LondonSeasonCard
 
   public function play(Player $player)
   {
-    $familyId = $player->getFamilyId();
-    $this->setLocation(Locations::playedBlackmailCards($familyId));
+    $this->setLocation(Locations::playedBlackmailCards($player->getId()));
     Notifications::moveBlackmailCard($player, $this, clienttranslate('${player_name} plays ${tkn_blackmailCard}'), [
       'player' => $player,
       'tkn_blackmailCard' => $this->getId(),

@@ -5,7 +5,7 @@ namespace Bga\Games\JohnCompany\Models;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\JoCoUtils;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\Players;
 
 class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
@@ -17,6 +17,7 @@ class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   protected $state;
   protected $type;
   protected $familyId;
+  protected $ownerPlayerId;
 
   protected $title;
 
@@ -25,6 +26,7 @@ class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     'location' => ['card_location', 'str'],
     'state' => ['card_state', 'int'],
     'type' => ['type', 'str'],
+    'ownerPlayerId' => ['owner_player_id', 'int'],
     'familyId' => ['family_id', 'str']
   ];
 
@@ -55,12 +57,12 @@ class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
       throw new \Bga\GameFramework\VisibleSystemException("PROMISE_CARD_001");
     }
 
-    return Families::getPlayerIdByFamilyId($location);
+    return (int) $location;
   }
 
   public function getOwnerPlayerId(): int
   {
-    return (int) explode('_', $this->getId())[1];
+    return $this->ownerPlayerId;
   }
 
   /**
@@ -97,7 +99,7 @@ class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     }
     $players = Players::getAll();
 
-    $this->setLocation(Locations::promiseCards($players[$ownerPlayerId]->getFamilyId()));
+    $this->setLocation(Locations::promiseCards($ownerPlayerId));
     Notifications::movePromiseCard($players[$actingPlayerId], $this, clienttranslate('${player_name} returns ${tkn_promiseCard} to ${player_name2}'), [
       'player' => $players[$actingPlayerId],
       'player_name2' => $players[$ownerPlayerId]->getName()

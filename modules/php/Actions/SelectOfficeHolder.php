@@ -75,7 +75,7 @@ class SelectOfficeHolder extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   private function vacateOffice(Office $office)
   {
-    $currentOwner = $office->getFamily()->getPlayer();
+    $currentOwner = $office->getPlayer();
     $office->returnFamilyMemberToSupply();
     $office->moveToVacantOffices($currentOwner);
   }

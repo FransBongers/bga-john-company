@@ -42,10 +42,9 @@ class LawCard_31 extends \Bga\Games\JohnCompany\Models\LawCard
 
     foreach (Players::getTurnOrder(Parliament::getPrimeMinisterPlayerId()) as $playerId) {
       $player = Players::get($playerId);
-      $family = $player->getFamily();
 
       $count = 0;
-      foreach ($family->getEnterprises() as $enterprise) {
+      foreach ($player->getEnterprises() as $enterprise) {
         if ($enterprise->getType() === WORKSHOP) {
           $count++;
         }
@@ -56,7 +55,7 @@ class LawCard_31 extends \Bga\Games\JohnCompany\Models\LawCard
         }
       }
 
-      $family->gainCash(2 * $count, $this->getTitle());
+      $player->gainCash(2 * $count, $this->getTitle());
     }
   }
 }

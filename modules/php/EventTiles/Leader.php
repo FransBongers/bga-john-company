@@ -5,7 +5,6 @@ namespace Bga\Games\JohnCompany\EventTiles;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Managers\Elephant;
 use Bga\Games\JohnCompany\Managers\Regions;
-use Bga\Games\JohnCompany\Managers\ResolveCrisis;
 
 class Leader extends \Bga\Games\JohnCompany\Models\EventTile
 {

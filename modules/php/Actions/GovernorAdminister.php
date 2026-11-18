@@ -87,9 +87,8 @@ class GovernorAdminister extends \Bga\Games\JohnCompany\Models\AtomicAction
     $this->insertExtraAdministerAction($stateArgs['dicePoolModifier'],  $checkResult, $playerId, $stateArgs['governor']);
 
     if ($checkResult === SUCCESS) {
-      $family = $player->getFamily();
       $bonus = $stateArgs['previousRollNoSuccess'] ? 2 : 1;
-      $family->gainCash($bonus);
+      $player->gainCash($bonus);
       Globals::incOfficeHolderBonus($bonus);
       $this->insertAdministerSuccessChoice($playerId, $stateArgs['governor']->getId());
     } else {

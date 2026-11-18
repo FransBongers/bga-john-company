@@ -6,7 +6,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\JoCoUtils;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
 
@@ -20,6 +20,7 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
   protected $familyId;
   protected $presidency = null;
   protected $type = FAMILY_MEMBER;
+  protected $playerId;
 
   public function __construct($row)
   {
@@ -33,6 +34,7 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
     'location' => 'family_member_location',
     'state' => ['family_member_state', 'int'],
     'familyId' => ['family_id', 'str'],
+    'playerId' => ['player_id', 'int'],
     'presidency' => ['presidency', 'str'],
   ];
 
@@ -61,7 +63,7 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
     }
     $this->setLocation(Locations::familyMemberSupply($this->familyId));
     if (!$skipNotification) {
-      Notifications::returnFamilyMemberToSupply(Players::getPlayerForFamily($this->familyId), $this);
+      Notifications::returnFamilyMemberToSupply(Players::get($this->playerId), $this);
     }
   }
 
@@ -96,7 +98,7 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
 
   public function getPlayer()
   {
-    return Players::getPlayerForFamily($this->familyId);
+    return Players::get($this->playerId);
   }
 
   public function getPlayerId()
@@ -131,8 +133,8 @@ class FamilyMember extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model i
     return false;
   }
 
-  public function getFamily()
+  public function getPlayerExtra()
   {
-    return Families::get($this->familyId);
+    return PlayersExtra::get($this->getPlayerId());
   }
 }

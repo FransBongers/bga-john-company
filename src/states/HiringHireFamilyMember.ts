@@ -22,7 +22,6 @@ interface OnEnteringHiringHireFamilyMemberArgs extends CommonStateArgs {
   office: JocoOfficeBase | null;
   title: string | Log;
   options: JocoFamilyMember[];
-  hiringFamilyId: string;
   hiringPlayerId: number;
   consentForNepotismRequired: boolean;
   appointingCommander: boolean;
@@ -114,7 +113,7 @@ export class HiringHireFamilyMember implements GameState<OnEnteringHiringHireFam
 
     if (
       this.args.consentForNepotismRequired &&
-      option.familyId === this.args.hiringFamilyId
+      option.playerId === this.args.hiringPlayerId
     ) {
       updatePageTitle(
         this.args.appointingCommander

@@ -82,14 +82,12 @@ class ParliamentMeetsResolvePolicy extends \Bga\Games\JohnCompany\Models\AtomicA
 
     foreach ($playerOrder as $playerId) {
       $player = $players[$playerId];
-      $family = $player->getFamily();
-      $familyId = $family->getId();
 
       if ($target === SHARE) {
-        $count = count(Company::getShares($familyId));
+        $count = count(Company::getShares($playerId));
       } else {
         $count = 0;
-        foreach ($family->getEnterprises() as $enterprise) {
+        foreach ($player->getEnterprises() as $enterprise) {
           if ($enterprise->getType() === $target) {
             $count++;
           }
@@ -102,7 +100,7 @@ class ParliamentMeetsResolvePolicy extends \Bga\Games\JohnCompany\Models\AtomicA
       }
 
       if ($count > 0) {
-        $family->gainCash($count);
+        $player->gainCash($count);
         $someoneGotMoney = true;
       }
     }

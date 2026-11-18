@@ -9,7 +9,7 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\Crown;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
@@ -159,7 +159,6 @@ class CrownManagerOfShippingBuyCompanyShips extends \Bga\Games\JohnCompany\Model
 
 
     $player = Players::get($playerId);
-    $family = $player->getFamily();
     $office = Offices::get(MANAGER_OF_SHIPPING);
     $crownPlayer = Crown::getPlayer();
 
@@ -168,7 +167,7 @@ class CrownManagerOfShippingBuyCompanyShips extends \Bga\Games\JohnCompany\Model
         $ship = Ships::getOtherShipFromSupply(COMPANY_SHIP);
         Ships::insertOnTop($ship->getId(), Locations::shipsToBePlacedByCrown());
         $cost = $playerOption['promiseCubeCost'];
-        $family->payPromiseCubes($cost, false);
+        $player->payPromiseCubes($cost, false);
         Notifications::payPromiseCubesToBuyCompanyShip($player, $cost, [$ship]);
         Notifications::buyCompanyShips($crownPlayer, [$ship]);
         $office->pay($crownPlayer, COST_TO_BUY_COMPANY_SHIP);

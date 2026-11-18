@@ -169,7 +169,7 @@ export const createFamilyMember = (
   const familyMemberNumber =
     typeof familyMemberId === 'number'
       ? familyMemberId
-      : Number(familyMemberId.split('_')[2]) % 18;
+      : Number(familyMemberId.split('_')[3]) % 18;
 
   elt.classList.add('joco-family-member');
   elt.id = familyMemberId.toString();

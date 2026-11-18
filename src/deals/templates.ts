@@ -1,7 +1,7 @@
 import { formatStringRecursive } from '../boilerplate';
 import { PlayerManager } from '../player-manager';
 import { GamedatasAlias, JocoDeal } from '../types';
-import { getFamilyName } from '../utility';
+import { getFamilyName, getFamilyNameForPlayerId } from '../utility';
 import { getAssetLabels, getStaticCardLabel } from './labels';
 
 const tplIconButton = (icon: string, label: string, playerId: number) => ``;
@@ -24,12 +24,12 @@ export const tplDealsTableHeader =
   <div>${_('Family')}</div><div>${_('Description')}</div><div></div><div>${_('Offered By')}</div>
 </div>`;
 
-export const tplDealsTableFamilyItem = (familyId: string) => {
-  const player = PlayerManager.getInstance().getPlayerForFamily(familyId);
+export const tplDealsTableFamilyItem = (playerId: number) => {
+  const player = PlayerManager.getInstance().getPlayer(playerId);
   return `
   <div class="joco-table-family-item">
     <div>${formatStringRecursive('${tkn_playerName}', { tkn_playerName: player.getName() })}</div>
-    <div class="fb-font-bold">${getFamilyName(familyId)}</div>
+    <div class="fb-font-bold">${getFamilyName(player.getFamilyId())}</div>
   </div>`;
 };
 
@@ -40,20 +40,22 @@ const escapeHtml = (text: string) =>
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 
-const tplDealAssetLines = (deal: JocoDeal, currentFamilyId: string | null) => {
-  const assetLabels = [deal.offeredByFamilyId, deal.familyId].map((familyId) => ({
-    familyId,
-    labels: getAssetLabels(deal.assets?.[familyId] ?? {}, getStaticCardLabel),
-  }));
+const tplDealAssetLines = (deal: JocoDeal, currentPlayerId: number | null) => {
+  const assetLabels = [deal.offeredByPlayerId, deal.playerId].map(
+    (playerId) => ({
+      playerId,
+      labels: getAssetLabels(deal.assets?.[playerId] ?? {}, getStaticCardLabel),
+    }),
+  );
   if (assetLabels.every(({ labels }) => labels.length === 0)) {
     return '';
   }
 
   const isAgreement = deal.status === 'agreement';
   return assetLabels
-    .map(({ familyId, labels }) => {
+    .map(({ playerId, labels }) => {
       const giver =
-        familyId === currentFamilyId
+        Number(playerId) === currentPlayerId
           ? formatStringRecursive(
               isAgreement
                 ? _('${tkn_boldText_you} gave')
@@ -66,7 +68,7 @@ const tplDealAssetLines = (deal: JocoDeal, currentFamilyId: string | null) => {
                 : _('${tkn_playerName} will give'),
               {
                 tkn_playerName: PlayerManager.getInstance()
-                  .getPlayerForFamily(familyId)
+                  .getPlayer(Number(playerId))
                   .getName(),
               },
             );
@@ -75,38 +77,43 @@ const tplDealAssetLines = (deal: JocoDeal, currentFamilyId: string | null) => {
     .join('');
 };
 
-const tplDealButtons = (deal: JocoDeal, currentFamilyId: string | null) => {
+const tplDealButtons = (deal: JocoDeal, currentPlayerId: number | null) => {
   if (deal.status === 'agreement') {
     const reports = deal.reports ?? {};
-    const report = currentFamilyId ? reports[currentFamilyId] : undefined;
-    const participants = [deal.familyId, deal.offeredByFamilyId];
-    const reportLine = (familyId: string) => {
-      const familyReport = reports[familyId];
-      const result = familyReport === 'fulfilled'
-        ? _('Fulfilled')
-        : familyReport === 'violated'
-          ? _('Violated')
-          : _('Pending');
-      return `<div>${getFamilyName(familyId)}: ${result}</div>`;
+    const report = currentPlayerId ? reports[currentPlayerId] : undefined;
+    const participants = [deal.playerId, deal.offeredByPlayerId];
+    const reportLine = (currentPlayerId: number) => {
+      const familyReport = reports[currentPlayerId];
+      const result =
+        familyReport === 'fulfilled'
+          ? _('Fulfilled')
+          : familyReport === 'violated'
+            ? _('Violated')
+            : _('Pending');
+      return `<div>${getFamilyNameForPlayerId(Number(currentPlayerId))}: ${result}</div>`;
     };
     return `<div class="joco-deal-buttons">
       <div>${participants.map(reportLine).join('')}</div>
-      ${currentFamilyId && participants.includes(currentFamilyId) && !report ? `<div class="joco-deal-buttons">
+      ${
+        currentPlayerId && participants.includes(currentPlayerId) && !report
+          ? `<div class="joco-deal-buttons">
         <div class="bgabutton bgabutton_blue" data-deal-action="fulfilled" data-deal-id="${deal.id}">${_('Fulfilled')}</div>
         <div class="bgabutton bgabutton_red" data-deal-action="violated" data-deal-id="${deal.id}">${_('Violated')}</div>
-      </div>` : ''}
+      </div>`
+          : ''
+      }
     </div>`;
   }
   if (deal.status !== 'offer') {
     return '';
   }
-  if (currentFamilyId === deal.familyId) {
+  if (currentPlayerId === deal.playerId) {
     return `<div class="joco-deal-buttons">
       <div class="bgabutton bgabutton_blue" data-deal-action="accept" data-deal-id="${deal.id}">${_('Accept')}</div>
       <div class="bgabutton bgabutton_red" data-deal-action="reject" data-deal-id="${deal.id}">${_('Reject')}</div>
     </div>`;
   }
-  if (currentFamilyId === deal.offeredByFamilyId) {
+  if (currentPlayerId === deal.offeredByPlayerId) {
     return `<div class="joco-deal-buttons">
       <div class="bgabutton bgabutton_red" data-deal-action="reject" data-deal-id="${deal.id}">${_('Cancel')}</div>
     </div>`;
@@ -116,23 +123,23 @@ const tplDealButtons = (deal: JocoDeal, currentFamilyId: string | null) => {
 
 const tplDealsTableDescription = (
   deal: JocoDeal,
-  currentFamilyId: string | null,
+  currentPlayerId: number | null,
 ) => `<div class="joco-deal-description">
   <div>${escapeHtml(deal.description)}</div>
-  ${tplDealAssetLines(deal, currentFamilyId)}
+  ${tplDealAssetLines(deal, currentPlayerId)}
 </div>`;
 
-const tplDealsTableActions = (
-  deal: JocoDeal,
-  currentFamilyId: string | null,
-) => `<div class="joco-deal-actions">${tplDealButtons(deal, currentFamilyId)}</div>`;
+const tplDealsTableActions = (deal: JocoDeal, currentPlayerId: number | null) =>
+  `<div class="joco-deal-actions">${tplDealButtons(deal, currentPlayerId)}</div>`;
 
 export const tplDealsTableRow = (
   deal: JocoDeal,
-  currentFamilyId: string | null,
-) => `<div id="joco-deal-${deal.id}" class="joco-table-row fb-font-baskerville">
-  ${tplDealsTableFamilyItem(deal.familyId)}${tplDealsTableDescription(deal, currentFamilyId)}${tplDealsTableActions(deal, currentFamilyId)}${tplDealsTableFamilyItem(deal.offeredByFamilyId)}
+  currentPlayerId: number | null,
+) => {
+  return `<div id="joco-deal-${deal.id}" class="joco-table-row fb-font-baskerville">
+  ${tplDealsTableFamilyItem(deal.playerId)}${tplDealsTableDescription(deal, currentPlayerId)}${tplDealsTableActions(deal, currentPlayerId)}${tplDealsTableFamilyItem(deal.offeredByPlayerId)}
 </div>`;
+};
 
 export const tplOffers =
   () => `<div id="joco-offers" class="joco-deals-table-outer">

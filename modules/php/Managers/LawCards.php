@@ -7,7 +7,7 @@ use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 
 
 class LawCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces

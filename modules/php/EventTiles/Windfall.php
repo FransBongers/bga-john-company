@@ -4,7 +4,7 @@ namespace Bga\Games\JohnCompany\EventTiles;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Orders;
 use Bga\Games\JohnCompany\Managers\Regions;
@@ -20,8 +20,6 @@ class Windfall extends \Bga\Games\JohnCompany\Models\EventTile
 
   public function resolveEvent(string $regionId, $ctx)
   {
-    // parent::resolveEvent($regionId, $ctx);
-
     $regions = Regions::getAll();
     $orders = Orders::getAll()->toArray();
     $familyMembers = FamilyMembers::getAll();
@@ -42,18 +40,18 @@ class Windfall extends \Bga\Games\JohnCompany\Models\EventTile
         continue;
       }
 
-      $familyId = $familyMember->getFamilyId();
-      if (isset($gainPerFamily[$familyId])) {
-        $gainPerFamily[$familyId] += 1;
+      $playerId = $familyMember->getPlayerId();
+      if (isset($gainPerFamily[$playerId])) {
+        $gainPerFamily[$playerId] += 1;
       } else {
-        $gainPerFamily[$familyId] = 1;
+        $gainPerFamily[$playerId] = 1;
       }
     }
 
     // Pay to families
-    $families = Families::getAll();
-    foreach($gainPerFamily as $familyId => $amount) {
-      $families[$familyId]->gainCash($amount);
+    $playerExtra = PlayersExtra::getAll();
+    foreach($gainPerFamily as $playerId => $amount) {
+      $playerExtra[$playerId]->gainCash($amount);
     }
   }
 }

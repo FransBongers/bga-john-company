@@ -85,7 +85,7 @@ class TradeInChina extends \Bga\Games\JohnCompany\Models\AtomicAction
       Notifications::addCashToCompanyBalance($player, $amount, $balance);
 
       $bonus = $numberOfExportIcons;
-      $player->getFamily()->gainCash($bonus);
+      $player->gainCash($bonus);
       Globals::setOfficeHolderBonus($bonus);
     }
 

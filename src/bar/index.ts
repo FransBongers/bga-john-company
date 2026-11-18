@@ -18,16 +18,16 @@ export class Bar {
 
   private config = [
     {
+      id: 'joco-player-areas',
+      text: _('Players'),
+    },
+    {
       id: 'joco-deals',
       text: _('Deals'),
     },
     {
       id: 'joco-india',
       text: _('India'),
-    },
-    {
-      id: 'joco-families',
-      text: _('Families'),
     },
     {
       id: 'joco-parliament',
@@ -100,8 +100,14 @@ export class Bar {
   }
 
   private updateDealAttention() {
-    const count = AttentionManager.getInstance().getEntries('new_offer', 'deal').length;
-    const button = this.ui.barButtons[this.config.findIndex((tab) => tab.id === 'joco-deals')];
+    const count = AttentionManager.getInstance().getEntries(
+      'new_offer',
+      'deal',
+    ).length;
+    const button =
+      this.ui.barButtons[
+        this.config.findIndex((tab) => tab.id === 'joco-deals')
+      ];
     if (!button) return;
     let badge = button.querySelector<HTMLElement>('.joco-attention-count');
     if (count) {

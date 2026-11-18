@@ -38,7 +38,6 @@ use Bga\Games\JohnCompany\Managers\Deals;
 use Bga\Games\JohnCompany\Managers\Elephant;
 use Bga\Games\JohnCompany\Managers\Enterprises;
 use Bga\Games\JohnCompany\Managers\EventTiles;
-use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
@@ -46,6 +45,7 @@ use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Orders;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Parliament;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\PowerMarkers;
 use Bga\Games\JohnCompany\Managers\Prizes;
 use Bga\Games\JohnCompany\Managers\PromiseCards;
@@ -407,7 +407,7 @@ class Game extends \Bga\GameFramework\Table
                 'discard' => EventTiles::getTopOf(DISCARD),
                 'all' => EventTiles::getAll()->toArray(),
             ],
-            'families' => Families::getAll(),
+            'families' => PlayersExtra::getAll(),
             'familyMembers' => FamilyMembers::getAll(),
             'londonSeasonDisplay' => LondonSeasonCards::getInLocationOrdered(LONDON_SEASON_DISPLAY)->toArray(),
             'londonSeason' => [
@@ -466,7 +466,7 @@ class Game extends \Bga\GameFramework\Table
         Elephant::setupNewGame();
         Enterprises::setupNewGame();
         EventTiles::setupNewGame();
-        Families::setupNewGame($players);
+        PlayersExtra::setupNewGame($players);
         FamilyMembers::setupNewGame();
         Company::setupNewGame();
         Offices::setupNewGame();

@@ -8,7 +8,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Models\Player;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
@@ -126,8 +126,8 @@ class HiringChairman extends \Bga\Games\JohnCompany\Models\AtomicAction
   {
     Notifications::message('No candidate receives the necessary support', []);
 
-    $chairmanFamily = Families::getChairmanFamily();
-    $playerId = Players::getPlayerForFamily($chairmanFamily->getId())->getId();
+    $chairmanFamily = PlayersExtra::getChairmanFamily();
+    $playerId = $chairmanFamily->getId();
 
     $this->ctx->insertAsBrother(new LeafNode([
       'action' => HIRING_CHOOSE_CHAIRMAN,
@@ -152,13 +152,13 @@ class HiringChairman extends \Bga\Games\JohnCompany\Models\AtomicAction
       ]
     ]);
 
-    $formerChairmanFamily = Families::getChairmanFamily();
+    $formerChairmanFamily = PlayersExtra::getChairmanFamily();
     $formerChairmanFamily->setHasChairmanMarker(0);
 
-    $familyMember->getFamily()->setHasChairmanMarker(1);
+    $familyMember->getPlayerExtra()->setHasChairmanMarker(1);
 
     $office->setFamilyMemberId($familyMember->getId());
-    $office->setLocation(Locations::familyOffices($familyMember->getFamilyId()));
+    $office->setLocation(Locations::familyOffices($familyMember->getPlayerId()));
     Notifications::moveOfficeCard($office, '', []);
   }
 

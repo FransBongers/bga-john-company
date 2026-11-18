@@ -7,8 +7,9 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Prizes;
 use Bga\Games\JohnCompany\Models\Player;
 
@@ -30,19 +31,17 @@ class LondonSeasonRetire extends \Bga\Games\JohnCompany\Models\AtomicAction
   public function argsLondonSeasonRetire()
   {
     $args = $this->ctx->getArgs();
-    $familyId = $args['familyId'];
+    $playerId = $args['playerId'];
     $applyLettersOfIntroduction = $args[LETTERS_OF_INTRODUCTION_ID] ?? false;
 
-    $family = Families::get($familyId);
-
-    $family->hasPrestigeCard(STOCK_BROKER_ID);
+    $player = Players::get($playerId);
 
     $data = [
-      'familyMembers' => Utils::filter(FamilyMembers::getInLocation(Locations::pensioners())->toArray(), fn($fm) => $fm->getFamilyId() === $familyId),
-      'treasury' => $family->getTreasury(),
-      'discount' => $family->getRetirementDiscount($applyLettersOfIntroduction),
+      'familyMembers' => Utils::filter(FamilyMembers::getInLocation(Locations::pensioners())->toArray(), fn($fm) => $fm->getPlayerId() === $playerId),
+      'treasury' => $player->getTreasury(),
+      'discount' => $player->getRetirementDiscount($applyLettersOfIntroduction),
       FINAL_RETIREMENT => $args[FINAL_RETIREMENT] ?? false,
-      'prizeFilter' => $family->hasPrestigeCard(LORD_HIGHGATE_ID) ? [PRIZE_8, PRIZE_12] : null,
+      'prizeFilter' => $player->hasPrestigeCard(LORD_HIGHGATE_ID) ? [PRIZE_8, PRIZE_12] : null,
     ];
 
     return $data;
@@ -74,8 +73,8 @@ class LondonSeasonRetire extends \Bga\Games\JohnCompany\Models\AtomicAction
     self::checkAction('actLondonSeasonRetire');
     $playerId = $this->checkPlayer();
 
-    $familyId = $this->ctx->getArgs()['familyId'];
-    $family = Families::get($familyId);
+    $playerId = $this->ctx->getArgs()['playerId'];
+    $family = PlayersExtra::get($playerId);
     $player = $family->getPlayer();
 
     $selectedPrizes = (array) $args->selectedPrizes;

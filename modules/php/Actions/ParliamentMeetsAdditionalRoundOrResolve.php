@@ -123,7 +123,7 @@ class ParliamentMeetsAdditionalRoundOrResolve extends \Bga\Games\JohnCompany\Mod
     $law->move($primeMinister, Locations::passedLaws());
 
     // Prime minister gets passed law token
-    $primeMinister->getFamily()->gainPassedLawToken();
+    $primeMinister->gainPassedLawToken();
 
 
     $this->ctx->insertAsBrother(Engine::buildTree([
@@ -158,7 +158,7 @@ class ParliamentMeetsAdditionalRoundOrResolve extends \Bga\Games\JohnCompany\Mod
       Notifications::message(clienttranslate('Prime Minister does not change: there is no leader of the opposition'));
       return;
     }
-    Parliament::changePrimeMinister(Players::get($leaderOppositionPlayerId)->getFamilyId());
+    Parliament::changePrimeMinister($leaderOppositionPlayerId);
 
     $this->ctx->insertAsBrother(new LeafNode([
       'action' => PARLIAMENT_MEETS_SELECT_POLICY,
@@ -199,7 +199,7 @@ class ParliamentMeetsAdditionalRoundOrResolve extends \Bga\Games\JohnCompany\Mod
 
   private function initiateAdditionalRound(int $playerId)
   {
-    Notifications::message(clienttranslate('${player_name} decides to initiate an additional round of voting'), ['player' => Players::get($playerId)]);
+    Notifications::message(clienttranslate('${player_name} initiates an additional round of voting'), ['player' => Players::get($playerId)]);
 
     $this->ctx->getParent()->insertAsBrother(Engine::buildTree(
       Parliament::getRoundOfVotingNodes()

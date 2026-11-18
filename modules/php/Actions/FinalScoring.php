@@ -126,10 +126,9 @@ class FinalScoring extends \Bga\Games\JohnCompany\Models\AtomicAction
     $primeMinisterOrder = Players::getTurnOrder(Parliament::getPrimeMinisterPlayerId());
     foreach ($primeMinisterOrder as $playerId) {
       $player = $players[$playerId];
-      $familyId = $player->getFamilyId();
-      $shares = count(Company::getShares($familyId));
-      $workshops = count(Utils::filter($enterprises, function ($enterprise) use ($familyId) {
-        return $enterprise->getType() === WORKSHOP && $enterprise->getLocation() === $familyId;
+      $shares = count(Company::getShares($playerId));
+      $workshops = count(Utils::filter($enterprises, function ($enterprise) use ($playerId) {
+        return $enterprise->getType() === WORKSHOP && $enterprise->getLocation() === $playerId;
       }));
 
       if ($shares > 0) {

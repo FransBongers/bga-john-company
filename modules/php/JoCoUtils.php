@@ -103,20 +103,19 @@ class JoCoUtils
 
     foreach (Players::getNonCrownPlayerIds() as $playerId) {
       $player = Players::get($playerId);
-      $family = $player->getFamily();
       $cards = $player->getLondonSeasonCards();
 
-      $powerTrack = ($trackValues[POWER_TOKEN_COMPANY_SHARE] ?? 0) * $family->getShareCount();
-      foreach ($family->getEnterprises() as $enterprise) {
+      $powerTrack = ($trackValues[POWER_TOKEN_COMPANY_SHARE] ?? 0) * $player->getShareCount();
+      foreach ($player->getEnterprises() as $enterprise) {
         $powerTrack += $trackValues[$enterprise->getType()] ?? 0;
       }
       foreach ($cards as $card) {
         $powerTrack += $trackValues[$card->getEnterpriseType()] ?? 0;
       }
 
-      $primeMinisterAndLaws = $family->getPassedLawTokens() + ($playerId === $primeMinisterPlayerId ? 2 : 0);
+      $primeMinisterAndLaws = $player->getPassedLawTokens() + ($playerId === $primeMinisterPlayerId ? 2 : 0);
 
-      $playedBlackmailCards = LondonSeasonCards::getInLocation(Locations::playedBlackmailCards($player->getFamilyId()))->toArray();
+      $playedBlackmailCards = LondonSeasonCards::getInLocation(Locations::playedBlackmailCards($player->getId()))->toArray();
       $cardsPower = 0;
       $cardsHidden = 0;
       foreach ($cards as $card) {
@@ -130,7 +129,7 @@ class JoCoUtils
         $cardsPower += $card->getPower() ?? 0;
       }
 
-      $trophies = $family->getTrophies();
+      $trophies = $player->getTrophies();
 
       $result[$playerId] = [
         'powerTrack' => $powerTrack,

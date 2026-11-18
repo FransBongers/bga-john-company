@@ -8,7 +8,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Managers\Crown;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
@@ -182,7 +182,7 @@ class CrownManagerOfShippingPlaceShips extends \Bga\Games\JohnCompany\Models\Ato
 
     $familyMembers = FamilyMembers::getWriters();
     foreach ($familyMembers as $writer) {
-      if ($crownOnly && $writer->getFamilyId() !== CROWN) {
+      if ($crownOnly && $writer->getPlayerId() !== CROWN_PLAYER_ID) {
         continue;
       }
       $presidency = $writerLocationPresidencyMap[$writer->getLocation()];

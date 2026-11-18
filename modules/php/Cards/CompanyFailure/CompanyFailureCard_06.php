@@ -37,7 +37,6 @@ class CompanyFailureCard_06 extends \Bga\Games\JohnCompany\Models\CompanyFailure
     foreach (Players::getTurnOrder(Parliament::getPrimeMinisterPlayerId()) as $playerId) {
       $player = Players::get($playerId);
       $penalty = 0;
-      $familyId = $player->getFamilyId();
 
       foreach ($offices as $office) {
         $officeId = $office->getId();
@@ -56,7 +55,7 @@ class CompanyFailureCard_06 extends \Bga\Games\JohnCompany\Models\CompanyFailure
           continue;
         }
         $familyMemberId = $data['familyMemberId'];
-        if (explode('_', $familyMemberId)[1] === $familyId) {
+        if (explode('_', $familyMemberId)[2] == $playerId) {
           $penalty += 2;
         }
       }

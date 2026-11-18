@@ -15,14 +15,13 @@ use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\ControlTokens;
 use Bga\Games\JohnCompany\Managers\Elephant;
 use Bga\Games\JohnCompany\Managers\Enterprises;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Orders;
 use Bga\Games\JohnCompany\Managers\Ships;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Regions;
-use Bga\Games\JohnCompany\Managers\ResolveCrisis;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 use Bga\Games\JohnCompany\Models\Office;
 use Bga\Games\JohnCompany\Models\Region;
@@ -324,8 +323,8 @@ class EventsInIndiaCrisisDefense extends ExhaustArmyPieces
     $presidencyId = $region->getControllingPresidencyId();
     $commander = FamilyMembers::getTopOf(Locations::commander($presidencyId));
     if ($commander !== null) {
-      $family = $commander->getFamily();
-      $family->gainTrophies(1);
+      $playerExtra = $commander->getPlayerExtra();
+      $playerExtra->gainTrophies(1);
     }
   }
 
@@ -361,8 +360,8 @@ class EventsInIndiaCrisisDefense extends ExhaustArmyPieces
 
     // Tarnish the Commander’s Name
     if ($commander !== null) {
-      $family = $commander->getFamily();
-      $family->loseHalfTrophiesRoundedUp();
+      $playerExtra = $commander->getPlayerExtra();
+      $playerExtra->loseHalfTrophiesRoundedUp();
       $commander->returnToSupply();
     }
 

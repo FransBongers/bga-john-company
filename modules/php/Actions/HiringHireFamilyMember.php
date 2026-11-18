@@ -55,18 +55,17 @@ class HiringHireFamilyMember extends Hiring
       $hiringPlayerId = $office->getHiringPlayerId();
     }
 
-    $familyId = Players::get($hiringPlayerId)->getFamilyId();
-    $familyIdFilter = $args['familyIdFilter'] ?? null;
+    $playerIdFilter = $args['playerIdFilter'] ?? null;
 
-    if ($familyIdFilter !== null) {
-      $options = Utils::filter($options, function ($candidate) use ($familyIdFilter) {
-        return in_array($candidate->getFamilyId(), $familyIdFilter);
+    if ($playerIdFilter !== null) {
+      $options = Utils::filter($options, function ($candidate) use ($playerIdFilter) {
+        return in_array($candidate->getPlayerId(), $playerIdFilter);
       });
     }
 
     if ($consentForNepotismRejected) {
-      $options = Utils::filter($options, function ($candidate) use ($familyId) {
-        return $candidate->getFamilyId() !== $familyId;
+      $options = Utils::filter($options, function ($candidate) use ($hiringPlayerId) {
+        return $candidate->getPlayerId() !== $hiringPlayerId;
       });
     }
 
@@ -74,12 +73,11 @@ class HiringHireFamilyMember extends Hiring
       'title' => $this->getTitleArgs($officeId, $office),
       'office' => $office,
       'options' => $options,
-      'familyIdFilter' => $familyIdFilter,
+      'playerIdFilter' => $playerIdFilter,
       'officeId' => $officeId,
-      'hiringFamilyId' => $familyId,
       'hiringPlayerId' => $hiringPlayerId,
-      'consentForNepotismRequired' => Utils::array_some($options, function ($familyMember) use ($familyId) {
-        return $familyMember->getFamilyId() !== $familyId;
+      'consentForNepotismRequired' => Utils::array_some($options, function ($familyMember) use ($hiringPlayerId) {
+        return $familyMember->getPlayerId() !== $hiringPlayerId;
       }),
       'appointingCommander' => $appointingCommander,
     ];
@@ -192,7 +190,6 @@ class HiringHireFamilyMember extends Hiring
       'args' => [
         'familyMemberId' => $familyMember->getId(),
         'officeId' => $stateArgs['officeId'],
-        'hiringFamilyId' => $stateArgs['hiringFamilyId'],
         'hiringPlayerId' => $stateArgs['hiringPlayerId'],
         'appointingCommander' => $stateArgs['appointingCommander'],
       ],

@@ -108,13 +108,6 @@ export class Deals {
   // .##.....##.##........##.....##.##.....##....##....##..........##.....##..##.
   // ..#######..##........########..##.....##....##....########.....#######..####
 
-  private getCurrentFamilyId(): string | null {
-    return (
-      PlayerManager.getInstance().getPlayer(this.game.getPlayerId())?.familyId ??
-      null
-    );
-  }
-
   private updateTable(gamedatas: GamedatasAlias) {
     Object.values(gamedatas.deals).forEach((deal) => this.addDeal(deal));
   }
@@ -128,7 +121,7 @@ export class Deals {
           : null;
     target?.insertAdjacentHTML(
       'beforeend',
-      tplDealsTableRow(deal, this.getCurrentFamilyId()),
+      tplDealsTableRow(deal, this.game.isSpectator ? null : this.game.getPlayerId()),
     );
     this.updateAttention();
   }

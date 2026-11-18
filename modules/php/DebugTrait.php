@@ -12,7 +12,7 @@ use Bga\Games\JohnCompany\Managers\ArmyPieces;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Crown;
 use Bga\Games\JohnCompany\Managers\Enterprises;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\Offices;
@@ -32,7 +32,6 @@ use Bga\Games\JohnCompany\Managers\Elephant;
 use Bga\Games\JohnCompany\Managers\EventTiles;
 use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\Parliament;
-use Bga\Games\JohnCompany\Managers\ResolveCrisis;
 use Bga\Games\JohnCompany\Utils\TradeRoutes;
 
 trait DebugTrait
@@ -41,9 +40,10 @@ trait DebugTrait
 
   function debug_test()
   {
-    $node = Engine::getNextUnresolved();
+    Notifications::log('enterprises', Players::get(2371053)->getEnterprises());
+    // $data = SetupCards::getAll();
 
-    Notifications::log('debug', count($node->getParent()->getUnresolvedActions([LONDON_SEASON_CHOOSE_CARD])));
+    // Notifications::log('debug', $data);
 
     // Deals::newDeal(HASTINGS, SYKES);
     // $deal = Deals::newDeal(HASTINGS, SYKES);
@@ -75,8 +75,8 @@ trait DebugTrait
     //   'leader' => 2371053,
     // ];
     // Globals::setParliament($parliament);
-    // $chairmanFamily = Families::getChairmanFamily();
-    // $playerId = Players::getPlayerForFamily($chairmanFamily->getId());
+    // $chairmanFamily = PlayersExtra::getChairmanFamily();
+
 
     // Notifications::log('debug', ControlTokens::getByRegion(MADRAS));
 
@@ -92,8 +92,8 @@ trait DebugTrait
 
     // Regions::get(PUNJAB)->setUnrest(3);
     // Regions::get(MARATHA)->setUnrest(1);
-    // Players::get(2371052)->getFamily()->updateOpportunityMarker(ENLIST_OFFICER);
-    // Players::get(2371053)->getFamily()->updateOpportunityMarker(SEEK_SHARE);
+    // Players::get(2371052)->updateOpportunityMarker(ENLIST_OFFICER);
+    // Players::get(2371053)->updateOpportunityMarker(SEEK_SHARE);
     // Globals::setRetirementMoney([]);
     // Globals::setElephant([
     //   FACING => HYDERABAD,
@@ -123,11 +123,11 @@ trait DebugTrait
     Engine::proceed();
   }
 
-  function debug_londonSeasonCard(string $familyId, string $cardId)
+  function debug_londonSeasonCard(int $playerId, string $cardId)
   {
     $card = LondonSeasonCards::get($cardId);
-    $card->setLocation(Locations::londonSeasonCards($familyId));
-    Notifications::moveLondonSeasonCard(Families::get($familyId)->getPlayer(), $card, null);
+    $card->setLocation(Locations::londonSeasonCards($playerId));
+    Notifications::moveLondonSeasonCard(Players::get($playerId), $card, null);
   }
 
   function debug_putLawInPlay(string $lawId)

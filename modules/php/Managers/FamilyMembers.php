@@ -18,6 +18,7 @@ class FamilyMembers extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     'family_id',
     'presidency',
     'used',
+    'player_id',
   ];
   protected static $autoremovePrefix = false;
   protected static $autoreshuffle = false;
@@ -47,24 +48,26 @@ class FamilyMembers extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 
   public static function setupNewGame()
   {
-    $families = Families::getAll();
+    $playerExtraData = PlayersExtra::getAll();
 
     $familyMembers = [];
 
-    foreach ($families as $familyId => $family) {
+    foreach ($playerExtraData as $playerId => $playerData) {
+      $familyId = $playerData->getFamilyId();
       $familyMembers[] = [
-        "id" => "familyMember_" . $familyId . "_{INDEX}",
+        "id" => "familyMember_" . $familyId . "_" . $playerId . "_{INDEX}",
         "nbr" => $familyId === CROWN ? 36 : 18,
         "nbrStart" => 1,
-        "location" => Locations::familyMemberSupply($familyId),
-        "family_id" => $familyId
+        "location" => Locations::familyMemberSupply($playerId),
+        "family_id" => $familyId,
+        "player_id" => $playerId
       ];
     }
 
     self::create($familyMembers);
 
-    foreach ($families as $familyId => $family) {
-      self::shuffle(Locations::familyMemberSupply($familyId));
+    foreach ($playerExtraData as $playerId => $playerData) {
+      self::shuffle(Locations::familyMemberSupply($playerId));
     }
   }
 
@@ -76,17 +79,17 @@ class FamilyMembers extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   // .##....##..##..........##.......##....##.......##....##..##....##
   // ..######...########....##.......##....########.##.....##..######.
 
-  public static function getAllFor(string $familyId)
+  public static function getAllFor(int $playerId)
   {
     $allMembers = self::getAll()->toArray();
-    return Utils::filter($allMembers, function ($familyMember) use ($familyId) {
-      return $familyMember->getFamilyId() === $familyId;
+    return Utils::filter($allMembers, function ($familyMember) use ($playerId) {
+      return $familyMember->getPlayerId() === $playerId;
     });
   }
 
-  public static function getMemberFor($familyId)
+  public static function getMemberFor(int $playerId)
   {
-    return self::getTopOf(Locations::familyMemberSupply($familyId));
+    return self::getTopOf(Locations::familyMemberSupply($playerId));
   }
 
   public static function getOnStockExchange()

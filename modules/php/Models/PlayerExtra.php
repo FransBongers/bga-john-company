@@ -7,20 +7,21 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Enterprises;
-use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\Players;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 
-class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
+class PlayerExtra extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
 {
   protected $id;
-  protected $table = 'families';
-  protected $primary = 'family_id';
+  protected $table = 'players_extra';
+  protected $primary = 'player_id';
   protected $location;
   protected $state;
   protected $hasChairmanMarker;
   protected $treasury;
+  protected $familyId;
 
   public function __construct($row)
   {
@@ -30,9 +31,10 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   }
 
   protected $attributes = [
-    'id' => ['family_id', 'str'],
-    'location' => 'family_location',
-    'state' => ['family_state', 'int'],
+    'id' => ['player_id', 'int'],
+    'location' => ['player_location', 'str'],
+    'state' => ['player_state', 'int'],
+    'familyId' => ['family_id', 'str'],
     'treasury' => ['treasury', 'int'],
     'victoryPoints' => ['victory_points', 'int'],
     'opportunityMarker' => ['opportunity_marker', 'string'],
@@ -55,42 +57,31 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     return $this->jsonSerialize(); // Static datas are already in js file
   }
 
-  public function hasChairmanMarker()
+  public function hasChairmanMarker(): bool
   {
     return $this->hasChairmanMarker === 1;
   }
 
-  public function getEnterprises($type = null)
-  {
-    $enterprises = Enterprises::getAll()->toArray();
-    $familyId = $this->getId();
-    return Utils::filter($enterprises, function ($enterprise) use ($familyId, $type) {
-      return $enterprise->getLocation() === $familyId && ($type === null || $enterprise->getType() === $type);
-    });
-  }
+  // public function getEnterprises($type = null)
+  // {
+  //   $enterprises = Enterprises::getAll()->toArray();
+  //   $familyId = $this->getId();
+  //   return Utils::filter($enterprises, function ($enterprise) use ($familyId, $type) {
+  //     return $enterprise->getLocation() === $familyId && ($type === null || $enterprise->getType() === $type);
+  //   });
+  // }
 
   public function getPlayer()
   {
-    return Players::getPlayerForFamily($this->id);
+    return Players::get($this->id);
   }
 
   public function getPlayerId()
   {
-    return $this->getPlayer()->getId();
+    return $this->getId();
   }
 
-  public function getShareCount()
-  {
-    return count(Company::getShares($this->getId()));
-  }
-
-  // TODO: include members on prizes in count
-  public function canPlaceFamilyMembers()
-  {
-    return count(FamilyMembers::getInLocation(Locations::familyMemberSupply($this->id))) > 0;
-  }
-
-  public function pay(int $amount, $skipNotification = true)
+  public function pay(int $amount, bool $skipNotification = true)
   {
     $this->incTreasury(-$amount);
     if (!$skipNotification) {
@@ -98,14 +89,14 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     }
   }
 
-  public function payPromiseCubes($amount, $notify = true)
+  public function payPromiseCubes(int $amount, bool $notify = true)
   {
     return $this->gainPromiseCubes(-$amount, $notify);
   }
 
-  public function gainPromiseCubes($amount, $notify = true)
+  public function gainPromiseCubes(int $amount, bool $notify = true)
   {
-    $crown = Families::get(CROWN);
+    $crown = PlayersExtra::get(CROWN_PLAYER_ID);
     if ($amount > 0 && $crown->getCrownPromiseCubes() === 0) {
       return;
     }
@@ -154,37 +145,6 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     Notifications::gainPassedLawTokens($this->getPlayer(), $number);
   }
 
-  /**
-   * Total windows owned by a player's family: retired family members on
-   * prizes, plus enterprises, plus prestige cards.
-   */
-  public function getWindowCount()
-  {
-    $familyId = $this->id;
-
-    $windows = 0;
-
-    $prizeMembers = Utils::filter(FamilyMembers::getAll()->toArray(), function ($familyMember) use ($familyId) {
-      return $familyMember->getFamilyId() === $familyId && array_key_exists($familyMember->getLocation(), PRIZES);
-    });
-    foreach ($prizeMembers as $familyMember) {
-      $windows += PRIZES[$familyMember->getLocation()][WINDOWS];
-    }
-
-    foreach ($this->getEnterprises() as $enterprise) {
-      $windows += $enterprise->getWindows();
-    }
-
-    $prestigeCards = Utils::filter(LondonSeasonCards::getAll()->toArray(), function ($card) use ($familyId) {
-      return $card->getLocation() === $familyId && $card->getType() === PRESTIGE;
-    });
-    foreach ($prestigeCards as $card) {
-      $windows += $card->getWindows() ?? 0;
-    }
-
-    return $windows;
-  }
-
   public function updateOpportunityMarker(string | null $familyActionOrRemoved)
   {
     $currentOpportunityMarker = $this->getOpportunityMarker();
@@ -194,30 +154,5 @@ class Family extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     // Implementation for updating the opportunity marker value for this family
     $this->setOpportunityMarker($familyActionOrRemoved);
     Notifications::updateOpportunityMarker($this, $familyActionOrRemoved);
-  }
-
-  public function hasPrestigeCard(string $prestigeCardId): bool
-  {
-    $prestigeCards = LondonSeasonCards::getInLocation(Locations::londonSeasonCards($this->getId()))->toArray();
-    return Utils::array_some($prestigeCards, function ($card) use ($prestigeCardId) {
-      return $card->getId() === $prestigeCardId;
-    });
-  }
-
-  public function getRetirementDiscount(bool $applyLettersOfIntroduction = false)
-  {
-
-    $prestigeCards = $applyLettersOfIntroduction ?
-      Utils::filter(LondonSeasonCards::getAll()->toArray(), function ($card) {
-        return Utils::startsWith($card->getLocation(), 'londonSeasonCards_');
-      })
-      : LondonSeasonCards::getInLocation(Locations::londonSeasonCards($this->getId()))->toArray();
-    $discount = 0;
-    foreach ($prestigeCards as $card) {
-      if ($card->getType() === PRESTIGE) {
-        $discount += $card->getDiscount() ?? 0;
-      }
-    }
-    return $discount;
   }
 }

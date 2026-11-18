@@ -12,7 +12,7 @@ use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Enterprises;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Orders;
@@ -142,18 +142,18 @@ class RevenuePayDividends extends \Bga\Games\JohnCompany\Actions\PresidencyActio
     $dividendGainPerFamily = [];
 
     foreach ($shares as $familyMember) {
-      $familyId = $familyMember->getFamilyId();
-      if (isset($dividendGainPerFamily[$familyId])) {
-        $dividendGainPerFamily[$familyId] += $numberOfDividends;
+      $dividendGainingPlayerId = $familyMember->getPlayerId();
+      if (isset($dividendGainPerFamily[$dividendGainingPlayerId])) {
+        $dividendGainPerFamily[$dividendGainingPlayerId] += $numberOfDividends;
       } else {
-        $dividendGainPerFamily[$familyId] = $numberOfDividends;
+        $dividendGainPerFamily[$dividendGainingPlayerId] = $numberOfDividends;
       }
     };
 
-    $families = Families::getAll();
+    $playersExtra = PlayersExtra::getAll();
 
-    foreach ($dividendGainPerFamily as $familyId => $amount) {
-      $families[$familyId]->gainCash($amount);
+    foreach ($dividendGainPerFamily as $dividendGainingPlayerId => $amount) {
+      $playersExtra[$dividendGainingPlayerId]->gainCash($amount);
     }
 
     $standing = Company::getStanding();

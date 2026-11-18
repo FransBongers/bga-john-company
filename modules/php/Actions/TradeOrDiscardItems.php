@@ -117,7 +117,7 @@ class TradeOrDiscardItems extends \Bga\Games\JohnCompany\Models\AtomicAction
         break;
       case SHIPYARD:
       case WORKSHOP:
-        $items[$type] = Players::get($playerId)->getFamily()->getEnterprises($type);
+        $items[$type] = Players::get($playerId)->getEnterprises($type);
         break;
     }
 

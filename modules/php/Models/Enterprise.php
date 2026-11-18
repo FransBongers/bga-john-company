@@ -67,8 +67,8 @@ class Enterprise extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model imp
     return $this->income;
   }
 
-  public function changeOwner(string $familyId) {
-    $this->setLocation($familyId);
+  public function changeOwner(int $playerId) {
+    $this->setLocation($playerId);
   }
 
   public function returnToSupply(Player $player) {

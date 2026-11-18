@@ -44,7 +44,6 @@ export class DealsPlayersTable {
         tplPlayerRow({
           currentPlayerId,
           playerId,
-          familyId,
         }),
       );
 

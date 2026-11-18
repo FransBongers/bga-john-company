@@ -3015,21 +3015,21 @@ span[style*="color:#addb90"] {
   border-radius: 4px;
 }
 
-#joco-families {
+#joco-player-areas {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
-#joco-families .tab-container {
+#joco-player-areas .tab-container {
   border: none;
 }
-#joco-families .tab-container .tabs {
+#joco-player-areas .tab-container .tabs {
   width: 100%;
   height: 48px;
   gap: 0;
   border-bottom: 2px solid rgb(130, 124, 112);
 }
-#joco-families .tab-container .tab-title {
+#joco-player-areas .tab-container .tab-title {
   font-family: "Libre Baskerville", serif;
   flex: 1 1 0;
   background-color: transparent;
@@ -3039,58 +3039,58 @@ span[style*="color:#addb90"] {
   color: rgb(130, 124, 112);
   transition: background-color 0.2s, color 0.2s;
 }
-#joco-families .tab-container .tab-title:not(.active) span {
+#joco-player-areas .tab-container .tab-title:not(.active) span {
   color: inherit;
 }
-#joco-families .tab-container .tab-title[data-family-id=Benyon]:not(.active):hover {
+#joco-player-areas .tab-container .tab-title[data-family-id=Benyon]:not(.active):hover {
   background-color: rgba(255, 177, 185, 0.1);
 }
-#joco-families .tab-container .tab-title[data-family-id=Benyon].active {
+#joco-player-areas .tab-container .tab-title[data-family-id=Benyon].active {
   border-bottom: 6px solid #ffb1b9;
   background-color: transparent;
   color: black;
 }
-#joco-families .tab-container .tab-title[data-family-id=Hastings]:not(.active):hover {
+#joco-player-areas .tab-container .tab-title[data-family-id=Hastings]:not(.active):hover {
   background-color: rgba(153, 218, 233, 0.1);
 }
-#joco-families .tab-container .tab-title[data-family-id=Hastings].active {
+#joco-player-areas .tab-container .tab-title[data-family-id=Hastings].active {
   border-bottom: 6px solid #99dae9;
   background-color: transparent;
   color: black;
 }
-#joco-families .tab-container .tab-title[data-family-id=Larkins]:not(.active):hover {
+#joco-player-areas .tab-container .tab-title[data-family-id=Larkins]:not(.active):hover {
   background-color: rgba(249, 224, 141, 0.1);
 }
-#joco-families .tab-container .tab-title[data-family-id=Larkins].active {
+#joco-player-areas .tab-container .tab-title[data-family-id=Larkins].active {
   border-bottom: 6px solid #f9e08d;
   background-color: transparent;
   color: black;
 }
-#joco-families .tab-container .tab-title[data-family-id=Paxton]:not(.active):hover {
+#joco-player-areas .tab-container .tab-title[data-family-id=Paxton]:not(.active):hover {
   background-color: rgba(219, 217, 214, 0.1);
 }
-#joco-families .tab-container .tab-title[data-family-id=Paxton].active {
+#joco-player-areas .tab-container .tab-title[data-family-id=Paxton].active {
   border-bottom: 6px solid #dbd9d6;
   background-color: transparent;
   color: black;
 }
-#joco-families .tab-container .tab-title[data-family-id=Sykes]:not(.active):hover {
+#joco-player-areas .tab-container .tab-title[data-family-id=Sykes]:not(.active):hover {
   background-color: rgba(199, 180, 225, 0.1);
 }
-#joco-families .tab-container .tab-title[data-family-id=Sykes].active {
+#joco-player-areas .tab-container .tab-title[data-family-id=Sykes].active {
   border-bottom: 6px solid #c7b4e1;
   background-color: transparent;
   color: black;
 }
-#joco-families .tab-container .tab-title[data-family-id=Walsh]:not(.active):hover {
+#joco-player-areas .tab-container .tab-title[data-family-id=Walsh]:not(.active):hover {
   background-color: rgba(173, 219, 144, 0.1);
 }
-#joco-families .tab-container .tab-title[data-family-id=Walsh].active {
+#joco-player-areas .tab-container .tab-title[data-family-id=Walsh].active {
   border-bottom: 6px solid #addb90;
   background-color: transparent;
   color: black;
 }
-#joco-families .tab-content {
+#joco-player-areas .tab-content {
   box-sizing: border-box;
   width: 1000px;
 }
@@ -4177,7 +4177,7 @@ span[style*="color:#c0c0c0"] {
   left: 448px;
 }
 .joco-unrest-container[data-region=Madras] {
-  top: 684px;
+  top: 646px;
   left: 474px;
   width: 66px;
 }
@@ -4718,3 +4718,5 @@ html {
 .player-button.yellow:hover {
   background-color: hsl(46, 90%, 86%);
 }
+
+/*# sourceMappingURL=johncompany.css.map */

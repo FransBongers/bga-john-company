@@ -131,11 +131,11 @@ export class DirectorOfTradeSpecialEnvoy implements GameState<OnEnteringDirector
       extraClasses: available === 0 ? DISABLED : '',
     });
 
-    addPrimaryActionButton({
-      id: 'propose_btn',
-      text: _('Propose'),
-      callback: () => this.performAction(false),
-    });
+    // addPrimaryActionButton({
+    //   id: 'propose_btn',
+    //   text: _('Propose'),
+    //   callback: () => this.performAction(false),
+    // });
     // addCancelButton();
     addPassButton(this.args.optionalAction);
   }

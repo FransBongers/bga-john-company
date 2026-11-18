@@ -11,8 +11,8 @@ class Deals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   protected static $customFields = [
     'description',
     'assets',
-    'offered_by_family_id',
-    'family_id',
+    'offered_by_player_id',
+    'player_id',
     'status',
     'deal_reports',
   ];
@@ -50,14 +50,14 @@ class Deals extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
   // .##.....##....##.....##..##........##.....##.......##...
   // ..#######.....##....####.########.####....##.......##...
 
-  public static function newDeal(string $familyId, string $offeredByFamilyId, string $description = '', $assets = null)
+  public static function newDeal(int $playerId, int $offeredByPlayerId, string $description = '', $assets = null)
   {
     return self::singleCreate([
       'description' => $description,
       'assets' => $assets,
       'location' => 'deals',
-      'offered_by_family_id' => $offeredByFamilyId,
-      'family_id' => $familyId,
+      'offered_by_player_id' => $offeredByPlayerId,
+      'player_id' => $playerId,
       'status' => DEAL_STATUS_OFFER,
       'deal_reports' => [],
     ]);

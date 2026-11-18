@@ -126,8 +126,7 @@ class CommanderDeployResolveCheck extends \Bga\Games\JohnCompany\Models\AtomicAc
       return;
     }
     if ($checkResult === CATASTROPHIC_FAILURE) {
-      $family = $player->getFamily();
-      $family->loseHalfTrophiesRoundedUp();
+      $player->loseHalfTrophiesRoundedUp();
       return;
     }
     $region = Regions::get($regionId);
@@ -136,7 +135,7 @@ class CommanderDeployResolveCheck extends \Bga\Games\JohnCompany\Models\AtomicAc
     $this->distributeLoot($region, $pieces, $player->getId());
 
     // Gain trophies for the surviving pieces
-    $player->getFamily()->gainTrophies($region->getStrength());
+    $player->gainTrophies($region->getStrength());
 
     // Gain control of region
     $region->companyGainsControl($player, $presidencyId);
@@ -221,7 +220,7 @@ class CommanderDeployResolveCheck extends \Bga\Games\JohnCompany\Models\AtomicAc
 
     foreach ($turnOrderStartingFromCommander as $playerId) {
       if (isset($distribution[$playerId])) {
-        Players::get($playerId)->getFamily()->gainCash($distribution[$playerId]);
+        Players::get($playerId)->gainCash($distribution[$playerId]);
       }
     }
     if (isset($distribution['bank'])) {

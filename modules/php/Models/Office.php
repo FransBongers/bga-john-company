@@ -4,7 +4,7 @@ namespace Bga\Games\JohnCompany\Models;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
@@ -57,18 +57,22 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
 
   public function getPlayer(): Player | null
   {
-    if ($this->familyMemberId === null) {
+    $playerId = $this->getPlayerId();
+    if ($playerId === null) {
       return null;
     }
 
-    $familyId = explode('_', $this->familyMemberId)[1];
-    return Players::getPlayerForFamily($familyId);
+    return Players::get($playerId);
   }
 
   public function getPlayerId(): int | null
   {
-    $player = $this->getPlayer();
-    return $player === null ? null : $player->getId();
+    if ($this->familyMemberId === null) {
+      return null;
+    }
+
+    $playerId = explode('_', $this->familyMemberId)[2];
+    return (int) $playerId;
   }
 
   public function getFamilyMember()
@@ -79,21 +83,11 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
     return FamilyMembers::get($this->familyMemberId);
   }
 
-  public function getFamilyId()
+  public function getPlayerExtra()
   {
-    if ($this->familyMemberId === null) {
-      return null;
-    }
+    $playerId = $this->getPlayerId();
 
-    $familyId = explode('_', $this->familyMemberId)[1];
-    return $familyId;
-  }
-
-  public function getFamily()
-  {
-    $familyId = $this->getFamilyId();
-
-    return $familyId === null ? null : Families::get($familyId);
+    return $playerId === null ? null : PlayersExtra::get($playerId);
   }
 
   public function isInPlay()

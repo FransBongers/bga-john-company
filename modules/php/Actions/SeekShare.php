@@ -6,12 +6,11 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Players;
-use Bga\Games\JohnCompany\Managers\SetupCards;
-use Bga\Games\JohnCompany\Models\Family;
 use Bga\Games\JohnCompany\Models\Player;
+use Bga\Games\JohnCompany\Models\PlayerExtra;
 
 class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
@@ -32,8 +31,8 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
   {
     $args = $this->ctx->getArgs();
     $source = $args['source'];
-    $familyId = $args['familyId'];
-    $family = Families::get($familyId);
+    $playerId = $args['playerId'];
+    $family = PlayersExtra::get($playerId);
 
     $data = [
       'options' => $this->getOptions($family),
@@ -85,26 +84,24 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
     $this->performAction($playerId, $position, $price);
 
     if ($stateArgs[SOURCE] === FAMILY_ACTION) {
-      $familyId = $this->ctx->getArgs()['familyId'];
-      $family = Families::get($familyId);
+      $playerId = $this->ctx->getArgs()['playerId'];
+      $playerExtraData = PlayersExtra::get($playerId);
 
-      $this->checkExtraActionOpportunityMarker($family, $playerId);
+      $this->checkExtraActionOpportunityMarker($playerExtraData, $playerId);
 
-      $family->updateOpportunityMarker(SEEK_SHARE);
+      $playerExtraData->updateOpportunityMarker(SEEK_SHARE);
     }
 
     $this->setPlayerActionCompleted($playerId);
     $this->resolveAction([], true);
   }
 
-  public function performAction($playerId, $position, $price)
+  public function performAction(int $playerId, string $position, int $price)
   {
     $player = Players::get($playerId);
-    $family = $player->getFamily();
+    $player->pay($price);
 
-    $family->pay($price);
-
-    $familyMember = FamilyMembers::getMemberFor($family->getId());
+    $familyMember = FamilyMembers::getMemberFor($player->getId());
     $familyMember->setLocation($position);
 
     Notifications::seekShare($player, $familyMember, $price);
@@ -119,14 +116,14 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  private function checkExtraActionOpportunityMarker(Family $family, int $playerId)
+  private function checkExtraActionOpportunityMarker(PlayerExtra $playerExtraData, int $playerId)
   {
-    $opportunityMarker = $family->getOpportunityMarker();
+    $opportunityMarker = $playerExtraData->getOpportunityMarker();
     if ($opportunityMarker !== SEEK_SHARE) {
       return;
     }
 
-    $isDoable = $this->canBePerformedBy($family);
+    $isDoable = $this->canBePerformedBy($playerExtraData);
     if (!$isDoable) {
       Notifications::message(clienttranslate('${player_name} cannot seek another share'), [
         'player' => Players::get($playerId),
@@ -140,7 +137,6 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
       'activePlayerIds' => [$playerId],
       'optional' => true,
       'args' => [
-        'familyId' => $family->getId(),
         'playerId' => $playerId,
         SOURCE => OPPORTUNITY_MARKER,
       ]
@@ -152,21 +148,21 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
     return intval(explode('_', $stockExchangeLocation)[1]);
   }
 
-  public function canBePerformedBy($family)
+  public function canBePerformedBy(PlayerExtra $playerExtraData)
   {
-    return count($this->getOptions($family)) > 0;
+    return count($this->getOptions($playerExtraData)) > 0;
   }
 
-  public function getOptions(Family $family)
+  public function getOptions(PlayerExtra $playerExtra)
   {
-    $treasury = $family->getTreasury();
+    $treasury = $playerExtra->getTreasury();
 
     $membersOnStockExchange = FamilyMembers::getOnStockExchange();
 
     $options = [];
 
     // TODO: allow other players to use Stock Broker
-    $hasStockBroker = $family->hasPrestigeCard(STOCK_BROKER_ID);
+    $hasStockBroker = Players::get($playerExtra->getPlayerId())->hasPrestigeCard(STOCK_BROKER_ID);
 
     foreach (STOCK_EXCHANGE_POSITIONS as $location) {
       if (Utils::array_some($membersOnStockExchange, function ($member) use ($location, $hasStockBroker) {
@@ -201,7 +197,7 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   public function performCrownAction()
   {
-    $family = Families::get(CROWN);
+    $family = PlayersExtra::get(CROWN_PLAYER_ID);
 
     $options = $this->getOptions($family);
 
@@ -239,9 +235,9 @@ class SeekShare extends \Bga\Games\JohnCompany\Models\AtomicAction
   public function isDoable(Player $player): bool
   {
     $args = $this->ctx->getArgs();
-    $familyId = $args['familyId'];
-    $family = Families::get($familyId);
+    $playerId = $args['playerId'];
+    $playerExtra = PlayersExtra::get($playerId);
 
-    return count($this->getOptions($family)) > 0 && !$family->hasPrestigeCard(JOSEPH_SEDLEY_ID);
+    return count($this->getOptions($playerExtra)) > 0 && !$player->hasPrestigeCard(JOSEPH_SEDLEY_ID);
   }
 }

@@ -8,12 +8,12 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Crown;
-use Bga\Games\JohnCompany\Managers\Families;
 use Bga\Games\JohnCompany\Managers\FamilyActions;
 use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\PromiseCards;
 use Bga\Games\JohnCompany\Managers\RemovedGovernors;
@@ -153,14 +153,10 @@ trait TurnTrait
   {
     $this->updatePhase(FAMILY);
 
-    $chairmanFamilyId = Utils::filter(Families::getAll()->toArray(), function ($family) {
-      return $family->hasChairmanMarker();
-    })[0]->getId();
-
-    $player = Players::getPlayerForFamily($chairmanFamilyId);
+    $chairmanPlayerId = PlayersExtra::getChairmanFamily()->getId();
 
     $extraAction = FamilyActions::getExtraAction();
-    $turnOrder = Players::getTurnOrder($player->getId());
+    $turnOrder = Players::getTurnOrder($chairmanPlayerId);
     $node = [
       'children' => array_map(function ($playerId) use ($extraAction) {
         $playerNode = [
@@ -249,9 +245,9 @@ trait TurnTrait
     $offices = Company::getOfficesWithTreasury();
 
     $chairman = Offices::get(CHAIRMAN);
-    $family = $chairman->getFamily();
+    $player = $chairman->getPlayer();
 
-    if ($family->getId() === CROWN) {
+    if ($player->getId() === CROWN_PLAYER_ID) {
       $this->stSetupCrownChairman();
       return;
     }
@@ -264,8 +260,8 @@ trait TurnTrait
 
 
 
-    if (Crown::isInGame() && $family->getId() !== CROWN && $family->getCrownPromiseCubes() > 0) {
-      $family->payPromiseCubes(1);
+    if (Crown::isInGame() && $player->getId() !== CROWN_PLAYER_ID && $player->getCrownPromiseCubes() > 0) {
+      $player->payPromiseCubes(1);
     }
 
     $node = [
@@ -397,7 +393,7 @@ trait TurnTrait
     $this->updatePhase(MANAGER_OF_SHIPPING);
     $office = Offices::get(MANAGER_OF_SHIPPING);
 
-    if ($office->getFamilyId() === CROWN) {
+    if ($office->getPlayerId() === CROWN_PLAYER_ID) {
       $this->stSetupCrownManagerOfShipping();
       return;
     }

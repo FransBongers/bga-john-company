@@ -7,7 +7,7 @@ use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 
 
 class SetupCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
@@ -87,7 +87,7 @@ class SetupCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     }
   }
 
-  private static function dealSetupCards($families)
+  private static function dealSetupCards(array $families)
   {
     $numberOfFamilies = count(Utils::filter(array_values($families), function ($family) {
       return $family->getId() !== CROWN;
@@ -100,23 +100,23 @@ class SetupCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     }
 
     foreach ($families as $family) {
-      $familyId = $family->getId();
-      if ($familyId === CROWN) {
+      $playerId = $family->getId();
+      if ($playerId === CROWN_PLAYER_ID) {
         continue;
       }
-      $location = $draftEnabled ? Locations::hand($familyId) : Locations::setupCards($familyId);
+      $location = $draftEnabled ? Locations::hand($playerId) : Locations::setupCards($playerId);
       self::pickForLocation($numberOfCards, DECK, $location);
     }
 
     if (!$draftEnabled && $numberOfFamilies <= 2) {
-      self::pickForLocation($numberOfFamilies === 1 ? 8 : 4, DECK, Locations::setupCards(CROWN));
+      self::pickForLocation($numberOfFamilies === 1 ? 8 : 4, DECK, Locations::setupCards(CROWN_PLAYER_ID));
     }
   }
 
   /* Creation of the cards */
   public static function setupNewGame($players = null, $options = null)
   {
-    $families = Families::getAll()->toArray();
+    $families = PlayersExtra::getAll()->toArray();
 
     self::setupLoadCards(count($families));
     self::dealSetupCards($families);

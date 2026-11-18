@@ -26,7 +26,7 @@ import {
 import { OpportunityMarker } from './opportunity-marker';
 import { PromiseCardsManager } from '../../cards/promise-cards';
 
-export interface FamilyAreaProps {
+export interface PlayerAreaProps {
   parentElement: HTMLElement | string;
   // id: string;
   gamedatas: GamedatasAlias;
@@ -34,7 +34,7 @@ export interface FamilyAreaProps {
   player: PlayerAlias;
 }
 
-export class FamilyArea {
+export class PlayerArea {
   protected ui: {
     // parent: HTMLElement;
     counters: HTMLElement;
@@ -46,6 +46,7 @@ export class FamilyArea {
   // private color: string;
   public opportunityMarker: OpportunityMarker;
   private familyId: string;
+  private playerId: number;
   private player: PlayerAlias;
   private enterprises: InstanceType<
     typeof BgaCards.LineStock<JocoEnterpriseCard>
@@ -59,10 +60,11 @@ export class FamilyArea {
   >;
   public counters: Record<string, TrophiesCounter> = {};
 
-  constructor(config: FamilyAreaProps) {
+  constructor(config: PlayerAreaProps) {
     // this.id = config.id;
     this.game = config.game;
     this.familyId = config.player.familyId;
+    this.playerId = Number(config.player.id);
     this.player = config.player;
     this.setup(config);
   }
@@ -75,7 +77,7 @@ export class FamilyArea {
   // .##....##.##..........##....##.....##.##.......
   // ..######..########....##.....#######..##.......
 
-  private setup(config: FamilyAreaProps) {
+  private setup(config: PlayerAreaProps) {
     // this.color = config.color;
     // const parentElement =
     //   typeof config.parentElement === 'string'
@@ -91,13 +93,13 @@ export class FamilyArea {
     this.ui = {
       // parent: parentElement,
       counters: document.getElementById(
-        `joco-counters-${this.familyId}`,
+        `joco-counters-${this.playerId}`,
       ) as HTMLElement,
       offices: document.getElementById(
-        `FamilyOffices_${this.familyId}`,
+        `FamilyOffices_${this.playerId}`,
       ) as HTMLElement,
       tab: document.getElementById(
-        `joco-family-area-${this.familyId}-tab`,
+        `joco-family-area-${this.playerId}-tab`,
       ) as HTMLElement,
     };
 
@@ -114,7 +116,7 @@ export class FamilyArea {
   private setupEnterprises(gamedatas: GamedatasAlias) {
     this.enterprises = new BgaCards.LineStock<JocoEnterpriseCard>(
       EnterpriseCardsManager.getInstance(),
-      document.getElementById(`joco-enterprises-${this.familyId}`)!,
+      document.getElementById(`joco-enterprises-${this.playerId}`)!,
       {
         gap: '12px',
       },
@@ -127,19 +129,19 @@ export class FamilyArea {
     this.stocks[`londonSeasonCards_${this.familyId}`] =
       new BgaCards.LineStock<JocoLondonSeasonCard>(
         LondonSeasonCardsManager.getInstance(),
-        document.getElementById(`joco-prestige-blackmail-${this.familyId}`)!,
+        document.getElementById(`joco-prestige-blackmail-${this.playerId}`)!,
       );
     this.stocks[`playedBlackmailCards_${this.familyId}`] =
       new BgaCards.LineStock<JocoLondonSeasonCard>(
         LondonSeasonCardsManager.getInstance(),
-        document.getElementById(`joco-played-blackmail-${this.familyId}`)!,
+        document.getElementById(`joco-played-blackmail-${this.playerId}`)!,
       );
     this.updateLondonSeasonCards(gamedatas);
   }
 
   private setupOffices(gamedatas: GamedatasAlias) {
     Object.entries(gamedatas.offices).forEach(([officeId, office]) => {
-      if (office.location !== `FamilyOffices_${this.familyId}`) {
+      if (office.location !== `FamilyOffices_${this.playerId}`) {
         return;
       }
       this.ui.offices.insertAdjacentHTML('beforeend', tplOfficeCard(office));
@@ -148,11 +150,11 @@ export class FamilyArea {
   private setupPromiseCards(gamedatas: GamedatasAlias) {
     this.promiseCards = new BgaCards.LineStock<JocoPromiseCard>(
       PromiseCardsManager.getInstance(),
-      document.getElementById(`joco-promise-cards-${this.familyId}`)!,
+      document.getElementById(`joco-promise-cards-${this.playerId}`)!,
     );
 
     const cards = Object.values(gamedatas.promiseCards)
-      .filter((card) => card.location === this.familyId)
+      .filter((card) => card.location === `${this.playerId}`)
       .map(getPromiseCard);
 
     this.promiseCards.addCards(cards);
@@ -160,23 +162,23 @@ export class FamilyArea {
 
   private setupCounter(gamedatas: GamedatasAlias) {
     this.counters[TROPHIES] = new TrophiesCounter({
-      id: `joco-trophies-${this.familyId}`,
+      id: `joco-trophies-${this.playerId}`,
       parentElement: this.ui.counters,
-      initialValue: gamedatas.families[this.familyId].trophies,
+      initialValue: gamedatas.families[this.playerId].trophies,
     });
 
     this.counters[PASSED_LAW_TOKENS] = new PassedLawTokensCounter({
-      id: `joco-passed-law-tokens-${this.familyId}`,
+      id: `joco-passed-law-tokens-${this.playerId}`,
       parentElement: this.ui.counters,
-      initialValue: gamedatas.families[this.familyId].passedLawTokens,
+      initialValue: gamedatas.families[this.playerId].passedLawTokens,
     });
   }
 
   private setupOpportunityMarker(gamedatas: GamedatasAlias) {
     this.opportunityMarker = new OpportunityMarker({
       game: this.game,
-      familyAction: gamedatas.families[this.familyId].opportunityMarker,
-      familyId: this.familyId,
+      familyAction: gamedatas.families[this.playerId].opportunityMarker,
+      playerId: this.playerId,
       parentElement: this.ui.counters,
     });
   }
@@ -192,7 +194,7 @@ export class FamilyArea {
   private updateEnterprises(gamedatas: GamedatasAlias) {
     const ships = Object.values(gamedatas.ships);
     Object.values(gamedatas.enterprises).forEach((enterprise) => {
-      if (enterprise.location !== this.familyId) {
+      if (enterprise.location !== `${this.playerId}`) {
         return;
       }
 

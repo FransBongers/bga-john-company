@@ -19,7 +19,7 @@ import { GameAlias } from '../../../types';
 export interface OpportunityMarkerProps {
   game: GameAlias;
   familyAction: string | null;
-  familyId: string;
+  playerId: number;
   parentElement: HTMLElement;
 }
 
@@ -44,7 +44,7 @@ export class OpportunityMarker {
     this.props.parentElement.insertAdjacentHTML('beforeend', this.tplOpportunityMarker());
 
     this.ui = {
-      opportunityMarkerValue: document.getElementById(`joco-opportunity-marker-value-${this.props.familyId}`) as HTMLElement,
+      opportunityMarkerValue: document.getElementById(`joco-opportunity-marker-value-${this.props.playerId}`) as HTMLElement,
     };
 
     this.update(this.props.familyAction);
@@ -93,15 +93,15 @@ export class OpportunityMarker {
       const { text, icon } = map[familyAction];
       return formatStringRecursive(text, { tkn_icon: icon });//.toLocaleUpperCase();
     }
-    return _('Not placed');
+    return _('not placed');
   }
 
   tplOpportunityMarker() {
     return `
-      <div id="joco-opportunity-marker-${this.props.familyId}" class="joco-opportunity-marker">
+      <div id="joco-opportunity-marker-${this.props.playerId}" class="joco-opportunity-marker">
         <span class="fb-font-baskerville fb-font-bold fb-font-16">${_('Opportunity Marker').toLocaleUpperCase()}</span>
         <div class="joco-opportunity-marker-value">
-          <span id="joco-opportunity-marker-value-${this.props.familyId}" class="fb-font-baskerville fb-font-bold fb-font-16"></span>
+          <span id="joco-opportunity-marker-value-${this.props.playerId}" class="fb-font-baskerville fb-font-bold fb-font-16"></span>
         </div>
       </div>
     `;

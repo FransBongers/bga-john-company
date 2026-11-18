@@ -2,7 +2,7 @@
 
 namespace Bga\Games\JohnCompany\Cards\AI;
 
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 
 class AICard_07 extends \Bga\Games\JohnCompany\Models\AICard
 {
@@ -22,7 +22,7 @@ class AICard_07 extends \Bga\Games\JohnCompany\Models\AICard
 
   public function getClimate(): string
   {
-    $crownTreasury = Families::get(CROWN)->getTreasury();
+    $crownTreasury = PlayersExtra::get(CROWN_PLAYER_ID)->getTreasury();
     if ($crownTreasury <= 7) {
       return BEAR;
     }

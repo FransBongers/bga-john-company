@@ -11,7 +11,7 @@ use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Enterprises;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\Offices;
@@ -38,11 +38,6 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
   public function argsManagerOfShipping()
   {
     $info = $this->ctx->getInfo();
-    // $player = self::getPlayer();
-    $activePlayerId = $info['activePlayerIds'][0];
-
-    $enterprises = Enterprises::getAll();
-    $map = Families::getFamilyIdPlayerIdMap();
 
     $playerShips = [];
     $otherShips = [];
@@ -55,7 +50,6 @@ class ManagerOfShipping extends \Bga\Games\JohnCompany\Models\AtomicAction
         $otherShips[] = $ship;
       }
     }
-
 
     $data = [
       'playerShips' => $playerShips,

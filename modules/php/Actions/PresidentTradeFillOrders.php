@@ -13,7 +13,7 @@ use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Enterprises;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\Offices;
@@ -112,7 +112,7 @@ class PresidentTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidency
     if ($tradeRegulationsInPlay) {
       $income[COMPANY] = $presidentBonus;
     } else {
-      $income[$player->getFamilyId()] = $presidentBonus; // player performing the action is president
+      $income[$player->getId()] = $presidentBonus; // player performing the action is president
       Globals::setOfficeHolderBonus($presidentBonus);
     }
 
@@ -143,7 +143,7 @@ class PresidentTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidency
           throw new \Bga\GameFramework\VisibleSystemException("ERROR_031");
         }
 
-        $bonusReceiver = $writerGraftReformInPlay ? COMPANY : $familyMember->getFamilyId();
+        $bonusReceiver = $writerGraftReformInPlay ? COMPANY : $familyMember->getPlayerId();
         if (!isset($income[$bonusReceiver])) {
           $income[$bonusReceiver] = 0;
         }
@@ -162,16 +162,16 @@ class PresidentTradeFillOrders extends \Bga\Games\JohnCompany\Actions\Presidency
       $order->fill($player, $familyMember);
     }
 
-    $families = Families::getAll();
+    $playersExtra = PlayersExtra::getAll();
 
     $companyBalance = Company::incBalance($companyBalanceIncrease);
     Notifications::increaseCompanyBalance($player, $companyBalance, $companyBalanceIncrease);
 
-    foreach ($income as $familyId => $amount) {
-      if ($familyId === COMPANY) {
+    foreach ($income as $bonusPlayerId => $amount) {
+      if ($bonusPlayerId === COMPANY) {
         $this->increaseCompanyBalance($amount, $tradeRegulationsInPlay, $writerGraftReformInPlay);
       } else {
-        $families[$familyId]->gainCash($amount);
+        $playersExtra[$bonusPlayerId]->gainCash($amount);
       }
     }
 

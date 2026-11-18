@@ -136,11 +136,11 @@ class Parliament
     self::set(OPPOSITION, $opposition);
   }
 
-  public static function changePrimeMinister(string $familyId)
+  public static function changePrimeMinister(string $playerId)
   {
-    $player = Players::getPlayerForFamily($familyId);
-    self::set(PRIME_MINISTER, $familyId);
-    Notifications::changePrimeMinister($player, $familyId);
+    $player = Players::get($playerId);
+    self::set(PRIME_MINISTER, $playerId);
+    Notifications::changePrimeMinister($player);
     Notifications::updatePower();
   }
 
@@ -168,11 +168,11 @@ class Parliament
 
   public static function getPrimeMinisterPlayer()
   {
-    $familyId = Globals::getParliament()[PRIME_MINISTER];
-    if ($familyId === null) {
+    $playerId = Globals::getParliament()[PRIME_MINISTER];
+    if ($playerId === null) {
       return null;
     }
-    return Players::getPlayerForFamily($familyId);
+    return Players::get($playerId);
   }
 
   public static function getDialPosition()

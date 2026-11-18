@@ -353,7 +353,7 @@ export interface NotifUpdatePower {
 }
 
 export interface NotifUpdateOpportunityMarker {
-  familyId: string;
+  playerId: number;
   familyAction: string | null;
 }
 

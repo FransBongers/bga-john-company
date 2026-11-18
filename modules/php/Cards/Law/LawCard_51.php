@@ -44,7 +44,7 @@ class LawCard_51 extends \Bga\Games\JohnCompany\Models\LawCard
     if ($passed) {
       $officeId = Globals::getSelectedOffice();
       $office = Offices::get($officeId);
-      $currentOwner = $office->getFamily()->getPlayer();
+      $currentOwner = $office->getPlayer();
       $office->returnFamilyMemberToSupply();
       $office->moveToVacantOffices($currentOwner);
     } else {

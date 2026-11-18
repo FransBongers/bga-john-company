@@ -52,8 +52,8 @@ class TakeMyOfficeHolderBonus extends \Bga\Games\JohnCompany\Models\PromiseCard
     $bonus = Globals::getOfficeHolderBonus();
 
     $counterChanges = [
-      $player->getFamilyId() => [CASH_COUNTER => $bonus],
-      $ownerPlayer->getFamilyId() => [CASH_COUNTER => -$bonus],
+      $player->getId() => [CASH_COUNTER => $bonus],
+      $ownerPlayer->getId() => [CASH_COUNTER => -$bonus],
     ];
 
     Notifications::updateCountersMultipleTargets($counterChanges, clienttranslate('${player_name} takes ${tkn_boldText_amount} from ${player_name2}'), [

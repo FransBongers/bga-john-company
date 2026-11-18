@@ -91,10 +91,11 @@ CREATE TABLE IF NOT EXISTS `event_tiles` (
   `event_tile_state` int(10) DEFAULT 0,
   PRIMARY KEY (`event_tile_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
-CREATE TABLE IF NOT EXISTS `families` (
-  `family_id` varchar(16) NOT NULL,
-  `family_location` varchar(32) NOT NULL,
-  `family_state` int(10) DEFAULT 0,
+CREATE TABLE IF NOT EXISTS `players_extra` (
+  `player_id` int(10) NOT NULL,
+  `player_location` varchar(32) NOT NULL,
+  `player_state` int(10) DEFAULT 0,
+  `family_id` varchar(16) DEFAULT NULL,
   `treasury` int(10) DEFAULT 0,
   `victory_points` int(10) DEFAULT 0,
   `opportunity_marker` varchar(32) DEFAULT NULL,
@@ -102,13 +103,14 @@ CREATE TABLE IF NOT EXISTS `families` (
   `has_chairman_marker` tinyint(1) DEFAULT 0,
   `trophies` int(10) DEFAULT 0,
   `passed_law_tokens` int(10) DEFAULT 0,
-  PRIMARY KEY (`family_id`)
+  PRIMARY KEY (`player_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 CREATE TABLE IF NOT EXISTS `family_members` (
   `family_member_id` varchar(32) NOT NULL,
   `family_member_location` varchar(32) NOT NULL,
   `family_member_state` int(10) DEFAULT 0,
-  `family_id` varchar(16) NOT NULL,
+  `family_id` varchar(16) DEFAULT NULL,
+  `player_id` int(10) DEFAULT NULL,
   `used` tinyint(1) DEFAULT 0,
   `presidency` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`family_member_id`)
@@ -166,8 +168,8 @@ CREATE TABLE IF NOT EXISTS `deals` (
   `deal_state` int(10) DEFAULT 0,
   `description` TEXT NOT NULL,
   `assets` JSON NULL,
-  `offered_by_family_id` varchar(16) NOT NULL,
-  `family_id` varchar(16) NOT NULL,
+  `offered_by_player_id` int(10) NOT NULL,
+  `player_id` int(10) NOT NULL,
   `status` varchar(32) NOT NULL,
   `deal_reports` JSON NULL,
   PRIMARY KEY (`deal_id`)

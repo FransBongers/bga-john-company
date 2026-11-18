@@ -5,9 +5,13 @@ namespace Bga\Games\JohnCompany\Models;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine\AbstractNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Preferences;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\AtomicActions;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\Company;
+use Bga\Games\JohnCompany\Managers\Enterprises;
+use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 
@@ -53,7 +57,7 @@ class Player extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
       return $card->jsonSerialize();
     }, $this->getLondonSeasonCards());
 
-    $playedBlackmailCards = LondonSeasonCards::getInLocationOrdered(Locations::playedBlackmailCards($this->getFamilyId()))->toArray();
+    $playedBlackmailCards = LondonSeasonCards::getInLocationOrdered(Locations::playedBlackmailCards($this->getId()))->toArray();
 
     return array_merge(
       $data,
@@ -80,9 +84,9 @@ class Player extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     return AtomicActions::isDoable($action, $ctx, $this);
   }
 
-  public function getFamily()
+  public function getPlayerExtra()
   {
-    return Families::get($this->getFamilyId());
+    return PlayersExtra::get($this->getId());
   }
 
   public function getFamilyId()
@@ -96,21 +100,171 @@ class Player extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
 
   public function getHandForDraft()
   {
-    return SetupCards::getInLocation(Locations::hand($this->getFamilyId()))->toArray();
+    return SetupCards::getInLocation(Locations::hand($this->getId()))->toArray();
   }
 
   public function getSetupCards()
   {
-    return SetupCards::getInLocation(Locations::setupCards($this->getFamilyId()))->toArray();
+    return SetupCards::getInLocation(Locations::setupCards($this->getId()))->toArray();
   }
 
   public function getLondonSeasonCards()
   {
-    return LondonSeasonCards::getInLocation(Locations::londonSeasonCards($this->getFamilyId()))->toArray();
+    return LondonSeasonCards::getInLocation(Locations::londonSeasonCards($this->getId()))->toArray();
   }
 
   public function incScore(int $change)
   {
     Game::get()->bga->playerScore->inc($this->getId(), $change);
+  }
+
+  public function getEnterprises($type = null)
+  {
+    $enterprises = Enterprises::getAll()->toArray();
+    $playerId = $this->getId();
+    return Utils::filter($enterprises, function ($enterprise) use ($playerId, $type) {
+      return $enterprise->getLocation() == $playerId && ($type === null || $enterprise->getType() === $type);
+    });
+  }
+
+  /**
+   * Total windows owned by a player's family: retired family members on
+   * prizes, plus enterprises, plus prestige cards.
+   */
+  public function getWindowCount()
+  {
+    $playerId = $this->id;
+
+    $windows = 0;
+
+    $prizeMembers = Utils::filter(FamilyMembers::getAll()->toArray(), function ($familyMember) use ($playerId) {
+      return $familyMember->getPlayerId() === $playerId && array_key_exists($familyMember->getLocation(), PRIZES);
+    });
+    foreach ($prizeMembers as $familyMember) {
+      $windows += PRIZES[$familyMember->getLocation()][WINDOWS];
+    }
+
+    foreach ($this->getEnterprises() as $enterprise) {
+      $windows += $enterprise->getWindows();
+    }
+
+    $prestigeCards = Utils::filter(LondonSeasonCards::getAll()->toArray(), function ($card) use ($playerId) {
+      return $card->getLocation() === $playerId && $card->getType() === PRESTIGE;
+    });
+    foreach ($prestigeCards as $card) {
+      $windows += $card->getWindows() ?? 0;
+    }
+
+    return $windows;
+  }
+
+  public function getShareCount()
+  {
+    return count(Company::getShares($this->getId()));
+  }
+
+  public function getCrownPromiseCubes()
+  {
+    return PlayersExtra::get($this->getId())->getCrownPromiseCubes();
+  }
+
+  public function updateOpportunityMarker(string | null $familyActionOrRemoved)
+  {
+    PlayersExtra::get($this->getId())->updateOpportunityMarker($familyActionOrRemoved);
+  }
+
+  public function setOpportunityMarker(string | null $familyActionOrRemoved)
+  {
+    PlayersExtra::get($this->getId())->setOpportunityMarker($familyActionOrRemoved);
+  }
+
+  public function gainCash(int $amount, string | null $source = null, bool $skipNotification = false)
+  {
+    PlayersExtra::get($this->getId())->gainCash($amount, $source, $skipNotification);
+  }
+
+  public function getTrophies(): int
+  {
+    return PlayersExtra::get($this->getId())->getTrophies();
+  }
+
+  public function getPassedLawTokens(): int
+  {
+    return PlayersExtra::get($this->getId())->getPassedLawTokens();
+  }
+
+  public function pay(int $amount, $skipNotification = true)
+  {
+    PlayersExtra::get($this->getId())->pay($amount, $skipNotification);
+  }
+
+  public function incTreasury(int $amount)
+  {
+    PlayersExtra::get($this->getId())->incTreasury($amount);
+  }
+
+  public function gainPassedLawToken(int $number = 1)
+  {
+    PlayersExtra::get($this->getId())->gainPassedLawToken($number);
+  }
+
+  public function hasPrestigeCard(string $prestigeCardId): bool
+  {
+    $prestigeCards = LondonSeasonCards::getInLocation(Locations::londonSeasonCards($this->getId()))->toArray();
+    return Utils::array_some($prestigeCards, function ($card) use ($prestigeCardId) {
+      return $card->getId() === $prestigeCardId;
+    });
+  }
+
+  public function hasChairmanMarker(): bool
+  {
+    return PlayersExtra::get($this->getId())->hasChairmanMarker();
+  }
+
+  // TODO: include members on prizes in count
+  public function canPlaceFamilyMembers()
+  {
+    return count(FamilyMembers::getInLocation(Locations::familyMemberSupply($this->id))) > 0;
+  }
+
+  public function gainPromiseCubes(int $amount, bool $notify = true)
+  {
+    PlayersExtra::get($this->getId())->gainPromiseCubes($amount, $notify);
+  }
+
+  public function payPromiseCubes(int $amount, bool $notify = true)
+  {
+    PlayersExtra::get($this->getId())->payPromiseCubes($amount, $notify);
+  }
+
+  public function loseHalfTrophiesRoundedUp()
+  {
+    PlayersExtra::get($this->getId())->loseHalfTrophiesRoundedUp();
+  }
+
+  public function getRetirementDiscount(bool $applyLettersOfIntroduction = false)
+  {
+    $prestigeCards = $applyLettersOfIntroduction ?
+      Utils::filter(LondonSeasonCards::getAll()->toArray(), function ($card) {
+        return Utils::startsWith($card->getLocation(), 'londonSeasonCards_');
+      })
+      : LondonSeasonCards::getInLocation(Locations::londonSeasonCards($this->getId()))->toArray();
+    $discount = 0;
+    foreach ($prestigeCards as $card) {
+      if ($card->getType() === PRESTIGE) {
+        $discount += $card->getDiscount() ?? 0;
+      }
+    }
+    return $discount;
+  }
+
+  public function getTreasury(): int
+  {
+    return PlayersExtra::get($this->getId())->getTreasury();
+  }
+
+  public function gainTrophies(int $amount)
+  {
+    return PlayersExtra::get($this->getId())->gainTrophies($amount);
   }
 }

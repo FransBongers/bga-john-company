@@ -5,7 +5,7 @@ namespace Bga\Games\JohnCompany\Models;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 
 class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
 {
@@ -79,7 +79,7 @@ class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Mod
   public function take(Player $player, object $ctx)
   {
     $from = $this->getLocation();
-    $this->setLocation(Locations::londonSeasonCards($player->getFamilyId()));
+    $this->setLocation(Locations::londonSeasonCards($player->getId()));
     Notifications::moveLondonSeasonCard($player, $this, $from);
     if ($this->getVictoryPoints() !== null) {
       $player->incScore($this->getVictoryPoints());
@@ -106,7 +106,7 @@ class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Mod
     if (!Utils::startsWith($location, 'londonSeasonCards_')) {
       throw new \Bga\GameFramework\VisibleSystemException("LONDON_SEASON_CARD_001");
     }
-    return Families::getPlayerIdByFamilyId(explode('_', $location)[1]);
+    return (int) explode('_', $location)[1];
   }
 
   /**

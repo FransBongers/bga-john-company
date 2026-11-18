@@ -2,7 +2,6 @@ import { Interaction, SELECTABLE, SELECTED } from '../boilerplate';
 import { LondonSeasonCardsManager } from '../cards/london-season-cards';
 import { PromiseCardsManager } from '../cards/promise-cards';
 import { CASH_COUNTER } from '../constants';
-import { Families } from '../families';
 import { PhaseTracker } from '../phase-tracker';
 import { PlayerManager } from '../player-manager';
 import { GameAlias } from '../types';
@@ -23,11 +22,11 @@ export class AnytimeCards {
     const playerId = this.game.getPlayerId();
     const players = PlayerManager.getInstance();
     const player = players.getPlayer(playerId);
-    const family = player && Families.getInstance().getFamily(player.familyId);
-    if (!family) return;
+    const playerArea = player && players.getPlayerArea(playerId);
+    if (!playerArea) return;
 
-    const promiseCards = family.getPromiseCards();
-    const blackmailCards = family.stocks[`londonSeasonCards_${player.familyId}`].getCards();
+    const promiseCards = playerArea.getPromiseCards();
+    const blackmailCards = playerArea.stocks[`londonSeasonCards_${player.familyId}`].getCards();
     const occupiedOffices = Object.keys(this.game.gamedatas.offices).filter((officeId) =>
       document.getElementById(`OfficeCard_${officeId}`) &&
       document.getElementById(officeId)?.querySelector('.joco-family-member'),

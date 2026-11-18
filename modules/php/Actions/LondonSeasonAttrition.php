@@ -127,7 +127,7 @@ class LondonSeasonAttrition extends \Bga\Games\JohnCompany\Models\AtomicAction
                 'activePlayerIds' => [$playerId],
                 'optional' => true,
                 'args' => [
-                  'familyId' => $player->getFamilyId(),
+                  'playerId' => $playerId,
                   FINAL_RETIREMENT => $finalRetirement
                 ]
               ]

@@ -11,8 +11,8 @@ class Deal extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   protected $state;
   protected $description;
   protected $assets;
-  protected $offeredByFamilyId;
-  protected $familyId;
+  protected $offeredByPlayerId;
+  protected $playerId;
   protected $status;
   protected $reports;
 
@@ -22,8 +22,8 @@ class Deal extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     'state' => ['deal_state', 'int'],
     'description' => ['description', 'str'],
     'assets' => ['assets', 'obj'],
-    'offeredByFamilyId' => ['offered_by_family_id', 'str'],
-    'familyId' => ['family_id', 'str'],
+    'offeredByPlayerId' => ['offered_by_player_id', 'int'],
+    'playerId' => ['player_id', 'int'],
     'status' => ['status', 'str'],
     'reports' => ['deal_reports', 'obj'],
   ];

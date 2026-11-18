@@ -27,7 +27,7 @@ class PrestigeCard_12 extends \Bga\Games\JohnCompany\Models\PrestigeCard
   {
 
     // If chairman, move back into court of directors
-    $playedBlackmailCards = LondonSeasonCards::getInLocationOrdered(Locations::playedBlackmailCards($player->getFamilyId()))->toArray();
+    $playedBlackmailCards = LondonSeasonCards::getInLocationOrdered(Locations::playedBlackmailCards($player->getId()))->toArray();
 
     if (count($playedBlackmailCards) > 0) {
       foreach ($playedBlackmailCards as $card) {

@@ -66,14 +66,14 @@ class Crown
     $promiseCubes = [];
 
     foreach($playerIds as $playerId) {
-      $promiseCubes[$playerId] = $players[$playerId]->getFamily()->getCrownPromiseCubes();
+      $promiseCubes[$playerId] = $players[$playerId]->getCrownPromiseCubes();
     }
     return $promiseCubes;
   }
 
   public static function isCrownPresidency($presidendy) {
     $office = Offices::get(PRESIDENCY_PRESIDENT_OFFICE_MAP[$presidendy]);
-    return $office->getFamilyId() === CROWN;
+    return $office->getPlayerId() === CROWN_PLAYER_ID;
   }
 
   public static function isInGame()

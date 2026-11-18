@@ -5,7 +5,7 @@ namespace Bga\Games\JohnCompany\Offices;
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Models\Player;
 
@@ -37,7 +37,7 @@ class SuperintendentOfTradeInChina extends \Bga\Games\JohnCompany\Models\Office
     $office->moveToVacantOffices($player);
 
     if (count($office->getCandidatesForHiring()) > 0) {
-      $chairmanPlayerId = Families::getChairmanFamily()->getPlayerId();
+      $chairmanPlayerId = PlayersExtra::getChairmanFamily()->getPlayerId();
       $ctx->insertAsBrother(new LeafNode([
         'action' => HIRING_HIRE_FAMILY_MEMBER,
         'playerId' => 'some',

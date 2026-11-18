@@ -39,11 +39,10 @@ class DraftCardNextStep extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $newCardsPerPlayer = [];
     foreach ($players as $playerId => $player) {
-      $familyId = $players[$playerId]->getFamilyId();
       $nextPlayerInTurnOrder = $this->getNextPlayerId($turnOrder, $playerId);
 
-      $currentCards = Utils::filter($setupCards, function ($card) use ($familyId) {
-        return $card->getLocation() === Locations::hand($familyId);
+      $currentCards = Utils::filter($setupCards, function ($card) use ($playerId) {
+        return $card->getLocation() === Locations::hand($playerId);
       });
 
       $newCardsPerPlayer[$nextPlayerInTurnOrder] = $currentCards;
@@ -53,10 +52,8 @@ class DraftCardNextStep extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     // Move cards
     foreach ($newCardsPerPlayer as $playerId => $cards) {
-      $familyId = $players[$playerId]->getFamilyId();
       foreach ($cards as $card) {
-        $card->setLocation($lastCard ? Locations::setupCards($familyId) : Locations::hand($familyId));
-        // SetupCards::move($cardIds, $lastCard ? Locations::setupCards($familyId) : Locations::hand($familyId));
+        $card->setLocation($lastCard ? Locations::setupCards($playerId) : Locations::hand($playerId));
       }
       
     }
@@ -66,12 +63,11 @@ class DraftCardNextStep extends \Bga\Games\JohnCompany\Models\AtomicAction
   private function crownDraft($players, $setupCards)
   {
     foreach ($players as $playerId => $player) {
-      $familyId = $players[$playerId]->getFamilyId();
       // Move remaining cards to the crown
-      $crownCards = Utils::itemsInLocation($setupCards, Locations::hand($familyId));
-      SetupCards::move(Utils::returnIds($crownCards), Locations::setupCards(CROWN));
+      $crownCards = Utils::itemsInLocation($setupCards, Locations::hand($playerId));
+      SetupCards::move(Utils::returnIds($crownCards), Locations::setupCards(CROWN_PLAYER_ID));
       // Draw new cards for player
-      $newCards = Utils::returnIds(SetupCards::pickForLocation(3, DECK, Locations::hand($familyId))->toArray());
+      $newCards = Utils::returnIds(SetupCards::pickForLocation(3, DECK, Locations::hand($playerId))->toArray());
       // Notifications::draftNewCards($player, $newCards, false);
     }
   }

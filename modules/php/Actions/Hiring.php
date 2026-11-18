@@ -91,7 +91,7 @@ class Hiring extends \Bga\Games\JohnCompany\Models\AtomicAction
       ]);
 
       $office->setFamilyMemberId($familyMember->getId());
-      $office->setLocation(Locations::familyOffices($familyMember->getFamilyId()));
+      $office->setLocation(Locations::familyOffices($familyMember->getPlayerId()));
       Notifications::moveOfficeCard($office, '', []);
     }
 

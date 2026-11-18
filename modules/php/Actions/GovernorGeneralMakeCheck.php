@@ -96,7 +96,7 @@ class GovernorGeneralMakeCheck extends \Bga\Games\JohnCompany\Models\AtomicActio
       $this->ctx->insertAsBrother(Engine::buildTree($action));
     } elseif ($checkResult === SUCCESS) {
       $bonus = count($companyControlledRegions) + ($zamindarTaxesInPlay ? 3 : 0);
-      $player->getFamily()->gainCash($bonus);
+      $player->gainCash($bonus);
       Globals::setOfficeHolderBonus($bonus);
       $this->insertGovernorGeneralActions($player, $playerId);
     }

@@ -88,13 +88,13 @@ export class ChairmanDebtConsent implements GameState<OnEnteringChairmanDebtCons
     //   Board.getInstance().ui.selectBoxes[`companyDebt_${this.args.debt}`],
     // );
     addPrimaryActionButton({
-      id: 'yay_btn',
-      text: 'Yay',
+      id: 'consent_btn',
+      text: _('Give consent'),
       callback: () => this.performAction(true),
     });
     addDangerActionButton({
-      id: 'nay_btn',
-      text: 'Nay',
+      id: 'no_consent_btn',
+      text: _('Do not give consent'),
       callback: () => this.performAction(false),
     });
   }

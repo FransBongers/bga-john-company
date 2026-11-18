@@ -265,18 +265,7 @@ class Players extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
 
   public static function getChairmanPlayerId()
   {
-    return Families::getChairmanFamily()->getPlayerId();
-  }
-
-  public static function getPlayerForFamily($familyId)
-  {
-    if ($familyId === CROWN) {
-      return self::getCrown();
-    }
-    $players = self::getAll()->toArray();
-    return Utils::array_find($players, function ($player) use ($familyId) {
-      return HEX_COLOR_COLOR_MAP[$player->getColor()] === FAMILY_COLOR_MAP[$familyId];
-    });
+    return PlayersExtra::getChairmanFamily()->getId();
   }
 
   public static function getNonCrownPlayerIds()

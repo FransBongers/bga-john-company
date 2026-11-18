@@ -153,7 +153,7 @@ export class PresidentTrade implements GameState<OnEnteringPresidentTradeArgs> {
     const available = this.args.treasury - this.spend;
     const minSpend = this.selectedRegionIds.length;
 
-    updatePageTitle(_('Trade: ${you} may spend 1 ${tkn_pound} per die'), {
+    updatePageTitle(_('Trade: ${you} may spend £1 per die'), {
       available,
       tkn_pound: 'pound',
     });

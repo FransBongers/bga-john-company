@@ -27,13 +27,13 @@ class Shipyard extends \Bga\Games\JohnCompany\Models\Enterprise
     return Ships::get($this->shipId);
   }
 
-  public function changeOwner($familyId)
+  public function changeOwner(int $playerId)
   {
-    parent::changeOwner($familyId);
+    parent::changeOwner($playerId);
 
     // Move ship
     $ship = $this->getShip();
     $ship->setLocation($this->getId());
-    $ship->setOwner(Players::getPlayerForFamily($familyId)->getId());
+    $ship->setOwner($playerId);
   }
 }

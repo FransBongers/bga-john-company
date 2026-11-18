@@ -21,7 +21,7 @@ class PrestigeCard_13 extends \Bga\Games\JohnCompany\Models\PrestigeCard
 
   protected function resolveImmediateEffect(Player $player, object $ctx)
   {
-    $family = $player->getFamily();
+    $family = $player->getPlayerExtra();
     $enterprises = $family->getEnterprises(WORKSHOP);
 
     if (count($enterprises) > 0) {

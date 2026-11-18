@@ -22,7 +22,6 @@ class PrestigeCard_18 extends \Bga\Games\JohnCompany\Models\PrestigeCard
 
   protected function resolveImmediateEffect(Player $player, object $ctx)
   {
-    $family = $player->getFamily();
-    $family->updateOpportunityMarker(REMOVED);
+    $player->updateOpportunityMarker(REMOVED);
   }
 }

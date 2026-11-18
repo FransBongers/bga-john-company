@@ -134,7 +134,7 @@ class LondonSeasonChooseCard extends \Bga\Games\JohnCompany\Models\AtomicAction
   private function canUseBeckySharp(Player $player): bool
   {
 
-    return $player->getFamily()->hasPrestigeCard(BECKY_SHARP_ID) && LondonSeasonCards::countInLocation(Locations::londonSeasonDisplay()) > 0;
+    return $player->hasPrestigeCard(BECKY_SHARP_ID) && LondonSeasonCards::countInLocation(Locations::londonSeasonDisplay()) > 0;
   }
 
   private function useBeckySharpAbility(Player $player)

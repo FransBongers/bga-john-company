@@ -36,10 +36,9 @@ class DraftCard extends \Bga\Games\JohnCompany\Models\AtomicAction
     $numberToSelect = count($players) === 2 ? 2 : 1;
 
     foreach ($players as $playerId => $player) {
-      $familyId = $player->getFamilyId();
-      
-      $cardsToSelectFrom = Utils::filter($cards, function ($card) use ($familyId) {
-        return $card->getLocation() === Locations::hand($familyId);
+     
+      $cardsToSelectFrom = Utils::filter($cards, function ($card) use ($playerId) {
+        return $card->getLocation() === Locations::hand($playerId);
       });
 
       $privateData[$playerId] = [
@@ -100,7 +99,7 @@ class DraftCard extends \Bga\Games\JohnCompany\Models\AtomicAction
         throw new \Bga\GameFramework\VisibleSystemException("ERROR_001");
       }
 
-      $selectedCard->setLocation(Locations::setupCards($player->getFamilyId()));
+      $selectedCard->setLocation(Locations::setupCards($player->getId()));
       $selectedCards[] = $selectedCard;
     }
 
@@ -120,7 +119,7 @@ class DraftCard extends \Bga\Games\JohnCompany\Models\AtomicAction
       'selected' => $selected,
     ]));
 
-    $this->resolveAction(['cardId' => $cardId], true);
+    $this->resolveAction(['cardIds' => $cardIds], true);
   }
 
   //  .##.....##.########.####.##.......####.########.##....##

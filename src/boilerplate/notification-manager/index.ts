@@ -22,16 +22,8 @@ import {
   CASH_COUNTER,
   FAMILY_MEMBERS_COUNTER,
   FILLED,
-  SHIPS_COUNTER,
-  SHARES_COUNTER,
   CROWN_PLAYER_ID,
   PROMISE_CUBES_COUNTER,
-  COLOR_FAMILY_MAP,
-  CROWN,
-  HEX_COLOR_COLOR_MAP,
-  COURT_OF_DIRECTORS,
-  CHAIRMAN,
-  FAMILIES,
   PRESIDENCIES,
   PARLIAMENT_MEETS_START,
   PARLIAMENT_MEETS_VOTING_STARTS,
@@ -47,7 +39,6 @@ import { CrownClimate } from '../../crown/climate';
 import { India } from '../../india';
 import { London } from '../../london';
 import { PhaseTracker } from '../../phase-tracker';
-import { Families } from '../../families';
 import { PlayerManager } from '../../player-manager';
 import { Deals } from '../../deals';
 import { JocoPlayer } from '../../player-manager/player';
@@ -452,11 +443,13 @@ export class NotificationManager {
   }
 
   updateCountersForTarget(
-    target: string,
+    target: string | number,
     counterChanges: Record<string, number>,
   ) {
-    if (FAMILIES.includes(target)) {
-      Families.getInstance().getFamily(target).incCounters(counterChanges);
+    if (this.game.playerOrder.includes(Number(target))) {
+      PlayerManager.getInstance()
+        .getPlayerArea(Number(target))
+        .incCounters(counterChanges);
     } else if (target === COMPANY) {
       Company.getInstance().incCounters(counterChanges);
     }
@@ -474,24 +467,24 @@ export class NotificationManager {
 
     await Promise.all(
       enterprises.map(async (enterprise) => {
-        await Families.getInstance()
-          .getFamily(enterprise.location)
+        await PlayerManager.getInstance()
+          .getPlayerArea(Number(enterprise.location))
           .addEnterprise(getEnterpriseCard(enterprise));
       }),
     );
 
     await Promise.all(
       promiseCards.map(async (card) => {
-        await Families.getInstance()
-          .getFamily(card.location)
+        await PlayerManager.getInstance()
+          .getPlayerArea(Number(card.location))
           .addPromiseCard(getPromiseCard(card));
       }),
     );
 
     await Promise.all(
       prestigeCards.map(async (card) => {
-        await Families.getInstance()
-          .getFamily(card.location)
+        await PlayerManager.getInstance()
+          .getPlayerArea(Number(card.location))
           .addLondonSeasonCard(getLondonSeasonCard(card));
       }),
     );
@@ -690,8 +683,8 @@ export class NotificationManager {
     const player = this.getPlayer(playerId);
     const familyId = player.familyId;
     // player.counters[this.getEnterpriseCounter(type)].incValue(1);
-    await Families.getInstance()
-      .getFamily(familyId)
+    await PlayerManager.getInstance()
+      .getPlayerArea(Number(playerId))
       .addEnterprise(getEnterpriseCard(enterprise));
     if (type === SHIPYARD && ship && !SEA_ZONES.includes(ship.location)) {
       EnterpriseCardsManager.getInstance().shipStocks[ship.id].addCard(ship);
@@ -839,9 +832,9 @@ export class NotificationManager {
 
     const cardToMove = _private?.card ?? card;
 
-    const familyId = cardToMove.location.split('_')[1];
-    await Families.getInstance()
-      .getFamily(familyId)
+    const playerId = cardToMove.location.split('_')[1];
+    await PlayerManager.getInstance()
+      .getPlayerArea(Number(playerId))
       .addLondonSeasonCard(getLondonSeasonCard(cardToMove));
   }
 
@@ -976,14 +969,14 @@ export class NotificationManager {
   }
 
   async notif_purchaseEnterprise(notif: NotifPurchaseEnterprise) {
-    const { playerId, enterprise, type, amount, ship, familyId } = notif;
+    const { playerId, enterprise, type, amount, ship } = notif;
 
     await this.pay(playerId, amount);
 
     const player = this.getPlayer(playerId);
     // player.counters[this.getEnterpriseCounter(type)].incValue(1);
-    await Families.getInstance()
-      .getFamily(familyId)
+    await PlayerManager.getInstance()
+      .getPlayerArea(Number(playerId))
       .addEnterprise(getEnterpriseCard(enterprise));
     if (type === SHIPYARD && ship) {
       // player.counters[SHIPS_COUNTER].incValue(1);
@@ -1033,26 +1026,19 @@ export class NotificationManager {
     const { deal, transferredAssets } = notif;
     Deals.getInstance().updateDeal(notif.deal);
     //  deal.offeredByFamilyId
-    const playerManager = PlayerManager.getInstance();
-    if (deal.status === 'closed') {
+    if (Object.keys(transferredAssets).length > 0) {
       await this.transferAssets(
-        transferredAssets[
-          playerManager.getPlayerForFamily(deal.offeredByFamilyId).getPlayerId()
-        ],
+        transferredAssets[Number(deal.offeredByPlayerId)],
       );
-      await this.transferAssets(
-        transferredAssets[
-          playerManager.getPlayerForFamily(deal.familyId).getPlayerId()
-        ],
-      );
+      await this.transferAssets(transferredAssets[Number(deal.playerId)]);
     }
   }
 
   async notif_movePromiseCard(notif: NotifMovePromiseCard) {
     const { card } = notif;
 
-    await Families.getInstance()
-      .getFamily(card.location)
+    await PlayerManager.getInstance()
+      .getPlayerArea(Number(card.location))
       .addPromiseCard(getPromiseCard(card));
   }
 
@@ -1275,9 +1261,9 @@ export class NotificationManager {
   }
 
   async notif_updateOpportunityMarker(notif: NotifUpdateOpportunityMarker) {
-    const { familyId, familyAction } = notif;
-    const family = Families.getInstance().getFamily(familyId);
-    family.opportunityMarker.update(familyAction);
+    const { playerId, familyAction } = notif;
+    const playerArea = PlayerManager.getInstance().getPlayerArea(playerId);
+    playerArea.opportunityMarker.update(familyAction);
   }
 
   async notif_updatePower(notif: NotifUpdatePower) {

@@ -7,7 +7,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\Enterprises;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\Offices;
@@ -40,14 +40,13 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   public function stPerformSetup()
   {
-    $families = Families::getAll();
+    $playersExtraData = PlayersExtra::getAll();
     $players = Players::getAll();
     $offices = Offices::getAll();
 
-    foreach ($families as $familyId => $family) {
-      $setupCards = SetupCards::getInLocation(Locations::setupCards($familyId))->toArray();
-      // $familyId = $player->getFamilyId();
-      $player = $family->getPlayer();
+    foreach ($playersExtraData as $playerId => $playerData) {
+      $setupCards = SetupCards::getInLocation(Locations::setupCards($playerId))->toArray();
+      $player = $players[$playerId];
       Notifications::setupRevealCards($player, $setupCards);
 
       $familyMembers = [];
@@ -62,44 +61,44 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
         foreach ($items as $item) {
           switch ($item['type']) {
             case OFFICE:
-              $familyMember = FamilyMembers::getMemberFor($familyId);
+              $familyMember = FamilyMembers::getMemberFor($playerId);
               $familyMember->setLocation($item['value']);
               $familyMembers[] = $familyMember;
               if ($item['value'] === CHAIRMAN) {
-                $families[$familyId]->setHasChairmanMarker(1);
+                $playersExtraData[$playerId]->setHasChairmanMarker(1);
               }
               $offices[$item['value']]->setFamilyMemberId($familyMember->getId());
-              $offices[$item['value']]->setLocation(Locations::familyOffices($familyId));
+              $offices[$item['value']]->setLocation(Locations::familyOffices($playerId));
               break;
             case COMPANY_SHARE:
-              $familyMember = FamilyMembers::getMemberFor($familyId);
+              $familyMember = FamilyMembers::getMemberFor($playerId);
               $familyMember->setLocation(COURT_OF_DIRECTORS);
               $familyMembers[] = $familyMember;
               break;
             case WRITER:
-              $familyMember = FamilyMembers::getMemberFor($familyId);
+              $familyMember = FamilyMembers::getMemberFor($playerId);
               $familyMember->setLocation(Locations::writers($item['value']));
               $familyMember->setPresidency($item['value']);
               $familyMembers[] = $familyMember;
               break;
             case OFFICER:
-              $familyMember = FamilyMembers::getMemberFor($familyId);
+              $familyMember = FamilyMembers::getMemberFor($playerId);
               $familyMember->setLocation(Locations::armyOfReady($item['value']));
               $familyMember->setPresidency($item['value']);
               $familyMembers[] = $familyMember;
               break;
             case COMMANDER:
-              $familyMember = FamilyMembers::getMemberFor($familyId);
+              $familyMember = FamilyMembers::getMemberFor($playerId);
               $familyMember->setLocation(Locations::commander($item['value']));
               $familyMembers[] = $familyMember;
               break;
             case OFFICER_IN_TRAINING:
-              $familyMember = FamilyMembers::getMemberFor($familyId);
+              $familyMember = FamilyMembers::getMemberFor($playerId);
               $familyMember->setLocation(OFFICER_IN_TRAINING);
               $familyMembers[] = $familyMember;
               break;
             case CASH:
-              $families[$familyId]->incTreasury($item['value']);
+              $playersExtraData[$playerId]->incTreasury($item['value']);
               $cash += $item['value'];
               break;
             case LUXURY;
@@ -120,7 +119,7 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
       Notifications::setupFamilyMembers($player, $familyMembers);
       Notifications::updateFamilyTreasury($player, $cash);
       if ($isPrimeMinister) {
-        Parliament::changePrimeMinister($familyId);
+        Parliament::changePrimeMinister($playerId);
       }
 
       // Enterprises
@@ -128,7 +127,7 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
         $type = $item['type'];
 
         $enterprise = Enterprises::getTopOf(Locations::supplyEnterprises($type));
-        $enterprise->changeOwner($familyId);
+        $enterprise->changeOwner($playerId);
 
         Notifications::gainEnterprise($player, $enterprise);
 

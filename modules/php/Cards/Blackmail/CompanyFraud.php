@@ -79,6 +79,6 @@ class CompanyFraud extends \Bga\Games\JohnCompany\Models\BlackmailCard
       'tkn_boldText_amount' => '£' . $amount,
     ]);
 
-    $player->getFamily()->gainCash($amount);
+    $player->gainCash($amount);
   }
 }

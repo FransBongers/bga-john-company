@@ -81,7 +81,7 @@ class HiringPreference extends \Bga\Games\JohnCompany\Models\BlackmailCard
     }
     $node = $hiringNodes[0];
     $args = $node->getArgs();
-    $args['familyIdFilter'] = [$player->getFamilyId()];
+    $args['playerIdFilter'] = [$player->getId()];
     $node->updateInfo('args', $args);
     Engine::save();
   }

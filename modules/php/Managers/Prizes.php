@@ -45,8 +45,8 @@ class Prizes
         return $cashSpentB - $cashSpentA;
       }
 
-      $windowsA = $players[$playerIdA]->getFamily()->getWindowCount();
-      $windowsB = $players[$playerIdB]->getFamily()->getWindowCount();
+      $windowsA = $players[$playerIdA]->getWindowCount();
+      $windowsB = $players[$playerIdB]->getWindowCount();
       if ($windowsA !== $windowsB) {
         return $windowsB - $windowsA;
       }

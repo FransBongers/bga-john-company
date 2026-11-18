@@ -8,7 +8,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Enterprises;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
@@ -54,7 +54,7 @@ class NewCompanyShares extends \Bga\Games\JohnCompany\Models\AtomicAction
       $familyMember->setLocation(COURT_OF_DIRECTORS);
       $debt--;
 
-      Notifications::newCompanyShare(Players::getPlayerForFamily($familyMember->getFamilyId()), $familyMember, $debt);
+      Notifications::newCompanyShare(Players::get($familyMember->getPlayerId()), $familyMember, $debt);
     }
 
     if ($debt !== $startingDebt) {

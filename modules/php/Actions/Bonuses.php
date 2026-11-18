@@ -6,7 +6,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\Players;
@@ -39,24 +39,24 @@ class Bonuses extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   public function stBonuses()
   {
-    $families = Families::getAll();
+    $players = Players::getAll();
     $inclosureActs = LawCards::isInPlay(INCLOSURE_ACTS_ID);
 
-    foreach($families as $family) {
+    foreach ($players as $playerId => $player) {
       $bonuses = 0;
-      $enterprises = $family->getEnterprises();
-      foreach($enterprises as $enterprise) {
+      $enterprises = $player->getEnterprises();
+      Notifications::log('enterprises', ['playerId' => $playerId, 'enterprises' => $enterprises]);
+      foreach ($enterprises as $enterprise) {
         $bonuses += $enterprise->getBonus();
       }
       if ($inclosureActs) {
-        $familyId = $family->getId();
-        $prizeMembers = Utils::filter(FamilyMembers::getAll()->toArray(), function ($familyMember) use ($familyId) {
-          return $familyMember->getFamilyId() === $familyId && array_key_exists($familyMember->getLocation(), PRIZES);
+        $prizeMembers = Utils::filter(FamilyMembers::getAll()->toArray(), function ($familyMember) use ($playerId) {
+          return $familyMember->getPlayerId() === $playerId && array_key_exists($familyMember->getLocation(), PRIZES);
         });
         $bonuses += count($prizeMembers);
       }
       if ($bonuses > 0) {
-        $family->gainCash($bonuses);
+        $player->gainCash($bonuses);
       }
     }
 

@@ -136,11 +136,11 @@ class Company
     return Offices::getMany($officesWithTreasury);
   }
 
-  public static function getShares($familyId = null)
+  public static function getShares($playerId = null)
   {
     $familyMembers = FamilyMembers::getAll()->toArray();
-    $shares = Utils::filter($familyMembers, function ($member) use ($familyId) {
-      return in_array($member->getLocation(), [COURT_OF_DIRECTORS, CHAIRMAN]) && ($familyId === null || $member->getFamilyId() === $familyId);
+    $shares = Utils::filter($familyMembers, function ($member) use ($playerId) {
+      return in_array($member->getLocation(), [COURT_OF_DIRECTORS, CHAIRMAN]) && ($playerId === null || $member->getPlayerId() === $playerId);
     });
     return $shares;
   }

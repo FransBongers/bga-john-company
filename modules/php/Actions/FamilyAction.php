@@ -11,7 +11,7 @@ use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\AtomicActions;
 use Bga\Games\JohnCompany\Managers\Crown;
 use Bga\Games\JohnCompany\Managers\Enterprises;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
@@ -119,7 +119,7 @@ class FamilyAction extends \Bga\Games\JohnCompany\Models\AtomicAction
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_003");
     }
 
-    Players::get($playerId)->getFamily()->setOpportunityMarker($familyAction);
+    Players::get($playerId)->setOpportunityMarker($familyAction);
 
     if (in_array($familyAction, [ENLIST_WRITER, SEEK_SHARE])) {
       $action = [
@@ -144,11 +144,9 @@ class FamilyAction extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  private function getOptions($playerId)
+  private function getOptions(int $playerId)
   {
-    $player = Players::get($playerId);
-    $familyId = $player->getFamilyId();
-    $family = Families::get($familyId);
+    $family = PlayersExtra::get($playerId);
 
     // $enterpriseOptions = AtomicActions::get(PURCHASE_ENTERPRISE)->getOptions($playerId);
 
@@ -188,7 +186,7 @@ class FamilyAction extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   private function performCrownAction()
   {
-    $family = Families::get(CROWN);
+    $family = PlayersExtra::get(CROWN_PLAYER_ID);
     $climate = Crown::getClimate();
 
     // 1. Free Writer Enlistment (TODO)

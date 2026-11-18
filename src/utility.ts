@@ -78,6 +78,12 @@ export const getCardTypeText = (cardType: string) => {
   }
 };
 
+
+export const getFamilyNameForPlayerId = (playerId: number) => {
+  const familyId = PlayerManager.getInstance().getPlayer(playerId).getFamilyId();
+  return getFamilyName(familyId);
+};
+
 export const getFamilyName = (familyId: string) => {
   switch (familyId) {
     case BENYON:

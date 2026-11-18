@@ -244,6 +244,7 @@ interface JocoFamilyMember {
   location: string;
   state: number;
   familyId: string;
+  playerId: number;
   presidency: JoCoPresidency | null;
 }
 
@@ -282,9 +283,9 @@ export interface JocoDealAssets {
 
 export interface JocoDeal extends GamePiece {
   description: string;
-  familyId: string;
+  playerId: number;
   assets: Record<string, JocoDealAssets>;
-  offeredByFamilyId: string;
+  offeredByPlayerId: number;
   reports: Record<string, 'fulfilled' | 'violated'>;
   status: string; // 'offer' | 'agreement' | 'rejected' | 'closed'
 }

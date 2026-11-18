@@ -105,7 +105,7 @@ class MoveElephant extends \Bga\Games\JohnCompany\Models\AtomicAction
       }
     }
     if ($highestOpenOrder > 0) {
-      Players::get($playerId)->getFamily()->gainCash($highestOpenOrder);
+      Players::get($playerId)->gainCash($highestOpenOrder);
     } else {
       Notifications::message(
         clienttranslate('No open orders in the region with the Elephant\'s tail.')

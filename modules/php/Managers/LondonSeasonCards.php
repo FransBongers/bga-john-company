@@ -8,8 +8,8 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
-use Bga\Games\JohnCompany\Managers\Families;
-use Bga\Games\JohnCompany\Models\Family;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
+use Bga\Games\JohnCompany\Models\PlayerExtra;
 
 class LondonSeasonCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 {
@@ -143,7 +143,7 @@ class LondonSeasonCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Piece
   // ..#######.....##....####.########.####....##.......##...
 
 
-  public static function getOwnerFamily(string $cardId): Family | null
+  public static function getOwnerFamily(string $cardId): PlayerExtra | null
   {
     $card = self::get($cardId);
 
@@ -151,6 +151,6 @@ class LondonSeasonCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Piece
     if (!Utils::startsWith($location, 'londonSeasonCards_')) {
       return null;
     }
-    return Families::get(explode('_', $location)[1]);
+    return PlayersExtra::get(explode('_', $location)[1]);
   }
 }

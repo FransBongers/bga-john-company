@@ -24,8 +24,7 @@ class PrestigeCard_14 extends \Bga\Games\JohnCompany\Models\PrestigeCard
 
   protected function resolveImmediateEffect(Player $player, object $ctx)
   {
-    $family = $player->getFamily();
-    $enterprises = $family->getEnterprises(SHIPYARD);
+    $enterprises = $player->getEnterprises(SHIPYARD);
 
     if (count($enterprises) > 0) {
       $ctx->insertAsBrother(new LeafNode([

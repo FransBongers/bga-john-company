@@ -71,7 +71,7 @@ class UseManOnTheInside extends \Bga\Games\JohnCompany\Models\AtomicAction
       $player = Players::get($playerId);
       $card = LondonSeasonCards::get(MAN_ON_THE_INSIDE_ID);
       $card->play($player);
-      $playedCard->setLocation(Locations::playedBlackmailCards($player->getFamilyId()));
+      $playedCard->setLocation(Locations::playedBlackmailCards($player->getId()));
       Notifications::moveBlackmailCard($player, $playedCard, clienttranslate('${player_name} cancels the effect of ${tkn_blackmailCard}'), [
         'player' => $player,
         'tkn_blackmailCard' => $playedCard->getId(),

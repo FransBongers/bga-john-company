@@ -10,7 +10,6 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Managers\Elephant;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Regions;
-use Bga\Games\JohnCompany\Managers\ResolveCrisis;
 
 class Crisis extends \Bga\Games\JohnCompany\Models\EventTile
 {

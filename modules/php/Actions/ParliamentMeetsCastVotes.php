@@ -8,13 +8,13 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Managers\Enterprises;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\LawCards;
 use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\Players;
-use Bga\Games\JohnCompany\Models\Family;
 use Bga\Games\JohnCompany\Models\Player;
+use Bga\Games\JohnCompany\Models\PlayerExtra;
 
 class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicAction
 {
@@ -36,12 +36,11 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
     $args = $this->ctx->getArgs();
 
     $playerId = $this->ctx->getArgs()['playerId'];
-    $familyId = Players::get($playerId)->getFamilyId();
-    $family = Families::get($familyId);
+    $player = Players::get($playerId);
 
     $data = [
-      'votes' => $this->getVotes($family),
-      'options' => $this->getOptions($family, $playerId),
+      'votes' => $this->getVotes($player),
+      'options' => $this->getOptions($playerId),
       'primeMinisterPlayerId' => Parliament::getPrimeMinisterPlayerId(),
     ];
 
@@ -102,7 +101,6 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
     }
 
     $player = Players::get($playerId);
-    $family = $player->getFamily();
 
     $totalVotes = $money / $stateArgs['votes']['pricePerVote'];
     $enterprises = [];
@@ -132,7 +130,7 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_066");
     }
 
-    $family->incTreasury(-$money);
+    $player->incTreasury(-$money);
     foreach ($enterprises as $enterprise) {
       $enterprise->setUsed(1);
     }
@@ -211,7 +209,7 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
     ]));
   }
 
-  private function getOptions(Family $family, int $playerId)
+  private function getOptions(int $playerId)
   {
     if ($playerId === Parliament::getPrimeMinisterPlayerId()) {
       return [IN_FAVOR];
@@ -225,14 +223,14 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
     return [IN_FAVOR, AGAINST];
   }
 
-  private function getVotes(Family $family)
+  private function getVotes(Player $player)
   {
-    $familyHasLadyNewcome = $family->hasPrestigeCard(LADY_NEWCOME_ID);
+    $familyHasLadyNewcome = $player->hasPrestigeCard(LADY_NEWCOME_ID);
 
     $policyTarget = PRIME_MINISTER_DIAL[Parliament::getDialPosition()][TARGET];
 
     $options = [
-      'money' => $family->getTreasury(),
+      'money' => $player->getTreasury(),
       'pricePerVote' => LawCards::isInPlay(MASSED_DEMAND_FRANCHISE_ID) ? 2 : 1,
       'enterprises' => [],
       'londonSeasonCards' => [],
@@ -244,7 +242,7 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
       return $options;
     }
 
-    foreach ($family->getEnterprises() as $enterprise) {
+    foreach ($player->getEnterprises() as $enterprise) {
       $votes = $enterprise->getVotes();
       if ($votes > 0 && $enterprise->getUsed() === 0) {
         $options['enterprises'][] = [
@@ -259,7 +257,7 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
       'PrestigeCard_23' => [WORKSHOP, SHIPYARD],
       'PrestigeCard_26' => [LUXURY, SHARE],
     ];
-    $cards = LondonSeasonCards::getInLocation(Locations::londonSeasonCards($family->getId()))->toArray();
+    $cards = LondonSeasonCards::getInLocation(Locations::londonSeasonCards($player->getId()))->toArray();
     foreach ($cards as $card) {
       $votes = $card->getVotes();
       if ($votes <= 0 || $card->getUsed() !== 0) {

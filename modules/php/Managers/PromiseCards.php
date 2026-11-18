@@ -9,7 +9,7 @@ class PromiseCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 {
   protected static $table = 'promise_cards';
   protected static $prefix = 'card_';
-  protected static $customFields = ['type', 'family_id'];
+  protected static $customFields = ['type', 'family_id', 'owner_player_id'];
   protected static $autoremovePrefix = false;
   protected static $autoreshuffle = false;
   protected static $autoIncrement = false;
@@ -61,9 +61,10 @@ class PromiseCards extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
         $cId = self::getPromiseCardId($player->getId(), $type);
         $cards[$cId] = [
           'id' => $cId,
-          'location' => Locations::promiseCards($familyId),
+          'location' => Locations::promiseCards($playerId),
           'type' => $type,
           'family_id' => $familyId,
+          'owner_player_id' => $playerId
         ];
       }
     }

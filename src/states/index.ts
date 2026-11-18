@@ -16,7 +16,7 @@ export * from './DirectorOfTradeTransfers';
 export * from './DraftCard';
 export * from './EnlistWriter';
 export * from './EventsInIndiaCrisisDefense';
-export * from './FamilyAction';
+// export * from './FamilyAction';
 export * from './GovernorAdminister';
 export * from './GovernorGeneralMakeCheck';
 export * from './HiringChairman';

@@ -49,7 +49,7 @@ trait DealsTrait
 
     $dealAssets = [];
     foreach ([$player, $opponent] as $owner) {
-      $dealAssets[$owner->getFamilyId()] = $this->validateDealAssets($owner, $assets[$owner->getId()] ?? []);
+      $dealAssets[$owner->getId()] = $this->validateDealAssets($owner, $assets[$owner->getId()] ?? []);
     }
 
     if ($description === '' && !$this->dealHasAssets($dealAssets)) {
@@ -57,7 +57,7 @@ trait DealsTrait
     }
 
     $description = $this->escapeStringForDB($description);
-    $deal = Deals::newDeal($opponent->getFamilyId(), $player->getFamilyId(), $description, $dealAssets);
+    $deal = Deals::newDeal($opponent->getId(), $player->getId(), $description, $dealAssets);
 
     Notifications::newDeal($player, $deal);
     Attention::create($opponentId, 'new_offer', 'deal', (string) $deal->getId());
@@ -122,21 +122,21 @@ trait DealsTrait
     $player = Players::get((int) $this->getCurrentPlayerId());
     $deal = $this->getOpenDeal($dealId);
 
-    if ($player === null || $deal->getFamilyId() !== $player->getFamilyId()) {
+    if ($player === null || $deal->getPlayerId() !== $player->getId()) {
       throw new \BgaUserException(clienttranslate('Only the player receiving the offer can accept it'));
     }
 
-    $offerer = Players::getPlayerForFamily($deal->getOfferedByFamilyId());
+    $offerer = Players::get($deal->getOfferedByPlayerId());
     $assets = $deal->getAssets();
 
     $validated = [];
     foreach ([$player, $offerer] as $owner) {
-      $validated[$owner->getFamilyId()] = $this->validateDealAssets($owner, $assets[$owner->getFamilyId()] ?? []);
+      $validated[$owner->getId()] = $this->validateDealAssets($owner, $assets[$owner->getId()] ?? []);
     }
 
     foreach ([[$offerer, $player], [$player, $offerer]] as [$from, $to]) {
-      $shares = count($validated[$from->getFamilyId()]['share']);
-      $supply = FamilyMembers::countInLocation(Locations::familyMemberSupply($to->getFamilyId()));
+      $shares = count($validated[$from->getId()]['share']);
+      $supply = FamilyMembers::countInLocation(Locations::familyMemberSupply($to->getId()));
       if ($shares > $supply) {
         throw new \BgaUserException(clienttranslate('Not enough family members in supply to receive the shares'));
       }
@@ -144,7 +144,7 @@ trait DealsTrait
 
     $transferredAssets = [];
     foreach ([[$offerer, $player], [$player, $offerer]] as [$from, $to]) {
-      $transferredAssets[$to->getId()] = $this->transferDealAssets($from, $to, $validated[$from->getFamilyId()]);
+      $transferredAssets[$to->getId()] = $this->transferDealAssets($from, $to, $validated[$from->getId()]);
     }
 
     $deal->setStatus(
@@ -157,31 +157,31 @@ trait DealsTrait
   #[CheckAction(false)]
   public function actMarkAgreement(string $dealId, string $report)
   {
-    $player = Players::get((int) $this->getCurrentPlayerId());
+    $playerId = (int) $this->getCurrentPlayerId();
+    $player = Players::get($playerId);
     $deal = Deals::get($dealId);
     if ($player === null || $deal->getStatus() !== DEAL_STATUS_AGREEMENT) {
       throw new \BgaUserException(clienttranslate('This agreement is no longer open'));
     }
 
-    $familyId = $player->getFamilyId();
-    $otherFamilyId = $deal->getFamilyId() === $familyId
-      ? $deal->getOfferedByFamilyId()
-      : $deal->getFamilyId();
+    $otherPlayerId = $deal->getPlayerId() === $playerId
+      ? $deal->getOfferedByPlayerId()
+      : $deal->getPlayerId();
     if (
-      !in_array($familyId, [$deal->getFamilyId(), $deal->getOfferedByFamilyId()], true)
+      !in_array($playerId, [$deal->getPlayerId(), $deal->getOfferedByPlayerId()], true)
       || !in_array($report, [DEAL_REPORT_FULFILLED, DEAL_REPORT_VIOLATED], true)
     ) {
       throw new \BgaUserException(clienttranslate('You cannot report on this agreement'));
     }
 
     $reports = $deal->getReports() ?? [];
-    if (isset($reports[$familyId])) {
+    if (isset($reports[$playerId])) {
       throw new \BgaUserException(clienttranslate('You have already reported on this agreement'));
     }
 
-    $reports[$familyId] = $report;
+    $reports[$playerId] = $report;
     $deal->setReports($reports);
-    if (isset($reports[$otherFamilyId])) {
+    if (isset($reports[$otherPlayerId])) {
       $deal->setStatus(DEAL_STATUS_CLOSED);
     }
 
@@ -194,8 +194,8 @@ trait DealsTrait
     $player = Players::get((int) $this->getCurrentPlayerId());
     $deal = $this->getOpenDeal($dealId);
 
-    $isOfferer = $player !== null && $deal->getOfferedByFamilyId() === $player->getFamilyId();
-    $isTarget = $player !== null && $deal->getFamilyId() === $player->getFamilyId();
+    $isOfferer = $player !== null && $deal->getOfferedByPlayerId() === $player->getId();
+    $isTarget = $player !== null && $deal->getPlayerId() === $player->getId();
     if (!$isOfferer && !$isTarget) {
       throw new \BgaUserException(clienttranslate('You are not part of this offer'));
     }
@@ -216,7 +216,7 @@ trait DealsTrait
 
   private function transferDealAssets(Player $from, Player $to, array $assets): array
   {
-    $toFamilyId = $to->getFamilyId();
+    $toPlayerId = $to->getId();
 
     $assetsNotif = [
       'counters' => [],
@@ -228,18 +228,18 @@ trait DealsTrait
 
     if ($assets['cash'] > 0) {
       $source = clienttranslate('Deal');
-      $from->getFamily()->gainCash(-$assets['cash'], $source, true);
+      $from->gainCash(-$assets['cash'], $source, true);
       $assetsNotif['counters'][$from->getId()] = [
         CASH_COUNTER => -$assets['cash']
       ];
-      $to->getFamily()->gainCash($assets['cash'], $source, true);
+      $to->gainCash($assets['cash'], $source, true);
       $assetsNotif['counters'][$to->getId()] = [
         CASH_COUNTER => $assets['cash']
       ];
     }
 
     foreach ($assets['share'] as $id) {
-      $newShare = FamilyMembers::getMemberFor($toFamilyId);
+      $newShare = FamilyMembers::getMemberFor($toPlayerId);
       $newShare->moveTo($to, COURT_OF_DIRECTORS, [
         'skipNotification' => true,
       ]);
@@ -253,19 +253,19 @@ trait DealsTrait
 
     foreach ($assets['enterprise'] as $id) {
       $enterprise = Enterprises::get($id);
-      $enterprise->changeOwner($toFamilyId);
+      $enterprise->changeOwner($toPlayerId);
       $assetsNotif['enterprises'][] = $enterprise;
     }
 
     foreach ($assets['promiseCard'] as $id) {
       $card = PromiseCards::get($id);
-      $card->setLocation(Locations::promiseCards($toFamilyId));
+      $card->setLocation(Locations::promiseCards($toPlayerId));
       $assetsNotif['promiseCards'][] = $card;
     }
 
     foreach ($assets['prestige'] as $id) {
       $card = LondonSeasonCards::get($id);
-      $card->setLocation(Locations::londonSeasonCards($toFamilyId));
+      $card->setLocation(Locations::londonSeasonCards($toPlayerId));
       $assetsNotif['prestigeCards'][] = $card;
     }
     return $assetsNotif;
@@ -286,15 +286,14 @@ trait DealsTrait
     return false;
   }
 
-  private function validateDealAssets($owner, $given): array
+  private function validateDealAssets(Player $owner, $given): array
   {
-    $family = $owner->getFamily();
-    $familyId = $family->getId();
+    $playerExtraData = $owner->getPlayerExtra();
     $ownerId = $owner->getId();
     $invalid = fn() => new \BgaUserException(clienttranslate('Offer contains assets that are not owned by the player'));
 
     $cash = (int) ($given['cash'] ?? 0);
-    if ($cash < 0 || $cash > $family->getTreasury()) {
+    if ($cash < 0 || $cash > $playerExtraData->getTreasury()) {
       throw $invalid();
     }
 
@@ -303,17 +302,17 @@ trait DealsTrait
     $checks = [
       'share' => fn($id) => FamilyMembers::get($id)->getLocation() === COURT_OF_DIRECTORS
         && FamilyMembers::get($id)->getPlayerId() === $ownerId,
-      'enterprise' => fn($id) => Enterprises::get($id)->getLocation() === $familyId,
-      'promiseCard' => fn($id) => PromiseCards::get($id)->getLocation() === Locations::promiseCards($familyId),
-      'prestige' => function ($id) use ($familyId) {
+      'enterprise' => fn($id) => Enterprises::get($id)->getLocation() === $ownerId,
+      'promiseCard' => fn($id) => PromiseCards::get($id)->getLocation() === Locations::promiseCards($ownerId),
+      'prestige' => function ($id) use ($ownerId) {
         $card = LondonSeasonCards::get($id);
-        return $card->getLocation() === Locations::londonSeasonCards($familyId)
+        return $card->getLocation() === Locations::londonSeasonCards($ownerId)
           && $card->getType() === PRESTIGE
           && $card->getSubtype() !== SPOUSE;
       },
-      'blackmail' => function ($id) use ($familyId) {
+      'blackmail' => function ($id) use ($ownerId) {
         $card = LondonSeasonCards::get($id);
-        return $card->getLocation() === Locations::londonSeasonCards($familyId) && $card->getType() === BLACKMAIL;
+        return $card->getLocation() === Locations::londonSeasonCards($ownerId) && $card->getType() === BLACKMAIL;
       },
     ];
 

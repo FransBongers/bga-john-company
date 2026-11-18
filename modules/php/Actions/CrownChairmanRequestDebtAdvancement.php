@@ -10,7 +10,7 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\Company;
 use Bga\Games\JohnCompany\Managers\Crown;
-use Bga\Games\JohnCompany\Managers\Families;
+use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\SetupCards;
@@ -103,7 +103,6 @@ class CrownChairmanRequestDebtAdvancement extends \Bga\Games\JohnCompany\Models\
     $newDebt = $stateArgs['newDebt'];
 
     $player = Players::get($playerId);
-    $family = $player->getFamily();
 
     if ($oneLessAdvancement) {
 
@@ -115,7 +114,7 @@ class CrownChairmanRequestDebtAdvancement extends \Bga\Games\JohnCompany\Models\
       }
       $newDebt -= 1;
       Notifications::message(clienttranslate('${player_name} requests one less Company Debt advancement'), ['player' => $player]);
-      $family->payPromiseCubes($stateArgs['oneLessAdvancement']['cost']);
+      $player->payPromiseCubes($stateArgs['oneLessAdvancement']['cost']);
     } else if ($additionalAdvancement) {
       if (!$stateArgs['additionalAdvancement']['possible']) {
         throw new \Bga\GameFramework\VisibleSystemException("ERROR_043");
@@ -125,7 +124,7 @@ class CrownChairmanRequestDebtAdvancement extends \Bga\Games\JohnCompany\Models\
       }
       $newDebt += 1;
       Notifications::message(clienttranslate('${player_name} requests an additional Company Debt advancement'), ['player' => $player]);
-      $family->payPromiseCubes($stateArgs['additionalAdvancement']['cost']);
+      $player->payPromiseCubes($stateArgs['additionalAdvancement']['cost']);
     }
     if (!$continue) {
       // TODO: check if multiple advancements can be 'bought'
