@@ -29,6 +29,7 @@ class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Mod
   protected $discount = null;
   protected $windows = null;
   protected $votes = 0;
+  protected $timingWindows = [];
 
   protected $attributes = [
     'id' => ['card_id', 'str'],
@@ -51,7 +52,8 @@ class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Mod
     'power',
     'discount',
     'windows',
-    'votes'
+    'votes',
+    'timingWindows'
   ];
 
   public function jsonSerialize(): array
@@ -67,6 +69,11 @@ class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Mod
   {
     // Notifications::log('getUiData card model', []);
     return $this->jsonSerialize(); // Static datas are already in js file
+  }
+
+  public function getTimingWindows(): array
+  {
+    return $this->timingWindows;
   }
 
   public function discard($player = null, $skipFrom = false)

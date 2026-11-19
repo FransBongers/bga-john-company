@@ -1,0 +1,81 @@
+@use '../base';
+
+.joco-card-timing-button {
+  position: absolute;
+  z-index: 3;
+  top: 4px;
+  right: 4px;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #554b42;
+  border-radius: 4px;
+  background: #fff;
+  color: #24211e;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.bga-cards_card[data-side='back'] > .joco-card-timing-button {
+  display: none;
+}
+
+#joco-timing-preferences {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 24px;
+}
+
+.joco-timing-content {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 2px solid base.$joco-gray;
+  background-color: base.$joco-white;
+  color: #24211e;
+  font-family: 'Libre Baskerville', serif;
+  box-sizing: border-box;
+
+  h2 { margin: 0 0 20px; }
+  h3 { margin: 24px 0 8px; }
+}
+
+.joco-timing-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+
+  label { display: flex; flex: 1 1 180px; flex-direction: column; gap: 6px; min-width: 0; }
+  label[hidden] { display: none; }
+  select { width: 100%; min-width: 0; min-height: 36px; }
+  button { min-height: 36px; }
+}
+
+.joco-timing-error { color: #a21d26; }
+.joco-timing-error:empty { display: none; }
+
+.joco-timing-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 42px;
+  border-bottom: 1px solid #d5ccc8;
+}
+
+.joco-timing-remove {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  color: #8d292c;
+  cursor: pointer;
+}
+
+.joco-timing-remove:hover { background: #f0dfdd; }
+
+@media (max-width: 600px) {
+  #joco-timing-preferences { padding: 12px; }
+  .joco-timing-content { padding: 16px; }
+}

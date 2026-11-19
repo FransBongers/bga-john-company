@@ -36,6 +36,15 @@
   flex-direction: column;
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
 #joco-bar {
   background-color: transparent;
   height: 52px;
@@ -51,6 +60,8 @@
 
 .joco-bar-item {
   display: flex;
+  flex-shrink: 0;
+  white-space: nowrap;
   justify-content: center;
   align-items: center;
   position: relative;
@@ -60,9 +71,31 @@
   vertical-align: middle;
   padding: 0px 8px;
   gap: 8px;
+  min-width: 48px;
+}
+.joco-bar-item i {
+  font-size: 32px;
 }
 .joco-bar-item .joco-attention-count {
   pointer-events: none;
+}
+.joco-bar-item .joco-bar-item-text {
+  background-color: rgb(245, 237, 224);
+  border: 2px solid rgb(130, 124, 112);
+  border-radius: 6px;
+  padding: 2px 4px;
+  opacity: 0;
+  position: absolute;
+  top: 110%;
+  left: 0%;
+  transition: opacity 0s;
+  user-select: none;
+  visibility: hidden;
+}
+.joco-bar-item:hover .joco-bar-item-text {
+  opacity: 1;
+  transition: visibility 0.4s ease-out, opacity 0.4s ease-out;
+  visibility: visible;
 }
 
 .joco-bar-item:hover {
@@ -4571,6 +4604,121 @@ span[style*="color:#c0c0c0"] {
   outline: 4px solid blue;
 }
 
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * JohnCompany implementation : © Frans Bongers <fjmbongers@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
+.joco-card-timing-button {
+  position: absolute;
+  z-index: 3;
+  top: 4px;
+  right: 4px;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #554b42;
+  border-radius: 4px;
+  background: #fff;
+  color: #24211e;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.bga-cards_card[data-side=back] > .joco-card-timing-button {
+  display: none;
+}
+
+#joco-timing-preferences {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 24px;
+}
+
+.joco-timing-content {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 2px solid rgb(130, 124, 112);
+  background-color: rgb(245, 237, 224);
+  color: #24211e;
+  font-family: "Libre Baskerville", serif;
+  box-sizing: border-box;
+}
+.joco-timing-content h2 {
+  margin: 0 0 20px;
+}
+.joco-timing-content h3 {
+  margin: 24px 0 8px;
+}
+
+.joco-timing-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+}
+.joco-timing-form label {
+  display: flex;
+  flex: 1 1 180px;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.joco-timing-form label[hidden] {
+  display: none;
+}
+.joco-timing-form select {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+}
+.joco-timing-form button {
+  min-height: 36px;
+}
+
+.joco-timing-error {
+  color: #a21d26;
+}
+
+.joco-timing-error:empty {
+  display: none;
+}
+
+.joco-timing-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 42px;
+  border-bottom: 1px solid #d5ccc8;
+}
+
+.joco-timing-remove {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  color: #8d292c;
+  cursor: pointer;
+}
+
+.joco-timing-remove:hover {
+  background: #f0dfdd;
+}
+
+@media (max-width: 600px) {
+  #joco-timing-preferences {
+    padding: 12px;
+  }
+  .joco-timing-content {
+    padding: 16px;
+  }
+}
 html {
   background-image: url("img/background.jpg");
   background-attachment: fixed;

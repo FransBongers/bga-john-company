@@ -1,6 +1,7 @@
 import { BgaCards } from '../../libs';
 import { GameAlias, JocoPromiseCard } from '../../types';
 import { tplPromiseCardContent } from './templates';
+import { TimingPreferences } from '../../timing-preferences';
 
 export class PromiseCardsManager extends BgaCards.Manager<JocoPromiseCard> {
   private static instance: PromiseCardsManager;
@@ -31,6 +32,7 @@ export class PromiseCardsManager extends BgaCards.Manager<JocoPromiseCard> {
 
   setupDiv(card: JocoPromiseCard, div: HTMLElement) {
     div.classList.add('joco-promise-card-container');
+    this.updateAlertButton(card, div);
   }
 
   setupFrontDiv(card: JocoPromiseCard, div: HTMLElement) {
@@ -39,10 +41,22 @@ export class PromiseCardsManager extends BgaCards.Manager<JocoPromiseCard> {
     // div.setAttribute('data-family-id', card.familyId);
     div.setAttribute('data-background', `PromiseCard${card.familyId}`);
 
-    if (div.children.length) {
-      return;
+    if (!div.children.length) {
+      div.insertAdjacentHTML('beforeend', tplPromiseCardContent(card));
     }
-    div.insertAdjacentHTML('beforeend', tplPromiseCardContent(card));
+    this.updateAlertButton(card, div.closest<HTMLElement>('.joco-promise-card-container'));
+  }
+
+  public updateAlertButton(card: JocoPromiseCard, div?: HTMLElement | null) {
+    const container = div ?? this.getCardElement(card);
+    if (!container) return;
+    const playerId = this.game.getPlayerId();
+    if (card.location === String(playerId) && card.ownerPlayerId !== playerId &&
+      this.game.gamedatas.staticData.promiseCards[card.id]?.timingWindows.length) {
+      TimingPreferences.get().addCardButton(container, card.id);
+    } else {
+      container.querySelector('.joco-card-timing-button')?.remove();
+    }
   }
 
   setupBackDiv(card: JocoPromiseCard, div: HTMLElement) {

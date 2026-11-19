@@ -7,6 +7,8 @@ use Bga\Games\JohnCompany\Models\Player;
 
 class VoteWithMyEnterprises extends \Bga\Games\JohnCompany\Models\PromiseCard
 {
+  protected $timingWindows = [BEFORE_ANY_VOTES_ARE_CAST];
+
   public function __construct($row)
   {
     parent::__construct($row);

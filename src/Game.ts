@@ -103,6 +103,7 @@ import { PromiseCardsManager } from './cards/promise-cards';
 import { SetupCardsManager } from './cards/setup-cards';
 import { Deals } from './deals';
 import { AnytimeCards, ANYTIME_CARD_STATE } from './anytime-cards';
+import { TimingPreferences } from './timing-preferences';
 
 // declare const define; // TODO: check if we comment here or in bga-animations module?
 // declare const ebg;
@@ -429,6 +430,7 @@ export class Game {
       },
     });
     StaticData.create(this);
+    TimingPreferences.create(this);
     EnterpriseCardsManager.create(this);
     EventTilesManager.create(this);
     LawCardsManager.create(this);
@@ -462,6 +464,7 @@ export class Game {
     ) {
       Draft.create(this);
     }
+    TimingPreferences.get().setup();
     Bar.create(this);
 
     this.notificationManager.setupNotifications();

@@ -10,6 +10,8 @@ use Bga\Games\JohnCompany\Models\Player;
 
 class LawCard_47 extends \Bga\Games\JohnCompany\Models\LawCard
 {
+  protected $timingWindows = [IMMEDIATELY_AFTER_MILITARY_AFFAIRS_ACTS];
+
   public function __construct($row)
   {
     parent::__construct($row);

@@ -500,6 +500,7 @@ export const WINDFALL = 'Windfall';
  */
 export const PLAYER_ID = 'playerId';
 export const OFFICE_ID = 'officeId';
+export const PHASE_ID = 'phaseId';
 export const CARD_ID = 'cardId';
 export const CARD_TYPE = 'cardType';
 export const LAW_CARD = 'lawCard';
@@ -507,6 +508,9 @@ export const BLACKMAIL_CARD = 'blackmailCard';
 export const PROMISE_CARD = 'promiseCard';
 export const TIMING_WINDOW = 'timingWindow';
 export const TIMING_DATA = 'timingData';
+export const START_OF_PHASE = 'startOfPhase';
+export const END_OF_PHASE = 'endOfPhase';
+export const BEFORE_OFFICE_ACTS = 'beforeOfficeActs';
 export const AFTER_OFFICE_FINISHED_ACTING = 'afterOfficeFinishedActing';
 
 /**

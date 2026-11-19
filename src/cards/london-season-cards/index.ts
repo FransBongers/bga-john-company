@@ -1,6 +1,7 @@
 import { BLACKMAIL, PRESTIGE } from '../../constants';
 import { BgaCards } from '../../libs';
 import { GameAlias, JocoLondonSeasonCard } from '../../types';
+import { TimingPreferences } from '../../timing-preferences';
 import {
   tplBlackmailCardContent,
   tplLondonSeasonCardContent,
@@ -39,9 +40,11 @@ export class LondonSeasonCardsManager extends BgaCards.Manager<JocoLondonSeasonC
     if (card.type === PRESTIGE) {
       div.setAttribute('data-subtype', card.subtype);
     }
+    this.updateAlertButton(card, div);
   }
 
   setupFrontDiv(card: JocoLondonSeasonCard, div: HTMLElement) {
+    this.updateAlertButton(card, div.closest<HTMLElement>('.joco-card-container'));
     div.classList.add('joco-card');
     div.setAttribute(
       'data-background',
@@ -71,6 +74,15 @@ export class LondonSeasonCardsManager extends BgaCards.Manager<JocoLondonSeasonC
 
     if (cardContent) {
       div.insertAdjacentHTML('beforeend', cardContent);
+    }
+  }
+
+  private updateAlertButton(card: JocoLondonSeasonCard, container: HTMLElement | null) {
+    if (!container) return;
+    if (card.type === BLACKMAIL && card.hiddenId && this.game.gamedatas.staticData.londonSeasonCards[card.hiddenId]?.timingWindows.length) {
+      TimingPreferences.get().addCardButton(container, card.hiddenId);
+    } else {
+      container.querySelector('.joco-card-timing-button')?.remove();
     }
   }
 

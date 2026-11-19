@@ -12,6 +12,8 @@ use Bga\Games\JohnCompany\Models\Player;
 
 class CompanyFraud extends \Bga\Games\JohnCompany\Models\BlackmailCard
 {
+  protected $timingWindows = [START_OF_PHASE];
+
   public function __construct($row)
   {
     parent::__construct($row);
@@ -32,6 +34,9 @@ class CompanyFraud extends \Bga\Games\JohnCompany\Models\BlackmailCard
    */
   public function effectCanBeApplied(array $timingData): array | null
   {
+    if (($timingData[PHASE_ID] ?? null) !== REVENUE) {
+      return null;
+    }
     // Has to be owned by a player
     if (!Utils::startsWith($this->getLocation(), 'londonSeasonCards_')) {
       return null;

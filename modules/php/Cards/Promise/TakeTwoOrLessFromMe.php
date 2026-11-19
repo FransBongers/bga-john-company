@@ -16,12 +16,25 @@ class TakeTwoOrLessFromMe extends \Bga\Games\JohnCompany\Models\PromiseCard
     $this->title = clienttranslate('Take £2 or less from me.');
   }
 
+  public function effectCanBeApplied(array $timingData): array | null
+  {
+    if (Players::get($this->getOwnerPlayerId())->getTreasury() <= 0) {
+      return null;
+    }
+    return parent::effectCanBeApplied($timingData);
+  }
+
+  public function canBePlayedAnytime(array $timingData): bool
+  {
+    return true;
+  }
+
   public function applyEffect(object $ctx, Player $player, array $timingData)
   {
     $ownerPlayer = Players::get($this->getOwnerPlayerId());
-    $playerData = PlayersExtra::get($player->getId());
-
-    $amount = min(2, $playerData->getTreasury());
+    $amount = min(2, $ownerPlayer->getTreasury());
+    $ownerPlayer->incTreasury(-$amount);
+    $player->incTreasury($amount);
 
     $counterChanges = [
       $player->getId() => [CASH_COUNTER => $amount],

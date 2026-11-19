@@ -12,6 +12,8 @@ use Bga\Games\JohnCompany\Models\Player;
 
 class MercantileConnection extends \Bga\Games\JohnCompany\Models\BlackmailCard
 {
+  protected $timingWindows = [AFTER_PRESIDENT_OR_FIRM_CHECK];
+
   public function __construct($row)
   {
     parent::__construct($row);

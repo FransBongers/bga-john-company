@@ -11,6 +11,13 @@ use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 
 class ScandalOnLeadenhallStreet extends \Bga\Games\JohnCompany\Models\BlackmailCard
 {
+  protected $timingWindows = [WHEN_TAKEN_FROM_DISPLAY, ANY_TIME_AFTER_REVENUE_PHASE];
+
+  public function canBePlayedAnytime(array $timingData): bool
+  {
+    return $timingData['afterRevenue'] ?? false;
+  }
+
   protected $affectedOffices = [
     CHAIRMAN,
     DIRECTOR_OF_TRADE,
@@ -67,6 +74,14 @@ class ScandalOnLeadenhallStreet extends \Bga\Games\JohnCompany\Models\BlackmailC
     });
   }
 
+  public function effectCanBeApplied(array $timingData): array | null
+  {
+    if (count($this->getAffectedOffices()) === 0) {
+      return null;
+    }
+    return parent::effectCanBeApplied($timingData);
+  }
+
   protected function resolveImmediateEffect(Player $player, object $ctx)
   {
     if (Globals::getPhase() === SETUP) {
@@ -77,7 +92,7 @@ class ScandalOnLeadenhallStreet extends \Bga\Games\JohnCompany\Models\BlackmailC
       'action' => TIMING_WINDOW_CHECK,
       'args' => [
         TIMING_WINDOW => [WHEN_TAKEN_FROM_DISPLAY],
-        BLACKMAIL_CARD => [$this->getId()],
+        TIMING_DATA => [CARD_ID => $this->getId()],
       ],
     ]));
   }

@@ -54,6 +54,7 @@ use Bga\Games\JohnCompany\Managers\RemovedGovernors;
 use Bga\Games\JohnCompany\Managers\Scenarios;
 use Bga\Games\JohnCompany\Managers\SetupCards;
 use Bga\Games\JohnCompany\Managers\Ships;
+use Bga\Games\JohnCompany\Managers\TimingPreferences;
 use Bga\Games\JohnCompany\Models\Enterprise;
 use Bga\GameFramework\Actions\CheckAction;
 use Bga\GameFramework\Actions\Types\JsonParam;
@@ -122,6 +123,17 @@ class Game extends \Bga\GameFramework\Table
             throw new \BgaUserException(clienttranslate('Only players can acknowledge attention'));
         }
         Attention::acknowledge($playerId, $ids);
+    }
+
+    #[CheckAction(false)]
+    public function actSetTimingPreference(string $kind, string $itemId, int $enabled)
+    {
+        $playerId = (int) $this->getCurrentPlayerId();
+        if (!isset(Players::getAll()[$playerId]) || !in_array($kind, ['window', 'card'], true) || !in_array($enabled, [0, 1], true)
+            || !preg_match('/\A[a-zA-Z0-9_:]{1,100}\z/', $itemId)) {
+            throw new \BgaUserException(clienttranslate('Invalid timing preference'));
+        }
+        TimingPreferences::set($playerId, $kind, $itemId, $enabled === 1);
     }
 
     // Exposing protected method getCurrentPlayerId
@@ -390,6 +402,7 @@ class Game extends \Bga\GameFramework\Table
 
         $data = [
             'attention' => isset(Players::getAll()[$playerId]) ? Attention::forPlayer((int) $playerId) : [],
+            'timingPreferences' => isset(Players::getAll()[$playerId]) ? TimingPreferences::forPlayer((int) $playerId) : ['window' => [], 'card' => []],
             'gameOptions' => [
                 'crownEnabled' => Globals::getCrownInGame(),
             ],

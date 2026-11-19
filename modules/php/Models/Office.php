@@ -8,6 +8,7 @@ use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
+use Bga\Games\JohnCompany\Managers\TimingPreferences;
 
 class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model implements \JsonSerializable
 {
@@ -108,6 +109,7 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   public function returnToSupply()
   {
     $this->setLocation(DECK);
+    TimingPreferences::removeOfficeWindows($this->getId());
     Notifications::moveOfficeCard($this, clienttranslate('${tkn_boldText_office} is returned to the supply'), [
       'tkn_boldText_office' => $this->getTitle(),
       'i18n' => ['tkn_boldText_office'],
@@ -138,6 +140,7 @@ class Office extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model impleme
   public function removeFromGame(Player | null $player = null)
   {
     $this->setLocation(DECK);
+    TimingPreferences::removeOfficeWindows($this->getId());
     $text = clienttranslate('${tkn_boldText_title} is removed from the game');
     $textArgs = [];
     if ($player === null) {

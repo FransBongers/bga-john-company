@@ -6,6 +6,7 @@ import {
   DIRECTOR_OF_TRADE,
   EVENTS_IN_INDIA,
   FAMILY,
+  FIRMS,
   HIRING,
   LONDON_SEASON,
   MANAGER_OF_SHIPPING,
@@ -24,6 +25,7 @@ import { getPhaseName } from './translations';
 const PHASES = [
   LONDON_SEASON,
   FAMILY,
+  FIRMS,
   HIRING,
   CHAIRMAN,
   DIRECTOR_OF_TRADE,

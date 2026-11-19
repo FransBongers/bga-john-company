@@ -8,6 +8,20 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 
 class ThePrimeMinistersEar extends \Bga\Games\JohnCompany\Models\BlackmailCard
 {
+  protected $timingWindows = [START_OF_PHASE];
+
+  public function canBePlayedAnytime(array $timingData): bool
+  {
+    return $timingData['beforeFamily'] ?? false;
+  }
+
+  public function effectCanBeApplied(array $timingData): array | null
+  {
+    return ($timingData['anytime'] ?? false) || ($timingData[PHASE_ID] ?? null) === FAMILY
+      ? parent::effectCanBeApplied($timingData)
+      : null;
+  }
+
   public function __construct($row)
   {
     parent::__construct($row);

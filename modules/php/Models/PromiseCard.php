@@ -20,6 +20,7 @@ class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   protected $ownerPlayerId;
 
   protected $title;
+  protected $timingWindows = [];
 
   protected $attributes = [
     'id' => ['card_id', 'str'],
@@ -31,7 +32,8 @@ class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   ];
 
   protected $staticAttributes = [
-    'title'
+    'title',
+    'timingWindows'
   ];
 
   public function removeFromGame(Player $player)
@@ -45,6 +47,16 @@ class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     $data = parent::getStaticData();
     $data['familyId'] = $this->getFamilyId();
     return $data;
+  }
+
+  public function getTimingWindows(): array
+  {
+    return $this->timingWindows;
+  }
+
+  public function canBePlayedAnytime(array $timingData): bool
+  {
+    return false;
   }
 
   /**

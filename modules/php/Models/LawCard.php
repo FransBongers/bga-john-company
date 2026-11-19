@@ -23,6 +23,7 @@ class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   protected $initialSupport = null;
   protected $policyTarget = null;
   protected $policyConsequence = null;
+  protected $timingWindows = [];
   // protected $type;
 
   protected $attributes = [
@@ -42,6 +43,7 @@ class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     'initialSupport',
     'policyTarget',
     'policyConsequence',
+    'timingWindows',
     // 'type',
   ];
 
@@ -55,6 +57,11 @@ class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
   {
     // Notifications::log('getUiData card model', []);
     return $this->jsonSerialize(); // Static datas are already in js file
+  }
+
+  public function getTimingWindows(): array
+  {
+    return $this->timingWindows;
   }
 
   public function isInPlay(): bool

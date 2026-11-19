@@ -42,7 +42,7 @@ class LondonSeasonOrder extends \Bga\Games\JohnCompany\Models\AtomicAction
             'action' => TIMING_WINDOW_CHECK,
             'args' => [
               TIMING_WINDOW => [START_OF_LONDON_SEASON_CHOOSE_CARD],
-              PROMISE_CARD => [PromiseCards::getPromiseCardId($playerId, TAKE_MY_LONDON_SEASON_CARD)],
+              TIMING_DATA => [PLAYER_ID => $playerId],
             ],
           ],
           [

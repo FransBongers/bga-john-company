@@ -175,7 +175,6 @@ class CommanderDeploy extends \Bga\Games\JohnCompany\Models\AtomicAction
       'action' => TIMING_WINDOW_CHECK,
       'args' => [
         TIMING_WINDOW => [AFTER_COMMANDER_DEPLOY_CHECK],
-        BLACKMAIL_CARD => [DIPLOMATIC_CONNECTION_ID],
       ],
     ]));
 

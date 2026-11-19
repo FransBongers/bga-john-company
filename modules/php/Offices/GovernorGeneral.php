@@ -10,6 +10,7 @@ use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\Regions;
 use Bga\Games\JohnCompany\Managers\Ships;
+use Bga\Games\JohnCompany\Managers\TimingPreferences;
 
 class GovernorGeneral extends \Bga\Games\JohnCompany\Models\Office
 {
@@ -51,6 +52,7 @@ class GovernorGeneral extends \Bga\Games\JohnCompany\Models\Office
     $directorOfTrade->setFatigue(0);
     $this->setLocation($directorOfTrade->getLocation());
     $directorOfTrade->setLocation(DECK);
+    TimingPreferences::removeOfficeWindows($directorOfTrade->getId());
     
 
     $familyMember = $directorOfTrade->getFamilyMember();

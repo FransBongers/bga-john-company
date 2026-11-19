@@ -61,6 +61,7 @@ export class AnytimeCards {
   private makeSelectable(element: HTMLElement, title: string) {
     if (!element) return;
     const handler: EventListener = (event) => {
+      if ((event.target as HTMLElement).closest('.joco-card-timing-button')) return;
       if (element.classList.contains(SELECTABLE) || element.classList.contains(SELECTED) || this.game._helpMode) return;
       // @ts-expect-error
       if (this.game.bga.actions.game.isInterfaceLocked()) return;

@@ -245,6 +245,7 @@ export class PlayerArea {
 
   public async addPromiseCard(card: JocoPromiseCard) {
     await this.promiseCards.addCard(card);
+    PromiseCardsManager.getInstance().updateAlertButton(card);
   }
 
   public incCounters(changes: Record<string, number>) {

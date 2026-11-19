@@ -174,7 +174,6 @@ class PresidentTrade extends \Bga\Games\JohnCompany\Actions\PresidencyActions
       'action' => TIMING_WINDOW_CHECK,
       'args' => [
         TIMING_WINDOW => [AFTER_PRESIDENT_OR_FIRM_CHECK],
-        BLACKMAIL_CARD => [MERCANTILE_CONNECTION_ID],
       ],
     ]));
 

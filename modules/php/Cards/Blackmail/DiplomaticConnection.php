@@ -6,6 +6,8 @@ use Bga\Games\JohnCompany\Models\Player;
 
 class DiplomaticConnection extends \Bga\Games\JohnCompany\Models\BlackmailCard
 {
+  protected $timingWindows = [AFTER_COMMANDER_DEPLOY_CHECK];
+
   public function __construct($row)
   {
     parent::__construct($row);

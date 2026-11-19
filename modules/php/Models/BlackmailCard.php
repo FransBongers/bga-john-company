@@ -36,6 +36,11 @@ class BlackmailCard extends \Bga\Games\JohnCompany\Models\LondonSeasonCard
     ]);
   }
 
+  public function canBePlayedAnytime(array $timingData): bool
+  {
+    return false;
+  }
+
   /**
    * Whether the effect of this london season card can be applied
    * Only for effects with specific timing windows

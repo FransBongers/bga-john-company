@@ -50,6 +50,10 @@ class PresidencyGovernor extends \Bga\Games\JohnCompany\Models\AtomicAction
         [
           'children' => [
             [
+              'action' => TIMING_WINDOW_CHECK,
+              'args' => [TIMING_WINDOW => [BEFORE_OFFICE_ACTS], TIMING_DATA => [OFFICE_ID => $governorOffice->getId()]],
+            ],
+            [
               'action' => GOVERNOR_ADMINISTER,
               'playerId' => 'some',
               'activePlayerIds' => [$governorPlayerId],
@@ -64,8 +68,6 @@ class PresidencyGovernor extends \Bga\Games\JohnCompany\Models\AtomicAction
               'action' => TIMING_WINDOW_CHECK,
               'args' => [
                 TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
-                LAW_CARD => [BOARD_OF_CONTROL_ID],
-                PROMISE_CARD => [PromiseCards::getPromiseCardId($governorPlayerId, TAKE_MY_OFFICE_HOLDER_BONUS)],
                 TIMING_DATA => [
                   'officeId' => $governorOffice->getId()
                 ],

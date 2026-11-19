@@ -1,6 +1,7 @@
 import { BgaCards } from '../../libs';
 import { GameAlias, JocoLawCard } from '../../types';
 import { tplLawCardContent } from './templates';
+import { TimingPreferences } from '../../timing-preferences';
 
 export class LawCardsManager extends BgaCards.Manager<JocoLawCard> {
   private static instance: LawCardsManager;
@@ -31,6 +32,9 @@ export class LawCardsManager extends BgaCards.Manager<JocoLawCard> {
 
   setupDiv(card: JocoLawCard, div: HTMLElement) {
     div.classList.add('joco-law-card-container');
+    if (this.game.gamedatas.staticData.lawCards[card.id]?.timingWindows.length) {
+      TimingPreferences.get().addCardButton(div, card.id);
+    }
   }
 
   setupFrontDiv(card: JocoLawCard, div: HTMLElement) {

@@ -7,6 +7,20 @@ use Bga\Games\JohnCompany\Models\Player;
 
 class EnvoyToTheMughals extends \Bga\Games\JohnCompany\Models\BlackmailCard
 {
+  protected $timingWindows = [START_OF_PHASE];
+
+  public function canBePlayedAnytime(array $timingData): bool
+  {
+    return $timingData['beforeEvents'] ?? false;
+  }
+
+  public function effectCanBeApplied(array $timingData): array | null
+  {
+    return ($timingData['anytime'] ?? false) || ($timingData[PHASE_ID] ?? null) === EVENTS_IN_INDIA
+      ? parent::effectCanBeApplied($timingData)
+      : null;
+  }
+
   public function __construct($row)
   {
     parent::__construct($row);

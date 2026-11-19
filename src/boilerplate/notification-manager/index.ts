@@ -8,6 +8,7 @@
 
 import { EnterpriseCardsManager } from '../../cards/enterprise-cards';
 import { AttentionManager } from '../../attention';
+import { TimingPreferences } from '../../timing-preferences';
 import { LondonSeasonCardsManager } from '../../cards/london-season-cards';
 import { tplOfficeCard } from '../../cards/office-cards';
 import { Company } from '../../company';
@@ -475,6 +476,7 @@ export class NotificationManager {
 
     await Promise.all(
       promiseCards.map(async (card) => {
+        TimingPreferences.get().updatePromiseCard(card);
         await PlayerManager.getInstance()
           .getPlayerArea(Number(card.location))
           .addPromiseCard(getPromiseCard(card));
@@ -616,6 +618,7 @@ export class NotificationManager {
 
   async notif_discardLondonSeasonCard(notif: NotifDiscardLondonSeasonCard) {
     const { card } = notif;
+    TimingPreferences.get().removeLondonSeasonCard(card);
 
     await LondonSeasonCardsManager.getInstance().removeCard(
       getLondonSeasonCard(card),
@@ -632,6 +635,7 @@ export class NotificationManager {
 
   async notif_changePrimeMinister(notif: NotifWithPlayerArgs) {
     const { playerId } = notif;
+    TimingPreferences.get().updatePrimeMinister(playerId);
 
     Parliament.getInstance().getPrimeMinisterDial().updatePlayerName(playerId);
   }
@@ -776,6 +780,7 @@ export class NotificationManager {
 
   async notif_moveLaws(notif: NotifMoveLaws) {
     const { laws } = notif;
+    laws.forEach((card) => TimingPreferences.get().updateLawCard(card));
 
     const cards = laws.map(getLawCard);
 
@@ -831,6 +836,7 @@ export class NotificationManager {
     const { card, _private } = notif;
 
     const cardToMove = _private?.card ?? card;
+    TimingPreferences.get().updateLondonSeasonCard(cardToMove);
 
     const playerId = cardToMove.location.split('_')[1];
     await PlayerManager.getInstance()
@@ -840,6 +846,7 @@ export class NotificationManager {
 
   async notif_moveOfficeCard(notif: NotifMoveOfficeCard) {
     const { office } = notif;
+    TimingPreferences.get().updateOffice(office.id, office.location);
     let element = document.getElementById(`OfficeCard_${office.id}`);
     if (!element) {
       element = createHtmlElement(tplOfficeCard(office));
@@ -1036,6 +1043,7 @@ export class NotificationManager {
 
   async notif_movePromiseCard(notif: NotifMovePromiseCard) {
     const { card } = notif;
+    TimingPreferences.get().updatePromiseCard(card);
 
     await PlayerManager.getInstance()
       .getPlayerArea(Number(card.location))
@@ -1044,12 +1052,15 @@ export class NotificationManager {
 
   async notif_removeCardFromGame(notif: NotifRemoveCardFromGame) {
     const { playerId, card } = notif;
+    TimingPreferences.get().updatePromiseCard(card);
 
     await PromiseCardsManager.getInstance().removeCard(getPromiseCard(card));
   }
 
   async notif_replaceDirectorOfTrade(notif: NotifReplaceDirectorOfTrade) {
     const { governorGeneral, familyMember } = notif;
+    TimingPreferences.get().updateOffice(DIRECTOR_OF_TRADE, DECK);
+    TimingPreferences.get().updateOffice(governorGeneral.id, governorGeneral.location);
 
     // Replace Offifce in Company tab
     const directorOfTradeOffice = document.getElementById(

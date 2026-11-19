@@ -9,6 +9,8 @@ use Bga\Games\JohnCompany\Models\Player;
 
 class LawCard_34 extends \Bga\Games\JohnCompany\Models\LawCard
 {
+  protected $timingWindows = [AFTER_OFFICE_FINISHED_ACTING];
+
   public function __construct($row)
   {
     parent::__construct($row);
@@ -34,7 +36,7 @@ class LawCard_34 extends \Bga\Games\JohnCompany\Models\LawCard
     }
 
     $officeId = $timingData[OFFICE_ID] ?? null;
-    if ($officeId === null) {
+    if ($officeId === null || $officeId === CHAIRMAN) {
       return null;
     }
 

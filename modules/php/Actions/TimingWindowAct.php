@@ -34,6 +34,10 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $private = [];
 
+    foreach ($this->getActivePlayerIds() as $playerId) {
+      $private[$playerId] = [];
+    }
+
     foreach ($options as $option) {
       $playerId = $option[PLAYER_ID];
 
@@ -42,6 +46,15 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Models\AtomicAction
       }
       $private[$playerId][] = $option;
     }
+
+    $resolved = $this->ctx->getInfo()['resolved'] ?? [];
+    foreach ($private as $playerId => &$playerOptions) {
+      foreach ($playerOptions as $index => &$option) {
+        $option['resolved'] = $resolved[$playerId][$index] ?? false;
+      }
+      unset($option);
+    }
+    unset($playerOptions);
 
     $data = [
       '_private' => $private,
@@ -71,7 +84,9 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Models\AtomicAction
   {
     $playerId = $this->checkPlayer();
     $this->setPlayerActionCompleted($playerId);
-    $this->resolveAction(PASS, true);
+    if (count(array_diff($this->getActivePlayerIds(), $this->ctx->getInfo()['completedPlayerIds'] ?? [])) === 0) {
+      $this->resolveAction(PASS, true);
+    }
   }
 
   public function actTimingWindowAct($args)
@@ -85,28 +100,23 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     if (!$use) {
       $this->setAllEffectsResolved($playerId, $stateArgs['_private'][$playerId]);
+      $this->setPlayerActionCompleted($playerId);
     } else {
       $effect = $stateArgs['_private'][$playerId][$index] ?? null;
-      if ($effect === null) {
+      $resolved = $this->ctx->getInfo()['resolved'] ?? [];
+      if ($effect === null || ($resolved[$playerId][$index] ?? false)) {
         throw new \Bga\GameFramework\VisibleSystemException("ERROR_074");
       }
+      $this->checkEffectStillAvailable($playerId, $effect);
       $this->resolveEffect($playerId, $effect);
       $this->setEffectResolved($playerId, $index);
     }
 
-    if ($this->allEffectsHaveBeenUsedOrSkipped($stateArgs['_private'])) {
-      $this->setAllActivePlayerIdsNonMultiactive();
+    if (count(array_diff($this->getActivePlayerIds(), $this->ctx->getInfo()['completedPlayerIds'] ?? [])) === 0) {
       $this->resolveAction([], true);
       return;
-      // All effects have been used or skipped, you can perform additional logic here if needed
     }
-
-    if ($this->playerHasUsedOrSkippedAllEffects($playerId, $stateArgs['_private'][$playerId])) {
-      // The current player has used or skipped all effects, but other players still need to complete their effects
-      $this->setPlayerActionCompleted($playerId);
-      $this->resolveAction([]);
-      return;
-    }
+    Engine::proceed();
   }
 
   //  .##.....##.########.####.##.......####.########.##....##
@@ -131,6 +141,26 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Models\AtomicAction
       $this->resolveBlackmailCard($player, $effect);
       // Notifications::message(clienttranslate('Applying effect of Company Fraud card'));
       // LondonSeasonCards::get($cardId)->applyEffect($this->ctx, $player, $timingData);
+    }
+  }
+
+  private function checkEffectStillAvailable(int $playerId, array $effect): void
+  {
+    $cardId = $effect[CARD_ID];
+    $cardType = $effect[CARD_TYPE];
+    if ($cardType === LAW_CARD) {
+      $card = LawCards::get($cardId);
+    } else if ($cardType === PROMISE_CARD) {
+      $card = PromiseCards::get($cardId);
+      if (!ctype_digit((string) $card->getLocation())) {
+        throw new \BgaUserException(clienttranslate('This card is no longer available'));
+      }
+    } else {
+      $card = LondonSeasonCards::get($cardId);
+    }
+    $currentEffect = $card->effectCanBeApplied($effect[TIMING_DATA] ?? []);
+    if ($currentEffect === null || $currentEffect[PLAYER_ID] !== $playerId) {
+      throw new \BgaUserException(clienttranslate('This card effect is no longer available'));
     }
   }
 
@@ -175,31 +205,6 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Models\AtomicAction
     foreach ($playerEffects as $index => $effect) {
       $this->setEffectResolved($playerId, $index);
     }
-  }
-
-  private function playerHasUsedOrSkippedAllEffects(int $playerId, array $playerEffects): bool
-  {
-    $resolved = $this->ctx->getInfo()['resolved'] ?? [];
-    foreach ($playerEffects as $index => $effect) {
-      if (!isset($resolved[$playerId][$index]) || !$resolved[$playerId][$index]) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private function allEffectsHaveBeenUsedOrSkipped(array $allPlayersEffects)
-  {
-
-    $resolved = $this->ctx->getInfo()['resolved'] ?? [];
-    foreach ($allPlayersEffects as $playerId => $playerEffects) {
-      foreach ($playerEffects as $index => $effect) {
-        if (!isset($resolved[$playerId][$index]) || !$resolved[$playerId][$index]) {
-          return false;
-        }
-      }
-    }
-    return true;
   }
 
   // .########.##....##..######...####.##....##.########

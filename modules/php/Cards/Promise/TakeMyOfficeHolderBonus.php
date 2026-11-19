@@ -11,6 +11,8 @@ use Bga\Games\JohnCompany\Models\Player;
 
 class TakeMyOfficeHolderBonus extends \Bga\Games\JohnCompany\Models\PromiseCard
 {
+  protected $timingWindows = [AFTER_OFFICE_FINISHED_ACTING];
+
   public function __construct($row)
   {
     parent::__construct($row);
@@ -23,6 +25,10 @@ class TakeMyOfficeHolderBonus extends \Bga\Games\JohnCompany\Models\PromiseCard
    */
   public function effectCanBeApplied(array $timingData): array | null
   {
+    $officeId = $timingData[OFFICE_ID] ?? null;
+    if ($officeId === null || Offices::get($officeId)->getPlayerId() !== $this->getOwnerPlayerId()) {
+      return null;
+    }
     if (!($this->getActingPlayerId() !== $this->getOwnerPlayerId())) {
       return null;
     }
@@ -31,8 +37,6 @@ class TakeMyOfficeHolderBonus extends \Bga\Games\JohnCompany\Models\PromiseCard
     if ($bonus === 0) {
       return null;
     }
-
-    $officeId = $timingData['officeId'];
 
     if (RemovedGovernors::hasBeenRemoved($officeId, CATASTROPHIC_FAILURE)) {
       return null;
@@ -50,6 +54,8 @@ class TakeMyOfficeHolderBonus extends \Bga\Games\JohnCompany\Models\PromiseCard
     $ownerPlayer = Players::get($this->getOwnerPlayerId());
 
     $bonus = Globals::getOfficeHolderBonus();
+    $ownerPlayer->incTreasury(-$bonus);
+    $player->incTreasury($bonus);
 
     $counterChanges = [
       $player->getId() => [CASH_COUNTER => $bonus],

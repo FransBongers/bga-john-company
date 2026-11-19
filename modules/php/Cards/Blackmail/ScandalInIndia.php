@@ -12,6 +12,13 @@ use Bga\Games\JohnCompany\Models\Player;
 
 class ScandalInIndia extends \Bga\Games\JohnCompany\Models\BlackmailCard
 {
+  protected $timingWindows = [WHEN_TAKEN_FROM_DISPLAY, ANY_TIME_AFTER_REVENUE_PHASE];
+
+  public function canBePlayedAnytime(array $timingData): bool
+  {
+    return $timingData['afterRevenue'] ?? false;
+  }
+
   protected $affectedOffices = [
     PRESIDENT_OF_BOMBAY,
     PRESIDENT_OF_MADRAS,
@@ -110,7 +117,7 @@ class ScandalInIndia extends \Bga\Games\JohnCompany\Models\BlackmailCard
       'action' => TIMING_WINDOW_CHECK,
       'args' => [
         TIMING_WINDOW => [WHEN_TAKEN_FROM_DISPLAY],
-        BLACKMAIL_CARD => [$this->getId()],
+        TIMING_DATA => [CARD_ID => $this->getId()],
       ],
     ]));
   }

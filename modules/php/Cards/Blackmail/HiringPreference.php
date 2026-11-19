@@ -10,6 +10,8 @@ use Bga\Games\JohnCompany\Models\Player;
 
 class HiringPreference extends \Bga\Games\JohnCompany\Models\BlackmailCard
 {
+  protected $timingWindows = [DURING_HIRING_IF_YOU_ARE_A_CANDIDATE];
+
   public function __construct($row)
   {
     parent::__construct($row);

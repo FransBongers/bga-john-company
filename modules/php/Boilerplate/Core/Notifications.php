@@ -932,6 +932,7 @@ class Notifications
   {
     $phaseNameMap = [
       FAMILY => clienttranslate('Family phase'),
+      FIRMS => clienttranslate('Firms'),
       HIRING => clienttranslate('Hiring'),
       CHAIRMAN => clienttranslate('Chairman'),
       DIRECTOR_OF_TRADE => clienttranslate('Director of Trade'),

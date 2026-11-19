@@ -88,7 +88,6 @@ class ChooseFamilyMember extends \Bga\Games\JohnCompany\Models\AtomicAction
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
             TIMING_WINDOW => [DURING_HIRING_IF_YOU_ARE_A_CANDIDATE],
-            BLACKMAIL_CARD => [HIRING_PREFERENCE_ID],
             TIMING_DATA => [
               'officeId' => $location
             ],

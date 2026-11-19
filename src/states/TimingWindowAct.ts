@@ -21,6 +21,7 @@ interface OnEnteringTimingWindowActArgs extends CommonStateArgs {
     playerId: number;
     cardId: string;
     cardType: string;
+    resolved?: boolean;
     // Add other properties as needed
   }>;
 }
@@ -74,13 +75,13 @@ export class TimingWindowAct implements GameState<OnEnteringTimingWindowActArgs>
     updatePageTitle(_('${you} may use card effects'), {});
 
     (this.args._private ?? []).forEach(
-      ({ playerId, cardId, cardType }, index) => {
-        this.addButton(cardId, cardType, index);
+      ({ cardId, cardType, resolved }, index) => {
+        if (!resolved) this.addButton(cardId, cardType, index);
       },
     );
     addSecondaryActionButton({
       id: 'do_not_use_card',
-      text: _('Do not use card effects'),
+      text: _('Pass'),
       callback: () => {
         this.updateInterfaceConfirm(false);
       },
@@ -101,7 +102,7 @@ export class TimingWindowAct implements GameState<OnEnteringTimingWindowActArgs>
         },
       );
     } else {
-      updatePageTitle(_('Skip using effect?'), {});
+      updatePageTitle(_('Pass this timing window?'), {});
     }
 
     addConfirmButton(() => {

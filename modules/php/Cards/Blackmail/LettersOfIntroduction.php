@@ -8,6 +8,8 @@ use Bga\Games\JohnCompany\Models\Player;
 
 class LettersOfIntroduction extends \Bga\Games\JohnCompany\Models\BlackmailCard
 {
+  protected $timingWindows = [WHEN_RETIRING];
+
   public function __construct($row)
   {
     parent::__construct($row);

@@ -20,26 +20,32 @@ export class Bar {
     {
       id: 'joco-player-areas',
       text: _('Players'),
+      icon: 'users',
     },
     {
       id: 'joco-deals',
       text: _('Deals'),
+      icon: 'handshake',
     },
     {
       id: 'joco-india',
       text: _('India'),
+      icon: 'earth-asia',
     },
     {
       id: 'joco-parliament',
       text: _('Parliament'),
+      icon: 'landmark',
     },
     {
       id: 'joco-london',
       text: _('London'),
+      icon: 'earth-europe',
     },
     {
       id: 'joco-company',
       text: _('Company'),
+      icon: 'briefcase',
     },
   ];
 
@@ -67,6 +73,13 @@ export class Bar {
   // Setup functions
   setup(gamedatas: GamedatasAlias) {
     const bar = document.getElementById('joco-bar');
+    if (!this.game.isSpectator) {
+      this.config.push({
+        id: 'joco-timing-preferences',
+        text: _('Alerts'),
+        icon: 'bell',
+      });
+    }
     if (
       !this.game.bga.players.isCurrentPlayerSpectator() &&
       gamedatas.phase === SETUP
@@ -74,11 +87,12 @@ export class Bar {
       this.config.push({
         id: 'joco-draft',
         text: _('Draft'),
+        icon: 'cards-blank',
       });
     }
 
-    this.config.forEach(({ id, text }, index) => {
-      bar.insertAdjacentHTML('beforeend', tplTabButton(text, index));
+    this.config.forEach(({ id, text, icon }, index) => {
+      bar.insertAdjacentHTML('beforeend', tplTabButton(icon, text, index));
       this.ui.barButtons.push(
         document.getElementById(`joco-bar-item-${index}`),
       );
@@ -133,8 +147,10 @@ export class Bar {
   // ..#######..##........########..##.....##....##....########.....#######..####
 
   private onIconClick(event: PointerEvent) {
-    const target = event.target as HTMLElement;
-    if (!target.classList.contains('joco-bar-item')) {
+    const target = (event.target as Element).closest<HTMLElement>(
+      '.joco-bar-item',
+    );
+    if (!target) {
       return;
     }
 

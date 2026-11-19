@@ -91,7 +91,6 @@ class HiringCheckVacantOffices extends \Bga\Games\JohnCompany\Models\AtomicActio
               'action' => TIMING_WINDOW_CHECK,
               'args' => [
                 TIMING_WINDOW => [DURING_HIRING_IF_YOU_ARE_A_CANDIDATE],
-                BLACKMAIL_CARD => [HIRING_PREFERENCE_ID],
                 TIMING_DATA => [
                   'officeId' => $office->getId()
                 ],

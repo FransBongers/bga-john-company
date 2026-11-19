@@ -1,6 +1,7 @@
 import {
   LONDON_SEASON,
   FAMILY,
+  FIRMS,
   HIRING,
   CHAIRMAN,
   DIRECTOR_OF_TRADE,
@@ -25,6 +26,8 @@ export const getPhaseName = (phase: string) => {
       return _('London Season');
     case FAMILY:
       return _('Family');
+    case FIRMS:
+      return _('Firms');
     case FINAL_SCORING:
       return _('Final Scoring');
     case HIRING:

@@ -1,9 +1,14 @@
+@use '../base';
+
 #joco-bar {
   background-color: transparent;
   height: 52px;
   margin: 15px auto auto;
   position: relative;
   width: fit-content;
+  // max-width: 100%;
+  // overflow-x: auto;
+  // overflow-y: hidden;
   z-index: 5;
   display: flex;
   flex-direction: row;
@@ -13,6 +18,8 @@
 
 .joco-bar-item {
   display: flex;
+  flex-shrink: 0;
+  white-space: nowrap;
   justify-content: center;
   align-items: center;
   position: relative;
@@ -22,9 +29,42 @@
   vertical-align: middle;
   padding: 0px 8px;
   gap: 8px;
+  min-width: 48px;
+
+  i {
+    font-size: 32px;
+  }
 
   .joco-attention-count {
     pointer-events: none;
+  }
+
+  .joco-bar-item-text {
+    background-color: base.$joco-white;
+    border: 2px solid base.$joco-gray;
+    border-radius: 6px;
+    padding: 2px 4px;
+    // gap: calc(var(--collapsableScale) * 4px);
+    // left: calc(var(--collapsableScale) * -10px);
+    opacity: 0;
+    // padding: calc(var(--collapsableScale) * 8px);
+    position: absolute;
+    top: 110%;
+    left: 0%;
+    transition: opacity 0s;
+    user-select: none;
+    visibility: hidden;
+    // z-index: 1;
+  }
+
+  &:hover {
+    .joco-bar-item-text {
+      opacity: 1;
+      transition:
+        visibility 0.4s ease-out,
+        opacity 0.4s ease-out;
+      visibility: visible;
+    }
   }
 }
 

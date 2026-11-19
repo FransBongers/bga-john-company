@@ -126,17 +126,10 @@ trait TurnTrait
         [
           'action' => LONDON_SEASON_CLEANUP,
         ],
-        [
-          'action' => TIMING_WINDOW_CHECK,
-          'args' => [
-            TIMING_WINDOW => [BEFORE_THE_FAMILY_PHASE],
-            BLACKMAIL_CARD => [THE_PRIME_MINISTERS_EAR_ID],
-          ],
-        ]
       ],
     ];
 
-    Engine::setup($node, ['method' => 'stSetupFamilyActions']);
+    Engine::setup($this->withPhaseWindows($node, LONDON_SEASON), ['method' => 'stSetupFamilyActions']);
     Engine::proceed();
   }
 
@@ -177,7 +170,7 @@ trait TurnTrait
       'action' => NEW_COMPANY_SHARES,
     ];
 
-    Engine::setup($node, ['method' => 'stSetupFirmsPhase']);
+    Engine::setup($this->withPhaseWindows($node, FAMILY), ['method' => 'stSetupFirmsPhase']);
     Engine::proceed();
   }
 
@@ -196,7 +189,10 @@ trait TurnTrait
      * otherwise Notif that there is no firms phase
      */
 
-    $this->stSetupHiring();
+    $this->updatePhase(FIRMS);
+    $node = $this->withPhaseWindows(['children' => []], FIRMS);
+    Engine::setup($node, ['method' => 'stSetupHiring']);
+    Engine::proceed();
   }
 
   // .##.....##.####.########..####.##....##..######..
@@ -219,7 +215,7 @@ trait TurnTrait
       ],
     ];
 
-    Engine::setup($node, ['method' => 'stSetupChairman']);
+    Engine::setup($this->withPhaseWindows($node, HIRING), ['method' => 'stSetupChairman']);
     Engine::proceed();
   }
 
@@ -277,7 +273,8 @@ trait TurnTrait
     ];
 
     // TODO: Governor General or Director of Trade callback
-    Engine::setup($node, ['method' => 'stCheckDirectorOfTradeOrGovernorGeneral']);
+    $node = $this->withOfficeWindows($node, CHAIRMAN);
+    Engine::setup($this->withPhaseWindows($node, COMPANY_OPERATIONS, true, false), ['method' => 'stCheckDirectorOfTradeOrGovernorGeneral']);
     Engine::proceed();
   }
 
@@ -302,7 +299,8 @@ trait TurnTrait
     ];
 
     // TODO: Governor General or Director of Trade callback
-    Engine::setup($node, ['method' => 'stCheckDirectorOfTradeOrGovernorGeneral']);
+    $node = $this->withOfficeWindows($node, CHAIRMAN);
+    Engine::setup($this->withPhaseWindows($node, COMPANY_OPERATIONS, true, false), ['method' => 'stCheckDirectorOfTradeOrGovernorGeneral']);
     Engine::proceed();
   }
 
@@ -338,8 +336,6 @@ trait TurnTrait
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
             TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
-            LAW_CARD => [BOARD_OF_CONTROL_ID],
-            PROMISE_CARD => [PromiseCards::getPromiseCardId($playerId, TAKE_MY_OFFICE_HOLDER_BONUS)],
             TIMING_DATA => [
               'officeId' => GOVERNOR_GENERAL
             ],
@@ -348,7 +344,7 @@ trait TurnTrait
       ],
     ];
 
-    Engine::setup($node, ['method' => 'stSetupManagerOfShipping']);
+    Engine::setup($this->withOfficeWindows($node, GOVERNOR_GENERAL, true, false), ['method' => 'stSetupManagerOfShipping']);
     Engine::proceed();
   }
 
@@ -375,7 +371,6 @@ trait TurnTrait
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
             TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
-            LAW_CARD => [BOARD_OF_CONTROL_ID],
             TIMING_DATA => [
               'officeId' => DIRECTOR_OF_TRADE
             ],
@@ -384,7 +379,7 @@ trait TurnTrait
       ],
     ];
 
-    Engine::setup($node, ['method' => 'stSetupManagerOfShipping']);
+    Engine::setup($this->withOfficeWindows($node, DIRECTOR_OF_TRADE, true, false), ['method' => 'stSetupManagerOfShipping']);
     Engine::proceed();
   }
 
@@ -409,7 +404,6 @@ trait TurnTrait
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
             TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
-            LAW_CARD => [BOARD_OF_CONTROL_ID],
             TIMING_DATA => [
               'officeId' => MANAGER_OF_SHIPPING
             ],
@@ -418,7 +412,7 @@ trait TurnTrait
       ],
     ];
 
-    Engine::setup($node, ['method' => 'stSetupMilitaryAffairs']);
+    Engine::setup($this->withOfficeWindows($node, MANAGER_OF_SHIPPING, true, false), ['method' => 'stSetupMilitaryAffairs']);
     Engine::proceed();
   }
 
@@ -452,7 +446,7 @@ trait TurnTrait
       ],
     ];
 
-    Engine::setup($node, ['method' => 'stSetupMilitaryAffairs']);
+    Engine::setup($this->withOfficeWindows($node, MANAGER_OF_SHIPPING), ['method' => 'stSetupMilitaryAffairs']);
     Engine::proceed();
   }
 
@@ -496,7 +490,6 @@ trait TurnTrait
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
             TIMING_WINDOW => [IMMEDIATELY_AFTER_MILITARY_AFFAIRS_ACTS],
-            LAW_CARD => [MILITARY_OVERSIGHT_ID],
 
           ],
         ],
@@ -504,7 +497,6 @@ trait TurnTrait
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
             TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING, BEFORE_BOMBAY_PRESIDENCY_OPERATIONS],
-            LAW_CARD => [BOARD_OF_CONTROL_ID],
             TIMING_DATA => [
               'officeId' => MILITARY_AFFAIRS
             ],
@@ -513,7 +505,7 @@ trait TurnTrait
       ],
     ];
 
-    Engine::setup($node, ['method' => 'stSetupBombayPresidencyOperations']);
+    Engine::setup($this->withOfficeWindows($node, MILITARY_AFFAIRS, true, false), ['method' => 'stSetupBombayPresidencyOperations']);
     Engine::proceed();
   }
 
@@ -571,8 +563,6 @@ trait TurnTrait
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
             TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
-            LAW_CARD => [BOARD_OF_CONTROL_ID],
-            PROMISE_CARD => [PromiseCards::getPromiseCardId($office->getPlayerId(), TAKE_MY_OFFICE_HOLDER_BONUS)],
             TIMING_DATA => [
               'officeId' => SUPERINTENDENT_OF_TRADE_IN_CHINA
             ],
@@ -581,7 +571,7 @@ trait TurnTrait
       ],
     ];
 
-    Engine::setup($node, ['method' => 'stSetupBonuses']);
+    Engine::setup($this->withOfficeWindows($node, SUPERINTENDENT_OF_TRADE_IN_CHINA, true, false), ['method' => 'stSetupBonuses']);
     Engine::proceed();
   }
 
@@ -607,7 +597,7 @@ trait TurnTrait
       ],
     ];
 
-    Engine::setup($node, ['method' => 'stSetupRevenue']);
+    Engine::setup($this->withPhaseWindows($node, COMPANY_OPERATIONS, false, true), ['method' => 'stSetupRevenue']);
     Engine::proceed();
   }
 
@@ -626,13 +616,6 @@ trait TurnTrait
     $node = [
       'children' => [
         [
-          'action' => TIMING_WINDOW_CHECK,
-          'args' => [
-            TIMING_WINDOW => [START_OF_REVENUE_PHASE],
-            BLACKMAIL_CARD => [COMPANY_FRAUD_ID],
-          ],
-        ],
-        [
           'action' => REVENUE_EXPENSES,
         ],
         [
@@ -646,17 +629,10 @@ trait TurnTrait
           'playerId' => 'some',
           'activePlayerIds' => [Offices::get(CHAIRMAN)->getPlayerId()],
         ],
-        [
-          'action' => TIMING_WINDOW_CHECK,
-          'args' => [
-            TIMING_WINDOW => [BEFORE_EVENTS_IN_INDIA_PHASE],
-            BLACKMAIL_CARD => [ENVOY_TO_THE_MUGHALS_ID],
-          ],
-        ]
       ],
     ];
 
-    Engine::setup($node, ['method' => 'stSetupEventsInIndia']);
+    Engine::setup($this->withPhaseWindows($node, REVENUE), ['method' => 'stSetupEventsInIndia']);
     Engine::proceed();
   }
 
@@ -694,7 +670,7 @@ trait TurnTrait
       ],
     ];
 
-    Engine::setup($node, ['method' => 'stSetupParliamentMeets']);
+    Engine::setup($this->withPhaseWindows($node, EVENTS_IN_INDIA), ['method' => 'stSetupParliamentMeets']);
     Engine::proceed();
   }
 
@@ -754,7 +730,6 @@ trait TurnTrait
         'action' => TIMING_WINDOW_CHECK,
         'args' => [
           TIMING_WINDOW => [BEFORE_ANY_VOTES_ARE_CAST],
-          PROMISE_CARD => array_map(fn($playerId) => PromiseCards::getPromiseCardId($playerId, VOTE_WITH_MY_ENTERPRISES), $playerIds),
         ],
       ],
       Parliament::getRoundOfVotingNodes(),
@@ -769,7 +744,7 @@ trait TurnTrait
     ];
 
 
-    Engine::setup($node, ['method' => 'stSetupUpkeepAndRefresh']);
+    Engine::setup($this->withPhaseWindows($node, PARLIAMENT_MEETS), ['method' => 'stSetupUpkeepAndRefresh']);
     Engine::proceed();
   }
 
@@ -798,8 +773,7 @@ trait TurnTrait
         [
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
-            TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
-            BLACKMAIL_CARD => [SCANDAL_IN_INDIA_ID, SCANDAL_ON_LEADENHALL_STREET_ID],
+            TIMING_WINDOW => [ANY_TIME_AFTER_REVENUE_PHASE],
           ],
         ],
         [
@@ -814,7 +788,7 @@ trait TurnTrait
       ],
     ];
 
-    Engine::setup($node, ['method' => 'stLastRoundCheck']);
+    Engine::setup($this->withPhaseWindows($node, UPKEEP_AND_REFRESH), ['method' => 'stLastRoundCheck']);
     Engine::proceed();
   }
 
@@ -1036,6 +1010,39 @@ trait TurnTrait
         ],
       ],
     ];
+  }
+
+  private function withPhaseWindows(array $node, string $phaseId, bool $start = true, bool $end = true): array
+  {
+    $window = fn($type) => [
+      'action' => TIMING_WINDOW_CHECK,
+      'args' => [TIMING_WINDOW => [$type], TIMING_DATA => [PHASE_ID => $phaseId]],
+    ];
+    if ($start) {
+      array_unshift($node['children'], $window(START_OF_PHASE));
+    }
+    if ($end) {
+      $node['children'][] = $window(END_OF_PHASE);
+    }
+    return $node;
+  }
+
+  private function withOfficeWindows(array $node, string $officeId, bool $before = true, bool $after = true): array
+  {
+    if ($before) {
+      Globals::setOfficeHolderBonus(0);
+    }
+    $window = fn($type) => [
+      'action' => TIMING_WINDOW_CHECK,
+      'args' => [TIMING_WINDOW => [$type], TIMING_DATA => [OFFICE_ID => $officeId]],
+    ];
+    if ($before) {
+      array_unshift($node['children'], $window(BEFORE_OFFICE_ACTS));
+    }
+    if ($after) {
+      $node['children'][] = $window(AFTER_OFFICE_FINISHED_ACTING);
+    }
+    return $node;
   }
 
   function updatePhase($phase)

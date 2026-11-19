@@ -114,6 +114,7 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
   // Default
   canceledNotifIds: string[];
   attention: JocoAttention[];
+  timingPreferences: { window: Record<string, boolean>; card: Record<string, boolean> };
   gameOptions: {
     crownEnabled: boolean;
   };
@@ -318,6 +319,7 @@ export interface JocoLondonSeasonCardBase extends GamePiece {
 }
 
 export interface JocoLondonSeasonCardStatic {
+  timingWindows: string[];
   title: string;
   background: string;
   subtype: 'Enterprise' | 'Spouse';
@@ -339,6 +341,7 @@ export type JocoLondonSeasonCard = JocoLondonSeasonCardBase &
 export interface JocoLawCardBase extends GamePiece {}
 
 export interface JocoLawCardStatic {
+  timingWindows: string[];
   background: string;
   title: string;
   header: string;
@@ -457,6 +460,7 @@ export interface JocoPromiseCardBase extends GamePiece {
 }
 
 export interface JocoPromiseCardStatic {
+  timingWindows: string[];
   title: string;
   familyId: string;
 }
