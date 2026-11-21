@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS `players_extra` (
   PRIMARY KEY (`player_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 CREATE TABLE IF NOT EXISTS `family_members` (
-  `family_member_id` varchar(32) NOT NULL,
+  `family_member_id` varchar(64) NOT NULL,
   `family_member_location` varchar(32) NOT NULL,
   `family_member_state` int(10) DEFAULT 0,
   `family_id` varchar(16) DEFAULT NULL,
@@ -160,7 +160,7 @@ CREATE TABLE IF NOT EXISTS `offices` (
   `office_location` varchar(32) NOT NULL,
   `office_state` int(10) DEFAULT 0,
   `treasury` int(10) DEFAULT 0,
-  `family_member_id` varchar(32) NULL,
+  `family_member_id` varchar(64) NULL,
   `fatigue` int(10) DEFAULT 0,
   PRIMARY KEY (`office_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
