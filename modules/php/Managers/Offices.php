@@ -60,14 +60,16 @@ class Offices extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
 
   public static function setupNewGame($players = null, $options = null)
   {
-    $companyTreasuries = Scenarios::get()->getCompanyTreasuries();
+    $scenario = Scenarios::get();
+    $companyTreasuries = $scenario->getCompanyTreasuries();
     $offices = [];
+    $officesInPlayAtStart = $scenario->getOfficesInPlayAtStart();
 
     foreach (OFFICES as $officeId) {
       // TODO: set location based on scenario
       $offices[$officeId] = [
         'id' => $officeId,
-        'location' => DECK,
+        'location' => in_array($officeId, $officesInPlayAtStart) ? Locations::vacantOffices() : DECK,
         'treasury' => in_array($officeId, OFFICES_WITH_TREASURY) ? $companyTreasuries : 0,
       ];
     }

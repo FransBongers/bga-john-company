@@ -12,6 +12,7 @@ class Scenario implements \JsonSerializable
   protected $companyStanding;
   protected $companyTreasuries;
   protected $companyShips = [];
+  protected $officesInPlayAtStart = [];
   protected $orders = [];
   protected $regions = [];
   protected $passedLaws = [];
@@ -57,6 +58,11 @@ class Scenario implements \JsonSerializable
   public function getElephant()
   {
     return $this->elephant;
+  }
+
+  public function getOfficesInPlayAtStart()
+  {
+    return $this->officesInPlayAtStart;
   }
 
   public function getOrders()

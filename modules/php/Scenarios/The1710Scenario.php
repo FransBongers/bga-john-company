@@ -16,6 +16,15 @@ class The1710Scenario extends \Bga\Games\JohnCompany\Models\Scenario
     $this->companyShips = [];
     $this->startTurn = 1;
     $this->endTurn = 5;
+    $this->officesInPlayAtStart = [
+      CHAIRMAN,
+      DIRECTOR_OF_TRADE,
+      MANAGER_OF_SHIPPING,
+      MILITARY_AFFAIRS,
+      PRESIDENT_OF_BOMBAY,
+      PRESIDENT_OF_MADRAS,
+      PRESIDENT_OF_BENGAL,
+    ];
     $this->orders = [
       ORDER_PUNJAB_1 => CLOSED,
       ORDER_DELHI_2 => CLOSED,

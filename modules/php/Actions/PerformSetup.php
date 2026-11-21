@@ -50,6 +50,7 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
       Notifications::setupRevealCards($player, $setupCards);
 
       $familyMembers = [];
+      $playerOffices = [];
       $cash = 0;
       $enterprises = [];
       $randomBlackMailCards = 0;
@@ -69,6 +70,7 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
               }
               $offices[$item['value']]->setFamilyMemberId($familyMember->getId());
               $offices[$item['value']]->setLocation(Locations::familyOffices($playerId));
+              $playerOffices[] = $offices[$item['value']];
               break;
             case COMPANY_SHARE:
               $familyMember = FamilyMembers::getMemberFor($playerId);
@@ -117,6 +119,9 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
       }
 
       Notifications::setupFamilyMembers($player, $familyMembers);
+      foreach ($playerOffices as $office) {
+        Notifications::moveOfficeCard($office, '', []);
+      }
       Notifications::updateFamilyTreasury($player, $cash);
       if ($isPrimeMinister) {
         Parliament::changePrimeMinister($playerId);
@@ -140,7 +145,6 @@ class PerformSetup extends \Bga\Games\JohnCompany\Models\AtomicAction
         $card = LondonSeasonCards::getTopOf(Locations::londonSeasonPool(BLACKMAIL));
         $card->take($player, $this->ctx);
       }
-
     }
     Notifications::updatePower();
 
