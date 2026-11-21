@@ -138,7 +138,7 @@ class Players extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
   }
 
 
-  public function getMany($playerIds)
+  public static function getMany($playerIds)
   {
     $players = self::DB()
       ->whereIn($playerIds)

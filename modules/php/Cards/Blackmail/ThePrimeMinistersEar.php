@@ -15,10 +15,13 @@ class ThePrimeMinistersEar extends \Bga\Games\JohnCompany\Models\BlackmailCard
     return $timingData['beforeFamily'] ?? false;
   }
 
-  public function effectCanBeApplied(array $timingData): array | null
+  public function effectCanBeApplied(string | int | null $itemId): array | null
   {
-    return ($timingData['anytime'] ?? false) || ($timingData[PHASE_ID] ?? null) === FAMILY
-      ? parent::effectCanBeApplied($timingData)
+    // TODO: check anytime timing windows
+    //   return ($timingData['anytime'] ?? false) || ($timingData[PHASE_ID] ?? null) === FAMILY
+    // ? parent::effectCanBeApplied($timingData)
+    return $itemId === 'anytime' || $itemId === FAMILY
+      ? parent::effectCanBeApplied($itemId)
       : null;
   }
 
@@ -32,7 +35,7 @@ class ThePrimeMinistersEar extends \Bga\Games\JohnCompany\Models\BlackmailCard
     ];
   }
 
-  public function applyEffect(object $ctx, Player $player, array $timingData)
+  public function applyEffect(object $ctx, Player $player, string | int | null $itemId)
   {
     $ctx->insertAsBrother(new LeafNode([
       'action' => SWAP_POWER_MARKERS,

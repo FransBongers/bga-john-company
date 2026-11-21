@@ -41,8 +41,8 @@ class LondonSeasonOrder extends \Bga\Games\JohnCompany\Models\AtomicAction
           [
             'action' => TIMING_WINDOW_CHECK,
             'args' => [
-              TIMING_WINDOW => [START_OF_LONDON_SEASON_CHOOSE_CARD],
-              TIMING_DATA => [PLAYER_ID => $playerId],
+              TIMING_WINDOW => START_OF_LONDON_SEASON_CHOOSE_CARD,
+              ITEM_ID => $playerId,
             ],
           ],
           [

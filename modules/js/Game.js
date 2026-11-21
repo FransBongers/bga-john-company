@@ -25,6 +25,7 @@ const BLACKMAIL = 'Blackmail';
 const PRESTIGE = 'Prestige';
 const ENTERPRISE = 'Enterprise';
 const SPOUSE = 'Spouse';
+const LAW = 'Law';
 const BLUE = 'blue';
 const GRAY = 'gray';
 const GREEN = 'green';
@@ -57,6 +58,7 @@ const SETUP = 'setup';
 const LONDON_SEASON = 'londonSeason';
 const FAMILY = 'family';
 const FIRMS = 'firms';
+const COMPANY_OPERATIONS = 'companyOperations';
 const HIRING = 'hiring';
 const BONUSES = 'Bonuses';
 const REVENUE = 'revenue';
@@ -77,6 +79,7 @@ const CIRCLE = 'Circle';
 const POWER = 'Power';
 const BONUS = 'Bonus';
 const TAX = 'Tax';
+const WINDOW_TAX = 'windowTax';
 const VICTORY_POINTS = 'VictoryPoints';
 const DISCOUNT = 'Discount';
 const SHIPYARD = 'Shipyard';
@@ -356,11 +359,16 @@ const LAW_CARD = 'lawCard';
 const BLACKMAIL_CARD = 'blackmailCard';
 const PROMISE_CARD = 'promiseCard';
 const TIMING_WINDOW = 'timingWindow';
-const TIMING_DATA = 'timingData';
 const START_OF_PHASE = 'startOfPhase';
 const END_OF_PHASE = 'endOfPhase';
 const BEFORE_OFFICE_ACTS = 'beforeOfficeActs';
 const AFTER_OFFICE_FINISHED_ACTING = 'afterOfficeFinishedActing';
+const ITEM_ID = 'itemId';
+const BEFORE_ANY_VOTES_ARE_CAST = 'beforeAnyVotesAreCast';
+const WHEN_RETIRING = 'whenRetiring';
+const START_OF_LONDON_SEASON_CHOOSE_CARD = 'startOfLondonSeasonChooseCard';
+const AFTER_PRESIDENT_OR_FIRM_CHECK = 'afterPresidentOrFirmCheck';
+const AFTER_COMMANDER_DEPLOY_CHECK = 'afterCommanderDeployCheck';
 const OLD_IDEAS_MADE_NEW_ID = 'LawCard_52';
 
 class AttentionManager {
@@ -423,9 +431,9 @@ class AttentionManager {
     }
 }
 
-const tplTabButton = (icon, text, index) => `
-<div id="joco-bar-item-${index}" class="joco-bar-item">
-  <i class="fa6 fa6-${icon}"></i>
+const tplTabButton = ({ id, icon, text }, index) => `
+<div id="joco-bar-item-${index}" class="joco-bar-item ${id}-bar-item">
+  ${icon ? `<i class="fa6 fa6-${icon}"></i>` : ''}
   <div class="fb-font-baskerville fb-font-bold joco-bar-item-text">${text}</div>
 </div>
 `;
@@ -444,19 +452,9 @@ class Bar {
                 icon: 'users',
             },
             {
-                id: 'joco-deals',
-                text: _('Deals'),
-                icon: 'handshake',
-            },
-            {
-                id: 'joco-india',
-                text: _('India'),
-                icon: 'earth-asia',
-            },
-            {
-                id: 'joco-parliament',
-                text: _('Parliament'),
-                icon: 'landmark',
+                id: 'joco-company',
+                text: _('Company'),
+                icon: 'briefcase',
             },
             {
                 id: 'joco-london',
@@ -464,9 +462,19 @@ class Bar {
                 icon: 'earth-europe',
             },
             {
-                id: 'joco-company',
-                text: _('Company'),
-                icon: 'briefcase',
+                id: 'joco-parliament',
+                text: _('Parliament'),
+                icon: 'landmark',
+            },
+            {
+                id: 'joco-india',
+                text: _('India'),
+                icon: 'earth-asia',
+            },
+            {
+                id: 'joco-deals',
+                text: _('Deals'),
+                icon: 'handshake',
             },
         ];
         this.game = game;
@@ -492,11 +500,11 @@ class Bar {
             this.config.push({
                 id: 'joco-draft',
                 text: _('Draft'),
-                icon: 'cards-blank',
             });
         }
-        this.config.forEach(({ id, text, icon }, index) => {
-            bar.insertAdjacentHTML('beforeend', tplTabButton(icon, text, index));
+        this.config.forEach((barConfig, index) => {
+            const { id, text, icon } = barConfig;
+            bar.insertAdjacentHTML('beforeend', tplTabButton(barConfig, index));
             this.ui.barButtons.push(document.getElementById(`joco-bar-item-${index}`));
             this.ui.tabs[id] = document.getElementById(id);
             if (index === this.active) {
@@ -1096,7 +1104,7 @@ const tplShipContent = (ship, back = false) => `
   ${back ? `<div class="joco-ship-fatigued fb-font-baskerville bga-autofit">${_('F')}</div>` : ''}
 `;
 
-const tlpLogTokenText = ({ text, tooltipId, italic = false, bold = true, }) => `<span ${tooltipId ? `id="${tooltipId}" class="log_tooltip"` : ''} style="font-weight: ${bold ? '700' : '400'};${italic ? ' font-style: italic;' : ''}">${_(text)}</span>`;
+const tlpLogTokenText = ({ text, tooltipId, italic = false, bold = true, color, }) => `<span ${tooltipId ? `id="${tooltipId}" class="log_tooltip"` : ''} style="font-weight: ${bold ? '700' : '400'};${italic ? ' font-style: italic;' : ''}${color ? ` color: #${color};` : ''}">${_(text)}</span>`;
 const tplLogTokenClimate = (climate) => `<div class="log-token joco-crown-climate-icon" data-climate="${climate}"></div>`;
 const tplLogTokenElephant = () => '<div class="log-token joco-elephant"></div>';
 const tplLogTokenLocalAlliance = (id) => {
@@ -1135,6 +1143,53 @@ const tknFamilyMember = (familyMember) => {
     return [familyMember.familyId, number].join(':');
 };
 
+const getPhaseName = (phase) => {
+    switch (phase) {
+        case LONDON_SEASON:
+            return _('London Season');
+        case FAMILY:
+            return _('Family');
+        case FIRMS:
+            return _('Firms');
+        case FINAL_SCORING:
+            return _('Final Scoring');
+        case HIRING:
+            return _('Hiring');
+        case CHAIRMAN:
+            return _('Chairman');
+        case COMPANY_OPERATIONS:
+            return _('Company Operations');
+        case DIRECTOR_OF_TRADE:
+            return _('Director of Trade');
+        case GOVERNOR_GENERAL:
+            return _('Governor General');
+        case MANAGER_OF_SHIPPING:
+            return _('Manager of Shipping');
+        case MILITARY_AFFAIRS:
+            return _('Military Affairs');
+        case BOMBAY_PRESIDENCY:
+            return _('Bombay Presidency');
+        case MADRAS_PRESIDENCY:
+            return _('Madras Presidency');
+        case BENGAL_PRESIDENCY:
+            return _('Bengal Presidency');
+        case SUPERINTENDENT_OF_TRADE_IN_CHINA:
+            return _('Superintendent of Trade in China');
+        case BONUSES:
+            return _('Bonuses');
+        case REVENUE:
+            return _('Revenue');
+        case EVENTS_IN_INDIA:
+            return _('Events in India');
+        case PARLIAMENT_MEETS:
+            return _('Parliament Meets');
+        case UPKEEP_AND_REFRESH:
+            return _('Upkeep & Refresh');
+        default:
+            return phase;
+    }
+};
+
 const getArmyNameForPresidency = (presidencyId) => {
     switch (presidencyId) {
         case BENGAL_PRESIDENCY:
@@ -1160,7 +1215,9 @@ const getCardTypeText = (cardType) => {
     }
 };
 const getFamilyNameForPlayerId = (playerId) => {
-    const familyId = PlayerManager.getInstance().getPlayer(playerId).getFamilyId();
+    const familyId = PlayerManager.getInstance()
+        .getPlayer(playerId)
+        .getFamilyId();
     return getFamilyName(familyId);
 };
 const getFamilyName = (familyId) => {
@@ -1300,6 +1357,58 @@ const getSetupCard = (card) => {
         ...card,
         ...cardStatic,
     };
+};
+const getTimingWindowText = (kind, itemId) => {
+    switch (kind) {
+        case AFTER_OFFICE_FINISHED_ACTING:
+            return formatStringRecursive(_('After ${officeTitle} finished acting'), {
+                officeTitle: StaticData.get().office(itemId).title,
+            });
+        case BEFORE_OFFICE_ACTS:
+            return formatStringRecursive(_('Before ${officeTitle} acts'), {
+                officeTitle: StaticData.get().office(itemId).title,
+            });
+        case END_OF_PHASE:
+            return formatStringRecursive(_('End of ${phaseName}'), {
+                phaseName: getPhaseName(itemId),
+            });
+        case START_OF_PHASE:
+            return formatStringRecursive(_('Start of ${phaseName}'), {
+                phaseName: getPhaseName(itemId),
+            });
+        case BEFORE_ANY_VOTES_ARE_CAST:
+            return _('Before any votes are cast');
+        case WHEN_RETIRING:
+            return _('When retiring');
+        case START_OF_LONDON_SEASON_CHOOSE_CARD:
+            return formatStringRecursive(_("When it's ${player_name}'s turn to take a card from the London Season Display"), {
+                player_name: getPlayer(itemId).getName(),
+            });
+        case AFTER_COMMANDER_DEPLOY_CHECK:
+            return _('After Commander Deploy roll');
+        default:
+            throw new Error(`Unknown timing window kind: ${kind}`);
+    }
+};
+const getCardPrefix = (cardId) => {
+    if (cardId.startsWith('PC')) {
+        return 'promise-card-';
+    }
+    if (cardId.startsWith(SHIPYARD) ||
+        cardId.startsWith(WORKSHOP) ||
+        cardId.startsWith(LUXURY)) {
+        return 'enterprise-card-';
+    }
+    if (cardId.startsWith('LawCard')) {
+        return 'law-card-';
+    }
+    return 'game-card-';
+};
+const getIdWithPrefix = (itemId) => {
+    if (itemId.startsWith('familyMember')) {
+        return itemId;
+    }
+    return getCardPrefix(itemId) + itemId;
 };
 
 const tplPlayerCounters = ({ crownInGame, familyId, playerId, }) => {
@@ -2764,51 +2873,6 @@ class Interaction {
     }
 }
 
-const getPhaseName = (phase) => {
-    switch (phase) {
-        case LONDON_SEASON:
-            return _('London Season');
-        case FAMILY:
-            return _('Family');
-        case FIRMS:
-            return _('Firms');
-        case FINAL_SCORING:
-            return _('Final Scoring');
-        case HIRING:
-            return _('Hiring');
-        case CHAIRMAN:
-            return _('Chairman');
-        case DIRECTOR_OF_TRADE:
-            return _('Director of Trade');
-        case GOVERNOR_GENERAL:
-            return _('Governor General');
-        case MANAGER_OF_SHIPPING:
-            return _('Manager of Shipping');
-        case MILITARY_AFFAIRS:
-            return _('Military Affairs');
-        case BOMBAY_PRESIDENCY:
-            return _('Bombay Presidency');
-        case MADRAS_PRESIDENCY:
-            return _('Madras Presidency');
-        case BENGAL_PRESIDENCY:
-            return _('Bengal Presidency');
-        case SUPERINTENDENT_OF_TRADE_IN_CHINA:
-            return _('Superintendent of Trade in China');
-        case BONUSES:
-            return _('Bonuses');
-        case REVENUE:
-            return _('Revenue');
-        case EVENTS_IN_INDIA:
-            return _('Events in India');
-        case PARLIAMENT_MEETS:
-            return _('Parliament Meets');
-        case UPKEEP_AND_REFRESH:
-            return _('Upkeep & Refresh');
-        default:
-            return phase;
-    }
-};
-
 const STOCK_EXCHANGE_CONFIG = [
     { id: STOCK_EXCHANGE_2, value: 2 },
     { id: STOCK_EXCHANGE_3_LEFT, value: 3 },
@@ -2932,7 +2996,7 @@ const tplCompanyDebt = () => `
     </div>
   </div>
 `;
-const COMPANY_STANDING_CONFIG = [
+const getCompanyStandingConfig = () => [
     {
         id: 'company-standing-fail',
         icon: 'failed',
@@ -2978,7 +3042,7 @@ const tplCompanyStanding = () => `
   <div id="joco-company-standing" class="joco-container">
     <div class="joco-header"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Standing').toLocaleUpperCase()}</span></div>
     <div class="joco-company-spots">
-      ${COMPANY_STANDING_CONFIG.map((item) => {
+      ${getCompanyStandingConfig().map((item) => {
     return `
         <div class="joco-column">
           ${tplCompanySpotIcon(item.icon)(item.id)}
@@ -3104,7 +3168,7 @@ class Company {
         this.balance.setValue(gamedatas.company.balance);
     }
     setupCompanyStanding(gamedatas) {
-        COMPANY_STANDING_CONFIG.forEach((item) => {
+        getCompanyStandingConfig().forEach((item) => {
             this.ui.standing[item.id] = document.getElementById(item.id);
         });
         this.updateCompanyStanding(gamedatas.company.standing);
@@ -6638,7 +6702,7 @@ const getTokenDiv = ({ key, value, game, }) => {
                 })
                 : value;
         case LOG_TOKEN_PROMISE_CARD:
-            return tplTextWithTooltip(game, value, StaticData.get().promiseCard(value).title);
+            return tplTextWithTooltip(game, value, StaticData.get().promiseCard(value).title, getPlayer(Number(value.split('_')[1])).getColor());
         case LOG_TOKEN_UNREST:
             return tplLogTokenCube('unrest');
         case LOG_TOKEN_VICTORY_POINTS:
@@ -6647,7 +6711,7 @@ const getTokenDiv = ({ key, value, game, }) => {
             return value;
     }
 };
-const tplTextWithTooltip = (game, cardId, text) => {
+const tplTextWithTooltip = (game, cardId, text, color) => {
     const cardNameTooltipId = `tooltip_${game._last_tooltip_id}`;
     game.tooltipsToMap.push([game._last_tooltip_id, cardId]);
     game._last_tooltip_id++;
@@ -6655,6 +6719,7 @@ const tplTextWithTooltip = (game, cardId, text) => {
         text,
         tooltipId: cardNameTooltipId,
         bold: true,
+        color,
     });
 };
 
@@ -8433,7 +8498,13 @@ class HiringGiveConsentForNepotism {
     onEnteringState(args) {
         debug('Entering HiringGiveConsentForNepotism state');
         this.args = args;
-        this.updateInterfaceInitialStep();
+        if (getCurrentPlayerId() === this.args.hiringPlayerId) {
+            this.updateInterfacePlayPromiseCards();
+            Bar.getInstance().goTo('joco-player-areas');
+        }
+        else {
+            this.updateInterfaceInitialStep();
+        }
     }
     onLeavingState() {
         debug('Leaving HiringGiveConsentForNepotism state');
@@ -8447,6 +8518,32 @@ class HiringGiveConsentForNepotism {
             tkn_familyMember: tknFamilyMember(args.familyMember),
             officeTitle: this.getTitle(),
         });
+    }
+    updateInterfacePlayPromiseCards() {
+        clearPossible();
+        updatePageTitle(_('Consent for nepotism: ${you} may play Promise Card(s)'));
+        this.args.promiseCards.forEach((card) => {
+            onClick(`promise-card-${card.id}`, () => this.updateInterfaceConfirmPromiseCard(card.id));
+        });
+        addSecondaryActionButton({
+            id: 'do_not_play_btn',
+            text: _('Do not play Promise Card(s)'),
+            callback: () => this.updateInterfaceConfirmPromiseCard(null),
+        });
+    }
+    updateInterfaceConfirmPromiseCard(promiseCardId) {
+        clearPossible();
+        updatePageTitle(promiseCardId
+            ? _('Play selected Promise Card?')
+            : _('Do not play any Promise Card(s)?'));
+        if (promiseCardId) {
+            setSelected(`promise-card-${promiseCardId}`);
+        }
+        addConfirmButton(() => performAction('actHiringGiveConsentForNepotism', {
+            isHiringPlayer: true,
+            promiseCardId,
+        }));
+        addCancelButton();
     }
     updateInterfaceInitialStep() {
         clearPossible();
@@ -8698,6 +8795,12 @@ class LondonSeasonRetire {
     setDescription(activePlayerIds, args) { }
     updateInterfaceInitialStep() {
         clearPossible();
+        const initialMoney = this.args.treasury + this.getRemainingDiscount();
+        if (initialMoney <= 1) {
+            updatePageTitle(_('${you} cannot afford to retire any family members'));
+            addPassButton(this.args.optionalAction, _('Do not retire any family members'));
+            return;
+        }
         const remainingMoney = this.getRemainingMoney() + this.getRemainingDiscount();
         if (remainingMoney <= 1 ||
             Object.keys(this.selectedPrizes).length === this.args.familyMembers.length) {
@@ -9808,35 +9911,51 @@ class TimingWindowAct {
         debug('Leaving TimingWindowAct state');
     }
     setDescription(activePlayerIds, args) {
-        updatePageTitle(_('Other players may use card effects'), {});
+        this.args = args;
+        this.updatePageTitle();
     }
     updateInterfaceInitialStep() {
         clearPossible();
-        updatePageTitle(_('${you} may use card effects'), {});
-        (this.args._private ?? []).forEach(({ cardId, cardType, resolved }, index) => {
-            if (!resolved)
-                this.addButton(cardId, cardType, index);
+        this.updatePageTitle();
+        (this.args._private ?? []).forEach(({ card, resolved }, index) => {
+            if (!resolved) {
+                onClick(`${getCardPrefix(card.id)}${card.id}`, () => {
+                    this.updateInterfaceConfirm(true, index);
+                });
+            }
         });
-        addSecondaryActionButton({
-            id: 'do_not_use_card',
-            text: _('Pass'),
-            callback: () => {
-                this.updateInterfaceConfirm(false);
-            },
-        });
+        if (Object.values(this.args._private ?? {}).length > 0) {
+            addSecondaryActionButton({
+                id: 'do_not_use_card',
+                text: _('Pass Timing Window'),
+                callback: () => {
+                    this.updateInterfaceConfirm(false);
+                },
+            });
+        }
+        else {
+            addPrimaryActionButton({
+                id: 'do_not_use_card',
+                text: _('Pass Timing Window'),
+                callback: () => {
+                    this.updateInterfaceConfirm(false);
+                },
+            });
+        }
     }
     updateInterfaceConfirm(use, index) {
         clearPossible();
         if (use && index !== undefined) {
             const option = this.args._private?.[index];
             updatePageTitle(option.cardType === LAW_CARD
-                ? _('Use ${cardText}?')
-                : _('Play ${cardText}?'), {
-                cardText: this.getCardText(option.cardId, option.cardType),
+                ? _('Use ${cardText} ?')
+                : _('Play ${cardText} ?'), {
+                cardText: this.getCardText(option.card),
             });
+            setSelected(`${getCardPrefix(option.cardId)}${option.cardId}`);
         }
         else {
-            updatePageTitle(_('Pass this timing window?'), {});
+            updatePageTitle(_('Pass Timing Window?'), {});
         }
         addConfirmButton(() => {
             performAction('actTimingWindowAct', {
@@ -9846,22 +9965,18 @@ class TimingWindowAct {
         });
         addCancelButton();
     }
-    getCardText(cardId, cardType) {
-        const text = '${cardTitle} (${cardType})';
-        return formatStringRecursive(text, {
-            cardTitle: _(StaticData.get().cardTitle(cardId)),
-            cardType: getCardTypeText(cardType),
+    updatePageTitle() {
+        updatePageTitle(_('Timing Window: ${timingWindow}'), {
+            timingWindow: getTimingWindowText(this.args[TIMING_WINDOW], this.args[ITEM_ID]),
         });
     }
-    addButton(cardId, cardType, index) {
-        const text = this.getCardText(cardId, cardType);
-        const title = StaticData.get().cardTitle(cardId);
-        addPrimaryActionButton({
-            id: `use_card_${index}`,
-            text: formatStringRecursive(text, { cardTitle: title }),
-            callback: () => {
-                this.updateInterfaceConfirm(true, index);
-            },
+    getCardText(card) {
+        const text = '"${cardTitle}"';
+        const cardId = card['type'] === BLACKMAIL && 'hiddenId' in card
+            ? card.hiddenId
+            : card.id;
+        return formatStringRecursive(text, {
+            cardTitle: _(StaticData.get().cardTitle(cardId)),
         });
     }
 }
@@ -10515,6 +10630,7 @@ class SwapPowerMarkers {
 class TaxAndUpkeep {
     constructor(game) {
         this.game = game;
+        this.selectedTargets = [];
     }
     static create(game) {
         TaxAndUpkeep.instance = new TaxAndUpkeep(game);
@@ -10525,18 +10641,101 @@ class TaxAndUpkeep {
     onEnteringState(args) {
         debug('Entering TaxAndUpkeep state');
         this.args = args;
+        this.selectedTargets = [];
         this.updateInterfaceInitialStep();
+        const bar = Bar.getInstance();
+        switch (this.args.type) {
+            case TAX:
+                bar.goTo('joco-player-areas');
+                break;
+            case UPKEEP:
+            case WINDOW_TAX:
+                bar.goTo('joco-london');
+                break;
+            default:
+                break;
+        }
     }
     onLeavingState() {
         debug('Leaving TaxAndUpkeep state');
     }
-    setDescription(activePlayerIds, args) { }
+    setDescription(activePlayerIds, args) {
+        this.args = args;
+        this.updatePageTitle(false);
+    }
     updateInterfaceInitialStep() {
         this.game.clearPossible();
-        updatePageTitle(_('${you} may perform an action'), {});
-        addConfirmButton(() => {
-            performAction('actTaxAndUpkeep', {});
+        const privateArgs = this.args._private;
+        if (!privateArgs) {
+            this.updatePageTitle(false);
+            return;
+        }
+        const amount = this.selectedTargets.reduce((remaining, targetId) => remaining - privateArgs.targets[targetId], privateArgs.amount);
+        const canPay = amount <= privateArgs.treasury;
+        this.updatePageTitle(true, amount, privateArgs.treasury);
+        Object.keys(privateArgs.targets).forEach((targetId) => {
+            const selected = this.selectedTargets.includes(targetId);
+            const elementId = getIdWithPrefix(targetId);
+            if (selected) {
+                setSelected(elementId);
+            }
+            if (!selected && canPay) {
+                return;
+            }
+            onClick(elementId, () => {
+                this.selectedTargets = selected
+                    ? this.selectedTargets.filter((id) => id !== targetId)
+                    : [...this.selectedTargets, targetId];
+                this.updateInterfaceInitialStep();
+            });
         });
+        addPrimaryActionButton({
+            id: 'confirm_btn',
+            text: _('Confirm'),
+            extraClasses: canPay ? undefined : DISABLED,
+            callback: () => {
+                if (canPay) {
+                    performAction('actTaxAndUpkeep', {
+                        selectedTargets: this.selectedTargets,
+                    });
+                }
+            },
+        });
+        addCancelButton();
+    }
+    updatePageTitle(activePlayer = true, amount = 0, treasury = 0) {
+        const shortfall = Math.max(0, amount - treasury);
+        switch (this.args.type) {
+            case UPKEEP:
+                updatePageTitle(activePlayer
+                    ? _('Upkeep: ${you} must return family members (short £${shortfall})')
+                    : _('Upkeep: other players must return family members they cannot pay for'), { shortfall });
+                break;
+            case TAX:
+                updatePageTitle(activePlayer
+                    ? _('Tax on ${tkn_icon}: ${you} must discard items (short £${shortfall})')
+                    : _('Tax on ${tkn_icon}: other players must discard items they cannot pay for'), { tkn_icon: this.args.target, shortfall });
+                break;
+            case WINDOW_TAX:
+                updatePageTitle(activePlayer
+                    ? _('Window Tax: ${you} must discard or return items (short £${shortfall})')
+                    : _('Window Tax: other players must discard or return items they cannot pay for'), { shortfall });
+                break;
+        }
+    }
+    getTargetText() {
+        switch (this.args.target) {
+            case SHARE:
+                return _('shares');
+            case SHIPYARD:
+                return _('shipyards');
+            case WORKSHOP:
+                return _('workshops');
+            case LUXURY:
+                return _('luxuries');
+            default:
+                return this.args.target ?? '';
+        }
     }
 }
 

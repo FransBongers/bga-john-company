@@ -3,6 +3,12 @@ import { AttentionManager } from '../attention';
 import { GameAlias, GamedatasAlias } from '../types';
 import { tplTabButton } from './templates';
 
+export interface BarConfig {
+  id: string;
+  text: string;
+  icon?: string;
+}
+
 export class Bar {
   private static instance: Bar;
   private game: GameAlias;
@@ -16,26 +22,16 @@ export class Bar {
   };
   private active: number = 0;
 
-  private config = [
+  private config: BarConfig[] = [
     {
       id: 'joco-player-areas',
       text: _('Players'),
       icon: 'users',
     },
     {
-      id: 'joco-deals',
-      text: _('Deals'),
-      icon: 'handshake',
-    },
-    {
-      id: 'joco-india',
-      text: _('India'),
-      icon: 'earth-asia',
-    },
-    {
-      id: 'joco-parliament',
-      text: _('Parliament'),
-      icon: 'landmark',
+      id: 'joco-company',
+      text: _('Company'),
+      icon: 'briefcase',
     },
     {
       id: 'joco-london',
@@ -43,9 +39,19 @@ export class Bar {
       icon: 'earth-europe',
     },
     {
-      id: 'joco-company',
-      text: _('Company'),
-      icon: 'briefcase',
+      id: 'joco-parliament',
+      text: _('Parliament'),
+      icon: 'landmark',
+    },
+    {
+      id: 'joco-india',
+      text: _('India'),
+      icon: 'earth-asia',
+    },
+    {
+      id: 'joco-deals',
+      text: _('Deals'),
+      icon: 'handshake',
     },
   ];
 
@@ -87,12 +93,12 @@ export class Bar {
       this.config.push({
         id: 'joco-draft',
         text: _('Draft'),
-        icon: 'cards-blank',
       });
     }
 
-    this.config.forEach(({ id, text, icon }, index) => {
-      bar.insertAdjacentHTML('beforeend', tplTabButton(icon, text, index));
+    this.config.forEach((barConfig, index) => {
+      const { id, text, icon } = barConfig;
+      bar.insertAdjacentHTML('beforeend', tplTabButton(barConfig, index));
       this.ui.barButtons.push(
         document.getElementById(`joco-bar-item-${index}`),
       );

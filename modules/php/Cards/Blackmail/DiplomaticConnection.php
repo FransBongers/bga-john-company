@@ -29,7 +29,7 @@ class DiplomaticConnection extends \Bga\Games\JohnCompany\Models\BlackmailCard
    * Apply the effect of this london season card
    * Only for effects with specific timing windows
    */
-  public function applyEffect(object $ctx, Player $player, array $timingData)
+  public function applyEffect(object $ctx, Player $player, string | int | null $itemId)
   {
     $this->forceRerollOfLatestCheck();
   }

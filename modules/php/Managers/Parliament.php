@@ -166,6 +166,19 @@ class Parliament
     Globals::setParliament($data);
   }
 
+  public static function getEnterpriseOwnerIdsPlayerCanVoteFor(int $playerId): array
+  {
+    $data = Globals::getParliament();
+    // Players for which playerId has played the "Vote With My Enterprises" card
+    $playerIds = $data[VOTE_WITH_MY_ENTERPRISES][$playerId] ?? [];
+    // Check if another player played the "Vote With My Enterprises" card for playerId
+    if (!Utils::array_some(array_values($data[VOTE_WITH_MY_ENTERPRISES]), fn($ids) => in_array($playerId, $ids))) {
+      $playerIds[] = $playerId;
+    }
+
+    return $playerIds;
+  }
+
   public static function getPrimeMinisterPlayer()
   {
     $playerId = Globals::getParliament()[PRIME_MINISTER];

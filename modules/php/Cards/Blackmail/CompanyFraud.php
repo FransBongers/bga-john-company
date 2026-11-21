@@ -32,9 +32,9 @@ class CompanyFraud extends \Bga\Games\JohnCompany\Models\BlackmailCard
    * Whether the effect of this london season card can be applied
    * Only for effects with specific timing windows
    */
-  public function effectCanBeApplied(array $timingData): array | null
+  public function effectCanBeApplied(string | int | null $itemId): array | null
   {
-    if (($timingData[PHASE_ID] ?? null) !== REVENUE) {
+    if ($itemId !== REVENUE) {
       return null;
     }
     // Has to be owned by a player
@@ -63,7 +63,7 @@ class CompanyFraud extends \Bga\Games\JohnCompany\Models\BlackmailCard
    * Apply the effect of this london season card
    * Only for effects with specific timing windows
    */
-  public function applyEffect(object $ctx, Player $player, array $timingData)
+  public function applyEffect(object $ctx, Player $player, string | int | null $itemId)
   {
     $playerId = $player->getId();
     $offices = Utils::filter(Offices::getAll()->toArray(), fn($office) => $office->getPlayerId() === $playerId);

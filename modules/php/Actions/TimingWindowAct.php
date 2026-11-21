@@ -12,7 +12,7 @@ use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\PromiseCards;
 use Bga\Games\JohnCompany\Models\Player;
 
-class TimingWindowAct extends \Bga\Games\JohnCompany\Models\AtomicAction
+class TimingWindowAct extends \Bga\Games\JohnCompany\Actions\TimingWindow
 {
   public function getState()
   {
@@ -30,7 +30,10 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Models\AtomicAction
   public function argsTimingWindowAct()
   {
     $args = $this->ctx->getArgs();
-    $options = $args['options'] ?? [];
+    $itemId = $args[ITEM_ID] ?? null;
+    $timingWindow = $args[TIMING_WINDOW];
+
+    $options = $this->getOptionsForTimingWindow($timingWindow, $itemId);
 
     $private = [];
 
@@ -47,7 +50,7 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Models\AtomicAction
       $private[$playerId][] = $option;
     }
 
-    $resolved = $this->ctx->getInfo()['resolved'] ?? [];
+    $resolved = $this->ctx->getInfo()['resolved'] ?? []; // No longer needed?
     foreach ($private as $playerId => &$playerOptions) {
       foreach ($playerOptions as $index => &$option) {
         $option['resolved'] = $resolved[$playerId][$index] ?? false;
@@ -58,7 +61,8 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $data = [
       '_private' => $private,
-      'debug' => $this->ctx->getParent()->getUnresolvedActions([LONDON_SEASON_CHOOSE_CARD])
+      TIMING_WINDOW => $args[TIMING_WINDOW],
+      ITEM_ID => $args[ITEM_ID] ?? null,
     ];
 
     return $data;
@@ -132,7 +136,7 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Models\AtomicAction
     $player = Players::get($playerId);
     $cardId = $effect[CARD_ID];
     $cardType = $effect[CARD_TYPE];
-    $timingData = $effect[TIMING_DATA] ?? [];
+    $timingData = $effect[ITEM_ID] ?? null;
     if ($cardType === LAW_CARD) {
       LawCards::get($cardId)->applyEffect($this->ctx, $player, $timingData);
     } else if ($cardType === PROMISE_CARD) {
@@ -158,7 +162,7 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Models\AtomicAction
     } else {
       $card = LondonSeasonCards::get($cardId);
     }
-    $currentEffect = $card->effectCanBeApplied($effect[TIMING_DATA] ?? []);
+    $currentEffect = $card->effectCanBeApplied($effect[ITEM_ID] ?? null);
     if ($currentEffect === null || $currentEffect[PLAYER_ID] !== $playerId) {
       throw new \BgaUserException(clienttranslate('This card effect is no longer available'));
     }
@@ -168,7 +172,7 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Models\AtomicAction
   {
     $cardId = $effect[CARD_ID];
     $cardType = $effect[CARD_TYPE];
-    $timingData = $effect[TIMING_DATA] ?? [];
+    $timingData = $effect[ITEM_ID] ?? null;
 
     $card = LondonSeasonCards::get($cardId);
     $card->play($player);

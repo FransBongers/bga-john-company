@@ -11,7 +11,7 @@ import {
 } from '../constants';
 import { GameAlias, GamedatasAlias } from '../types';
 import {
-  COMPANY_STANDING_CONFIG,
+  getCompanyStandingConfig,
   STOCK_EXCHANGE_CONFIG,
   tplCompanyStanding,
   tplCourtOfDirectors,
@@ -100,7 +100,7 @@ export class Company {
   }
 
   setupCompanyStanding(gamedatas: GamedatasAlias) {
-    COMPANY_STANDING_CONFIG.forEach((item) => {
+    getCompanyStandingConfig().forEach((item) => {
       this.ui.standing[item.id] = document.getElementById(item.id)!;
     });
     this.updateCompanyStanding(gamedatas.company.standing);

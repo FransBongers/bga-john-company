@@ -14,10 +14,10 @@ class EnvoyToTheMughals extends \Bga\Games\JohnCompany\Models\BlackmailCard
     return $timingData['beforeEvents'] ?? false;
   }
 
-  public function effectCanBeApplied(array $timingData): array | null
+  public function effectCanBeApplied(string | int | null $itemId): array | null
   {
-    return ($timingData['anytime'] ?? false) || ($timingData[PHASE_ID] ?? null) === EVENTS_IN_INDIA
-      ? parent::effectCanBeApplied($timingData)
+    return ($itemId === 'anytime') || ($itemId === EVENTS_IN_INDIA)
+      ? parent::effectCanBeApplied($itemId)
       : null;
   }
 
@@ -29,7 +29,7 @@ class EnvoyToTheMughals extends \Bga\Games\JohnCompany\Models\BlackmailCard
       clienttranslate('Play anytime on a turn before the Events in India phase. Move the Elephant to any legal position and then take £ equal to the highest open order in the region with the Elephant\'s tail.')
     ];
   }
-  public function applyEffect(object $ctx, Player $player, array $timingData)
+  public function applyEffect(object $ctx, Player $player, string | int | null $itemId)
   {
     $ctx->insertAsBrother(new LeafNode([
       'action' => MOVE_ELEPHANT,

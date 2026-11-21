@@ -1,3 +1,4 @@
+import { formatStringRecursive, getPlayer } from './boilerplate';
 import {
   EAST_INDIAN,
   SOUTH_INDIAN,
@@ -27,8 +28,20 @@ import {
   LAW_CARD,
   PROMISE_CARD,
   BLACKMAIL_CARD,
+  AFTER_OFFICE_FINISHED_ACTING,
+  BEFORE_OFFICE_ACTS,
+  END_OF_PHASE,
+  START_OF_PHASE,
+  BEFORE_ANY_VOTES_ARE_CAST,
+  SHIPYARD,
+  WORKSHOP,
+  LUXURY,
+  WHEN_RETIRING,
+  START_OF_LONDON_SEASON_CHOOSE_CARD,
+  AFTER_COMMANDER_DEPLOY_CHECK,
 } from './constants';
 import { tknShipValue } from './logs/templates';
+import { getPhaseName } from './phase-tracker/translations';
 import { PlayerManager } from './player-manager';
 import { StaticData } from './static-data';
 import {
@@ -78,9 +91,10 @@ export const getCardTypeText = (cardType: string) => {
   }
 };
 
-
 export const getFamilyNameForPlayerId = (playerId: number) => {
-  const familyId = PlayerManager.getInstance().getPlayer(playerId).getFamilyId();
+  const familyId = PlayerManager.getInstance()
+    .getPlayer(playerId)
+    .getFamilyId();
   return getFamilyName(familyId);
 };
 
@@ -240,4 +254,69 @@ export const getSetupCard = (card: JocoSetupCardBase): JocoSetupCard => {
     ...card,
     ...cardStatic,
   };
+};
+
+export const getTimingWindowText = (
+  kind: string,
+  itemId: string | number | null,
+) => {
+  switch (kind) {
+    case AFTER_OFFICE_FINISHED_ACTING:
+      return formatStringRecursive(_('After ${officeTitle} finished acting'), {
+        officeTitle: StaticData.get().office(itemId as string).title,
+      });
+    case BEFORE_OFFICE_ACTS:
+      return formatStringRecursive(_('Before ${officeTitle} acts'), {
+        officeTitle: StaticData.get().office(itemId as string).title,
+      });
+    case END_OF_PHASE:
+      return formatStringRecursive(_('End of ${phaseName}'), {
+        phaseName: getPhaseName(itemId as string),
+      });
+    case START_OF_PHASE:
+      return formatStringRecursive(_('Start of ${phaseName}'), {
+        phaseName: getPhaseName(itemId as string),
+      });
+    case BEFORE_ANY_VOTES_ARE_CAST:
+      return _('Before any votes are cast');
+    case WHEN_RETIRING:
+      return _('When retiring');
+    case START_OF_LONDON_SEASON_CHOOSE_CARD:
+      return formatStringRecursive(
+        _(
+          "When it's ${player_name}'s turn to take a card from the London Season Display",
+        ),
+        {
+          player_name: getPlayer(itemId as number).getName(),
+        },
+      );
+    case AFTER_COMMANDER_DEPLOY_CHECK:
+      return _('After Commander Deploy roll');
+    default:
+      throw new Error(`Unknown timing window kind: ${kind}`);
+  }
+};
+
+export const getCardPrefix = (cardId: string) => {
+  if (cardId.startsWith('PC')) {
+    return 'promise-card-';
+  }
+  if (
+    cardId.startsWith(SHIPYARD) ||
+    cardId.startsWith(WORKSHOP) ||
+    cardId.startsWith(LUXURY)
+  ) {
+    return 'enterprise-card-';
+  }
+  if (cardId.startsWith('LawCard')) {
+    return 'law-card-';
+  }
+  return 'game-card-';
+};
+
+export const getIdWithPrefix = (itemId: string) => {
+  if (itemId.startsWith('familyMember')) {
+    return itemId;
+  }
+  return getCardPrefix(itemId) + itemId;
 };

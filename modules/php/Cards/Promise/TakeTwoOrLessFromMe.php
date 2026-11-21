@@ -13,15 +13,15 @@ class TakeTwoOrLessFromMe extends \Bga\Games\JohnCompany\Models\PromiseCard
   public function __construct($row)
   {
     parent::__construct($row);
-    $this->title = clienttranslate('Take £2 or less from me.');
+    $this->title = clienttranslate('Take £2 or less from me');
   }
 
-  public function effectCanBeApplied(array $timingData): array | null
+  public function effectCanBeApplied(string | int | null $itemId): array | null
   {
     if (Players::get($this->getOwnerPlayerId())->getTreasury() <= 0) {
       return null;
     }
-    return parent::effectCanBeApplied($timingData);
+    return parent::effectCanBeApplied($itemId);
   }
 
   public function canBePlayedAnytime(array $timingData): bool
@@ -29,8 +29,10 @@ class TakeTwoOrLessFromMe extends \Bga\Games\JohnCompany\Models\PromiseCard
     return true;
   }
 
-  public function applyEffect(object $ctx, Player $player, array $timingData)
+  public function applyEffect(object $ctx, Player $player, string | int | null $itemId)
   {
+    $this->playAndReturnToOwner();
+
     $ownerPlayer = Players::get($this->getOwnerPlayerId());
     $amount = min(2, $ownerPlayer->getTreasury());
     $ownerPlayer->incTreasury(-$amount);
@@ -46,7 +48,5 @@ class TakeTwoOrLessFromMe extends \Bga\Games\JohnCompany\Models\PromiseCard
       'tkn_boldText_amount' => '£' . $amount,
       'player_name2' => $ownerPlayer->getName(),
     ]);
-
-    $this->returnToOwner();
   }
 }

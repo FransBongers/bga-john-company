@@ -22,7 +22,7 @@ interface OnEnteringLondonSeasonRetireArgs extends CommonStateArgs {
   familyMembers: JocoFamilyMember[];
   treasury: number;
   discount: number;
-  prizeFilter: string[] | null
+  prizeFilter: string[] | null;
 }
 
 export class LondonSeasonRetire implements GameState<OnEnteringLondonSeasonRetireArgs> {
@@ -77,6 +77,17 @@ export class LondonSeasonRetire implements GameState<OnEnteringLondonSeasonRetir
 
   private updateInterfaceInitialStep() {
     clearPossible();
+    const initialMoney = this.args.treasury + this.getRemainingDiscount();
+
+    if (initialMoney <= 1) {
+      updatePageTitle(_('${you} cannot afford to retire any family members'));
+      addPassButton(
+        this.args.optionalAction,
+        _('Do not retire any family members'),
+      );
+      return;
+    }
+
     const remainingMoney =
       this.getRemainingMoney() + this.getRemainingDiscount();
     if (

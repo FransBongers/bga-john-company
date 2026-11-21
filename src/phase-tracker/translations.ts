@@ -18,6 +18,7 @@ import {
   UPKEEP_AND_REFRESH,
   FINAL_SCORING,
   GOVERNOR_GENERAL,
+  COMPANY_OPERATIONS,
 } from '../constants';
 
 export const getPhaseName = (phase: string) => {
@@ -34,6 +35,8 @@ export const getPhaseName = (phase: string) => {
       return _('Hiring');
     case CHAIRMAN:
       return _('Chairman');
+    case COMPANY_OPERATIONS:
+      return _('Company Operations');
     case DIRECTOR_OF_TRADE:
       return _('Director of Trade');
     case GOVERNOR_GENERAL:

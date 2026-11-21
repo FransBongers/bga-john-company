@@ -15,23 +15,22 @@ class TakeMyLondonSeasonCard extends \Bga\Games\JohnCompany\Models\PromiseCard
     $this->title = clienttranslate('Take my card from the London Season Display');
   }
 
-  public function effectCanBeApplied(array $timingData): array | null
+  public function effectCanBeApplied(string | int | null $itemId): array | null
   {
-    if ($this->getOwnerPlayerId() !== ($timingData[PLAYER_ID] ?? null)) {
+    if ($this->getOwnerPlayerId() != $itemId) {
       return null;
     }
-    return parent::effectCanBeApplied($timingData);
+    return parent::effectCanBeApplied($itemId);
   }
 
-  public function applyEffect(object $ctx, Player $player, array $timingData)
+  public function applyEffect(object $ctx, Player $player, string | int | null $itemId)
   {
+    $this->playAndReturnToOwner();
     $nodes = $ctx->getParent()->getUnresolvedActions([LONDON_SEASON_CHOOSE_CARD]);
     if (count($nodes) !== 1) {
       throw new \Bga\GameFramework\VisibleSystemException("ERROR_087");
     }
     $nodes[0]->updateInfo('activePlayerIds', [$player->getId()]);
     Engine::save();
-
-    $this->returnToOwner();
   }
 }

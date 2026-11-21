@@ -4,13 +4,12 @@ namespace Bga\Games\JohnCompany\Actions;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
-use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Models\Player;
 
 
-class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
+class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Actions\TaxAndUpkeepBase
 {
   public function getState()
   {
@@ -39,8 +38,6 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
     $type = $args['type'];
     $target = $args['target'] ?? null;
 
-    Notifications::log('stPreTaxAndUpkeep', ['type' => $type]);
-
     $primeMinisterPlayerId = Parliament::getPrimeMinisterPlayerId();
     $playerIdsInTurnOrder = Players::getTurnOrder($primeMinisterPlayerId);
     $players = Players::getAll();
@@ -66,8 +63,6 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
     }
 
 
-    $data = [];
-
     $this->resolveAction(['automatic' => true]);
   }
 
@@ -78,69 +73,6 @@ class PreTaxAndUpkeep extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  .##.....##....##.....##..##........##.....##.......##...
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
-
-  private function getWindowCount(array $players)
-  {
-    $result = [];
-    foreach ($players as $player) {
-      $windows = $player->getWindowCount();
-      $result[] = [
-        'player' => $player,
-        'amount' => $windows,
-      ];
-    }
-    return $result;
-  }
-
-  private function getUpkeep(array $players)
-  {
-    $result = [];
-    foreach ($players as $player) {
-      $upkeep = 0;
-      foreach (FamilyMembers::getAllFor($player->getId()) as $familyMember) {
-        $location = $familyMember->getLocation();
-        if (array_key_exists($location, PRIZES)) {
-          $upkeep += PRIZES[$location][UPKEEP];
-        }
-      }
-
-      $result[] = [
-        'player' => $player,
-        'amount' => $upkeep,
-      ];
-    }
-    return $result;
-  }
-
-  private function getTax(array $players, string $target)
-  {
-    $result = [];
-    foreach ($players as $player) {
-      $amount = 0;
-
-      if ($target === SHARE) {
-        $amount = $player->getShareCount();
-      } else {
-        $amount = 0;
-        foreach ($player->getEnterprises() as $enterprise) {
-          if ($enterprise->getType() === $target) {
-            $amount++;
-          }
-        }
-        foreach ($player->getLondonSeasonCards() as $card) {
-          if ($card->getEnterpriseType() === $target) {
-            $amount++;
-          }
-        }
-      }
-
-      $result[] = [
-        'player' => $player,
-        'amount' => $amount,
-      ];
-    }
-    return $result;
-  }
 
   private function resolveTaxOrUpkeep(array $dataPerPlayer, string $type, string | null $target)
   {

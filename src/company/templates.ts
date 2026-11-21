@@ -156,12 +156,12 @@ export const tplCompanyDebt = () => `
   </div>
 `;
 
-export const COMPANY_STANDING_CONFIG: Array<{
+export const getCompanyStandingConfig = (): Array<{
   id: string;
   icon: string;
   text?: string;
   amount?: number;
-}> = [
+}>  => [
   {
     id: 'company-standing-fail',
     icon: 'failed',
@@ -208,7 +208,7 @@ export const tplCompanyStanding = () => `
   <div id="joco-company-standing" class="joco-container">
     <div class="joco-header"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Standing').toLocaleUpperCase()}</span></div>
     <div class="joco-company-spots">
-      ${COMPANY_STANDING_CONFIG.map((item) => {
+      ${getCompanyStandingConfig().map((item) => {
         return `
         <div class="joco-column">
           ${tplCompanySpotIcon(item.icon)(item.id)}

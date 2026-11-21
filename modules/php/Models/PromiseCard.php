@@ -81,7 +81,7 @@ class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
    * Whether the effect of this promise card can be applied
    * Only for effects with specific timing windows
    */
-  public function effectCanBeApplied(array $timingData): array | null
+  public function effectCanBeApplied(string | int | null $itemId): array | null
   {
     if ($this->getActingPlayerId() === $this->getOwnerPlayerId()) {
       return null;
@@ -97,12 +97,12 @@ class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
    * Apply the effect of this promise card
    * Only for effects with specific timing windows
    */
-  public function applyEffect(object $ctx, Player $player, array $timingData)
+  public function applyEffect(object $ctx, Player $player, string | int | null $itemId)
   {
     throw new \Bga\GameFramework\VisibleSystemException("PROMISE_CARD_003");
   }
 
-  public function returnToOwner()
+  public function playAndReturnToOwner()
   {
     $actingPlayerId = $this->getActingPlayerId();
     $ownerPlayerId = $this->getOwnerPlayerId();
@@ -112,9 +112,8 @@ class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     $players = Players::getAll();
 
     $this->setLocation(Locations::promiseCards($ownerPlayerId));
-    Notifications::movePromiseCard($players[$actingPlayerId], $this, clienttranslate('${player_name} returns ${tkn_promiseCard} to ${player_name2}'), [
+    Notifications::movePromiseCard($players[$actingPlayerId], $this, clienttranslate('${player_name} plays ${tkn_promiseCard}'), [
       'player' => $players[$actingPlayerId],
-      'player_name2' => $players[$ownerPlayerId]->getName()
     ]);
   }
 }

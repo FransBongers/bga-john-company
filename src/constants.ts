@@ -51,6 +51,7 @@ export const BLACKMAIL = 'Blackmail';
 export const PRESTIGE = 'Prestige';
 export const ENTERPRISE = 'Enterprise';
 export const SPOUSE = 'Spouse';
+export const LAW = 'Law';
 
 /**
  * Colors
@@ -99,6 +100,7 @@ export const SETUP = 'setup'; // Only used during start of game
 export const LONDON_SEASON = 'londonSeason';
 export const FAMILY = 'family';
 export const FIRMS = 'firms';
+export const COMPANY_OPERATIONS = 'companyOperations';
 export const HIRING = 'hiring';
 export const BONUSES = 'Bonuses';
 export const REVENUE = 'revenue';
@@ -124,6 +126,7 @@ export const CIRCLE = 'Circle';
 export const POWER = 'Power';
 export const BONUS = 'Bonus';
 export const TAX = 'Tax';
+export const WINDOW_TAX = 'windowTax';
 export const VICTORY_POINTS = 'VictoryPoints';
 export const DISCOUNT = 'Discount';
 
@@ -507,12 +510,17 @@ export const LAW_CARD = 'lawCard';
 export const BLACKMAIL_CARD = 'blackmailCard';
 export const PROMISE_CARD = 'promiseCard';
 export const TIMING_WINDOW = 'timingWindow';
-export const TIMING_DATA = 'timingData';
 export const START_OF_PHASE = 'startOfPhase';
 export const END_OF_PHASE = 'endOfPhase';
 export const BEFORE_OFFICE_ACTS = 'beforeOfficeActs';
 export const AFTER_OFFICE_FINISHED_ACTING = 'afterOfficeFinishedActing';
-
+export const ITEM_ID = 'itemId';
+export const BEFORE_ANY_VOTES_ARE_CAST = 'beforeAnyVotesAreCast';
+export const WHEN_RETIRING = 'whenRetiring';
+export const START_OF_LONDON_SEASON_CHOOSE_CARD =
+  'startOfLondonSeasonChooseCard';
+export const AFTER_PRESIDENT_OR_FIRM_CHECK = 'afterPresidentOrFirmCheck';
+export const AFTER_COMMANDER_DEPLOY_CHECK = 'afterCommanderDeployCheck';
 /**
  * LawCardIds: specific card IDs that affect the game and
  * are used in the code

@@ -226,6 +226,8 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
   private function getVotes(Player $player)
   {
     $familyHasLadyNewcome = $player->hasPrestigeCard(LADY_NEWCOME_ID);
+    // Can be playerId and the other players for which they have played the "Vote With My Enterprises" card
+    $enterpriseOwnerIdsPlayerCanVoteFor = Parliament::getEnterpriseOwnerIdsPlayerCanVoteFor($player->getId());
 
     $policyTarget = PRIME_MINISTER_DIAL[Parliament::getDialPosition()][TARGET];
 
@@ -242,37 +244,43 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
       return $options;
     }
 
-    foreach ($player->getEnterprises() as $enterprise) {
-      $votes = $enterprise->getVotes();
-      if ($votes > 0 && $enterprise->getUsed() === 0) {
-        $options['enterprises'][] = [
-          'id' => $enterprise->getId(),
-          'votes' => $votes,
-        ];
-      }
-    }
-
-
     $policyTargets = [
       'PrestigeCard_23' => [WORKSHOP, SHIPYARD],
       'PrestigeCard_26' => [LUXURY, SHARE],
     ];
-    $cards = LondonSeasonCards::getInLocation(Locations::londonSeasonCards($player->getId()))->toArray();
-    foreach ($cards as $card) {
-      $votes = $card->getVotes();
-      if ($votes <= 0 || $card->getUsed() !== 0) {
-        continue;
+
+    foreach ($enterpriseOwnerIdsPlayerCanVoteFor as $ownerPlayerId) {
+      $ownerPlayer = Players::get($ownerPlayerId);
+
+      $enterprises = $ownerPlayer->getEnterprises();
+
+      foreach ($enterprises as $enterprise) {
+        $votes = $enterprise->getVotes();
+        if ($votes > 0 && $enterprise->getUsed() === 0) {
+          $options['enterprises'][] = [
+            'id' => $enterprise->getId(),
+            'votes' => $votes,
+          ];
+        }
       }
 
-      $cardId = $card->getId();
-      if (isset($policyTargets[$cardId]) && !in_array($policyTarget, $policyTargets[$cardId])) {
-        continue;
-      }
+      $londonSeasonCards = $ownerPlayer->getLondonSeasonCards();
+      foreach ($londonSeasonCards as $card) {
+        $votes = $card->getVotes();
+        if ($votes <= 0 || $card->getUsed() !== 0) {
+          continue;
+        }
 
-      $options['londonSeasonCards'][] = [
-        'id' => $cardId,
-        'votes' => $votes,
-      ];
+        $cardId = $card->getId();
+        if (isset($policyTargets[$cardId]) && !in_array($policyTarget, $policyTargets[$cardId])) {
+          continue;
+        }
+
+        $options['londonSeasonCards'][] = [
+          'id' => $cardId,
+          'votes' => $votes,
+        ];
+      }
     }
 
     return $options;

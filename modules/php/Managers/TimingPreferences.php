@@ -50,13 +50,13 @@ class TimingPreferences extends DB_Manager
     }
   }
 
-  public static function windowKey(string $window, array $timingData): string
+  public static function windowKey(string $window, string | int | null $itemId): string
   {
     if ($window === START_OF_PHASE || $window === END_OF_PHASE) {
-      return $window . ':' . ($timingData[PHASE_ID] ?? '');
+      return $window . ':' . ($itemId ?? '');
     }
     if ($window === BEFORE_OFFICE_ACTS || $window === AFTER_OFFICE_FINISHED_ACTING) {
-      return $window . ':' . ($timingData[OFFICE_ID] ?? '');
+      return $window . ':' . ($itemId ?? '');
     }
     return $window;
   }

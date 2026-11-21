@@ -51,7 +51,7 @@ class PresidencyPresident extends \Bga\Games\JohnCompany\Models\AtomicAction
           'children' => [
             [
               'action' => TIMING_WINDOW_CHECK,
-              'args' => [TIMING_WINDOW => [BEFORE_OFFICE_ACTS], TIMING_DATA => [OFFICE_ID => $office->getId()]],
+              'args' => [TIMING_WINDOW => BEFORE_OFFICE_ACTS, ITEM_ID => $office->getId()],
             ],
             [
               'action' => PRESIDENT_TRADE,
@@ -69,10 +69,8 @@ class PresidencyPresident extends \Bga\Games\JohnCompany\Models\AtomicAction
             [
               'action' => TIMING_WINDOW_CHECK,
               'args' => [
-                TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
-                TIMING_DATA => [
-                  'officeId' => $office->getId()
-                ],
+                TIMING_WINDOW => AFTER_OFFICE_FINISHED_ACTING,
+                ITEM_ID => $office->getId(),
               ],
             ]
           ],

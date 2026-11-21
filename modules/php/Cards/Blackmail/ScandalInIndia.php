@@ -12,7 +12,7 @@ use Bga\Games\JohnCompany\Models\Player;
 
 class ScandalInIndia extends \Bga\Games\JohnCompany\Models\BlackmailCard
 {
-  protected $timingWindows = [WHEN_TAKEN_FROM_DISPLAY, ANY_TIME_AFTER_REVENUE_PHASE];
+  protected $timingWindows = [WHEN_TAKEN_FROM_DISPLAY, START_OF_PHASE];
 
   public function canBePlayedAnytime(array $timingData): bool
   {
@@ -62,7 +62,7 @@ class ScandalInIndia extends \Bga\Games\JohnCompany\Models\BlackmailCard
    * Whether the effect of this london season card can be applied
    * Only for effects with specific timing windows
    */
-  public function effectCanBeApplied(array $timingData): array | null
+  public function effectCanBeApplied(string | int | null $itemId): array | null
   {
     // Has to be owned by a player
     if (!Utils::startsWith($this->getLocation(), 'londonSeasonCards_')) {
@@ -70,6 +70,10 @@ class ScandalInIndia extends \Bga\Games\JohnCompany\Models\BlackmailCard
     }
 
     if (count($this->getAffectedOffices()) === 0) {
+      return null;
+    }
+    
+    if ($itemId !== null && $itemId !== UPKEEP_AND_REFRESH) {
       return null;
     }
 
@@ -84,7 +88,7 @@ class ScandalInIndia extends \Bga\Games\JohnCompany\Models\BlackmailCard
    * Apply the effect of this london season card
    * Only for effects with specific timing windows
    */
-  public function applyEffect(object $ctx, Player $player, array $timingData)
+  public function applyEffect(object $ctx, Player $player, string | int | null $itemId)
   {
     $ctx->insertAsBrother(Engine::buildTree([
       'type' => NODE_XOR,
@@ -116,8 +120,8 @@ class ScandalInIndia extends \Bga\Games\JohnCompany\Models\BlackmailCard
     $ctx->insertAsBrother(new LeafNode([
       'action' => TIMING_WINDOW_CHECK,
       'args' => [
-        TIMING_WINDOW => [WHEN_TAKEN_FROM_DISPLAY],
-        TIMING_DATA => [CARD_ID => $this->getId()],
+        TIMING_WINDOW => WHEN_TAKEN_FROM_DISPLAY,
+        ITEM_ID => $this->getId(),
       ],
     ]));
   }

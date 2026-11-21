@@ -5,7 +5,9 @@ namespace Bga\Games\JohnCompany\Actions;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
+use Bga\Games\JohnCompany\Managers\FamilyMembers;
 use Bga\Games\JohnCompany\Managers\Offices;
+use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Models\FamilyMember;
 use Bga\Games\JohnCompany\Models\Office;
@@ -98,5 +100,25 @@ class Hiring extends \Bga\Games\JohnCompany\Models\AtomicAction
     if ($previousOffice !== null) {
       $previousOffice->moveToVacantOffices($hiredPlayer);
     }
+  }
+
+  public function getCandidatesForHiringAndHiringPlayerId(string $officeId)
+  {
+    $options = [];
+    $hiringPlayerId = null;
+    $appointingCommander = false;
+    $office = null;
+    if (Utils::startsWith($officeId, 'Commander_')) {
+      // Here $officeId is the location of the commander 'Commander_<presidencyId>'
+      $presidencyId = explode('_', $officeId)[1];
+      $options = FamilyMembers::getOfficers($presidencyId);
+      $hiringPlayerId = Parliament::getPrimeMinisterPlayerId();
+      $appointingCommander = true;
+    } else {
+      $office = Offices::get($officeId);
+      $options = $office->getCandidatesForHiring();
+      $hiringPlayerId = $office->getHiringPlayerId();
+    }
+    return [$hiringPlayerId, $options, $appointingCommander, $office];
   }
 }

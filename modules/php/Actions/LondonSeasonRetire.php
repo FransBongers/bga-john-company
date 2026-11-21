@@ -65,6 +65,8 @@ class LondonSeasonRetire extends \Bga\Games\JohnCompany\Models\AtomicAction
 
   public function actPassLondonSeasonRetire()
   {
+    $playerId = $this->checkPlayer();
+    $this->setPlayerActionCompleted($playerId);
     $this->resolveAction(PASS);
   }
 

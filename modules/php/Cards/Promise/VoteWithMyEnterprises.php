@@ -12,13 +12,13 @@ class VoteWithMyEnterprises extends \Bga\Games\JohnCompany\Models\PromiseCard
   public function __construct($row)
   {
     parent::__construct($row);
-    $this->title = clienttranslate('Vote with my enterprises as if you owned them.');
+    $this->title = clienttranslate('Vote with my enterprises as if you owned them');
   }
 
-  public function applyEffect(object $ctx, Player $player, array $timingData)
+  public function applyEffect(object $ctx, Player $player, string | int | null $itemId)
   {
     Parliament::updateVoteWithMyEnterprises($player->getId(), $this->getOwnerPlayerId());
 
-    $this->returnToOwner();
+    $this->playAndReturnToOwner();
   }
 }

@@ -10,7 +10,7 @@ use Bga\Games\JohnCompany\Models\Player;
 
 class LawCard_47 extends \Bga\Games\JohnCompany\Models\LawCard
 {
-  protected $timingWindows = [IMMEDIATELY_AFTER_MILITARY_AFFAIRS_ACTS];
+  protected $timingWindows = [AFTER_OFFICE_FINISHED_ACTING];
 
   public function __construct($row)
   {
@@ -38,8 +38,12 @@ class LawCard_47 extends \Bga\Games\JohnCompany\Models\LawCard
     return $commanders;
   }
 
-  public function effectCanBeApplied(array $timingData): array | null
+  public function effectCanBeApplied(string | int | null $itemId): array | null
   {
+    if ($itemId !== MILITARY_AFFAIRS) {
+      return null;
+    }
+
     if (!$this->isInPlay()) {
       return null;
     }
@@ -57,7 +61,7 @@ class LawCard_47 extends \Bga\Games\JohnCompany\Models\LawCard
     ];
   }
 
-  public function applyEffect(object $ctx, Player $player, array $timingData)
+  public function applyEffect(object $ctx, Player $player, string | int | null $itemId)
   {
     $playerId = $player->getId();
     $commanders = $this->getCommanders();

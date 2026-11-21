@@ -79,6 +79,7 @@ class RevenuePayDividends extends \Bga\Games\JohnCompany\Actions\PresidencyActio
     $data = [
       'costPerDividend' => $costPerDividend,
       'maxNumberOfDividends' => $maxNumberOfDividends,
+      'skipOnEnteringState' => $balance < count($shares)
     ];
     return $data;
   }

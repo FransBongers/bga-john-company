@@ -1,3 +1,4 @@
+import { getPlayer } from '../boilerplate';
 import {
   tplIcon,
   tplPassedLawTokenIcon,
@@ -171,6 +172,7 @@ export const getTokenDiv = ({
         game,
         value,
         StaticData.get().promiseCard(value).title,
+        getPlayer(Number(value.split('_')[1])).getColor()
       );
     case LOG_TOKEN_UNREST:
       return tplLogTokenCube('unrest');
@@ -181,7 +183,7 @@ export const getTokenDiv = ({
   }
 };
 
-const tplTextWithTooltip = (game: GameAlias, cardId: string, text: string) => {
+const tplTextWithTooltip = (game: GameAlias, cardId: string, text: string, color?: string) => {
   const cardNameTooltipId = `tooltip_${game._last_tooltip_id}`;
   game.tooltipsToMap.push([game._last_tooltip_id, cardId]);
   game._last_tooltip_id++;
@@ -189,5 +191,6 @@ const tplTextWithTooltip = (game: GameAlias, cardId: string, text: string) => {
     text,
     tooltipId: cardNameTooltipId,
     bold: true,
+    color,
   });
 };

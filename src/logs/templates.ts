@@ -20,15 +20,19 @@ export const tlpLogTokenText = ({
   tooltipId,
   italic = false,
   bold = true,
+  color,
 }: {
   text: string;
   tooltipId?: string;
   italic?: boolean;
   bold?: boolean;
+  color?: string;
 }) =>
   `<span ${
     tooltipId ? `id="${tooltipId}" class="log_tooltip"` : ''
-  } style="font-weight: ${bold ? '700' : '400'};${italic ? ' font-style: italic;' : ''}">${_(
+  } style="font-weight: ${bold ? '700' : '400'};${italic ? ' font-style: italic;' : ''}${
+    color ? ` color: #${color};` : ''
+  }">${_(
     text,
   )}</span>`;
 

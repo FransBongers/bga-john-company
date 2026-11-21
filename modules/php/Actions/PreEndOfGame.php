@@ -53,7 +53,7 @@ class PreEndOfGame extends \Bga\Games\JohnCompany\Models\AtomicAction
     $playerCount = count($turnOrder);
 
     foreach ($turnOrder as $index => $playerId) {
-      $windows = $players[$playerId]->getWindowCount();
+      list($windows) = $players[$playerId]->getWindowCount();
       // Higher aux wins, so the Prime Minister gets the highest position value
       $position = $playerCount - $index;
       Game::get()->bga->playerScoreAux->set($playerId, $windows * 10 + $position);

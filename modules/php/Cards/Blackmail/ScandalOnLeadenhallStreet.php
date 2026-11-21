@@ -42,7 +42,7 @@ class ScandalOnLeadenhallStreet extends \Bga\Games\JohnCompany\Models\BlackmailC
     ];
   }
 
-  public function applyEffect(object $ctx, Player $player, array $timingData)
+  public function applyEffect(object $ctx, Player $player, string | int | null $itemId)
   {
     $ctx->insertAsBrother(Engine::buildTree([
       'type' => NODE_XOR,
@@ -74,12 +74,12 @@ class ScandalOnLeadenhallStreet extends \Bga\Games\JohnCompany\Models\BlackmailC
     });
   }
 
-  public function effectCanBeApplied(array $timingData): array | null
+  public function effectCanBeApplied(string | int | null $itemId): array | null
   {
     if (count($this->getAffectedOffices()) === 0) {
       return null;
     }
-    return parent::effectCanBeApplied($timingData);
+    return parent::effectCanBeApplied($itemId);
   }
 
   protected function resolveImmediateEffect(Player $player, object $ctx)
@@ -91,8 +91,8 @@ class ScandalOnLeadenhallStreet extends \Bga\Games\JohnCompany\Models\BlackmailC
     $ctx->insertAsBrother(new LeafNode([
       'action' => TIMING_WINDOW_CHECK,
       'args' => [
-        TIMING_WINDOW => [WHEN_TAKEN_FROM_DISPLAY],
-        TIMING_DATA => [CARD_ID => $this->getId()],
+        TIMING_WINDOW => WHEN_TAKEN_FROM_DISPLAY,
+        ITEM_ID => $this->getId(),
       ],
     ]));
   }

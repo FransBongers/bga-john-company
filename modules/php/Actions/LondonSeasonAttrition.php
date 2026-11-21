@@ -114,10 +114,8 @@ class LondonSeasonAttrition extends \Bga\Games\JohnCompany\Models\AtomicAction
               [
                 'action' => TIMING_WINDOW_CHECK,
                 'args' => [
-                  TIMING_WINDOW => [WHEN_RETIRING],
-                  TIMING_DATA => [
-                    PLAYER_ID => $playerId
-                  ]
+                  TIMING_WINDOW => WHEN_RETIRING,
+                  ITEM_ID => $playerId
                 ],
               ],
               [

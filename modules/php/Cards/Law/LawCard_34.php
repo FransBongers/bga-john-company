@@ -29,13 +29,13 @@ class LawCard_34 extends \Bga\Games\JohnCompany\Models\LawCard
     return Parliament::getPrimeMinisterPlayerId();
   }
 
-  public function effectCanBeApplied(array $timingData): array | null
+  public function effectCanBeApplied(string | int | null $itemId): array | null
   {
     if (!$this->isInPlay() || $this->hasBeenUsed()) {
       return null;
     }
 
-    $officeId = $timingData[OFFICE_ID] ?? null;
+    $officeId = $itemId;
     if ($officeId === null || $officeId === CHAIRMAN) {
       return null;
     }
@@ -46,23 +46,21 @@ class LawCard_34 extends \Bga\Games\JohnCompany\Models\LawCard
     }
 
     return [
-      TIMING_DATA => [
-        OFFICE_ID => $officeId,
-      ],
+      ITEM_ID => $officeId,
       PLAYER_ID => Parliament::getPrimeMinisterPlayerId(),
       CARD_ID => $this->getId(),
       CARD_TYPE => LAW_CARD,
     ];
   }
 
-  public function applyEffect(object $ctx, Player $player, array $timingData)
+  public function applyEffect(object $ctx, Player $player, string | int | null $itemId)
   {
     Notifications::message(clienttranslate('${player_name} uses ${tkn_lawCard}'), [
       'player' => $player,
       'tkn_lawCard' => $this->getId(),
     ]);
     $this->setUsed(1);
-    $officeId = $timingData[OFFICE_ID];
+    $officeId = $itemId;
     $office = Offices::get($officeId);
     $officeHolderPlayer = $office->getFamilyMember()->getPlayer();
     $office->returnFamilyMemberToSupply();

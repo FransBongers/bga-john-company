@@ -136,26 +136,39 @@ class Player extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     $playerId = $this->id;
 
     $windows = 0;
+    $targets = [];
 
     $prizeMembers = Utils::filter(FamilyMembers::getAll()->toArray(), function ($familyMember) use ($playerId) {
       return $familyMember->getPlayerId() === $playerId && array_key_exists($familyMember->getLocation(), PRIZES);
     });
     foreach ($prizeMembers as $familyMember) {
-      $windows += PRIZES[$familyMember->getLocation()][WINDOWS];
+      $windowCount = PRIZES[$familyMember->getLocation()][WINDOWS];
+      if ($windowCount > 0) {
+        $windows += $windowCount;
+        $targets[$familyMember->getId()] = $windowCount;
+      }
     }
 
     foreach ($this->getEnterprises() as $enterprise) {
-      $windows += $enterprise->getWindows();
+      $windowCount = $enterprise->getWindows();
+      if ($windowCount > 0) {
+        $windows += $windowCount;
+        $targets[$enterprise->getId()] = $windowCount;
+      }
     }
 
-    $prestigeCards = Utils::filter(LondonSeasonCards::getAll()->toArray(), function ($card) use ($playerId) {
-      return $card->getLocation() === $playerId && $card->getType() === PRESTIGE;
+    $prestigeCards = Utils::filter($this->getLondonSeasonCards(), function ($card) {
+      return $card->getType() === PRESTIGE;
     });
     foreach ($prestigeCards as $card) {
-      $windows += $card->getWindows() ?? 0;
+      $windowCount = $card->getWindows() ?? 0;
+      if ($windowCount > 0) {
+        $windows += $windowCount;
+        $targets[$card->getId()] = $windowCount;
+      }
     }
 
-    return $windows;
+    return [$windows, $targets];
   }
 
   public function getShareCount()

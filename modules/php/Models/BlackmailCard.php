@@ -45,7 +45,7 @@ class BlackmailCard extends \Bga\Games\JohnCompany\Models\LondonSeasonCard
    * Whether the effect of this london season card can be applied
    * Only for effects with specific timing windows
    */
-  public function effectCanBeApplied(array $timingData): array | null
+  public function effectCanBeApplied(string | int | null $itemId): array | null
   {
     // Has to be owned by a player
     if (!Utils::startsWith($this->getLocation(), 'londonSeasonCards_')) {

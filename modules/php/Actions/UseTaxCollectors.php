@@ -139,11 +139,11 @@ class UseTaxCollectors extends \Bga\Games\JohnCompany\Models\AtomicAction
     $option = $args['option'];
     $consent = $args['consent'] ?? false;
     if ($option === YES && !$consent) {
-      return clienttranslate('Propose additional window tax');
+      return clienttranslate('Add additional window tax');
     } else if ($option === YES && $consent) {
       return clienttranslate('Give consent for additional window tax');
     } else if ($option === NO && !$consent) {
-      return clienttranslate('Do not propose additional window tax');
+      return clienttranslate('Do not add additional window tax');
     } else if ($option === NO && $consent) {
       return clienttranslate('Do not give consent for additional window tax');
     }

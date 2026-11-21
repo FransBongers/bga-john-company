@@ -1,4 +1,7 @@
+import { Bar } from '../bar';
 import {
+  addCancelButton,
+  addConfirmButton,
   addDangerActionButton,
   addPrimaryActionButton,
   addSecondaryActionButton,
@@ -7,13 +10,21 @@ import {
   debug,
   formatStringRecursive,
   GameState,
+  getCurrentPlayerId,
   getPlayerName,
+  onClick,
   performAction,
+  setSelected,
   updatePageTitle,
 } from '../boilerplate';
 import { Log } from '../boilerplate/notification-manager/types';
 import { tknFamilyMember } from '../logs/templates';
-import { GameAlias, JocoFamilyMember, JocoOffice } from '../types';
+import {
+  GameAlias,
+  JocoFamilyMember,
+  JocoOffice,
+  JocoPromiseCardBase,
+} from '../types';
 import { getOffice } from '../utility';
 
 interface OnEnteringHiringGiveConsentForNepotismArgs extends CommonStateArgs {
@@ -24,6 +35,7 @@ interface OnEnteringHiringGiveConsentForNepotismArgs extends CommonStateArgs {
   hiringPlayerId: number;
   familyMember: JocoFamilyMember;
   currentPosition: string;
+  promiseCards: JocoPromiseCardBase[];
 }
 
 export class HiringGiveConsentForNepotism implements GameState<OnEnteringHiringGiveConsentForNepotismArgs> {
@@ -45,7 +57,12 @@ export class HiringGiveConsentForNepotism implements GameState<OnEnteringHiringG
   onEnteringState(args: OnEnteringHiringGiveConsentForNepotismArgs) {
     debug('Entering HiringGiveConsentForNepotism state');
     this.args = args;
-    this.updateInterfaceInitialStep();
+    if (getCurrentPlayerId() === this.args.hiringPlayerId) {
+      this.updateInterfacePlayPromiseCards();
+      Bar.getInstance().goTo('joco-player-areas');
+    } else {
+      this.updateInterfaceInitialStep();
+    }
   }
 
   onLeavingState() {
@@ -88,6 +105,42 @@ export class HiringGiveConsentForNepotism implements GameState<OnEnteringHiringG
   // .......##....##....##.......##..............##
   // .##....##....##....##.......##........##....##
   // ..######.....##....########.##.........######.
+
+  private updateInterfacePlayPromiseCards() {
+    clearPossible();
+    updatePageTitle(_('Consent for nepotism: ${you} may play Promise Card(s)'));
+
+    this.args.promiseCards.forEach((card) => {
+      onClick(`promise-card-${card.id}`, () =>
+        this.updateInterfaceConfirmPromiseCard(card.id),
+      );
+    });
+
+    addSecondaryActionButton({
+      id: 'do_not_play_btn',
+      text: _('Do not play Promise Card(s)'),
+      callback: () => this.updateInterfaceConfirmPromiseCard(null),
+    });
+  }
+
+  private updateInterfaceConfirmPromiseCard(promiseCardId: string | null) {
+    clearPossible();
+    updatePageTitle(
+      promiseCardId
+        ? _('Play selected Promise Card?')
+        : _('Do not play any Promise Card(s)?'),
+    );
+    if (promiseCardId) {
+      setSelected(`promise-card-${promiseCardId}`);
+    }
+    addConfirmButton(() =>
+      performAction('actHiringGiveConsentForNepotism', {
+        isHiringPlayer: true,
+        promiseCardId,
+      }),
+    );
+    addCancelButton();
+  }
 
   private updateInterfaceInitialStep() {
     clearPossible();

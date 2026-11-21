@@ -78,7 +78,7 @@ class UseManOnTheInside extends \Bga\Games\JohnCompany\Models\AtomicAction
       ]);
     } else {
       $playedCardOwner = Players::get($effect[PLAYER_ID]);
-      $timingData = $effect[TIMING_DATA] ?? [];
+      $timingData = $effect[ITEM_ID] ?? null;
       $playedCard->applyEffect($this->ctx, $playedCardOwner, $timingData);
     }
 

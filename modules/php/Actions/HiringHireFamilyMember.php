@@ -39,21 +39,7 @@ class HiringHireFamilyMember extends Hiring
     $officeId = $args['officeId'];
     $consentForNepotismRejected = $args['consentForNepotismRejected'] ?? false;
 
-    $options = [];
-    $hiringPlayerId = null;
-    $appointingCommander = false;
-    $office = null;
-    if (Utils::startsWith($officeId, 'Commander_')) {
-      // Here $officeId is the location of the commander 'Commander_<presidencyId>'
-      $presidencyId = explode('_', $officeId)[1];
-      $options = FamilyMembers::getOfficers($presidencyId);
-      $hiringPlayerId = Parliament::getPrimeMinisterPlayerId();
-      $appointingCommander = true;
-    } else {
-      $office = Offices::get($officeId);
-      $options = $office->getCandidatesForHiring();
-      $hiringPlayerId = $office->getHiringPlayerId();
-    }
+    list($hiringPlayerId, $options, $appointingCommander, $office) = $this->getCandidatesForHiringAndHiringPlayerId($officeId);
 
     $playerIdFilter = $args['playerIdFilter'] ?? null;
 

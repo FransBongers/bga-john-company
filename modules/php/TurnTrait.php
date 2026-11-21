@@ -335,10 +335,8 @@ trait TurnTrait
         [
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
-            TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
-            TIMING_DATA => [
-              'officeId' => GOVERNOR_GENERAL
-            ],
+            TIMING_WINDOW => AFTER_OFFICE_FINISHED_ACTING,
+            ITEM_ID => GOVERNOR_GENERAL
           ],
         ]
       ],
@@ -370,10 +368,8 @@ trait TurnTrait
         [
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
-            TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
-            TIMING_DATA => [
-              'officeId' => DIRECTOR_OF_TRADE
-            ],
+            TIMING_WINDOW => AFTER_OFFICE_FINISHED_ACTING,
+            ITEM_ID => DIRECTOR_OF_TRADE,
           ],
         ]
       ],
@@ -403,10 +399,8 @@ trait TurnTrait
         [
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
-            TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
-            TIMING_DATA => [
-              'officeId' => MANAGER_OF_SHIPPING
-            ],
+            TIMING_WINDOW => AFTER_OFFICE_FINISHED_ACTING,
+            ITEM_ID => MANAGER_OF_SHIPPING,
           ],
         ]
       ],
@@ -486,22 +480,6 @@ trait TurnTrait
             'presidencyId' => BENGAL_PRESIDENCY,
           ]
         ],
-        [
-          'action' => TIMING_WINDOW_CHECK,
-          'args' => [
-            TIMING_WINDOW => [IMMEDIATELY_AFTER_MILITARY_AFFAIRS_ACTS],
-
-          ],
-        ],
-        [
-          'action' => TIMING_WINDOW_CHECK,
-          'args' => [
-            TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING, BEFORE_BOMBAY_PRESIDENCY_OPERATIONS],
-            TIMING_DATA => [
-              'officeId' => MILITARY_AFFAIRS
-            ],
-          ],
-        ]
       ],
     ];
 
@@ -562,10 +540,8 @@ trait TurnTrait
         [
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
-            TIMING_WINDOW => [AFTER_OFFICE_FINISHED_ACTING],
-            TIMING_DATA => [
-              'officeId' => SUPERINTENDENT_OF_TRADE_IN_CHINA
-            ],
+            TIMING_WINDOW => AFTER_OFFICE_FINISHED_ACTING,
+            ITEM_ID => SUPERINTENDENT_OF_TRADE_IN_CHINA,
           ],
         ]
       ],
@@ -597,7 +573,7 @@ trait TurnTrait
       ],
     ];
 
-    Engine::setup($this->withPhaseWindows($node, COMPANY_OPERATIONS, false, true), ['method' => 'stSetupRevenue']);
+    Engine::setup($this->withPhaseWindows($node, BONUSES, false, true), ['method' => 'stSetupRevenue']);
     Engine::proceed();
   }
 
@@ -729,7 +705,7 @@ trait TurnTrait
       [
         'action' => TIMING_WINDOW_CHECK,
         'args' => [
-          TIMING_WINDOW => [BEFORE_ANY_VOTES_ARE_CAST],
+          TIMING_WINDOW => BEFORE_ANY_VOTES_ARE_CAST,
         ],
       ],
       Parliament::getRoundOfVotingNodes(),
@@ -773,7 +749,7 @@ trait TurnTrait
         [
           'action' => TIMING_WINDOW_CHECK,
           'args' => [
-            TIMING_WINDOW => [ANY_TIME_AFTER_REVENUE_PHASE],
+            TIMING_WINDOW => ANY_TIME_AFTER_REVENUE_PHASE,
           ],
         ],
         [
@@ -1016,7 +992,7 @@ trait TurnTrait
   {
     $window = fn($type) => [
       'action' => TIMING_WINDOW_CHECK,
-      'args' => [TIMING_WINDOW => [$type], TIMING_DATA => [PHASE_ID => $phaseId]],
+      'args' => [TIMING_WINDOW => $type, ITEM_ID => $phaseId],
     ];
     if ($start) {
       array_unshift($node['children'], $window(START_OF_PHASE));
@@ -1034,7 +1010,7 @@ trait TurnTrait
     }
     $window = fn($type) => [
       'action' => TIMING_WINDOW_CHECK,
-      'args' => [TIMING_WINDOW => [$type], TIMING_DATA => [OFFICE_ID => $officeId]],
+      'args' => [TIMING_WINDOW => $type, ITEM_ID => $officeId],
     ];
     if ($before) {
       array_unshift($node['children'], $window(BEFORE_OFFICE_ACTS));

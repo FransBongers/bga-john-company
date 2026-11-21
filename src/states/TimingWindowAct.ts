@@ -8,13 +8,31 @@ import {
   debug,
   formatStringRecursive,
   GameState,
+  onClick,
   performAction,
+  setSelected,
   updatePageTitle,
 } from '../boilerplate';
-import { BLACKMAIL_CARD, LAW_CARD, PROMISE_CARD } from '../constants';
+import {
+  BLACKMAIL,
+  BLACKMAIL_CARD,
+  ITEM_ID,
+  LAW_CARD,
+  PROMISE_CARD,
+  TIMING_WINDOW,
+} from '../constants';
 import { StaticData } from '../static-data';
-import { GameAlias } from '../types';
-import { getCardTypeText } from '../utility';
+import {
+  GameAlias,
+  JocoLawCardBase,
+  JocoLondonSeasonCardBase,
+  JocoPromiseCardBase,
+} from '../types';
+import {
+  getCardPrefix,
+  // getCardTypeText,
+  getTimingWindowText,
+} from '../utility';
 
 interface OnEnteringTimingWindowActArgs extends CommonStateArgs {
   _private?: Array<{
@@ -22,8 +40,11 @@ interface OnEnteringTimingWindowActArgs extends CommonStateArgs {
     cardId: string;
     cardType: string;
     resolved?: boolean;
+    card: JocoLondonSeasonCardBase | JocoLawCardBase | JocoPromiseCardBase;
     // Add other properties as needed
   }>;
+  timingWindow: string;
+  itemId: string | number | null;
 }
 
 export class TimingWindowAct implements GameState<OnEnteringTimingWindowActArgs> {
@@ -51,7 +72,8 @@ export class TimingWindowAct implements GameState<OnEnteringTimingWindowActArgs>
   }
 
   setDescription(activePlayerIds: number, args: OnEnteringTimingWindowActArgs) {
-    updatePageTitle(_('Other players may use card effects'), {});
+    this.args = args;
+    this.updatePageTitle();
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########
@@ -72,20 +94,34 @@ export class TimingWindowAct implements GameState<OnEnteringTimingWindowActArgs>
 
   private updateInterfaceInitialStep() {
     clearPossible();
-    updatePageTitle(_('${you} may use card effects'), {});
+    this.updatePageTitle();
 
     (this.args._private ?? []).forEach(
-      ({ cardId, cardType, resolved }, index) => {
-        if (!resolved) this.addButton(cardId, cardType, index);
+      ({ card, resolved }, index) => {
+        if (!resolved) {
+          onClick(`${getCardPrefix(card.id)}${card.id}`, () => {
+            this.updateInterfaceConfirm(true, index);
+          });
+        }
       },
     );
-    addSecondaryActionButton({
-      id: 'do_not_use_card',
-      text: _('Pass'),
-      callback: () => {
-        this.updateInterfaceConfirm(false);
-      },
-    });
+    if (Object.values(this.args._private ?? {}).length > 0) {
+      addSecondaryActionButton({
+        id: 'do_not_use_card',
+        text: _('Pass Timing Window'),
+        callback: () => {
+          this.updateInterfaceConfirm(false);
+        },
+      });
+    } else {
+      addPrimaryActionButton({
+        id: 'do_not_use_card',
+        text: _('Pass Timing Window'),
+        callback: () => {
+          this.updateInterfaceConfirm(false);
+        },
+      });
+    }
   }
 
   private updateInterfaceConfirm(use: boolean, index?: number) {
@@ -95,14 +131,15 @@ export class TimingWindowAct implements GameState<OnEnteringTimingWindowActArgs>
 
       updatePageTitle(
         option.cardType === LAW_CARD
-          ? _('Use ${cardText}?')
-          : _('Play ${cardText}?'),
+          ? _('Use ${cardText} ?')
+          : _('Play ${cardText} ?'),
         {
-          cardText: this.getCardText(option.cardId, option.cardType),
+          cardText: this.getCardText(option.card),
         },
       );
+      setSelected(`${getCardPrefix(option.cardId)}${option.cardId}`);
     } else {
-      updatePageTitle(_('Pass this timing window?'), {});
+      updatePageTitle(_('Pass Timing Window?'), {});
     }
 
     addConfirmButton(() => {
@@ -122,24 +159,39 @@ export class TimingWindowAct implements GameState<OnEnteringTimingWindowActArgs>
   //  .##.....##....##.....##..##........##.....##.......##...
   //  ..#######.....##....####.########.####....##.......##...
 
-  private getCardText(cardId: string, cardType: string) {
-    const text = '${cardTitle} (${cardType})';
+  private updatePageTitle() {
+    updatePageTitle(_('Timing Window: ${timingWindow}'), {
+      timingWindow: getTimingWindowText(
+        this.args[TIMING_WINDOW],
+        this.args[ITEM_ID],
+      ),
+    });
+  }
+
+  private getCardText(
+    card: JocoLondonSeasonCardBase | JocoLawCardBase | JocoPromiseCardBase,
+  ) {
+    const text = '"${cardTitle}"';
+
+    const cardId =
+      card['type'] === BLACKMAIL && 'hiddenId' in card
+        ? card.hiddenId
+        : card.id;
     return formatStringRecursive(text, {
       cardTitle: _(StaticData.get().cardTitle(cardId)),
-      cardType: getCardTypeText(cardType),
     });
   }
 
-  private addButton(cardId: string, cardType: string, index: number) {
-    const text = this.getCardText(cardId, cardType);
+  // private addButton(cardId: string, cardType: string, index: number) {
+  //   const text = this.getCardText(cardId, cardType);
 
-    const title = StaticData.get().cardTitle(cardId);
-    addPrimaryActionButton({
-      id: `use_card_${index}`,
-      text: formatStringRecursive(text, { cardTitle: title }),
-      callback: () => {
-        this.updateInterfaceConfirm(true, index);
-      },
-    });
-  }
+  //   const title = StaticData.get().cardTitle(cardId);
+  //   addPrimaryActionButton({
+  //     id: `use_card_${index}`,
+  //     text: formatStringRecursive(text, { cardTitle: title }),
+  //     callback: () => {
+  //       this.updateInterfaceConfirm(true, index);
+  //     },
+  //   });
+  // }
 }

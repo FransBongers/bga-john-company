@@ -16,16 +16,16 @@ class TakeMyOfficeHolderBonus extends \Bga\Games\JohnCompany\Models\PromiseCard
   public function __construct($row)
   {
     parent::__construct($row);
-    $this->title = clienttranslate('Take my officeholder\'s bonus.');
+    $this->title = clienttranslate('Take my officeholder\'s bonus');
   }
 
   /**
    * Whether the effect of this promise card can be applied
    * Only for effects with specific timing windows
    */
-  public function effectCanBeApplied(array $timingData): array | null
+  public function effectCanBeApplied(string | int | null $itemId): array | null
   {
-    $officeId = $timingData[OFFICE_ID] ?? null;
+    $officeId = $itemId;
     if ($officeId === null || Offices::get($officeId)->getPlayerId() !== $this->getOwnerPlayerId()) {
       return null;
     }
@@ -49,8 +49,10 @@ class TakeMyOfficeHolderBonus extends \Bga\Games\JohnCompany\Models\PromiseCard
     ];
   }
 
-  public function applyEffect(object $ctx, Player $player, array $timingData)
+  public function applyEffect(object $ctx, Player $player, string | int | null $itemId)
   {
+    $this->playAndReturnToOwner();
+
     $ownerPlayer = Players::get($this->getOwnerPlayerId());
 
     $bonus = Globals::getOfficeHolderBonus();
@@ -67,7 +69,5 @@ class TakeMyOfficeHolderBonus extends \Bga\Games\JohnCompany\Models\PromiseCard
       'tkn_boldText_amount' => '£' . $bonus,
       'player_name2' => $ownerPlayer->getName(),
     ]);
-
-    $this->returnToOwner();
   }
 }

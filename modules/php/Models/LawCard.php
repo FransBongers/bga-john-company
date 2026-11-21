@@ -131,7 +131,7 @@ class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
    * Whether the effect of this law card can be applied
    * Only for effects with specific timing windows
    */
-  public function effectCanBeApplied(array $timingData): array | null
+  public function effectCanBeApplied(string | int | null $itemId): array | null
   {
     throw new \Bga\GameFramework\VisibleSystemException("LAW_CARD_002");
   }
@@ -140,7 +140,7 @@ class LawCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
    * Apply the effect of this law card
    * Only for effects with specific timing windows
    */
-  public function applyEffect(object $ctx, Player $player, array $timingData)
+  public function applyEffect(object $ctx, Player $player, string | int | null $itemId)
   {
     throw new \Bga\GameFramework\VisibleSystemException("LAW_CARD_003");
   }

@@ -4,12 +4,7 @@ namespace Bga\Games\JohnCompany\Actions;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
-use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
-use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\PromiseCards;
-use Bga\Games\JohnCompany\Managers\LawCards;
-use Bga\Games\JohnCompany\Managers\BlackmailCards;
-use Bga\Games\JohnCompany\Managers\PlayersExtra;
 use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\TimingPreferences;
@@ -17,9 +12,9 @@ use Bga\Games\JohnCompany\Models\Player;
 use Bga\Games\JohnCompany\Models\BlackmailCard;
 
 /**
- * Check if effects of Promise Cards, Blackmail Cards, Law Cards can be applied
+ * Check if any timing window effects can be applied or if players have set alerts
  */
-class TimingWindowCheck extends \Bga\Games\JohnCompany\Models\AtomicAction
+class TimingWindowCheck extends \Bga\Games\JohnCompany\Actions\TimingWindow
 {
   public function getState()
   {
@@ -45,46 +40,16 @@ class TimingWindowCheck extends \Bga\Games\JohnCompany\Models\AtomicAction
   public function stTimingWindowCheck()
   {
     $args = $this->ctx->getArgs();
-    $timingData = $args[TIMING_DATA] ?? [];
+    $itemId = $args[ITEM_ID] ?? null;
+    $timingWindow = $args[TIMING_WINDOW];
 
-    $options = [];
+    $options = $this->getOptionsForTimingWindow($timingWindow, $itemId);
 
-    foreach ([LondonSeasonCards::getAll(), LawCards::getAll()] as $cards) {
-      foreach ($cards as $card) {
-        if (!array_intersect($args[TIMING_WINDOW] ?? [], $card->getTimingWindows())) {
-          continue;
-        }
-        if (in_array(WHEN_TAKEN_FROM_DISPLAY, $args[TIMING_WINDOW] ?? [], true)
-          && $card->getId() !== ($timingData[CARD_ID] ?? null)) {
-          continue;
-        }
-        $effect = $card->effectCanBeApplied($timingData);
-        if ($effect !== null) {
-          $effect[TIMING_DATA] = $effect[TIMING_DATA] ?? $timingData;
-          $options[] = $effect;
-        }
-      }
-    }
-
-    foreach (PromiseCards::getAll() as $card) {
-      if (!array_intersect($args[TIMING_WINDOW] ?? [], $card->getTimingWindows())) {
-        continue;
-      }
-      if (!ctype_digit((string) $card->getLocation())) {
-        continue;
-      }
-      $effect = $card->effectCanBeApplied($timingData);
-      if ($effect !== null) {
-        $effect[TIMING_DATA] = $effect[TIMING_DATA] ?? $timingData;
-        $options[] = $effect;
-      }
-    }
-
-    $activePlayerIds = $this->getActingPlayerIds($options, $args[TIMING_WINDOW] ?? [], $timingData);
+    $activePlayerIds = $this->getActingPlayerIds($options, [$timingWindow], $itemId);
     if (count($activePlayerIds) > 0) {
-      if (!in_array(WHEN_TAKEN_FROM_DISPLAY, $args[TIMING_WINDOW] ?? [], true)) {
-        $options = $this->addAnytimeOptions($options, $activePlayerIds, $args[TIMING_WINDOW] ?? [], $timingData);
-      }
+      // if ($timingWindow !== WHEN_TAKEN_FROM_DISPLAY) {
+      //   $options = $this->addAnytimeOptions($options, $activePlayerIds, [$timingWindow], $timingData);
+      // }
       // Insert node when there are applicable options
       $action =  [
         'action' => TIMING_WINDOW_ACT,
@@ -92,7 +57,8 @@ class TimingWindowCheck extends \Bga\Games\JohnCompany\Models\AtomicAction
         'activePlayerIds' => $activePlayerIds,
         'optional' => true,
         'args' => [
-          'options' => array_values(array_filter($options, fn($option) => in_array($option[PLAYER_ID], $activePlayerIds, true)))
+          TIMING_WINDOW => $timingWindow,
+          ITEM_ID => $itemId,
         ]
       ];
       $this->ctx->insertAsBrother(new LeafNode($action));
@@ -110,7 +76,7 @@ class TimingWindowCheck extends \Bga\Games\JohnCompany\Models\AtomicAction
   //  ..#######.....##....####.########.####....##.......##...
 
 
-  private function getActingPlayerIds(array $options, array $windows, array $timingData): array
+  private function getActingPlayerIds(array $options, array $windows, string | int | null $itemId): array
   {
     $activePlayerIds = [];
     foreach (Players::getAll() as $player) {
@@ -123,7 +89,7 @@ class TimingWindowCheck extends \Bga\Games\JohnCompany\Models\AtomicAction
         }
       }
       foreach ($windows as $window) {
-        if ($window !== WHEN_TAKEN_FROM_DISPLAY && ($preferences['window'][TimingPreferences::windowKey($window, $timingData)] ?? false)) {
+        if ($window !== WHEN_TAKEN_FROM_DISPLAY && ($preferences['window'][TimingPreferences::windowKey($window, $itemId)] ?? false)) {
           $activePlayerIds[] = $playerId;
           break;
         }
@@ -133,17 +99,35 @@ class TimingWindowCheck extends \Bga\Games\JohnCompany\Models\AtomicAction
     return array_unique($activePlayerIds);
   }
 
-  private function addAnytimeOptions(array $options, array $activePlayerIds, array $windows, array $timingData): array
+  private function addAnytimeOptions(array $options, array $activePlayerIds, array $windows, string | int | null $itemId): array
   {
-    $phases = [LONDON_SEASON, FAMILY, FIRMS, HIRING, CHAIRMAN, DIRECTOR_OF_TRADE, GOVERNOR_GENERAL,
-      MANAGER_OF_SHIPPING, MILITARY_AFFAIRS, BOMBAY_PRESIDENCY, MADRAS_PRESIDENCY, BENGAL_PRESIDENCY,
-      SUPERINTENDENT_OF_TRADE_IN_CHINA, BONUSES, REVENUE, EVENTS_IN_INDIA, PARLIAMENT_MEETS, UPKEEP_AND_REFRESH];
+    $phases = [
+      LONDON_SEASON,
+      FAMILY,
+      FIRMS,
+      HIRING,
+      CHAIRMAN,
+      DIRECTOR_OF_TRADE,
+      GOVERNOR_GENERAL,
+      MANAGER_OF_SHIPPING,
+      MILITARY_AFFAIRS,
+      BOMBAY_PRESIDENCY,
+      MADRAS_PRESIDENCY,
+      BENGAL_PRESIDENCY,
+      SUPERINTENDENT_OF_TRADE_IN_CHINA,
+      BONUSES,
+      REVENUE,
+      EVENTS_IN_INDIA,
+      PARLIAMENT_MEETS,
+      UPKEEP_AND_REFRESH
+    ];
     $phaseIndex = array_search(Globals::getPhase(), $phases, true);
     if ($phaseIndex === false) {
       return $options;
     }
 
-    $anytimeData = array_merge($timingData, [
+    $anytimeData = array_merge([
+      ITEM_ID => $itemId,
       'anytime' => true,
       'afterRevenue' => $phaseIndex > array_search(REVENUE, $phases, true)
         || (Globals::getPhase() === REVENUE && in_array(END_OF_PHASE, $windows, true)),
@@ -176,7 +160,7 @@ class TimingWindowCheck extends \Bga\Games\JohnCompany\Models\AtomicAction
       }
       $alreadyOffered = array_filter($options, fn($option) => $option[PLAYER_ID] === $effect[PLAYER_ID] && $option[CARD_ID] === $effect[CARD_ID]);
       if (!$alreadyOffered) {
-        $effect[TIMING_DATA] = $anytimeData;
+        $effect[ITEM_ID] = $anytimeData;
         $options[] = $effect;
       }
     }
