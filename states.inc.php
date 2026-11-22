@@ -979,6 +979,7 @@ $machinestates = [
         'description' => '',
         'type' => 'game',
         'action' => 'stAtomicAction',
+        "updateGameProgression" => true,
         'transitions' => [],
     ],
 

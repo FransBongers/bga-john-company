@@ -316,9 +316,23 @@ class Game extends \Bga\GameFramework\Table
      */
     public function getGameProgression()
     {
-        // TODO: compute and return the game progression
+        $phase = Globals::getPhase();
+        if ($phase === SETUP) {
+            return 0;
+        }
+        if ($phase === FINAL_SCORING) {
+            return 100;
+        }
 
-        return 0;
+        $scenario = Scenarios::get();
+        $startTurn = $scenario->getStartTurn();
+        $roundCount = $scenario->getEndTurn() - $startTurn + 1;
+        $phases = array_values(array_filter(JoCoUtils::getPhases(), fn($roundPhase) => $roundPhase !== FINAL_SCORING));
+        $phaseIndex = array_search($phase, $phases, true);
+        $completedRounds = Globals::getTurn() - $startTurn;
+        $progression = 100 * ($completedRounds + ($phaseIndex === false ? 0 : $phaseIndex / count($phases))) / $roundCount;
+
+        return (int) max(0, min(100, floor($progression)));
     }
 
     /**

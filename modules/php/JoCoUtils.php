@@ -8,6 +8,7 @@ use Bga\Games\JohnCompany\Models\FamilyMember;
 use Bga\Games\JohnCompany\Models\Player;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
+use Bga\Games\JohnCompany\Managers\Offices;
 use Bga\Games\JohnCompany\Managers\Parliament;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Managers\PowerMarkers;
@@ -155,5 +156,35 @@ class JoCoUtils
       }
     }
     return $data;
+  }
+
+  public static function getPhases()
+  {
+    $phases = [
+      LONDON_SEASON,
+      FAMILY,
+      FIRMS,
+      HIRING,
+      CHAIRMAN,
+      Offices::get(GOVERNOR_GENERAL)->isInPlay() ? GOVERNOR_GENERAL : DIRECTOR_OF_TRADE,
+      MANAGER_OF_SHIPPING,
+      MILITARY_AFFAIRS,
+      BOMBAY_PRESIDENCY,
+      MADRAS_PRESIDENCY,
+      BENGAL_PRESIDENCY,
+      BONUSES,
+      REVENUE,
+      EVENTS_IN_INDIA,
+      PARLIAMENT_MEETS,
+      UPKEEP_AND_REFRESH,
+      FINAL_SCORING,
+    ];
+
+    if (Offices::get(SUPERINTENDENT_OF_TRADE_IN_CHINA)->isInPlay()) {
+      $bengalIndex = array_search(BENGAL_PRESIDENCY, $phases, true);
+      array_splice($phases, $bengalIndex + 1, 0, [SUPERINTENDENT_OF_TRADE_IN_CHINA]);
+    }
+
+    return $phases;
   }
 }
