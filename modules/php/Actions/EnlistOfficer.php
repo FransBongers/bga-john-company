@@ -100,9 +100,6 @@ class EnlistOfficer extends \Bga\Games\JohnCompany\Models\AtomicAction
         'children' => [
           [
             'action' => ENLIST_OFFICER,
-            'playerId' => 'some',
-            'activePlayerIds' => [$playerId],
-            'optional' => true,
             'args' => [
               'playerId' => $playerId,
               SOURCE => OPPORTUNITY_MARKER,

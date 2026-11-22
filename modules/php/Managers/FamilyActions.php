@@ -65,8 +65,6 @@ class FamilyActions
   {
     return       [
       'action' => ENLIST_OFFICER,
-      'playerId' => 'some',
-      'activePlayerIds' => [$playerId],
       'args' => [
         'playerId' => $playerId,
         SOURCE => $source,

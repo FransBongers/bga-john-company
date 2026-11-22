@@ -40,7 +40,8 @@ trait DebugTrait
 
   function debug_test()
   {
-    Notifications::log('enterprises', Game::get()->getAnytimeArgs());
+    Players::get(2371053)->setOpportunityMarker(ENLIST_OFFICER);
+    // Notifications::log('enterprises', Game::get()->getAnytimeArgs());
     // $data = SetupCards::getAll();
 
     // Notifications::log('debug', $data);
