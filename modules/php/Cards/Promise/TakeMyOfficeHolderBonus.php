@@ -23,7 +23,7 @@ class TakeMyOfficeHolderBonus extends \Bga\Games\JohnCompany\Models\PromiseCard
    * Whether the effect of this promise card can be applied
    * Only for effects with specific timing windows
    */
-  public function effectCanBeApplied(string | int | null $itemId): array | null
+  public function effectCanBeApplied(string $timingWindow, string | int | null $itemId): array | null
   {
     $officeId = $itemId;
     if ($officeId === null || Offices::get($officeId)->getPlayerId() !== $this->getOwnerPlayerId()) {

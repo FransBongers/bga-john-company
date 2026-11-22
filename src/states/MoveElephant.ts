@@ -1,3 +1,4 @@
+import { Bar } from '../bar';
 import {
   AbsolutePosition,
   addCancelButton,
@@ -49,17 +50,17 @@ const config: Record<string, AbsolutePosition> = {
   [PUNJAB]: { top: 4, left: 142 },
   [BENGAL_DELHI_BORDER]: { top: 79, left: 696 },
   [BENGAL_MARATHA_BORDER]: { top: 237, left: 682 },
-  [BOMBAY_DELHI_BORDER]: { top: 116, left: 297 },
-  [BOMBAY_HYDERABAD_BORDER]: { top: 378, left: 316 },
-  [BOMBAY_MARATHA_BORDER]: { top: 231, left: 339 },
-  [BOMBAY_MYSORE_BORDER]: { top: 523, left: 305 },
-  [BOMBAY_PUNJAB_BORDER]: { top: 134, left: 174 },
+  [BOMBAY_DELHI_BORDER]: { top: 125, left: 294 },
+  [BOMBAY_HYDERABAD_BORDER]: { top: 356, left: 325 },
+  [BOMBAY_MARATHA_BORDER]: { top: 231, left: 324 },
+  [BOMBAY_MYSORE_BORDER]: { top: 531, left: 281 },
+  [BOMBAY_PUNJAB_BORDER]: { top: 136, left: 164 },
   [DELHI_MARATHA_BORDER]: { top: 125, left: 528 },
-  [DELHI_PUNJAB_BORDER]: { top: 22, left: 282 },
-  [HYDERABAD_MADRAS_BORDER]: { top: 546, left: 482 },
-  [HYDERABAD_MARATHA_BORDER]: { top: 364, left: 506 },
-  [HYDERABAD_MYSORE_BORDER]: { top: 530, left: 395 },
-  [MADRAS_MYSORE_BORDER]: { top: 736, left: 442 },
+  [DELHI_PUNJAB_BORDER]: { top: 22, left: 270 },
+  [HYDERABAD_MADRAS_BORDER]: { top: 551, left: 460 },
+  [HYDERABAD_MARATHA_BORDER]: { top: 375, left: 506 },
+  [HYDERABAD_MYSORE_BORDER]: { top: 543, left: 390 },
+  [MADRAS_MYSORE_BORDER]: { top: 736, left: 429 },
 };
 
 interface OnEnteringMoveElephantArgs extends CommonStateArgs {
@@ -85,6 +86,7 @@ export class MoveElephant implements GameState<OnEnteringMoveElephantArgs> {
     this.args = args;
     this.createSelectBoxes();
     this.updateInterfaceInitialStep();
+    Bar.getInstance().goTo('joco-india');
   }
 
   onLeavingState() {

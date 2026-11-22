@@ -3,21 +3,24 @@
 namespace Bga\Games\JohnCompany\Cards\Blackmail;
 
 use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
+use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Models\Player;
 
 class EnvoyToTheMughals extends \Bga\Games\JohnCompany\Models\BlackmailCard
 {
-  protected $timingWindows = [START_OF_PHASE];
+  protected $timingWindows = [END_OF_PHASE];
 
-  public function canBePlayedAnytime(array $timingData): bool
+  public function canBePlayedAnytime(array $anytimeData): bool
   {
-    return $timingData['beforeEvents'] ?? false;
+    $result = $anytimeData['beforeEvents'] ?? false;
+    Notifications::log("canBePlayedAnytime Envoy", $result);
+    return $result;
   }
 
-  public function effectCanBeApplied(string | int | null $itemId): array | null
+  public function effectCanBeApplied(string $timingWindow, string | int | null $itemId): array | null
   {
-    return ($itemId === 'anytime') || ($itemId === EVENTS_IN_INDIA)
-      ? parent::effectCanBeApplied($itemId)
+    return ($timingWindow === ANYTIME) || ($itemId === BONUSES)
+      ? parent::effectCanBeApplied($timingWindow, $itemId)
       : null;
   }
 
@@ -29,9 +32,10 @@ class EnvoyToTheMughals extends \Bga\Games\JohnCompany\Models\BlackmailCard
       clienttranslate('Play anytime on a turn before the Events in India phase. Move the Elephant to any legal position and then take £ equal to the highest open order in the region with the Elephant\'s tail.')
     ];
   }
+  
   public function applyEffect(object $ctx, Player $player, string | int | null $itemId)
   {
-    $ctx->insertAsBrother(new LeafNode([
+    $ctx->insertBefore(new LeafNode([
       'action' => MOVE_ELEPHANT,
       'playerId' => 'some',
       'activePlayerIds' => [$player->getId()]

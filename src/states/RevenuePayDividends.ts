@@ -79,12 +79,11 @@ export class RevenuePayDividends implements GameState<OnEnteringRevenuePayDivide
 
     updatePageTitle(
       _(
-        '${you} may pay up to ${maxNumber} dividends for ${amount} ${tkn_pound} each',
+        '${you} may pay up to ${maxNumber} dividends for £${amount} each',
       ),
       {
         maxNumber: this.args.maxNumberOfDividends,
         amount: this.args.costPerDividend,
-        tkn_pound: 'pound',
       },
     );
 

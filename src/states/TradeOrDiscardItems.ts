@@ -18,7 +18,9 @@ interface OnEnteringTradeOrDiscardItemsArgs extends CommonStateArgs {
   source: string;
   type: 'Share';
   _private?: {
-    Share?: JocoFamilyMember[];
+    items: {
+      Share?: JocoFamilyMember[];
+    };
   };
 }
 
@@ -56,9 +58,7 @@ export class TradeOrDiscardItems implements GameState<OnEnteringTradeOrDiscardIt
   ) {
     updatePageTitle(
       args.type === SHARE
-        ? _(
-            '${source}: ${actplayer} must trade or remove their ${type}',
-          )
+        ? _('${source}: ${actplayer} must trade or remove their ${type}')
         : _('${source}: ${actplayer} must trade or discard their ${type}'),
       {
         type: this.getTypeText(args.type),

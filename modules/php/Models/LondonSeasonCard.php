@@ -120,7 +120,7 @@ class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Mod
    * Whether the effect of this london season card can be applied
    * Only for effects with specific timing windows
    */
-  public function effectCanBeApplied(string | int | null $itemId): array | null
+  public function effectCanBeApplied(string $timingWindow, string | int | null $itemId): array | null
   {
     throw new \Bga\GameFramework\VisibleSystemException("LONDON_SEASON_CARD_002");
   }

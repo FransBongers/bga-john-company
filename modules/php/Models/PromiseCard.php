@@ -54,7 +54,7 @@ class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
     return $this->timingWindows;
   }
 
-  public function canBePlayedAnytime(array $timingData): bool
+  public function canBePlayedAnytime(array $anytimeData): bool
   {
     return false;
   }
@@ -81,7 +81,7 @@ class PromiseCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model
    * Whether the effect of this promise card can be applied
    * Only for effects with specific timing windows
    */
-  public function effectCanBeApplied(string | int | null $itemId): array | null
+  public function effectCanBeApplied(string $timingWindow, string | int | null $itemId): array | null
   {
     if ($this->getActingPlayerId() === $this->getOwnerPlayerId()) {
       return null;

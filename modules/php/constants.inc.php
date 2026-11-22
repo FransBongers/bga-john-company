@@ -1090,6 +1090,7 @@ const ANY_TIME_AFTER_REVENUE_PHASE = 'anyTimeAfterRevenuePhase';
 const START_OF_LONDON_SEASON_CHOOSE_CARD = 'startOfLondonSeasonChooseCard';
 const WHEN_A_BLACKMAIL_CARD_IS_PLAYED = 'whenABlackmailCardIsPlayed';
 const WHEN_RETIRING = 'whenRetiring';
+const ANYTIME = 'anytime';
 // const BEFORE_BOMBAY_PRESIDENCY_OPERATIONS = 'beforeBombayPresidencyOperations';
 const BEFORE_ANY_VOTES_ARE_CAST = 'beforeAnyVotesAreCast';
 

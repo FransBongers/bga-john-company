@@ -15,8 +15,10 @@ import { CommonStateArgs, GameAlias, JocoSetupCardBase } from '../types';
 
 interface OnEnteringDraftCardArgs extends CommonStateArgs {
   _private?: {
-    options: JocoSetupCardBase[];
-    selected: string[];
+    draft: {
+      options: JocoSetupCardBase[];
+      selected: string[];
+    };
   };
   numberToSelect: number;
 }
@@ -49,8 +51,8 @@ export class DraftCard implements GameState<OnEnteringDraftCardArgs> {
   }
 
   setDescription(activePlayerIds: number[], args: OnEnteringDraftCardArgs) {
-    if (args._private?.selected) {
-      args._private?.selected.forEach((cardId) => setSelected(cardId));
+    if (args._private?.draft.selected) {
+      args._private?.draft.selected.forEach((cardId) => setSelected(cardId));
     }
   }
 
@@ -86,7 +88,7 @@ export class DraftCard implements GameState<OnEnteringDraftCardArgs> {
 
     this.setSelected();
 
-    this.args._private.options.forEach((option) => {
+    this.args._private?.draft.options.forEach((option) => {
       // const node = document.getElementById(option.id);
       // node.classList.add(SELECTABLE);
       onClick(`setup-card-${option.id}`, () => this.handleClick(option.id));

@@ -10,19 +10,14 @@ class ThePrimeMinistersEar extends \Bga\Games\JohnCompany\Models\BlackmailCard
 {
   protected $timingWindows = [START_OF_PHASE];
 
-  public function canBePlayedAnytime(array $timingData): bool
+  public function canBePlayedAnytime(array $anytimeData): bool
   {
-    return $timingData['beforeFamily'] ?? false;
+    return $anytimeData['beforeFamily'] ?? false;
   }
 
-  public function effectCanBeApplied(string | int | null $itemId): array | null
+  public function effectCanBeApplied(string $timingWindow, string | int | null $itemId): array | null
   {
-    // TODO: check anytime timing windows
-    //   return ($timingData['anytime'] ?? false) || ($timingData[PHASE_ID] ?? null) === FAMILY
-    // ? parent::effectCanBeApplied($timingData)
-    return $itemId === 'anytime' || $itemId === FAMILY
-      ? parent::effectCanBeApplied($itemId)
-      : null;
+    return parent::effectCanBeApplied($timingWindow, $itemId);
   }
 
   public function __construct($row)
@@ -37,7 +32,7 @@ class ThePrimeMinistersEar extends \Bga\Games\JohnCompany\Models\BlackmailCard
 
   public function applyEffect(object $ctx, Player $player, string | int | null $itemId)
   {
-    $ctx->insertAsBrother(new LeafNode([
+    $ctx->insertBefore(new LeafNode([
       'action' => SWAP_POWER_MARKERS,
       'playerId' => 'some',
       'activePlayerIds' => [$player->getId()],

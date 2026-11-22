@@ -40,7 +40,7 @@ trait DebugTrait
 
   function debug_test()
   {
-    Notifications::log('enterprises', Players::get(2371053)->getEnterprises());
+    Notifications::log('enterprises', Game::get()->getAnytimeArgs());
     // $data = SetupCards::getAll();
 
     // Notifications::log('debug', $data);

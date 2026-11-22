@@ -9,7 +9,15 @@ import {
   setSelected,
   updatePageTitle,
 } from '../boilerplate';
-import { LUXURY, SHARE, SHIPYARD, TAX, UPKEEP, WINDOW_TAX, WORKSHOP } from '../constants';
+import {
+  LUXURY,
+  SHARE,
+  SHIPYARD,
+  TAX,
+  UPKEEP,
+  WINDOW_TAX,
+  WORKSHOP,
+} from '../constants';
 import { CommonStateArgs, GameAlias, GameState } from '../types';
 import { getIdWithPrefix } from '../utility';
 
@@ -17,9 +25,11 @@ interface OnEnteringTaxAndUpkeepArgs extends CommonStateArgs {
   type: string;
   target?: string;
   _private?: {
-    amount: number;
-    targets: Record<string, number>;
-    treasury: number;
+    taxData: {
+      amount: number;
+      targets: Record<string, number>;
+      treasury: number;
+    };
   };
 }
 
@@ -44,7 +54,7 @@ export class TaxAndUpkeep implements GameState<OnEnteringTaxAndUpkeepArgs> {
     this.selectedTargets = [];
     this.updateInterfaceInitialStep();
     const bar = Bar.getInstance();
-    switch(this.args.type) {
+    switch (this.args.type) {
       case TAX:
         bar.goTo('joco-player-areas');
         break;
@@ -91,13 +101,13 @@ export class TaxAndUpkeep implements GameState<OnEnteringTaxAndUpkeepArgs> {
     }
 
     const amount = this.selectedTargets.reduce(
-      (remaining, targetId) => remaining - privateArgs.targets[targetId],
-      privateArgs.amount,
+      (remaining, targetId) => remaining - privateArgs.taxData.targets[targetId],
+      privateArgs.taxData.amount,
     );
-    const canPay = amount <= privateArgs.treasury;
-    this.updatePageTitle(true, amount, privateArgs.treasury);
+    const canPay = amount <= privateArgs.taxData.treasury;
+    this.updatePageTitle(true, amount, privateArgs.taxData.treasury);
 
-    Object.keys(privateArgs.targets).forEach((targetId) => {
+    Object.keys(privateArgs.taxData.targets).forEach((targetId) => {
       const selected = this.selectedTargets.includes(targetId);
       const elementId = getIdWithPrefix(targetId);
       if (selected) {
@@ -143,7 +153,9 @@ export class TaxAndUpkeep implements GameState<OnEnteringTaxAndUpkeepArgs> {
       case UPKEEP:
         updatePageTitle(
           activePlayer
-            ? _('Upkeep: ${you} must return family members (short £${shortfall})')
+            ? _(
+                'Upkeep: ${you} must return family members (short £${shortfall})',
+              )
             : _(
                 'Upkeep: other players must return family members they cannot pay for',
               ),
@@ -153,16 +165,24 @@ export class TaxAndUpkeep implements GameState<OnEnteringTaxAndUpkeepArgs> {
       case TAX:
         updatePageTitle(
           activePlayer
-            ? _('Tax on ${tkn_icon}: ${you} must discard items (short £${shortfall})')
-            : _('Tax on ${tkn_icon}: other players must discard items they cannot pay for'),
+            ? _(
+                'Tax on ${tkn_icon}: ${you} must discard items (short £${shortfall})',
+              )
+            : _(
+                'Tax on ${tkn_icon}: other players must discard items they cannot pay for',
+              ),
           { tkn_icon: this.args.target, shortfall },
         );
         break;
       case WINDOW_TAX:
         updatePageTitle(
           activePlayer
-            ? _('Window Tax: ${you} must discard or return items (short £${shortfall})')
-            : _('Window Tax: other players must discard or return items they cannot pay for'),
+            ? _(
+                'Window Tax: ${you} must discard or return items (short £${shortfall})',
+              )
+            : _(
+                'Window Tax: other players must discard or return items they cannot pay for',
+              ),
           { shortfall },
         );
         break;

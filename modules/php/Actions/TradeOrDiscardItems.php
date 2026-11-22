@@ -33,7 +33,9 @@ class TradeOrDiscardItems extends \Bga\Games\JohnCompany\Models\AtomicAction
 
     $data = [
       '_private' => [
-        $playerId => $this->getItems($playerId, $type),
+        $playerId => [
+          'items' => $this->getItems($playerId, $type)
+        ],
       ],
       'type' => $type,
       'source' => LondonSeasonCards::get($source)->getTitle(),

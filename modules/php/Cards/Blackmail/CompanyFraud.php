@@ -32,7 +32,7 @@ class CompanyFraud extends \Bga\Games\JohnCompany\Models\BlackmailCard
    * Whether the effect of this london season card can be applied
    * Only for effects with specific timing windows
    */
-  public function effectCanBeApplied(string | int | null $itemId): array | null
+  public function effectCanBeApplied(string $timingWindow, string | int | null $itemId): array | null
   {
     if ($itemId !== REVENUE) {
       return null;

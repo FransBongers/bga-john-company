@@ -61,6 +61,7 @@ use Bga\GameFramework\Actions\Types\JsonParam;
 
 class Game extends \Bga\GameFramework\Table
 {
+    use \Bga\Games\JohnCompany\AnytimeActionsTrait;
     use \Bga\Games\JohnCompany\DebugTrait;
     use \Bga\Games\JohnCompany\EngineTrait;
     use \Bga\Games\JohnCompany\TurnTrait;

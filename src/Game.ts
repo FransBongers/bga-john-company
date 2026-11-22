@@ -102,8 +102,8 @@ import { EventTilesManager } from './cards/event-tiles';
 import { PromiseCardsManager } from './cards/promise-cards';
 import { SetupCardsManager } from './cards/setup-cards';
 import { Deals } from './deals';
-import { AnytimeCards, ANYTIME_CARD_STATE } from './anytime-cards';
 import { TimingPreferences } from './timing-preferences';
+import { AnytimeActions } from './anytime-actions';
 
 // declare const define; // TODO: check if we comment here or in bga-animations module?
 // declare const ebg;
@@ -151,7 +151,6 @@ export class Game {
   public activePlayerIds: number[] | undefined = undefined;
   public completedPlayerIds: number[] = [];
   private currentStateName = '';
-  private anytimeCards = new AnytimeCards(this);
 
   private states = {
     // Boilerplate
@@ -429,6 +428,7 @@ export class Game {
         return showAnimations && this.bga.gameui.bgaAnimationsActive();
       },
     });
+    AnytimeActions.create(this);
     StaticData.create(this);
     TimingPreferences.create(this);
     EnterpriseCardsManager.create(this);
@@ -444,6 +444,7 @@ export class Game {
     PhaseTracker.create(this);
 
     PlayerManager.create(this);
+    PlayerManager.getInstance().setupPlayerAreas(this.gamedatas);
     if (this.gameOptions.crownEnabled) {
       CrownClimate.create(this);
     }
@@ -508,10 +509,6 @@ export class Game {
   //                  You can use this method to perform some user interface changes at this moment.
   public onEnteringState(stateName: string, args: any) {
     console.log('Entering state: ' + stateName, args);
-    if (stateName === ANYTIME_CARD_STATE) {
-      this.anytimeCards.showConfirmation();
-      return;
-    }
     const activePlayerIds: number[] | undefined = args.args?.activePlayerIds;
     this.activePlayerIds = activePlayerIds;
     this.completedPlayerIds = args.args?.completedPlayerIds ?? [];
@@ -573,14 +570,13 @@ export class Game {
     //   });
     // }
     this.updateMakeInactiveButton();
-    this.anytimeCards.setup(stateName, args.args);
+    AnytimeActions.getInstance().setup(stateName, args.args._private?.['anytime']);
   }
 
   // onLeavingState: this method is called each time we are leaving a game state.
   //                 You can use this method to perform some user interface changes at this moment.
   //
   public onLeavingState(stateName: string) {
-    this.anytimeCards.clear();
     if (this.states[stateName]) {
       this.states[stateName].getInstance().onLeavingState();
     }

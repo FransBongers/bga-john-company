@@ -39,6 +39,7 @@ import {
   WHEN_RETIRING,
   START_OF_LONDON_SEASON_CHOOSE_CARD,
   AFTER_COMMANDER_DEPLOY_CHECK,
+  BLACKMAIL,
 } from './constants';
 import { tknShipValue } from './logs/templates';
 import { getPhaseName } from './phase-tracker/translations';
@@ -319,4 +320,21 @@ export const getIdWithPrefix = (itemId: string) => {
     return itemId;
   }
   return getCardPrefix(itemId) + itemId;
+};
+
+export const getCardText = (
+  card: JocoLondonSeasonCardBase | JocoLawCardBase | JocoPromiseCardBase,
+) => {
+  if (card.id.startsWith('PC')) {
+    return formatStringRecursive('${tkn_promiseCard}', {
+      tkn_promiseCard: card.id,
+    });
+  }
+  const text = '"${cardTitle}"';
+
+  const cardId =
+    card['type'] === BLACKMAIL && 'hiddenId' in card ? card.hiddenId : card.id;
+  return formatStringRecursive(text, {
+    cardTitle: _(StaticData.get().cardTitle(cardId)),
+  });
 };

@@ -38,7 +38,7 @@ class LawCard_47 extends \Bga\Games\JohnCompany\Models\LawCard
     return $commanders;
   }
 
-  public function effectCanBeApplied(string | int | null $itemId): array | null
+  public function effectCanBeApplied(string $timingWindow, string | int | null $itemId): array | null
   {
     if ($itemId !== MILITARY_AFFAIRS) {
       return null;

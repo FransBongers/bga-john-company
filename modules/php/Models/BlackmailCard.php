@@ -2,12 +2,14 @@
 
 namespace Bga\Games\JohnCompany\Models;
 
+use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 use Bga\Games\JohnCompany\Boilerplate\Core\Globals;
 use Bga\Games\JohnCompany\Boilerplate\Core\Notifications;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Locations;
 use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
 use Bga\Games\JohnCompany\JoCoUtils;
 use Bga\Games\JohnCompany\Managers\FamilyMembers;
+use Bga\Games\JohnCompany\Managers\LondonSeasonCards;
 use Bga\Games\JohnCompany\Managers\Players;
 
 class BlackmailCard extends \Bga\Games\JohnCompany\Models\LondonSeasonCard
@@ -27,25 +29,49 @@ class BlackmailCard extends \Bga\Games\JohnCompany\Models\LondonSeasonCard
     return $data;
   }
 
-  public function play(Player $player)
+  public function play(object $ctx, Player $player): void
   {
     $this->setLocation(Locations::playedBlackmailCards($player->getId()));
     Notifications::moveBlackmailCard($player, $this, clienttranslate('${player_name} plays ${tkn_blackmailCard}'), [
       'player' => $player,
       'tkn_blackmailCard' => $this->getId(),
     ]);
+
+    if ($this->getId() === MAN_ON_THE_INSIDE_ID) {
+      return;
+    }
+
+    $manOnTheInsideCard = LondonSeasonCards::get(MAN_ON_THE_INSIDE_ID);
+    if ($manOnTheInsideCard->canBePlayed($player)) {
+      // Insert before because it is needed for anytime actions
+      // Should not matter for other actions
+      $ctx->insertBefore(new LeafNode([
+        'action' => USE_MAN_ON_THE_INSIDE,
+        'playerId' => 'some',
+        'activePlayerIds' => [$manOnTheInsideCard->getActingPlayerId()],
+        'args' => [
+          'cardId' => $this->getId(),
+          'actingPlayerId' => $player->getId()
+        ],
+      ]));
+    } else {
+      // Card cannot be cancelled, so apply its effect immediately
+      $this->applyEffect($ctx, $player, null);
+    }
   }
 
-  public function canBePlayedAnytime(array $timingData): bool
+
+
+  public function canBePlayedAnytime(array $anytimeData): bool
   {
     return false;
   }
 
   /**
-   * Whether the effect of this london season card can be applied
+   * Whether the effect of this blackmail card can be applied
    * Only for effects with specific timing windows
    */
-  public function effectCanBeApplied(string | int | null $itemId): array | null
+  public function effectCanBeApplied(string $timingWindow, string | int | null $itemId): array | null
   {
     // Has to be owned by a player
     if (!Utils::startsWith($this->getLocation(), 'londonSeasonCards_')) {
@@ -60,7 +86,7 @@ class BlackmailCard extends \Bga\Games\JohnCompany\Models\LondonSeasonCard
   }
 
   /**
-   * Apply the effect of this london season card
+   * Apply the effect of this black card
    * Only for effects with specific timing windows
    */
   public function forceRerollOfLatestCheck()

@@ -16,15 +16,15 @@ class TakeTwoOrLessFromMe extends \Bga\Games\JohnCompany\Models\PromiseCard
     $this->title = clienttranslate('Take £2 or less from me');
   }
 
-  public function effectCanBeApplied(string | int | null $itemId): array | null
+  public function effectCanBeApplied(string $timingWindow, string | int | null $itemId): array | null
   {
     if (Players::get($this->getOwnerPlayerId())->getTreasury() <= 0) {
       return null;
     }
-    return parent::effectCanBeApplied($itemId);
+    return parent::effectCanBeApplied($timingWindow, $itemId);
   }
 
-  public function canBePlayedAnytime(array $timingData): bool
+  public function canBePlayedAnytime(array $anytimeData): bool
   {
     return true;
   }

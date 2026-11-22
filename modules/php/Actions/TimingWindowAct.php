@@ -38,7 +38,9 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Actions\TimingWindow
     $private = [];
 
     foreach ($this->getActivePlayerIds() as $playerId) {
-      $private[$playerId] = [];
+      $private[$playerId] = [
+        'timingWindowOptions' => [],
+      ];
     }
 
     foreach ($options as $option) {
@@ -47,12 +49,12 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Actions\TimingWindow
       if (!isset($private[$playerId])) {
         $private[$playerId] = [];
       }
-      $private[$playerId][] = $option;
+      $private[$playerId]['timingWindowOptions'][] = $option;
     }
 
     $resolved = $this->ctx->getInfo()['resolved'] ?? []; // No longer needed?
     foreach ($private as $playerId => &$playerOptions) {
-      foreach ($playerOptions as $index => &$option) {
+      foreach ($playerOptions['timingWindowOptions'] as $index => &$option) {
         $option['resolved'] = $resolved[$playerId][$index] ?? false;
       }
       unset($option);
@@ -106,12 +108,12 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Actions\TimingWindow
       $this->setAllEffectsResolved($playerId, $stateArgs['_private'][$playerId]);
       $this->setPlayerActionCompleted($playerId);
     } else {
-      $effect = $stateArgs['_private'][$playerId][$index] ?? null;
+      $effect = $stateArgs['_private'][$playerId]['timingWindowOptions'][$index] ?? null;
       $resolved = $this->ctx->getInfo()['resolved'] ?? [];
       if ($effect === null || ($resolved[$playerId][$index] ?? false)) {
         throw new \Bga\GameFramework\VisibleSystemException("ERROR_074");
       }
-      $this->checkEffectStillAvailable($playerId, $effect);
+      $this->checkEffectStillAvailable($stateArgs[TIMING_WINDOW], $playerId, $effect);
       $this->resolveEffect($playerId, $effect);
       $this->setEffectResolved($playerId, $index);
     }
@@ -142,13 +144,15 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Actions\TimingWindow
     } else if ($cardType === PROMISE_CARD) {
       PromiseCards::get($cardId)->applyEffect($this->ctx, $player, $timingData);
     } else if ($cardType === BLACKMAIL_CARD) {
-      $this->resolveBlackmailCard($player, $effect);
+      $card = LondonSeasonCards::get($effect[CARD_ID]);
+      $card->play($this->ctx, $player);
+      // $this->resolveBlackmailCard($player, $effect);
       // Notifications::message(clienttranslate('Applying effect of Company Fraud card'));
       // LondonSeasonCards::get($cardId)->applyEffect($this->ctx, $player, $timingData);
     }
   }
 
-  private function checkEffectStillAvailable(int $playerId, array $effect): void
+  private function checkEffectStillAvailable(string $timingWindow, int $playerId, array $effect): void
   {
     $cardId = $effect[CARD_ID];
     $cardType = $effect[CARD_TYPE];
@@ -162,36 +166,36 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Actions\TimingWindow
     } else {
       $card = LondonSeasonCards::get($cardId);
     }
-    $currentEffect = $card->effectCanBeApplied($effect[ITEM_ID] ?? null);
+    $currentEffect = $card->effectCanBeApplied($timingWindow, $effect[ITEM_ID] ?? null);
     if ($currentEffect === null || $currentEffect[PLAYER_ID] !== $playerId) {
       throw new \BgaUserException(clienttranslate('This card effect is no longer available'));
     }
   }
 
-  private function resolveBlackmailCard(Player $player, array $effect)
-  {
-    $cardId = $effect[CARD_ID];
-    $cardType = $effect[CARD_TYPE];
-    $timingData = $effect[ITEM_ID] ?? null;
+  // private function resolveBlackmailCard(Player $player, array $effect)
+  // {
+  //   $cardId = $effect[CARD_ID];
+  //   $cardType = $effect[CARD_TYPE];
+  //   $timingData = $effect[ITEM_ID] ?? null;
 
-    $card = LondonSeasonCards::get($cardId);
-    $card->play($player);
+  //   $card = LondonSeasonCards::get($cardId);
+  //   $card->play($player);
 
-    $manOnTheInsideCard = LondonSeasonCards::get(MAN_ON_THE_INSIDE_ID);
-    if ($manOnTheInsideCard->canBePlayed($player)) {
-      $this->ctx->insertAsBrother(new LeafNode([
-        'action' => USE_MAN_ON_THE_INSIDE,
-        'playerId' => 'some',
-        'activePlayerIds' => [$manOnTheInsideCard->getActingPlayerId()],
-        'args' => [
-          'effect' => $effect
-        ],
-      ]));
-    } else {
-      // Card cannot be cancelled, so apply its effect immediately
-      LondonSeasonCards::get($cardId)->applyEffect($this->ctx, $player, $timingData);
-    }
-  }
+  //   $manOnTheInsideCard = LondonSeasonCards::get(MAN_ON_THE_INSIDE_ID);
+  //   if ($manOnTheInsideCard->canBePlayed($player)) {
+  //     $this->ctx->insertAsBrother(new LeafNode([
+  //       'action' => USE_MAN_ON_THE_INSIDE,
+  //       'playerId' => 'some',
+  //       'activePlayerIds' => [$manOnTheInsideCard->getActingPlayerId()],
+  //       'args' => [
+  //         'effect' => $effect
+  //       ],
+  //     ]));
+  //   } else {
+  //     // Card cannot be cancelled, so apply its effect immediately
+  //     LondonSeasonCards::get($cardId)->applyEffect($this->ctx, $player, $timingData);
+  //   }
+  // }
 
   private function setEffectResolved(int $playerId, int $index)
   {

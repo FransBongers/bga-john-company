@@ -27,10 +27,10 @@ class UseManOnTheInside extends \Bga\Games\JohnCompany\Models\AtomicAction
   public function argsUseManOnTheInside()
   {
     $args = $this->ctx->getArgs();
-    $effect = $args['effect'];
+    $cardId = $args['cardId'];
 
     $data = [
-      'playedCardId' => $effect[CARD_ID]
+      'playedCardId' => $cardId
     ];
 
     return $data;
@@ -64,22 +64,23 @@ class UseManOnTheInside extends \Bga\Games\JohnCompany\Models\AtomicAction
     $playerId = $this->checkPlayer();
     $play = $args->play;
 
-    $effect = $this->ctx->getArgs()['effect'];
+    $args = $this->ctx->getArgs();
+    $cardId = $args['cardId'];
+    $playedCardOwnerId = $args['actingPlayerId'];
+    $playedCard = LondonSeasonCards::get($cardId);
 
-    $playedCard = LondonSeasonCards::get($effect[CARD_ID]);
     if ($play) {
       $player = Players::get($playerId);
       $card = LondonSeasonCards::get(MAN_ON_THE_INSIDE_ID);
-      $card->play($player);
+      $card->play($this->ctx, $player);
       $playedCard->setLocation(Locations::playedBlackmailCards($player->getId()));
       Notifications::moveBlackmailCard($player, $playedCard, clienttranslate('${player_name} cancels the effect of ${tkn_blackmailCard}'), [
         'player' => $player,
         'tkn_blackmailCard' => $playedCard->getId(),
       ]);
     } else {
-      $playedCardOwner = Players::get($effect[PLAYER_ID]);
-      $timingData = $effect[ITEM_ID] ?? null;
-      $playedCard->applyEffect($this->ctx, $playedCardOwner, $timingData);
+      $playedCardOwner = Players::get($playedCardOwnerId);
+      $playedCard->applyEffect($this->ctx, $playedCardOwner, null);
     }
 
 

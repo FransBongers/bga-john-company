@@ -23,7 +23,7 @@ class TimingWindow extends \Bga\Games\JohnCompany\Models\AtomicAction
         ) {
           continue;
         }
-        $effect = $card->effectCanBeApplied($itemId);
+        $effect = $card->effectCanBeApplied($timingWindow, $itemId);
         if ($effect !== null) {
           $effect[ITEM_ID] = $effect[ITEM_ID] ?? $itemId;
           $effect['card'] = $card->getType() === BLACKMAIL ? $card->jsonSerializePrivate() : $card->jsonSerialize();
@@ -39,7 +39,7 @@ class TimingWindow extends \Bga\Games\JohnCompany\Models\AtomicAction
       if (!ctype_digit((string) $card->getLocation())) {
         continue;
       }
-      $effect = $card->effectCanBeApplied($itemId);
+      $effect = $card->effectCanBeApplied($timingWindow, $itemId);
       if ($effect !== null) {
         $effect[ITEM_ID] = $effect[ITEM_ID] ?? $itemId; // TODO: check what this does?
         $effect['card'] = $card->jsonSerialize();

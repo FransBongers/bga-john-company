@@ -14,9 +14,9 @@ class ScandalInIndia extends \Bga\Games\JohnCompany\Models\BlackmailCard
 {
   protected $timingWindows = [WHEN_TAKEN_FROM_DISPLAY, START_OF_PHASE];
 
-  public function canBePlayedAnytime(array $timingData): bool
+  public function canBePlayedAnytime(array $anytimeData): bool
   {
-    return $timingData['afterRevenue'] ?? false;
+    return $anytimeData['afterRevenue'] ?? false;
   }
 
   protected $affectedOffices = [
@@ -59,29 +59,20 @@ class ScandalInIndia extends \Bga\Games\JohnCompany\Models\BlackmailCard
   }
 
   /**
-   * Whether the effect of this london season card can be applied
+   * Whether the effect of this blackmail card can be applied
    * Only for effects with specific timing windows
    */
-  public function effectCanBeApplied(string | int | null $itemId): array | null
+  public function effectCanBeApplied(string $timingWindow, string | int | null $itemId): array | null
   {
-    // Has to be owned by a player
-    if (!Utils::startsWith($this->getLocation(), 'londonSeasonCards_')) {
+    if ($timingWindow === START_OF_PHASE && $itemId !== UPKEEP) {
       return null;
     }
 
     if (count($this->getAffectedOffices()) === 0) {
       return null;
     }
-    
-    if ($itemId !== null && $itemId !== UPKEEP_AND_REFRESH) {
-      return null;
-    }
 
-    return [
-      PLAYER_ID => $this->getActingPlayerId(),
-      CARD_ID => $this->getId(),
-      CARD_TYPE => BLACKMAIL_CARD,
-    ];
+    return parent::effectCanBeApplied($timingWindow, $itemId);
   }
 
   /**
@@ -90,7 +81,7 @@ class ScandalInIndia extends \Bga\Games\JohnCompany\Models\BlackmailCard
    */
   public function applyEffect(object $ctx, Player $player, string | int | null $itemId)
   {
-    $ctx->insertAsBrother(Engine::buildTree([
+    $ctx->insertBefore(Engine::buildTree([
       'type' => NODE_XOR,
       'children' => array_map(function ($office) use ($player) {
         return [
@@ -117,7 +108,7 @@ class ScandalInIndia extends \Bga\Games\JohnCompany\Models\BlackmailCard
       return;
     }
 
-    $ctx->insertAsBrother(new LeafNode([
+    $ctx->insertBefore(new LeafNode([
       'action' => TIMING_WINDOW_CHECK,
       'args' => [
         TIMING_WINDOW => WHEN_TAKEN_FROM_DISPLAY,

@@ -15,12 +15,12 @@ class TakeMyLondonSeasonCard extends \Bga\Games\JohnCompany\Models\PromiseCard
     $this->title = clienttranslate('Take my card from the London Season Display');
   }
 
-  public function effectCanBeApplied(string | int | null $itemId): array | null
+  public function effectCanBeApplied(string $timingWindow, string | int | null $itemId): array | null
   {
     if ($this->getOwnerPlayerId() != $itemId) {
       return null;
     }
-    return parent::effectCanBeApplied($itemId);
+    return parent::effectCanBeApplied($timingWindow, $itemId);
   }
 
   public function applyEffect(object $ctx, Player $player, string | int | null $itemId)

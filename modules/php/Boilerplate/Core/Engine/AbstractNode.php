@@ -2,6 +2,8 @@
 
 namespace Bga\Games\JohnCompany\Boilerplate\Core\Engine;
 
+use Bga\Games\JohnCompany\Boilerplate\Helpers\Utils;
+use Bga\Games\JohnCompany\Game;
 use Bga\Games\JohnCompany\Managers\Players;
 use Bga\Games\JohnCompany\Models\Player;
 
@@ -115,7 +117,6 @@ class AbstractNode
       $newParent = new \Bga\Games\JohnCompany\Boilerplate\Core\Engine\SeqNode([], []);
       $newParent = $this->parent->replaceAtPos($newParent, $index);
       $newParent->pushChild($this);
-      $index = $this->getIndex();
     }
 
     return $this->parent->insertChildAtPos($newNode, $index - 1);
@@ -268,6 +269,30 @@ class AbstractNode
   public function getSourceId()
   {
     return $this->infos['sourceId'] ?? null;
+  }
+
+  public function getActivePlayerIds()
+  {
+    if ($this->getPlayerId() === 'all') {
+      return array_map('intval', Players::getAll()->getIds());
+    }
+    $activePlayerIds = $this->getInfo()['activePlayerIds'] ?? [];
+    return $activePlayerIds;
+  }
+
+  /**
+   * JoCo specific. Returns the active players from amongst those listed in the context's activePlayerIds.
+   */
+  public function getActivePlayerIdsCurrentlyMultiactive()
+  {
+    $game = Game::get();
+    $activePlayerList = $game->gamestate->getActivePlayerList();
+
+    $info = $this->getInfo();
+    $activePlayerIds = array_diff($this->getActivePlayerIds(), $info['completedPlayerIds'] ?? []);
+    return Utils::filter($activePlayerIds, function ($playerId) use ($activePlayerList) {
+      return in_array($playerId, $activePlayerList);
+    });
   }
 
   public function getInfo()

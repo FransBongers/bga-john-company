@@ -21,7 +21,7 @@ const WALSH = 'Walsh';
 const FAMILIES = [BENYON, HASTINGS, LARKINS, PAXTON, SYKES, WALSH];
 const CROWN = 'Crown';
 const CROWN_PLAYER_ID = 1;
-const BLACKMAIL = 'Blackmail';
+const BLACKMAIL$1 = 'Blackmail';
 const PRESTIGE = 'Prestige';
 const ENTERPRISE = 'Enterprise';
 const SPOUSE = 'Spouse';
@@ -654,6 +654,79 @@ class TabContainer {
     }
 }
 
+const isDebug = window.location.host == 'studio.boardgamearena.com' ||
+    window.location.hash.indexOf('debug') > -1;
+const debug = isDebug ? console.info.bind(window.console) : () => { };
+const addCancelButton = (props = {}) => {
+    Interaction.use().addCancelButton(props);
+};
+const addConfirmButton = (callback) => {
+    Interaction.use().addConfirmButton(callback);
+};
+const addDangerActionButton = (props) => {
+    Interaction.use().addDangerActionButton(props);
+};
+const addPassButton = (optionalAction, text) => Interaction.use().addPassButton(optionalAction, text);
+const addPlayerButton = (props) => Interaction.use().addPlayerButton(props);
+const addPrimaryActionButton = (props) => Interaction.use().addPrimaryActionButton(props);
+const addSecondaryActionButton = (props) => Interaction.use().addSecondaryActionButton(props);
+const addUndoButtons = (props) => {
+    Interaction.use().addUndoButtons(props);
+};
+const clearPossible = () => {
+    Interaction.use().clearPossible();
+};
+const updatePageTitle = (text, args = {}) => Interaction.use().clientUpdatePageTitle(text, args);
+const formatStringRecursive$1 = (log, args) => {
+    return Interaction.use().formatStringRecursive(log, args);
+};
+const setAbsolutePosition = (elt, scaleVarName, { top, left }) => {
+    if (!elt) {
+        return;
+    }
+    elt.style.top = `calc(var(--${scaleVarName}) * ${top}px)`;
+    elt.style.left = `calc(var(--${scaleVarName}) * ${left}px)`;
+};
+const onClick = (node, callback, temporary = true) => {
+    let element = typeof node === 'string' ? document.getElementById(node) : node;
+    Interaction.use().onClick(element, callback, temporary);
+};
+const setSelected = (node) => {
+    let element = typeof node === 'string' ? document.getElementById(node) : node;
+    Interaction.use().setSelected(element);
+};
+const performAction = (actionName, args) => {
+    Interaction.use().clearPossible();
+    Interaction.use().performAction(actionName, args);
+};
+const getPlayer = (playerId) => {
+    return PlayerManager.getInstance().getPlayer(playerId);
+};
+const getPlayerName = (playerId) => {
+    return PlayerManager.getInstance().getPlayer(playerId).getName();
+};
+const createHtmlElement = (html) => {
+    const template = document.createElement('template');
+    template.innerHTML = html.trim();
+    return template.content.firstChild;
+};
+const parentHasChildWithId = (parent, child) => {
+    const locationElement = typeof parent === 'string' ? document.getElementById(parent) : parent;
+    const childId = typeof child === 'string' ? child : child.id;
+    if (Array.from(locationElement?.children ?? []).some((c) => c.id === childId)) {
+        return true;
+    }
+    return false;
+};
+const getCurrentPlayerId = () => {
+    return PlayerManager.getInstance().getCurrentPlayerId();
+};
+const lowerCaseFirstCharacter$1 = (text) => {
+    if (!text)
+        return '';
+    return text.charAt(0).toLowerCase() + text.slice(1);
+};
+
 const tplCube = (type, extraClasses = '') => `
   <div class="joco-cube ${extraClasses}" data-type="${type}"></div>
 `;
@@ -810,6 +883,693 @@ const createFamilyMember = (familyId, familyMemberId, extraClasses) => {
     return elt;
 };
 
+const tplPlayerCounters = ({ crownInGame, familyId, playerId, }) => {
+    const elt = createFamilyMember(familyId, Math.floor(Math.random() * 18));
+    elt.id = `joco-familyMembers-${playerId}`;
+    return `
+  <div class="joco-player-panel-item">
+    <div class="joco-treasury-counter-container">
+      <span class="fb-font-baskerville fb-font-16 fb-font-bold">£</span><span id="joco-cash-counter-${playerId}" class="fb-font-baskerville fb-font-bold fb-font-24"></span>
+    </div>
+  </div>
+  <div class="joco-player-panel-item">
+    ${elt.outerHTML}
+    <span id="joco-familyMembers-counter-${playerId}" class="joco-counter fb-font-baskerville fb-font-bold fb-font-20"></span>
+  </div>
+  <div class="joco-player-panel-item">
+    <div class="joco-icon" data-icon="Power">
+      <span id="joco-power-counter-${playerId}" class="fb-font-baskerville fb-font-bold fb-font-20">10</span>
+    </div>
+  </div>
+`;
+};
+const tplPlayerAreas = () => `<div id="joco-player-areas">
+</div>`;
+const tplPlayerArea = (player) => {
+    const playerId = player.getPlayerId();
+    return `
+      <div id="joco-family-area-${playerId}" class="joco-family-area">
+        <div class="joco-family-area-content">
+          <div id="joco-counters-${playerId}" class="joco-family-area-counters">
+          </div>
+          <div class="joco-row">
+            <div class="joco-container joco-column">
+              <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Offices').toLocaleUpperCase()}</span>
+              <div id="FamilyOffices_${playerId}" class="joco-family-offices"></div>
+            </div>
+            <div class="joco-column" style="flex-grow: 1;">
+              <div class="joco-container">
+                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Enterprises').toLocaleUpperCase()}</span>
+                <div id="joco-enterprises-${playerId}" class="joco-enterprises"></div>
+              </div>
+              <div class="joco-container">
+                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Prestige & Blackmail cards').toLocaleUpperCase()}</span>
+                <div id="joco-prestige-blackmail-${playerId}" class="joco-prestige-blackmail"></div>
+              </div>
+              <div class="joco-container">
+                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Promise cards').toLocaleUpperCase()}</span>
+                <div id="joco-promise-cards-${playerId}" class="joco-promise-cards"></div>
+              </div>
+              <div class="joco-container">
+                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Played Blackmail cards').toLocaleUpperCase()}</span>
+                <div id="joco-played-blackmail-${playerId}" class="joco-prestige-blackmail"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+};
+
+class JocoPlayer {
+    constructor(game, player) {
+        this.game = game;
+        this.counters = {};
+        this.ui = {};
+        this.game = game;
+        const playerId = player.id;
+        this.playerId = Number(playerId);
+        this.playerName = player.name;
+        this.playerColor = player.color;
+        this.familyId = player.familyId;
+        const gamedatas = game.gamedatas;
+        this.setupPlayer(gamedatas);
+    }
+    clearInterface() { }
+    updatePlayer(gamedatas) {
+        this.updatePlayerPanel(gamedatas);
+    }
+    setupPlayer(gamedatas) {
+        this.setupPlayerPanel(gamedatas);
+    }
+    setupPlayerPanel(gamedatas) {
+        const playerGamedatas = gamedatas.players[this.playerId];
+        const node = document.querySelector(`#player_board_${this.playerId} .player-board-game-specific-content`);
+        if (!node) {
+            return;
+        }
+        const familyId = this.familyId === CROWN
+            ? COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[this.getColor()]]
+            : this.familyId;
+        node.insertAdjacentHTML('afterbegin', tplPlayerCounters({
+            playerId: this.playerId,
+            familyId,
+            crownInGame: this.game.gameOptions.crownEnabled,
+        }));
+        const counters = [...COUNTERS];
+        if (this.game.gameOptions.crownEnabled) {
+            counters.push(PROMISE_CUBES_COUNTER);
+        }
+        counters.forEach((counter) => {
+            this.counters[counter] = new ebg.counter();
+            this.counters[counter].create(`joco-${counter}-counter-${this.playerId}`);
+            this.ui[counter] = document.getElementById(`joco-${counter}-${this.playerId}`);
+        });
+        this.updatePlayerPanel(gamedatas);
+    }
+    updatePlayerPanel(gamedatas) {
+        this.counters[CASH_COUNTER].setValue(gamedatas.families[this.playerId].treasury);
+        this.counters[FAMILY_MEMBERS_COUNTER].setValue(Object.values(gamedatas.familyMembers).filter(({ familyId, location }) => familyId === this.familyId && location.startsWith('supply')).length);
+        const power = gamedatas.power[this.playerId].total ??
+            gamedatas.power[this.playerId].totalVisible;
+        this.counters[POWER_COUNTER].setValue(power);
+    }
+    getColor() {
+        return this.playerColor;
+    }
+    getName() {
+        return this.playerName;
+    }
+    getPlayerId() {
+        return this.playerId;
+    }
+    getFamilyId() {
+        return this.familyId;
+    }
+}
+
+const BgaAnimations = await globalThis.importEsmLib('bga-animations', '1.x');
+const BgaCards = await globalThis.importEsmLib('bga-cards', '1.x');
+const BgaAutofit = await globalThis.importEsmLib('bga-autofit', '1.x');
+
+const tplShipContent = (ship, back = false) => `
+  <div class="joco-ship-name bga-autofit"><span class="fb-font-baskerville">${back && ship.type !== PLAYER_OWNED_SHIP ? _('Extra Ship') : _(ship.name)}</span></div>
+  ${back ? `<div class="joco-ship-fatigued fb-font-baskerville bga-autofit">${_('F')}</div>` : ''}
+`;
+
+class ShipsManager extends BgaCards.Manager {
+    static create(game) {
+        ShipsManager.instance = new ShipsManager(game);
+    }
+    static getInstance() {
+        return ShipsManager.instance;
+    }
+    constructor(game) {
+        super({
+            getId: (card) => card.id,
+            setupDiv: (card, div) => this.setupDiv(card, div),
+            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
+            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
+            isCardVisible: (card) => this.isCardVisible(card),
+            animationManager: game.animationManager,
+            cardWidth: 75,
+            cardHeight: 68,
+            type: 'ship',
+        });
+        this.game = game;
+    }
+    clearInterface() { }
+    setupDiv(card, div) {
+        div.classList.add('joco-ship-container');
+    }
+    setupFrontDiv(card, div) {
+        div.classList.add('joco-ship');
+        div.setAttribute('data-side', card.type === PLAYER_OWNED_SHIP ? FULL : COMPANY_SHIP);
+        if (div.children.length) {
+            return;
+        }
+        div.insertAdjacentHTML('beforeend', tplShipContent(card));
+    }
+    setupBackDiv(card, div) {
+        div.classList.add('joco-ship');
+        div.setAttribute('data-side', card.type === PLAYER_OWNED_SHIP ? FATIGUED : EXTRA_SHIP);
+        if (div.children.length) {
+            return;
+        }
+        div.insertAdjacentHTML('beforeend', tplShipContent(card, true));
+    }
+    isCardVisible(card) {
+        return card.side === FULL || card.side === COMPANY_SHIP;
+    }
+}
+
+class StaticData {
+    constructor(game) {
+        this.game = game;
+        this.staticData = game.gamedatas.staticData;
+    }
+    static create(game) {
+        StaticData.instance = new StaticData(game);
+    }
+    static get() {
+        return StaticData.instance;
+    }
+    armyPiece(id) {
+        const card = this.staticData.armyPieces[id] ?? {};
+        if (!card) {
+            throw new Error('STATIC_DATA_ERROR_001');
+        }
+        return card;
+    }
+    cardTitle(id) {
+        if (id.startsWith('LawCard_')) {
+            return this.lawCard(id).title;
+        }
+        else if (id.startsWith('PC')) {
+            return this.promiseCard(id).title;
+        }
+        else {
+            return this.londonSeasonCard(id).title;
+        }
+    }
+    enterpriseCard(id) {
+        const card = this.staticData.enterpriseCards[id] ?? {};
+        if (!card) {
+            throw new Error('STATIC_DATA_ERROR_002');
+        }
+        return card;
+    }
+    eventTile(id) {
+        const card = this.staticData.eventTiles[id] ?? {};
+        if (!card) {
+            throw new Error('STATIC_DATA_ERROR_002');
+        }
+        return card;
+    }
+    lawCard(id) {
+        const card = this.staticData.lawCards[id] ?? {};
+        if (!card) {
+            throw new Error('STATIC_DATA_ERROR_001');
+        }
+        return card;
+    }
+    londonSeasonCard(id) {
+        const card = this.staticData.londonSeasonCards[id] ??
+            {};
+        if (!card) {
+            throw new Error('STATIC_DATA_ERROR_002');
+        }
+        return card;
+    }
+    order(id) {
+        const order = this.staticData.orders[id];
+        if (!order) {
+            throw new Error('STATIC_DATA_ERROR_003');
+        }
+        return order;
+    }
+    office(id) {
+        const office = this.staticData.offices[id];
+        if (!office) {
+            throw new Error('STATIC_DATA_ERROR_004');
+        }
+        return office;
+    }
+    promiseCard(id) {
+        const card = this.staticData.promiseCards[id];
+        if (!card) {
+            throw new Error('STATIC_DATA_ERROR_007');
+        }
+        return card;
+    }
+    region(id) {
+        const region = this.staticData.regions[id];
+        if (!region) {
+            throw new Error('STATIC_DATA_ERROR_005');
+        }
+        return region;
+    }
+    setupCard(id) {
+        const setupCard = this.staticData.setupCards[id];
+        if (!setupCard) {
+            throw new Error('STATIC_DATA_ERROR_006');
+        }
+        return setupCard;
+    }
+    setupCards() {
+        return Object.values(this.staticData.setupCards);
+    }
+    ship(id) {
+        return this.game.gamedatas.ships[id];
+    }
+}
+
+const tplEnterpriseCardContent = (card, addId = true) => {
+    let shipName = null;
+    if (card.type === SHIPYARD) {
+        shipName = StaticData.get().ship(card.shipId).name;
+    }
+    return `
+  <div class="joco-title fb-font-baskerville  fb-font-12 bga-autofit">${card.type === WORKSHOP && card.invested ? _('Invested Workshop').toLocaleUpperCase() : _(card.name).toLocaleUpperCase()}</div>
+  ${shipName !== null ? `
+    <div ${addId ? `id="${card.id}-ship"` : ''} class="joco-shipyard-ship"></div>
+    <div class="joco-ship-first-letter fb-font-baskerville fb-font-24 fb-font-italic bga-autofit">${_(shipName).charAt(0)}</div>
+    <div class="joco-ship-name fb-font-baskerville fb-font-8 bga-autofit">${_(shipName)}</div>
+    ` : ''}  
+  
+`;
+};
+
+class EnterpriseCardsManager extends BgaCards.Manager {
+    static create(game) {
+        EnterpriseCardsManager.instance = new EnterpriseCardsManager(game);
+    }
+    static getInstance() {
+        return EnterpriseCardsManager.instance;
+    }
+    constructor(game) {
+        super({
+            getId: (card) => card.id,
+            setupDiv: (card, div) => this.setupDiv(card, div),
+            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
+            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
+            isCardVisible: (card) => this.isCardVisible(card),
+            animationManager: game.animationManager,
+            cardHeight: 150,
+            cardWidth: 228.75,
+            type: 'enterprise-card',
+        });
+        this.game = game;
+        this.shipStocks = {};
+    }
+    clearInterface() { }
+    setupDiv(card, div) {
+        div.classList.add('joco-enterprise-card-container');
+        if (card.used) {
+            div.classList.add('used');
+        }
+    }
+    setupFrontDiv(card, div) {
+        div.classList.add('joco-enterprise-card');
+        div.classList.add('joco-small-card-horizontal');
+        div.setAttribute('data-background', card.type);
+        if (div.children.length) {
+            return;
+        }
+        div.insertAdjacentHTML('beforeend', tplEnterpriseCardContent(card));
+        if (card.type === SHIPYARD) {
+            this.shipStocks[card.shipId] = new BgaCards.LineStock(ShipsManager.getInstance(), document.getElementById(`${card.id}-ship`));
+        }
+    }
+    setupBackDiv(card, div) {
+        div.classList.add('joco-enterprise-card');
+        div.classList.add('joco-small-card-horizontal');
+        div.setAttribute('data-background', card.type === WORKSHOP ? `${WORKSHOP}Invested` : card.type);
+    }
+    isCardVisible(card) {
+        if (card.type === WORKSHOP && card.invested) {
+            return false;
+        }
+        return true;
+    }
+}
+
+const phases$1 = [
+    ['londonSeason', 'London Season'], ['family', 'Family'],
+    ['firms', 'Firms'], ['hiring', 'Hiring'],
+    ['companyOperations', 'Company Operations'], ['revenue', 'Revenue'],
+    ['eventsInIndia', 'Events in India'], ['ParliamentMeets', 'Parliament Meets'],
+    ['upkeepAndRefresh', 'Upkeep & Refresh'],
+];
+const otherWindows = [
+    ['duringHiringIfYouAreACandidate', 'During hiring'],
+    ['afterPresidentOrFirmCheck', 'After a trade check'],
+    ['afterCommanderDeployCheck', 'After a deploy check'],
+    ['immediatelyAfterMilitaryAffairsActs', 'After Military Affairs acts'],
+    ['beforeBombayPresidencyOperations', 'Before Bombay Presidency operations'],
+    ['startOfLondonSeasonChooseCard', 'Before choosing a London Season card'],
+    ['whenRetiring', 'When retiring'],
+    ['beforeAnyVotesAreCast', 'Before votes are cast'],
+    ['anyTimeAfterRevenuePhase', 'After Revenue'],
+];
+const officeIds = new Set([
+    CHAIRMAN, DIRECTOR_OF_TRADE, GOVERNOR_GENERAL, MANAGER_OF_SHIPPING,
+    MILITARY_AFFAIRS, SUPERINTENDENT_OF_TRADE_IN_CHINA,
+    PRESIDENT_OF_BOMBAY, PRESIDENT_OF_MADRAS, PRESIDENT_OF_BENGAL,
+    GOVERNOR_OF_BOMBAY, GOVERNOR_OF_MADRAS, GOVERNOR_OF_BENGAL,
+    GOVERNOR_OF_PUNJAB, GOVERNOR_OF_DELHI, GOVERNOR_OF_MARATHA,
+    GOVERNOR_OF_HYDERABAD, GOVERNOR_OF_MYSORE,
+]);
+const kinds = [
+    { id: START_OF_PHASE, label: 'Start of a phase', items: 'phase' },
+    { id: END_OF_PHASE, label: 'End of a phase', items: 'phase' },
+    { id: BEFORE_OFFICE_ACTS, label: 'Before an office acts', items: 'office' },
+    { id: AFTER_OFFICE_FINISHED_ACTING, label: 'After an office acts', items: 'office' },
+];
+class TimingPreferences {
+    constructor(game) {
+        this.game = game;
+        this.blackmailCards = {};
+        this.pending = false;
+        this.preferences = game.gamedatas.timingPreferences;
+        this.officeLocations = Object.fromEntries(Object.entries(game.gamedatas.offices).map(([id, office]) => [id, office.location]));
+        this.promiseCards = { ...game.gamedatas.promiseCards };
+        this.passedLaws = Object.fromEntries(game.gamedatas.passedLaws.map((card) => [card.id, card]));
+        this.primeMinisterId = game.gamedatas.parliament.primeMinister.playerId;
+        const player = game.gamedatas.players[game.getPlayerId()];
+        player?.londonSeasonCards.forEach((card) => {
+            if (card.type === BLACKMAIL$1 && card.hiddenId)
+                this.blackmailCards[card.id] = card;
+        });
+    }
+    static create(game) {
+        TimingPreferences.instance = new TimingPreferences(game);
+    }
+    static get() {
+        return TimingPreferences.instance;
+    }
+    setup() {
+        if (this.game.isSpectator)
+            return;
+        const tab = document.createElement('div');
+        tab.id = 'joco-timing-preferences';
+        tab.className = 'joco-tab';
+        const content = document.createElement('div');
+        content.className = 'joco-timing-content joco-container';
+        const title = document.createElement('h2');
+        title.textContent = _('Alerts');
+        const form = document.createElement('form');
+        form.className = 'joco-timing-form';
+        const kindField = document.createElement('label');
+        kindField.textContent = _('Timing window');
+        this.kindSelect = document.createElement('select');
+        kindField.appendChild(this.kindSelect);
+        this.itemField = document.createElement('label');
+        this.itemSelect = document.createElement('select');
+        this.addButton = document.createElement('button');
+        this.addButton.type = 'submit';
+        this.addButton.className = 'bgabutton bgabutton_blue';
+        this.addButton.textContent = _('Add');
+        form.append(kindField, this.itemField, this.addButton);
+        this.error = document.createElement('p');
+        this.error.className = 'joco-timing-error';
+        this.error.setAttribute('role', 'alert');
+        const listTitle = document.createElement('h3');
+        listTitle.textContent = _('Active Alerts');
+        this.list = document.createElement('div');
+        this.list.className = 'joco-timing-list';
+        content.append(title, form, this.error, listTitle, this.list);
+        tab.appendChild(content);
+        document.getElementById('joco').appendChild(tab);
+        this.kindSelect.addEventListener('change', () => this.render());
+        this.itemSelect.addEventListener('change', () => this.updateAddButton());
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const kind = kinds.find((entry) => entry.id === this.kindSelect.value);
+            if (!kind || this.addButton.disabled)
+                return;
+            const key = kind.items ? `${kind.id}:${this.itemSelect.value}` : kind.id;
+            void this.updateWindow(key, true);
+        });
+        this.render();
+    }
+    updateOffice(id, location) {
+        this.officeLocations[id] = location;
+        if (location === DECK) {
+            delete this.preferences.window[`${BEFORE_OFFICE_ACTS}:${id}`];
+            delete this.preferences.window[`${AFTER_OFFICE_FINISHED_ACTING}:${id}`];
+        }
+        if (!this.game.isSpectator && this.list)
+            this.render();
+    }
+    updatePromiseCard(card) {
+        this.promiseCards[card.id] = card;
+        if (!this.game.isSpectator && this.list)
+            this.render();
+    }
+    updateLondonSeasonCard(card) {
+        if (card.type !== BLACKMAIL$1)
+            return;
+        if (card.location === `londonSeasonCards_${this.game.getPlayerId()}` && card.hiddenId) {
+            this.blackmailCards[card.id] = card;
+        }
+        else {
+            delete this.blackmailCards[card.id];
+        }
+        if (!this.game.isSpectator && this.list)
+            this.render();
+    }
+    removeLondonSeasonCard(card) {
+        delete this.blackmailCards[card.id];
+        if (!this.game.isSpectator && this.list)
+            this.render();
+    }
+    updateLawCard(card) {
+        if (card.location === 'PassedLaws')
+            this.passedLaws[card.id] = card;
+        else
+            delete this.passedLaws[card.id];
+        if (!this.game.isSpectator && this.list)
+            this.render();
+    }
+    updatePrimeMinister(playerId) {
+        this.primeMinisterId = Number(playerId);
+        if (!this.game.isSpectator && this.list)
+            this.render();
+    }
+    addCardButton(container, cardId) {
+        if (this.game.isSpectator || !cardId || container.querySelector('.joco-card-timing-button'))
+            return;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'joco-card-timing-button';
+        button.dataset.cardId = cardId;
+        this.updateCardButton(button);
+        button.addEventListener('click', (event) => {
+            event.stopPropagation();
+            void this.updateCard(cardId, !(this.preferences.card[cardId] ?? true));
+        });
+        container.appendChild(button);
+    }
+    updateCardButton(button) {
+        const enabled = this.preferences.card[button.dataset.cardId] ?? true;
+        button.title = enabled ? _('Card prompts enabled') : _('Card prompts disabled');
+        button.setAttribute('aria-label', button.title);
+        button.setAttribute('aria-pressed', String(enabled));
+        button.innerHTML = `<i class="fa fa-${enabled ? 'bell' : 'bell-slash'}" aria-hidden="true"></i>`;
+        button.disabled = this.pending;
+    }
+    activeCards() {
+        const playerId = this.game.getPlayerId();
+        const cards = [];
+        Object.values(this.promiseCards).forEach((card) => {
+            const data = this.game.gamedatas.staticData.promiseCards[card.id];
+            if (card.location === String(playerId) && card.ownerPlayerId !== playerId && data) {
+                cards.push({ id: card.id, ...data });
+            }
+        });
+        Object.values(this.blackmailCards).forEach((card) => {
+            const data = this.game.gamedatas.staticData.londonSeasonCards[card.hiddenId];
+            if (data)
+                cards.push({ id: card.hiddenId, ...data });
+        });
+        if (Number(this.primeMinisterId) === playerId) {
+            Object.values(this.passedLaws).forEach((card) => {
+                const data = this.game.gamedatas.staticData.lawCards[card.id];
+                if (data)
+                    cards.push({ id: card.id, ...data });
+            });
+        }
+        return cards
+            .filter((card) => card.timingWindows.length > 0 && (this.preferences.card[card.id] ?? true))
+            .map((card) => ({ id: card.id, label: _('If I can play / use ${cardName}').replace('${cardName}', _(card.title)) }));
+    }
+    items(kind) {
+        if (kind.items === 'phase')
+            return phases$1.map(([id, label]) => [id, _(label)]);
+        if (kind.items === 'office') {
+            return Object.entries(this.game.gamedatas.staticData.offices)
+                .filter(([id]) => officeIds.has(id) && this.officeLocations[id] !== undefined && this.officeLocations[id] !== DECK)
+                .map(([id, office]) => [id, _(office.title)]);
+        }
+        return [];
+    }
+    label(key) {
+        const [kindId, itemId] = key.split(':');
+        const kind = kinds.find((entry) => entry.id === kindId);
+        if (!kind)
+            return key;
+        if (!kind.items)
+            return _(kind.label);
+        const item = kind.items === 'phase'
+            ? phases$1.find(([id]) => id === itemId)?.[1]
+            : this.game.gamedatas.staticData.offices[itemId]?.title;
+        const name = item ? _(item) : itemId;
+        const template = kindId === START_OF_PHASE ? _('Start of phase: ${name}')
+            : kindId === END_OF_PHASE ? _('End of phase: ${name}')
+                : kindId === BEFORE_OFFICE_ACTS ? _('Before an office acts: ${name}')
+                    : _('After an office acts: ${name}');
+        return template.replace('${name}', name);
+    }
+    render() {
+        const selectedKind = this.kindSelect.value;
+        const selectedItem = this.itemSelect.value;
+        this.kindSelect.replaceChildren(new Option(_('Select a timing window'), ''));
+        kinds.forEach((kind) => {
+            const available = kind.items
+                ? this.items(kind).some(([id]) => !this.preferences.window[`${kind.id}:${id}`])
+                : !this.preferences.window[kind.id];
+            if (available)
+                this.kindSelect.add(new Option(_(kind.label), kind.id));
+        });
+        this.kindSelect.value = selectedKind;
+        if (this.kindSelect.selectedIndex < 0)
+            this.kindSelect.value = '';
+        const kind = kinds.find((entry) => entry.id === this.kindSelect.value);
+        this.itemField.hidden = !kind?.items;
+        this.itemField.replaceChildren(document.createTextNode(kind?.items === 'phase' ? _('Phase') : _('Office')), this.itemSelect);
+        this.itemSelect.replaceChildren(new Option(_('Select an item'), ''));
+        if (kind?.items) {
+            this.items(kind)
+                .filter(([id]) => !this.preferences.window[`${kind.id}:${id}`])
+                .sort((left, right) => left[1].localeCompare(right[1]))
+                .forEach(([id, label]) => this.itemSelect.add(new Option(label, id)));
+            this.itemSelect.value = selectedItem;
+            if (this.itemSelect.selectedIndex < 0)
+                this.itemSelect.value = '';
+        }
+        this.kindSelect.disabled = this.pending;
+        this.itemSelect.disabled = this.pending;
+        this.updateAddButton();
+        document.querySelectorAll('.joco-card-timing-button').forEach((button) => this.updateCardButton(button));
+        this.list.replaceChildren();
+        const saved = [
+            ...Object.keys(this.preferences.window).filter((key) => this.preferences.window[key])
+                .map((key) => ({ kind: 'window', id: key, label: this.label(key) })),
+            ...this.activeCards().map((card) => ({ kind: 'card', ...card })),
+        ].sort((left, right) => left.label.localeCompare(right.label));
+        if (!saved.length) {
+            const empty = document.createElement('p');
+            empty.textContent = _('No active alerts');
+            this.list.appendChild(empty);
+        }
+        saved.forEach((entry) => {
+            const row = document.createElement('div');
+            row.className = 'joco-timing-row';
+            const text = document.createElement('span');
+            text.textContent = entry.label;
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'joco-timing-remove';
+            remove.title = _('Remove alert');
+            remove.setAttribute('aria-label', `${remove.title}: ${text.textContent}`);
+            remove.innerHTML = '<i class="fa fa-close" aria-hidden="true"></i>';
+            remove.disabled = this.pending;
+            remove.addEventListener('click', () => {
+                if (entry.kind === 'card')
+                    void this.updateCard(entry.id, false);
+                else
+                    void this.updateWindow(entry.id, false);
+            });
+            row.append(text, remove);
+            this.list.appendChild(row);
+        });
+    }
+    updateAddButton() {
+        const kind = kinds.find((entry) => entry.id === this.kindSelect.value);
+        this.addButton.disabled = this.pending || !kind || (!!kind.items && !this.itemSelect.value);
+    }
+    async updateCard(cardId, enabled) {
+        if (this.pending)
+            return;
+        this.pending = true;
+        this.error.textContent = '';
+        this.render();
+        try {
+            await this.set('card', cardId, enabled);
+        }
+        catch (error) {
+            this.error.textContent = _('Unable to update timing preference');
+            console.error('Unable to update timing preference', error);
+        }
+        finally {
+            this.pending = false;
+            this.render();
+        }
+    }
+    async updateWindow(key, enabled) {
+        this.pending = true;
+        this.error.textContent = '';
+        this.render();
+        try {
+            await this.set('window', key, enabled);
+            const [kind, officeId] = key.split(':');
+            if ((kind === BEFORE_OFFICE_ACTS || kind === AFTER_OFFICE_FINISHED_ACTING) && this.officeLocations[officeId] === DECK) {
+                delete this.preferences.window[key];
+            }
+            if (enabled) {
+                this.kindSelect.value = '';
+                this.itemSelect.value = '';
+            }
+        }
+        catch (error) {
+            this.error.textContent = _('Unable to update timing preference');
+            console.error('Unable to update timing preference', error);
+        }
+        finally {
+            this.pending = false;
+            this.render();
+        }
+    }
+    async set(kind, itemId, enabled) {
+        const request = this.game.bga.actions.performAction('actSetTimingPreference', { kind, itemId, enabled: enabled ? 1 : 0 }, { lock: false, checkAction: false, checkPossibleActions: false });
+        if (!request)
+            throw new Error('Timing preference action unavailable');
+        await request;
+        this.preferences[kind][itemId] = enabled;
+    }
+}
+
 const tplIcon = (type, extraClasses = '') => `<div class="joco-icon ${extraClasses ?? ''}" data-icon="${type}"></div>`;
 const getPolicyConsequenceTranslation = (consequence) => {
     switch (consequence) {
@@ -846,6 +1606,145 @@ const tplPassedLawTokenIcon = (extraClasses = '') => `<div class="joco-passed-la
     </div>
   </div>`;
 const tplMoneyIcon = (value, extraClasses = '') => `<div class="joco-icon ${extraClasses ?? ''}" data-icon="CircleLight">${tplAmount(value, true)}</div>`;
+
+const tplCardText = (text, { containerClass = 'fb-card-text', textClass = 'fb-font-12 fb-font-baskerville', }) => {
+    return `
+    <div class="${containerClass} bga-autofit">
+      ${text
+        .map((item) => {
+        if (typeof item === 'string') {
+            return `<span class="${textClass}">${item}</span>`;
+        }
+        else {
+            return `<span class="${textClass}">${formatStringRecursive$1(_(item.log), item.args)}</span>`;
+        }
+    })
+        .join('')}
+    
+    </div>
+  `;
+};
+
+const tplSpouse = (card) => `
+  <div class="joco-card-title fb-font-16 fb-font-baskerville bga-autofit">${_('SPOUSE')}</div>
+  <div class="joco-card-subtitle fb-font-12 fb-font-italic fb-font-baskerville bga-autofit">${_('You cannot transfer this card')}</div>
+  <div class="joco-card-name fb-font-24 fb-font-parisienne fb-font-bold bga-autofit">${_(card.title)}</div>
+  ${tplCardText(card.text, {})}
+  ${card.textNote
+    ? tplCardText([card.textNote], {
+        containerClass: 'fb-card-text-note',
+        textClass: 'fb-font-12 fb-font-baskerville fb-font-italic',
+    })
+    : ''}
+  ${card.victoryPoints !== null ? tplVictoryPointsIcon(card.victoryPoints) : ''}
+  ${card.power !== null ? tplPowerIcon(card.power) : ''}
+  ${card.discount !== null ? tplDiscountIcon(card.discount) : ''}
+`;
+const tplEnterprise = (card) => `
+  <div class="joco-card-name fb-font-16 fb-font-baskerville bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
+  <div class="joco-enterprise-icon">${tplIcon(card.enterpriseType)}</div>
+  ${tplCardText(card.text, {})}
+`;
+const tplScottishCastle = (card) => `
+  <div class="joco-card-name fb-font-16 fb-font-baskerville bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
+  <div class="joco-enterprise-icon">${tplIcon(card.enterpriseType)}</div>
+    ${tplPowerIcon('3')}
+    ${tplIcon(WINDOW, 'joco-window-1')}
+    ${tplIcon(WINDOW, 'joco-window-2')}
+`;
+const tplLondonSeasonCardContent = (card) => {
+    if (card.background === 'ScottishCastle') {
+        return tplScottishCastle(card);
+    }
+    if (card.type === PRESTIGE && card.subtype === SPOUSE) {
+        return tplSpouse(card);
+    }
+    else if (card.type === PRESTIGE && card.subtype === ENTERPRISE) {
+        return tplEnterprise(card);
+    }
+    return null;
+};
+const tplBlackmailCardContent = (card) => {
+    return `<div class="joco-card-name fb-font-24 fb-font-parisienne fb-font-bold bga-autofit">${_(card.title)}</div>
+  ${tplCardText(card.text, {})}
+  ${card.power ? tplPowerIcon(card.power) : ''}
+`;
+};
+
+class LondonSeasonCardsManager extends BgaCards.Manager {
+    static create(game) {
+        LondonSeasonCardsManager.instance = new LondonSeasonCardsManager(game);
+    }
+    static getInstance() {
+        return LondonSeasonCardsManager.instance;
+    }
+    constructor(game) {
+        super({
+            getId: (card) => card.id,
+            setupDiv: (card, div) => this.setupDiv(card, div),
+            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
+            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
+            isCardVisible: (card) => this.isCardVisible(card),
+            animationManager: game.animationManager,
+            cardHeight: 351,
+            cardWidth: 225,
+        });
+        this.game = game;
+    }
+    clearInterface() { }
+    setupDiv(card, div) {
+        div.classList.add('joco-card-container');
+        div.setAttribute('data-type', card.type);
+        if (card.type === PRESTIGE) {
+            div.setAttribute('data-subtype', card.subtype);
+        }
+        this.updateAlertButton(card, div);
+    }
+    setupFrontDiv(card, div) {
+        this.updateAlertButton(card, div.closest('.joco-card-container'));
+        div.classList.add('joco-card');
+        div.setAttribute('data-background', card.type === BLACKMAIL$1 ? 'Blackmail' : card.background);
+        div.setAttribute('data-has-text-note', card.textNote ? 'true' : 'false');
+        div.setAttribute('data-card-id', card.id);
+        if (card.type === PRESTIGE) {
+            div.setAttribute('data-subtype', card.subtype);
+        }
+        if (card.type === BLACKMAIL$1 && !card.hiddenId && div.children.length) {
+            div.replaceChildren();
+            return;
+        }
+        if (div.children.length || (card.type === BLACKMAIL$1 && !card.hiddenId)) {
+            return;
+        }
+        let cardContent = '';
+        if (card.type === BLACKMAIL$1 && card.hiddenId) {
+            cardContent = tplBlackmailCardContent(card);
+        }
+        else if (card.type === PRESTIGE) {
+            cardContent = tplLondonSeasonCardContent(card);
+        }
+        if (cardContent) {
+            div.insertAdjacentHTML('beforeend', cardContent);
+        }
+    }
+    updateAlertButton(card, container) {
+        if (!container)
+            return;
+        if (card.type === BLACKMAIL$1 && card.hiddenId && this.game.gamedatas.staticData.londonSeasonCards[card.hiddenId]?.timingWindows.length) {
+            TimingPreferences.get().addCardButton(container, card.hiddenId);
+        }
+        else {
+            container.querySelector('.joco-card-timing-button')?.remove();
+        }
+    }
+    setupBackDiv(card, div) {
+        div.classList.add('joco-card');
+        div.setAttribute('data-background', card.type === PRESTIGE ? 'PrestigeBack' : 'BlackmailBack');
+    }
+    isCardVisible(card) {
+        return (card.type !== BLACKMAIL$1 || (card.type === BLACKMAIL$1 && !!card.hiddenId));
+    }
+}
 
 const tplSetupCardItemContainer = (htmnl, index) => `
   <div class="setup-card-item" data-index="${index}">${htmnl}</div>
@@ -997,112 +1896,6 @@ const tplArmyPiece = (piece) => {
     const armyPiece = getArmyPiece(piece);
     return tplLocalAlliance(armyPiece);
 };
-
-class StaticData {
-    constructor(game) {
-        this.game = game;
-        this.staticData = game.gamedatas.staticData;
-    }
-    static create(game) {
-        StaticData.instance = new StaticData(game);
-    }
-    static get() {
-        return StaticData.instance;
-    }
-    armyPiece(id) {
-        const card = this.staticData.armyPieces[id] ?? {};
-        if (!card) {
-            throw new Error('STATIC_DATA_ERROR_001');
-        }
-        return card;
-    }
-    cardTitle(id) {
-        if (id.startsWith('LawCard_')) {
-            return this.lawCard(id).title;
-        }
-        else if (id.startsWith('PC')) {
-            return this.promiseCard(id).title;
-        }
-        else {
-            return this.londonSeasonCard(id).title;
-        }
-    }
-    enterpriseCard(id) {
-        const card = this.staticData.enterpriseCards[id] ?? {};
-        if (!card) {
-            throw new Error('STATIC_DATA_ERROR_002');
-        }
-        return card;
-    }
-    eventTile(id) {
-        const card = this.staticData.eventTiles[id] ?? {};
-        if (!card) {
-            throw new Error('STATIC_DATA_ERROR_002');
-        }
-        return card;
-    }
-    lawCard(id) {
-        const card = this.staticData.lawCards[id] ?? {};
-        if (!card) {
-            throw new Error('STATIC_DATA_ERROR_001');
-        }
-        return card;
-    }
-    londonSeasonCard(id) {
-        const card = this.staticData.londonSeasonCards[id] ??
-            {};
-        if (!card) {
-            throw new Error('STATIC_DATA_ERROR_002');
-        }
-        return card;
-    }
-    order(id) {
-        const order = this.staticData.orders[id];
-        if (!order) {
-            throw new Error('STATIC_DATA_ERROR_003');
-        }
-        return order;
-    }
-    office(id) {
-        const office = this.staticData.offices[id];
-        if (!office) {
-            throw new Error('STATIC_DATA_ERROR_004');
-        }
-        return office;
-    }
-    promiseCard(id) {
-        const card = this.staticData.promiseCards[id];
-        if (!card) {
-            throw new Error('STATIC_DATA_ERROR_007');
-        }
-        return card;
-    }
-    region(id) {
-        const region = this.staticData.regions[id];
-        if (!region) {
-            throw new Error('STATIC_DATA_ERROR_005');
-        }
-        return region;
-    }
-    setupCard(id) {
-        const setupCard = this.staticData.setupCards[id];
-        if (!setupCard) {
-            throw new Error('STATIC_DATA_ERROR_006');
-        }
-        return setupCard;
-    }
-    setupCards() {
-        return Object.values(this.staticData.setupCards);
-    }
-    ship(id) {
-        return this.game.gamedatas.ships[id];
-    }
-}
-
-const tplShipContent = (ship, back = false) => `
-  <div class="joco-ship-name bga-autofit"><span class="fb-font-baskerville">${back && ship.type !== PLAYER_OWNED_SHIP ? _('Extra Ship') : _(ship.name)}</span></div>
-  ${back ? `<div class="joco-ship-fatigued fb-font-baskerville bga-autofit">${_('F')}</div>` : ''}
-`;
 
 const tlpLogTokenText = ({ text, tooltipId, italic = false, bold = true, color, }) => `<span ${tooltipId ? `id="${tooltipId}" class="log_tooltip"` : ''} style="font-weight: ${bold ? '700' : '400'};${italic ? ' font-style: italic;' : ''}${color ? ` color: #${color};` : ''}">${_(text)}</span>`;
 const tplLogTokenClimate = (climate) => `<div class="log-token joco-crown-climate-icon" data-climate="${climate}"></div>`;
@@ -1361,19 +2154,19 @@ const getSetupCard = (card) => {
 const getTimingWindowText = (kind, itemId) => {
     switch (kind) {
         case AFTER_OFFICE_FINISHED_ACTING:
-            return formatStringRecursive(_('After ${officeTitle} finished acting'), {
+            return formatStringRecursive$1(_('After ${officeTitle} finished acting'), {
                 officeTitle: StaticData.get().office(itemId).title,
             });
         case BEFORE_OFFICE_ACTS:
-            return formatStringRecursive(_('Before ${officeTitle} acts'), {
+            return formatStringRecursive$1(_('Before ${officeTitle} acts'), {
                 officeTitle: StaticData.get().office(itemId).title,
             });
         case END_OF_PHASE:
-            return formatStringRecursive(_('End of ${phaseName}'), {
+            return formatStringRecursive$1(_('End of ${phaseName}'), {
                 phaseName: getPhaseName(itemId),
             });
         case START_OF_PHASE:
-            return formatStringRecursive(_('Start of ${phaseName}'), {
+            return formatStringRecursive$1(_('Start of ${phaseName}'), {
                 phaseName: getPhaseName(itemId),
             });
         case BEFORE_ANY_VOTES_ARE_CAST:
@@ -1381,7 +2174,7 @@ const getTimingWindowText = (kind, itemId) => {
         case WHEN_RETIRING:
             return _('When retiring');
         case START_OF_LONDON_SEASON_CHOOSE_CARD:
-            return formatStringRecursive(_("When it's ${player_name}'s turn to take a card from the London Season Display"), {
+            return formatStringRecursive$1(_("When it's ${player_name}'s turn to take a card from the London Season Display"), {
                 player_name: getPlayer(itemId).getName(),
             });
         case AFTER_COMMANDER_DEPLOY_CHECK:
@@ -1410,794 +2203,18 @@ const getIdWithPrefix = (itemId) => {
     }
     return getCardPrefix(itemId) + itemId;
 };
-
-const tplPlayerCounters = ({ crownInGame, familyId, playerId, }) => {
-    const elt = createFamilyMember(familyId, Math.floor(Math.random() * 18));
-    elt.id = `joco-familyMembers-${playerId}`;
-    return `
-  <div class="joco-player-panel-item">
-    <div class="joco-treasury-counter-container">
-      <span class="fb-font-baskerville fb-font-16 fb-font-bold">£</span><span id="joco-cash-counter-${playerId}" class="fb-font-baskerville fb-font-bold fb-font-24"></span>
-    </div>
-  </div>
-  <div class="joco-player-panel-item">
-    ${elt.outerHTML}
-    <span id="joco-familyMembers-counter-${playerId}" class="joco-counter fb-font-baskerville fb-font-bold fb-font-20"></span>
-  </div>
-  <div class="joco-player-panel-item">
-    <div class="joco-icon" data-icon="Power">
-      <span id="joco-power-counter-${playerId}" class="fb-font-baskerville fb-font-bold fb-font-20">10</span>
-    </div>
-  </div>
-`;
-};
-const tplPlayerAreas = () => `<div id="joco-player-areas">
-</div>`;
-const tplPlayerArea = (player) => {
-    const playerId = player.getPlayerId();
-    return `
-      <div id="joco-family-area-${playerId}" class="joco-family-area">
-        <div class="joco-family-area-content">
-          <div id="joco-counters-${playerId}" class="joco-family-area-counters">
-          </div>
-          <div class="joco-row">
-            <div class="joco-container joco-column">
-              <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Offices').toLocaleUpperCase()}</span>
-              <div id="FamilyOffices_${playerId}" class="joco-family-offices"></div>
-            </div>
-            <div class="joco-column" style="flex-grow: 1;">
-              <div class="joco-container">
-                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Enterprises').toLocaleUpperCase()}</span>
-                <div id="joco-enterprises-${playerId}" class="joco-enterprises"></div>
-              </div>
-              <div class="joco-container">
-                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Prestige & Blackmail cards').toLocaleUpperCase()}</span>
-                <div id="joco-prestige-blackmail-${playerId}" class="joco-prestige-blackmail"></div>
-              </div>
-              <div class="joco-container">
-                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Promise cards').toLocaleUpperCase()}</span>
-                <div id="joco-promise-cards-${playerId}" class="joco-promise-cards"></div>
-              </div>
-              <div class="joco-container">
-                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Played Blackmail cards').toLocaleUpperCase()}</span>
-                <div id="joco-played-blackmail-${playerId}" class="joco-prestige-blackmail"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-};
-
-class JocoPlayer {
-    constructor(game, player) {
-        this.game = game;
-        this.counters = {};
-        this.ui = {};
-        this.game = game;
-        const playerId = player.id;
-        this.playerId = Number(playerId);
-        this.playerName = player.name;
-        this.playerColor = player.color;
-        this.familyId = player.familyId;
-        const gamedatas = game.gamedatas;
-        this.setupPlayer(gamedatas);
-    }
-    clearInterface() { }
-    updatePlayer(gamedatas) {
-        this.updatePlayerPanel(gamedatas);
-    }
-    setupPlayer(gamedatas) {
-        this.setupPlayerPanel(gamedatas);
-    }
-    setupPlayerPanel(gamedatas) {
-        const playerGamedatas = gamedatas.players[this.playerId];
-        const node = document.querySelector(`#player_board_${this.playerId} .player-board-game-specific-content`);
-        if (!node) {
-            return;
-        }
-        const familyId = this.familyId === CROWN
-            ? COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[this.getColor()]]
-            : this.familyId;
-        node.insertAdjacentHTML('afterbegin', tplPlayerCounters({
-            playerId: this.playerId,
-            familyId,
-            crownInGame: this.game.gameOptions.crownEnabled,
-        }));
-        const counters = [...COUNTERS];
-        if (this.game.gameOptions.crownEnabled) {
-            counters.push(PROMISE_CUBES_COUNTER);
-        }
-        counters.forEach((counter) => {
-            this.counters[counter] = new ebg.counter();
-            this.counters[counter].create(`joco-${counter}-counter-${this.playerId}`);
-            this.ui[counter] = document.getElementById(`joco-${counter}-${this.playerId}`);
-        });
-        this.updatePlayerPanel(gamedatas);
-    }
-    updatePlayerPanel(gamedatas) {
-        this.counters[CASH_COUNTER].setValue(gamedatas.families[this.playerId].treasury);
-        this.counters[FAMILY_MEMBERS_COUNTER].setValue(Object.values(gamedatas.familyMembers).filter(({ familyId, location }) => familyId === this.familyId && location.startsWith('supply')).length);
-        const power = gamedatas.power[this.playerId].total ??
-            gamedatas.power[this.playerId].totalVisible;
-        this.counters[POWER_COUNTER].setValue(power);
-    }
-    getColor() {
-        return this.playerColor;
-    }
-    getName() {
-        return this.playerName;
-    }
-    getPlayerId() {
-        return this.playerId;
-    }
-    getFamilyId() {
-        return this.familyId;
-    }
-}
-
-const BgaAnimations = await globalThis.importEsmLib('bga-animations', '1.x');
-const BgaCards = await globalThis.importEsmLib('bga-cards', '1.x');
-const BgaAutofit = await globalThis.importEsmLib('bga-autofit', '1.x');
-
-class ShipsManager extends BgaCards.Manager {
-    static create(game) {
-        ShipsManager.instance = new ShipsManager(game);
-    }
-    static getInstance() {
-        return ShipsManager.instance;
-    }
-    constructor(game) {
-        super({
-            getId: (card) => card.id,
-            setupDiv: (card, div) => this.setupDiv(card, div),
-            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
-            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
-            isCardVisible: (card) => this.isCardVisible(card),
-            animationManager: game.animationManager,
-            cardWidth: 75,
-            cardHeight: 68,
-            type: 'ship',
-        });
-        this.game = game;
-    }
-    clearInterface() { }
-    setupDiv(card, div) {
-        div.classList.add('joco-ship-container');
-    }
-    setupFrontDiv(card, div) {
-        div.classList.add('joco-ship');
-        div.setAttribute('data-side', card.type === PLAYER_OWNED_SHIP ? FULL : COMPANY_SHIP);
-        if (div.children.length) {
-            return;
-        }
-        div.insertAdjacentHTML('beforeend', tplShipContent(card));
-    }
-    setupBackDiv(card, div) {
-        div.classList.add('joco-ship');
-        div.setAttribute('data-side', card.type === PLAYER_OWNED_SHIP ? FATIGUED : EXTRA_SHIP);
-        if (div.children.length) {
-            return;
-        }
-        div.insertAdjacentHTML('beforeend', tplShipContent(card, true));
-    }
-    isCardVisible(card) {
-        return card.side === FULL || card.side === COMPANY_SHIP;
-    }
-}
-
-const tplEnterpriseCardContent = (card, addId = true) => {
-    let shipName = null;
-    if (card.type === SHIPYARD) {
-        shipName = StaticData.get().ship(card.shipId).name;
-    }
-    return `
-  <div class="joco-title fb-font-baskerville  fb-font-12 bga-autofit">${card.type === WORKSHOP && card.invested ? _('Invested Workshop').toLocaleUpperCase() : _(card.name).toLocaleUpperCase()}</div>
-  ${shipName !== null ? `
-    <div ${addId ? `id="${card.id}-ship"` : ''} class="joco-shipyard-ship"></div>
-    <div class="joco-ship-first-letter fb-font-baskerville fb-font-24 fb-font-italic bga-autofit">${_(shipName).charAt(0)}</div>
-    <div class="joco-ship-name fb-font-baskerville fb-font-8 bga-autofit">${_(shipName)}</div>
-    ` : ''}  
-  
-`;
-};
-
-class EnterpriseCardsManager extends BgaCards.Manager {
-    static create(game) {
-        EnterpriseCardsManager.instance = new EnterpriseCardsManager(game);
-    }
-    static getInstance() {
-        return EnterpriseCardsManager.instance;
-    }
-    constructor(game) {
-        super({
-            getId: (card) => card.id,
-            setupDiv: (card, div) => this.setupDiv(card, div),
-            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
-            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
-            isCardVisible: (card) => this.isCardVisible(card),
-            animationManager: game.animationManager,
-            cardHeight: 150,
-            cardWidth: 228.75,
-            type: 'enterprise-card',
-        });
-        this.game = game;
-        this.shipStocks = {};
-    }
-    clearInterface() { }
-    setupDiv(card, div) {
-        div.classList.add('joco-enterprise-card-container');
-        if (card.used) {
-            div.classList.add('used');
-        }
-    }
-    setupFrontDiv(card, div) {
-        div.classList.add('joco-enterprise-card');
-        div.classList.add('joco-small-card-horizontal');
-        div.setAttribute('data-background', card.type);
-        if (div.children.length) {
-            return;
-        }
-        div.insertAdjacentHTML('beforeend', tplEnterpriseCardContent(card));
-        if (card.type === SHIPYARD) {
-            this.shipStocks[card.shipId] = new BgaCards.LineStock(ShipsManager.getInstance(), document.getElementById(`${card.id}-ship`));
-        }
-    }
-    setupBackDiv(card, div) {
-        div.classList.add('joco-enterprise-card');
-        div.classList.add('joco-small-card-horizontal');
-        div.setAttribute('data-background', card.type === WORKSHOP ? `${WORKSHOP}Invested` : card.type);
-    }
-    isCardVisible(card) {
-        if (card.type === WORKSHOP && card.invested) {
-            return false;
-        }
-        return true;
-    }
-}
-
-const phases$1 = [
-    ['londonSeason', 'London Season'], ['family', 'Family'],
-    ['firms', 'Firms'], ['hiring', 'Hiring'],
-    ['companyOperations', 'Company Operations'], ['revenue', 'Revenue'],
-    ['eventsInIndia', 'Events in India'], ['ParliamentMeets', 'Parliament Meets'],
-    ['upkeepAndRefresh', 'Upkeep & Refresh'],
-];
-const otherWindows = [
-    ['duringHiringIfYouAreACandidate', 'During hiring'],
-    ['afterPresidentOrFirmCheck', 'After a trade check'],
-    ['afterCommanderDeployCheck', 'After a deploy check'],
-    ['immediatelyAfterMilitaryAffairsActs', 'After Military Affairs acts'],
-    ['beforeBombayPresidencyOperations', 'Before Bombay Presidency operations'],
-    ['startOfLondonSeasonChooseCard', 'Before choosing a London Season card'],
-    ['whenRetiring', 'When retiring'],
-    ['beforeAnyVotesAreCast', 'Before votes are cast'],
-    ['anyTimeAfterRevenuePhase', 'After Revenue'],
-];
-const officeIds = new Set([
-    CHAIRMAN, DIRECTOR_OF_TRADE, GOVERNOR_GENERAL, MANAGER_OF_SHIPPING,
-    MILITARY_AFFAIRS, SUPERINTENDENT_OF_TRADE_IN_CHINA,
-    PRESIDENT_OF_BOMBAY, PRESIDENT_OF_MADRAS, PRESIDENT_OF_BENGAL,
-    GOVERNOR_OF_BOMBAY, GOVERNOR_OF_MADRAS, GOVERNOR_OF_BENGAL,
-    GOVERNOR_OF_PUNJAB, GOVERNOR_OF_DELHI, GOVERNOR_OF_MARATHA,
-    GOVERNOR_OF_HYDERABAD, GOVERNOR_OF_MYSORE,
-]);
-const kinds = [
-    { id: START_OF_PHASE, label: 'Start of a phase', items: 'phase' },
-    { id: END_OF_PHASE, label: 'End of a phase', items: 'phase' },
-    { id: BEFORE_OFFICE_ACTS, label: 'Before an office acts', items: 'office' },
-    { id: AFTER_OFFICE_FINISHED_ACTING, label: 'After an office acts', items: 'office' },
-];
-class TimingPreferences {
-    constructor(game) {
-        this.game = game;
-        this.blackmailCards = {};
-        this.pending = false;
-        this.preferences = game.gamedatas.timingPreferences;
-        this.officeLocations = Object.fromEntries(Object.entries(game.gamedatas.offices).map(([id, office]) => [id, office.location]));
-        this.promiseCards = { ...game.gamedatas.promiseCards };
-        this.passedLaws = Object.fromEntries(game.gamedatas.passedLaws.map((card) => [card.id, card]));
-        this.primeMinisterId = game.gamedatas.parliament.primeMinister.playerId;
-        const player = game.gamedatas.players[game.getPlayerId()];
-        player?.londonSeasonCards.forEach((card) => {
-            if (card.type === BLACKMAIL && card.hiddenId)
-                this.blackmailCards[card.id] = card;
+const getCardText = (card) => {
+    if (card.id.startsWith('PC')) {
+        return formatStringRecursive$1('${tkn_promiseCard}', {
+            tkn_promiseCard: card.id,
         });
     }
-    static create(game) {
-        TimingPreferences.instance = new TimingPreferences(game);
-    }
-    static get() {
-        return TimingPreferences.instance;
-    }
-    setup() {
-        if (this.game.isSpectator)
-            return;
-        const tab = document.createElement('div');
-        tab.id = 'joco-timing-preferences';
-        tab.className = 'joco-tab';
-        const content = document.createElement('div');
-        content.className = 'joco-timing-content joco-container';
-        const title = document.createElement('h2');
-        title.textContent = _('Alerts');
-        const form = document.createElement('form');
-        form.className = 'joco-timing-form';
-        const kindField = document.createElement('label');
-        kindField.textContent = _('Timing window');
-        this.kindSelect = document.createElement('select');
-        kindField.appendChild(this.kindSelect);
-        this.itemField = document.createElement('label');
-        this.itemSelect = document.createElement('select');
-        this.addButton = document.createElement('button');
-        this.addButton.type = 'submit';
-        this.addButton.className = 'bgabutton bgabutton_blue';
-        this.addButton.textContent = _('Add');
-        form.append(kindField, this.itemField, this.addButton);
-        this.error = document.createElement('p');
-        this.error.className = 'joco-timing-error';
-        this.error.setAttribute('role', 'alert');
-        const listTitle = document.createElement('h3');
-        listTitle.textContent = _('Active Alerts');
-        this.list = document.createElement('div');
-        this.list.className = 'joco-timing-list';
-        content.append(title, form, this.error, listTitle, this.list);
-        tab.appendChild(content);
-        document.getElementById('joco').appendChild(tab);
-        this.kindSelect.addEventListener('change', () => this.render());
-        this.itemSelect.addEventListener('change', () => this.updateAddButton());
-        form.addEventListener('submit', (event) => {
-            event.preventDefault();
-            const kind = kinds.find((entry) => entry.id === this.kindSelect.value);
-            if (!kind || this.addButton.disabled)
-                return;
-            const key = kind.items ? `${kind.id}:${this.itemSelect.value}` : kind.id;
-            void this.updateWindow(key, true);
-        });
-        this.render();
-    }
-    updateOffice(id, location) {
-        this.officeLocations[id] = location;
-        if (location === DECK) {
-            delete this.preferences.window[`${BEFORE_OFFICE_ACTS}:${id}`];
-            delete this.preferences.window[`${AFTER_OFFICE_FINISHED_ACTING}:${id}`];
-        }
-        if (!this.game.isSpectator && this.list)
-            this.render();
-    }
-    updatePromiseCard(card) {
-        this.promiseCards[card.id] = card;
-        if (!this.game.isSpectator && this.list)
-            this.render();
-    }
-    updateLondonSeasonCard(card) {
-        if (card.type !== BLACKMAIL)
-            return;
-        if (card.location === `londonSeasonCards_${this.game.getPlayerId()}` && card.hiddenId) {
-            this.blackmailCards[card.id] = card;
-        }
-        else {
-            delete this.blackmailCards[card.id];
-        }
-        if (!this.game.isSpectator && this.list)
-            this.render();
-    }
-    removeLondonSeasonCard(card) {
-        delete this.blackmailCards[card.id];
-        if (!this.game.isSpectator && this.list)
-            this.render();
-    }
-    updateLawCard(card) {
-        if (card.location === 'PassedLaws')
-            this.passedLaws[card.id] = card;
-        else
-            delete this.passedLaws[card.id];
-        if (!this.game.isSpectator && this.list)
-            this.render();
-    }
-    updatePrimeMinister(playerId) {
-        this.primeMinisterId = Number(playerId);
-        if (!this.game.isSpectator && this.list)
-            this.render();
-    }
-    addCardButton(container, cardId) {
-        if (this.game.isSpectator || !cardId || container.querySelector('.joco-card-timing-button'))
-            return;
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'joco-card-timing-button';
-        button.dataset.cardId = cardId;
-        this.updateCardButton(button);
-        button.addEventListener('click', (event) => {
-            event.stopPropagation();
-            void this.updateCard(cardId, !(this.preferences.card[cardId] ?? true));
-        });
-        container.appendChild(button);
-    }
-    updateCardButton(button) {
-        const enabled = this.preferences.card[button.dataset.cardId] ?? true;
-        button.title = enabled ? _('Card prompts enabled') : _('Card prompts disabled');
-        button.setAttribute('aria-label', button.title);
-        button.setAttribute('aria-pressed', String(enabled));
-        button.innerHTML = `<i class="fa fa-${enabled ? 'bell' : 'bell-slash'}" aria-hidden="true"></i>`;
-        button.disabled = this.pending;
-    }
-    activeCards() {
-        const playerId = this.game.getPlayerId();
-        const cards = [];
-        Object.values(this.promiseCards).forEach((card) => {
-            const data = this.game.gamedatas.staticData.promiseCards[card.id];
-            if (card.location === String(playerId) && card.ownerPlayerId !== playerId && data) {
-                cards.push({ id: card.id, ...data });
-            }
-        });
-        Object.values(this.blackmailCards).forEach((card) => {
-            const data = this.game.gamedatas.staticData.londonSeasonCards[card.hiddenId];
-            if (data)
-                cards.push({ id: card.hiddenId, ...data });
-        });
-        if (Number(this.primeMinisterId) === playerId) {
-            Object.values(this.passedLaws).forEach((card) => {
-                const data = this.game.gamedatas.staticData.lawCards[card.id];
-                if (data)
-                    cards.push({ id: card.id, ...data });
-            });
-        }
-        return cards
-            .filter((card) => card.timingWindows.length > 0 && (this.preferences.card[card.id] ?? true))
-            .map((card) => ({ id: card.id, label: _('If I can play / use ${cardName}').replace('${cardName}', _(card.title)) }));
-    }
-    items(kind) {
-        if (kind.items === 'phase')
-            return phases$1.map(([id, label]) => [id, _(label)]);
-        if (kind.items === 'office') {
-            return Object.entries(this.game.gamedatas.staticData.offices)
-                .filter(([id]) => officeIds.has(id) && this.officeLocations[id] !== undefined && this.officeLocations[id] !== DECK)
-                .map(([id, office]) => [id, _(office.title)]);
-        }
-        return [];
-    }
-    label(key) {
-        const [kindId, itemId] = key.split(':');
-        const kind = kinds.find((entry) => entry.id === kindId);
-        if (!kind)
-            return key;
-        if (!kind.items)
-            return _(kind.label);
-        const item = kind.items === 'phase'
-            ? phases$1.find(([id]) => id === itemId)?.[1]
-            : this.game.gamedatas.staticData.offices[itemId]?.title;
-        const name = item ? _(item) : itemId;
-        const template = kindId === START_OF_PHASE ? _('Start of phase: ${name}')
-            : kindId === END_OF_PHASE ? _('End of phase: ${name}')
-                : kindId === BEFORE_OFFICE_ACTS ? _('Before an office acts: ${name}')
-                    : _('After an office acts: ${name}');
-        return template.replace('${name}', name);
-    }
-    render() {
-        const selectedKind = this.kindSelect.value;
-        const selectedItem = this.itemSelect.value;
-        this.kindSelect.replaceChildren(new Option(_('Select a timing window'), ''));
-        kinds.forEach((kind) => {
-            const available = kind.items
-                ? this.items(kind).some(([id]) => !this.preferences.window[`${kind.id}:${id}`])
-                : !this.preferences.window[kind.id];
-            if (available)
-                this.kindSelect.add(new Option(_(kind.label), kind.id));
-        });
-        this.kindSelect.value = selectedKind;
-        if (this.kindSelect.selectedIndex < 0)
-            this.kindSelect.value = '';
-        const kind = kinds.find((entry) => entry.id === this.kindSelect.value);
-        this.itemField.hidden = !kind?.items;
-        this.itemField.replaceChildren(document.createTextNode(kind?.items === 'phase' ? _('Phase') : _('Office')), this.itemSelect);
-        this.itemSelect.replaceChildren(new Option(_('Select an item'), ''));
-        if (kind?.items) {
-            this.items(kind)
-                .filter(([id]) => !this.preferences.window[`${kind.id}:${id}`])
-                .sort((left, right) => left[1].localeCompare(right[1]))
-                .forEach(([id, label]) => this.itemSelect.add(new Option(label, id)));
-            this.itemSelect.value = selectedItem;
-            if (this.itemSelect.selectedIndex < 0)
-                this.itemSelect.value = '';
-        }
-        this.kindSelect.disabled = this.pending;
-        this.itemSelect.disabled = this.pending;
-        this.updateAddButton();
-        document.querySelectorAll('.joco-card-timing-button').forEach((button) => this.updateCardButton(button));
-        this.list.replaceChildren();
-        const saved = [
-            ...Object.keys(this.preferences.window).filter((key) => this.preferences.window[key])
-                .map((key) => ({ kind: 'window', id: key, label: this.label(key) })),
-            ...this.activeCards().map((card) => ({ kind: 'card', ...card })),
-        ].sort((left, right) => left.label.localeCompare(right.label));
-        if (!saved.length) {
-            const empty = document.createElement('p');
-            empty.textContent = _('No active alerts');
-            this.list.appendChild(empty);
-        }
-        saved.forEach((entry) => {
-            const row = document.createElement('div');
-            row.className = 'joco-timing-row';
-            const text = document.createElement('span');
-            text.textContent = entry.label;
-            const remove = document.createElement('button');
-            remove.type = 'button';
-            remove.className = 'joco-timing-remove';
-            remove.title = _('Remove alert');
-            remove.setAttribute('aria-label', `${remove.title}: ${text.textContent}`);
-            remove.innerHTML = '<i class="fa fa-close" aria-hidden="true"></i>';
-            remove.disabled = this.pending;
-            remove.addEventListener('click', () => {
-                if (entry.kind === 'card')
-                    void this.updateCard(entry.id, false);
-                else
-                    void this.updateWindow(entry.id, false);
-            });
-            row.append(text, remove);
-            this.list.appendChild(row);
-        });
-    }
-    updateAddButton() {
-        const kind = kinds.find((entry) => entry.id === this.kindSelect.value);
-        this.addButton.disabled = this.pending || !kind || (!!kind.items && !this.itemSelect.value);
-    }
-    async updateCard(cardId, enabled) {
-        if (this.pending)
-            return;
-        this.pending = true;
-        this.error.textContent = '';
-        this.render();
-        try {
-            await this.set('card', cardId, enabled);
-        }
-        catch (error) {
-            this.error.textContent = _('Unable to update timing preference');
-            console.error('Unable to update timing preference', error);
-        }
-        finally {
-            this.pending = false;
-            this.render();
-        }
-    }
-    async updateWindow(key, enabled) {
-        this.pending = true;
-        this.error.textContent = '';
-        this.render();
-        try {
-            await this.set('window', key, enabled);
-            const [kind, officeId] = key.split(':');
-            if ((kind === BEFORE_OFFICE_ACTS || kind === AFTER_OFFICE_FINISHED_ACTING) && this.officeLocations[officeId] === DECK) {
-                delete this.preferences.window[key];
-            }
-            if (enabled) {
-                this.kindSelect.value = '';
-                this.itemSelect.value = '';
-            }
-        }
-        catch (error) {
-            this.error.textContent = _('Unable to update timing preference');
-            console.error('Unable to update timing preference', error);
-        }
-        finally {
-            this.pending = false;
-            this.render();
-        }
-    }
-    async set(kind, itemId, enabled) {
-        const request = this.game.bga.actions.performAction('actSetTimingPreference', { kind, itemId, enabled: enabled ? 1 : 0 }, { lock: false, checkAction: false, checkPossibleActions: false });
-        if (!request)
-            throw new Error('Timing preference action unavailable');
-        await request;
-        this.preferences[kind][itemId] = enabled;
-    }
-}
-
-const isDebug = window.location.host == 'studio.boardgamearena.com' ||
-    window.location.hash.indexOf('debug') > -1;
-const debug = isDebug ? console.info.bind(window.console) : () => { };
-const addCancelButton = (props = {}) => {
-    Interaction.use().addCancelButton(props);
+    const text = '"${cardTitle}"';
+    const cardId = card['type'] === BLACKMAIL$1 && 'hiddenId' in card ? card.hiddenId : card.id;
+    return formatStringRecursive$1(text, {
+        cardTitle: _(StaticData.get().cardTitle(cardId)),
+    });
 };
-const addConfirmButton = (callback) => {
-    Interaction.use().addConfirmButton(callback);
-};
-const addDangerActionButton = (props) => {
-    Interaction.use().addDangerActionButton(props);
-};
-const addPassButton = (optionalAction, text) => Interaction.use().addPassButton(optionalAction, text);
-const addPlayerButton = (props) => Interaction.use().addPlayerButton(props);
-const addPrimaryActionButton = (props) => Interaction.use().addPrimaryActionButton(props);
-const addSecondaryActionButton = (props) => Interaction.use().addSecondaryActionButton(props);
-const addUndoButtons = (props) => {
-    Interaction.use().addUndoButtons(props);
-};
-const clearPossible = () => {
-    Interaction.use().clearPossible();
-};
-const updatePageTitle = (text, args = {}) => Interaction.use().clientUpdatePageTitle(text, args);
-const formatStringRecursive = (log, args) => {
-    return Interaction.use().formatStringRecursive(log, args);
-};
-const setAbsolutePosition = (elt, scaleVarName, { top, left }) => {
-    if (!elt) {
-        return;
-    }
-    elt.style.top = `calc(var(--${scaleVarName}) * ${top}px)`;
-    elt.style.left = `calc(var(--${scaleVarName}) * ${left}px)`;
-};
-const onClick = (node, callback, temporary = true) => {
-    let element = typeof node === 'string' ? document.getElementById(node) : node;
-    Interaction.use().onClick(element, callback, temporary);
-};
-const setSelected = (node) => {
-    let element = typeof node === 'string' ? document.getElementById(node) : node;
-    Interaction.use().setSelected(element);
-};
-const performAction = (actionName, args) => {
-    Interaction.use().clearPossible();
-    Interaction.use().performAction(actionName, args);
-};
-const getPlayer = (playerId) => {
-    return PlayerManager.getInstance().getPlayer(playerId);
-};
-const getPlayerName = (playerId) => {
-    return PlayerManager.getInstance().getPlayer(playerId).getName();
-};
-const createHtmlElement = (html) => {
-    const template = document.createElement('template');
-    template.innerHTML = html.trim();
-    return template.content.firstChild;
-};
-const parentHasChildWithId = (parent, child) => {
-    const locationElement = typeof parent === 'string' ? document.getElementById(parent) : parent;
-    const childId = typeof child === 'string' ? child : child.id;
-    if (Array.from(locationElement?.children ?? []).some((c) => c.id === childId)) {
-        return true;
-    }
-    return false;
-};
-const getCurrentPlayerId = () => {
-    return PlayerManager.getInstance().getCurrentPlayerId();
-};
-
-const tplCardText = (text, { containerClass = 'fb-card-text', textClass = 'fb-font-12 fb-font-baskerville', }) => {
-    return `
-    <div class="${containerClass} bga-autofit">
-      ${text
-        .map((item) => {
-        if (typeof item === 'string') {
-            return `<span class="${textClass}">${item}</span>`;
-        }
-        else {
-            return `<span class="${textClass}">${formatStringRecursive(_(item.log), item.args)}</span>`;
-        }
-    })
-        .join('')}
-    
-    </div>
-  `;
-};
-
-const tplSpouse = (card) => `
-  <div class="joco-card-title fb-font-16 fb-font-baskerville bga-autofit">${_('SPOUSE')}</div>
-  <div class="joco-card-subtitle fb-font-12 fb-font-italic fb-font-baskerville bga-autofit">${_('You cannot transfer this card')}</div>
-  <div class="joco-card-name fb-font-24 fb-font-parisienne fb-font-bold bga-autofit">${_(card.title)}</div>
-  ${tplCardText(card.text, {})}
-  ${card.textNote
-    ? tplCardText([card.textNote], {
-        containerClass: 'fb-card-text-note',
-        textClass: 'fb-font-12 fb-font-baskerville fb-font-italic',
-    })
-    : ''}
-  ${card.victoryPoints !== null ? tplVictoryPointsIcon(card.victoryPoints) : ''}
-  ${card.power !== null ? tplPowerIcon(card.power) : ''}
-  ${card.discount !== null ? tplDiscountIcon(card.discount) : ''}
-`;
-const tplEnterprise = (card) => `
-  <div class="joco-card-name fb-font-16 fb-font-baskerville bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
-  <div class="joco-enterprise-icon">${tplIcon(card.enterpriseType)}</div>
-  ${tplCardText(card.text, {})}
-`;
-const tplScottishCastle = (card) => `
-  <div class="joco-card-name fb-font-16 fb-font-baskerville bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
-  <div class="joco-enterprise-icon">${tplIcon(card.enterpriseType)}</div>
-    ${tplPowerIcon('3')}
-    ${tplIcon(WINDOW, 'joco-window-1')}
-    ${tplIcon(WINDOW, 'joco-window-2')}
-`;
-const tplLondonSeasonCardContent = (card) => {
-    if (card.background === 'ScottishCastle') {
-        return tplScottishCastle(card);
-    }
-    if (card.type === PRESTIGE && card.subtype === SPOUSE) {
-        return tplSpouse(card);
-    }
-    else if (card.type === PRESTIGE && card.subtype === ENTERPRISE) {
-        return tplEnterprise(card);
-    }
-    return null;
-};
-const tplBlackmailCardContent = (card) => {
-    return `<div class="joco-card-name fb-font-24 fb-font-parisienne fb-font-bold bga-autofit">${_(card.title)}</div>
-  ${tplCardText(card.text, {})}
-  ${card.power ? tplPowerIcon(card.power) : ''}
-`;
-};
-
-class LondonSeasonCardsManager extends BgaCards.Manager {
-    static create(game) {
-        LondonSeasonCardsManager.instance = new LondonSeasonCardsManager(game);
-    }
-    static getInstance() {
-        return LondonSeasonCardsManager.instance;
-    }
-    constructor(game) {
-        super({
-            getId: (card) => card.id,
-            setupDiv: (card, div) => this.setupDiv(card, div),
-            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
-            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
-            isCardVisible: (card) => this.isCardVisible(card),
-            animationManager: game.animationManager,
-            cardHeight: 351,
-            cardWidth: 225,
-        });
-        this.game = game;
-    }
-    clearInterface() { }
-    setupDiv(card, div) {
-        div.classList.add('joco-card-container');
-        div.setAttribute('data-type', card.type);
-        if (card.type === PRESTIGE) {
-            div.setAttribute('data-subtype', card.subtype);
-        }
-        this.updateAlertButton(card, div);
-    }
-    setupFrontDiv(card, div) {
-        this.updateAlertButton(card, div.closest('.joco-card-container'));
-        div.classList.add('joco-card');
-        div.setAttribute('data-background', card.type === BLACKMAIL ? 'Blackmail' : card.background);
-        div.setAttribute('data-has-text-note', card.textNote ? 'true' : 'false');
-        div.setAttribute('data-card-id', card.id);
-        if (card.type === PRESTIGE) {
-            div.setAttribute('data-subtype', card.subtype);
-        }
-        if (card.type === BLACKMAIL && !card.hiddenId && div.children.length) {
-            div.replaceChildren();
-            return;
-        }
-        if (div.children.length || (card.type === BLACKMAIL && !card.hiddenId)) {
-            return;
-        }
-        let cardContent = '';
-        if (card.type === BLACKMAIL && card.hiddenId) {
-            cardContent = tplBlackmailCardContent(card);
-        }
-        else if (card.type === PRESTIGE) {
-            cardContent = tplLondonSeasonCardContent(card);
-        }
-        if (cardContent) {
-            div.insertAdjacentHTML('beforeend', cardContent);
-        }
-    }
-    updateAlertButton(card, container) {
-        if (!container)
-            return;
-        if (card.type === BLACKMAIL && card.hiddenId && this.game.gamedatas.staticData.londonSeasonCards[card.hiddenId]?.timingWindows.length) {
-            TimingPreferences.get().addCardButton(container, card.hiddenId);
-        }
-        else {
-            container.querySelector('.joco-card-timing-button')?.remove();
-        }
-    }
-    setupBackDiv(card, div) {
-        div.classList.add('joco-card');
-        div.setAttribute('data-background', card.type === PRESTIGE ? 'PrestigeBack' : 'BlackmailBack');
-    }
-    isCardVisible(card) {
-        return (card.type !== BLACKMAIL || (card.type === BLACKMAIL && !!card.hiddenId));
-    }
-}
 
 const tplOfficeCard = (data) => {
     const office = getOffice(data);
@@ -2451,7 +2468,7 @@ class OpportunityMarker {
         };
         if (familyAction && map[familyAction]) {
             const { text, icon } = map[familyAction];
-            return formatStringRecursive(text, { tkn_icon: icon });
+            return formatStringRecursive$1(text, { tkn_icon: icon });
         }
         return _('not placed');
     }
@@ -2469,7 +2486,7 @@ class OpportunityMarker {
 
 const tplPromiseCardContent = (card) => `
   <div class="joco-title joco-card-text fb-font-baskerville fb-font-16 bga-autofit">${card.title}</div>
-  <div class="joco-signature joco-card-text fb-font-parisienne fb-font-20 bga-autofit">${formatStringRecursive(_('${familyName} Family'), {
+  <div class="joco-signature joco-card-text fb-font-parisienne fb-font-20 bga-autofit">${formatStringRecursive$1(_('${familyName} Family'), {
     familyName: getFamilyName(card.familyId),
 })}</div>
 `;
@@ -2631,7 +2648,12 @@ class PlayerArea {
         await this.enterprises.addCard(getEnterpriseCard(enterprise));
     }
     async addLondonSeasonCard(card) {
-        await this.stocks[`londonSeasonCards_${this.familyId}`].addCard(getLondonSeasonCard(card));
+        if (card.location.startsWith('londonSeasonCards_')) {
+            await this.stocks[`londonSeasonCards_${this.familyId}`].addCard(getLondonSeasonCard(card));
+        }
+        else if (card.location.startsWith('playedBlackmailCards_')) {
+            await this.stocks[`playedBlackmailCards_${this.familyId}`].addCard(getLondonSeasonCard(card));
+        }
     }
     async addPromiseCard(card) {
         await this.promiseCards.addCard(card);
@@ -2667,7 +2689,6 @@ class PlayerManager {
             const player = game.gamedatas.players[playerId];
             this.players[playerId] = new JocoPlayer(this.game, player);
         }
-        this.setup(game.gamedatas);
     }
     static create(game) {
         PlayerManager.instance = new PlayerManager(game);
@@ -2704,7 +2725,7 @@ class PlayerManager {
         const currentPlayerId = this.getCurrentPlayerId();
         return this.getPlayer(currentPlayerId);
     }
-    setup(gamedatas) {
+    setupPlayerAreas(gamedatas) {
         document
             .getElementById('joco')
             .insertAdjacentHTML('afterbegin', tplPlayerAreas());
@@ -2717,7 +2738,9 @@ class PlayerManager {
                 const player = this.getPlayer(playerId);
                 return {
                     id: `joco-family-area-${player.getPlayerId()}`,
-                    title: `${player.getName()} - ${getFamilyName(player.familyId)}`,
+                    title: formatStringRecursive$1('${tkn_playerName}', {
+                        tkn_playerName: player.getName(),
+                    }),
                     content: tplPlayerArea(player),
                 };
             }),
@@ -3793,7 +3816,7 @@ class ShipZone {
     updateCount(modifier = 0) {
         this.ui.count.replaceChildren();
         const count = this.stock.getCards().length + modifier;
-        let textContent = formatStringRecursive(count === 1 ? _('${count} Ship') : _('${count} Ships'), {
+        let textContent = formatStringRecursive$1(count === 1 ? _('${count} Ship') : _('${count} Ships'), {
             count,
         });
         if (this.id === SUPERINTENDENT_OF_TRADE_IN_CHINA) {
@@ -4114,7 +4137,7 @@ const tplLondonSeasonOrder = ({ order, cashSpent, }) => {
     });
     return `
     <span class="fb-font-baskerville fb-font-12">
-      ${formatStringRecursive(_('Order for choosing cards from the London Season Display: ${playerLog}'), {
+      ${formatStringRecursive$1(_('Order for choosing cards from the London Season Display: ${playerLog}'), {
         playerLog: {
             log: playerLog,
             args: playerArgs,
@@ -4699,7 +4722,7 @@ class NewOffer {
     }
     getSideName(side) {
         const player = getPlayer(this.getPlayerId(side));
-        return formatStringRecursive('${tkn_playerName}', {
+        return formatStringRecursive$1('${tkn_playerName}', {
             tkn_playerName: player.getName(),
         });
     }
@@ -4721,10 +4744,10 @@ class NewOffer {
     }
     getSummaryHeading(side) {
         return side === 'self'
-            ? formatStringRecursive(_('${tkn_boldText_you} will give'), {
+            ? formatStringRecursive$1(_('${tkn_boldText_you} will give'), {
                 tkn_boldText_you: _('You'),
             })
-            : formatStringRecursive(_('${tkn_playerName} will give'), {
+            : formatStringRecursive$1(_('${tkn_playerName} will give'), {
                 tkn_playerName: this.getSideName(side),
             });
     }
@@ -4791,7 +4814,7 @@ const tplDealsTableFamilyItem = (playerId) => {
     const player = PlayerManager.getInstance().getPlayer(playerId);
     return `
   <div class="joco-table-family-item">
-    <div>${formatStringRecursive('${tkn_playerName}', { tkn_playerName: player.getName() })}</div>
+    <div>${formatStringRecursive$1('${tkn_playerName}', { tkn_playerName: player.getName() })}</div>
     <div class="fb-font-bold">${getFamilyName(player.getFamilyId())}</div>
   </div>`;
 };
@@ -4812,10 +4835,10 @@ const tplDealAssetLines = (deal, currentPlayerId) => {
     return assetLabels
         .map(({ playerId, labels }) => {
         const giver = Number(playerId) === currentPlayerId
-            ? formatStringRecursive(isAgreement
+            ? formatStringRecursive$1(isAgreement
                 ? _('${tkn_boldText_you} gave')
                 : _('${tkn_boldText_you} will give'), { tkn_boldText_you: _('You') })
-            : formatStringRecursive(isAgreement
+            : formatStringRecursive$1(isAgreement
                 ? _('${tkn_playerName} gave')
                 : _('${tkn_playerName} will give'), {
                 tkn_playerName: PlayerManager.getInstance()
@@ -5300,7 +5323,7 @@ class PrimeMinisterDial {
             return;
         }
         this.ui.playerName.replaceChildren();
-        this.ui.playerName.insertAdjacentHTML('beforeend', formatStringRecursive('${tkn_playerName}', {
+        this.ui.playerName.insertAdjacentHTML('beforeend', formatStringRecursive$1('${tkn_playerName}', {
             tkn_playerName: getPlayerName(playerId),
         }));
     }
@@ -5343,7 +5366,7 @@ const tplLeaderOfTheOpposition = (leaderName) => {
     return `
   <div class="joco-leader-of-the-opposition">
     <span class="fb-font-baskerville fb-font-16 fb-font-bold">Leader:</span>
-    <span class="fb-font-baskerville fb-font-16">${formatStringRecursive('${tkn_playerName}', {
+    <span class="fb-font-baskerville fb-font-16">${formatStringRecursive$1('${tkn_playerName}', {
         tkn_playerName: leaderName,
     })}</span>
   </div>
@@ -5380,7 +5403,7 @@ const tplOppositionContent = (opposition) => {
         ? tplLeaderOfTheOpposition(getPlayerName(opposition.leader))
         : ''}
         <span class="fb-font-baskerville fb-font-16">
-          ${formatStringRecursive('${playerLog}', {
+          ${formatStringRecursive$1('${playerLog}', {
         playerLog: {
             log: playerLog,
             args: playerArgs,
@@ -7260,7 +7283,7 @@ class CrownChairmanRequestAllocation {
         this.setOfficesSelectable();
         addSecondaryActionButton({
             id: 'pay_btn',
-            text: formatStringRecursive(_('Pay 1 ${tkn_promiseCube}'), {
+            text: formatStringRecursive$1(_('Pay 1 ${tkn_promiseCube}'), {
                 tkn_promiseCube: tknPromiseCubes(),
             }),
             callback: () => this.updateInterfaceSelectOffice(),
@@ -7285,7 +7308,7 @@ class CrownChairmanRequestAllocation {
         for (let i = 1; i <= this.args.maxAmount; i++) {
             addSecondaryActionButton({
                 id: `amount_${i}_btn`,
-                text: formatStringRecursive(_('${amount} ${tkn_pound}'), {
+                text: formatStringRecursive$1(_('${amount} ${tkn_pound}'), {
                     amount: i,
                     tkn_pound: tknPound(),
                 }),
@@ -7345,7 +7368,7 @@ class CrownChairmanRequestDebtAdvancement {
         if (this.args.oneLessAdvancement.possible) {
             addSecondaryActionButton({
                 id: 'one_less_btn',
-                text: formatStringRecursive(_('Pay ${amount} ${tkn_promiseCube} for -1 Debt'), {
+                text: formatStringRecursive$1(_('Pay ${amount} ${tkn_promiseCube} for -1 Debt'), {
                     amount: this.args.oneLessAdvancement.cost,
                     tkn_promiseCube: tknPromiseCubes(),
                 }),
@@ -7362,7 +7385,7 @@ class CrownChairmanRequestDebtAdvancement {
         if (this.args.additionalAdvancement.possible) {
             addSecondaryActionButton({
                 id: 'additional_btn',
-                text: formatStringRecursive(_('Pay ${amount} ${tkn_promiseCube} for +1 Debt'), {
+                text: formatStringRecursive$1(_('Pay ${amount} ${tkn_promiseCube} for +1 Debt'), {
                     amount: this.args.additionalAdvancement.cost,
                     tkn_promiseCube: tknPromiseCubes(),
                 }),
@@ -7442,7 +7465,7 @@ class CrownManagerOfShippingBuyCompanyShips {
                 case BUY_COMPANY_SHIP:
                     addSecondaryActionButton({
                         id: 'buy_ship_btn',
-                        text: formatStringRecursive(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to buy ${tkn_ship}'), {
+                        text: formatStringRecursive$1(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to buy ${tkn_ship}'), {
                             amount: option.promiseCubeCost,
                             tkn_playerName_crown: getCrownPlayerName(),
                             tkn_promiseCube: tknPromiseCubes(),
@@ -7459,7 +7482,7 @@ class CrownManagerOfShippingBuyCompanyShips {
                 case DO_NOT_BUY_COMPANY_SHIP:
                     addSecondaryActionButton({
                         id: 'do_not_buy_ship_btn',
-                        text: formatStringRecursive(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to not buy ${tkn_ship}'), {
+                        text: formatStringRecursive$1(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to not buy ${tkn_ship}'), {
                             amount: option.promiseCubeCost,
                             tkn_playerName_crown: getCrownPlayerName(),
                             tkn_promiseCube: tknPromiseCubes(),
@@ -7614,7 +7637,7 @@ class CrownManagerOfShippingLeaseExtraShips {
         if (optionToLeaveTwoUnspent) {
             addSecondaryActionButton({
                 id: 'buy_ship_btn',
-                text: formatStringRecursive(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to leave 2 ${tkn_pound} unspent'), {
+                text: formatStringRecursive$1(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to leave 2 ${tkn_pound} unspent'), {
                     amount: 1,
                     tkn_playerName_crown: getCrownPlayerName(),
                     tkn_promiseCube: tknPromiseCubes(),
@@ -7833,7 +7856,7 @@ class DirectorOfTradeSpecialEnvoy {
         });
         addPrimaryActionButton({
             id: 'make_check_btn',
-            text: formatStringRecursive(_('Roll ${number} dice'), {
+            text: formatStringRecursive$1(_('Roll ${number} dice'), {
                 number: this.spend,
             }),
             callback: () => this.updateInterfaceConfirm(),
@@ -8086,8 +8109,8 @@ class DraftCard {
         debug('Leaving DraftCard state');
     }
     setDescription(activePlayerIds, args) {
-        if (args._private?.selected) {
-            args._private?.selected.forEach((cardId) => setSelected(cardId));
+        if (args._private?.draft.selected) {
+            args._private?.draft.selected.forEach((cardId) => setSelected(cardId));
         }
     }
     updateInterfaceInitialStep() {
@@ -8101,7 +8124,7 @@ class DraftCard {
             });
         }
         this.setSelected();
-        this.args._private.options.forEach((option) => {
+        this.args._private?.draft.options.forEach((option) => {
             onClick(`setup-card-${option.id}`, () => this.handleClick(option.id));
         });
         if (this.selectedCards.length > 0) {
@@ -8304,7 +8327,7 @@ class GovernorAdminister {
         });
         addPrimaryActionButton({
             id: 'administer-btn',
-            text: formatStringRecursive(this.args.dicePool === 1
+            text: formatStringRecursive$1(this.args.dicePool === 1
                 ? _('Make a check with 1 die')
                 : _('Make a check with ${number} dice'), {
                 number: this.args.dicePool,
@@ -8358,7 +8381,7 @@ class GovernorGeneralMakeCheck {
         });
         addPrimaryActionButton({
             id: 'make_check_btn',
-            text: formatStringRecursive(_('Roll ${number} dice'), {
+            text: formatStringRecursive$1(_('Roll ${number} dice'), {
                 number: this.spend,
             }),
             callback: () => this.updateInterfaceConfirm(),
@@ -8571,7 +8594,7 @@ class HiringGiveConsentForNepotism {
             return _(this.args.title);
         }
         else {
-            return formatStringRecursive(_(this.args.title.log), this.args.title.args);
+            return formatStringRecursive$1(_(this.args.title.log), this.args.title.args);
         }
     }
     performAction(consent) {
@@ -8653,7 +8676,7 @@ class HiringHireFamilyMember {
             return _(this.args.title);
         }
         else {
-            return formatStringRecursive(_(this.args.title.log), this.args.title.args);
+            return formatStringRecursive$1(_(this.args.title.log), this.args.title.args);
         }
     }
     goToTab() {
@@ -8686,7 +8709,7 @@ class LondonSeasonChooseCard {
         this.args = args;
         this.selectedCard = null;
         if (this.args._private) {
-            this.args._private.forEach((cardBase) => {
+            this.args._private.cards.forEach((cardBase) => {
                 const card = getLondonSeasonCard(cardBase);
                 LondonSeasonCardsManager.getInstance().updateCardInformations(card);
             });
@@ -8697,7 +8720,7 @@ class LondonSeasonChooseCard {
     onLeavingState() {
         debug('Leaving LondonSeasonChooseCard state');
         if (this.args?._private) {
-            this.args._private.forEach((cardBase) => {
+            this.args._private.cards.forEach((cardBase) => {
                 if (cardBase.id === this.selectedCard) {
                     return;
                 }
@@ -8713,15 +8736,15 @@ class LondonSeasonChooseCard {
         updatePageTitle(this.args.canUseBeckySharp
             ? _('${you} must choose a card from the London Season Display to take or discard. You may take the top card of the deck instead')
             : _('${you} must choose a card from the London Season Display to take or discard'), {
-            cardType: this.args.topOfDeckType === BLACKMAIL
+            cardType: this.args.topOfDeckType === BLACKMAIL$1
                 ? _('Blackmail')
                 : _('Prestige'),
         });
         if (this.args.canUseBeckySharp) {
             addPrimaryActionButton({
                 id: 'becky-sharp-btn',
-                text: formatStringRecursive(_('Take top card (${cardType} card)'), {
-                    cardType: this.args.topOfDeckType === BLACKMAIL
+                text: formatStringRecursive$1(_('Take top card (${cardType} card)'), {
+                    cardType: this.args.topOfDeckType === BLACKMAIL$1
                         ? _('Blackmail')
                         : _('Prestige'),
                 }),
@@ -8729,12 +8752,12 @@ class LondonSeasonChooseCard {
             });
         }
         this.args.prestigeCards.forEach((card) => onClick(`game-card-${card.id}`, () => this.updateInterfaceConfirm(card)));
-        this.args._private.forEach((card) => onClick(`game-card-${card.id}`, () => this.updateInterfaceConfirm(card)));
+        this.args._private.cards.forEach((card) => onClick(`game-card-${card.id}`, () => this.updateInterfaceConfirm(card)));
     }
     updateInterfaceConfirmBeckySharp() {
         clearPossible();
         updatePageTitle(_('Take top card of the deck (${cardType} card)?'), {
-            cardType: this.args.topOfDeckType === BLACKMAIL ? _('Blackmail') : _('Prestige'),
+            cardType: this.args.topOfDeckType === BLACKMAIL$1 ? _('Blackmail') : _('Prestige'),
         });
         addConfirmButton(() => performAction('actLondonSeasonChooseCard', {
             cardId: null,
@@ -8755,7 +8778,7 @@ class LondonSeasonChooseCard {
             id: 'take-btn',
             text: _('Take'),
             callback: () => performAction('actLondonSeasonChooseCard', {
-                cardId: card.type === BLACKMAIL ? card.hiddenId : card.id,
+                cardId: card.type === BLACKMAIL$1 ? card.hiddenId : card.id,
                 take: true,
             }),
         });
@@ -8763,7 +8786,7 @@ class LondonSeasonChooseCard {
             id: 'discard-btn',
             text: _('Discard'),
             callback: () => performAction('actLondonSeasonChooseCard', {
-                cardId: card.type === BLACKMAIL ? card.hiddenId : card.id,
+                cardId: card.type === BLACKMAIL$1 ? card.hiddenId : card.id,
                 take: false,
             }),
         });
@@ -8956,7 +8979,7 @@ class ManagerOfShipping {
             playerShipsAvailable = true;
             addPlayerButton({
                 id: `${ship.id}_btn`,
-                text: formatStringRecursive(_('Fit ${tkn_ship}'), {
+                text: formatStringRecursive$1(_('Fit ${tkn_ship}'), {
                     tkn_ship: tknShipValue({ side: FULL, name }),
                 }),
                 playerId,
@@ -8968,7 +8991,7 @@ class ManagerOfShipping {
         if (this.treasury >= 2) {
             addSecondaryActionButton({
                 id: 'extraShip_btn',
-                text: formatStringRecursive(_('Lease ${tkn_ship}'), {
+                text: formatStringRecursive$1(_('Lease ${tkn_ship}'), {
                     tkn_ship: tknShipValue({
                         side: EXTRA_SHIP,
                         name: _('Extra Ship'),
@@ -8984,7 +9007,7 @@ class ManagerOfShipping {
         if (!playerShipsAvailable && this.treasury >= 5) {
             addSecondaryActionButton({
                 id: 'companyShip_btn',
-                text: formatStringRecursive(_('Buy ${tkn_ship}'), {
+                text: formatStringRecursive$1(_('Buy ${tkn_ship}'), {
                     tkn_ship: tknShipValue({
                         side: COMPANY_SHIP,
                         name: _('Company Ship'),
@@ -9109,17 +9132,17 @@ const config = {
     [PUNJAB]: { top: 4, left: 142 },
     [BENGAL_DELHI_BORDER]: { top: 79, left: 696 },
     [BENGAL_MARATHA_BORDER]: { top: 237, left: 682 },
-    [BOMBAY_DELHI_BORDER]: { top: 116, left: 297 },
-    [BOMBAY_HYDERABAD_BORDER]: { top: 378, left: 316 },
-    [BOMBAY_MARATHA_BORDER]: { top: 231, left: 339 },
-    [BOMBAY_MYSORE_BORDER]: { top: 523, left: 305 },
-    [BOMBAY_PUNJAB_BORDER]: { top: 134, left: 174 },
+    [BOMBAY_DELHI_BORDER]: { top: 125, left: 294 },
+    [BOMBAY_HYDERABAD_BORDER]: { top: 356, left: 325 },
+    [BOMBAY_MARATHA_BORDER]: { top: 231, left: 324 },
+    [BOMBAY_MYSORE_BORDER]: { top: 531, left: 281 },
+    [BOMBAY_PUNJAB_BORDER]: { top: 136, left: 164 },
     [DELHI_MARATHA_BORDER]: { top: 125, left: 528 },
-    [DELHI_PUNJAB_BORDER]: { top: 22, left: 282 },
-    [HYDERABAD_MADRAS_BORDER]: { top: 546, left: 482 },
-    [HYDERABAD_MARATHA_BORDER]: { top: 364, left: 506 },
-    [HYDERABAD_MYSORE_BORDER]: { top: 530, left: 395 },
-    [MADRAS_MYSORE_BORDER]: { top: 736, left: 442 },
+    [DELHI_PUNJAB_BORDER]: { top: 22, left: 270 },
+    [HYDERABAD_MADRAS_BORDER]: { top: 551, left: 460 },
+    [HYDERABAD_MARATHA_BORDER]: { top: 375, left: 506 },
+    [HYDERABAD_MYSORE_BORDER]: { top: 543, left: 390 },
+    [MADRAS_MYSORE_BORDER]: { top: 736, left: 429 },
 };
 class MoveElephant {
     constructor(game) {
@@ -9136,6 +9159,7 @@ class MoveElephant {
         this.args = args;
         this.createSelectBoxes();
         this.updateInterfaceInitialStep();
+        Bar.getInstance().goTo('joco-india');
     }
     onLeavingState() {
         this.removeSelectBoxes();
@@ -9550,7 +9574,7 @@ class ParliamentMeetsSelectPolicy {
         addCancelButton();
     }
     getTextForPolicy(policy) {
-        return formatStringRecursive(policy.windowTax
+        return formatStringRecursive$1(policy.windowTax
             ? _('${consequence} ${tkn_icon} & WINDOW TAX')
             : '${consequence} ${tkn_icon}', {
             consequence: getPolicyConsequenceTranslation(policy.consequence).toLocaleUpperCase(),
@@ -9627,7 +9651,7 @@ class ParliamentMeetsCastVotes {
         if (this.args.options.includes(IN_FAVOR)) {
             addPrimaryActionButton({
                 id: 'vote_in_favor_btn',
-                text: formatStringRecursive(_('Cast ${number} vote(s) in favor'), {
+                text: formatStringRecursive$1(_('Cast ${number} vote(s) in favor'), {
                     number: totalVotes,
                 }),
                 callback: () => this.updateInterfaceConfirm(IN_FAVOR),
@@ -9637,7 +9661,7 @@ class ParliamentMeetsCastVotes {
         if (this.args.options.includes(AGAINST)) {
             addDangerActionButton({
                 id: 'vote_against_btn',
-                text: formatStringRecursive(_('Cast ${number} vote(s) against'), {
+                text: formatStringRecursive$1(_('Cast ${number} vote(s) against'), {
                     number: totalVotes,
                 }),
                 callback: () => this.updateInterfaceSelectTarget(),
@@ -9673,7 +9697,7 @@ class ParliamentMeetsCastVotes {
             .forEach((player) => {
             addPrimaryActionButton({
                 id: `vote_for_${player.getPlayerId()}_btn`,
-                text: formatStringRecursive(_('${tkn_playerName}'), {
+                text: formatStringRecursive$1(_('${tkn_playerName}'), {
                     tkn_playerName: player.getName(),
                 }),
                 callback: () => this.updateInterfaceConfirm(AGAINST, player.getPlayerId()),
@@ -9917,14 +9941,14 @@ class TimingWindowAct {
     updateInterfaceInitialStep() {
         clearPossible();
         this.updatePageTitle();
-        (this.args._private ?? []).forEach(({ card, resolved }, index) => {
+        (this.args._private?.timingWindowOptions ?? []).forEach(({ card, resolved }, index) => {
             if (!resolved) {
                 onClick(`${getCardPrefix(card.id)}${card.id}`, () => {
                     this.updateInterfaceConfirm(true, index);
                 });
             }
         });
-        if (Object.values(this.args._private ?? {}).length > 0) {
+        if (Object.values(this.args._private.timingWindowOptions ?? {}).length > 0) {
             addSecondaryActionButton({
                 id: 'do_not_use_card',
                 text: _('Pass Timing Window'),
@@ -9946,11 +9970,11 @@ class TimingWindowAct {
     updateInterfaceConfirm(use, index) {
         clearPossible();
         if (use && index !== undefined) {
-            const option = this.args._private?.[index];
+            const option = this.args._private?.timingWindowOptions?.[index];
             updatePageTitle(option.cardType === LAW_CARD
                 ? _('Use ${cardText} ?')
                 : _('Play ${cardText} ?'), {
-                cardText: this.getCardText(option.card),
+                cardText: getCardText(option.card),
             });
             setSelected(`${getCardPrefix(option.cardId)}${option.cardId}`);
         }
@@ -9967,16 +9991,7 @@ class TimingWindowAct {
     }
     updatePageTitle() {
         updatePageTitle(_('Timing Window: ${timingWindow}'), {
-            timingWindow: getTimingWindowText(this.args[TIMING_WINDOW], this.args[ITEM_ID]),
-        });
-    }
-    getCardText(card) {
-        const text = '"${cardTitle}"';
-        const cardId = card['type'] === BLACKMAIL && 'hiddenId' in card
-            ? card.hiddenId
-            : card.id;
-        return formatStringRecursive(text, {
-            cardTitle: _(StaticData.get().cardTitle(cardId)),
+            timingWindow: lowerCaseFirstCharacter$1(getTimingWindowText(this.args[TIMING_WINDOW], this.args[ITEM_ID])),
         });
     }
 }
@@ -10015,7 +10030,9 @@ class PresidentTrade {
             this.setMinSpendAmount();
             return;
         }
-        updatePageTitle(_('Trade check: ${you} must select the regions in which you wish to trade'));
+        updatePageTitle(_('Trade check: ${you} must select the regions in which you wish to trade (selected: ${selected})'), {
+            selected: this.selectedRegionIds.join(', '),
+        });
         const staticData = StaticData.get();
         Object.entries(this.args.options.regions).forEach(([regionId, region]) => {
             if (this.selectedRegionIds.includes(regionId)) {
@@ -10069,7 +10086,7 @@ class PresidentTrade {
         });
         addPrimaryActionButton({
             id: 'make_check_btn',
-            text: formatStringRecursive(_('Roll ${number} dice'), {
+            text: formatStringRecursive$1(_('Roll ${number} dice'), {
                 number: Math.max(this.spend - penalty, 0),
             }),
             callback: () => this.updateInterfaceConfirm(),
@@ -10409,10 +10426,9 @@ class RevenuePayDividends {
     }
     updateInterfaceInitialStep() {
         this.game.clearPossible();
-        updatePageTitle(_('${you} may pay up to ${maxNumber} dividends for ${amount} ${tkn_pound} each'), {
+        updatePageTitle(_('${you} may pay up to ${maxNumber} dividends for £${amount} each'), {
             maxNumber: this.args.maxNumberOfDividends,
             amount: this.args.costPerDividend,
-            tkn_pound: 'pound',
         });
         addSecondaryActionButton({
             id: 'minus_btn',
@@ -10436,7 +10452,7 @@ class RevenuePayDividends {
         });
         addPrimaryActionButton({
             id: 'make_check_btn',
-            text: formatStringRecursive(_('Pay ${number} dividend(s)'), {
+            text: formatStringRecursive$1(_('Pay ${number} dividend(s)'), {
                 number: this.selectedNumberOfDividends,
             }),
             callback: () => this.updateInterfaceConfirm(),
@@ -10670,10 +10686,10 @@ class TaxAndUpkeep {
             this.updatePageTitle(false);
             return;
         }
-        const amount = this.selectedTargets.reduce((remaining, targetId) => remaining - privateArgs.targets[targetId], privateArgs.amount);
-        const canPay = amount <= privateArgs.treasury;
-        this.updatePageTitle(true, amount, privateArgs.treasury);
-        Object.keys(privateArgs.targets).forEach((targetId) => {
+        const amount = this.selectedTargets.reduce((remaining, targetId) => remaining - privateArgs.taxData.targets[targetId], privateArgs.taxData.amount);
+        const canPay = amount <= privateArgs.taxData.treasury;
+        this.updatePageTitle(true, amount, privateArgs.taxData.treasury);
+        Object.keys(privateArgs.taxData.targets).forEach((targetId) => {
             const selected = this.selectedTargets.includes(targetId);
             const elementId = getIdWithPrefix(targetId);
             if (selected) {
@@ -10767,7 +10783,7 @@ class TradeInChina {
         updatePageTitle(_('Trade in China: ${you} may make a check'), {});
         addPrimaryActionButton({
             id: 'trade-btn',
-            text: formatStringRecursive(this.args.numberOfDice === 1
+            text: formatStringRecursive$1(this.args.numberOfDice === 1
                 ? _('Make a check with 1 die')
                 : _('Make a check with ${number} dice'), {
                 number: this.args.numberOfDice,
@@ -10851,7 +10867,7 @@ class TradeOrDiscardItems {
         switch (type) {
             case SHARE:
                 return _('Company share(s)');
-            case BLACKMAIL:
+            case BLACKMAIL$1:
                 return _('Blackmail card(s)');
             case WORKSHOP:
                 return _('workshop(s)');
@@ -10882,17 +10898,19 @@ class UseManOnTheInside {
         debug('Leaving UseManOnTheInside state');
     }
     setDescription(activePlayerIds, args) {
-        updatePageTitle(_('Other players may use card effects'), {});
+        updatePageTitle(_('Timing Window: ${timingWindow}'), {
+            timingWindow: lowerCaseFirstCharacter$1(_('When a blackmail card is played')),
+        });
     }
     updateInterfaceInitialStep() {
         clearPossible();
-        updatePageTitle(_('${you} may play card ${cardTitle} to cancel ${playedCardTitle}'), {
+        updatePageTitle(_('${you} may play "${cardTitle}" to cancel "${playedCardTitle}"'), {
             cardTitle: _(StaticData.get().cardTitle('ManOnTheInside')),
             playedCardTitle: _(StaticData.get().cardTitle(this.args.playedCardId)),
         });
         addPrimaryActionButton({
             id: 'use_card',
-            text: formatStringRecursive(_('Play ${cardTitle}'), {
+            text: formatStringRecursive$1(_('Play ${cardTitle}'), {
                 cardTitle: _(StaticData.get().cardTitle('ManOnTheInside')),
             }),
             callback: () => {
@@ -10901,7 +10919,7 @@ class UseManOnTheInside {
         });
         addSecondaryActionButton({
             id: 'do_not_use_card',
-            text: formatStringRecursive(_('Do not play ${cardTitle}'), {
+            text: formatStringRecursive$1(_('Do not play ${cardTitle}'), {
                 cardTitle: _(StaticData.get().cardTitle('ManOnTheInside')),
             }),
             callback: () => {
@@ -10913,7 +10931,7 @@ class UseManOnTheInside {
         const cardId = 'ManOnTheInside';
         const cardType = BLACKMAIL_CARD;
         const text = '${cardTitle} (${cardType})';
-        return formatStringRecursive(text, {
+        return formatStringRecursive$1(text, {
             cardTitle: _(StaticData.get().cardTitle(cardId)),
             cardType: getCardTypeText(cardType),
         });
@@ -11046,142 +11064,39 @@ class WaitForOffer {
     }
 }
 
-const phases = [
-    LONDON_SEASON, FAMILY, HIRING, CHAIRMAN, DIRECTOR_OF_TRADE,
-    MANAGER_OF_SHIPPING, MILITARY_AFFAIRS, BOMBAY_PRESIDENCY,
-    MADRAS_PRESIDENCY, BENGAL_PRESIDENCY, BONUSES, REVENUE,
-    EVENTS_IN_INDIA, PARLIAMENT_MEETS, UPKEEP_AND_REFRESH,
-];
-const indiaOffices = [
-    PRESIDENT_OF_BOMBAY, PRESIDENT_OF_MADRAS, PRESIDENT_OF_BENGAL,
-    GOVERNOR_GENERAL, GOVERNOR_OF_BOMBAY, GOVERNOR_OF_MADRAS,
-    GOVERNOR_OF_BENGAL, GOVERNOR_OF_PUNJAB, GOVERNOR_OF_DELHI,
-    GOVERNOR_OF_MARATHA, GOVERNOR_OF_HYDERABAD, GOVERNOR_OF_MYSORE,
-];
-const londonOffices = [
-    CHAIRMAN, DIRECTOR_OF_TRADE, MANAGER_OF_SHIPPING, MILITARY_AFFAIRS,
-    SUPERINTENDENT_OF_TRADE_IN_CHINA,
-];
-function getAnytimeCardIds(data) {
-    const phaseIndex = phases.indexOf(data.phase);
-    if (phaseIndex < 0)
-        return [];
-    const eligible = data.promiseCards.filter(({ id }) => {
-        const [prefix, owner, type] = id.split('_');
-        return prefix === 'PC' && type === 'TakeTwoOrLessFromMe' &&
-            Number(owner) !== data.playerId && (data.cashByPlayer[Number(owner)] ?? 0) > 0;
-    }).map(({ id }) => id);
-    const afterRevenue = phaseIndex > phases.indexOf(REVENUE);
-    const beforeEvents = phaseIndex < phases.indexOf(EVENTS_IN_INDIA);
-    data.blackmailCards.forEach((card) => {
-        if (card.type !== BLACKMAIL || !card.hiddenId)
-            return;
-        let canPlay = false;
-        switch (card.hiddenId) {
-            case 'EnvoyToTheMughals':
-                canPlay = beforeEvents;
-                break;
-            case 'ThePrimeMinistersEar':
-                canPlay = phaseIndex < phases.indexOf(FAMILY);
-                break;
-            case 'ScandalInIndia':
-                canPlay = afterRevenue && indiaOffices.some((office) => data.occupiedOffices.includes(office));
-                break;
-            case 'ScandalOnLeadenhallStreet':
-                canPlay = afterRevenue && londonOffices.some((office) => data.occupiedOffices.includes(office));
-                break;
-        }
-        if (canPlay)
-            eligible.push(card.id);
-    });
-    return eligible;
-}
-
-const ANYTIME_CARD_STATE = 'clientConfirmAnytimeCard';
-class AnytimeCards {
+class AnytimeActions {
     constructor(game) {
         this.game = game;
-        this.listeners = [];
-        this.selectedTitle = '';
     }
-    setup(stateName, args) {
-        this.clear();
-        if (this.game.isSpectator)
-            return;
-        const playerId = this.game.getPlayerId();
-        const players = PlayerManager.getInstance();
-        const player = players.getPlayer(playerId);
-        const playerArea = player && players.getPlayerArea(playerId);
-        if (!playerArea)
-            return;
-        const promiseCards = playerArea.getPromiseCards();
-        const blackmailCards = playerArea.stocks[`londonSeasonCards_${player.familyId}`].getCards();
-        const occupiedOffices = Object.keys(this.game.gamedatas.offices).filter((officeId) => document.getElementById(`OfficeCard_${officeId}`) &&
-            document.getElementById(officeId)?.querySelector('.joco-family-member'));
-        const cashByPlayer = Object.fromEntries(players.getPlayerIds().map((id) => [
-            id, players.getPlayer(id).counters[CASH_COUNTER]?.getValue() ?? 0,
-        ]));
-        const eligibleIds = getAnytimeCardIds({
-            playerId,
-            phase: PhaseTracker.getInstance().getPhase(),
-            promiseCards,
-            blackmailCards,
-            cashByPlayer,
-            occupiedOffices,
-        });
-        const timingCardIds = stateName === 'TimingWindowAct'
-            ? (args?._private ?? []).map((option) => option.cardId)
-            : [];
-        promiseCards.forEach((card) => {
-            if (eligibleIds.includes(card.id) && !timingCardIds.includes(card.id)) {
-                this.makeSelectable(PromiseCardsManager.getInstance().getCardElement(card), card.title);
-            }
-        });
-        blackmailCards.forEach((card) => {
-            if (eligibleIds.includes(card.id) && !timingCardIds.includes(card.hiddenId)) {
-                this.makeSelectable(LondonSeasonCardsManager.getInstance().getCardElement(card), card.title);
-            }
-        });
+    static create(game) {
+        AnytimeActions.instance = new AnytimeActions(game);
     }
-    makeSelectable(element, title) {
-        if (!element)
+    static getInstance() {
+        return AnytimeActions.instance;
+    }
+    setup(stateName, anytimeActions) {
+        if (this.game.isSpectator || !anytimeActions) {
             return;
-        const handler = (event) => {
-            if (event.target.closest('.joco-card-timing-button'))
-                return;
-            if (element.classList.contains(SELECTABLE) || element.classList.contains(SELECTED) || this.game._helpMode)
-                return;
-            if (this.game.bga.actions.game.isInterfaceLocked())
-                return;
-            event.stopPropagation();
-            this.selectedTitle = title;
-            this.game.bga.states.setClientState(ANYTIME_CARD_STATE, {
-                descriptionmyturn: _('Play ${cardTitle}?'),
-                args: { cardTitle: _(title) },
+        }
+        anytimeActions.forEach((option) => {
+            const { card } = option;
+            onClick(`${getCardPrefix(card.id)}${card.id}`, () => {
+                this.updateInterfaceConfirm(option);
             });
-        };
-        element.classList.add('anytime-selectable');
-        element.addEventListener('click', handler, true);
-        this.listeners.push({ element, handler });
-    }
-    showConfirmation() {
-        this.clear();
-        this.game.clearPossible();
-        this.game.bga.statusBar.setTitle(_('Play ${cardTitle}?'), { cardTitle: _(this.selectedTitle) });
-        this.game.bga.statusBar.addActionButton(_('Confirm'), () => { }, {
-            id: 'confirm_anytime_card',
-            color: 'primary',
-            destination: document.getElementById('customActions'),
-            disabled: true,
         });
-        Interaction.use().addCancelButton();
     }
-    clear() {
-        this.listeners.forEach(({ element, handler }) => {
-            element.removeEventListener('click', handler, true);
-            element.classList.remove('anytime-selectable');
+    updateInterfaceConfirm(option) {
+        clearPossible();
+        updatePageTitle(_('Play ${cardText} ?'), {
+            cardText: getCardText(option.card),
         });
-        this.listeners = [];
+        setSelected(`${getCardPrefix(option.card.id)}${option.card.id}`);
+        addConfirmButton(() => {
+            this.game.bga.actions.performAction('actAnytimeAction', {
+                cardId: option.cardId,
+            }, { checkAction: false, checkPossibleActions: false });
+        });
+        addCancelButton();
     }
 }
 
@@ -11204,7 +11119,6 @@ class Game {
         this.activePlayerIds = undefined;
         this.completedPlayerIds = [];
         this.currentStateName = '';
-        this.anytimeCards = new AnytimeCards(this);
         this.states = {
             ConfirmPartialTurn,
             ConfirmTurn,
@@ -11374,6 +11288,7 @@ class Game {
                 return showAnimations && this.bga.gameui.bgaAnimationsActive();
             },
         });
+        AnytimeActions.create(this);
         StaticData.create(this);
         TimingPreferences.create(this);
         EnterpriseCardsManager.create(this);
@@ -11387,6 +11302,7 @@ class Game {
         Interaction.create(this);
         PhaseTracker.create(this);
         PlayerManager.create(this);
+        PlayerManager.getInstance().setupPlayerAreas(this.gamedatas);
         if (this.gameOptions.crownEnabled) {
             CrownClimate.create(this);
         }
@@ -11421,10 +11337,6 @@ class Game {
     setupDontPreloadImages() { }
     onEnteringState(stateName, args) {
         console.log('Entering state: ' + stateName, args);
-        if (stateName === ANYTIME_CARD_STATE) {
-            this.anytimeCards.showConfirmation();
-            return;
-        }
         const activePlayerIds = args.args?.activePlayerIds;
         this.activePlayerIds = activePlayerIds;
         this.completedPlayerIds = args.args?.completedPlayerIds ?? [];
@@ -11446,10 +11358,9 @@ class Game {
                 .setDescription(activePlayerIds || Number(args.active_player), args.args);
         }
         this.updateMakeInactiveButton();
-        this.anytimeCards.setup(stateName, args.args);
+        AnytimeActions.getInstance().setup(stateName, args.args._private?.['anytime']);
     }
     onLeavingState(stateName) {
-        this.anytimeCards.clear();
         if (this.states[stateName]) {
             this.states[stateName].getInstance().onLeavingState();
         }

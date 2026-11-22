@@ -143,3 +143,8 @@ export const parentHasChildWithId = (
 export const getCurrentPlayerId = (): number => {
   return PlayerManager.getInstance().getCurrentPlayerId();
 };
+
+export const lowerCaseFirstCharacter = (text: string): string => {
+  if (!text) return '';
+  return text.charAt(0).toLowerCase() + text.slice(1);
+};

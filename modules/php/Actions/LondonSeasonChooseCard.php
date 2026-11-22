@@ -60,7 +60,10 @@ class LondonSeasonChooseCard extends \Bga\Games\JohnCompany\Models\AtomicAction
     $data = [
       'prestigeCards' => Utils::filter($cards, fn($card) => $card->getType() === PRESTIGE),
       '_private' => [
-        $playerId => array_map(fn($card) => $card->jsonSerializePrivate(), Utils::filter($cards, fn($card) => $card->getType() === BLACKMAIL)),
+        $playerId =>
+        [
+          'cards' => array_map(fn($card) => $card->jsonSerializePrivate(), Utils::filter($cards, fn($card) => $card->getType() === BLACKMAIL)),
+        ]
       ],
       'canUseBeckySharp' => $this->canUseBeckySharp(Players::get($playerId)),
       'topOfDeckType' => LondonSeasonCards::getTopOf(DECK)->getType(),

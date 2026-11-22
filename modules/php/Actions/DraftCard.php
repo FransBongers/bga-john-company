@@ -36,14 +36,16 @@ class DraftCard extends \Bga\Games\JohnCompany\Models\AtomicAction
     $numberToSelect = count($players) === 2 ? 2 : 1;
 
     foreach ($players as $playerId => $player) {
-     
+
       $cardsToSelectFrom = Utils::filter($cards, function ($card) use ($playerId) {
         return $card->getLocation() === Locations::hand($playerId);
       });
 
       $privateData[$playerId] = [
-        'options' => $cardsToSelectFrom,
-        'selected' => isset($selected[$playerId]) ? $selected[$playerId] : null,
+        'draft' => [
+          'options' => $cardsToSelectFrom,
+          'selected' => isset($selected[$playerId]) ? $selected[$playerId] : null,
+        ]
       ];
     }
 
@@ -83,14 +85,14 @@ class DraftCard extends \Bga\Games\JohnCompany\Models\AtomicAction
   {
     self::checkAction('actDraftCard');
     $cardIds = $args->cardIds;
-        
+
 
     $player = Players::getCurrent();
     $stateArgs = $this->argsDraftCard();
 
     $availableCardsForPlayer = $stateArgs['_private'][$player->getId()]['options'];
     $selectedCards = [];
-    foreach($cardIds as $cardId) {
+    foreach ($cardIds as $cardId) {
       $selectedCard = Utils::array_find($availableCardsForPlayer, function ($card) use ($cardId) {
         return $cardId === $card->getId();
       });
@@ -106,7 +108,7 @@ class DraftCard extends \Bga\Games\JohnCompany\Models\AtomicAction
     $selected = $this->updateSelected($player, $selectedCards);
 
     Notifications::draftCard($player, $selectedCards);
-   
+
     // Make the player inactive
     $game = Game::get();
     $this->setPlayerActionCompleted($player->getId());

@@ -103,8 +103,11 @@ export class PresidentTrade implements GameState<OnEnteringPresidentTradeArgs> {
 
     updatePageTitle(
       _(
-        'Trade check: ${you} must select the regions in which you wish to trade',
+        'Trade check: ${you} must select the regions in which you wish to trade (selected: ${selected})',
       ),
+      {
+        selected: this.selectedRegionIds.join(', '),
+      }
     );
 
     const staticData = StaticData.get();

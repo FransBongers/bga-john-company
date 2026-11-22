@@ -29,7 +29,7 @@ class LawCard_34 extends \Bga\Games\JohnCompany\Models\LawCard
     return Parliament::getPrimeMinisterPlayerId();
   }
 
-  public function effectCanBeApplied(string | int | null $itemId): array | null
+  public function effectCanBeApplied(string $timingWindow, string | int | null $itemId): array | null
   {
     if (!$this->isInPlay() || $this->hasBeenUsed()) {
       return null;

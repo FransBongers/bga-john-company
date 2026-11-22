@@ -33,24 +33,6 @@ class MercantileConnection extends \Bga\Games\JohnCompany\Models\BlackmailCard
 
 
   /**
-   * Whether the effect of this london season card can be applied
-   * Only for effects with specific timing windows
-   */
-  public function effectCanBeApplied(string | int | null $itemId): array | null
-  {
-    // Has to be owned by a player
-    if (!Utils::startsWith($this->getLocation(), 'londonSeasonCards_')) {
-      return null;
-    }
-
-    return [
-      PLAYER_ID => $this->getActingPlayerId(),
-      CARD_ID => $this->getId(),
-      CARD_TYPE => BLACKMAIL_CARD,
-    ];
-  }
-
-  /**
    * Apply the effect of this london season card
    * Only for effects with specific timing windows
    */

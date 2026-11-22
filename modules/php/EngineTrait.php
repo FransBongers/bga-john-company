@@ -19,6 +19,30 @@ trait EngineTrait
     $args['previousSteps'] = Log::getUndoableSteps();
   }
 
+  function addAnytimeArgs(array &$args)
+  {
+    $anytimeArgs = Game::get()->getAnytimeArgs();
+
+    if (empty($anytimeArgs)) {
+      return;
+    }
+
+    if (!isset($args['_private'])) {
+      $args['_private'] = [];
+    }
+
+    foreach ($anytimeArgs as $playerId => $effects) {
+      if (!isset($args['_private'][$playerId])) {
+        $args['_private'][$playerId] = [];
+      }
+      $args['_private'][$playerId]['anytime'] = array_map(function ($effect) {
+        $card = $effect['card'];
+        $effect['card'] = $card instanceof \Bga\Games\JohnCompany\Models\BlackmailCard ? $card->jsonSerializePrivate() : $card->jsonSerialize();
+        return $effect;
+      }, $effects);
+    }
+  }
+
   /**
    * Trying to get the atomic action corresponding to the state where the game is
    */
@@ -38,6 +62,7 @@ trait EngineTrait
     $node = Engine::getNextUnresolved();
     $args = AtomicActions::getArgs($action, $node);
     $this->addCommonArgs($args);
+    $this->addAnytimeArgs($args);
 
     return $args;
   }

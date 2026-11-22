@@ -1,4 +1,5 @@
 import { TabContainer } from "../boilerplate/ui-components/tab-container";
+import { formatStringRecursive } from "../boilerplate/utility";
 import { GameAlias, GamedatasAlias, PlayerAlias } from "../types";
 import { getFamilyName } from "../utility";
 import { JocoPlayer } from "./player";
@@ -27,7 +28,7 @@ export class PlayerManager {
       this.players[playerId] = new JocoPlayer(this.game, player);
     }
 
-    this.setup(game.gamedatas);
+    // this.setup(game.gamedatas);
   }
 
   public static create(game: GameAlias) {
@@ -87,7 +88,7 @@ export class PlayerManager {
   // .##....##.##..........##....##.....##.##.......
   // ..######..########....##.....#######..##.......
 
-  setup(gamedatas: GamedatasAlias) {
+  public setupPlayerAreas(gamedatas: GamedatasAlias) {
 
     document
       .getElementById('joco')
@@ -102,7 +103,10 @@ export class PlayerManager {
         const player = this.getPlayer(playerId);
         return {
           id: `joco-family-area-${player.getPlayerId()}`,
-          title: `${player.getName()} - ${getFamilyName(player.familyId)}`,
+          // title: `${player.getName()} - ${getFamilyName(player.familyId)}`,
+          title: formatStringRecursive('${tkn_playerName}', {
+            tkn_playerName: player.getName(),
+          }),
           content: tplPlayerArea(player),
         };
       }),

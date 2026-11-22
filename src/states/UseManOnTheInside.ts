@@ -8,6 +8,7 @@ import {
   debug,
   formatStringRecursive,
   GameState,
+  lowerCaseFirstCharacter,
   performAction,
   updatePageTitle,
 } from '../boilerplate';
@@ -48,7 +49,9 @@ export class UseManOnTheInside implements GameState<OnEnteringUseManOnTheInsideA
     activePlayerIds: number,
     args: OnEnteringUseManOnTheInsideArgs,
   ) {
-    updatePageTitle(_('Other players may use card effects'), {});
+    updatePageTitle(_('Timing Window: ${timingWindow}'), {
+      timingWindow: lowerCaseFirstCharacter(_('When a blackmail card is played')),
+    });
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########
@@ -70,7 +73,7 @@ export class UseManOnTheInside implements GameState<OnEnteringUseManOnTheInsideA
   private updateInterfaceInitialStep() {
     clearPossible();
     updatePageTitle(
-      _('${you} may play card ${cardTitle} to cancel ${playedCardTitle}'),
+      _('${you} may play "${cardTitle}" to cancel "${playedCardTitle}"'),
       {
         cardTitle: _(StaticData.get().cardTitle('ManOnTheInside')),
         playedCardTitle: _(StaticData.get().cardTitle(this.args.playedCardId)),

@@ -8,6 +8,7 @@ import {
   debug,
   formatStringRecursive,
   GameState,
+  lowerCaseFirstCharacter,
   onClick,
   performAction,
   setSelected,
@@ -30,19 +31,22 @@ import {
 } from '../types';
 import {
   getCardPrefix,
+  getCardText,
   // getCardTypeText,
   getTimingWindowText,
 } from '../utility';
 
 interface OnEnteringTimingWindowActArgs extends CommonStateArgs {
-  _private?: Array<{
-    playerId: number;
-    cardId: string;
-    cardType: string;
-    resolved?: boolean;
-    card: JocoLondonSeasonCardBase | JocoLawCardBase | JocoPromiseCardBase;
-    // Add other properties as needed
-  }>;
+  _private?: {
+    timingWindowOptions: Array<{
+      playerId: number;
+      cardId: string;
+      cardType: string;
+      resolved?: boolean;
+      card: JocoLondonSeasonCardBase | JocoLawCardBase | JocoPromiseCardBase;
+      // Add other properties as needed
+    }>;
+  };
   timingWindow: string;
   itemId: string | number | null;
 }
@@ -96,7 +100,7 @@ export class TimingWindowAct implements GameState<OnEnteringTimingWindowActArgs>
     clearPossible();
     this.updatePageTitle();
 
-    (this.args._private ?? []).forEach(
+    (this.args._private?.timingWindowOptions ?? []).forEach(
       ({ card, resolved }, index) => {
         if (!resolved) {
           onClick(`${getCardPrefix(card.id)}${card.id}`, () => {
@@ -105,7 +109,9 @@ export class TimingWindowAct implements GameState<OnEnteringTimingWindowActArgs>
         }
       },
     );
-    if (Object.values(this.args._private ?? {}).length > 0) {
+    if (
+      Object.values(this.args._private.timingWindowOptions ?? {}).length > 0
+    ) {
       addSecondaryActionButton({
         id: 'do_not_use_card',
         text: _('Pass Timing Window'),
@@ -127,14 +133,14 @@ export class TimingWindowAct implements GameState<OnEnteringTimingWindowActArgs>
   private updateInterfaceConfirm(use: boolean, index?: number) {
     clearPossible();
     if (use && index !== undefined) {
-      const option = this.args._private?.[index];
+      const option = this.args._private?.timingWindowOptions?.[index];
 
       updatePageTitle(
         option.cardType === LAW_CARD
           ? _('Use ${cardText} ?')
           : _('Play ${cardText} ?'),
         {
-          cardText: this.getCardText(option.card),
+          cardText: getCardText(option.card),
         },
       );
       setSelected(`${getCardPrefix(option.cardId)}${option.cardId}`);
@@ -161,26 +167,25 @@ export class TimingWindowAct implements GameState<OnEnteringTimingWindowActArgs>
 
   private updatePageTitle() {
     updatePageTitle(_('Timing Window: ${timingWindow}'), {
-      timingWindow: getTimingWindowText(
-        this.args[TIMING_WINDOW],
-        this.args[ITEM_ID],
+      timingWindow: lowerCaseFirstCharacter(
+        getTimingWindowText(this.args[TIMING_WINDOW], this.args[ITEM_ID]),
       ),
     });
   }
 
-  private getCardText(
-    card: JocoLondonSeasonCardBase | JocoLawCardBase | JocoPromiseCardBase,
-  ) {
-    const text = '"${cardTitle}"';
+  // private getCardText(
+  //   card: JocoLondonSeasonCardBase | JocoLawCardBase | JocoPromiseCardBase,
+  // ) {
+  //   const text = '"${cardTitle}"';
 
-    const cardId =
-      card['type'] === BLACKMAIL && 'hiddenId' in card
-        ? card.hiddenId
-        : card.id;
-    return formatStringRecursive(text, {
-      cardTitle: _(StaticData.get().cardTitle(cardId)),
-    });
-  }
+  //   const cardId =
+  //     card['type'] === BLACKMAIL && 'hiddenId' in card
+  //       ? card.hiddenId
+  //       : card.id;
+  //   return formatStringRecursive(text, {
+  //     cardTitle: _(StaticData.get().cardTitle(cardId)),
+  //   });
+  // }
 
   // private addButton(cardId: string, cardType: string, index: number) {
   //   const text = this.getCardText(cardId, cardType);

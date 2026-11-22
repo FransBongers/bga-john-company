@@ -240,7 +240,15 @@ export class PlayerArea {
   }
 
   public async addLondonSeasonCard(card: JocoLondonSeasonCard) {
-    await this.stocks[`londonSeasonCards_${this.familyId}`].addCard(getLondonSeasonCard(card));
+    if (card.location.startsWith('londonSeasonCards_')) {
+      await this.stocks[`londonSeasonCards_${this.familyId}`].addCard(
+        getLondonSeasonCard(card),
+      );
+    } else if (card.location.startsWith('playedBlackmailCards_')) {
+      await this.stocks[`playedBlackmailCards_${this.familyId}`].addCard(
+        getLondonSeasonCard(card),
+      );
+    }
   }
 
   public async addPromiseCard(card: JocoPromiseCard) {

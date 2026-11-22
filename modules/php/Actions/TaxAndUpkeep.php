@@ -53,9 +53,11 @@ class TaxAndUpkeep extends \Bga\Games\JohnCompany\Actions\TaxAndUpkeepBase
     foreach ($taxDataPerPlayer as $playerData) {
       $player = $playerData['player'];
       $private[$player->getId()] = [
-        'amount' => $playerData['amount'],
-        'targets' => $playerData['targets'],
-        'treasury' => $player->getTreasury(),
+        'taxData' => [
+          'amount' => $playerData['amount'],
+          'targets' => $playerData['targets'],
+          'treasury' => $player->getTreasury(),
+        ]
       ];
     }
 
@@ -133,7 +135,7 @@ class TaxAndUpkeep extends \Bga\Games\JohnCompany\Actions\TaxAndUpkeepBase
         $player->incScore(-$item->getVictoryPoints());
         $item->returnToSupply($player);
       } elseif ($item instanceof LondonSeasonCard) {
-        $player->incScore(-($item->getVictoryPoints() ?? 0));
+        $player->incScore(- ($item->getVictoryPoints() ?? 0));
         $item->discard($player, true);
       }
     }

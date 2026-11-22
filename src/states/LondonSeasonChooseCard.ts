@@ -21,7 +21,7 @@ import { getLondonSeasonCard } from '../utility';
 
 interface OnEnteringLondonSeasonChooseCardArgs extends CommonStateArgs {
   prestigeCards: JocoLondonSeasonCardBase[];
-  _private: JocoLondonSeasonCardBase[];
+  _private: { cards: JocoLondonSeasonCardBase[] };
   canUseBeckySharp: boolean;
   topOfDeckType: string;
 }
@@ -47,7 +47,7 @@ export class LondonSeasonChooseCard implements GameState<OnEnteringLondonSeasonC
     this.selectedCard = null;
 
     if (this.args._private) {
-      this.args._private.forEach((cardBase) => {
+      this.args._private.cards.forEach((cardBase) => {
         const card = getLondonSeasonCard(cardBase);
         LondonSeasonCardsManager.getInstance().updateCardInformations(card);
       });
@@ -59,7 +59,7 @@ export class LondonSeasonChooseCard implements GameState<OnEnteringLondonSeasonC
   onLeavingState() {
     debug('Leaving LondonSeasonChooseCard state');
     if (this.args?._private) {
-      this.args._private.forEach((cardBase) => {
+      this.args._private.cards.forEach((cardBase) => {
         if (cardBase.id === this.selectedCard) {
           return;
         }
@@ -124,7 +124,7 @@ export class LondonSeasonChooseCard implements GameState<OnEnteringLondonSeasonC
     this.args.prestigeCards.forEach((card) =>
       onClick(`game-card-${card.id}`, () => this.updateInterfaceConfirm(card)),
     );
-    this.args._private.forEach((card) =>
+    this.args._private.cards.forEach((card) =>
       onClick(`game-card-${card.id}`, () => this.updateInterfaceConfirm(card)),
     );
   }

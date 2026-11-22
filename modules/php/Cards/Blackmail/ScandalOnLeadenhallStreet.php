@@ -13,9 +13,9 @@ class ScandalOnLeadenhallStreet extends \Bga\Games\JohnCompany\Models\BlackmailC
 {
   protected $timingWindows = [WHEN_TAKEN_FROM_DISPLAY, ANY_TIME_AFTER_REVENUE_PHASE];
 
-  public function canBePlayedAnytime(array $timingData): bool
+  public function canBePlayedAnytime(array $anytimeData): bool
   {
-    return $timingData['afterRevenue'] ?? false;
+    return $anytimeData['afterRevenue'] ?? false;
   }
 
   protected $affectedOffices = [
@@ -44,7 +44,7 @@ class ScandalOnLeadenhallStreet extends \Bga\Games\JohnCompany\Models\BlackmailC
 
   public function applyEffect(object $ctx, Player $player, string | int | null $itemId)
   {
-    $ctx->insertAsBrother(Engine::buildTree([
+    $ctx->insertBefore(Engine::buildTree([
       'type' => NODE_XOR,
       'children' => array_map(function ($office) use ($player) {
         return [
@@ -74,12 +74,12 @@ class ScandalOnLeadenhallStreet extends \Bga\Games\JohnCompany\Models\BlackmailC
     });
   }
 
-  public function effectCanBeApplied(string | int | null $itemId): array | null
+  public function effectCanBeApplied(string $timingWindow, string | int | null $itemId): array | null
   {
     if (count($this->getAffectedOffices()) === 0) {
       return null;
     }
-    return parent::effectCanBeApplied($itemId);
+    return parent::effectCanBeApplied($timingWindow, $itemId);
   }
 
   protected function resolveImmediateEffect(Player $player, object $ctx)
@@ -88,7 +88,7 @@ class ScandalOnLeadenhallStreet extends \Bga\Games\JohnCompany\Models\BlackmailC
       return;
     }
 
-    $ctx->insertAsBrother(new LeafNode([
+    $ctx->insertBefore(new LeafNode([
       'action' => TIMING_WINDOW_CHECK,
       'args' => [
         TIMING_WINDOW => WHEN_TAKEN_FROM_DISPLAY,
