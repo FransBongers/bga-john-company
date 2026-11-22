@@ -105,7 +105,7 @@ class TimingWindowAct extends \Bga\Games\JohnCompany\Actions\TimingWindow
     $stateArgs = $this->argsTimingWindowAct();
 
     if (!$use) {
-      $this->setAllEffectsResolved($playerId, $stateArgs['_private'][$playerId]);
+      $this->setAllEffectsResolved($playerId, $stateArgs['_private'][$playerId]['timingWindowOptions']);
       $this->setPlayerActionCompleted($playerId);
     } else {
       $effect = $stateArgs['_private'][$playerId]['timingWindowOptions'][$index] ?? null;

@@ -17,6 +17,10 @@ class ThePrimeMinistersEar extends \Bga\Games\JohnCompany\Models\BlackmailCard
 
   public function effectCanBeApplied(string $timingWindow, string | int | null $itemId): array | null
   {
+    if ($timingWindow === START_OF_PHASE && $itemId !== FAMILY) {
+      return null;
+    }
+
     return parent::effectCanBeApplied($timingWindow, $itemId);
   }
 
