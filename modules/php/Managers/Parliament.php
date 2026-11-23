@@ -205,7 +205,7 @@ class Parliament
       'revealedLaws' => LawCards::getInLocationOrdered(REVEALED_LAWS)->toArray(),
       'selectedLaw' => LawCards::getTopOf(SELECTED_LAW),
       SUPPORT => $data[SUPPORT] ?? 0,
-      OPPOSITION => $data[OPPOSITION],
+      OPPOSITION => self::getUiOpposition(),
       SELECTING_LAW => $data[SELECTING_LAW] ?? false,
     ];
   }
@@ -266,6 +266,13 @@ class Parliament
       'leader' => null,
       'votes' => []
     ];
+  }
+
+  public static function getUiOpposition()
+  {
+    $opposition = self::getOpposition();
+    $opposition['voters'] = self::getPlayersThatVotedAgainst();
+    return $opposition;
   }
 
   public static function getRoundOfVotingNodes()

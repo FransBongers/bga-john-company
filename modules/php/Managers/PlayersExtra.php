@@ -75,9 +75,9 @@ class PlayersExtra extends \Bga\Games\JohnCompany\Boilerplate\Helpers\Pieces
     self::create($families, null);
   }
 
-  public static function getChairmanFamily(): PlayerExtra
+  public static function getChairmanPlayer(): PlayerExtra
   {
-    $families = self::getAll()->toArray();
-    return Utils::array_find($families, fn($family) => $family->hasChairmanMarker());
+    $playerExtraData = self::getAll()->toArray();
+    return Utils::array_find($playerExtraData, fn($playerExtra) => $playerExtra->hasChairmanMarker());
   }
 }

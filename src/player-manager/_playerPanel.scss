@@ -5,6 +5,40 @@
   gap: 8px;
   padding-top: 8px;
 
+  .joco-player-roles {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 3px;
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  .joco-player-role {
+    color: black;
+    font-weight: bold;
+    padding: 3px 6px;
+    margin-left: -3px;
+    margin-right: -3px;
+
+    &[data-role='Chairman'] {
+      background-color: rgba(229, 192, 192, 1);
+    }
+
+    &[data-role='leaderOfTheOpposition'] {
+      background-color: rgba(192, 191, 222, 1);
+    }
+
+    &[data-role='opposition'] {
+      background-color: rgba(128, 150, 190, 1);
+    }
+
+    &[data-role='primeMinister'] {
+      background-color: rgba(146, 181, 151, 1);
+    }
+  }
+
   .joco-player-panel-item {
     display: flex;
     flex-direction: row;
@@ -20,7 +54,7 @@
     //   margin: 0px auto;
   }
 
-  .joco-icon[data-icon="Power"] {
+  .joco-icon[data-icon='Power'] {
     height: 46px;
   }
 

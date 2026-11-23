@@ -146,7 +146,7 @@ trait TurnTrait
   {
     $this->updatePhase(FAMILY);
 
-    $chairmanPlayerId = PlayersExtra::getChairmanFamily()->getId();
+    $chairmanPlayerId = PlayersExtra::getChairmanPlayer()->getId();
 
     $extraAction = FamilyActions::getExtraAction();
     $turnOrder = Players::getTurnOrder($chairmanPlayerId);

@@ -637,6 +637,8 @@ export class NotificationManager {
     const { playerId } = notif;
     TimingPreferences.get().updatePrimeMinister(playerId);
 
+    this.game.gamedatas.parliament.primeMinister.playerId = playerId;
+    PlayerManager.getInstance().updateRoles();
     Parliament.getInstance().getPrimeMinisterDial().updatePlayerName(playerId);
   }
 
@@ -846,6 +848,12 @@ export class NotificationManager {
 
   async notif_moveOfficeCard(notif: NotifMoveOfficeCard) {
     const { office } = notif;
+    if (notif.chairmanPlayerId !== undefined) {
+      Object.entries(this.game.gamedatas.families).forEach(([playerId, family]) => {
+        family.hasChairmanMarker = notif.chairmanPlayerId !== null && Number(playerId) === Number(notif.chairmanPlayerId) ? 1 : 0;
+      });
+      PlayerManager.getInstance().updateRoles();
+    }
     TimingPreferences.get().updateOffice(office.id, office.location);
     let element = document.getElementById(`OfficeCard_${office.id}`);
     if (!element) {

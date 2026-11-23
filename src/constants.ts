@@ -134,6 +134,12 @@ export const SHIPYARD = 'Shipyard';
 export const SHARE = 'Share';
 
 /**
+ * Roles
+ */
+export const LEADER_OF_THE_OPPOSITION = 'leaderOfTheOpposition';
+export const OPPOSITION = 'opposition';
+
+/**
  * Counters
  */
 export const FAMILY_MEMBERS_COUNTER = 'familyMembers';

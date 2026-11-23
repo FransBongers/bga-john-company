@@ -126,7 +126,7 @@ class HiringChairman extends \Bga\Games\JohnCompany\Models\AtomicAction
   {
     Notifications::message('No candidate receives the necessary support', []);
 
-    $chairmanFamily = PlayersExtra::getChairmanFamily();
+    $chairmanFamily = PlayersExtra::getChairmanPlayer();
     $playerId = $chairmanFamily->getId();
 
     $this->ctx->insertAsBrother(new LeafNode([
@@ -152,7 +152,7 @@ class HiringChairman extends \Bga\Games\JohnCompany\Models\AtomicAction
       ]
     ]);
 
-    $formerChairmanFamily = PlayersExtra::getChairmanFamily();
+    $formerChairmanFamily = PlayersExtra::getChairmanPlayer();
     $formerChairmanFamily->setHasChairmanMarker(0);
 
     $familyMember->getPlayerExtra()->setHasChairmanMarker(1);

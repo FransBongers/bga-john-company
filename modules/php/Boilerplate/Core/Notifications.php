@@ -923,6 +923,9 @@ class Notifications
 
   public static function moveOfficeCard(Office $office, string $text, array $textArgs)
   {
+    if ($office->getId() === CHAIRMAN) {
+      $textArgs['chairmanPlayerId'] = Players::getChairmanPlayerId();
+    }
     self::notifyAll('moveOfficeCard', $text, array_merge($textArgs, [
       'office' => $office->jsonSerialize(),
     ]));
@@ -1716,7 +1719,7 @@ class Notifications
       'player_name2' => $target === null ? '' : $target->getName(),
       'enterpriseIds' => Utils::returnIds($enterprises),
       'londonSeasonCardIds' => Utils::returnIds($londonSeasonCards),
-      'opposition' => Parliament::getOpposition(),
+      'opposition' => Parliament::getUiOpposition(),
     ]);
   }
 

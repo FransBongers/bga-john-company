@@ -40,6 +40,10 @@ import {
   START_OF_LONDON_SEASON_CHOOSE_CARD,
   AFTER_COMMANDER_DEPLOY_CHECK,
   BLACKMAIL,
+  CHAIRMAN,
+  PRIME_MINISTER,
+  LEADER_OF_THE_OPPOSITION,
+  OPPOSITION,
 } from './constants';
 import { tknShipValue } from './logs/templates';
 import { getPhaseName } from './phase-tracker/translations';
@@ -337,4 +341,20 @@ export const getCardText = (
   return formatStringRecursive(text, {
     cardTitle: _(StaticData.get().cardTitle(cardId)),
   });
+};
+
+// TODO: Add more roles as needed and use consistenly
+export const getRoleName = (role: string) => {
+  switch (role) {
+    case CHAIRMAN:
+      return _('Chairman');
+    case PRIME_MINISTER:
+      return _('Prime Minister');
+    case LEADER_OF_THE_OPPOSITION:
+      return _('Leader of the Opposition');
+    case OPPOSITION:
+      return _('Opposition');
+    default:
+      throw new Error(`Unknown role: ${role}`);
+  }
 };

@@ -61,6 +61,10 @@ export class PlayerManager {
     }
   }
 
+  updateRoles() {
+    this.getPlayers().forEach((player) => player.updateRoles(this.game.gamedatas));
+  }
+
   clearInterface() {
     Object.keys(this.players).forEach((playerId) => {
       this.players[playerId].clearInterface();

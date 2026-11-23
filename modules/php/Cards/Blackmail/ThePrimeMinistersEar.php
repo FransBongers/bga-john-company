@@ -8,7 +8,7 @@ use Bga\Games\JohnCompany\Boilerplate\Core\Engine\LeafNode;
 
 class ThePrimeMinistersEar extends \Bga\Games\JohnCompany\Models\BlackmailCard
 {
-  protected $timingWindows = [START_OF_PHASE];
+  protected $timingWindows = [END_OF_PHASE];
 
   public function canBePlayedAnytime(array $anytimeData): bool
   {
@@ -17,7 +17,7 @@ class ThePrimeMinistersEar extends \Bga\Games\JohnCompany\Models\BlackmailCard
 
   public function effectCanBeApplied(string $timingWindow, string | int | null $itemId): array | null
   {
-    if ($timingWindow === START_OF_PHASE && $itemId !== FAMILY) {
+    if ($timingWindow === END_OF_PHASE && $itemId !== LONDON_SEASON) {
       return null;
     }
 

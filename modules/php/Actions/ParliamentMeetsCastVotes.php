@@ -181,9 +181,8 @@ class ParliamentMeetsCastVotes extends \Bga\Games\JohnCompany\Models\AtomicActio
   private function voteAgainst(int $targetPlayerId, int $playerId, int $totalVotes)
   {
     Parliament::incSupport(-$totalVotes);
-    if ($targetPlayerId === $playerId) {
-      Parliament::addPlayerThatVotedAgainst($playerId);
-    }
+    Parliament::addPlayerThatVotedAgainst($playerId);
+
     if (in_array($targetPlayerId, Parliament::getPlayersThatVotedAgainst())) {
       Parliament::incOppositionVotes($targetPlayerId, $totalVotes);
       return false;

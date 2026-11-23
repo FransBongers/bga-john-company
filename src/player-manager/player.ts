@@ -15,8 +15,13 @@ import {
   CASH_COUNTER,
   FAMILY_MEMBERS_COUNTER,
   POWER_COUNTER,
+  CHAIRMAN,
+  PRIME_MINISTER,
+  LEADER_OF_THE_OPPOSITION,
+  OPPOSITION,
 } from '../constants';
 import { GameAlias, JohnCompanyPlayerData, GamedatasAlias } from '../types';
+import { getRoleName } from '../utility';
 import { tplPlayerCounters } from './templates';
 
 export class JocoPlayer {
@@ -118,6 +123,7 @@ export class JocoPlayer {
   }
 
   updatePlayerPanel(gamedatas: GamedatasAlias) {
+    this.updateRoles(gamedatas);
     this.counters[CASH_COUNTER].setValue(
       gamedatas.families[this.playerId].treasury,
     );
@@ -161,6 +167,36 @@ export class JocoPlayer {
     //     gamedatas.families[this.familyId].crownPromiseCubes,
     //   );
     // }
+  }
+
+  updateRoles(gamedatas: GamedatasAlias) {
+    const container = document.getElementById(`joco-player-roles-${this.playerId}`);
+    if (!container) return;
+
+    const roles: string[] = [];
+    const { primeMinister, opposition } = gamedatas.parliament;
+    if (gamedatas.families[this.playerId]?.hasChairmanMarker) {
+      roles.push(CHAIRMAN);
+    }
+    if (primeMinister.playerId !== null && Number(primeMinister.playerId) === this.playerId) {
+      roles.push(PRIME_MINISTER);
+    }
+    if (opposition.leader !== null && Number(opposition.leader) === this.playerId) {
+      roles.push(LEADER_OF_THE_OPPOSITION);
+    } else if (
+      Object.keys(opposition.votes).some((playerId) => Number(playerId) === this.playerId) ||
+      (opposition.voters ?? []).some((playerId) => Number(playerId) === this.playerId)
+    ) {
+      roles.push(OPPOSITION);
+    }
+
+    container.replaceChildren(...roles.map((role) => {
+      const element = document.createElement('div');
+      element.className = 'joco-player-role fb-font-baskerville fb-font-12';
+      element.setAttribute('data-role', role);
+      element.textContent = getRoleName(role);
+      return element;
+    }));
   }
 
   // ..######...########.########.########.########.########...######.

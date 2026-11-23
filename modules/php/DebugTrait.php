@@ -76,7 +76,7 @@ trait DebugTrait
     //   'leader' => 2371053,
     // ];
     // Globals::setParliament($parliament);
-    // $chairmanFamily = PlayersExtra::getChairmanFamily();
+    // $chairmanFamily = PlayersExtra::getChairmanPlayer();
 
 
     // Notifications::log('debug', ControlTokens::getByRegion(MADRAS));

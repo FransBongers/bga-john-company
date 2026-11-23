@@ -37,7 +37,7 @@ class SuperintendentOfTradeInChina extends \Bga\Games\JohnCompany\Models\Office
     $office->moveToVacantOffices($player);
 
     if (count($office->getCandidatesForHiring()) > 0) {
-      $chairmanPlayerId = PlayersExtra::getChairmanFamily()->getPlayerId();
+      $chairmanPlayerId = PlayersExtra::getChairmanPlayer()->getPlayerId();
       $ctx->insertAsBrother(new LeafNode([
         'action' => HIRING_HIRE_FAMILY_MEMBER,
         'playerId' => 'some',

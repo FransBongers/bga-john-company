@@ -21,7 +21,7 @@ const WALSH = 'Walsh';
 const FAMILIES = [BENYON, HASTINGS, LARKINS, PAXTON, SYKES, WALSH];
 const CROWN = 'Crown';
 const CROWN_PLAYER_ID = 1;
-const BLACKMAIL$1 = 'Blackmail';
+const BLACKMAIL = 'Blackmail';
 const PRESTIGE = 'Prestige';
 const ENTERPRISE = 'Enterprise';
 const SPOUSE = 'Spouse';
@@ -84,6 +84,8 @@ const VICTORY_POINTS = 'VictoryPoints';
 const DISCOUNT = 'Discount';
 const SHIPYARD = 'Shipyard';
 const SHARE = 'Share';
+const LEADER_OF_THE_OPPOSITION = 'leaderOfTheOpposition';
+const OPPOSITION = 'opposition';
 const FAMILY_MEMBERS_COUNTER = 'familyMembers';
 const CASH_COUNTER = 'cash';
 const SHIPS_COUNTER = 'ships';
@@ -883,693 +885,6 @@ const createFamilyMember = (familyId, familyMemberId, extraClasses) => {
     return elt;
 };
 
-const tplPlayerCounters = ({ crownInGame, familyId, playerId, }) => {
-    const elt = createFamilyMember(familyId, Math.floor(Math.random() * 18));
-    elt.id = `joco-familyMembers-${playerId}`;
-    return `
-  <div class="joco-player-panel-item">
-    <div class="joco-treasury-counter-container">
-      <span class="fb-font-baskerville fb-font-16 fb-font-bold">£</span><span id="joco-cash-counter-${playerId}" class="fb-font-baskerville fb-font-bold fb-font-24"></span>
-    </div>
-  </div>
-  <div class="joco-player-panel-item">
-    ${elt.outerHTML}
-    <span id="joco-familyMembers-counter-${playerId}" class="joco-counter fb-font-baskerville fb-font-bold fb-font-20"></span>
-  </div>
-  <div class="joco-player-panel-item">
-    <div class="joco-icon" data-icon="Power">
-      <span id="joco-power-counter-${playerId}" class="fb-font-baskerville fb-font-bold fb-font-20">10</span>
-    </div>
-  </div>
-`;
-};
-const tplPlayerAreas = () => `<div id="joco-player-areas">
-</div>`;
-const tplPlayerArea = (player) => {
-    const playerId = player.getPlayerId();
-    return `
-      <div id="joco-family-area-${playerId}" class="joco-family-area">
-        <div class="joco-family-area-content">
-          <div id="joco-counters-${playerId}" class="joco-family-area-counters">
-          </div>
-          <div class="joco-row">
-            <div class="joco-container joco-column">
-              <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Offices').toLocaleUpperCase()}</span>
-              <div id="FamilyOffices_${playerId}" class="joco-family-offices"></div>
-            </div>
-            <div class="joco-column" style="flex-grow: 1;">
-              <div class="joco-container">
-                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Enterprises').toLocaleUpperCase()}</span>
-                <div id="joco-enterprises-${playerId}" class="joco-enterprises"></div>
-              </div>
-              <div class="joco-container">
-                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Prestige & Blackmail cards').toLocaleUpperCase()}</span>
-                <div id="joco-prestige-blackmail-${playerId}" class="joco-prestige-blackmail"></div>
-              </div>
-              <div class="joco-container">
-                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Promise cards').toLocaleUpperCase()}</span>
-                <div id="joco-promise-cards-${playerId}" class="joco-promise-cards"></div>
-              </div>
-              <div class="joco-container">
-                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Played Blackmail cards').toLocaleUpperCase()}</span>
-                <div id="joco-played-blackmail-${playerId}" class="joco-prestige-blackmail"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-};
-
-class JocoPlayer {
-    constructor(game, player) {
-        this.game = game;
-        this.counters = {};
-        this.ui = {};
-        this.game = game;
-        const playerId = player.id;
-        this.playerId = Number(playerId);
-        this.playerName = player.name;
-        this.playerColor = player.color;
-        this.familyId = player.familyId;
-        const gamedatas = game.gamedatas;
-        this.setupPlayer(gamedatas);
-    }
-    clearInterface() { }
-    updatePlayer(gamedatas) {
-        this.updatePlayerPanel(gamedatas);
-    }
-    setupPlayer(gamedatas) {
-        this.setupPlayerPanel(gamedatas);
-    }
-    setupPlayerPanel(gamedatas) {
-        const playerGamedatas = gamedatas.players[this.playerId];
-        const node = document.querySelector(`#player_board_${this.playerId} .player-board-game-specific-content`);
-        if (!node) {
-            return;
-        }
-        const familyId = this.familyId === CROWN
-            ? COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[this.getColor()]]
-            : this.familyId;
-        node.insertAdjacentHTML('afterbegin', tplPlayerCounters({
-            playerId: this.playerId,
-            familyId,
-            crownInGame: this.game.gameOptions.crownEnabled,
-        }));
-        const counters = [...COUNTERS];
-        if (this.game.gameOptions.crownEnabled) {
-            counters.push(PROMISE_CUBES_COUNTER);
-        }
-        counters.forEach((counter) => {
-            this.counters[counter] = new ebg.counter();
-            this.counters[counter].create(`joco-${counter}-counter-${this.playerId}`);
-            this.ui[counter] = document.getElementById(`joco-${counter}-${this.playerId}`);
-        });
-        this.updatePlayerPanel(gamedatas);
-    }
-    updatePlayerPanel(gamedatas) {
-        this.counters[CASH_COUNTER].setValue(gamedatas.families[this.playerId].treasury);
-        this.counters[FAMILY_MEMBERS_COUNTER].setValue(Object.values(gamedatas.familyMembers).filter(({ familyId, location }) => familyId === this.familyId && location.startsWith('supply')).length);
-        const power = gamedatas.power[this.playerId].total ??
-            gamedatas.power[this.playerId].totalVisible;
-        this.counters[POWER_COUNTER].setValue(power);
-    }
-    getColor() {
-        return this.playerColor;
-    }
-    getName() {
-        return this.playerName;
-    }
-    getPlayerId() {
-        return this.playerId;
-    }
-    getFamilyId() {
-        return this.familyId;
-    }
-}
-
-const BgaAnimations = await globalThis.importEsmLib('bga-animations', '1.x');
-const BgaCards = await globalThis.importEsmLib('bga-cards', '1.x');
-const BgaAutofit = await globalThis.importEsmLib('bga-autofit', '1.x');
-
-const tplShipContent = (ship, back = false) => `
-  <div class="joco-ship-name bga-autofit"><span class="fb-font-baskerville">${back && ship.type !== PLAYER_OWNED_SHIP ? _('Extra Ship') : _(ship.name)}</span></div>
-  ${back ? `<div class="joco-ship-fatigued fb-font-baskerville bga-autofit">${_('F')}</div>` : ''}
-`;
-
-class ShipsManager extends BgaCards.Manager {
-    static create(game) {
-        ShipsManager.instance = new ShipsManager(game);
-    }
-    static getInstance() {
-        return ShipsManager.instance;
-    }
-    constructor(game) {
-        super({
-            getId: (card) => card.id,
-            setupDiv: (card, div) => this.setupDiv(card, div),
-            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
-            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
-            isCardVisible: (card) => this.isCardVisible(card),
-            animationManager: game.animationManager,
-            cardWidth: 75,
-            cardHeight: 68,
-            type: 'ship',
-        });
-        this.game = game;
-    }
-    clearInterface() { }
-    setupDiv(card, div) {
-        div.classList.add('joco-ship-container');
-    }
-    setupFrontDiv(card, div) {
-        div.classList.add('joco-ship');
-        div.setAttribute('data-side', card.type === PLAYER_OWNED_SHIP ? FULL : COMPANY_SHIP);
-        if (div.children.length) {
-            return;
-        }
-        div.insertAdjacentHTML('beforeend', tplShipContent(card));
-    }
-    setupBackDiv(card, div) {
-        div.classList.add('joco-ship');
-        div.setAttribute('data-side', card.type === PLAYER_OWNED_SHIP ? FATIGUED : EXTRA_SHIP);
-        if (div.children.length) {
-            return;
-        }
-        div.insertAdjacentHTML('beforeend', tplShipContent(card, true));
-    }
-    isCardVisible(card) {
-        return card.side === FULL || card.side === COMPANY_SHIP;
-    }
-}
-
-class StaticData {
-    constructor(game) {
-        this.game = game;
-        this.staticData = game.gamedatas.staticData;
-    }
-    static create(game) {
-        StaticData.instance = new StaticData(game);
-    }
-    static get() {
-        return StaticData.instance;
-    }
-    armyPiece(id) {
-        const card = this.staticData.armyPieces[id] ?? {};
-        if (!card) {
-            throw new Error('STATIC_DATA_ERROR_001');
-        }
-        return card;
-    }
-    cardTitle(id) {
-        if (id.startsWith('LawCard_')) {
-            return this.lawCard(id).title;
-        }
-        else if (id.startsWith('PC')) {
-            return this.promiseCard(id).title;
-        }
-        else {
-            return this.londonSeasonCard(id).title;
-        }
-    }
-    enterpriseCard(id) {
-        const card = this.staticData.enterpriseCards[id] ?? {};
-        if (!card) {
-            throw new Error('STATIC_DATA_ERROR_002');
-        }
-        return card;
-    }
-    eventTile(id) {
-        const card = this.staticData.eventTiles[id] ?? {};
-        if (!card) {
-            throw new Error('STATIC_DATA_ERROR_002');
-        }
-        return card;
-    }
-    lawCard(id) {
-        const card = this.staticData.lawCards[id] ?? {};
-        if (!card) {
-            throw new Error('STATIC_DATA_ERROR_001');
-        }
-        return card;
-    }
-    londonSeasonCard(id) {
-        const card = this.staticData.londonSeasonCards[id] ??
-            {};
-        if (!card) {
-            throw new Error('STATIC_DATA_ERROR_002');
-        }
-        return card;
-    }
-    order(id) {
-        const order = this.staticData.orders[id];
-        if (!order) {
-            throw new Error('STATIC_DATA_ERROR_003');
-        }
-        return order;
-    }
-    office(id) {
-        const office = this.staticData.offices[id];
-        if (!office) {
-            throw new Error('STATIC_DATA_ERROR_004');
-        }
-        return office;
-    }
-    promiseCard(id) {
-        const card = this.staticData.promiseCards[id];
-        if (!card) {
-            throw new Error('STATIC_DATA_ERROR_007');
-        }
-        return card;
-    }
-    region(id) {
-        const region = this.staticData.regions[id];
-        if (!region) {
-            throw new Error('STATIC_DATA_ERROR_005');
-        }
-        return region;
-    }
-    setupCard(id) {
-        const setupCard = this.staticData.setupCards[id];
-        if (!setupCard) {
-            throw new Error('STATIC_DATA_ERROR_006');
-        }
-        return setupCard;
-    }
-    setupCards() {
-        return Object.values(this.staticData.setupCards);
-    }
-    ship(id) {
-        return this.game.gamedatas.ships[id];
-    }
-}
-
-const tplEnterpriseCardContent = (card, addId = true) => {
-    let shipName = null;
-    if (card.type === SHIPYARD) {
-        shipName = StaticData.get().ship(card.shipId).name;
-    }
-    return `
-  <div class="joco-title fb-font-baskerville  fb-font-12 bga-autofit">${card.type === WORKSHOP && card.invested ? _('Invested Workshop').toLocaleUpperCase() : _(card.name).toLocaleUpperCase()}</div>
-  ${shipName !== null ? `
-    <div ${addId ? `id="${card.id}-ship"` : ''} class="joco-shipyard-ship"></div>
-    <div class="joco-ship-first-letter fb-font-baskerville fb-font-24 fb-font-italic bga-autofit">${_(shipName).charAt(0)}</div>
-    <div class="joco-ship-name fb-font-baskerville fb-font-8 bga-autofit">${_(shipName)}</div>
-    ` : ''}  
-  
-`;
-};
-
-class EnterpriseCardsManager extends BgaCards.Manager {
-    static create(game) {
-        EnterpriseCardsManager.instance = new EnterpriseCardsManager(game);
-    }
-    static getInstance() {
-        return EnterpriseCardsManager.instance;
-    }
-    constructor(game) {
-        super({
-            getId: (card) => card.id,
-            setupDiv: (card, div) => this.setupDiv(card, div),
-            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
-            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
-            isCardVisible: (card) => this.isCardVisible(card),
-            animationManager: game.animationManager,
-            cardHeight: 150,
-            cardWidth: 228.75,
-            type: 'enterprise-card',
-        });
-        this.game = game;
-        this.shipStocks = {};
-    }
-    clearInterface() { }
-    setupDiv(card, div) {
-        div.classList.add('joco-enterprise-card-container');
-        if (card.used) {
-            div.classList.add('used');
-        }
-    }
-    setupFrontDiv(card, div) {
-        div.classList.add('joco-enterprise-card');
-        div.classList.add('joco-small-card-horizontal');
-        div.setAttribute('data-background', card.type);
-        if (div.children.length) {
-            return;
-        }
-        div.insertAdjacentHTML('beforeend', tplEnterpriseCardContent(card));
-        if (card.type === SHIPYARD) {
-            this.shipStocks[card.shipId] = new BgaCards.LineStock(ShipsManager.getInstance(), document.getElementById(`${card.id}-ship`));
-        }
-    }
-    setupBackDiv(card, div) {
-        div.classList.add('joco-enterprise-card');
-        div.classList.add('joco-small-card-horizontal');
-        div.setAttribute('data-background', card.type === WORKSHOP ? `${WORKSHOP}Invested` : card.type);
-    }
-    isCardVisible(card) {
-        if (card.type === WORKSHOP && card.invested) {
-            return false;
-        }
-        return true;
-    }
-}
-
-const phases$1 = [
-    ['londonSeason', 'London Season'], ['family', 'Family'],
-    ['firms', 'Firms'], ['hiring', 'Hiring'],
-    ['companyOperations', 'Company Operations'], ['revenue', 'Revenue'],
-    ['eventsInIndia', 'Events in India'], ['ParliamentMeets', 'Parliament Meets'],
-    ['upkeepAndRefresh', 'Upkeep & Refresh'],
-];
-const otherWindows = [
-    ['duringHiringIfYouAreACandidate', 'During hiring'],
-    ['afterPresidentOrFirmCheck', 'After a trade check'],
-    ['afterCommanderDeployCheck', 'After a deploy check'],
-    ['immediatelyAfterMilitaryAffairsActs', 'After Military Affairs acts'],
-    ['beforeBombayPresidencyOperations', 'Before Bombay Presidency operations'],
-    ['startOfLondonSeasonChooseCard', 'Before choosing a London Season card'],
-    ['whenRetiring', 'When retiring'],
-    ['beforeAnyVotesAreCast', 'Before votes are cast'],
-    ['anyTimeAfterRevenuePhase', 'After Revenue'],
-];
-const officeIds = new Set([
-    CHAIRMAN, DIRECTOR_OF_TRADE, GOVERNOR_GENERAL, MANAGER_OF_SHIPPING,
-    MILITARY_AFFAIRS, SUPERINTENDENT_OF_TRADE_IN_CHINA,
-    PRESIDENT_OF_BOMBAY, PRESIDENT_OF_MADRAS, PRESIDENT_OF_BENGAL,
-    GOVERNOR_OF_BOMBAY, GOVERNOR_OF_MADRAS, GOVERNOR_OF_BENGAL,
-    GOVERNOR_OF_PUNJAB, GOVERNOR_OF_DELHI, GOVERNOR_OF_MARATHA,
-    GOVERNOR_OF_HYDERABAD, GOVERNOR_OF_MYSORE,
-]);
-const kinds = [
-    { id: START_OF_PHASE, label: 'Start of a phase', items: 'phase' },
-    { id: END_OF_PHASE, label: 'End of a phase', items: 'phase' },
-    { id: BEFORE_OFFICE_ACTS, label: 'Before an office acts', items: 'office' },
-    { id: AFTER_OFFICE_FINISHED_ACTING, label: 'After an office acts', items: 'office' },
-];
-class TimingPreferences {
-    constructor(game) {
-        this.game = game;
-        this.blackmailCards = {};
-        this.pending = false;
-        this.preferences = game.gamedatas.timingPreferences;
-        this.officeLocations = Object.fromEntries(Object.entries(game.gamedatas.offices).map(([id, office]) => [id, office.location]));
-        this.promiseCards = { ...game.gamedatas.promiseCards };
-        this.passedLaws = Object.fromEntries(game.gamedatas.passedLaws.map((card) => [card.id, card]));
-        this.primeMinisterId = game.gamedatas.parliament.primeMinister.playerId;
-        const player = game.gamedatas.players[game.getPlayerId()];
-        player?.londonSeasonCards.forEach((card) => {
-            if (card.type === BLACKMAIL$1 && card.hiddenId)
-                this.blackmailCards[card.id] = card;
-        });
-    }
-    static create(game) {
-        TimingPreferences.instance = new TimingPreferences(game);
-    }
-    static get() {
-        return TimingPreferences.instance;
-    }
-    setup() {
-        if (this.game.isSpectator)
-            return;
-        const tab = document.createElement('div');
-        tab.id = 'joco-timing-preferences';
-        tab.className = 'joco-tab';
-        const content = document.createElement('div');
-        content.className = 'joco-timing-content joco-container';
-        const title = document.createElement('h2');
-        title.textContent = _('Alerts');
-        const form = document.createElement('form');
-        form.className = 'joco-timing-form';
-        const kindField = document.createElement('label');
-        kindField.textContent = _('Timing window');
-        this.kindSelect = document.createElement('select');
-        kindField.appendChild(this.kindSelect);
-        this.itemField = document.createElement('label');
-        this.itemSelect = document.createElement('select');
-        this.addButton = document.createElement('button');
-        this.addButton.type = 'submit';
-        this.addButton.className = 'bgabutton bgabutton_blue';
-        this.addButton.textContent = _('Add');
-        form.append(kindField, this.itemField, this.addButton);
-        this.error = document.createElement('p');
-        this.error.className = 'joco-timing-error';
-        this.error.setAttribute('role', 'alert');
-        const listTitle = document.createElement('h3');
-        listTitle.textContent = _('Active Alerts');
-        this.list = document.createElement('div');
-        this.list.className = 'joco-timing-list';
-        content.append(title, form, this.error, listTitle, this.list);
-        tab.appendChild(content);
-        document.getElementById('joco').appendChild(tab);
-        this.kindSelect.addEventListener('change', () => this.render());
-        this.itemSelect.addEventListener('change', () => this.updateAddButton());
-        form.addEventListener('submit', (event) => {
-            event.preventDefault();
-            const kind = kinds.find((entry) => entry.id === this.kindSelect.value);
-            if (!kind || this.addButton.disabled)
-                return;
-            const key = kind.items ? `${kind.id}:${this.itemSelect.value}` : kind.id;
-            void this.updateWindow(key, true);
-        });
-        this.render();
-    }
-    updateOffice(id, location) {
-        this.officeLocations[id] = location;
-        if (location === DECK) {
-            delete this.preferences.window[`${BEFORE_OFFICE_ACTS}:${id}`];
-            delete this.preferences.window[`${AFTER_OFFICE_FINISHED_ACTING}:${id}`];
-        }
-        if (!this.game.isSpectator && this.list)
-            this.render();
-    }
-    updatePromiseCard(card) {
-        this.promiseCards[card.id] = card;
-        if (!this.game.isSpectator && this.list)
-            this.render();
-    }
-    updateLondonSeasonCard(card) {
-        if (card.type !== BLACKMAIL$1)
-            return;
-        if (card.location === `londonSeasonCards_${this.game.getPlayerId()}` && card.hiddenId) {
-            this.blackmailCards[card.id] = card;
-        }
-        else {
-            delete this.blackmailCards[card.id];
-        }
-        if (!this.game.isSpectator && this.list)
-            this.render();
-    }
-    removeLondonSeasonCard(card) {
-        delete this.blackmailCards[card.id];
-        if (!this.game.isSpectator && this.list)
-            this.render();
-    }
-    updateLawCard(card) {
-        if (card.location === 'PassedLaws')
-            this.passedLaws[card.id] = card;
-        else
-            delete this.passedLaws[card.id];
-        if (!this.game.isSpectator && this.list)
-            this.render();
-    }
-    updatePrimeMinister(playerId) {
-        this.primeMinisterId = Number(playerId);
-        if (!this.game.isSpectator && this.list)
-            this.render();
-    }
-    addCardButton(container, cardId) {
-        if (this.game.isSpectator || !cardId || container.querySelector('.joco-card-timing-button'))
-            return;
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'joco-card-timing-button';
-        button.dataset.cardId = cardId;
-        this.updateCardButton(button);
-        button.addEventListener('click', (event) => {
-            event.stopPropagation();
-            void this.updateCard(cardId, !(this.preferences.card[cardId] ?? true));
-        });
-        container.appendChild(button);
-    }
-    updateCardButton(button) {
-        const enabled = this.preferences.card[button.dataset.cardId] ?? true;
-        button.title = enabled ? _('Card prompts enabled') : _('Card prompts disabled');
-        button.setAttribute('aria-label', button.title);
-        button.setAttribute('aria-pressed', String(enabled));
-        button.innerHTML = `<i class="fa fa-${enabled ? 'bell' : 'bell-slash'}" aria-hidden="true"></i>`;
-        button.disabled = this.pending;
-    }
-    activeCards() {
-        const playerId = this.game.getPlayerId();
-        const cards = [];
-        Object.values(this.promiseCards).forEach((card) => {
-            const data = this.game.gamedatas.staticData.promiseCards[card.id];
-            if (card.location === String(playerId) && card.ownerPlayerId !== playerId && data) {
-                cards.push({ id: card.id, ...data });
-            }
-        });
-        Object.values(this.blackmailCards).forEach((card) => {
-            const data = this.game.gamedatas.staticData.londonSeasonCards[card.hiddenId];
-            if (data)
-                cards.push({ id: card.hiddenId, ...data });
-        });
-        if (Number(this.primeMinisterId) === playerId) {
-            Object.values(this.passedLaws).forEach((card) => {
-                const data = this.game.gamedatas.staticData.lawCards[card.id];
-                if (data)
-                    cards.push({ id: card.id, ...data });
-            });
-        }
-        return cards
-            .filter((card) => card.timingWindows.length > 0 && (this.preferences.card[card.id] ?? true))
-            .map((card) => ({ id: card.id, label: _('If I can play / use ${cardName}').replace('${cardName}', _(card.title)) }));
-    }
-    items(kind) {
-        if (kind.items === 'phase')
-            return phases$1.map(([id, label]) => [id, _(label)]);
-        if (kind.items === 'office') {
-            return Object.entries(this.game.gamedatas.staticData.offices)
-                .filter(([id]) => officeIds.has(id) && this.officeLocations[id] !== undefined && this.officeLocations[id] !== DECK)
-                .map(([id, office]) => [id, _(office.title)]);
-        }
-        return [];
-    }
-    label(key) {
-        const [kindId, itemId] = key.split(':');
-        const kind = kinds.find((entry) => entry.id === kindId);
-        if (!kind)
-            return key;
-        if (!kind.items)
-            return _(kind.label);
-        const item = kind.items === 'phase'
-            ? phases$1.find(([id]) => id === itemId)?.[1]
-            : this.game.gamedatas.staticData.offices[itemId]?.title;
-        const name = item ? _(item) : itemId;
-        const template = kindId === START_OF_PHASE ? _('Start of phase: ${name}')
-            : kindId === END_OF_PHASE ? _('End of phase: ${name}')
-                : kindId === BEFORE_OFFICE_ACTS ? _('Before an office acts: ${name}')
-                    : _('After an office acts: ${name}');
-        return template.replace('${name}', name);
-    }
-    render() {
-        const selectedKind = this.kindSelect.value;
-        const selectedItem = this.itemSelect.value;
-        this.kindSelect.replaceChildren(new Option(_('Select a timing window'), ''));
-        kinds.forEach((kind) => {
-            const available = kind.items
-                ? this.items(kind).some(([id]) => !this.preferences.window[`${kind.id}:${id}`])
-                : !this.preferences.window[kind.id];
-            if (available)
-                this.kindSelect.add(new Option(_(kind.label), kind.id));
-        });
-        this.kindSelect.value = selectedKind;
-        if (this.kindSelect.selectedIndex < 0)
-            this.kindSelect.value = '';
-        const kind = kinds.find((entry) => entry.id === this.kindSelect.value);
-        this.itemField.hidden = !kind?.items;
-        this.itemField.replaceChildren(document.createTextNode(kind?.items === 'phase' ? _('Phase') : _('Office')), this.itemSelect);
-        this.itemSelect.replaceChildren(new Option(_('Select an item'), ''));
-        if (kind?.items) {
-            this.items(kind)
-                .filter(([id]) => !this.preferences.window[`${kind.id}:${id}`])
-                .sort((left, right) => left[1].localeCompare(right[1]))
-                .forEach(([id, label]) => this.itemSelect.add(new Option(label, id)));
-            this.itemSelect.value = selectedItem;
-            if (this.itemSelect.selectedIndex < 0)
-                this.itemSelect.value = '';
-        }
-        this.kindSelect.disabled = this.pending;
-        this.itemSelect.disabled = this.pending;
-        this.updateAddButton();
-        document.querySelectorAll('.joco-card-timing-button').forEach((button) => this.updateCardButton(button));
-        this.list.replaceChildren();
-        const saved = [
-            ...Object.keys(this.preferences.window).filter((key) => this.preferences.window[key])
-                .map((key) => ({ kind: 'window', id: key, label: this.label(key) })),
-            ...this.activeCards().map((card) => ({ kind: 'card', ...card })),
-        ].sort((left, right) => left.label.localeCompare(right.label));
-        if (!saved.length) {
-            const empty = document.createElement('p');
-            empty.textContent = _('No active alerts');
-            this.list.appendChild(empty);
-        }
-        saved.forEach((entry) => {
-            const row = document.createElement('div');
-            row.className = 'joco-timing-row';
-            const text = document.createElement('span');
-            text.textContent = entry.label;
-            const remove = document.createElement('button');
-            remove.type = 'button';
-            remove.className = 'joco-timing-remove';
-            remove.title = _('Remove alert');
-            remove.setAttribute('aria-label', `${remove.title}: ${text.textContent}`);
-            remove.innerHTML = '<i class="fa fa-close" aria-hidden="true"></i>';
-            remove.disabled = this.pending;
-            remove.addEventListener('click', () => {
-                if (entry.kind === 'card')
-                    void this.updateCard(entry.id, false);
-                else
-                    void this.updateWindow(entry.id, false);
-            });
-            row.append(text, remove);
-            this.list.appendChild(row);
-        });
-    }
-    updateAddButton() {
-        const kind = kinds.find((entry) => entry.id === this.kindSelect.value);
-        this.addButton.disabled = this.pending || !kind || (!!kind.items && !this.itemSelect.value);
-    }
-    async updateCard(cardId, enabled) {
-        if (this.pending)
-            return;
-        this.pending = true;
-        this.error.textContent = '';
-        this.render();
-        try {
-            await this.set('card', cardId, enabled);
-        }
-        catch (error) {
-            this.error.textContent = _('Unable to update timing preference');
-            console.error('Unable to update timing preference', error);
-        }
-        finally {
-            this.pending = false;
-            this.render();
-        }
-    }
-    async updateWindow(key, enabled) {
-        this.pending = true;
-        this.error.textContent = '';
-        this.render();
-        try {
-            await this.set('window', key, enabled);
-            const [kind, officeId] = key.split(':');
-            if ((kind === BEFORE_OFFICE_ACTS || kind === AFTER_OFFICE_FINISHED_ACTING) && this.officeLocations[officeId] === DECK) {
-                delete this.preferences.window[key];
-            }
-            if (enabled) {
-                this.kindSelect.value = '';
-                this.itemSelect.value = '';
-            }
-        }
-        catch (error) {
-            this.error.textContent = _('Unable to update timing preference');
-            console.error('Unable to update timing preference', error);
-        }
-        finally {
-            this.pending = false;
-            this.render();
-        }
-    }
-    async set(kind, itemId, enabled) {
-        const request = this.game.bga.actions.performAction('actSetTimingPreference', { kind, itemId, enabled: enabled ? 1 : 0 }, { lock: false, checkAction: false, checkPossibleActions: false });
-        if (!request)
-            throw new Error('Timing preference action unavailable');
-        await request;
-        this.preferences[kind][itemId] = enabled;
-    }
-}
-
 const tplIcon = (type, extraClasses = '') => `<div class="joco-icon ${extraClasses ?? ''}" data-icon="${type}"></div>`;
 const getPolicyConsequenceTranslation = (consequence) => {
     switch (consequence) {
@@ -1606,145 +921,6 @@ const tplPassedLawTokenIcon = (extraClasses = '') => `<div class="joco-passed-la
     </div>
   </div>`;
 const tplMoneyIcon = (value, extraClasses = '') => `<div class="joco-icon ${extraClasses ?? ''}" data-icon="CircleLight">${tplAmount(value, true)}</div>`;
-
-const tplCardText = (text, { containerClass = 'fb-card-text', textClass = 'fb-font-12 fb-font-baskerville', }) => {
-    return `
-    <div class="${containerClass} bga-autofit">
-      ${text
-        .map((item) => {
-        if (typeof item === 'string') {
-            return `<span class="${textClass}">${item}</span>`;
-        }
-        else {
-            return `<span class="${textClass}">${formatStringRecursive$1(_(item.log), item.args)}</span>`;
-        }
-    })
-        .join('')}
-    
-    </div>
-  `;
-};
-
-const tplSpouse = (card) => `
-  <div class="joco-card-title fb-font-16 fb-font-baskerville bga-autofit">${_('SPOUSE')}</div>
-  <div class="joco-card-subtitle fb-font-12 fb-font-italic fb-font-baskerville bga-autofit">${_('You cannot transfer this card')}</div>
-  <div class="joco-card-name fb-font-24 fb-font-parisienne fb-font-bold bga-autofit">${_(card.title)}</div>
-  ${tplCardText(card.text, {})}
-  ${card.textNote
-    ? tplCardText([card.textNote], {
-        containerClass: 'fb-card-text-note',
-        textClass: 'fb-font-12 fb-font-baskerville fb-font-italic',
-    })
-    : ''}
-  ${card.victoryPoints !== null ? tplVictoryPointsIcon(card.victoryPoints) : ''}
-  ${card.power !== null ? tplPowerIcon(card.power) : ''}
-  ${card.discount !== null ? tplDiscountIcon(card.discount) : ''}
-`;
-const tplEnterprise = (card) => `
-  <div class="joco-card-name fb-font-16 fb-font-baskerville bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
-  <div class="joco-enterprise-icon">${tplIcon(card.enterpriseType)}</div>
-  ${tplCardText(card.text, {})}
-`;
-const tplScottishCastle = (card) => `
-  <div class="joco-card-name fb-font-16 fb-font-baskerville bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
-  <div class="joco-enterprise-icon">${tplIcon(card.enterpriseType)}</div>
-    ${tplPowerIcon('3')}
-    ${tplIcon(WINDOW, 'joco-window-1')}
-    ${tplIcon(WINDOW, 'joco-window-2')}
-`;
-const tplLondonSeasonCardContent = (card) => {
-    if (card.background === 'ScottishCastle') {
-        return tplScottishCastle(card);
-    }
-    if (card.type === PRESTIGE && card.subtype === SPOUSE) {
-        return tplSpouse(card);
-    }
-    else if (card.type === PRESTIGE && card.subtype === ENTERPRISE) {
-        return tplEnterprise(card);
-    }
-    return null;
-};
-const tplBlackmailCardContent = (card) => {
-    return `<div class="joco-card-name fb-font-24 fb-font-parisienne fb-font-bold bga-autofit">${_(card.title)}</div>
-  ${tplCardText(card.text, {})}
-  ${card.power ? tplPowerIcon(card.power) : ''}
-`;
-};
-
-class LondonSeasonCardsManager extends BgaCards.Manager {
-    static create(game) {
-        LondonSeasonCardsManager.instance = new LondonSeasonCardsManager(game);
-    }
-    static getInstance() {
-        return LondonSeasonCardsManager.instance;
-    }
-    constructor(game) {
-        super({
-            getId: (card) => card.id,
-            setupDiv: (card, div) => this.setupDiv(card, div),
-            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
-            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
-            isCardVisible: (card) => this.isCardVisible(card),
-            animationManager: game.animationManager,
-            cardHeight: 351,
-            cardWidth: 225,
-        });
-        this.game = game;
-    }
-    clearInterface() { }
-    setupDiv(card, div) {
-        div.classList.add('joco-card-container');
-        div.setAttribute('data-type', card.type);
-        if (card.type === PRESTIGE) {
-            div.setAttribute('data-subtype', card.subtype);
-        }
-        this.updateAlertButton(card, div);
-    }
-    setupFrontDiv(card, div) {
-        this.updateAlertButton(card, div.closest('.joco-card-container'));
-        div.classList.add('joco-card');
-        div.setAttribute('data-background', card.type === BLACKMAIL$1 ? 'Blackmail' : card.background);
-        div.setAttribute('data-has-text-note', card.textNote ? 'true' : 'false');
-        div.setAttribute('data-card-id', card.id);
-        if (card.type === PRESTIGE) {
-            div.setAttribute('data-subtype', card.subtype);
-        }
-        if (card.type === BLACKMAIL$1 && !card.hiddenId && div.children.length) {
-            div.replaceChildren();
-            return;
-        }
-        if (div.children.length || (card.type === BLACKMAIL$1 && !card.hiddenId)) {
-            return;
-        }
-        let cardContent = '';
-        if (card.type === BLACKMAIL$1 && card.hiddenId) {
-            cardContent = tplBlackmailCardContent(card);
-        }
-        else if (card.type === PRESTIGE) {
-            cardContent = tplLondonSeasonCardContent(card);
-        }
-        if (cardContent) {
-            div.insertAdjacentHTML('beforeend', cardContent);
-        }
-    }
-    updateAlertButton(card, container) {
-        if (!container)
-            return;
-        if (card.type === BLACKMAIL$1 && card.hiddenId && this.game.gamedatas.staticData.londonSeasonCards[card.hiddenId]?.timingWindows.length) {
-            TimingPreferences.get().addCardButton(container, card.hiddenId);
-        }
-        else {
-            container.querySelector('.joco-card-timing-button')?.remove();
-        }
-    }
-    setupBackDiv(card, div) {
-        div.classList.add('joco-card');
-        div.setAttribute('data-background', card.type === PRESTIGE ? 'PrestigeBack' : 'BlackmailBack');
-    }
-    isCardVisible(card) {
-        return (card.type !== BLACKMAIL$1 || (card.type === BLACKMAIL$1 && !!card.hiddenId));
-    }
-}
 
 const tplSetupCardItemContainer = (htmnl, index) => `
   <div class="setup-card-item" data-index="${index}">${htmnl}</div>
@@ -1896,6 +1072,112 @@ const tplArmyPiece = (piece) => {
     const armyPiece = getArmyPiece(piece);
     return tplLocalAlliance(armyPiece);
 };
+
+class StaticData {
+    constructor(game) {
+        this.game = game;
+        this.staticData = game.gamedatas.staticData;
+    }
+    static create(game) {
+        StaticData.instance = new StaticData(game);
+    }
+    static get() {
+        return StaticData.instance;
+    }
+    armyPiece(id) {
+        const card = this.staticData.armyPieces[id] ?? {};
+        if (!card) {
+            throw new Error('STATIC_DATA_ERROR_001');
+        }
+        return card;
+    }
+    cardTitle(id) {
+        if (id.startsWith('LawCard_')) {
+            return this.lawCard(id).title;
+        }
+        else if (id.startsWith('PC')) {
+            return this.promiseCard(id).title;
+        }
+        else {
+            return this.londonSeasonCard(id).title;
+        }
+    }
+    enterpriseCard(id) {
+        const card = this.staticData.enterpriseCards[id] ?? {};
+        if (!card) {
+            throw new Error('STATIC_DATA_ERROR_002');
+        }
+        return card;
+    }
+    eventTile(id) {
+        const card = this.staticData.eventTiles[id] ?? {};
+        if (!card) {
+            throw new Error('STATIC_DATA_ERROR_002');
+        }
+        return card;
+    }
+    lawCard(id) {
+        const card = this.staticData.lawCards[id] ?? {};
+        if (!card) {
+            throw new Error('STATIC_DATA_ERROR_001');
+        }
+        return card;
+    }
+    londonSeasonCard(id) {
+        const card = this.staticData.londonSeasonCards[id] ??
+            {};
+        if (!card) {
+            throw new Error('STATIC_DATA_ERROR_002');
+        }
+        return card;
+    }
+    order(id) {
+        const order = this.staticData.orders[id];
+        if (!order) {
+            throw new Error('STATIC_DATA_ERROR_003');
+        }
+        return order;
+    }
+    office(id) {
+        const office = this.staticData.offices[id];
+        if (!office) {
+            throw new Error('STATIC_DATA_ERROR_004');
+        }
+        return office;
+    }
+    promiseCard(id) {
+        const card = this.staticData.promiseCards[id];
+        if (!card) {
+            throw new Error('STATIC_DATA_ERROR_007');
+        }
+        return card;
+    }
+    region(id) {
+        const region = this.staticData.regions[id];
+        if (!region) {
+            throw new Error('STATIC_DATA_ERROR_005');
+        }
+        return region;
+    }
+    setupCard(id) {
+        const setupCard = this.staticData.setupCards[id];
+        if (!setupCard) {
+            throw new Error('STATIC_DATA_ERROR_006');
+        }
+        return setupCard;
+    }
+    setupCards() {
+        return Object.values(this.staticData.setupCards);
+    }
+    ship(id) {
+        return this.game.gamedatas.ships[id];
+    }
+}
+
+const tplShipContent = (ship, back = false) => `
+  <div class="joco-ship-name bga-autofit"><span class="fb-font-baskerville">${back && ship.type !== PLAYER_OWNED_SHIP ? _('Extra Ship') : _(ship.name)}</span></div>
+  ${back ? `<div class="joco-ship-fatigued fb-font-baskerville bga-autofit">${_('F')}</div>` : ''}
+`;
 
 const tlpLogTokenText = ({ text, tooltipId, italic = false, bold = true, color, }) => `<span ${tooltipId ? `id="${tooltipId}" class="log_tooltip"` : ''} style="font-weight: ${bold ? '700' : '400'};${italic ? ' font-style: italic;' : ''}${color ? ` color: #${color};` : ''}">${_(text)}</span>`;
 const tplLogTokenClimate = (climate) => `<div class="log-token joco-crown-climate-icon" data-climate="${climate}"></div>`;
@@ -2210,11 +1492,774 @@ const getCardText = (card) => {
         });
     }
     const text = '"${cardTitle}"';
-    const cardId = card['type'] === BLACKMAIL$1 && 'hiddenId' in card ? card.hiddenId : card.id;
+    const cardId = card['type'] === BLACKMAIL && 'hiddenId' in card ? card.hiddenId : card.id;
     return formatStringRecursive$1(text, {
         cardTitle: _(StaticData.get().cardTitle(cardId)),
     });
 };
+const getRoleName$1 = (role) => {
+    switch (role) {
+        case CHAIRMAN:
+            return _('Chairman');
+        case PRIME_MINISTER:
+            return _('Prime Minister');
+        case LEADER_OF_THE_OPPOSITION:
+            return _('Leader of the Opposition');
+        case OPPOSITION:
+            return _('Opposition');
+        default:
+            throw new Error(`Unknown role: ${role}`);
+    }
+};
+
+const tplPlayerCounters = ({ crownInGame, familyId, playerId, }) => {
+    const elt = createFamilyMember(familyId, Math.floor(Math.random() * 18));
+    elt.id = `joco-familyMembers-${playerId}`;
+    return `
+  <div id="joco-player-roles-${playerId}" class="joco-player-roles"></div>
+  <div class="joco-player-panel-item">
+    <div class="joco-treasury-counter-container">
+      <span class="fb-font-baskerville fb-font-16 fb-font-bold">£</span><span id="joco-cash-counter-${playerId}" class="fb-font-baskerville fb-font-bold fb-font-24"></span>
+    </div>
+  </div>
+  <div class="joco-player-panel-item">
+    ${elt.outerHTML}
+    <span id="joco-familyMembers-counter-${playerId}" class="joco-counter fb-font-baskerville fb-font-bold fb-font-20"></span>
+  </div>
+  <div class="joco-player-panel-item">
+    <div class="joco-icon" data-icon="Power">
+      <span id="joco-power-counter-${playerId}" class="fb-font-baskerville fb-font-bold fb-font-20">10</span>
+    </div>
+  </div>
+`;
+};
+const tplPlayerAreas = () => `<div id="joco-player-areas">
+</div>`;
+const tplPlayerArea = (player) => {
+    const playerId = player.getPlayerId();
+    return `
+      <div id="joco-family-area-${playerId}" class="joco-family-area">
+        <div class="joco-family-area-content">
+          <div id="joco-counters-${playerId}" class="joco-family-area-counters">
+          </div>
+          <div class="joco-row">
+            <div class="joco-container joco-column">
+              <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Offices').toLocaleUpperCase()}</span>
+              <div id="FamilyOffices_${playerId}" class="joco-family-offices"></div>
+            </div>
+            <div class="joco-column" style="flex-grow: 1;">
+              <div class="joco-container">
+                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Enterprises').toLocaleUpperCase()}</span>
+                <div id="joco-enterprises-${playerId}" class="joco-enterprises"></div>
+              </div>
+              <div class="joco-container">
+                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Prestige & Blackmail cards').toLocaleUpperCase()}</span>
+                <div id="joco-prestige-blackmail-${playerId}" class="joco-prestige-blackmail"></div>
+              </div>
+              <div class="joco-container">
+                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Promise cards').toLocaleUpperCase()}</span>
+                <div id="joco-promise-cards-${playerId}" class="joco-promise-cards"></div>
+              </div>
+              <div class="joco-container">
+                <span class="joco-header fb-font-baskerville fb-font-16 fb-font-bold">${_('Played Blackmail cards').toLocaleUpperCase()}</span>
+                <div id="joco-played-blackmail-${playerId}" class="joco-prestige-blackmail"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+};
+
+class JocoPlayer {
+    constructor(game, player) {
+        this.game = game;
+        this.counters = {};
+        this.ui = {};
+        this.game = game;
+        const playerId = player.id;
+        this.playerId = Number(playerId);
+        this.playerName = player.name;
+        this.playerColor = player.color;
+        this.familyId = player.familyId;
+        const gamedatas = game.gamedatas;
+        this.setupPlayer(gamedatas);
+    }
+    clearInterface() { }
+    updatePlayer(gamedatas) {
+        this.updatePlayerPanel(gamedatas);
+    }
+    setupPlayer(gamedatas) {
+        this.setupPlayerPanel(gamedatas);
+    }
+    setupPlayerPanel(gamedatas) {
+        const playerGamedatas = gamedatas.players[this.playerId];
+        const node = document.querySelector(`#player_board_${this.playerId} .player-board-game-specific-content`);
+        if (!node) {
+            return;
+        }
+        const familyId = this.familyId === CROWN
+            ? COLOR_FAMILY_MAP[HEX_COLOR_COLOR_MAP[this.getColor()]]
+            : this.familyId;
+        node.insertAdjacentHTML('afterbegin', tplPlayerCounters({
+            playerId: this.playerId,
+            familyId,
+            crownInGame: this.game.gameOptions.crownEnabled,
+        }));
+        const counters = [...COUNTERS];
+        if (this.game.gameOptions.crownEnabled) {
+            counters.push(PROMISE_CUBES_COUNTER);
+        }
+        counters.forEach((counter) => {
+            this.counters[counter] = new ebg.counter();
+            this.counters[counter].create(`joco-${counter}-counter-${this.playerId}`);
+            this.ui[counter] = document.getElementById(`joco-${counter}-${this.playerId}`);
+        });
+        this.updatePlayerPanel(gamedatas);
+    }
+    updatePlayerPanel(gamedatas) {
+        this.updateRoles(gamedatas);
+        this.counters[CASH_COUNTER].setValue(gamedatas.families[this.playerId].treasury);
+        this.counters[FAMILY_MEMBERS_COUNTER].setValue(Object.values(gamedatas.familyMembers).filter(({ familyId, location }) => familyId === this.familyId && location.startsWith('supply')).length);
+        const power = gamedatas.power[this.playerId].total ??
+            gamedatas.power[this.playerId].totalVisible;
+        this.counters[POWER_COUNTER].setValue(power);
+    }
+    updateRoles(gamedatas) {
+        const container = document.getElementById(`joco-player-roles-${this.playerId}`);
+        if (!container)
+            return;
+        const roles = [];
+        const { primeMinister, opposition } = gamedatas.parliament;
+        if (gamedatas.families[this.playerId]?.hasChairmanMarker) {
+            roles.push(CHAIRMAN);
+        }
+        if (primeMinister.playerId !== null && Number(primeMinister.playerId) === this.playerId) {
+            roles.push(PRIME_MINISTER);
+        }
+        if (opposition.leader !== null && Number(opposition.leader) === this.playerId) {
+            roles.push(LEADER_OF_THE_OPPOSITION);
+        }
+        else if (Object.keys(opposition.votes).some((playerId) => Number(playerId) === this.playerId) ||
+            (opposition.voters ?? []).some((playerId) => Number(playerId) === this.playerId)) {
+            roles.push(OPPOSITION);
+        }
+        container.replaceChildren(...roles.map((role) => {
+            const element = document.createElement('div');
+            element.className = 'joco-player-role fb-font-baskerville fb-font-12';
+            element.setAttribute('data-role', role);
+            element.textContent = getRoleName$1(role);
+            return element;
+        }));
+    }
+    getColor() {
+        return this.playerColor;
+    }
+    getName() {
+        return this.playerName;
+    }
+    getPlayerId() {
+        return this.playerId;
+    }
+    getFamilyId() {
+        return this.familyId;
+    }
+}
+
+const BgaAnimations = await globalThis.importEsmLib('bga-animations', '1.x');
+const BgaCards = await globalThis.importEsmLib('bga-cards', '1.x');
+const BgaAutofit = await globalThis.importEsmLib('bga-autofit', '1.x');
+
+class ShipsManager extends BgaCards.Manager {
+    static create(game) {
+        ShipsManager.instance = new ShipsManager(game);
+    }
+    static getInstance() {
+        return ShipsManager.instance;
+    }
+    constructor(game) {
+        super({
+            getId: (card) => card.id,
+            setupDiv: (card, div) => this.setupDiv(card, div),
+            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
+            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
+            isCardVisible: (card) => this.isCardVisible(card),
+            animationManager: game.animationManager,
+            cardWidth: 75,
+            cardHeight: 68,
+            type: 'ship',
+        });
+        this.game = game;
+    }
+    clearInterface() { }
+    setupDiv(card, div) {
+        div.classList.add('joco-ship-container');
+    }
+    setupFrontDiv(card, div) {
+        div.classList.add('joco-ship');
+        div.setAttribute('data-side', card.type === PLAYER_OWNED_SHIP ? FULL : COMPANY_SHIP);
+        if (div.children.length) {
+            return;
+        }
+        div.insertAdjacentHTML('beforeend', tplShipContent(card));
+    }
+    setupBackDiv(card, div) {
+        div.classList.add('joco-ship');
+        div.setAttribute('data-side', card.type === PLAYER_OWNED_SHIP ? FATIGUED : EXTRA_SHIP);
+        if (div.children.length) {
+            return;
+        }
+        div.insertAdjacentHTML('beforeend', tplShipContent(card, true));
+    }
+    isCardVisible(card) {
+        return card.side === FULL || card.side === COMPANY_SHIP;
+    }
+}
+
+const tplEnterpriseCardContent = (card, addId = true) => {
+    let shipName = null;
+    if (card.type === SHIPYARD) {
+        shipName = StaticData.get().ship(card.shipId).name;
+    }
+    return `
+  <div class="joco-title fb-font-baskerville  fb-font-12 bga-autofit">${card.type === WORKSHOP && card.invested ? _('Invested Workshop').toLocaleUpperCase() : _(card.name).toLocaleUpperCase()}</div>
+  ${shipName !== null ? `
+    <div ${addId ? `id="${card.id}-ship"` : ''} class="joco-shipyard-ship"></div>
+    <div class="joco-ship-first-letter fb-font-baskerville fb-font-24 fb-font-italic bga-autofit">${_(shipName).charAt(0)}</div>
+    <div class="joco-ship-name fb-font-baskerville fb-font-8 bga-autofit">${_(shipName)}</div>
+    ` : ''}  
+  
+`;
+};
+
+class EnterpriseCardsManager extends BgaCards.Manager {
+    static create(game) {
+        EnterpriseCardsManager.instance = new EnterpriseCardsManager(game);
+    }
+    static getInstance() {
+        return EnterpriseCardsManager.instance;
+    }
+    constructor(game) {
+        super({
+            getId: (card) => card.id,
+            setupDiv: (card, div) => this.setupDiv(card, div),
+            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
+            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
+            isCardVisible: (card) => this.isCardVisible(card),
+            animationManager: game.animationManager,
+            cardHeight: 150,
+            cardWidth: 228.75,
+            type: 'enterprise-card',
+        });
+        this.game = game;
+        this.shipStocks = {};
+    }
+    clearInterface() { }
+    setupDiv(card, div) {
+        div.classList.add('joco-enterprise-card-container');
+        if (card.used) {
+            div.classList.add('used');
+        }
+    }
+    setupFrontDiv(card, div) {
+        div.classList.add('joco-enterprise-card');
+        div.classList.add('joco-small-card-horizontal');
+        div.setAttribute('data-background', card.type);
+        if (div.children.length) {
+            return;
+        }
+        div.insertAdjacentHTML('beforeend', tplEnterpriseCardContent(card));
+        if (card.type === SHIPYARD) {
+            this.shipStocks[card.shipId] = new BgaCards.LineStock(ShipsManager.getInstance(), document.getElementById(`${card.id}-ship`));
+        }
+    }
+    setupBackDiv(card, div) {
+        div.classList.add('joco-enterprise-card');
+        div.classList.add('joco-small-card-horizontal');
+        div.setAttribute('data-background', card.type === WORKSHOP ? `${WORKSHOP}Invested` : card.type);
+    }
+    isCardVisible(card) {
+        if (card.type === WORKSHOP && card.invested) {
+            return false;
+        }
+        return true;
+    }
+}
+
+const phases$1 = [
+    ['londonSeason', 'London Season'], ['family', 'Family'],
+    ['firms', 'Firms'], ['hiring', 'Hiring'],
+    ['companyOperations', 'Company Operations'], ['revenue', 'Revenue'],
+    ['eventsInIndia', 'Events in India'], ['ParliamentMeets', 'Parliament Meets'],
+    ['upkeepAndRefresh', 'Upkeep & Refresh'],
+];
+const otherWindows = [
+    ['duringHiringIfYouAreACandidate', 'During hiring'],
+    ['afterPresidentOrFirmCheck', 'After a trade check'],
+    ['afterCommanderDeployCheck', 'After a deploy check'],
+    ['immediatelyAfterMilitaryAffairsActs', 'After Military Affairs acts'],
+    ['beforeBombayPresidencyOperations', 'Before Bombay Presidency operations'],
+    ['startOfLondonSeasonChooseCard', 'Before choosing a London Season card'],
+    ['whenRetiring', 'When retiring'],
+    ['beforeAnyVotesAreCast', 'Before votes are cast'],
+    ['anyTimeAfterRevenuePhase', 'After Revenue'],
+];
+const officeIds = new Set([
+    CHAIRMAN, DIRECTOR_OF_TRADE, GOVERNOR_GENERAL, MANAGER_OF_SHIPPING,
+    MILITARY_AFFAIRS, SUPERINTENDENT_OF_TRADE_IN_CHINA,
+    PRESIDENT_OF_BOMBAY, PRESIDENT_OF_MADRAS, PRESIDENT_OF_BENGAL,
+    GOVERNOR_OF_BOMBAY, GOVERNOR_OF_MADRAS, GOVERNOR_OF_BENGAL,
+    GOVERNOR_OF_PUNJAB, GOVERNOR_OF_DELHI, GOVERNOR_OF_MARATHA,
+    GOVERNOR_OF_HYDERABAD, GOVERNOR_OF_MYSORE,
+]);
+const kinds = [
+    { id: START_OF_PHASE, label: 'Start of a phase', items: 'phase' },
+    { id: END_OF_PHASE, label: 'End of a phase', items: 'phase' },
+    { id: BEFORE_OFFICE_ACTS, label: 'Before an office acts', items: 'office' },
+    { id: AFTER_OFFICE_FINISHED_ACTING, label: 'After an office acts', items: 'office' },
+];
+class TimingPreferences {
+    constructor(game) {
+        this.game = game;
+        this.blackmailCards = {};
+        this.pending = false;
+        this.preferences = game.gamedatas.timingPreferences;
+        this.officeLocations = Object.fromEntries(Object.entries(game.gamedatas.offices).map(([id, office]) => [id, office.location]));
+        this.promiseCards = { ...game.gamedatas.promiseCards };
+        this.passedLaws = Object.fromEntries(game.gamedatas.passedLaws.map((card) => [card.id, card]));
+        this.primeMinisterId = game.gamedatas.parliament.primeMinister.playerId;
+        const player = game.gamedatas.players[game.getPlayerId()];
+        player?.londonSeasonCards.forEach((card) => {
+            if (card.type === BLACKMAIL && card.hiddenId)
+                this.blackmailCards[card.id] = card;
+        });
+    }
+    static create(game) {
+        TimingPreferences.instance = new TimingPreferences(game);
+    }
+    static get() {
+        return TimingPreferences.instance;
+    }
+    setup() {
+        if (this.game.isSpectator)
+            return;
+        const tab = document.createElement('div');
+        tab.id = 'joco-timing-preferences';
+        tab.className = 'joco-tab';
+        const content = document.createElement('div');
+        content.className = 'joco-timing-content joco-container';
+        const title = document.createElement('h2');
+        title.textContent = _('Alerts');
+        const form = document.createElement('form');
+        form.className = 'joco-timing-form';
+        const kindField = document.createElement('label');
+        kindField.textContent = _('Timing window');
+        this.kindSelect = document.createElement('select');
+        kindField.appendChild(this.kindSelect);
+        this.itemField = document.createElement('label');
+        this.itemSelect = document.createElement('select');
+        this.addButton = document.createElement('button');
+        this.addButton.type = 'submit';
+        this.addButton.className = 'bgabutton bgabutton_blue';
+        this.addButton.textContent = _('Add');
+        form.append(kindField, this.itemField, this.addButton);
+        this.error = document.createElement('p');
+        this.error.className = 'joco-timing-error';
+        this.error.setAttribute('role', 'alert');
+        const listTitle = document.createElement('h3');
+        listTitle.textContent = _('Active Alerts');
+        this.list = document.createElement('div');
+        this.list.className = 'joco-timing-list';
+        content.append(title, form, this.error, listTitle, this.list);
+        tab.appendChild(content);
+        document.getElementById('joco').appendChild(tab);
+        this.kindSelect.addEventListener('change', () => this.render());
+        this.itemSelect.addEventListener('change', () => this.updateAddButton());
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const kind = kinds.find((entry) => entry.id === this.kindSelect.value);
+            if (!kind || this.addButton.disabled)
+                return;
+            const key = kind.items ? `${kind.id}:${this.itemSelect.value}` : kind.id;
+            void this.updateWindow(key, true);
+        });
+        this.render();
+    }
+    updateOffice(id, location) {
+        this.officeLocations[id] = location;
+        if (location === DECK) {
+            delete this.preferences.window[`${BEFORE_OFFICE_ACTS}:${id}`];
+            delete this.preferences.window[`${AFTER_OFFICE_FINISHED_ACTING}:${id}`];
+        }
+        if (!this.game.isSpectator && this.list)
+            this.render();
+    }
+    updatePromiseCard(card) {
+        this.promiseCards[card.id] = card;
+        if (!this.game.isSpectator && this.list)
+            this.render();
+    }
+    updateLondonSeasonCard(card) {
+        if (card.type !== BLACKMAIL)
+            return;
+        if (card.location === `londonSeasonCards_${this.game.getPlayerId()}` && card.hiddenId) {
+            this.blackmailCards[card.id] = card;
+        }
+        else {
+            delete this.blackmailCards[card.id];
+        }
+        if (!this.game.isSpectator && this.list)
+            this.render();
+    }
+    removeLondonSeasonCard(card) {
+        delete this.blackmailCards[card.id];
+        if (!this.game.isSpectator && this.list)
+            this.render();
+    }
+    updateLawCard(card) {
+        if (card.location === 'PassedLaws')
+            this.passedLaws[card.id] = card;
+        else
+            delete this.passedLaws[card.id];
+        if (!this.game.isSpectator && this.list)
+            this.render();
+    }
+    updatePrimeMinister(playerId) {
+        this.primeMinisterId = Number(playerId);
+        if (!this.game.isSpectator && this.list)
+            this.render();
+    }
+    addCardButton(container, cardId) {
+        if (this.game.isSpectator || !cardId || container.querySelector('.joco-card-timing-button'))
+            return;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'joco-card-timing-button';
+        button.dataset.cardId = cardId;
+        this.updateCardButton(button);
+        button.addEventListener('click', (event) => {
+            event.stopPropagation();
+            void this.updateCard(cardId, !(this.preferences.card[cardId] ?? true));
+        });
+        container.appendChild(button);
+    }
+    updateCardButton(button) {
+        const enabled = this.preferences.card[button.dataset.cardId] ?? true;
+        button.title = enabled ? _('Card prompts enabled') : _('Card prompts disabled');
+        button.setAttribute('aria-label', button.title);
+        button.setAttribute('aria-pressed', String(enabled));
+        button.innerHTML = `<i class="fa fa-${enabled ? 'bell' : 'bell-slash'}" aria-hidden="true"></i>`;
+        button.disabled = this.pending;
+    }
+    activeCards() {
+        const playerId = this.game.getPlayerId();
+        const cards = [];
+        Object.values(this.promiseCards).forEach((card) => {
+            const data = this.game.gamedatas.staticData.promiseCards[card.id];
+            if (card.location === String(playerId) && card.ownerPlayerId !== playerId && data) {
+                cards.push({ id: card.id, ...data });
+            }
+        });
+        Object.values(this.blackmailCards).forEach((card) => {
+            const data = this.game.gamedatas.staticData.londonSeasonCards[card.hiddenId];
+            if (data)
+                cards.push({ id: card.hiddenId, ...data });
+        });
+        if (Number(this.primeMinisterId) === playerId) {
+            Object.values(this.passedLaws).forEach((card) => {
+                const data = this.game.gamedatas.staticData.lawCards[card.id];
+                if (data)
+                    cards.push({ id: card.id, ...data });
+            });
+        }
+        return cards
+            .filter((card) => card.timingWindows.length > 0 && (this.preferences.card[card.id] ?? true))
+            .map((card) => ({ id: card.id, label: _('If I can play / use ${cardName}').replace('${cardName}', _(card.title)) }));
+    }
+    items(kind) {
+        if (kind.items === 'phase')
+            return phases$1.map(([id, label]) => [id, _(label)]);
+        if (kind.items === 'office') {
+            return Object.entries(this.game.gamedatas.staticData.offices)
+                .filter(([id]) => officeIds.has(id) && this.officeLocations[id] !== undefined && this.officeLocations[id] !== DECK)
+                .map(([id, office]) => [id, _(office.title)]);
+        }
+        return [];
+    }
+    label(key) {
+        const [kindId, itemId] = key.split(':');
+        const kind = kinds.find((entry) => entry.id === kindId);
+        if (!kind)
+            return key;
+        if (!kind.items)
+            return _(kind.label);
+        const item = kind.items === 'phase'
+            ? phases$1.find(([id]) => id === itemId)?.[1]
+            : this.game.gamedatas.staticData.offices[itemId]?.title;
+        const name = item ? _(item) : itemId;
+        const template = kindId === START_OF_PHASE ? _('Start of phase: ${name}')
+            : kindId === END_OF_PHASE ? _('End of phase: ${name}')
+                : kindId === BEFORE_OFFICE_ACTS ? _('Before an office acts: ${name}')
+                    : _('After an office acts: ${name}');
+        return template.replace('${name}', name);
+    }
+    render() {
+        const selectedKind = this.kindSelect.value;
+        const selectedItem = this.itemSelect.value;
+        this.kindSelect.replaceChildren(new Option(_('Select a timing window'), ''));
+        kinds.forEach((kind) => {
+            const available = kind.items
+                ? this.items(kind).some(([id]) => !this.preferences.window[`${kind.id}:${id}`])
+                : !this.preferences.window[kind.id];
+            if (available)
+                this.kindSelect.add(new Option(_(kind.label), kind.id));
+        });
+        this.kindSelect.value = selectedKind;
+        if (this.kindSelect.selectedIndex < 0)
+            this.kindSelect.value = '';
+        const kind = kinds.find((entry) => entry.id === this.kindSelect.value);
+        this.itemField.hidden = !kind?.items;
+        this.itemField.replaceChildren(document.createTextNode(kind?.items === 'phase' ? _('Phase') : _('Office')), this.itemSelect);
+        this.itemSelect.replaceChildren(new Option(_('Select an item'), ''));
+        if (kind?.items) {
+            this.items(kind)
+                .filter(([id]) => !this.preferences.window[`${kind.id}:${id}`])
+                .sort((left, right) => left[1].localeCompare(right[1]))
+                .forEach(([id, label]) => this.itemSelect.add(new Option(label, id)));
+            this.itemSelect.value = selectedItem;
+            if (this.itemSelect.selectedIndex < 0)
+                this.itemSelect.value = '';
+        }
+        this.kindSelect.disabled = this.pending;
+        this.itemSelect.disabled = this.pending;
+        this.updateAddButton();
+        document.querySelectorAll('.joco-card-timing-button').forEach((button) => this.updateCardButton(button));
+        this.list.replaceChildren();
+        const saved = [
+            ...Object.keys(this.preferences.window).filter((key) => this.preferences.window[key])
+                .map((key) => ({ kind: 'window', id: key, label: this.label(key) })),
+            ...this.activeCards().map((card) => ({ kind: 'card', ...card })),
+        ].sort((left, right) => left.label.localeCompare(right.label));
+        if (!saved.length) {
+            const empty = document.createElement('p');
+            empty.textContent = _('No active alerts');
+            this.list.appendChild(empty);
+        }
+        saved.forEach((entry) => {
+            const row = document.createElement('div');
+            row.className = 'joco-timing-row';
+            const text = document.createElement('span');
+            text.textContent = entry.label;
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'joco-timing-remove';
+            remove.title = _('Remove alert');
+            remove.setAttribute('aria-label', `${remove.title}: ${text.textContent}`);
+            remove.innerHTML = '<i class="fa fa-close" aria-hidden="true"></i>';
+            remove.disabled = this.pending;
+            remove.addEventListener('click', () => {
+                if (entry.kind === 'card')
+                    void this.updateCard(entry.id, false);
+                else
+                    void this.updateWindow(entry.id, false);
+            });
+            row.append(text, remove);
+            this.list.appendChild(row);
+        });
+    }
+    updateAddButton() {
+        const kind = kinds.find((entry) => entry.id === this.kindSelect.value);
+        this.addButton.disabled = this.pending || !kind || (!!kind.items && !this.itemSelect.value);
+    }
+    async updateCard(cardId, enabled) {
+        if (this.pending)
+            return;
+        this.pending = true;
+        this.error.textContent = '';
+        this.render();
+        try {
+            await this.set('card', cardId, enabled);
+        }
+        catch (error) {
+            this.error.textContent = _('Unable to update timing preference');
+            console.error('Unable to update timing preference', error);
+        }
+        finally {
+            this.pending = false;
+            this.render();
+        }
+    }
+    async updateWindow(key, enabled) {
+        this.pending = true;
+        this.error.textContent = '';
+        this.render();
+        try {
+            await this.set('window', key, enabled);
+            const [kind, officeId] = key.split(':');
+            if ((kind === BEFORE_OFFICE_ACTS || kind === AFTER_OFFICE_FINISHED_ACTING) && this.officeLocations[officeId] === DECK) {
+                delete this.preferences.window[key];
+            }
+            if (enabled) {
+                this.kindSelect.value = '';
+                this.itemSelect.value = '';
+            }
+        }
+        catch (error) {
+            this.error.textContent = _('Unable to update timing preference');
+            console.error('Unable to update timing preference', error);
+        }
+        finally {
+            this.pending = false;
+            this.render();
+        }
+    }
+    async set(kind, itemId, enabled) {
+        const request = this.game.bga.actions.performAction('actSetTimingPreference', { kind, itemId, enabled: enabled ? 1 : 0 }, { lock: false, checkAction: false, checkPossibleActions: false });
+        if (!request)
+            throw new Error('Timing preference action unavailable');
+        await request;
+        this.preferences[kind][itemId] = enabled;
+    }
+}
+
+const tplCardText = (text, { containerClass = 'fb-card-text', textClass = 'fb-font-12 fb-font-baskerville', }) => {
+    return `
+    <div class="${containerClass} bga-autofit">
+      ${text
+        .map((item) => {
+        if (typeof item === 'string') {
+            return `<span class="${textClass}">${item}</span>`;
+        }
+        else {
+            return `<span class="${textClass}">${formatStringRecursive$1(_(item.log), item.args)}</span>`;
+        }
+    })
+        .join('')}
+    
+    </div>
+  `;
+};
+
+const tplSpouse = (card) => `
+  <div class="joco-card-title fb-font-16 fb-font-baskerville bga-autofit">${_('SPOUSE')}</div>
+  <div class="joco-card-subtitle fb-font-12 fb-font-italic fb-font-baskerville bga-autofit">${_('You cannot transfer this card')}</div>
+  <div class="joco-card-name fb-font-24 fb-font-parisienne fb-font-bold bga-autofit">${_(card.title)}</div>
+  ${tplCardText(card.text, {})}
+  ${card.textNote
+    ? tplCardText([card.textNote], {
+        containerClass: 'fb-card-text-note',
+        textClass: 'fb-font-12 fb-font-baskerville fb-font-italic',
+    })
+    : ''}
+  ${card.victoryPoints !== null ? tplVictoryPointsIcon(card.victoryPoints) : ''}
+  ${card.power !== null ? tplPowerIcon(card.power) : ''}
+  ${card.discount !== null ? tplDiscountIcon(card.discount) : ''}
+`;
+const tplEnterprise = (card) => `
+  <div class="joco-card-name fb-font-16 fb-font-baskerville bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
+  <div class="joco-enterprise-icon">${tplIcon(card.enterpriseType)}</div>
+  ${tplCardText(card.text, {})}
+`;
+const tplScottishCastle = (card) => `
+  <div class="joco-card-name fb-font-16 fb-font-baskerville bga-autofit">${_(card.title).toLocaleUpperCase()}</div>
+  <div class="joco-enterprise-icon">${tplIcon(card.enterpriseType)}</div>
+    ${tplPowerIcon('3')}
+    ${tplIcon(WINDOW, 'joco-window-1')}
+    ${tplIcon(WINDOW, 'joco-window-2')}
+`;
+const tplLondonSeasonCardContent = (card) => {
+    if (card.background === 'ScottishCastle') {
+        return tplScottishCastle(card);
+    }
+    if (card.type === PRESTIGE && card.subtype === SPOUSE) {
+        return tplSpouse(card);
+    }
+    else if (card.type === PRESTIGE && card.subtype === ENTERPRISE) {
+        return tplEnterprise(card);
+    }
+    return null;
+};
+const tplBlackmailCardContent = (card) => {
+    return `<div class="joco-card-name fb-font-24 fb-font-parisienne fb-font-bold bga-autofit">${_(card.title)}</div>
+  ${tplCardText(card.text, {})}
+  ${card.power ? tplPowerIcon(card.power) : ''}
+`;
+};
+
+class LondonSeasonCardsManager extends BgaCards.Manager {
+    static create(game) {
+        LondonSeasonCardsManager.instance = new LondonSeasonCardsManager(game);
+    }
+    static getInstance() {
+        return LondonSeasonCardsManager.instance;
+    }
+    constructor(game) {
+        super({
+            getId: (card) => card.id,
+            setupDiv: (card, div) => this.setupDiv(card, div),
+            setupFrontDiv: (card, div) => this.setupFrontDiv(card, div),
+            setupBackDiv: (card, div) => this.setupBackDiv(card, div),
+            isCardVisible: (card) => this.isCardVisible(card),
+            animationManager: game.animationManager,
+            cardHeight: 351,
+            cardWidth: 225,
+        });
+        this.game = game;
+    }
+    clearInterface() { }
+    setupDiv(card, div) {
+        div.classList.add('joco-card-container');
+        div.setAttribute('data-type', card.type);
+        if (card.type === PRESTIGE) {
+            div.setAttribute('data-subtype', card.subtype);
+        }
+        this.updateAlertButton(card, div);
+    }
+    setupFrontDiv(card, div) {
+        this.updateAlertButton(card, div.closest('.joco-card-container'));
+        div.classList.add('joco-card');
+        div.setAttribute('data-background', card.type === BLACKMAIL ? 'Blackmail' : card.background);
+        div.setAttribute('data-has-text-note', card.textNote ? 'true' : 'false');
+        div.setAttribute('data-card-id', card.id);
+        if (card.type === PRESTIGE) {
+            div.setAttribute('data-subtype', card.subtype);
+        }
+        if (card.type === BLACKMAIL && !card.hiddenId && div.children.length) {
+            div.replaceChildren();
+            return;
+        }
+        if (div.children.length || (card.type === BLACKMAIL && !card.hiddenId)) {
+            return;
+        }
+        let cardContent = '';
+        if (card.type === BLACKMAIL && card.hiddenId) {
+            cardContent = tplBlackmailCardContent(card);
+        }
+        else if (card.type === PRESTIGE) {
+            cardContent = tplLondonSeasonCardContent(card);
+        }
+        if (cardContent) {
+            div.insertAdjacentHTML('beforeend', cardContent);
+        }
+    }
+    updateAlertButton(card, container) {
+        if (!container)
+            return;
+        if (card.type === BLACKMAIL && card.hiddenId && this.game.gamedatas.staticData.londonSeasonCards[card.hiddenId]?.timingWindows.length) {
+            TimingPreferences.get().addCardButton(container, card.hiddenId);
+        }
+        else {
+            container.querySelector('.joco-card-timing-button')?.remove();
+        }
+    }
+    setupBackDiv(card, div) {
+        div.classList.add('joco-card');
+        div.setAttribute('data-background', card.type === PRESTIGE ? 'PrestigeBack' : 'BlackmailBack');
+    }
+    isCardVisible(card) {
+        return (card.type !== BLACKMAIL || (card.type === BLACKMAIL && !!card.hiddenId));
+    }
+}
 
 const tplOfficeCard = (data) => {
     const office = getOffice(data);
@@ -2713,6 +2758,9 @@ class PlayerManager {
             this.players[playerId].updatePlayer(gamedatas);
         }
     }
+    updateRoles() {
+        this.getPlayers().forEach((player) => player.updateRoles(this.game.gamedatas));
+    }
     clearInterface() {
         Object.keys(this.players).forEach((playerId) => {
             this.players[playerId].clearInterface();
@@ -2905,7 +2953,7 @@ const STOCK_EXCHANGE_CONFIG = [
 ];
 const tplVacantOffices = () => `
   <div class="joco-container">
-    <div><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Vacant Offices').toLocaleUpperCase()}</span></div>
+    <div class="joco-header" style="justify-content: flex-start;"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Vacant Offices').toLocaleUpperCase()}</span></div>
     <div id="VacantOffices"></div>
   </div>
 `;
@@ -3384,7 +3432,7 @@ class Army {
         <div class="joco-army-banner joco-background-${this.id}">${tplFamilyMemberSpot(this.getCommanderId())}<span class="fb-font-baskerville fb-font-16">${this.getName().toLocaleUpperCase()}</span></div>
         <div class="joco-inner-container">
           <div id="army_${this.id}_exhausted" class="joco-army-stock joco-exhausted"></div>
-          <div><span class="fb-font-baskerville fb-font-12">${_('Exhausted pieces & Local Alliances').toLocaleUpperCase()}</span></div>
+          <div class="joco-footer"><span class="fb-font-baskerville fb-font-12">${_('Exhausted pieces & Local Alliances').toLocaleUpperCase()}</span></div>
         </div>
       </div>
     `;
@@ -5584,6 +5632,8 @@ class Parliament {
         }
     }
     updateOpposition(opposition) {
+        this.game.gamedatas.parliament.opposition = opposition;
+        PlayerManager.getInstance().updateRoles();
         this.ui.oppositionContainer.replaceChildren();
         this.ui.oppositionContainer.insertAdjacentHTML('beforeend', tplOppositionContent(opposition));
     }
@@ -6029,6 +6079,8 @@ class NotificationManager {
     async notif_changePrimeMinister(notif) {
         const { playerId } = notif;
         TimingPreferences.get().updatePrimeMinister(playerId);
+        this.game.gamedatas.parliament.primeMinister.playerId = playerId;
+        PlayerManager.getInstance().updateRoles();
         Parliament.getInstance().getPrimeMinisterDial().updatePlayerName(playerId);
     }
     async notif_draftNewCards(notif) {
@@ -6158,6 +6210,12 @@ class NotificationManager {
     }
     async notif_moveOfficeCard(notif) {
         const { office } = notif;
+        if (notif.chairmanPlayerId !== undefined) {
+            Object.entries(this.game.gamedatas.families).forEach(([playerId, family]) => {
+                family.hasChairmanMarker = notif.chairmanPlayerId !== null && Number(playerId) === Number(notif.chairmanPlayerId) ? 1 : 0;
+            });
+            PlayerManager.getInstance().updateRoles();
+        }
         TimingPreferences.get().updateOffice(office.id, office.location);
         let element = document.getElementById(`OfficeCard_${office.id}`);
         if (!element) {
@@ -8736,7 +8794,7 @@ class LondonSeasonChooseCard {
         updatePageTitle(this.args.canUseBeckySharp
             ? _('${you} must choose a card from the London Season Display to take or discard. You may take the top card of the deck instead')
             : _('${you} must choose a card from the London Season Display to take or discard'), {
-            cardType: this.args.topOfDeckType === BLACKMAIL$1
+            cardType: this.args.topOfDeckType === BLACKMAIL
                 ? _('Blackmail')
                 : _('Prestige'),
         });
@@ -8744,7 +8802,7 @@ class LondonSeasonChooseCard {
             addPrimaryActionButton({
                 id: 'becky-sharp-btn',
                 text: formatStringRecursive$1(_('Take top card (${cardType} card)'), {
-                    cardType: this.args.topOfDeckType === BLACKMAIL$1
+                    cardType: this.args.topOfDeckType === BLACKMAIL
                         ? _('Blackmail')
                         : _('Prestige'),
                 }),
@@ -8757,7 +8815,7 @@ class LondonSeasonChooseCard {
     updateInterfaceConfirmBeckySharp() {
         clearPossible();
         updatePageTitle(_('Take top card of the deck (${cardType} card)?'), {
-            cardType: this.args.topOfDeckType === BLACKMAIL$1 ? _('Blackmail') : _('Prestige'),
+            cardType: this.args.topOfDeckType === BLACKMAIL ? _('Blackmail') : _('Prestige'),
         });
         addConfirmButton(() => performAction('actLondonSeasonChooseCard', {
             cardId: null,
@@ -8778,7 +8836,7 @@ class LondonSeasonChooseCard {
             id: 'take-btn',
             text: _('Take'),
             callback: () => performAction('actLondonSeasonChooseCard', {
-                cardId: card.type === BLACKMAIL$1 ? card.hiddenId : card.id,
+                cardId: card.type === BLACKMAIL ? card.hiddenId : card.id,
                 take: true,
             }),
         });
@@ -8786,7 +8844,7 @@ class LondonSeasonChooseCard {
             id: 'discard-btn',
             text: _('Discard'),
             callback: () => performAction('actLondonSeasonChooseCard', {
-                cardId: card.type === BLACKMAIL$1 ? card.hiddenId : card.id,
+                cardId: card.type === BLACKMAIL ? card.hiddenId : card.id,
                 take: false,
             }),
         });
@@ -10867,7 +10925,7 @@ class TradeOrDiscardItems {
         switch (type) {
             case SHARE:
                 return _('Company share(s)');
-            case BLACKMAIL$1:
+            case BLACKMAIL:
                 return _('Blackmail card(s)');
             case WORKSHOP:
                 return _('workshop(s)');

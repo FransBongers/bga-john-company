@@ -33,6 +33,7 @@
 @use './parliament/parliament';
 @use './states/states';
 @use './timing-preferences/timing-preferences';
+@use './dark-mode';
 
 html {
   background-image: url('img/background.jpg');

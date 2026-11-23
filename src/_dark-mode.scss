@@ -1,0 +1,76 @@
+html[data-theme='dark'] {
+  .joco-cash-counter-container,
+  .joco-card,
+  .joco-control-token,
+  .joco-enterprise-card,
+  .joco-event-tile,
+  // .joco-footer,
+  .joco-law-card,
+  .joco-local-alliance,
+  .joco-promise-card,
+  .joco-setup-card,
+  #joco-trackers,
+  #joco-bar {
+    color: black;
+  }
+
+  .joco-table-family-item,
+  #joco-company-balance,
+  #joco-prime-minister-dial,
+  #joco-stock-exchange,
+  .joco-army-banner,
+  .joco-header,
+  .joco-icon,
+  .joco-opportunity-marker,
+  .joco-opposition-container,
+  .joco-passed-law-token,
+  .joco-ship-count,
+  .joco-support-container,
+  .joco-table-row,
+  .joco-trophy,
+  .joco-upkeep {
+    color: black;
+
+    span {
+      color: black;
+    }
+
+    &[data-icon='CircleDark'] {
+      span {
+        color: white;
+      }
+    }
+  }
+
+  .joco-office-header {
+    span {
+      color: white;
+    }
+  }
+
+  .joco-army,
+  .joco-presidency {
+    span {
+      color: black;
+    }
+
+    .joco-inner-container {
+      color: black;
+    }
+  }
+
+  .joco-family-area-counters {
+    .icon-counter-counter {
+      color: black;
+    }
+  }
+
+  .joco-new-offer {
+    color: black;
+
+    #joco-new-offer-description {
+      color: white;
+    }
+  }
+  
+}

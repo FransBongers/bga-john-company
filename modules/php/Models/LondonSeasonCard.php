@@ -111,7 +111,7 @@ class LondonSeasonCard extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Mod
   {
     $location = $this->getLocation();
     if (!Utils::startsWith($location, 'londonSeasonCards_')) {
-      throw new \Bga\GameFramework\VisibleSystemException("LONDON_SEASON_CARD_001");
+      throw new \Bga\GameFramework\VisibleSystemException("LONDON_SEASON_CARD_001: " . $this->getId());
     }
     return (int) explode('_', $location)[1];
   }

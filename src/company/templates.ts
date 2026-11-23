@@ -19,7 +19,7 @@ export const STOCK_EXCHANGE_CONFIG: Array<{ id: string; value: number }> = [
 
 export const tplVacantOffices = () => `
   <div class="joco-container">
-    <div><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Vacant Offices').toLocaleUpperCase()}</span></div>
+    <div class="joco-header" style="justify-content: flex-start;"><span class="fb-font-baskerville fb-font-16 fb-font-bold">${_('Vacant Offices').toLocaleUpperCase()}</span></div>
     <div id="VacantOffices"></div>
   </div>
 `;

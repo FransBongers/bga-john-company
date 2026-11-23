@@ -78,7 +78,7 @@ class ParliamentMeetsCommitToOpposition extends \Bga\Games\JohnCompany\Models\At
       (bool) $commit,
       Players::get($votingPlayerId),
       $numberOfVotes,
-      Parliament::getOpposition()
+      Parliament::getUiOpposition()
     );
 
     $this->setPlayerActionCompleted($playerId);

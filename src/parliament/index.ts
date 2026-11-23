@@ -10,6 +10,7 @@ import {
 import { getLawCard } from '../utility';
 import { tplOppositionContent, tplParliament } from './templates';
 import { PowerMarkers } from './power-markers';
+import { PlayerManager } from '../player-manager';
 
 export class Parliament {
   private static instance: Parliament;
@@ -157,6 +158,8 @@ export class Parliament {
   public updateOpposition(
     opposition: GamedatasAlias['parliament']['opposition'],
   ) {
+    this.game.gamedatas.parliament.opposition = opposition;
+    PlayerManager.getInstance().updateRoles();
     this.ui.oppositionContainer.replaceChildren();
     this.ui.oppositionContainer.insertAdjacentHTML(
       'beforeend',

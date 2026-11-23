@@ -165,6 +165,7 @@ export interface JohnCompanyGamedatas extends Gamedatas<JohnCompanyPlayerData> {
     opposition: {
       leader: number | null;
       votes: Record<number, number>;
+      voters?: number[];
     };
   };
   passedLaws: JocoLawCardBase[];

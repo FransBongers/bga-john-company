@@ -3175,6 +3175,33 @@ span[style*="color:#addb90"] {
   gap: 8px;
   padding-top: 8px;
 }
+.player-board-game-specific-content .joco-player-roles {
+  grid-column: 1/-1;
+  display: grid;
+  gap: 3px;
+}
+.player-board-game-specific-content .joco-player-roles:empty {
+  display: none;
+}
+.player-board-game-specific-content .joco-player-role {
+  color: black;
+  font-weight: bold;
+  padding: 3px 6px;
+  margin-left: -3px;
+  margin-right: -3px;
+}
+.player-board-game-specific-content .joco-player-role[data-role=Chairman] {
+  background-color: rgb(229, 192, 192);
+}
+.player-board-game-specific-content .joco-player-role[data-role=leaderOfTheOpposition] {
+  background-color: rgb(192, 191, 222);
+}
+.player-board-game-specific-content .joco-player-role[data-role=opposition] {
+  background-color: rgb(128, 150, 190);
+}
+.player-board-game-specific-content .joco-player-role[data-role=primeMinister] {
+  background-color: rgb(146, 181, 151);
+}
 .player-board-game-specific-content .joco-player-panel-item {
   display: flex;
   flex-direction: row;
@@ -4725,6 +4752,91 @@ span[style*="color:#c0c0c0"] {
     padding: 16px;
   }
 }
+html[data-theme=dark] .joco-cash-counter-container,
+html[data-theme=dark] .joco-card,
+html[data-theme=dark] .joco-control-token,
+html[data-theme=dark] .joco-enterprise-card,
+html[data-theme=dark] .joco-event-tile,
+html[data-theme=dark] .joco-law-card,
+html[data-theme=dark] .joco-local-alliance,
+html[data-theme=dark] .joco-promise-card,
+html[data-theme=dark] .joco-setup-card,
+html[data-theme=dark] #joco-trackers,
+html[data-theme=dark] #joco-bar {
+  color: black;
+}
+html[data-theme=dark] .joco-table-family-item,
+html[data-theme=dark] #joco-company-balance,
+html[data-theme=dark] #joco-prime-minister-dial,
+html[data-theme=dark] #joco-stock-exchange,
+html[data-theme=dark] .joco-army-banner,
+html[data-theme=dark] .joco-header,
+html[data-theme=dark] .joco-icon,
+html[data-theme=dark] .joco-opportunity-marker,
+html[data-theme=dark] .joco-opposition-container,
+html[data-theme=dark] .joco-passed-law-token,
+html[data-theme=dark] .joco-ship-count,
+html[data-theme=dark] .joco-support-container,
+html[data-theme=dark] .joco-table-row,
+html[data-theme=dark] .joco-trophy,
+html[data-theme=dark] .joco-upkeep {
+  color: black;
+}
+html[data-theme=dark] .joco-table-family-item span,
+html[data-theme=dark] #joco-company-balance span,
+html[data-theme=dark] #joco-prime-minister-dial span,
+html[data-theme=dark] #joco-stock-exchange span,
+html[data-theme=dark] .joco-army-banner span,
+html[data-theme=dark] .joco-header span,
+html[data-theme=dark] .joco-icon span,
+html[data-theme=dark] .joco-opportunity-marker span,
+html[data-theme=dark] .joco-opposition-container span,
+html[data-theme=dark] .joco-passed-law-token span,
+html[data-theme=dark] .joco-ship-count span,
+html[data-theme=dark] .joco-support-container span,
+html[data-theme=dark] .joco-table-row span,
+html[data-theme=dark] .joco-trophy span,
+html[data-theme=dark] .joco-upkeep span {
+  color: black;
+}
+html[data-theme=dark] .joco-table-family-item[data-icon=CircleDark] span,
+html[data-theme=dark] #joco-company-balance[data-icon=CircleDark] span,
+html[data-theme=dark] #joco-prime-minister-dial[data-icon=CircleDark] span,
+html[data-theme=dark] #joco-stock-exchange[data-icon=CircleDark] span,
+html[data-theme=dark] .joco-army-banner[data-icon=CircleDark] span,
+html[data-theme=dark] .joco-header[data-icon=CircleDark] span,
+html[data-theme=dark] .joco-icon[data-icon=CircleDark] span,
+html[data-theme=dark] .joco-opportunity-marker[data-icon=CircleDark] span,
+html[data-theme=dark] .joco-opposition-container[data-icon=CircleDark] span,
+html[data-theme=dark] .joco-passed-law-token[data-icon=CircleDark] span,
+html[data-theme=dark] .joco-ship-count[data-icon=CircleDark] span,
+html[data-theme=dark] .joco-support-container[data-icon=CircleDark] span,
+html[data-theme=dark] .joco-table-row[data-icon=CircleDark] span,
+html[data-theme=dark] .joco-trophy[data-icon=CircleDark] span,
+html[data-theme=dark] .joco-upkeep[data-icon=CircleDark] span {
+  color: white;
+}
+html[data-theme=dark] .joco-office-header span {
+  color: white;
+}
+html[data-theme=dark] .joco-army span,
+html[data-theme=dark] .joco-presidency span {
+  color: black;
+}
+html[data-theme=dark] .joco-army .joco-inner-container,
+html[data-theme=dark] .joco-presidency .joco-inner-container {
+  color: black;
+}
+html[data-theme=dark] .joco-family-area-counters .icon-counter-counter {
+  color: black;
+}
+html[data-theme=dark] .joco-new-offer {
+  color: black;
+}
+html[data-theme=dark] .joco-new-offer #joco-new-offer-description {
+  color: white;
+}
+
 html {
   background-image: url("img/background.jpg");
   background-attachment: fixed;

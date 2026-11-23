@@ -168,6 +168,7 @@ export interface NotifMoveLondonSeasonCard extends NotifWithPlayerArgs {
 
 export interface NotifMoveOfficeCard extends NotifWithPlayerArgs {
   office: JocoOfficeBase;
+  chairmanPlayerId?: number | null;
 }
 
 export interface NotifMovePieces extends NotifWithPlayerArgs {

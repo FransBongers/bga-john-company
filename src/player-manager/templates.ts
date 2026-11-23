@@ -26,6 +26,7 @@ export const tplPlayerCounters = ({
   elt.id = `joco-familyMembers-${playerId}`;
 
   return `
+  <div id="joco-player-roles-${playerId}" class="joco-player-roles"></div>
   <div class="joco-player-panel-item">
     <div class="joco-treasury-counter-container">
       <span class="fb-font-baskerville fb-font-16 fb-font-bold">£</span><span id="joco-cash-counter-${playerId}" class="fb-font-baskerville fb-font-bold fb-font-24"></span>

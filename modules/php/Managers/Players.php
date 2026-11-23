@@ -265,7 +265,7 @@ class Players extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Manager
 
   public static function getChairmanPlayerId()
   {
-    return PlayersExtra::getChairmanFamily()->getId();
+    return PlayersExtra::getChairmanPlayer()->getId();
   }
 
   public static function getNonCrownPlayerIds()

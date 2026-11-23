@@ -74,7 +74,7 @@ export class Army {
         <div class="joco-army-banner joco-background-${this.id}">${tplFamilyMemberSpot(this.getCommanderId())}<span class="fb-font-baskerville fb-font-16">${this.getName().toLocaleUpperCase()}</span></div>
         <div class="joco-inner-container">
           <div id="army_${this.id}_exhausted" class="joco-army-stock joco-exhausted"></div>
-          <div><span class="fb-font-baskerville fb-font-12">${_('Exhausted pieces & Local Alliances').toLocaleUpperCase()}</span></div>
+          <div class="joco-footer"><span class="fb-font-baskerville fb-font-12">${_('Exhausted pieces & Local Alliances').toLocaleUpperCase()}</span></div>
         </div>
       </div>
     `;
