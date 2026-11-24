@@ -615,7 +615,7 @@ $machinestates = [
         'descriptionmyturn' => clienttranslate('${you}'),
         'args' => 'argsAtomicAction',
         'action' => 'stAtomicAction',
-        'possibleactions' => ['act' . PRESIDENT_TRADE, 'actTakeAtomicAction'],
+        'possibleactions' => ['act' . PRESIDENT_TRADE, 'actTakeAtomicAction', 'actPassOptionalAction', 'actPass'],
         'transitions' => ['next' => ST_RESOLVE_STACK],
     ],
 

@@ -10114,7 +10114,7 @@ class PresidentTrade {
             addCancelButton();
         }
         else {
-            addPassButton(this.args.optionalAction);
+            addPassButton(this.args.optionalAction, _('Do not trade'));
         }
     }
     setMinSpendAmount() {

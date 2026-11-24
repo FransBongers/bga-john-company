@@ -24,7 +24,7 @@ class TradeRoutes
   {
     $orders = Orders::getAll();
 
-    if ($orders[$homePortOrderId]->getStatus() !== OPEN) {
+    if ($orders[$homePortOrderId]->getStatus() !== OPEN || $maxCount === 0) {
       return [
         'orders' => [],
         'regions' => [],

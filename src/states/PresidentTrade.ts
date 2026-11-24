@@ -135,7 +135,7 @@ export class PresidentTrade implements GameState<OnEnteringPresidentTradeArgs> {
     if (this.selectedRegionIds.length > 1) {
       addCancelButton();
     } else {
-      addPassButton(this.args.optionalAction);
+      addPassButton(this.args.optionalAction, _('Do not trade'));
     }
   }
 
