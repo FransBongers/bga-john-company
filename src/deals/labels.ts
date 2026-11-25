@@ -1,19 +1,28 @@
-import { JocoDealAssets } from '../types';
+import { JocoDealAssets, JocoEnterpriseCardBase } from '../types';
 import { StaticData } from '../static-data';
+import { formatStringRecursive } from '../boilerplate';
 
 type CardAssetType = 'enterprise' | 'promiseCard' | 'prestige';
 
 const CARD_TYPES: CardAssetType[] = ['enterprise', 'promiseCard', 'prestige'];
 
+export const getEnterpriseLabel = (
+  name: string,
+  enterprise?: Pick<JocoEnterpriseCardBase, 'shipId'>,
+) => {
+  const shipId = enterprise?.shipId;
+  return shipId ? `${_(name)} (${_(StaticData.get().ship(shipId).name)})` : _(name);
+};
+
 export const getStaticCardLabel = (type: CardAssetType, id: string) => {
   const staticData = StaticData.get();
   switch (type) {
     case 'enterprise':
-      return staticData.enterpriseCard(id).name;
+      return getEnterpriseLabel(staticData.enterpriseCard(id).name, staticData.enterprise(id));
     case 'promiseCard':
-      return staticData.promiseCard(id).title;
+      return formatStringRecursive('${tkn_promiseCard}', { tkn_promiseCard: id });
     case 'prestige':
-      return staticData.londonSeasonCard(id).title;
+      return _(staticData.londonSeasonCard(id).title);
   }
 };
 

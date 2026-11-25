@@ -7,6 +7,7 @@ import {
   JocoLondonSeasonCardStatic,
   JocoLawCardStatic,
   JocoEnterpriseCardStatic,
+  JocoEnterpriseCardBase,
   JocoShipBase,
   JocoRegionStatic,
   JocoArmyPieceStatic,
@@ -65,6 +66,10 @@ export class StaticData {
       throw new Error('STATIC_DATA_ERROR_002');
     }
     return card;
+  }
+
+  public enterprise(id: string): JocoEnterpriseCardBase | undefined {
+    return this.game.gamedatas.enterprises[id];
   }
 
   public eventTile(id: string): JocoEventTileStatic {

@@ -8,6 +8,7 @@ import { CASH_COUNTER, SPOUSE } from '../../constants';
 import { PlayerManager } from '../../player-manager';
 import { createFamilyMember } from '../../templates';
 import { AssetOption, AvailableAssets } from './types';
+import { getEnterpriseLabel } from '../labels';
 
 const getCompanyShares = (playerId: number): AssetOption[] => {
   const result: AssetOption[] = [];
@@ -36,7 +37,7 @@ export const getAvailableAssets = (playerId: number): AvailableAssets => {
       share: getCompanyShares(playerId),
       enterprise: family.getEnterprises().map((card) => ({
         id: card.id,
-        label: card.name,
+        label: getEnterpriseLabel(card.name, card),
         element: createHtmlElement(tplEnterpriseCardTooltip(card)),
       })),
       promiseCard: family.getPromiseCards().map((card) => ({

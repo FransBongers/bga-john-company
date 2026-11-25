@@ -30,6 +30,27 @@ const templates = loadModule('src/deals/templates.ts', {
 });
 const { Deals } = loadModule('src/deals/index.ts', { './templates': templates });
 
+test('enterprise labels identify the associated ship in previews and deals', () => {
+  const enterprises = {
+    Shipyard_1: { shipId: 'Atlas' },
+    Workshop_1: { shipId: null },
+  };
+  const staticData = {
+    enterprise: (id) => enterprises[id],
+    enterpriseCard: (id) => ({ name: id.startsWith('Shipyard') ? 'Shipyard' : 'Workshop' }),
+    ship: (id) => ({ name: id }),
+  };
+  const { getEnterpriseLabel, getStaticCardLabel, getAssetLabels } = loadModule('src/deals/labels.ts', {
+    '../static-data': { StaticData: { get: () => staticData } },
+  });
+
+  assert.equal(getEnterpriseLabel('Shipyard', enterprises.Shipyard_1), 'Shipyard (Atlas)');
+  assert.equal(getStaticCardLabel('enterprise', 'Shipyard_1'), 'Shipyard (Atlas)');
+  assert.equal(getStaticCardLabel('enterprise', 'Workshop_1'), 'Workshop');
+  assert.equal(getStaticCardLabel('enterprise', 'Shipyard_missing'), 'Shipyard');
+  assert.equal(getAssetLabels({ enterprise: ['Shipyard_1'] }, getStaticCardLabel)[0], 'Shipyard (Atlas)');
+});
+
 function renderDeal(deal, playerId, isSpectator = false) {
   let html = '';
   const deals = Object.create(Deals.prototype);

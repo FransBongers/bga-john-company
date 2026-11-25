@@ -1,7 +1,7 @@
 import { formatStringRecursive } from '../boilerplate';
 import { PlayerManager } from '../player-manager';
 import { GamedatasAlias, JocoDeal } from '../types';
-import { getFamilyName, getFamilyNameForPlayerId } from '../utility';
+import { getFamilyNameForPlayerId } from '../utility';
 import { getAssetLabels, getStaticCardLabel } from './labels';
 
 const tplIconButton = (icon: string, label: string, playerId: number) => ``;
@@ -21,7 +21,7 @@ export const tplDealsPlayers = (
 
 export const tplDealsTableHeader =
   () => `<div class="joco-table-header joco-table-row fb-font-bold fb-font-baskerville fb-font24">
-  <div>${_('Family')}</div><div>${_('Description')}</div><div></div><div>${_('Offered By')}</div>
+  <div>${_('Player')}</div><div>${_('Description')}</div><div></div><div>${_('Offered By')}</div>
 </div>`;
 
 export const tplDealsTableFamilyItem = (playerId: number) => {
@@ -29,7 +29,6 @@ export const tplDealsTableFamilyItem = (playerId: number) => {
   return `
   <div class="joco-table-family-item">
     <div>${formatStringRecursive('${tkn_playerName}', { tkn_playerName: player.getName() })}</div>
-    <div class="fb-font-bold">${getFamilyName(player.getFamilyId())}</div>
   </div>`;
 };
 
