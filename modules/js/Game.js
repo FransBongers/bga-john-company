@@ -679,7 +679,7 @@ const clearPossible = () => {
     Interaction.use().clearPossible();
 };
 const updatePageTitle = (text, args = {}) => Interaction.use().clientUpdatePageTitle(text, args);
-const formatStringRecursive$1 = (log, args) => {
+const formatStringRecursive = (log, args) => {
     return Interaction.use().formatStringRecursive(log, args);
 };
 const setAbsolutePosition = (elt, scaleVarName, { top, left }) => {
@@ -723,7 +723,7 @@ const parentHasChildWithId = (parent, child) => {
 const getCurrentPlayerId = () => {
     return PlayerManager.getInstance().getCurrentPlayerId();
 };
-const lowerCaseFirstCharacter$1 = (text) => {
+const lowerCaseFirstCharacter = (text) => {
     if (!text)
         return '';
     return text.charAt(0).toLowerCase() + text.slice(1);
@@ -1436,19 +1436,19 @@ const getSetupCard = (card) => {
 const getTimingWindowText = (kind, itemId) => {
     switch (kind) {
         case AFTER_OFFICE_FINISHED_ACTING:
-            return formatStringRecursive$1(_('After ${officeTitle} finished acting'), {
+            return formatStringRecursive(_('After ${officeTitle} finished acting'), {
                 officeTitle: StaticData.get().office(itemId).title,
             });
         case BEFORE_OFFICE_ACTS:
-            return formatStringRecursive$1(_('Before ${officeTitle} acts'), {
+            return formatStringRecursive(_('Before ${officeTitle} acts'), {
                 officeTitle: StaticData.get().office(itemId).title,
             });
         case END_OF_PHASE:
-            return formatStringRecursive$1(_('End of ${phaseName}'), {
+            return formatStringRecursive(_('End of ${phaseName}'), {
                 phaseName: getPhaseName(itemId),
             });
         case START_OF_PHASE:
-            return formatStringRecursive$1(_('Start of ${phaseName}'), {
+            return formatStringRecursive(_('Start of ${phaseName}'), {
                 phaseName: getPhaseName(itemId),
             });
         case BEFORE_ANY_VOTES_ARE_CAST:
@@ -1456,7 +1456,7 @@ const getTimingWindowText = (kind, itemId) => {
         case WHEN_RETIRING:
             return _('When retiring');
         case START_OF_LONDON_SEASON_CHOOSE_CARD:
-            return formatStringRecursive$1(_("When it's ${player_name}'s turn to take a card from the London Season Display"), {
+            return formatStringRecursive(_("When it's ${player_name}'s turn to take a card from the London Season Display"), {
                 player_name: getPlayer(itemId).getName(),
             });
         case AFTER_COMMANDER_DEPLOY_CHECK:
@@ -1487,17 +1487,17 @@ const getIdWithPrefix = (itemId) => {
 };
 const getCardText = (card) => {
     if (card.id.startsWith('PC')) {
-        return formatStringRecursive$1('${tkn_promiseCard}', {
+        return formatStringRecursive('${tkn_promiseCard}', {
             tkn_promiseCard: card.id,
         });
     }
     const text = '"${cardTitle}"';
     const cardId = card['type'] === BLACKMAIL && 'hiddenId' in card ? card.hiddenId : card.id;
-    return formatStringRecursive$1(text, {
+    return formatStringRecursive(text, {
         cardTitle: _(StaticData.get().cardTitle(cardId)),
     });
 };
-const getRoleName$1 = (role) => {
+const getRoleName = (role) => {
     switch (role) {
         case CHAIRMAN:
             return _('Chairman');
@@ -1648,7 +1648,7 @@ class JocoPlayer {
             const element = document.createElement('div');
             element.className = 'joco-player-role fb-font-baskerville fb-font-12';
             element.setAttribute('data-role', role);
-            element.textContent = getRoleName$1(role);
+            element.textContent = getRoleName(role);
             return element;
         }));
     }
@@ -1786,7 +1786,7 @@ class EnterpriseCardsManager extends BgaCards.Manager {
     }
 }
 
-const phases$1 = [
+const phases = [
     ['londonSeason', 'London Season'], ['family', 'Family'],
     ['firms', 'Firms'], ['hiring', 'Hiring'],
     ['companyOperations', 'Company Operations'], ['revenue', 'Revenue'],
@@ -1978,7 +1978,7 @@ class TimingPreferences {
     }
     items(kind) {
         if (kind.items === 'phase')
-            return phases$1.map(([id, label]) => [id, _(label)]);
+            return phases.map(([id, label]) => [id, _(label)]);
         if (kind.items === 'office') {
             return Object.entries(this.game.gamedatas.staticData.offices)
                 .filter(([id]) => officeIds.has(id) && this.officeLocations[id] !== undefined && this.officeLocations[id] !== DECK)
@@ -1994,7 +1994,7 @@ class TimingPreferences {
         if (!kind.items)
             return _(kind.label);
         const item = kind.items === 'phase'
-            ? phases$1.find(([id]) => id === itemId)?.[1]
+            ? phases.find(([id]) => id === itemId)?.[1]
             : this.game.gamedatas.staticData.offices[itemId]?.title;
         const name = item ? _(item) : itemId;
         const template = kindId === START_OF_PHASE ? _('Start of phase: ${name}')
@@ -2131,7 +2131,7 @@ const tplCardText = (text, { containerClass = 'fb-card-text', textClass = 'fb-fo
             return `<span class="${textClass}">${item}</span>`;
         }
         else {
-            return `<span class="${textClass}">${formatStringRecursive$1(_(item.log), item.args)}</span>`;
+            return `<span class="${textClass}">${formatStringRecursive(_(item.log), item.args)}</span>`;
         }
     })
         .join('')}
@@ -2513,7 +2513,7 @@ class OpportunityMarker {
         };
         if (familyAction && map[familyAction]) {
             const { text, icon } = map[familyAction];
-            return formatStringRecursive$1(text, { tkn_icon: icon });
+            return formatStringRecursive(text, { tkn_icon: icon });
         }
         return _('not placed');
     }
@@ -2531,7 +2531,7 @@ class OpportunityMarker {
 
 const tplPromiseCardContent = (card) => `
   <div class="joco-title joco-card-text fb-font-baskerville fb-font-16 bga-autofit">${card.title}</div>
-  <div class="joco-signature joco-card-text fb-font-parisienne fb-font-20 bga-autofit">${formatStringRecursive$1(_('${familyName} Family'), {
+  <div class="joco-signature joco-card-text fb-font-parisienne fb-font-20 bga-autofit">${formatStringRecursive(_('${familyName} Family'), {
     familyName: getFamilyName(card.familyId),
 })}</div>
 `;
@@ -2786,7 +2786,7 @@ class PlayerManager {
                 const player = this.getPlayer(playerId);
                 return {
                     id: `joco-family-area-${player.getPlayerId()}`,
-                    title: formatStringRecursive$1('${tkn_playerName}', {
+                    title: formatStringRecursive('${tkn_playerName}', {
                         tkn_playerName: player.getName(),
                     }),
                     content: tplPlayerArea(player),
@@ -3864,7 +3864,7 @@ class ShipZone {
     updateCount(modifier = 0) {
         this.ui.count.replaceChildren();
         const count = this.stock.getCards().length + modifier;
-        let textContent = formatStringRecursive$1(count === 1 ? _('${count} Ship') : _('${count} Ships'), {
+        let textContent = formatStringRecursive(count === 1 ? _('${count} Ship') : _('${count} Ships'), {
             count,
         });
         if (this.id === SUPERINTENDENT_OF_TRADE_IN_CHINA) {
@@ -4185,7 +4185,7 @@ const tplLondonSeasonOrder = ({ order, cashSpent, }) => {
     });
     return `
     <span class="fb-font-baskerville fb-font-12">
-      ${formatStringRecursive$1(_('Order for choosing cards from the London Season Display: ${playerLog}'), {
+      ${formatStringRecursive(_('Order for choosing cards from the London Season Display: ${playerLog}'), {
         playerLog: {
             log: playerLog,
             args: playerArgs,
@@ -4770,7 +4770,7 @@ class NewOffer {
     }
     getSideName(side) {
         const player = getPlayer(this.getPlayerId(side));
-        return formatStringRecursive$1('${tkn_playerName}', {
+        return formatStringRecursive('${tkn_playerName}', {
             tkn_playerName: player.getName(),
         });
     }
@@ -4792,10 +4792,10 @@ class NewOffer {
     }
     getSummaryHeading(side) {
         return side === 'self'
-            ? formatStringRecursive$1(_('${tkn_boldText_you} will give'), {
+            ? formatStringRecursive(_('${tkn_boldText_you} will give'), {
                 tkn_boldText_you: _('You'),
             })
-            : formatStringRecursive$1(_('${tkn_playerName} will give'), {
+            : formatStringRecursive(_('${tkn_playerName} will give'), {
                 tkn_playerName: this.getSideName(side),
             });
     }
@@ -4862,7 +4862,7 @@ const tplDealsTableFamilyItem = (playerId) => {
     const player = PlayerManager.getInstance().getPlayer(playerId);
     return `
   <div class="joco-table-family-item">
-    <div>${formatStringRecursive$1('${tkn_playerName}', { tkn_playerName: player.getName() })}</div>
+    <div>${formatStringRecursive('${tkn_playerName}', { tkn_playerName: player.getName() })}</div>
     <div class="fb-font-bold">${getFamilyName(player.getFamilyId())}</div>
   </div>`;
 };
@@ -4883,10 +4883,10 @@ const tplDealAssetLines = (deal, currentPlayerId) => {
     return assetLabels
         .map(({ playerId, labels }) => {
         const giver = Number(playerId) === currentPlayerId
-            ? formatStringRecursive$1(isAgreement
+            ? formatStringRecursive(isAgreement
                 ? _('${tkn_boldText_you} gave')
                 : _('${tkn_boldText_you} will give'), { tkn_boldText_you: _('You') })
-            : formatStringRecursive$1(isAgreement
+            : formatStringRecursive(isAgreement
                 ? _('${tkn_playerName} gave')
                 : _('${tkn_playerName} will give'), {
                 tkn_playerName: PlayerManager.getInstance()
@@ -4968,11 +4968,12 @@ const tplDealsPlayersTable = () => {
 };
 const tplPlayerRow = ({ currentPlayerId, playerId, }) => {
     const isCurrentPlayer = playerId === currentPlayerId;
+    const canCreateDeal = currentPlayerId !== 'Spectator' && !isCurrentPlayer;
     return `
     <div class="joco-players-table-row">
       ${tplDealsTableFamilyItem(playerId)}
       <div>
-        ${isCurrentPlayer ? '<div></div>' : `<div id="joco-new-offer-${playerId}" class="bgabutton bgabutton_blue">${_('New Deal')}</div>`}
+        ${canCreateDeal ? `<div id="joco-new-offer-${playerId}" class="bgabutton bgabutton_blue">${_('New Deal')}</div>` : '<div></div>'}
         <div class="joco-trade-status"></div>
       </div>
     </div>
@@ -5371,7 +5372,7 @@ class PrimeMinisterDial {
             return;
         }
         this.ui.playerName.replaceChildren();
-        this.ui.playerName.insertAdjacentHTML('beforeend', formatStringRecursive$1('${tkn_playerName}', {
+        this.ui.playerName.insertAdjacentHTML('beforeend', formatStringRecursive('${tkn_playerName}', {
             tkn_playerName: getPlayerName(playerId),
         }));
     }
@@ -5414,7 +5415,7 @@ const tplLeaderOfTheOpposition = (leaderName) => {
     return `
   <div class="joco-leader-of-the-opposition">
     <span class="fb-font-baskerville fb-font-16 fb-font-bold">Leader:</span>
-    <span class="fb-font-baskerville fb-font-16">${formatStringRecursive$1('${tkn_playerName}', {
+    <span class="fb-font-baskerville fb-font-16">${formatStringRecursive('${tkn_playerName}', {
         tkn_playerName: leaderName,
     })}</span>
   </div>
@@ -5451,7 +5452,7 @@ const tplOppositionContent = (opposition) => {
         ? tplLeaderOfTheOpposition(getPlayerName(opposition.leader))
         : ''}
         <span class="fb-font-baskerville fb-font-16">
-          ${formatStringRecursive$1('${playerLog}', {
+          ${formatStringRecursive('${playerLog}', {
         playerLog: {
             log: playerLog,
             args: playerArgs,
@@ -7341,7 +7342,7 @@ class CrownChairmanRequestAllocation {
         this.setOfficesSelectable();
         addSecondaryActionButton({
             id: 'pay_btn',
-            text: formatStringRecursive$1(_('Pay 1 ${tkn_promiseCube}'), {
+            text: formatStringRecursive(_('Pay 1 ${tkn_promiseCube}'), {
                 tkn_promiseCube: tknPromiseCubes(),
             }),
             callback: () => this.updateInterfaceSelectOffice(),
@@ -7366,7 +7367,7 @@ class CrownChairmanRequestAllocation {
         for (let i = 1; i <= this.args.maxAmount; i++) {
             addSecondaryActionButton({
                 id: `amount_${i}_btn`,
-                text: formatStringRecursive$1(_('${amount} ${tkn_pound}'), {
+                text: formatStringRecursive(_('${amount} ${tkn_pound}'), {
                     amount: i,
                     tkn_pound: tknPound(),
                 }),
@@ -7426,7 +7427,7 @@ class CrownChairmanRequestDebtAdvancement {
         if (this.args.oneLessAdvancement.possible) {
             addSecondaryActionButton({
                 id: 'one_less_btn',
-                text: formatStringRecursive$1(_('Pay ${amount} ${tkn_promiseCube} for -1 Debt'), {
+                text: formatStringRecursive(_('Pay ${amount} ${tkn_promiseCube} for -1 Debt'), {
                     amount: this.args.oneLessAdvancement.cost,
                     tkn_promiseCube: tknPromiseCubes(),
                 }),
@@ -7443,7 +7444,7 @@ class CrownChairmanRequestDebtAdvancement {
         if (this.args.additionalAdvancement.possible) {
             addSecondaryActionButton({
                 id: 'additional_btn',
-                text: formatStringRecursive$1(_('Pay ${amount} ${tkn_promiseCube} for +1 Debt'), {
+                text: formatStringRecursive(_('Pay ${amount} ${tkn_promiseCube} for +1 Debt'), {
                     amount: this.args.additionalAdvancement.cost,
                     tkn_promiseCube: tknPromiseCubes(),
                 }),
@@ -7523,7 +7524,7 @@ class CrownManagerOfShippingBuyCompanyShips {
                 case BUY_COMPANY_SHIP:
                     addSecondaryActionButton({
                         id: 'buy_ship_btn',
-                        text: formatStringRecursive$1(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to buy ${tkn_ship}'), {
+                        text: formatStringRecursive(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to buy ${tkn_ship}'), {
                             amount: option.promiseCubeCost,
                             tkn_playerName_crown: getCrownPlayerName(),
                             tkn_promiseCube: tknPromiseCubes(),
@@ -7540,7 +7541,7 @@ class CrownManagerOfShippingBuyCompanyShips {
                 case DO_NOT_BUY_COMPANY_SHIP:
                     addSecondaryActionButton({
                         id: 'do_not_buy_ship_btn',
-                        text: formatStringRecursive$1(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to not buy ${tkn_ship}'), {
+                        text: formatStringRecursive(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to not buy ${tkn_ship}'), {
                             amount: option.promiseCubeCost,
                             tkn_playerName_crown: getCrownPlayerName(),
                             tkn_promiseCube: tknPromiseCubes(),
@@ -7695,7 +7696,7 @@ class CrownManagerOfShippingLeaseExtraShips {
         if (optionToLeaveTwoUnspent) {
             addSecondaryActionButton({
                 id: 'buy_ship_btn',
-                text: formatStringRecursive$1(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to leave 2 ${tkn_pound} unspent'), {
+                text: formatStringRecursive(_('Pay ${tkn_playerName_crown} ${amount} ${tkn_promiseCube} to leave 2 ${tkn_pound} unspent'), {
                     amount: 1,
                     tkn_playerName_crown: getCrownPlayerName(),
                     tkn_promiseCube: tknPromiseCubes(),
@@ -7914,7 +7915,7 @@ class DirectorOfTradeSpecialEnvoy {
         });
         addPrimaryActionButton({
             id: 'make_check_btn',
-            text: formatStringRecursive$1(_('Roll ${number} dice'), {
+            text: formatStringRecursive(_('Roll ${number} dice'), {
                 number: this.spend,
             }),
             callback: () => this.updateInterfaceConfirm(),
@@ -8385,7 +8386,7 @@ class GovernorAdminister {
         });
         addPrimaryActionButton({
             id: 'administer-btn',
-            text: formatStringRecursive$1(this.args.dicePool === 1
+            text: formatStringRecursive(this.args.dicePool === 1
                 ? _('Make a check with 1 die')
                 : _('Make a check with ${number} dice'), {
                 number: this.args.dicePool,
@@ -8439,7 +8440,7 @@ class GovernorGeneralMakeCheck {
         });
         addPrimaryActionButton({
             id: 'make_check_btn',
-            text: formatStringRecursive$1(_('Roll ${number} dice'), {
+            text: formatStringRecursive(_('Roll ${number} dice'), {
                 number: this.spend,
             }),
             callback: () => this.updateInterfaceConfirm(),
@@ -8652,7 +8653,7 @@ class HiringGiveConsentForNepotism {
             return _(this.args.title);
         }
         else {
-            return formatStringRecursive$1(_(this.args.title.log), this.args.title.args);
+            return formatStringRecursive(_(this.args.title.log), this.args.title.args);
         }
     }
     performAction(consent) {
@@ -8734,7 +8735,7 @@ class HiringHireFamilyMember {
             return _(this.args.title);
         }
         else {
-            return formatStringRecursive$1(_(this.args.title.log), this.args.title.args);
+            return formatStringRecursive(_(this.args.title.log), this.args.title.args);
         }
     }
     goToTab() {
@@ -8801,7 +8802,7 @@ class LondonSeasonChooseCard {
         if (this.args.canUseBeckySharp) {
             addPrimaryActionButton({
                 id: 'becky-sharp-btn',
-                text: formatStringRecursive$1(_('Take top card (${cardType} card)'), {
+                text: formatStringRecursive(_('Take top card (${cardType} card)'), {
                     cardType: this.args.topOfDeckType === BLACKMAIL
                         ? _('Blackmail')
                         : _('Prestige'),
@@ -9037,7 +9038,7 @@ class ManagerOfShipping {
             playerShipsAvailable = true;
             addPlayerButton({
                 id: `${ship.id}_btn`,
-                text: formatStringRecursive$1(_('Fit ${tkn_ship}'), {
+                text: formatStringRecursive(_('Fit ${tkn_ship}'), {
                     tkn_ship: tknShipValue({ side: FULL, name }),
                 }),
                 playerId,
@@ -9049,7 +9050,7 @@ class ManagerOfShipping {
         if (this.treasury >= 2) {
             addSecondaryActionButton({
                 id: 'extraShip_btn',
-                text: formatStringRecursive$1(_('Lease ${tkn_ship}'), {
+                text: formatStringRecursive(_('Lease ${tkn_ship}'), {
                     tkn_ship: tknShipValue({
                         side: EXTRA_SHIP,
                         name: _('Extra Ship'),
@@ -9065,7 +9066,7 @@ class ManagerOfShipping {
         if (!playerShipsAvailable && this.treasury >= 5) {
             addSecondaryActionButton({
                 id: 'companyShip_btn',
-                text: formatStringRecursive$1(_('Buy ${tkn_ship}'), {
+                text: formatStringRecursive(_('Buy ${tkn_ship}'), {
                     tkn_ship: tknShipValue({
                         side: COMPANY_SHIP,
                         name: _('Company Ship'),
@@ -9632,7 +9633,7 @@ class ParliamentMeetsSelectPolicy {
         addCancelButton();
     }
     getTextForPolicy(policy) {
-        return formatStringRecursive$1(policy.windowTax
+        return formatStringRecursive(policy.windowTax
             ? _('${consequence} ${tkn_icon} & WINDOW TAX')
             : '${consequence} ${tkn_icon}', {
             consequence: getPolicyConsequenceTranslation(policy.consequence).toLocaleUpperCase(),
@@ -9709,7 +9710,7 @@ class ParliamentMeetsCastVotes {
         if (this.args.options.includes(IN_FAVOR)) {
             addPrimaryActionButton({
                 id: 'vote_in_favor_btn',
-                text: formatStringRecursive$1(_('Cast ${number} vote(s) in favor'), {
+                text: formatStringRecursive(_('Cast ${number} vote(s) in favor'), {
                     number: totalVotes,
                 }),
                 callback: () => this.updateInterfaceConfirm(IN_FAVOR),
@@ -9719,7 +9720,7 @@ class ParliamentMeetsCastVotes {
         if (this.args.options.includes(AGAINST)) {
             addDangerActionButton({
                 id: 'vote_against_btn',
-                text: formatStringRecursive$1(_('Cast ${number} vote(s) against'), {
+                text: formatStringRecursive(_('Cast ${number} vote(s) against'), {
                     number: totalVotes,
                 }),
                 callback: () => this.updateInterfaceSelectTarget(),
@@ -9755,7 +9756,7 @@ class ParliamentMeetsCastVotes {
             .forEach((player) => {
             addPrimaryActionButton({
                 id: `vote_for_${player.getPlayerId()}_btn`,
-                text: formatStringRecursive$1(_('${tkn_playerName}'), {
+                text: formatStringRecursive(_('${tkn_playerName}'), {
                     tkn_playerName: player.getName(),
                 }),
                 callback: () => this.updateInterfaceConfirm(AGAINST, player.getPlayerId()),
@@ -10049,7 +10050,7 @@ class TimingWindowAct {
     }
     updatePageTitle() {
         updatePageTitle(_('Timing Window: ${timingWindow}'), {
-            timingWindow: lowerCaseFirstCharacter$1(getTimingWindowText(this.args[TIMING_WINDOW], this.args[ITEM_ID])),
+            timingWindow: lowerCaseFirstCharacter(getTimingWindowText(this.args[TIMING_WINDOW], this.args[ITEM_ID])),
         });
     }
 }
@@ -10144,7 +10145,7 @@ class PresidentTrade {
         });
         addPrimaryActionButton({
             id: 'make_check_btn',
-            text: formatStringRecursive$1(_('Roll ${number} dice'), {
+            text: formatStringRecursive(_('Roll ${number} dice'), {
                 number: Math.max(this.spend - penalty, 0),
             }),
             callback: () => this.updateInterfaceConfirm(),
@@ -10510,7 +10511,7 @@ class RevenuePayDividends {
         });
         addPrimaryActionButton({
             id: 'make_check_btn',
-            text: formatStringRecursive$1(_('Pay ${number} dividend(s)'), {
+            text: formatStringRecursive(_('Pay ${number} dividend(s)'), {
                 number: this.selectedNumberOfDividends,
             }),
             callback: () => this.updateInterfaceConfirm(),
@@ -10841,7 +10842,7 @@ class TradeInChina {
         updatePageTitle(_('Trade in China: ${you} may make a check'), {});
         addPrimaryActionButton({
             id: 'trade-btn',
-            text: formatStringRecursive$1(this.args.numberOfDice === 1
+            text: formatStringRecursive(this.args.numberOfDice === 1
                 ? _('Make a check with 1 die')
                 : _('Make a check with ${number} dice'), {
                 number: this.args.numberOfDice,
@@ -10957,7 +10958,7 @@ class UseManOnTheInside {
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(_('Timing Window: ${timingWindow}'), {
-            timingWindow: lowerCaseFirstCharacter$1(_('When a blackmail card is played')),
+            timingWindow: lowerCaseFirstCharacter(_('When a blackmail card is played')),
         });
     }
     updateInterfaceInitialStep() {
@@ -10968,7 +10969,7 @@ class UseManOnTheInside {
         });
         addPrimaryActionButton({
             id: 'use_card',
-            text: formatStringRecursive$1(_('Play ${cardTitle}'), {
+            text: formatStringRecursive(_('Play ${cardTitle}'), {
                 cardTitle: _(StaticData.get().cardTitle('ManOnTheInside')),
             }),
             callback: () => {
@@ -10977,7 +10978,7 @@ class UseManOnTheInside {
         });
         addSecondaryActionButton({
             id: 'do_not_use_card',
-            text: formatStringRecursive$1(_('Do not play ${cardTitle}'), {
+            text: formatStringRecursive(_('Do not play ${cardTitle}'), {
                 cardTitle: _(StaticData.get().cardTitle('ManOnTheInside')),
             }),
             callback: () => {
@@ -10989,7 +10990,7 @@ class UseManOnTheInside {
         const cardId = 'ManOnTheInside';
         const cardType = BLACKMAIL_CARD;
         const text = '${cardTitle} (${cardType})';
-        return formatStringRecursive$1(text, {
+        return formatStringRecursive(text, {
             cardTitle: _(StaticData.get().cardTitle(cardId)),
             cardType: getCardTypeText(cardType),
         });
