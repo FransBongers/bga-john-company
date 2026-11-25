@@ -301,9 +301,9 @@ trait DealsTrait
 
     $checks = [
       'share' => fn($id) => FamilyMembers::get($id)->getLocation() === COURT_OF_DIRECTORS
-        && FamilyMembers::get($id)->getPlayerId() === $ownerId,
-      'enterprise' => fn($id) => Enterprises::get($id)->getLocation() === $ownerId,
-      'promiseCard' => fn($id) => PromiseCards::get($id)->getLocation() === Locations::promiseCards($ownerId),
+        && FamilyMembers::get($id)->getPlayerId() == $ownerId,
+      'enterprise' => fn($id) => Enterprises::get($id)->getLocation() == $ownerId,
+      'promiseCard' => fn($id) => PromiseCards::get($id)->getLocation() == Locations::promiseCards($ownerId),
       'prestige' => function ($id) use ($ownerId) {
         $card = LondonSeasonCards::get($id);
         return $card->getLocation() === Locations::londonSeasonCards($ownerId)

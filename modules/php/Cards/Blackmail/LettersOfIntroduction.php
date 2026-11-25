@@ -32,6 +32,10 @@ class LettersOfIntroduction extends \Bga\Games\JohnCompany\Models\BlackmailCard
    */
   public function effectCanBeApplied(string $timingWindow, string | int | null $itemId): array | null
   {
+    if (!Utils::startsWith($this->getLocation(), 'londonSeasonCards_')) {
+      return null;
+    }
+
     $actingPlayerId = $this->getActingPlayerId();
     if ($actingPlayerId !== $itemId) {
       return null;
