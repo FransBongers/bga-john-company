@@ -16,7 +16,7 @@ import {
   setSelected,
   updatePageTitle,
 } from '../boilerplate';
-import { AGAINST, CASH_COUNTER, CROWN_PLAYER_ID, IN_FAVOR } from '../constants';
+import { AGAINST, CASH_COUNTER, CROWN_PLAYER_ID, IN_FAVOR, PARLIAMENT_TAB, PLAYER_AREAS_TAB } from '../constants';
 import { PlayerManager } from '../player-manager';
 import { GameAlias } from '../types';
 
@@ -56,8 +56,14 @@ export class ParliamentMeetsCastVotes implements GameState<OnEnteringParliamentM
     this.treasury = this.args.votes.money;
     this.selectedEnterpriseCardIds = [];
     this.selectedLondonSeasonCardIds = [];
+    const bar = Bar.getInstance();
+    const attentionTabs = [PARLIAMENT_TAB];
+    if (args.votes.enterprises.length + args.votes.londonSeasonCards.length > 0) {
+      attentionTabs.push(PLAYER_AREAS_TAB);
+    }
+    bar.setAttention(attentionTabs);
     this.updateInterfaceInitialStep();
-    Bar.getInstance().goTo('joco-parliament');
+    Bar.getInstance().goTo(PARLIAMENT_TAB);
   }
 
   onLeavingState() {
@@ -93,7 +99,7 @@ export class ParliamentMeetsCastVotes implements GameState<OnEnteringParliamentM
 
   private updateInterfaceInitialStep() {
     clearPossible();
-    updatePageTitle(_('${you} may spend £ and enterprises to cast votes'), {});
+    updatePageTitle(_('${you} may spend £ and exhaust enterprises to cast votes'), {});
 
     const totalVotes = this.getTotalVoteCount();
 

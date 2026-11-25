@@ -1,6 +1,7 @@
 /**
  * Class names
  */
+export const ATTENTION = 'attention';
 export const DISABLED = 'disabled';
 export const SELECTABLE = 'selectable';
 export const SELECTED = 'selected';

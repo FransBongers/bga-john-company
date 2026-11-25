@@ -304,6 +304,7 @@ namespace Bga\GameFramework {
      */
     abstract class Bga {
         public Db\Globals $globals;
+        public Data $data;
         public Notify $notify;
         public Logs $logs;
         public Legacy $legacy;
@@ -319,6 +320,30 @@ namespace Bga\GameFramework {
         
         public Components\Counters\PlayerCounter $playerScore;
         public Components\Counters\PlayerCounter $playerScoreAux;
+    }
+
+    abstract class Data {
+        /**
+         * Read the raw contents of a file in the game's data directory.
+         *
+         * @param string $relativePath Path relative to data/, with "/" separators.
+         * @throws SystemException If the path is invalid or the file cannot be read.
+         */
+        public function loadFile(string $relativePath): string {
+            return '';
+        }
+
+        /**
+         * Decode a JSON file in the game's data directory. Paths ending in .jsonc use JSONC.
+         * JSON objects become associative arrays.
+         *
+         * @param string $relativePath Path relative to data/, with "/" separators.
+         * @throws SystemException If the path is invalid or the file cannot be read.
+         * @throws \JsonException If the file contains invalid JSON or JSONC.
+         */
+        public function loadJson(string $relativePath): mixed {
+            return null;
+        }
     }
 
     abstract class Notify {
@@ -1407,9 +1432,9 @@ namespace Bga\GameFramework {
          *
          * @see https://doc.studio.boardgamearena.com/framework-documentation/back-end/main-game-logic/database/
          */
-        final public static function DbQuery(string $sql): null|\mysqli_result|bool
+        final public static function DbQuery(string $sql): \PDOStatement|true
         {
-            return null;
+            return true;
         }
 
         /**
@@ -2997,12 +3022,12 @@ namespace Bga\GameFramework\Components\Counters {
          * @param string $name the name of the counter, used to link it to the JS counter
          * @param ?int $min the minimum value of the counter (null = no minimum)
          * @param ?int $max the maximum value of the counter (null = no maximum)
-         * @param CounterVisibility $visibility define the visibility of the counter
+         * @param CounterVisibility|(callable(): CounterVisibility) $visibility the value or a zero-argument callback evaluated on each visibility check
          * @param bool $useNo use player no instead of player id
          * @param bool $strict set if the player no or id passed as a function param should be validated
          * @return PlayerCounter a new PlayerCounter object
          */
-        public function createPlayerCounter(string $name, ?int $min = 0, ?int $max = null, CounterVisibility $visibility = CounterVisibility::VISIBLE, bool $useNo = false, ?bool $strict = null,): PlayerCounter {
+        public function createPlayerCounter(string $name, ?int $min = 0, ?int $max = null, CounterVisibility|callable $visibility = CounterVisibility::VISIBLE, bool $useNo = false, ?bool $strict = null,): PlayerCounter {
             return new class extends PlayerCounter {};
         }
 
@@ -3032,30 +3057,32 @@ namespace Bga\GameFramework\Components\Counters {
      */
     abstract class PlayerCounter {
         /**
-         * Return if the counter is visible by anyone.
+         * Return if the counter is visible by anyone. Evaluates the visibility callback on each call.
          */
         public function isVisible(): bool {
             return false;
         }
 
         /**
-         * Return if the counter is invisible.
+         * Return if the counter is invisible. Evaluates the visibility callback on each call.
          */
         public function isHidden(): bool {
             return false;
         }
 
         /**
-         * Return if the counter is visible by the current player only.
+         * Return if the counter is visible by the current player only. Evaluates the visibility callback on each call.
          */
         public function isSelf(): bool {
             return false;
         }
 
         /**
-         * Set the counter visibility.
+         * Set the counter visibility. This does not send a notification.
+         *
+         * @param CounterVisibility|(callable(): CounterVisibility) $visibility the value or a zero-argument callback evaluated on each visibility check
          */
-        public function setVisibility(CounterVisibility $visibility): void {
+        public function setVisibility(CounterVisibility|callable $visibility): void {
         }
 
         /**

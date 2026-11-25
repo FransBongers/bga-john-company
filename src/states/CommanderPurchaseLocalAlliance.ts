@@ -15,10 +15,12 @@ import {
 } from '../boilerplate';
 import { StaticData } from '../static-data';
 import { GameAlias, JocoArmyPieceBase } from '../types';
+import { getCommanderTitleForPresidency } from '../utility';
 
 interface OnEnteringCommanderPurchaseLocalAllianceArgs extends CommonStateArgs {
   options: JocoArmyPieceBase[];
   commanderIsPresident: boolean;
+  presidencyId: string;
 }
 
 export class CommanderPurchaseLocalAlliance implements GameState<OnEnteringCommanderPurchaseLocalAllianceArgs> {
@@ -51,8 +53,9 @@ export class CommanderPurchaseLocalAlliance implements GameState<OnEnteringComma
     activePlayerIds: number,
     args: OnEnteringCommanderPurchaseLocalAllianceArgs,
   ) {
-    updatePageTitle(_('${tkn_playerName} may purchase a local alliance'), {
-      tkn_playerName: getPlayerName(activePlayerIds[0]),
+    updatePageTitle(_('${commander}: ${player_name} may purchase a local alliance'), {
+      commander: getCommanderTitleForPresidency(this.args.presidencyId),
+      player_name: getPlayerName(activePlayerIds[0]),
     });
   }
 
@@ -74,7 +77,9 @@ export class CommanderPurchaseLocalAlliance implements GameState<OnEnteringComma
 
   private updateInterfaceInitialStep() {
     clearPossible();
-    updatePageTitle(_('${you} may purchase a local alliance'), {});
+    updatePageTitle(_('${commander}: ${you} may purchase a local alliance'), {
+      commander: getCommanderTitleForPresidency(this.args.presidencyId),
+    });
 
     this.args.options.forEach((option) =>
       onClick(option.id, () => this.updateInterfaceConfirm(option)),
@@ -89,11 +94,12 @@ export class CommanderPurchaseLocalAlliance implements GameState<OnEnteringComma
 
     updatePageTitle(
       this.args.commanderIsPresident
-        ? _('Purchase an alliance with ${tkn_localAlliance}?')
+        ? _('${commander}: purchase an alliance with ${tkn_localAlliance}?')
         : _(
-            'Requests funds to purchase an alliance with ${tkn_localAlliance}?',
+            '${commander}: requests funds to purchase an alliance with ${tkn_localAlliance}?',
           ),
       {
+        commander: getCommanderTitleForPresidency(this.args.presidencyId),
         name: _(StaticData.get().armyPiece(localAlliance.id).name),
         tkn_localAlliance: localAlliance.id,
       },

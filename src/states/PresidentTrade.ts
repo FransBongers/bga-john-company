@@ -17,8 +17,10 @@ import {
   updatePageTitle,
 } from '../boilerplate';
 import { Company } from '../company';
+import { INDIA_TAB } from '../constants';
 import { StaticData } from '../static-data';
 import { JoCoOrderBase, JocoRegionBase, GameAlias } from '../types';
+import { getRoleName } from '../utility';
 
 interface OnEnteringPresidentTradeArgs extends CommonStateArgs {
   treasury: number;
@@ -54,7 +56,10 @@ export class PresidentTrade implements GameState<OnEnteringPresidentTradeArgs> {
     this.spend = args.proposal || 0;
     this.selectedRegionIds = [this.args.options.homeRegionId];
     this.updateInterfaceInitialStep();
-    Bar.getInstance().goTo('joco-india');
+    const bar = Bar.getInstance();
+    bar.setAttention(INDIA_TAB);
+    this.updateInterfaceInitialStep();
+    bar.goTo(INDIA_TAB);
   }
 
   onLeavingState() {
@@ -64,10 +69,11 @@ export class PresidentTrade implements GameState<OnEnteringPresidentTradeArgs> {
   setDescription(activePlayerIds: number, args: OnEnteringPresidentTradeArgs) {
     updatePageTitle(
       _(
-        '${tkn_playerName} may Trade',
+        '${office}: ${player_name} may Trade',
       ),
       {
-        tkn_playerName: getPlayerName(activePlayerIds[0]),
+        office: getRoleName(args.officeId),
+        player_name: getPlayerName(activePlayerIds[0]),
         amount: args.proposal,
       },
     );
@@ -103,9 +109,10 @@ export class PresidentTrade implements GameState<OnEnteringPresidentTradeArgs> {
 
     updatePageTitle(
       _(
-        'Trade check: ${you} must select the regions in which you wish to trade (selected: ${selected})',
+        '${office}: ${you} must select the regions in which you wish to trade (selected: ${selected})',
       ),
       {
+        office: getRoleName(this.args.officeId),
         selected: this.selectedRegionIds.join(', '),
       }
     );
@@ -156,8 +163,10 @@ export class PresidentTrade implements GameState<OnEnteringPresidentTradeArgs> {
     const available = this.args.treasury - this.spend;
     const minSpend = this.selectedRegionIds.length;
 
-    updatePageTitle(_('Trade: ${you} may spend £1 per die'), {
+    updatePageTitle(_('${office}: ${you} may spend £1 per die (total: £${amount})'), {
+      office: getRoleName(this.args.officeId),
       available,
+      amount: this.spend,
       tkn_pound: 'pound',
     });
 
@@ -207,10 +216,11 @@ export class PresidentTrade implements GameState<OnEnteringPresidentTradeArgs> {
     clearPossible();
 
     updatePageTitle(
-      _('Make a check with ${number} dice to trade in ${tradeLog}?'),
+      _('${office}: spend £${amount} to make a check with ${number} dice?'),
       {
+        office: getRoleName(this.args.officeId),
+        amount: this.spend,
         number: this.spend,
-        tradeLog: this.getTradeLog(),
       },
     );
 

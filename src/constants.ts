@@ -12,6 +12,14 @@ export const DONE = 'done';
 export const TRADE = 'trade';
 
 /**
+ * TAB_IDS
+ */
+export const COMPANY_TAB = 'joco-company';
+export const PARLIAMENT_TAB = 'joco-parliament';
+export const PLAYER_AREAS_TAB = 'joco-player-areas';
+export const INDIA_TAB = 'joco-india';
+
+/**
  * Triggers for frontend changes
  */
 export const PARLIAMENT_MEETS_START = 'ParliamentMeetsStart';

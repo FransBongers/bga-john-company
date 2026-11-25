@@ -10,7 +10,7 @@ import {
   addCancelButton,
   addPassButton,
 } from '../boilerplate';
-import { WRITER, SHARE, OPPORTUNITY_MARKER } from '../constants';
+import { WRITER, SHARE, OPPORTUNITY_MARKER, COMPANY_TAB } from '../constants';
 import { PlayerManager } from '../player-manager';
 import { CommonStateArgs, GameAlias, GameState } from '../types';
 
@@ -36,10 +36,14 @@ export class SeekShare implements GameState<OnEnteringSeekShareArgs> {
   onEnteringState(args: OnEnteringSeekShareArgs) {
     debug('Entering SeekShare state');
     this.args = args;
+    const bar = Bar.getInstance();
+    bar.setAttention(COMPANY_TAB);
     this.updateInterfaceInitialStep();
+    bar.goTo(COMPANY_TAB);
   }
 
   onLeavingState() {
+    Bar.getInstance().clearAttention();
     debug('Leaving SeekShare state');
   }
 
@@ -74,7 +78,6 @@ export class SeekShare implements GameState<OnEnteringSeekShareArgs> {
 
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
-    Bar.getInstance().goTo('joco-company');
 
     updatePageTitle(
       this.args.source === OPPORTUNITY_MARKER ? _('${you} may select an additional place on the Stock Exchange track (opportunity marker)') : _('${you} must select a place on the Stock Exchange track'),

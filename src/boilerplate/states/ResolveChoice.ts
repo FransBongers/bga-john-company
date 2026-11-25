@@ -54,7 +54,9 @@ export class ResolveChoice implements GameState<OnEnteringResolveChoiceArgs> {
     this.args = args;
     this.updateInterfaceInitialStep();
     if (this.args.tab) {
-      Bar.getInstance().goTo(this.args.tab);
+      const bar = Bar.getInstance();
+      bar.setAttention(this.args.tab);
+      bar.goTo(this.args.tab);
     }
   }
 

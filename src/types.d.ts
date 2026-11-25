@@ -370,6 +370,7 @@ export interface JocoEnterpriseCardStatic {
   name: string;
   cost: number;
   votes: number;
+  shipId: string | null;
 }
 
 export type JocoEnterpriseCard = JocoEnterpriseCardBase &

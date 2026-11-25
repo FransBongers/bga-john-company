@@ -2,6 +2,7 @@ import { SETUP } from '../constants';
 import { AttentionManager } from '../attention';
 import { GameAlias, GamedatasAlias } from '../types';
 import { tplTabButton } from './templates';
+import { ATTENTION } from '../boilerplate/constants';
 
 export interface BarConfig {
   id: string;
@@ -15,12 +16,12 @@ export class Bar {
 
   private ui: {
     tabs: Record<string, HTMLElement>;
-    barButtons: HTMLElement[];
+    barButtons: Record<string, HTMLElement>;
   } = {
     tabs: {},
-    barButtons: [],
+    barButtons: {},
   };
-  private active: number = 0;
+  private active: string = 'joco-player-areas';
 
   private config: BarConfig[] = [
     {
@@ -96,16 +97,14 @@ export class Bar {
       });
     }
 
-    this.config.forEach((barConfig, index) => {
-      const { id, text, icon } = barConfig;
-      bar.insertAdjacentHTML('beforeend', tplTabButton(barConfig, index));
-      this.ui.barButtons.push(
-        document.getElementById(`joco-bar-item-${index}`),
-      );
+    this.config.forEach((barConfig) => {
+      const { id } = barConfig;
+      bar.insertAdjacentHTML('beforeend', tplTabButton(barConfig));
+      this.ui.barButtons[id] = document.getElementById(`joco-bar-item-${id}`);
       this.ui.tabs[id] = document.getElementById(id);
 
-      if (index === this.active) {
-        this.ui.barButtons[index].classList.add('joco-bar-item-active');
+      if (id === this.active) {
+        this.ui.barButtons[id].classList.add('joco-bar-item-active');
         this.ui.tabs[id].classList.add('joco-tab-visible');
       } else {
         this.ui.tabs[id].classList.add('joco-tab-hidden');
@@ -125,9 +124,7 @@ export class Bar {
       'deal',
     ).length;
     const button =
-      this.ui.barButtons[
-        this.config.findIndex((tab) => tab.id === 'joco-deals')
-      ];
+      this.ui.barButtons['joco-deals'];
     if (!button) return;
     let badge = button.querySelector<HTMLElement>('.joco-attention-count');
     if (count) {
@@ -160,28 +157,27 @@ export class Bar {
       return;
     }
 
-    const index = Number(target.id.split('-')[3]);
-    this.updateActive();
-    this.active = index;
-    this.updateActive();
+    this.goTo(target.dataset.tabId);
   }
 
   private updateActive() {
-    const tab = this.ui.tabs[this.config[this.active].id];
+    const tab = this.ui.tabs[this.active];
     tab.classList.toggle('joco-tab-visible');
     tab.classList.toggle('joco-tab-hidden');
     this.ui.barButtons[this.active].classList.toggle('joco-bar-item-active');
   }
 
   public goTo(id: string) {
-    const index = this.config.findIndex((tab) => tab.id === id);
+    if (!this.ui.tabs[id]) {
+      return;
+    }
     this.updateActive();
-    this.active = index;
+    this.active = id;
     this.updateActive();
   }
 
   public getActiveTabId() {
-    return this.config[this.active].id;
+    return this.active;
   }
 
   public removeTabWithId(id: string) {
@@ -189,19 +185,44 @@ export class Bar {
     if (index === -1) {
       return;
     }
+    if (this.active === id) {
+      const fallback = this.config.find((tab) => tab.id !== id);
+      if (fallback) {
+        this.goTo(fallback.id);
+      }
+    }
     this.config.splice(index, 1);
     const tab = this.ui.tabs[id];
     if (tab) {
       tab.remove();
       delete this.ui.tabs[id];
     }
-    const button = this.ui.barButtons[index];
+    const button = this.ui.barButtons[id];
     if (button) {
       button.remove();
-      this.ui.barButtons.splice(index, 1);
+      delete this.ui.barButtons[id];
     }
-    if (this.active >= this.config.length) {
-      this.active = this.config.length - 1;
+  }
+
+  public setAttention(tabIds: string | string[]) {
+    if (typeof tabIds === 'string') {
+      tabIds = [tabIds];
+    }
+
+    for (const tabId in this.ui.barButtons) {
+      const tab = this.ui.barButtons[tabId];
+      if (tabIds.includes(tabId)) {
+        tab.classList.add(ATTENTION);
+      } else {
+        tab.classList.remove(ATTENTION);
+      }
+    }
+  }
+
+  public clearAttention() {
+    for (const tabId in this.ui.barButtons) {
+      const tab = this.ui.barButtons[tabId];
+      tab.classList.remove(ATTENTION);
     }
   }
 }

@@ -63,6 +63,13 @@ class Enterprise extends \Bga\Games\JohnCompany\Boilerplate\Helpers\DB_Model imp
     return $this->jsonSerialize(); // Static datas are already in js file
   }
 
+  public function getStaticData()
+  {
+    $staticdata = parent::getStaticData();
+    $staticdata['shipId'] = $this->shipId ?? null;
+    return $staticdata;
+  }
+
   public function getBonus() {
     return $this->income;
   }

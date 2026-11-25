@@ -12,6 +12,7 @@ import {
   performAction,
   addPrimaryActionButton,
 } from '../boilerplate';
+import { INDIA_TAB } from '../constants';
 import { India } from '../india';
 import { CommonStateArgs, GameAlias, GameState, JoCoOrderBase } from '../types';
 
@@ -38,10 +39,15 @@ export class DirectorOfTradeSpecialEnvoySuccess implements GameState<OnEnteringD
   onEnteringState(args: OnEnteringDirectorOfTradeSpecialEnvoySuccessArgs) {
     debug('Entering DirectorOfTradeSpecialEnvoySuccess state');
     this.args = args;
+
+    const bar = Bar.getInstance();
+    bar.setAttention(INDIA_TAB);
     this.updateInterfaceInitialStep();
+    bar.goTo(INDIA_TAB);
   }
 
   onLeavingState() {
+    Bar.getInstance().clearAttention();
     debug('Leaving DirectorOfTradeSpecialEnvoySuccess state');
   }
 
@@ -52,11 +58,11 @@ export class DirectorOfTradeSpecialEnvoySuccess implements GameState<OnEnteringD
     updatePageTitle(
       args.openTradeWithChina
         ? _(
-            '${tkn_playerName} may open trade with China or may open a closed order',
+            '${player_name} may open trade with China or may open a closed order',
           )
-        : _('${tkn_playerName} may open a closed order'),
+        : _('${player_name} may open a closed order'),
       {
-        tkn_playerName: getPlayerName(activePlayerIds[0]),
+        player_name: getPlayerName(activePlayerIds[0]),
       },
     );
   }
@@ -79,7 +85,6 @@ export class DirectorOfTradeSpecialEnvoySuccess implements GameState<OnEnteringD
 
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
-    Bar.getInstance().goTo('joco-india');
 
     updatePageTitle(
       this.args.openTradeWithChina

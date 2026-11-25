@@ -25,6 +25,7 @@ import {
   MANAGER_OF_SHIPPING,
   FULL,
   SUPERINTENDENT_OF_TRADE_IN_CHINA,
+  INDIA_TAB,
 } from '../constants';
 import { India } from '../india';
 import { tknShipValue } from '../logs/templates';
@@ -83,11 +84,14 @@ export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingA
     this.placedExtraShips = {};
     this.placedPlayerShips = {};
     this.treasury = this.args.treasury;
-    Bar.getInstance().goTo('joco-india');
+    const bar = Bar.getInstance();
+    bar.setAttention(INDIA_TAB);
     this.updateInterfaceInitialStep();
+    bar.goTo(INDIA_TAB);
   }
 
   onLeavingState() {
+    Bar.getInstance().clearAttention();
     debug('Leaving ManagerOfShipping state');
   }
 
@@ -96,9 +100,9 @@ export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingA
     args: OnEnteringManagerOfShippingArgs,
   ) {
     updatePageTitle(
-      _('${tkn_playerName} may fit, buy and lease ships'),
+      _('Manager of Shipping: ${player_name} may fit, buy and lease ships'),
       {
-        tkn_playerName: getPlayerName(activePlayerIds[0]),
+        player_name: getPlayerName(activePlayerIds[0]),
       },
     );
   }
@@ -128,7 +132,7 @@ export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingA
     }
 
     updatePageTitle(
-      _('${you} may fit, buy and lease ships (£${amount} remaining)'),
+      _('Manager of Shipping: ${you} may fit, buy and lease ships (£${amount} remaining)'),
       { amount: this.treasury },
     );
 
@@ -280,7 +284,7 @@ export class ManagerOfShipping implements GameState<OnEnteringManagerOfShippingA
   private updateInterfaceConfirm() {
     clearPossible();
 
-    updatePageTitle(_('Confirm ship placement'));
+    updatePageTitle(_('Manager of Shipping: confirm ship placement?'));
 
     addConfirmButton(() => {
       performAction('actManagerOfShipping', {

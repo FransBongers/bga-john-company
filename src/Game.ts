@@ -457,7 +457,6 @@ export class Game {
     Parliament.create(this);
     India.create(this);
     EventTiles.create(this);
-    
 
     if (
       this.playerOrder.includes(this.getPlayerId()) &&
@@ -570,7 +569,10 @@ export class Game {
     //   });
     // }
     this.updateMakeInactiveButton();
-    AnytimeActions.getInstance().setup(stateName, args.args._private?.['anytime']);
+    AnytimeActions.getInstance().setup(
+      stateName,
+      args.args._private?.['anytime'],
+    );
   }
 
   // onLeavingState: this method is called each time we are leaving a game state.
@@ -580,30 +582,38 @@ export class Game {
     if (this.states[stateName]) {
       this.states[stateName].getInstance().onLeavingState();
     }
+    Bar.getInstance().clearAttention();
     this.clearPossible();
   }
 
   public updateMakeInactiveButton() {
     const playerId = this.getPlayerId();
-    const canMakeInactive = Array.isArray(this.activePlayerIds) && this.bga.players.isCurrentPlayerActive() && (
-      this.currentStateName === 'WaitForOffer' ||
-      !this.activePlayerIds?.includes(playerId) ||
-      this.completedPlayerIds.includes(playerId)
-    );
+    const canMakeInactive =
+      Array.isArray(this.activePlayerIds) &&
+      this.bga.players.isCurrentPlayerActive() &&
+      (this.currentStateName === 'WaitForOffer' ||
+        !this.activePlayerIds?.includes(playerId) ||
+        this.completedPlayerIds.includes(playerId));
     if (canMakeInactive) {
       Interaction.use().addSecondaryActionButton({
         id: 'make-inactive',
         text: _('Become inactive'),
-        callback: () => this.bga.actions.performAction(
-          'actMakeInactive', {}, { checkAction: false, checkPossibleActions: false },
-        ),
+        callback: () =>
+          this.bga.actions.performAction(
+            'actMakeInactive',
+            {},
+            { checkAction: false, checkPossibleActions: false },
+          ),
       });
     } else {
       document.getElementById('make-inactive')?.remove();
     }
   }
 
-  public updateActionParticipants(activePlayerIds: number[] | null, completedPlayerIds: number[]) {
+  public updateActionParticipants(
+    activePlayerIds: number[] | null,
+    completedPlayerIds: number[],
+  ) {
     this.activePlayerIds = activePlayerIds ?? undefined;
     this.completedPlayerIds = completedPlayerIds;
     if (completedPlayerIds.includes(this.getPlayerId())) {
@@ -957,7 +967,13 @@ export class Game {
     }
   }
 
-  addLogTooltip({ tooltipId, cardId: inputCardId }: { tooltipId: number; cardId: string }) {
+  addLogTooltip({
+    tooltipId,
+    cardId: inputCardId,
+  }: {
+    tooltipId: number;
+    cardId: string;
+  }) {
     const tooltipManager = TooltipManager.getInstance();
     const [cardId, data] = inputCardId.split(':');
     if (cardId.startsWith('BlackmailCard')) {

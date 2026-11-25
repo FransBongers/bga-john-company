@@ -13,7 +13,7 @@ import {
   updatePageTitle,
 } from '../boilerplate';
 import { GameAlias, JocoArmyPieceBase, JocoFamilyMember } from '../types';
-import { getRegionName } from '../utility';
+import { getCommanderTitleForPresidency, getRegionName } from '../utility';
 import { ExhaustArmyPieces } from './ExhaustArmyPieces';
 
 interface OnEnteringCommanderDeployArgs extends CommonStateArgs {
@@ -62,8 +62,9 @@ export class CommanderDeploy
   }
 
   setDescription(activePlayerIds: number, args: OnEnteringCommanderDeployArgs) {
-    updatePageTitle(_('${tkn_playerName} may deploy'), {
-      tkn_playerName: getPlayerName(activePlayerIds[0]),
+    updatePageTitle(_('${commander}: ${player_name} may deploy'), {
+      commander: getCommanderTitleForPresidency(this.args.presidencyId),
+      player_name: getPlayerName(activePlayerIds[0]),
     });
   }
 
@@ -85,7 +86,9 @@ export class CommanderDeploy
 
   private updateInterfaceInitialStep() {
     clearPossible();
-    updatePageTitle(_('Deploy: ${you} may choose a target'), {});
+    updatePageTitle(_('${commander}: ${you} may choose a target to deploy to'), {
+      commander: getCommanderTitleForPresidency(this.args.presidencyId),
+    });
 
     Object.entries(this.args.options).forEach(
       ([regionId, requiredStrength]) => {
@@ -106,7 +109,9 @@ export class CommanderDeploy
   updateInterfaceSelectArmyPieces() {
     clearPossible();
 
-    updatePageTitle(_('Deploy: ${you} must exhaust ready pieces'), {});
+    updatePageTitle(_('${commander}: ${you} must exhaust ready pieces'), {
+      commander: getCommanderTitleForPresidency(this.args.presidencyId),
+    });
 
     this.setSelectablePieces(() => this.updateInterfaceSelectArmyPieces());
 
@@ -134,9 +139,10 @@ export class CommanderDeploy
 
     updatePageTitle(
       numberOfDice === 1
-        ? _('Deploy to ${regionName} and make a check with ${number} die?')
-        : _('Deploy to ${regionName} and make a check with ${number} dice?'),
+        ? _('${commander}: deploy to ${regionName} and make a check with ${number} die?')
+        : _('${commander}: deploy to ${regionName} and make a check with ${number} dice?'),
       {
+        commander: getCommanderTitleForPresidency(this.args.presidencyId),
         regionName: getRegionName(this.targetId),
         number: numberOfDice,
       },

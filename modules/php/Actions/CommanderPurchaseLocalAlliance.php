@@ -80,6 +80,7 @@ class CommanderPurchaseLocalAlliance extends \Bga\Games\JohnCompany\Models\Atomi
       'commanderIsPresident' => $commanderPlayerId === $presidentPlayerId,
       'skipOnEnteringState' => count($options) === 0 || $presidentPlayerId === null,
       'presidentPlayerId' => $presidentPlayerId,
+      'presidencyId' => $args['presidencyId'],
     ];
 
     return $data;

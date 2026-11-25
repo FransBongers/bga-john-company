@@ -3,6 +3,10 @@ const PLUS = 'plus';
 const MINUS = 'minus';
 const DONE = 'done';
 const TRADE = 'trade';
+const COMPANY_TAB = 'joco-company';
+const PARLIAMENT_TAB = 'joco-parliament';
+const PLAYER_AREAS_TAB = 'joco-player-areas';
+const INDIA_TAB = 'joco-india';
 const PARLIAMENT_MEETS_START = 'ParliamentMeetsStart';
 const PARLIAMENT_MEETS_VOTING_STARTS = 'ParliamentMeetsVotingStarts';
 const PARLIAMENT_MEETS_END = 'ParliamentMeetsEnd';
@@ -433,20 +437,32 @@ class AttentionManager {
     }
 }
 
-const tplTabButton = ({ id, icon, text }, index) => `
-<div id="joco-bar-item-${index}" class="joco-bar-item ${id}-bar-item">
+const tplTabButton = ({ id, icon, text }) => `
+<div id="joco-bar-item-${id}" data-tab-id="${id}" class="joco-bar-item ${id}-bar-item">
   ${icon ? `<i class="fa6 fa6-${icon}"></i>` : ''}
   <div class="fb-font-baskerville fb-font-bold joco-bar-item-text">${text}</div>
 </div>
 `;
 
+const ATTENTION$1 = 'attention';
+const DISABLED = 'disabled';
+const SELECTABLE = 'selectable';
+const SELECTED = 'selected';
+const USED = 'used';
+const HIDDEN = 'hidden';
+const PRIMARY = 'primary';
+const SECONDARY = 'secondary';
+const DECK = 'deck';
+const DISCARD = 'discard';
+const TEMPORARY_DISCARD = 'temporaryDiscard';
+
 class Bar {
     constructor(game) {
         this.ui = {
             tabs: {},
-            barButtons: [],
+            barButtons: {},
         };
-        this.active = 0;
+        this.active = 'joco-player-areas';
         this.config = [
             {
                 id: 'joco-player-areas',
@@ -504,13 +520,13 @@ class Bar {
                 text: _('Draft'),
             });
         }
-        this.config.forEach((barConfig, index) => {
-            const { id, text, icon } = barConfig;
-            bar.insertAdjacentHTML('beforeend', tplTabButton(barConfig, index));
-            this.ui.barButtons.push(document.getElementById(`joco-bar-item-${index}`));
+        this.config.forEach((barConfig) => {
+            const { id } = barConfig;
+            bar.insertAdjacentHTML('beforeend', tplTabButton(barConfig));
+            this.ui.barButtons[id] = document.getElementById(`joco-bar-item-${id}`);
             this.ui.tabs[id] = document.getElementById(id);
-            if (index === this.active) {
-                this.ui.barButtons[index].classList.add('joco-bar-item-active');
+            if (id === this.active) {
+                this.ui.barButtons[id].classList.add('joco-bar-item-active');
                 this.ui.tabs[id].classList.add('joco-tab-visible');
             }
             else {
@@ -523,7 +539,7 @@ class Bar {
     }
     updateDealAttention() {
         const count = AttentionManager.getInstance().getEntries('new_offer', 'deal').length;
-        const button = this.ui.barButtons[this.config.findIndex((tab) => tab.id === 'joco-deals')];
+        const button = this.ui.barButtons['joco-deals'];
         if (!button)
             return;
         let badge = button.querySelector('.joco-attention-count');
@@ -546,30 +562,35 @@ class Bar {
         if (!target) {
             return;
         }
-        const index = Number(target.id.split('-')[3]);
-        this.updateActive();
-        this.active = index;
-        this.updateActive();
+        this.goTo(target.dataset.tabId);
     }
     updateActive() {
-        const tab = this.ui.tabs[this.config[this.active].id];
+        const tab = this.ui.tabs[this.active];
         tab.classList.toggle('joco-tab-visible');
         tab.classList.toggle('joco-tab-hidden');
         this.ui.barButtons[this.active].classList.toggle('joco-bar-item-active');
     }
     goTo(id) {
-        const index = this.config.findIndex((tab) => tab.id === id);
+        if (!this.ui.tabs[id]) {
+            return;
+        }
         this.updateActive();
-        this.active = index;
+        this.active = id;
         this.updateActive();
     }
     getActiveTabId() {
-        return this.config[this.active].id;
+        return this.active;
     }
     removeTabWithId(id) {
         const index = this.config.findIndex((tab) => tab.id === id);
         if (index === -1) {
             return;
+        }
+        if (this.active === id) {
+            const fallback = this.config.find((tab) => tab.id !== id);
+            if (fallback) {
+                this.goTo(fallback.id);
+            }
         }
         this.config.splice(index, 1);
         const tab = this.ui.tabs[id];
@@ -577,27 +598,33 @@ class Bar {
             tab.remove();
             delete this.ui.tabs[id];
         }
-        const button = this.ui.barButtons[index];
+        const button = this.ui.barButtons[id];
         if (button) {
             button.remove();
-            this.ui.barButtons.splice(index, 1);
+            delete this.ui.barButtons[id];
         }
-        if (this.active >= this.config.length) {
-            this.active = this.config.length - 1;
+    }
+    setAttention(tabIds) {
+        if (typeof tabIds === 'string') {
+            tabIds = [tabIds];
+        }
+        for (const tabId in this.ui.barButtons) {
+            const tab = this.ui.barButtons[tabId];
+            if (tabIds.includes(tabId)) {
+                tab.classList.add(ATTENTION$1);
+            }
+            else {
+                tab.classList.remove(ATTENTION$1);
+            }
+        }
+    }
+    clearAttention() {
+        for (const tabId in this.ui.barButtons) {
+            const tab = this.ui.barButtons[tabId];
+            tab.classList.remove(ATTENTION$1);
         }
     }
 }
-
-const DISABLED = 'disabled';
-const SELECTABLE = 'selectable';
-const SELECTED = 'selected';
-const USED = 'used';
-const HIDDEN = 'hidden';
-const PRIMARY = 'primary';
-const SECONDARY = 'secondary';
-const DECK = 'deck';
-const DISCARD = 'discard';
-const TEMPORARY_DISCARD = 'temporaryDiscard';
 
 const tplTabContainer = (props) => `
   <div id="${props.id}" class="tab-container">
@@ -1500,7 +1527,7 @@ const getCardText = (card) => {
         cardTitle: _(StaticData.get().cardTitle(cardId)),
     });
 };
-const getRoleName$1 = (role) => {
+const getRoleName = (role) => {
     switch (role) {
         case CHAIRMAN:
             return _('Chairman');
@@ -1510,8 +1537,26 @@ const getRoleName$1 = (role) => {
             return _('Leader of the Opposition');
         case OPPOSITION:
             return _('Opposition');
+        case PRESIDENT_OF_BENGAL:
+            return _('President of Bengal');
+        case PRESIDENT_OF_BOMBAY:
+            return _('President of Bombay');
+        case PRESIDENT_OF_MADRAS:
+            return _('President of Madras');
         default:
             throw new Error(`Unknown role: ${role}`);
+    }
+};
+const getCommanderTitleForPresidency = (presidencyId) => {
+    switch (presidencyId) {
+        case BENGAL_PRESIDENCY:
+            return _('Commander of Bengal');
+        case BOMBAY_PRESIDENCY:
+            return _('Commander of Bombay');
+        case MADRAS_PRESIDENCY:
+            return _('Commander of Madras');
+        default:
+            throw new Error(`Unknown presidency: ${presidencyId}`);
     }
 };
 
@@ -1651,7 +1696,7 @@ class JocoPlayer {
             const element = document.createElement('div');
             element.className = 'joco-player-role fb-font-baskerville fb-font-12';
             element.setAttribute('data-role', role);
-            element.textContent = getRoleName$1(role);
+            element.textContent = getRoleName(role);
             return element;
         }));
     }
@@ -6605,7 +6650,9 @@ class ResolveChoice {
         this.args = args;
         this.updateInterfaceInitialStep();
         if (this.args.tab) {
-            Bar.getInstance().goTo(this.args.tab);
+            const bar = Bar.getInstance();
+            bar.setAttention(this.args.tab);
+            bar.goTo(this.args.tab);
         }
     }
     onLeavingState() {
@@ -6712,7 +6759,13 @@ const getTokenDiv = ({ key, value, game, }) => {
         case LOG_TOKEN_CLIMATE:
             return tplLogTokenClimate(value);
         case LOG_TOKEN_ENTERPRISE_CARD:
-            return tplTextWithTooltip(game, value, StaticData.get().enterpriseCard(value.split(':')[0]).name);
+            const enterpriseCard = StaticData.get().enterpriseCard(value.split(':')[0]);
+            return tplTextWithTooltip(game, value, enterpriseCard.shipId
+                ? formatStringRecursive$1('${enterpriseName} (${shipName})', {
+                    enterpriseName: _(enterpriseCard.name),
+                    shipName: _(enterpriseCard.shipId),
+                })
+                : _(enterpriseCard.name));
         case LOG_TOKEN_ICON:
         case LOG_TOKEN_ENTERPRISE_ICON:
             return tplIcon(value, 'log-token');
@@ -6827,11 +6880,14 @@ class Chairman {
         this.args = args;
         this.companyBalance = args.companyBalance;
         this.currentDebt = args.debtOptions.currentDebt;
+        const bar = Bar.getInstance();
+        bar.setAttention([COMPANY_TAB, INDIA_TAB]);
         this.updateInterfaceInitialStep();
-        Bar.getInstance().goTo('joco-company');
+        bar.goTo('joco-company');
     }
     onLeavingState() {
         debug('Leaving Chairman state');
+        Bar.getInstance().clearAttention();
         this.deactivateTreasuries();
     }
     setDescription(activePlayerIds, args) {
@@ -7015,9 +7071,13 @@ class ChairmanDebtConsent {
     onEnteringState(args) {
         debug('Entering ChairmanDebtConsent state');
         this.args = args;
+        const bar = Bar.getInstance();
+        bar.setAttention(COMPANY_TAB);
         this.updateInterfaceInitialStep();
+        bar.goTo(COMPANY_TAB);
     }
     onLeavingState() {
+        Bar.getInstance().clearAttention();
         debug('Leaving ChairmanDebtConsent state');
     }
     setDescription(activePlayerIds, args) {
@@ -7209,13 +7269,16 @@ class CommanderDeploy extends ExhaustArmyPieces {
         debug('Leaving CommanderDeploy state');
     }
     setDescription(activePlayerIds, args) {
-        updatePageTitle(_('${tkn_playerName} may deploy'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        updatePageTitle(_('${commander}: ${player_name} may deploy'), {
+            commander: getCommanderTitleForPresidency(this.args.presidencyId),
+            player_name: getPlayerName(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
         clearPossible();
-        updatePageTitle(_('Deploy: ${you} may choose a target'), {});
+        updatePageTitle(_('${commander}: ${you} may choose a target to deploy to'), {
+            commander: getCommanderTitleForPresidency(this.args.presidencyId),
+        });
         Object.entries(this.args.options).forEach(([regionId, requiredStrength]) => {
             addPrimaryActionButton({
                 id: `deploy-${regionId}`,
@@ -7230,7 +7293,9 @@ class CommanderDeploy extends ExhaustArmyPieces {
     }
     updateInterfaceSelectArmyPieces() {
         clearPossible();
-        updatePageTitle(_('Deploy: ${you} must exhaust ready pieces'), {});
+        updatePageTitle(_('${commander}: ${you} must exhaust ready pieces'), {
+            commander: getCommanderTitleForPresidency(this.args.presidencyId),
+        });
         this.setSelectablePieces(() => this.updateInterfaceSelectArmyPieces());
         this.setSelectedPieces();
         addPrimaryActionButton({
@@ -7249,8 +7314,9 @@ class CommanderDeploy extends ExhaustArmyPieces {
         clearPossible();
         const numberOfDice = this.getTotalStrength() - this.args.options[this.targetId];
         updatePageTitle(numberOfDice === 1
-            ? _('Deploy to ${regionName} and make a check with ${number} die?')
-            : _('Deploy to ${regionName} and make a check with ${number} dice?'), {
+            ? _('${commander}: deploy to ${regionName} and make a check with ${number} die?')
+            : _('${commander}: deploy to ${regionName} and make a check with ${number} dice?'), {
+            commander: getCommanderTitleForPresidency(this.args.presidencyId),
             regionName: getRegionName(this.targetId),
             number: numberOfDice,
         });
@@ -7285,13 +7351,16 @@ class CommanderPurchaseLocalAlliance {
         debug('Leaving CommanderPurchaseLocalAlliance state');
     }
     setDescription(activePlayerIds, args) {
-        updatePageTitle(_('${tkn_playerName} may purchase a local alliance'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        updatePageTitle(_('${commander}: ${player_name} may purchase a local alliance'), {
+            commander: getCommanderTitleForPresidency(this.args.presidencyId),
+            player_name: getPlayerName(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
         clearPossible();
-        updatePageTitle(_('${you} may purchase a local alliance'), {});
+        updatePageTitle(_('${commander}: ${you} may purchase a local alliance'), {
+            commander: getCommanderTitleForPresidency(this.args.presidencyId),
+        });
         this.args.options.forEach((option) => onClick(option.id, () => this.updateInterfaceConfirm(option)));
         addPassButton(this.args.optionalAction, _('Do not purchase a local alliance'));
     }
@@ -7299,8 +7368,9 @@ class CommanderPurchaseLocalAlliance {
         clearPossible();
         setSelected(localAlliance.id);
         updatePageTitle(this.args.commanderIsPresident
-            ? _('Purchase an alliance with ${tkn_localAlliance}?')
-            : _('Requests funds to purchase an alliance with ${tkn_localAlliance}?'), {
+            ? _('${commander}: purchase an alliance with ${tkn_localAlliance}?')
+            : _('${commander}: requests funds to purchase an alliance with ${tkn_localAlliance}?'), {
+            commander: getCommanderTitleForPresidency(this.args.presidencyId),
             name: _(StaticData.get().armyPiece(localAlliance.id).name),
             tkn_localAlliance: localAlliance.id,
         });
@@ -7880,34 +7950,38 @@ class DirectorOfTradeSpecialEnvoy {
         debug('Entering DirectorOfTradeSpecialEnvoy state');
         this.args = args;
         this.spend = args.proposal || 0;
+        const bar = Bar.getInstance();
+        bar.setAttention(COMPANY_TAB);
         this.updateInterfaceInitialStep();
+        bar.goTo(COMPANY_TAB);
     }
     onLeavingState() {
+        Bar.getInstance().clearAttention();
         debug('Leaving DirectorOfTradeSpecialEnvoy state');
     }
     setDescription(activePlayerIds, args) {
         if (args.proposal > 0) {
-            updatePageTitle(_('Special Envoy: ${tkn_playerName} proposes to spend £${amount} to make a check'), {
-                tkn_playerName: getPlayerName(activePlayerIds[0]),
+            updatePageTitle(_('Director of Trade: ${player_name} proposes to spend £${amount} to make a check'), {
+                player_name: getPlayerName(activePlayerIds[0]),
                 amount: args.proposal,
                 tkn_pound: 'pound',
             });
         }
         else if (args.proposal === 0) {
-            updatePageTitle(_('Special Envoy: ${tkn_playerName} proposes not to make a check'), {
-                tkn_playerName: getPlayerName(activePlayerIds[0]),
+            updatePageTitle(_('Director of Trade: ${player_name} proposes not to make a check'), {
+                player_name: getPlayerName(activePlayerIds[0]),
             });
         }
         else {
-            updatePageTitle(_('Special Envoy: ${tkn_playerName} may make a check'), {
-                tkn_playerName: getPlayerName(activePlayerIds[0]),
+            updatePageTitle(_('Director of Trade: ${player_name} may make a check'), {
+                player_name: getPlayerName(activePlayerIds[0]),
             });
         }
     }
     updateInterfaceInitialStep() {
         this.game.clearPossible();
         const available = this.args.treasury - this.spend;
-        updatePageTitle(_('Special Envoy: ${you} may spend £1 per die'), {
+        updatePageTitle(_('Director of Trade: ${you} may spend £1 per die to make a check'), {
             available,
         });
         addSecondaryActionButton({
@@ -7925,6 +7999,7 @@ class DirectorOfTradeSpecialEnvoy {
                 number: this.spend,
             }),
             callback: () => this.updateInterfaceConfirm(),
+            extraClasses: this.spend === 0 ? DISABLED : '',
         });
         addSecondaryActionButton({
             id: 'plus_btn',
@@ -7939,7 +8014,7 @@ class DirectorOfTradeSpecialEnvoy {
     }
     updateInterfaceConfirm() {
         clearPossible();
-        updatePageTitle(_('Special Envoy: make a check with ${number} dice?'), {
+        updatePageTitle(_('Director of Trade: make a check with ${number} dice?'), {
             number: this.spend,
         });
         addConfirmButton(() => this.performAction(true));
@@ -7967,21 +8042,24 @@ class DirectorOfTradeSpecialEnvoySuccess {
     onEnteringState(args) {
         debug('Entering DirectorOfTradeSpecialEnvoySuccess state');
         this.args = args;
+        const bar = Bar.getInstance();
+        bar.setAttention(INDIA_TAB);
         this.updateInterfaceInitialStep();
+        bar.goTo(INDIA_TAB);
     }
     onLeavingState() {
+        Bar.getInstance().clearAttention();
         debug('Leaving DirectorOfTradeSpecialEnvoySuccess state');
     }
     setDescription(activePlayerIds, args) {
         updatePageTitle(args.openTradeWithChina
-            ? _('${tkn_playerName} may open trade with China or may open a closed order')
-            : _('${tkn_playerName} may open a closed order'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+            ? _('${player_name} may open trade with China or may open a closed order')
+            : _('${player_name} may open a closed order'), {
+            player_name: getPlayerName(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
         this.game.clearPossible();
-        Bar.getInstance().goTo('joco-india');
         updatePageTitle(this.args.openTradeWithChina
             ? _('${you} may open trade with China or may open a closed order')
             : _('${you} may open a closed order'));
@@ -8037,25 +8115,28 @@ class DirectorOfTradeTransfers {
             ships: {},
             writers: {},
         };
+        const bar = Bar.getInstance();
+        bar.setAttention(INDIA_TAB);
         this.updateInterfaceInitialStep();
+        bar.goTo(INDIA_TAB);
     }
     onLeavingState() {
+        Bar.getInstance().clearAttention();
         debug('Leaving DirectorOfTradeTransfers state');
     }
     setDescription(activePlayerIds, args) {
-        updatePageTitle(_('${tkn_playerName} may move writers or ships'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        updatePageTitle(_('Director of Trade: ${player_name} may transfer writers or ships'), {
+            player_name: getPlayerName(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
         this.game.clearPossible();
-        Bar.getInstance().goTo('joco-india');
         const transferCount = this.getTransferCount();
         if (transferCount === 2) {
             this.updateInterfaceConfirm();
             return;
         }
-        updatePageTitle(_('${you} may make up to two transfers (${number} remaining)'), {
+        updatePageTitle(_('Director of Trade: ${you} may transfer up to two writers or ships (${number} remaining)'), {
             number: 2 - this.getTransferCount(),
         });
         Object.entries(this.args.options.writers).forEach(([id, data]) => onClick(id, () => this.updateInterfaceSelectPresidency(data)));
@@ -8069,14 +8150,14 @@ class DirectorOfTradeTransfers {
             this.addCancelButton();
         }
         else {
-            addPassButton(this.args.optionalAction);
+            addPassButton(this.args.optionalAction, _('Do not make any transfers'));
         }
     }
     updateInterfaceSelectPresidency({ familyMember: writer, locations, }) {
         clearPossible();
         const writerElt = document.getElementById(writer.id);
         setSelected(writerElt);
-        updatePageTitle(_('${you} must select a Presidency'));
+        updatePageTitle(_('Director of Trade: ${you} must select a Presidency'));
         locations.forEach((newLocation) => {
             const presidencyId = newLocation.split('_')[1];
             onClick(presidencyId, async () => {
@@ -8094,7 +8175,7 @@ class DirectorOfTradeTransfers {
     }
     updateInterfaceSelectSeaZone({ ship, locations, }) {
         clearPossible();
-        updatePageTitle(_('${you} must select a sea zone'));
+        updatePageTitle(_('Director of Trade: ${you} must select a sea zone'));
         setSelected(`ship-${ship.id}`);
         const india = India.getInstance();
         locations.forEach((seaZone) => {
@@ -8119,7 +8200,7 @@ class DirectorOfTradeTransfers {
     }
     updateInterfaceConfirm() {
         clearPossible();
-        updatePageTitle(_('Confirm transfers'));
+        updatePageTitle(_('Director of Trade: confirm transfers?'));
         addConfirmButton(() => {
             performAction('actDirectorOfTradeTransfers', {
                 transfers: this.transfers,
@@ -8245,10 +8326,13 @@ class EnlistWriter {
     onEnteringState(args) {
         debug('Entering EnlistWriter state');
         this.args = args;
+        const bar = Bar.getInstance();
+        bar.setAttention(['joco-india']);
         this.updateInterfaceInitialStep();
-        Bar.getInstance().goTo('joco-india');
+        bar.goTo('joco-india');
     }
     onLeavingState() {
+        Bar.getInstance().clearAttention();
         debug('Leaving EnlistWriter state');
     }
     setDescription(activePlayerIds, args) {
@@ -9017,15 +9101,18 @@ class ManagerOfShipping {
         this.placedExtraShips = {};
         this.placedPlayerShips = {};
         this.treasury = this.args.treasury;
-        Bar.getInstance().goTo('joco-india');
+        const bar = Bar.getInstance();
+        bar.setAttention(INDIA_TAB);
         this.updateInterfaceInitialStep();
+        bar.goTo(INDIA_TAB);
     }
     onLeavingState() {
+        Bar.getInstance().clearAttention();
         debug('Leaving ManagerOfShipping state');
     }
     setDescription(activePlayerIds, args) {
-        updatePageTitle(_('${tkn_playerName} may fit, buy and lease ships'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        updatePageTitle(_('Manager of Shipping: ${player_name} may fit, buy and lease ships'), {
+            player_name: getPlayerName(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -9034,7 +9121,7 @@ class ManagerOfShipping {
             this.updateInterfaceConfirm();
             return;
         }
-        updatePageTitle(_('${you} may fit, buy and lease ships (£${amount} remaining)'), { amount: this.treasury });
+        updatePageTitle(_('Manager of Shipping: ${you} may fit, buy and lease ships (£${amount} remaining)'), { amount: this.treasury });
         let playerShipsAvailable = false;
         this.args.playerShips.forEach((ship) => {
             const { id, type, name, owner: playerId } = ship;
@@ -9137,7 +9224,7 @@ class ManagerOfShipping {
     }
     updateInterfaceConfirm() {
         clearPossible();
-        updatePageTitle(_('Confirm ship placement'));
+        updatePageTitle(_('Manager of Shipping: confirm ship placement?'));
         addConfirmButton(() => {
             performAction('actManagerOfShipping', {
                 playerShips: this.getActionData(this.placedPlayerShips),
@@ -9334,15 +9421,17 @@ class MilitaryAffairsAssign {
         debug('Entering MilitaryAffairsAssign state');
         this.args = args;
         this.assignedOfficers = {};
+        const bar = Bar.getInstance();
+        bar.setAttention(INDIA_TAB);
         this.updateInterfaceInitialStep();
-        Bar.getInstance().goTo('joco-india');
+        bar.goTo(INDIA_TAB);
     }
     onLeavingState() {
         debug('Leaving MilitaryAffairsAssign state');
     }
     setDescription(activePlayerIds, args) {
-        updatePageTitle(_('${tkn_playerName} must assign officers-in-training'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        updatePageTitle(_('Military Affairs: ${player_name} must assign officers-in-training'), {
+            player_name: getPlayerName(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -9472,15 +9561,18 @@ class MilitaryAffairsTransfers {
             officers: {},
             regiments: {},
         };
-        Bar.getInstance().goTo('joco-india');
+        const bar = Bar.getInstance();
+        bar.setAttention(INDIA_TAB);
         this.updateInterfaceInitialStep();
+        bar.goTo(INDIA_TAB);
     }
     onLeavingState() {
+        Bar.getInstance().clearAttention();
         debug('Leaving MilitaryAffairsTransfers state');
     }
     setDescription(activePlayerIds, args) {
-        updatePageTitle(_('${tkn_playerName} may make Army transfers'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        updatePageTitle(_('Military Affairs: ${player_name} may make Army transfers'), {
+            player_name: getPlayerName(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
@@ -9490,7 +9582,7 @@ class MilitaryAffairsTransfers {
             this.updateInterfaceConfirm();
             return;
         }
-        updatePageTitle(_('${you} may make up to two Army transfers (${number} remaining)'), {
+        updatePageTitle(_('Military Affairs: ${you} may make up to two Army transfers (${number} remaining)'), {
             number: 2 - this.getTransferCount(),
         });
         Object.entries(this.args.options.regiments).forEach(([id, data]) => {
@@ -9514,7 +9606,7 @@ class MilitaryAffairsTransfers {
             this.addCancelButton();
         }
         else {
-            addPassButton(this.args.optionalAction);
+            addPassButton(this.args.optionalAction, _('Do not make any transfers'));
         }
     }
     updateInterfaceSelectArmy({ familyMember, regiment, locations, }) {
@@ -9534,9 +9626,7 @@ class MilitaryAffairsTransfers {
                 };
                 piece.location = to;
                 clearPossible();
-                await India.getInstance()
-                    .getArmy(presidencyId)
-                    .addPiece(piece.id);
+                await India.getInstance().getArmy(presidencyId).addPiece(piece.id);
                 this.updateInterfaceInitialStep();
             });
         });
@@ -9544,7 +9634,7 @@ class MilitaryAffairsTransfers {
     }
     updateInterfaceConfirm() {
         clearPossible();
-        updatePageTitle(_('Confirm transfers'));
+        updatePageTitle(_('Military Affairs: confirm transfers?'));
         addConfirmButton(() => {
             performAction('actMilitaryAffairsTransfers', {
                 transfers: {
@@ -9606,8 +9696,10 @@ class ParliamentMeetsSelectPolicy {
         this.primeMinisterDial.updateLeftArmPosition(this.args.left);
         this.primeMinisterDial.updateRightArmPosition(this.args.right);
         this.primeMinisterDial.showConsequenceOptions(true);
+        const bar = Bar.getInstance();
+        bar.setAttention(PARLIAMENT_TAB);
         this.updateInterfaceInitialStep();
-        Bar.getInstance().goTo('joco-parliament');
+        Bar.getInstance().goTo(PARLIAMENT_TAB);
     }
     onLeavingState() {
         debug('Leaving ParliamentMeetsSelectPolicy state');
@@ -9678,8 +9770,14 @@ class ParliamentMeetsCastVotes {
         this.treasury = this.args.votes.money;
         this.selectedEnterpriseCardIds = [];
         this.selectedLondonSeasonCardIds = [];
+        const bar = Bar.getInstance();
+        const attentionTabs = [PARLIAMENT_TAB];
+        if (args.votes.enterprises.length + args.votes.londonSeasonCards.length > 0) {
+            attentionTabs.push(PLAYER_AREAS_TAB);
+        }
+        bar.setAttention(attentionTabs);
         this.updateInterfaceInitialStep();
-        Bar.getInstance().goTo('joco-parliament');
+        Bar.getInstance().goTo(PARLIAMENT_TAB);
     }
     onLeavingState() {
         debug('Leaving ParliamentMeetsCastVotes state');
@@ -9693,7 +9791,7 @@ class ParliamentMeetsCastVotes {
     }
     updateInterfaceInitialStep() {
         clearPossible();
-        updatePageTitle(_('${you} may spend £ and enterprises to cast votes'), {});
+        updatePageTitle(_('${you} may spend £ and exhaust enterprises to cast votes'), {});
         const totalVotes = this.getTotalVoteCount();
         this.args.votes.enterprises.forEach((card) => {
             onClick(`enterprise-card-${card.id}`, () => this.handleCardClick(card.id, 'enterprise'));
@@ -10077,14 +10175,18 @@ class PresidentTrade {
         this.spend = args.proposal || 0;
         this.selectedRegionIds = [this.args.options.homeRegionId];
         this.updateInterfaceInitialStep();
-        Bar.getInstance().goTo('joco-india');
+        const bar = Bar.getInstance();
+        bar.setAttention(INDIA_TAB);
+        this.updateInterfaceInitialStep();
+        bar.goTo(INDIA_TAB);
     }
     onLeavingState() {
         debug('Leaving PresidentTrade state');
     }
     setDescription(activePlayerIds, args) {
-        updatePageTitle(_('${tkn_playerName} may Trade'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        updatePageTitle(_('${office}: ${player_name} may Trade'), {
+            office: getRoleName(args.officeId),
+            player_name: getPlayerName(activePlayerIds[0]),
             amount: args.proposal,
         });
     }
@@ -10095,7 +10197,8 @@ class PresidentTrade {
             this.setMinSpendAmount();
             return;
         }
-        updatePageTitle(_('Trade check: ${you} must select the regions in which you wish to trade (selected: ${selected})'), {
+        updatePageTitle(_('${office}: ${you} must select the regions in which you wish to trade (selected: ${selected})'), {
+            office: getRoleName(this.args.officeId),
             selected: this.selectedRegionIds.join(', '),
         });
         const staticData = StaticData.get();
@@ -10134,8 +10237,10 @@ class PresidentTrade {
         const penalty = this.selectedRegionIds.length - 1;
         const available = this.args.treasury - this.spend;
         const minSpend = this.selectedRegionIds.length;
-        updatePageTitle(_('Trade: ${you} may spend £1 per die'), {
+        updatePageTitle(_('${office}: ${you} may spend £1 per die (total: £${amount})'), {
+            office: getRoleName(this.args.officeId),
             available,
+            amount: this.spend,
             tkn_pound: 'pound',
         });
         const treasury = Company.getInstance().treasuries[this.args.officeId];
@@ -10171,9 +10276,10 @@ class PresidentTrade {
     }
     updateInterfaceConfirm() {
         clearPossible();
-        updatePageTitle(_('Make a check with ${number} dice to trade in ${tradeLog}?'), {
+        updatePageTitle(_('${office}: spend £${amount} to make a check with ${number} dice?'), {
+            office: getRoleName(this.args.officeId),
+            amount: this.spend,
             number: this.spend,
-            tradeLog: this.getTradeLog(),
         });
         addConfirmButton(() => this.performAction(true));
         this.addCancelButton();
@@ -10226,8 +10332,10 @@ class PresidentTradeFillOrders {
         this.args = args;
         this.filledOrders = [];
         this.balance = this.args.companyBalance;
+        const bar = Bar.getInstance();
+        bar.setAttention(INDIA_TAB);
         this.updateInterfaceInitialStep();
-        Bar.getInstance().goTo('joco-india');
+        bar.goTo(INDIA_TAB);
     }
     onLeavingState() {
         debug('Leaving PresidentTradeFillOrders state');
@@ -10347,8 +10455,10 @@ class ParliamentMeetsSelectLaw {
         this.primeMinisterDial.updateLeftArmPosition(this.args.dial);
         this.primeMinisterDial.updateRightArmPosition(this.args.dial);
         this.primeMinisterDial.showConsequenceOptions(true);
+        const bar = Bar.getInstance();
+        bar.setAttention(PARLIAMENT_TAB);
         this.updateInterfaceInitialStep();
-        Bar.getInstance().goTo('joco-parliament');
+        Bar.getInstance().goTo(PARLIAMENT_TAB);
     }
     onLeavingState() {
         this.args?.revealedLaws.forEach((law) => {
@@ -10371,17 +10481,17 @@ class ParliamentMeetsSelectLaw {
         }
         switch (numberOfRevealedLaws) {
             case 0:
-                updatePageTitle(_('${tkn_playerName} must draw and reveal a law'), {
-                    tkn_playerName: playerName,
+                updatePageTitle(_('Prime Minister: ${player_name} must draw and reveal a law'), {
+                    player_name: playerName,
                 });
                 break;
             case 3:
-                updatePageTitle(_('${tkn_playerName} must select a law'), {
-                    tkn_playerName: playerName,
+                updatePageTitle(_('Prime Minister: ${player_name} must select a law'), {
+                    player_name: playerName,
                 });
                 break;
             default:
-                updatePageTitle(_('${tkn_playerName} must select a law or draw and reveal another'), { tkn_playerName: playerName });
+                updatePageTitle(_('Prime Minister: ${player_name} must select a law or draw and reveal another'), { player_name: playerName });
                 break;
         }
     }
@@ -10434,8 +10544,8 @@ class ParliamentMeetsSelectLaw {
             setSelected(`law-card-${law.id}`);
         }
         updatePageTitle(action === 'draw'
-            ? _('Draw and reveal a law?')
-            : _('Bring ${lawName} up for a vote?'), {
+            ? _('Prime Minister: draw and reveal a law?')
+            : _('Prime Minister: bring ${lawName} up for a vote?'), {
             lawName: law ? _(getLawCard(law).title) : '',
         });
         addConfirmButton(() => {
@@ -10452,13 +10562,13 @@ class ParliamentMeetsSelectLaw {
         }
         switch (numberOfRevealedLaws) {
             case 0:
-                updatePageTitle(_('${you} must draw and reveal a law'), {});
+                updatePageTitle(_('Prime Minister: ${you} must draw and reveal a law'), {});
                 break;
             case 3:
-                updatePageTitle(_('${you} must select a law'), {});
+                updatePageTitle(_('Prime Minister: ${you} must select a law'), {});
                 break;
             default:
-                updatePageTitle(_('${you} must select a law or draw and reveal another'), {});
+                updatePageTitle(_('Prime Minister: ${you} must select a law or draw and reveal another'), {});
                 break;
         }
     }
@@ -10478,20 +10588,22 @@ class RevenuePayDividends {
         debug('Entering RevenuePayDividends state');
         this.args = args;
         this.selectedNumberOfDividends = 0;
+        const bar = Bar.getInstance();
+        bar.setAttention(COMPANY_TAB);
         this.updateInterfaceInitialStep();
-        Bar.getInstance().goTo('joco-company');
+        bar.goTo(COMPANY_TAB);
     }
     onLeavingState() {
         debug('Leaving RevenuePayDividends state');
     }
     setDescription(activePlayerIds, args) {
-        updatePageTitle(_('${tkn_playerName} may pay dividends'), {
-            tkn_playerName: getPlayerName(activePlayerIds[0]),
+        updatePageTitle(_('Chairman: ${player_name} may pay dividends'), {
+            player_name: getPlayerName(activePlayerIds[0]),
         });
     }
     updateInterfaceInitialStep() {
         this.game.clearPossible();
-        updatePageTitle(_('${you} may pay up to ${maxNumber} dividends for £${amount} each'), {
+        updatePageTitle(_('Chairman: ${you} may pay up to ${maxNumber} dividends for £${amount} each'), {
             maxNumber: this.args.maxNumberOfDividends,
             amount: this.args.costPerDividend,
         });
@@ -10532,9 +10644,7 @@ class RevenuePayDividends {
             updatePageTitle(_('Do not pay any dividends?'));
         }
         else {
-            updatePageTitle(this.selectedNumberOfDividends === 1
-                ? _('Spend ${amount} ${tkn_pound} to pay ${number} dividend?')
-                : _('Spend ${amount} ${tkn_pound} to pay ${number} dividends?'), {
+            updatePageTitle(_('Chairman: spend £${amount} to pay ${number} dividend(s)?'), {
                 number: this.selectedNumberOfDividends,
                 amount: this.args.costPerDividend * this.selectedNumberOfDividends,
                 tkn_pound: 'pound',
@@ -10600,9 +10710,13 @@ class SeekShare {
     onEnteringState(args) {
         debug('Entering SeekShare state');
         this.args = args;
+        const bar = Bar.getInstance();
+        bar.setAttention(COMPANY_TAB);
         this.updateInterfaceInitialStep();
+        bar.goTo(COMPANY_TAB);
     }
     onLeavingState() {
+        Bar.getInstance().clearAttention();
         debug('Leaving SeekShare state');
     }
     setDescription(activePlayerIds, args) {
@@ -10614,7 +10728,6 @@ class SeekShare {
     }
     updateInterfaceInitialStep() {
         this.game.clearPossible();
-        Bar.getInstance().goTo('joco-company');
         updatePageTitle(this.args.source === OPPORTUNITY_MARKER ? _('${you} may select an additional place on the Stock Exchange track (opportunity marker)') : _('${you} must select a place on the Stock Exchange track'), {
             tkn_icon: WRITER,
         });
@@ -11429,13 +11542,16 @@ class Game {
         if (this.states[stateName]) {
             this.states[stateName].getInstance().onLeavingState();
         }
+        Bar.getInstance().clearAttention();
         this.clearPossible();
     }
     updateMakeInactiveButton() {
         const playerId = this.getPlayerId();
-        const canMakeInactive = Array.isArray(this.activePlayerIds) && this.bga.players.isCurrentPlayerActive() && (this.currentStateName === 'WaitForOffer' ||
-            !this.activePlayerIds?.includes(playerId) ||
-            this.completedPlayerIds.includes(playerId));
+        const canMakeInactive = Array.isArray(this.activePlayerIds) &&
+            this.bga.players.isCurrentPlayerActive() &&
+            (this.currentStateName === 'WaitForOffer' ||
+                !this.activePlayerIds?.includes(playerId) ||
+                this.completedPlayerIds.includes(playerId));
         if (canMakeInactive) {
             Interaction.use().addSecondaryActionButton({
                 id: 'make-inactive',
@@ -11590,7 +11706,7 @@ class Game {
             }
         }
     }
-    addLogTooltip({ tooltipId, cardId: inputCardId }) {
+    addLogTooltip({ tooltipId, cardId: inputCardId, }) {
         const tooltipManager = TooltipManager.getInstance();
         const [cardId, data] = inputCardId.split(':');
         if (cardId.startsWith('BlackmailCard')) {

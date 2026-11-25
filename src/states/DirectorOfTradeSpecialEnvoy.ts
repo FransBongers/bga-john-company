@@ -1,3 +1,4 @@
+import { Bar } from '../bar';
 import {
   debug,
   updatePageTitle,
@@ -14,6 +15,7 @@ import {
   CommonStateArgs,
 } from '../boilerplate';
 import { GameState } from '../boilerplate';
+import { COMPANY_TAB } from '../constants';
 import { GameAlias } from '../types';
 
 interface OnEnteringDirectorOfTradeSpecialEnvoyArgs extends CommonStateArgs {
@@ -42,10 +44,14 @@ export class DirectorOfTradeSpecialEnvoy implements GameState<OnEnteringDirector
     debug('Entering DirectorOfTradeSpecialEnvoy state');
     this.args = args;
     this.spend = args.proposal || 0;
+    const bar = Bar.getInstance();
+    bar.setAttention(COMPANY_TAB);
     this.updateInterfaceInitialStep();
+    bar.goTo(COMPANY_TAB);
   }
 
   onLeavingState() {
+    Bar.getInstance().clearAttention();
     debug('Leaving DirectorOfTradeSpecialEnvoy state');
   }
 
@@ -56,25 +62,28 @@ export class DirectorOfTradeSpecialEnvoy implements GameState<OnEnteringDirector
     if (args.proposal > 0) {
       updatePageTitle(
         _(
-          'Special Envoy: ${tkn_playerName} proposes to spend £${amount} to make a check',
+          'Director of Trade: ${player_name} proposes to spend £${amount} to make a check',
         ),
         {
-          tkn_playerName: getPlayerName(activePlayerIds[0]),
+          player_name: getPlayerName(activePlayerIds[0]),
           amount: args.proposal,
           tkn_pound: 'pound',
         },
       );
     } else if (args.proposal === 0) {
       updatePageTitle(
-        _('Special Envoy: ${tkn_playerName} proposes not to make a check'),
+        _('Director of Trade: ${player_name} proposes not to make a check'),
         {
-          tkn_playerName: getPlayerName(activePlayerIds[0]),
+          player_name: getPlayerName(activePlayerIds[0]),
         },
       );
     } else {
-      updatePageTitle(_('Special Envoy: ${tkn_playerName} may make a check'), {
-        tkn_playerName: getPlayerName(activePlayerIds[0]),
-      });
+      updatePageTitle(
+        _('Director of Trade: ${player_name} may make a check'),
+        {
+          player_name: getPlayerName(activePlayerIds[0]),
+        },
+      );
     }
   }
 
@@ -99,9 +108,12 @@ export class DirectorOfTradeSpecialEnvoy implements GameState<OnEnteringDirector
 
     const available = this.args.treasury - this.spend;
 
-    updatePageTitle(_('Special Envoy: ${you} may spend £1 per die'), {
-      available,
-    });
+    updatePageTitle(
+      _('Director of Trade: ${you} may spend £1 per die to make a check'),
+      {
+        available,
+      },
+    );
 
     addSecondaryActionButton({
       id: 'minus_btn',
@@ -119,6 +131,7 @@ export class DirectorOfTradeSpecialEnvoy implements GameState<OnEnteringDirector
         number: this.spend,
       }),
       callback: () => this.updateInterfaceConfirm(),
+      extraClasses: this.spend === 0 ? DISABLED : '',
     });
 
     addSecondaryActionButton({
@@ -143,7 +156,7 @@ export class DirectorOfTradeSpecialEnvoy implements GameState<OnEnteringDirector
   private updateInterfaceConfirm() {
     clearPossible();
 
-    updatePageTitle(_('Special Envoy: make a check with ${number} dice?'), {
+    updatePageTitle(_('Director of Trade: make a check with ${number} dice?'), {
       number: this.spend,
     });
 

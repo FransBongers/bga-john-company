@@ -13,6 +13,7 @@ import {
   performAction,
   addDangerActionButton,
 } from '../boilerplate';
+import { INDIA_TAB } from '../constants';
 import { India } from '../india';
 import {
   CommonStateArgs,
@@ -77,10 +78,15 @@ export class DirectorOfTradeTransfers implements GameState<OnEnteringDirectorOfT
       ships: {},
       writers: {},
     };
+
+    const bar = Bar.getInstance();
+    bar.setAttention(INDIA_TAB);
     this.updateInterfaceInitialStep();
+    bar.goTo(INDIA_TAB);
   }
 
   onLeavingState() {
+    Bar.getInstance().clearAttention();
     debug('Leaving DirectorOfTradeTransfers state');
   }
 
@@ -88,9 +94,12 @@ export class DirectorOfTradeTransfers implements GameState<OnEnteringDirectorOfT
     activePlayerIds: number,
     args: OnEnteringDirectorOfTradeTransfersArgs,
   ) {
-    updatePageTitle(_('${tkn_playerName} may move writers or ships'), {
-      tkn_playerName: getPlayerName(activePlayerIds[0]),
-    });
+    updatePageTitle(
+      _('Director of Trade: ${player_name} may transfer writers or ships'),
+      {
+        player_name: getPlayerName(activePlayerIds[0]),
+      },
+    );
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########
@@ -111,7 +120,6 @@ export class DirectorOfTradeTransfers implements GameState<OnEnteringDirectorOfT
 
   private updateInterfaceInitialStep() {
     this.game.clearPossible();
-    Bar.getInstance().goTo('joco-india');
 
     const transferCount = this.getTransferCount();
     if (transferCount === 2) {
@@ -120,7 +128,9 @@ export class DirectorOfTradeTransfers implements GameState<OnEnteringDirectorOfT
     }
 
     updatePageTitle(
-      _('${you} may make up to two transfers (${number} remaining)'),
+      _(
+        'Director of Trade: ${you} may transfer up to two writers or ships (${number} remaining)',
+      ),
       {
         number: 2 - this.getTransferCount(),
       },
@@ -142,7 +152,7 @@ export class DirectorOfTradeTransfers implements GameState<OnEnteringDirectorOfT
       });
       this.addCancelButton();
     } else {
-      addPassButton(this.args.optionalAction);
+      addPassButton(this.args.optionalAction, _('Do not make any transfers'));
     }
   }
 
@@ -158,12 +168,11 @@ export class DirectorOfTradeTransfers implements GameState<OnEnteringDirectorOfT
     const writerElt = document.getElementById(writer.id)!;
     setSelected(writerElt);
 
-    updatePageTitle(_('${you} must select a Presidency'));
-
+    updatePageTitle(_('Director of Trade: ${you} must select a Presidency'));
 
     locations.forEach((newLocation) => {
       const presidencyId = newLocation.split('_')[1];
-      
+
       onClick(presidencyId, async () => {
         clearPossible();
         this.transfers.writers[writer.id] = {
@@ -191,7 +200,7 @@ export class DirectorOfTradeTransfers implements GameState<OnEnteringDirectorOfT
   }) {
     clearPossible();
 
-    updatePageTitle(_('${you} must select a sea zone'));
+    updatePageTitle(_('Director of Trade: ${you} must select a sea zone'));
     setSelected(`ship-${ship.id}`);
     const india = India.getInstance();
 
@@ -230,7 +239,7 @@ export class DirectorOfTradeTransfers implements GameState<OnEnteringDirectorOfT
 
   private updateInterfaceConfirm() {
     clearPossible();
-    updatePageTitle(_('Confirm transfers'));
+    updatePageTitle(_('Director of Trade: confirm transfers?'));
 
     addConfirmButton(() => {
       performAction('actDirectorOfTradeTransfers', {

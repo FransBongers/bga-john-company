@@ -26,6 +26,37 @@ class MilitaryAffairsAssign extends \Bga\Games\JohnCompany\Models\AtomicAction
     return ST_MILITARY_AFFAIRS_ASSIGN;
   }
 
+  // ..######..########....###....########.########
+  // .##....##....##......##.##......##....##......
+  // .##..........##.....##...##.....##....##......
+  // ..######.....##....##.....##....##....######..
+  // .......##....##....#########....##....##......
+  // .##....##....##....##.....##....##....##......
+  // ..######.....##....##.....##....##....########
+
+  // ....###.....######..########.####..#######..##....##
+  // ...##.##...##....##....##.....##..##.....##.###...##
+  // ..##...##..##..........##.....##..##.....##.####..##
+  // .##.....##.##..........##.....##..##.....##.##.##.##
+  // .#########.##..........##.....##..##.....##.##..####
+  // .##.....##.##....##....##.....##..##.....##.##...###
+  // .##.....##..######.....##....####..#######..##....##
+
+
+  public function stMilitaryAffairsAssign()
+  {
+    $stateArgs = $this->argsMilitaryAffairsAssign();
+    if ($stateArgs['skipOnEnteringState']) {
+      $playerId = $this->getActivePlayerIds()[0];
+      $player = Players::get($playerId);
+      Notifications::message('${player_name} cannot assign any officers-in-training', [
+        'player' => $player,
+      ]);
+      $this->setPlayerActionCompleted($playerId);
+      $this->resolveAction(['automatic' => true]);
+    }
+  }
+
   // ....###....########...######....######.
   // ...##.##...##.....##.##....##..##....##
   // ..##...##..##.....##.##........##......
@@ -47,6 +78,7 @@ class MilitaryAffairsAssign extends \Bga\Games\JohnCompany\Models\AtomicAction
         return Locations::armyOfReady($presidencyId);
       }, [BOMBAY_PRESIDENCY, MADRAS_PRESIDENCY, BENGAL_PRESIDENCY]),
       'officersInTraining' => $officersInTraining,
+      'skipOnEnteringState' => count($officersInTraining) === 0
     ];
 
     return $data;

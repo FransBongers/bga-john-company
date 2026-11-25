@@ -1,4 +1,4 @@
-import { getPlayer } from '../boilerplate';
+import { formatStringRecursive, getPlayer } from '../boilerplate';
 import {
   tplIcon,
   tplPassedLawTokenIcon,
@@ -83,10 +83,18 @@ export const getTokenDiv = ({
     case LOG_TOKEN_CLIMATE:
       return tplLogTokenClimate(value);
     case LOG_TOKEN_ENTERPRISE_CARD:
+      const enterpriseCard = StaticData.get().enterpriseCard(
+        value.split(':')[0],
+      );
       return tplTextWithTooltip(
         game,
         value,
-        StaticData.get().enterpriseCard(value.split(':')[0]).name,
+        enterpriseCard.shipId
+          ? formatStringRecursive('${enterpriseName} (${shipName})', {
+              enterpriseName: _(enterpriseCard.name),
+              shipName: _(enterpriseCard.shipId),
+            })
+          : _(enterpriseCard.name),
       );
     // return tlpLogTokenText({
     //   text: StaticData.get().enterpriseCard(value).name,
@@ -172,7 +180,7 @@ export const getTokenDiv = ({
         game,
         value,
         StaticData.get().promiseCard(value).title,
-        getPlayer(Number(value.split('_')[1])).getColor()
+        getPlayer(Number(value.split('_')[1])).getColor(),
       );
     case LOG_TOKEN_UNREST:
       return tplLogTokenCube('unrest');
@@ -183,7 +191,12 @@ export const getTokenDiv = ({
   }
 };
 
-const tplTextWithTooltip = (game: GameAlias, cardId: string, text: string, color?: string) => {
+const tplTextWithTooltip = (
+  game: GameAlias,
+  cardId: string,
+  text: string,
+  color?: string,
+) => {
   const cardNameTooltipId = `tooltip_${game._last_tooltip_id}`;
   game.tooltipsToMap.push([game._last_tooltip_id, cardId]);
   game._last_tooltip_id++;

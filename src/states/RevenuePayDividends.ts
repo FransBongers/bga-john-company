@@ -12,6 +12,7 @@ import {
   addConfirmButton,
   performAction,
 } from '../boilerplate';
+import { COMPANY_TAB } from '../constants';
 import { CommonStateArgs, GameState, GameAlias } from '../types';
 
 interface OnEnteringRevenuePayDividendsArgs extends CommonStateArgs {
@@ -38,8 +39,10 @@ export class RevenuePayDividends implements GameState<OnEnteringRevenuePayDivide
     debug('Entering RevenuePayDividends state');
     this.args = args;
     this.selectedNumberOfDividends = 0;
+    const bar = Bar.getInstance();
+    bar.setAttention(COMPANY_TAB);
     this.updateInterfaceInitialStep();
-    Bar.getInstance().goTo('joco-company');
+    bar.goTo(COMPANY_TAB);
   }
 
   onLeavingState() {
@@ -50,12 +53,9 @@ export class RevenuePayDividends implements GameState<OnEnteringRevenuePayDivide
     activePlayerIds: number,
     args: OnEnteringRevenuePayDividendsArgs,
   ) {
-    updatePageTitle(
-      _('${tkn_playerName} may pay dividends'),
-      {
-        tkn_playerName: getPlayerName(activePlayerIds[0]),
-      },
-    );
+    updatePageTitle(_('Chairman: ${player_name} may pay dividends'), {
+      player_name: getPlayerName(activePlayerIds[0]),
+    });
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########
@@ -79,7 +79,7 @@ export class RevenuePayDividends implements GameState<OnEnteringRevenuePayDivide
 
     updatePageTitle(
       _(
-        '${you} may pay up to ${maxNumber} dividends for £${amount} each',
+        'Chairman: ${you} may pay up to ${maxNumber} dividends for £${amount} each',
       ),
       {
         maxNumber: this.args.maxNumberOfDividends,
@@ -130,9 +130,7 @@ export class RevenuePayDividends implements GameState<OnEnteringRevenuePayDivide
       updatePageTitle(_('Do not pay any dividends?'));
     } else {
       updatePageTitle(
-        this.selectedNumberOfDividends === 1
-          ? _('Spend ${amount} ${tkn_pound} to pay ${number} dividend?')
-          : _('Spend ${amount} ${tkn_pound} to pay ${number} dividends?'),
+        _('Chairman: spend £${amount} to pay ${number} dividend(s)?'),
         {
           number: this.selectedNumberOfDividends,
           amount: this.args.costPerDividend * this.selectedNumberOfDividends,

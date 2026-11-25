@@ -13,7 +13,7 @@ import {
   updatePageTitle,
 } from '../boilerplate/utility';
 import { Company } from '../company';
-import { CROWN_PLAYER_ID, PLUS, MINUS } from '../constants';
+import { CROWN_PLAYER_ID, PLUS, MINUS, INDIA_TAB, COMPANY_TAB } from '../constants';
 import { PlayerManager } from '../player-manager';
 import { CommonStateArgs, GameAlias, GameState } from '../types';
 
@@ -53,12 +53,15 @@ export class Chairman implements GameState<OnEnteringChairmanArgs> {
     this.args = args;
     this.companyBalance = args.companyBalance;
     this.currentDebt = args.debtOptions.currentDebt;
+    const bar = Bar.getInstance();
+    bar.setAttention([COMPANY_TAB, INDIA_TAB]);
     this.updateInterfaceInitialStep();
-    Bar.getInstance().goTo('joco-company');
+    bar.goTo('joco-company');
   }
 
   onLeavingState() {
     debug('Leaving Chairman state');
+    Bar.getInstance().clearAttention();
     this.deactivateTreasuries();
   }
 

@@ -46,11 +46,14 @@ export class EnlistWriter implements GameState<OnEnteringEnlistWriterArgs> {
   onEnteringState(args: OnEnteringEnlistWriterArgs) {
     debug('Entering EnlistWriter state');
     this.args = args;
+    const bar = Bar.getInstance();
+    bar.setAttention(['joco-india']);
     this.updateInterfaceInitialStep();
-    Bar.getInstance().goTo('joco-india');
+    bar.goTo('joco-india');
   }
 
   onLeavingState() {
+    Bar.getInstance().clearAttention();
     debug('Leaving EnlistWriter state');
   }
 

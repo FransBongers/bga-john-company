@@ -14,7 +14,7 @@ import {
   setSelected,
   updatePageTitle,
 } from '../boilerplate';
-import { OLD_IDEAS_MADE_NEW_ID } from '../constants';
+import { OLD_IDEAS_MADE_NEW_ID, PARLIAMENT_TAB } from '../constants';
 import { Parliament } from '../parliament';
 import { PrimeMinisterDial } from '../parliament/prime-minister-dial';
 import { GameAlias, JocoLawCardBase } from '../types';
@@ -49,8 +49,10 @@ export class ParliamentMeetsSelectLaw implements GameState<OnEnteringParliamentM
     this.primeMinisterDial.updateLeftArmPosition(this.args.dial);
     this.primeMinisterDial.updateRightArmPosition(this.args.dial);
     this.primeMinisterDial.showConsequenceOptions(true);
+    const bar = Bar.getInstance();
+    bar.setAttention(PARLIAMENT_TAB);
     this.updateInterfaceInitialStep();
-    Bar.getInstance().goTo('joco-parliament');
+    Bar.getInstance().goTo(PARLIAMENT_TAB);
   }
 
   onLeavingState() {
@@ -80,19 +82,19 @@ export class ParliamentMeetsSelectLaw implements GameState<OnEnteringParliamentM
 
     switch (numberOfRevealedLaws) {
       case 0:
-        updatePageTitle(_('${tkn_playerName} must draw and reveal a law'), {
-          tkn_playerName: playerName,
+        updatePageTitle(_('Prime Minister: ${player_name} must draw and reveal a law'), {
+          player_name: playerName,
         });
         break;
       case 3:
-        updatePageTitle(_('${tkn_playerName} must select a law'), {
-          tkn_playerName: playerName,
+        updatePageTitle(_('Prime Minister: ${player_name} must select a law'), {
+          player_name: playerName,
         });
         break;
       default:
         updatePageTitle(
-          _('${tkn_playerName} must select a law or draw and reveal another'),
-          { tkn_playerName: playerName },
+          _('Prime Minister: ${player_name} must select a law or draw and reveal another'),
+          { player_name: playerName },
         );
         break;
     }
@@ -174,8 +176,8 @@ export class ParliamentMeetsSelectLaw implements GameState<OnEnteringParliamentM
 
     updatePageTitle(
       action === 'draw'
-        ? _('Draw and reveal a law?')
-        : _('Bring ${lawName} up for a vote?'),
+        ? _('Prime Minister: draw and reveal a law?')
+        : _('Prime Minister: bring ${lawName} up for a vote?'),
       {
         lawName: law ? _(getLawCard(law).title) : '',
       },
@@ -205,14 +207,14 @@ export class ParliamentMeetsSelectLaw implements GameState<OnEnteringParliamentM
     }
     switch (numberOfRevealedLaws) {
       case 0:
-        updatePageTitle(_('${you} must draw and reveal a law'), {});
+        updatePageTitle(_('Prime Minister: ${you} must draw and reveal a law'), {});
         break;
       case 3:
-        updatePageTitle(_('${you} must select a law'), {});
+        updatePageTitle(_('Prime Minister: ${you} must select a law'), {});
         break;
       default:
         updatePageTitle(
-          _('${you} must select a law or draw and reveal another'),
+          _('Prime Minister: ${you} must select a law or draw and reveal another'),
           {},
         );
         break;

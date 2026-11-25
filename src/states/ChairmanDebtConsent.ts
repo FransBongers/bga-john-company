@@ -4,9 +4,10 @@ import {
   debug,
   getPlayerName,
   performAction,
-  setSelected,
   updatePageTitle,
 } from '../boilerplate/utility';
+import { Bar } from '../bar';
+import { COMPANY_TAB } from '../constants';
 import { SHARE } from '../constants';
 import { CommonStateArgs, GameAlias, GameState } from '../types';
 
@@ -33,11 +34,14 @@ export class ChairmanDebtConsent implements GameState<OnEnteringChairmanDebtCons
   onEnteringState(args: OnEnteringChairmanDebtConsentArgs) {
     debug('Entering ChairmanDebtConsent state');
     this.args = args;
-
+    const bar = Bar.getInstance();
+    bar.setAttention(COMPANY_TAB);
     this.updateInterfaceInitialStep();
+    bar.goTo(COMPANY_TAB);
   }
 
   onLeavingState() {
+    Bar.getInstance().clearAttention();
     debug('Leaving ChairmanDebtConsent state');
   }
 

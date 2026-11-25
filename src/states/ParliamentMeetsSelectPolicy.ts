@@ -12,6 +12,7 @@ import {
   performAction,
   updatePageTitle,
 } from '../boilerplate';
+import { PARLIAMENT_TAB } from '../constants';
 import { getPolicyConsequenceTranslation } from '../icons/templates';
 import { Parliament } from '../parliament';
 import { PrimeMinisterDial } from '../parliament/prime-minister-dial';
@@ -50,8 +51,10 @@ export class ParliamentMeetsSelectPolicy implements GameState<OnEnteringParliame
     this.primeMinisterDial.updateLeftArmPosition(this.args.left);
     this.primeMinisterDial.updateRightArmPosition(this.args.right);
     this.primeMinisterDial.showConsequenceOptions(true);
+    const bar = Bar.getInstance();
+    bar.setAttention(PARLIAMENT_TAB);
     this.updateInterfaceInitialStep();
-    Bar.getInstance().goTo('joco-parliament');
+    Bar.getInstance().goTo(PARLIAMENT_TAB);
   }
 
   onLeavingState() {

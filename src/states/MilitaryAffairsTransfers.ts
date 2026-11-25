@@ -12,6 +12,7 @@ import {
   performAction,
   addDangerActionButton,
 } from '../boilerplate';
+import { INDIA_TAB } from '../constants';
 import { India } from '../india';
 import {
   CommonStateArgs,
@@ -75,11 +76,14 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
       officers: {},
       regiments: {},
     };
-    Bar.getInstance().goTo('joco-india');
+    const bar = Bar.getInstance();
+    bar.setAttention(INDIA_TAB);
     this.updateInterfaceInitialStep();
+    bar.goTo(INDIA_TAB);
   }
 
   onLeavingState() {
+    Bar.getInstance().clearAttention();
     debug('Leaving MilitaryAffairsTransfers state');
   }
 
@@ -87,9 +91,12 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
     activePlayerIds: number,
     args: OnEnteringMilitaryAffairsTransfersArgs,
   ) {
-    updatePageTitle(_('${tkn_playerName} may make Army transfers'), {
-      tkn_playerName: getPlayerName(activePlayerIds[0]),
-    });
+    updatePageTitle(
+      _('Military Affairs: ${player_name} may make Army transfers'),
+      {
+        player_name: getPlayerName(activePlayerIds[0]),
+      },
+    );
   }
 
   //  .####.##....##.########.########.########..########....###.....######..########
@@ -118,7 +125,9 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
     }
 
     updatePageTitle(
-      _('${you} may make up to two Army transfers (${number} remaining)'),
+      _(
+        'Military Affairs: ${you} may make up to two Army transfers (${number} remaining)',
+      ),
       {
         number: 2 - this.getTransferCount(),
       },
@@ -145,7 +154,7 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
       });
       this.addCancelButton();
     } else {
-      addPassButton(this.args.optionalAction);
+      addPassButton(this.args.optionalAction, _('Do not make any transfers'));
     }
   }
 
@@ -176,9 +185,7 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
         };
         piece.location = to;
         clearPossible();
-        await India.getInstance()
-          .getArmy(presidencyId)
-          .addPiece(piece.id);
+        await India.getInstance().getArmy(presidencyId).addPiece(piece.id);
         this.updateInterfaceInitialStep();
       });
     });
@@ -188,7 +195,7 @@ export class MilitaryAffairsTransfers implements GameState<OnEnteringMilitaryAff
 
   private updateInterfaceConfirm() {
     clearPossible();
-    updatePageTitle(_('Confirm transfers'));
+    updatePageTitle(_('Military Affairs: confirm transfers?'));
 
     addConfirmButton(() => {
       performAction('actMilitaryAffairsTransfers', {

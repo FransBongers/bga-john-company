@@ -44,6 +44,9 @@ import {
   PRIME_MINISTER,
   LEADER_OF_THE_OPPOSITION,
   OPPOSITION,
+  PRESIDENT_OF_BOMBAY,
+  PRESIDENT_OF_MADRAS,
+  PRESIDENT_OF_BENGAL,
 } from './constants';
 import { tknShipValue } from './logs/templates';
 import { getPhaseName } from './phase-tracker/translations';
@@ -354,7 +357,26 @@ export const getRoleName = (role: string) => {
       return _('Leader of the Opposition');
     case OPPOSITION:
       return _('Opposition');
+    case PRESIDENT_OF_BENGAL:
+      return _('President of Bengal');
+    case PRESIDENT_OF_BOMBAY:
+      return _('President of Bombay');
+    case PRESIDENT_OF_MADRAS:
+      return _('President of Madras');
     default:
       throw new Error(`Unknown role: ${role}`);
+  }
+};
+
+export const getCommanderTitleForPresidency = (presidencyId: string) => {
+  switch (presidencyId) {
+    case BENGAL_PRESIDENCY:
+      return _('Commander of Bengal');
+    case BOMBAY_PRESIDENCY:
+      return _('Commander of Bombay');
+    case MADRAS_PRESIDENCY:
+      return _('Commander of Madras');
+    default:
+      throw new Error(`Unknown presidency: ${presidencyId}`);
   }
 };

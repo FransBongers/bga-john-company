@@ -10,7 +10,7 @@ import {
   performAction,
   addDangerActionButton,
 } from '../boilerplate';
-import { OFFICER_IN_TRAINING } from '../constants';
+import { INDIA_TAB, OFFICER_IN_TRAINING } from '../constants';
 import { India } from '../india';
 import {
   CommonStateArgs,
@@ -50,8 +50,10 @@ export class MilitaryAffairsAssign implements GameState<OnEnteringMilitaryAffair
     this.args = args;
     this.assignedOfficers = {};
 
+    const bar = Bar.getInstance();
+    bar.setAttention(INDIA_TAB);
     this.updateInterfaceInitialStep();
-    Bar.getInstance().goTo('joco-india');
+    bar.goTo(INDIA_TAB);
   }
 
   onLeavingState() {
@@ -63,9 +65,9 @@ export class MilitaryAffairsAssign implements GameState<OnEnteringMilitaryAffair
     args: OnEnteringMilitaryAffairsAssignArgs,
   ) {
     updatePageTitle(
-      _('${tkn_playerName} must assign officers-in-training'),
+      _('Military Affairs: ${player_name} must assign officers-in-training'),
       {
-        tkn_playerName: getPlayerName(activePlayerIds[0]),
+        player_name: getPlayerName(activePlayerIds[0]),
       },
     );
   }

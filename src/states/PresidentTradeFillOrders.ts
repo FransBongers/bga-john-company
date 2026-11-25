@@ -12,7 +12,7 @@ import {
   updatePageTitle,
 } from '../boilerplate';
 import { Company } from '../company';
-import { FILLED, OPEN } from '../constants';
+import { FILLED, INDIA_TAB, OPEN } from '../constants';
 import { StaticData } from '../static-data';
 import type {
   CommonStateArgs,
@@ -50,8 +50,10 @@ export class PresidentTradeFillOrders implements GameState<OnEnteringPresidentTr
     this.args = args;
     this.filledOrders = [];
     this.balance = this.args.companyBalance;
+    const bar = Bar.getInstance();
+    bar.setAttention(INDIA_TAB);
     this.updateInterfaceInitialStep();
-    Bar.getInstance().goTo('joco-india');
+    bar.goTo(INDIA_TAB);
   }
 
   onLeavingState() {
